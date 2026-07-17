@@ -1,0 +1,1640 @@
+[
+ {
+  "candidateId": "selenium-001",
+  "productName": "365 데이 부스터",
+  "productNameEn": "365 데이 부스터",
+  "manufacturer": "(주)세종바이오팜",
+  "manufacturerEn": null,
+  "statementNo": "20190009105380",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 하얀 분홍색의 분말\n2. 셀레늄 : 표시량(25 μg/ 3.5g)의 80~150%\n3. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 또는 물과 함께 섭취하십시오.",
+   "caution": "1) 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 섭취량 및 섭취방법을 준수하십시오.\n5) 소비기한이 경과한 제품은 섭취하지 마십시오.\n6) 영·유아, 임신·수유부나 질환보유자 또는 약 복용 중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 하얀 분홍색의 분말",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "μg",
+    "basisAmount": 3.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 25μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>365 데이 부스터<small>셀레늄</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 셀레늄 <b>25μg</b>를 표시량으로 담았습니다(표시 기준 3.5g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>25μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 하얀 분홍색의 분말 · (주)세종바이오팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(25μg/3.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 하얀 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 25μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>365 데이 부스터<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)세종바이오팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>25μg</b> of labelled Selenium (per 3.5g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>25μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세종바이오팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (25μg / 3.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 하얀 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-002",
+  "productName": "Life-space Ubiquinol CoQ10",
+  "productNameEn": "Life-space Ubiquinol CoQ10",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200062105",
+  "category": "hff",
+  "source": {
+   "mainFunction": "셀레늄 : 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색 또는 흰 노란색의 내용물을 함유한 하얀색 경질캡슐\n(2) 셀레늄 : 표시량(60 μg/0.9g)의 80%~150%\n(3) 대장균군 : 음성\n(4) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색 또는 흰 노란색의 내용물을 함유한 하얀색 경질캡슐",
+   "storage": "(1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 60,
+    "unit": "μg",
+    "basisAmount": 0.9,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 60μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>Life-space Ubiquinol CoQ10<small>셀레늄</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 셀레늄 <b>60μg</b>를 표시량으로 담았습니다(표시 기준 0.9g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 셀레늄 <b>60μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색 또는 흰 노란색의 내용물을 함유한 하얀색 경질캡슐 · (주)서흥 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(60μg/0.9g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색 또는 흰 노란색의 내용물을 함유한 하얀색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 60μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Life-space Ubiquinol CoQ10<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>60μg</b> of labelled Selenium (per 0.9g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>60μg</b> of Selenium per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (60μg / 0.9g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색 또는 흰 노란색의 내용물을 함유한 하얀색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-003",
+  "productName": "Super antioxidants",
+  "productNameEn": "Super antioxidants",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150831942",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미·이취가 없는 노란 하얀색 또는 하얀색의 내용물을 함유한 백색의 경질캡슐\n(2) 셀레늄 : 표시량(16.5 μg/450 mg)의 80% 이상 150% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 노란 하얀색 또는 하얀색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "뚜껑을 꼭 닫아 건조하고 서늘한 곳에 보관하십시오. 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 잘 밀봉하여 보관하시기 바랍니다.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>Super antioxidants<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>16.5μg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>16.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 노란 하얀색 또는 하얀색의 내용물을 함유한 백색의 경질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 노란 하얀색 또는 하얀색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 뚜껑을 꼭 닫아 건조하고 서늘한 곳에 보관하십시오. 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 잘 밀봉하여 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Super antioxidants<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>16.5μg</b> of labelled Selenium (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>16.5μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 노란 하얀색 또는 하얀색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 뚜껑을 꼭 닫아 건조하고 서늘한 곳에 보관하십시오. 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 잘 밀봉하여 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-004",
+  "productName": "뉴빛셀",
+  "productNameEn": "뉴빛셀",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046514",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 백색의 경질캡슐\n2) 셀렌 : 표시량(55.0㎍/1,500mg)의 80~150% 이어야 한다.\n3) 붕해시험 : 20분 이내\n4) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 백색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 1500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>뉴빛셀<small>셀레늄</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 1500mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 백색의 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>뉴빛셀<small>Selenium</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>55μg</b> of labelled Selenium (per 1500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-005",
+  "productName": "뉴트리마인 셀레늄",
+  "productNameEn": "뉴트리마인 셀레늄",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "201900163401",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한회색의 원형정제 \n2. 셀렌 : 표시량 (55.0 ㎍ / 100mg)의 80~150% 이어야 한다.\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내 붕해",
+   "intake": "1일 1회, 1회 1정",
+   "caution": "1)과량 섭취 시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오. \n2)유통기한이 경과된 제품은 섭취하지 마십시오. \n3)원료 특성상 습기에 매우 민감하여 개봉 전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 연한회색의 원형정제",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 셀레늄<small>셀레늄</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 100mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 연한회색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 연한회색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 셀레늄<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>55μg</b> of labelled Selenium (per 100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 100mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 연한회색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-006",
+  "productName": "더블라이프 프리",
+  "productNameEn": "더블라이프 프리",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007329",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 원형 제피정제\n② 셀렌 : 표시량 (16.5 ㎍/3000 mg)의 80～150%\n③ 대장균군 : 음성\n④ 붕해시험 : 적합",
+   "intake": "1일 3회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 원형 제피정제",
+   "storage": "- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>더블라이프 프리<small>셀레늄</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>16.5μg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 셀레늄 <b>16.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 원형 제피정제 · (주)한풍네이처팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/3000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>더블라이프 프리<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>16.5μg</b> of labelled Selenium (per 3000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>16.5μg</b> of Selenium per serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 3000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미∙이취가 없는 노랑 하양색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-007",
+  "productName": "도담바이오 셀렌해유",
+  "productNameEn": "도담바이오 셀렌해유",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141329",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 분홍색의 점도가 있는 내용물을 함유한 빨강색의 타원형 연질캡슐\n② 셀레늄(또는 셀렌) : 표시량 (16.5 ㎍/2,000 mg)의 80~150%\n③ 대장균군 : 음성\n④ 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 분홍색의 점도가 있는 내용물을 함유한 빨강색의 타원형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>도담바이오 셀렌해유<small>셀레늄</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>16.5μg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 셀레늄 <b>16.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 분홍색의 점도가 있는 내용물을 함유한 빨강색의 타원형 연질캡슐 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 분홍색의 점도가 있는 내용물을 함유한 빨강색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>도담바이오 셀렌해유<small>Selenium</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>16.5μg</b> of labelled Selenium (per 2000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>16.5μg</b> of Selenium per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 분홍색의 점도가 있는 내용물을 함유한 빨강색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-008",
+  "productName": "라이프토콜 셀레늄 200",
+  "productNameEn": "라이프토콜 셀레늄 200",
+  "manufacturer": "주식회사 피플리브",
+  "manufacturerEn": null,
+  "statementNo": "2025001831022",
+  "category": "hff",
+  "source": {
+   "mainFunction": "유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취 없는 흰색의 원형 정제\n2) 셀레늄 : 표시량(200㎍/200㎎)의 80~150%\n3) 대장균군 : 음성\n4) 붕해 : 30분이내",
+   "intake": "1일 1회, 1회 1정 (200 mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질·알레르기 체질의 경우 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n3) 용기 안의 실리카겔(방습제)은 절대 드시지 마십시오.\n4) 소비기한을 확인하시고, 섭취량 및 섭취 방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취 없는 흰색의 원형 정제",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 200,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프토콜 셀레늄 200<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 피플리브 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취 없는 흰색의 원형 정제 · 주식회사 피플리브 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프토콜 셀레늄 200<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 피플리브 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Selenium (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 피플리브</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-009",
+  "productName": "라이프토콜 셀레늄 300mcg 100정",
+  "productNameEn": "라이프토콜 셀레늄 300mcg 100정",
+  "manufacturer": "주식회사 피플리브",
+  "manufacturerEn": null,
+  "statementNo": "202500183101",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상 : 고유의 색택과 향미가 있고 이미,이취가 없으며 광택이 없는 흰색의 원형 정제\n(2)셀레늄 : 표시량(300μg/300mg)의 80-150%,\n(3)대장균군 : 음성\n(4)붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정 (300mg)을 충분한 물과 함께 섭취",
+   "caution": "",
+   "dosageForm": "고유의 색택과 향미가 있고 이미,이취가 없으며 광택이 없는 흰색의 원형 정제",
+   "storage": "직사광선을 피하여 실온보관",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 300,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 300μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프토콜 셀레늄 300mcg 100정<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 피플리브 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>300μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>300μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미가 있고 이미,이취가 없으며 광택이 없는 흰색의 원형 정제 · 주식회사 피플리브 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(300μg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미가 있고 이미,이취가 없으며 광택이 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 300μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프토콜 셀레늄 300mcg 100정<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 피플리브 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>300μg</b> of labelled Selenium (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>300μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 피플리브</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (300μg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미가 있고 이미,이취가 없으며 광택이 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-010",
+  "productName": "리얼 프리미엄 셀레늄 300",
+  "productNameEn": "리얼 프리미엄 셀레늄 300",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110756",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 장방형 정제\n2. 셀레늄 : 표시량(300㎍/600㎎)의 80~150%\n3. 대장균군 : 음성\n4. 붕해 : 적합(30분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 장방형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 300μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>리얼 프리미엄 셀레늄 300<small>셀레늄</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>300μg</b>를 표시량으로 담았습니다(표시 기준 600mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>300μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 장방형 정제 · 주)팜크로스 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(300μg/600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 300μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>리얼 프리미엄 셀레늄 300<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>300μg</b> of labelled Selenium (per 600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>300μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (300μg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-011",
+  "productName": "메가셀렌",
+  "productNameEn": "메가셀렌",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106110",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 백색의 장방형 정제\r\n2. 셀레늄(셀렌) : 표시량(200ug / 1000mg)의 80%~150%\r\n3. 대장균근 : 음성\r\n4. 붕해도 : 적합(30분이내)",
+   "intake": "1일 2회, 1회 1정(500mg)을 물과 함께 섭취하십시오.",
+   "caution": "1) 섭취량 및 섭취방법을 준수하십시오.\r\n2) 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취전 전문가와 상의하십시오.",
+   "dosageForm": "백색의 장방형 정제",
+   "storage": "습기가 적고 직사광선을 받지 안는 서늘한 곳에 보관하십시요.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 500,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메가셀렌<small>셀레늄</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>백색의 장방형 정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 백색의 장방형 정제</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 안는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메가셀렌<small>Selenium</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>200μg</b> of labelled Selenium (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 백색의 장방형 정제</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 안는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-012",
+  "productName": "모로 애플 밸런스",
+  "productNameEn": "모로 애플 밸런스",
+  "manufacturer": "주식회사 코스팜",
+  "manufacturerEn": null,
+  "statementNo": "20172880236336",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀렌] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말\n2. 셀렌(%) : 표시량(16.5 μg / 3 g)의 80 이상 150 이하\n3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하십시오.",
+   "caution": "1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n2) 당알코올류가 함유되어 과량 섭취 시 설사를 일으킬 수 있습니다. \n3) 특이체질, 알레르기체질이신 경우 원료 성분을 확인하신 후 섭취하시기 바랍니다.\n4) 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 방법을 준수하시기 바랍니다.\n5) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>모로 애플 밸런스<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 코스팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 셀레늄 <b>16.5μg</b>를 표시량으로 담았습니다(표시 기준 3g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>16.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말 · 주식회사 코스팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/3g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>모로 애플 밸런스<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 코스팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>16.5μg</b> of labelled Selenium (per 3g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>16.5μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 코스팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 3g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-013",
+  "productName": "바이탈 셀",
+  "productNameEn": "바이탈 셀",
+  "manufacturer": "(주)생명과학",
+  "manufacturerEn": null,
+  "statementNo": "20040020038156",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상: 이미,이취가 없고 고유의 향미가 있는 노랑하양색의 분말이 들어있는 투명한 경질캅셀\n② 셀레늄: 100μg/740mg(표시량의 80~150%)\n③ 대장균군: 음성\n④ 붕해도: 20분 이내",
+   "intake": "1일 1회, 1회 1캅셀씩을 물과 함께 섭취하십시오.",
+   "caution": "① 내용물을 꺼낸 후 뚜껑을 꼭 닫아주십시오\n② 알레르기나 특이체질이신 경우 성분을 확인한 후 섭취 하여 주시기 바랍니다",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 노랑하양색의 분말이 들어있는 투명한 경질캅셀",
+   "storage": "① 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오.② 제품 개봉 후에는 인습 되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로 부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "μg",
+    "basisAmount": 740,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 100μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바이탈 셀<small>셀레늄</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>100μg</b>를 표시량으로 담았습니다(표시 기준 740mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>100μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 노랑하양색의 분말이 들어있는 투명한 경질캅셀 · (주)생명과학 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(100μg/740mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 노랑하양색의 분말이 들어있는 투명한 경질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>보관</b> ① 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오. ② 제품 개봉 후에는 인습 되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 100μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>바이탈 셀<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)생명과학 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>100μg</b> of labelled Selenium (per 740mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>100μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)생명과학</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (100μg / 740mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 노랑하양색의 분말이 들어있는 투명한 경질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오. ② 제품 개봉 후에는 인습 되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-014",
+  "productName": "세종 셀레늄",
+  "productNameEn": "세종 셀레늄",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211355",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 황회색 분말을 함유한 연한 노란연두색의 경질캡슐\n②셀레늄 : 표시량(50 μg/ 320 mg)의 80 ~ 150%\n③붕해시험 : 20분 이내\n④대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 알레르기체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황회색 분말을 함유한 연한 노란연두색의 경질캡슐",
+   "storage": "실온보관/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 320,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 50μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>세종 셀레늄<small>셀레늄</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>50μg</b>를 표시량으로 담았습니다(표시 기준 320mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>50μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황회색 분말을 함유한 연한 노란연두색의 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(50μg/320mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황회색 분말을 함유한 연한 노란연두색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온보관/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 50μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>세종 셀레늄<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>50μg</b> of labelled Selenium (per 320mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>50μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (50μg / 320mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 황회색 분말을 함유한 연한 노란연두색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온보관/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-015",
+  "productName": "센스업 브이",
+  "productNameEn": "센스업 브이",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150831237",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없으며 고유의 향미를 지닌 회황색의 분말.\n(2) 셀레늄 : 표시량(55 μg/10,000 mg)의 80% 이상 150% 이하\n(3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하거나 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없으며 고유의 향미를 지닌 회황색의 분말.",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 10000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>센스업 브이<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 10000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없으며 고유의 향미를 지닌 회황색의 분말. · 주식회사한미양행 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/10000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없으며 고유의 향미를 지닌 회황색의 분말.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>센스업 브이<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>55μg</b> of labelled Selenium (per 10000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 10000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없으며 고유의 향미를 지닌 회황색의 분말.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-016",
+  "productName": "셀-포스 Sel-Force",
+  "productNameEn": "셀-포스 Sel-Force",
+  "manufacturer": "디에이치팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040015102223",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미,이취가 없는 회황색의 장방형 정제\n붕해시험 : 30분 이내\n대장균군 : 음성\n셀렌 : 표시량(200µg/500mg)의 80～150%",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 회황색의 장방형 정제",
+   "storage": "직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관",
+   "shelfLife": "제조일로부터 실온에서 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀-포스 Sel-Force<small>셀레늄</small></h1><p class=\"sd-meta\">디에이치팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 회황색의 장방형 정제 · 디에이치팜(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀-포스 Sel-Force<small>Selenium</small></h1><p class=\"sd-meta\">Made by 디에이치팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Selenium (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 디에이치팜(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-017",
+  "productName": "셀레치온",
+  "productNameEn": "셀레치온",
+  "manufacturer": "(주)메디바이오랩",
+  "manufacturerEn": null,
+  "statementNo": "2017278206858",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①셀레늄 : 표시량(200 ㎍/750 mg)의 80%~150%\n②성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 타원형 제피정제\n③붕해시험 : 60분이내\n④대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1. 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n2. 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n3. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 하양색의 타원형 제피장제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 750,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀레치온<small>셀레늄</small></h1><p class=\"sd-meta\">(주)메디바이오랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 750mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 하양색의 타원형 제피장제 · (주)메디바이오랩 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/750mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 하양색의 타원형 제피장제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀레치온<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)메디바이오랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Selenium (per 750mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)메디바이오랩</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 750mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 하양색의 타원형 제피장제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-018",
+  "productName": "셀레타임 포르테",
+  "productNameEn": "셀레타임 포르테",
+  "manufacturer": "(주)코지맘바이오",
+  "manufacturerEn": null,
+  "statementNo": "2023002876649",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰색의 장방형 제피정제\n2. 셀레늄 : 표시량(200 ㎍ / 1,000 mg)의 80~150%\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰색의 장방형 제피정제",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀레타임 포르테<small>셀레늄</small></h1><p class=\"sd-meta\">(주)코지맘바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰색의 장방형 제피정제 · (주)코지맘바이오 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀레타임 포르테<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)코지맘바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Selenium (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)코지맘바이오</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-019",
+  "productName": "셀렌셀",
+  "productNameEn": "셀렌셀",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352011",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]\n① 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말을 함유한 투명한 경질캡슐\n2. 셀렌: 표시량(55μg/2100mg)의 80% ~ 150%\n3. 붕해시험: 20분 이내\n4. 대장균군: 음성",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n2. 유통기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말을 함유한 투명한 경질캡슐",
+   "storage": "1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 2100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>셀렌셀<small>셀레늄</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 2100mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말을 함유한 투명한 경질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2100mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>셀렌셀<small>Selenium</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>55μg</b> of labelled Selenium (per 2100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2100mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-020",
+  "productName": "셀렌이스트라민",
+  "productNameEn": "셀렌이스트라민",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106374",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연회색의 코팅정제\n② 셀레늄 : 표시량(55㎍/2000mg)의 80~150%\n③ 대장균군 : 음성\n④ 붕해도 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 준수하십시오.\n② 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.\n③ 이상증세가 생길 경우 즉시 섭취를 중단하시고 전문의와 상담하십시오.\n④ 동봉된 흡습제(실리카겔)은 섭취하지 마십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연회색의 코팅정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀렌이스트라민<small>셀레늄</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연회색의 코팅정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연회색의 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀렌이스트라민<small>Selenium</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>55μg</b> of labelled Selenium (per 2000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연회색의 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-021",
+  "productName": "셀렌플렉스 캡슐",
+  "productNameEn": "셀렌플렉스 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "manufacturerEn": null,
+  "statementNo": "2016000751554",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말을 함유한 갈색의 장방형 경질캡슐\r\n(2) 셀레늄 : 표시량(300μg/500mg)의 80~150%\r\n(3) 대장균군 : 음성\r\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1캡슐당 500mg)을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. \r\n(병포장 시) 습기방지제(방습제)는 먹지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말을 함유한 갈색의 장방형 경질캡슐",
+   "storage": "직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 500,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 300μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀렌플렉스 캡슐<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 제이비케이랩 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>300μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>300μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말을 함유한 갈색의 장방형 경질캡슐 · 주식회사 제이비케이랩 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(300μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말을 함유한 갈색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 300μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀렌플렉스 캡슐<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 제이비케이랩 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>300μg</b> of labelled Selenium (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>300μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 제이비케이랩</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (300μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말을 함유한 갈색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-022",
+  "productName": "셀렌효모",
+  "productNameEn": "셀렌효모",
+  "manufacturer": "(주)허브큐어",
+  "manufacturerEn": null,
+  "statementNo": "20040015162131",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 색택과 향미를 가지며 이미, 이취가 없는 밝은 회황색의 원형정제\n(2) 셀레늄 : 표시량(50μg/7.8g)의 80～150%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 3회, 1회 13정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "-특정성분에 알레르기가 있는 분은 섭취전 반드시 원료성분을 확인하시기 바랍니다.\n-섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.\n-개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미, 이취가 없는 밝은 회황색의 원형정제",
+   "storage": "고온 다습, 직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 7.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 13,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 50μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>셀렌효모<small>셀레늄</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 3회 13정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>50μg</b>를 표시량으로 담았습니다(표시 기준 7.8g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(13정) 섭취로 셀레늄 <b>50μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미, 이취가 없는 밝은 회황색의 원형정제 · (주)허브큐어 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 13정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(50μg/7.8g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미, 이취가 없는 밝은 회황색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 50μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>셀렌효모<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)허브큐어 · 3 times a day · 13 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>50μg</b> of labelled Selenium (per 7.8g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>50μg</b> of Selenium per serving (13 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)허브큐어</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">13 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (50μg / 7.8g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미, 이취가 없는 밝은 회황색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-023",
+  "productName": "셀렌효모정",
+  "productNameEn": "셀렌효모정",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "20040020014779",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미ㆍ이취가 없으며 점박이가 있는 흐린녹갈색의 원형 제피정제\n② 셀레늄(또는 셀렌) : 표시량(30㎍/3600mg)의 80~150%\n③ 붕해 : 60분 이내\n④ 대장균군 : 음성",
+   "intake": "1일 3회, 1회 3정씩 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취여부를 결정하여야 함",
+   "dosageForm": "고유의 향미가 있고 이미ㆍ이취가 없으며 점박이가 있는 흐린녹갈색의 원형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "μg",
+    "basisAmount": 3600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 30μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>셀렌효모정<small>셀레늄</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 3회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>30μg</b>를 표시량으로 담았습니다(표시 기준 3600mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(3정) 섭취로 셀레늄 <b>30μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미ㆍ이취가 없으며 점박이가 있는 흐린녹갈색의 원형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(30μg/3600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미ㆍ이취가 없으며 점박이가 있는 흐린녹갈색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 30μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>셀렌효모정<small>Selenium</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · 3 times a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>30μg</b> of labelled Selenium (per 3600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>30μg</b> of Selenium per serving (3 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (30μg / 3600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미ㆍ이취가 없으며 점박이가 있는 흐린녹갈색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-024",
+  "productName": "셀렌후켄골드플러스",
+  "productNameEn": "셀렌후켄골드플러스",
+  "manufacturer": "(주)허브큐어",
+  "manufacturerEn": null,
+  "statementNo": "20040015162130",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 색택과 향미를 가지며 이미, 이취가 없는 연한 노란주황색의 원형정제\n(2) 셀레늄 : 표시량(50μg/2g)의 80～150%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 2회, 1회 5정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "-특정성분에 알레르기가 있는 분은 섭취전 반드시 원료성분을 확인하시기 바랍니다.\n-섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.\n-개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미,이취가 없는 연한 노란주황색의 원형정제",
+   "storage": "고온 다습, 직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 5,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 50μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀렌후켄골드플러스<small>셀레늄</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>50μg</b>를 표시량으로 담았습니다(표시 기준 2g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(5정) 섭취로 셀레늄 <b>50μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미,이취가 없는 연한 노란주황색의 원형정제 · (주)허브큐어 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(50μg/2g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미,이취가 없는 연한 노란주황색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 50μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀렌후켄골드플러스<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)허브큐어 · 2 times a day · 5 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>50μg</b> of labelled Selenium (per 2g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>50μg</b> of Selenium per serving (5 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)허브큐어</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (50μg / 2g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미,이취가 없는 연한 노란주황색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-025",
+  "productName": "셀로맥스 셀렌",
+  "productNameEn": "셀로맥스 셀렌",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031397",
+  "category": "hff",
+  "source": {
+   "mainFunction": "- 셀레늄 :  유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제\n2. 셀렌 : 표시량(220 ug/750 mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 220,
+    "unit": "μg",
+    "basisAmount": 750,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 220μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 셀렌<small>셀레늄</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>220μg</b>를 표시량으로 담았습니다(표시 기준 750mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>220μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(220μg/750mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 220μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로맥스 셀렌<small>Selenium</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>220μg</b> of labelled Selenium (per 750mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>220μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (220μg / 750mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-026",
+  "productName": "셀로맥스 셀렌",
+  "productNameEn": "셀로맥스 셀렌",
+  "manufacturer": "콜마비앤에이치(주)세종3공장",
+  "manufacturerEn": null,
+  "statementNo": "20240028080305",
+  "category": "hff",
+  "source": {
+   "mainFunction": "- 셀레늄 :  유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제\n2. 셀렌 : 표시량(220 ug/750 mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 220,
+    "unit": "μg",
+    "basisAmount": 750,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 220μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 셀렌<small>셀레늄</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)세종3공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>220μg</b>를 표시량으로 담았습니다(표시 기준 750mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>220μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제 · 콜마비앤에이치(주)세종3공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(220μg/750mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 220μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로맥스 셀렌<small>Selenium</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)세종3공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>220μg</b> of labelled Selenium (per 750mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>220μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)세종3공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (220μg / 750mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-027",
+  "productName": "셀맥스",
+  "productNameEn": "셀맥스",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "20110020099297",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미를 가지고 이미, 이취가 없는 어두운 주황 노란색의 제피정제\n2. 대장균군 : 음성\n3. 붕해시험 : 60분 이내\n4. 셀렌 : 표시량(135㎍/1.2g)의 80%~150%",
+   "intake": "1일 2회, 1회 1정을 충분한 물과 함께 섭취하십시오.1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지고 이미, 이취가 없는 어두운 주황 노란색의 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 135,
+    "unit": "μg",
+    "basisAmount": 1.2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 135μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀맥스<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>135μg</b>를 표시량으로 담았습니다(표시 기준 1.2g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 셀레늄 <b>135μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지고 이미, 이취가 없는 어두운 주황 노란색의 제피정제 · 주식회사 아리너스 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(135μg/1.2g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지고 이미, 이취가 없는 어두운 주황 노란색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 135μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀맥스<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>135μg</b> of labelled Selenium (per 1.2g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>135μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (135μg / 1.2g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지고 이미, 이취가 없는 어두운 주황 노란색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-028",
+  "productName": "아셀치온",
+  "productNameEn": "아셀치온",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021737",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있는 연갈색의 제피정제\n②셀렌 : 표시량(135㎍/200mg)의 80~150%\n③대장균군 : 음성\n④붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "- 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \n- 알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연갈색의 제피정제",
+   "storage": "① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 135,
+    "unit": "μg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 135μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아셀치온<small>셀레늄</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>135μg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>135μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연갈색의 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(135μg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연갈색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 135μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아셀치온<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>135μg</b> of labelled Selenium (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>135μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (135μg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연갈색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-029",
+  "productName": "아셀치올",
+  "productNameEn": "아셀치올",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832464",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄] \n유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 흰 노란색 또는 노란 하얀색의 내용물을 함유한 하얀색의 타원형 연질캡슐\n(2) 셀레늄 : 표시량(135 μg/100 mg)의 80% 이상 150% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 흰 노란색 또는 노란 하얀색의 내용물을 함유한 하얀색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 135,
+    "unit": "μg",
+    "basisAmount": 100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 135μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아셀치올<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>135μg</b>를 표시량으로 담았습니다(표시 기준 100mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>135μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 흰 노란색 또는 노란 하얀색의 내용물을 함유한 하얀색의 타원형 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(135μg/100mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 흰 노란색 또는 노란 하얀색의 내용물을 함유한 하얀색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 135μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아셀치올<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>135μg</b> of labelled Selenium (per 100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>135μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (135μg / 100mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 흰 노란색 또는 노란 하얀색의 내용물을 함유한 하얀색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-030",
+  "productName": "알엠에스셀렌포르테캅셀",
+  "productNameEn": "알엠에스셀렌포르테캅셀",
+  "manufacturer": "(주)케이지앤에프",
+  "manufacturerEn": null,
+  "statementNo": "2004001602094",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 베이지색의 내용물을 함유한 연노란색의 경질캅셀\r\n② 셀레늄 : 표시량(50㎍/320mg)의 80~150%\r\n③ 대장균군 : 음성\r\n④ 붕해도 : 건강기능식품공전 Ⅲ.2 붕해도시험(4)캅셀제품에 따라 20분내에 붕해",
+   "intake": "1일 1회, 1회 1캅셀 물과 함께 섭취",
+   "caution": "① 특정식품에 알레르기 증상이 계신 분은 성분을 확인 후 섭취하십시오.\r\n② 약물 복용 중이신 분은 섭취 전에 의사，약사 등 전문가와 상의하십시오.",
+   "dosageForm": "베이지색의 내용물을 함유한 연노란색의 경질캅셀",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관, 유통하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 320,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 50μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>알엠에스셀렌포르테캅셀<small>셀레늄</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>50μg</b>를 표시량으로 담았습니다(표시 기준 320mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>50μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>베이지색의 내용물을 함유한 연노란색의 경질캅셀 · (주)케이지앤에프 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(50μg/320mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 베이지색의 내용물을 함유한 연노란색의 경질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 50μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>알엠에스셀렌포르테캅셀<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)케이지앤에프 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>50μg</b> of labelled Selenium (per 320mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>50μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)케이지앤에프</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (50μg / 320mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 베이지색의 내용물을 함유한 연노란색의 경질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-031",
+  "productName": "액티브셀레늄200",
+  "productNameEn": "액티브셀레늄200",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046522",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 미황색의 원형 정제\n2) 셀레늄 : 표시량(200.0㎍/300mg)의 80~150% 이어야 한다.\n3) 붕해시험 : 30분 이내\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "",
+   "dosageForm": "미황색의 원형 정제",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>액티브셀레늄200<small>셀레늄</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 셀레늄 <b>200μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 원형 정제 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 미황색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>액티브셀레늄200<small>Selenium</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Selenium (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Selenium per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 미황색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-032",
+  "productName": "유해산소엔 셀레늄",
+  "productNameEn": "유해산소엔 셀레늄",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "2018000391592",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말이 든 흰색의 경질캡슐\n(2) 셀레늄 : 표시량 (135 μg/450 mg)의 80~150%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오. \n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. \n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말이 든 흰색의 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 135,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 135μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>유해산소엔 셀레늄<small>셀레늄</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 셀레늄 <b>135μg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>135μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말이 든 흰색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(135μg/450mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 135μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>유해산소엔 셀레늄<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>135μg</b> of labelled Selenium (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>135μg</b> of Selenium per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (135μg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-033",
+  "productName": "이든효모",
+  "productNameEn": "이든효모",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021412",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상: 연한 갈색의 정제로 이미, 이취가 없다.\r\n(2) 셀레늄 : 표시량(12.5㎍/3,000mg)의 80~150%\r\n(3) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 5정을 씹어서 섭취한다.",
+   "caution": "① 섭취량 및 섭취방법 준수하십시오.\n② 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n③ 알레르기 체질이신 분은 성분을 확인 후 섭취하시기 바랍니다.",
+   "dosageForm": "연한 갈색의 정제로 이미, 이취가 없다.",
+   "storage": "고온다습, 직사광선을 피하고 서늘한 곳에 보관한다. \r\n어린이 손에 닿지 않는 곳에 보관한다. \r\n인습이 되지 않도록 주의하여 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 12.5,
+    "unit": "μg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 5,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 12.5μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>이든효모<small>셀레늄</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 3회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>12.5μg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(5정) 섭취로 셀레늄 <b>12.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연한 갈색의 정제로 이미, 이취가 없다. · (주)비오팜 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(12.5μg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 연한 갈색의 정제로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하고 서늘한 곳에 보관한다. 어린이 손에 닿지 않는 곳에 보관한다. 인습이 되지 않도록 주의하여 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>씹어 먹는 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 12.5μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>이든효모<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 3 times a day · 5 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>12.5μg</b> of labelled Selenium (per 3000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>12.5μg</b> of Selenium per serving (5 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (12.5μg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 연한 갈색의 정제로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하고 서늘한 곳에 보관한다. 어린이 손에 닿지 않는 곳에 보관한다. 인습이 되지 않도록 주의하여 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a chewable form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-034",
+  "productName": "제네시스 에스",
+  "productNameEn": "제네시스 에스",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200201246",
+  "category": "hff",
+  "source": {
+   "mainFunction": "* 셀레늄(or 셀렌)\n① 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말\n② 셀렌 : 18 ㎍ / 4 g (표시량의 80-150%)\n③ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 혹은 물과 함께 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 18,
+    "unit": "μg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 18μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>제네시스 에스<small>셀레늄</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 셀레늄 <b>18μg</b>를 표시량으로 담았습니다(표시 기준 4g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>18μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(18μg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 18μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>제네시스 에스<small>Selenium</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>18μg</b> of labelled Selenium (per 4g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>18μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (18μg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-035",
+  "productName": "지이셀렌플러스",
+  "productNameEn": "지이셀렌플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106343",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색의 원형 정제                                                                                                                         \n② 셀렌 : 표시량(55㎍/2400mg)의 80~150%                                                                                                                                      \n③ 붕해시험 : 30분 이내.                                                                                                                                                               \n④ 대장균군 : 음성.",
+   "intake": "1일 2회, 1회 4정(1200mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 준수하십시오.                                                                                                                                             \n② 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취전 전문가와 상의하십시오.      \n③ 동봉된 흡습제(실리카겔)은 섭취하지 마십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 원형 정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.",
+   "shelfLife": "제조일로부터 2년(24개월)"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 4,
+    "servingTotalWeight": 1200,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>지이셀렌플러스<small>셀레늄</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 2회 4정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 2400mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(4정) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 갈색의 원형 정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 4정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년(24개월)</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>지이셀렌플러스<small>Selenium</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · 2 times a day · 4 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>55μg</b> of labelled Selenium (per 2400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (4 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">4 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년(24개월)</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시요.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-036",
+  "productName": "지피오",
+  "productNameEn": "지피오",
+  "manufacturer": "(주)생명과학",
+  "manufacturerEn": null,
+  "statementNo": "20040020038148",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상: 짙은 갈색의 결정성분말로 이미 이취가 없어야한다\n② 셀렌: 표시량(100ug/12,000mg)의 80~150%\n③ 대장균군: 음성",
+   "intake": "1일 2회, 1회 1포(6g)씩을 식전에 씹어서 충분한 물과 함께 섭취하십시오",
+   "caution": "제품개봉이나 섭취시 포장재에 의해 상처를 입을 수 있어 주의가 필요합니다\n씹어서 충분한 물과 함께 섭취하십시오",
+   "dosageForm": "짙은 갈색의 결정성분말로 이미 이취가 없어야한다",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관",
+   "shelfLife": "제조일로 부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "μg",
+    "basisAmount": 12000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 6,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 100μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>지피오<small>셀레늄</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>100μg</b>를 표시량으로 담았습니다(표시 기준 12000mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 셀레늄 <b>100μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>짙은 갈색의 결정성분말로 이미 이취가 없어야한다 · (주)생명과학 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(100μg/12000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 짙은 갈색의 결정성분말로 이미 이취가 없어야한다</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>씹어 먹는 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 100μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>지피오<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)생명과학 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>100μg</b> of labelled Selenium (per 12000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>100μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)생명과학</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (100μg / 12000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 짙은 갈색의 결정성분말로 이미 이취가 없어야한다</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a chewable form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-037",
+  "productName": "카티플렉스 캡슐",
+  "productNameEn": "카티플렉스 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "manufacturerEn": null,
+  "statementNo": "2016000751570",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말을 함유한 투명한 경질캡슐 \n(2) 셀레늄 : 표시량(30μg/2400mg)의 80～150%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 3캡슐(1캡슐당 400mg)을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취 하십시오. \n(병포장 시) 습기방지제(방습제)는 먹지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말을 함유한 투명한 경질캡슐",
+   "storage": "직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "μg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": 400,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 30μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>카티플렉스 캡슐<small>셀레늄</small></h1><p class=\"sd-meta\">주식회사 제이비케이랩 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>30μg</b>를 표시량으로 담았습니다(표시 기준 2400mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 셀레늄 <b>30μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말을 함유한 투명한 경질캡슐 · 주식회사 제이비케이랩 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(30μg/2400mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 30μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>카티플렉스 캡슐<small>Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 제이비케이랩 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>30μg</b> of labelled Selenium (per 2400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>30μg</b> of Selenium per serving (3 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 제이비케이랩</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (30μg / 2400mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-038",
+  "productName": "크리스탈 셀렌타치 미",
+  "productNameEn": "크리스탈 셀렌타치 미",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141345",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미∙이취가 없는 밝은 회황색의 분말\n② 셀렌 : 표시량(55 ㎍/4 g)의 80~150%\n③ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(4 g)를 그대로 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 4,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>크리스탈 셀렌타치 미<small>셀레늄</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 셀레늄 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 4g당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>크리스탈 셀렌타치 미<small>Selenium</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>55μg</b> of labelled Selenium (per 4g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Selenium per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "selenium-039",
+  "productName": "화진어랑골드 셀레늄",
+  "productNameEn": "화진어랑골드 셀레늄",
+  "manufacturer": "(주)화진바이오코스메틱",
+  "manufacturerEn": null,
+  "statementNo": "2004001508122",
+  "category": "hff",
+  "source": {
+   "mainFunction": "유해산소로부터 세포를 보호하는데 필요 .",
+   "baseStandard": "1>성상 : 황갈색의 내용물을 함유한 녹색의 연질칼셀\n2>셀레늄 : 표시량(16㎍/800mg)의 80~150%\n3>대장균군 : 음 성\n4>붕해시험 : 20분 이내",
+   "intake": "1일 3회 1회 1캅셀을 음용수와 섭취하세요",
+   "caution": "① 대두 및 화분에 알레르기가 있으신 분은 섭취 시 주의하세요.\n② 특이체질, 알러지 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n③ 섭취 시 위장장애, 소화불량 등의 이상증상이 생길 경우 섭취를 중단한다.\n④ P.T.P 포장 개봉 시 다칠 염려가 있으므로 주의한다.",
+   "dosageForm": "황갈색의 내용물을 함유한 녹색의 연질칼셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하세요.",
+   "shelfLife": "제조일로 부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16,
+    "unit": "μg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>화진어랑골드 셀레늄<small>셀레늄</small></h1><p class=\"sd-meta\">(주)화진바이오코스메틱 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>16μg</b>를 표시량으로 담았습니다(표시 기준 800mg당). 셀레늄의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 셀레늄 <b>16μg</b></li><li>황갈색의 내용물을 함유한 녹색의 연질칼셀 · (주)화진바이오코스메틱 제조</li></ul>\n  <h2>셀레늄 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16μg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 황갈색의 내용물을 함유한 녹색의 연질칼셀</div><div class=\"sd-item\"><b>유통기한</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관하세요.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>화진어랑골드 셀레늄<small>Selenium</small></h1><p class=\"sd-meta\">Made by (주)화진바이오코스메틱 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>16μg</b> of labelled Selenium (per 800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>16μg</b> of Selenium per serving (1 capsule)</li><li>Made by (주)화진바이오코스메틱</li></ul>\n  <h2>Selenium nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16μg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 황갈색의 내용물을 함유한 녹색의 연질칼셀</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로 부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관하세요.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Selenium daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

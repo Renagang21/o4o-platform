@@ -1,0 +1,548 @@
+[
+ {
+  "candidateId": "vitamin-b12-001",
+  "productName": "NUTRIKIT 비타민B12 240",
+  "productNameEn": "NUTRIKIT 비타민B12 240",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832030",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 분홍색 점박이가 있는 흰 분홍색의 마름모 모양의 제피정제\n(2) 비타민 B12 : 표시량(240 ㎍/150 mg)의 80% 이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B12]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 분홍색 점박이가 있는 흰 분홍색의 마름모 모양의 제피정제",
+   "storage": "",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 240,
+    "unit": "μg",
+    "basisAmount": 150,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 240μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>NUTRIKIT 비타민B12 240<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>240μg</b>를 표시량으로 담았습니다(표시 기준 150mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>240μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 분홍색 점박이가 있는 흰 분홍색의 마름모 모양의 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(240μg/150mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 분홍색 점박이가 있는 흰 분홍색의 마름모 모양의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 240μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>NUTRIKIT 비타민B12 240<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>240μg</b> of labelled Vitamin B12 (per 150mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>240μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (240μg / 150mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 분홍색 점박이가 있는 흰 분홍색의 마름모 모양의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-002",
+  "productName": "jw중외제약 메가 비타민B12 프리미엄 Pro",
+  "productNameEn": "jw중외제약 메가 비타민B12 프리미엄 Pro",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832371",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제\n(2) 비타민B12 : 표시량(600 μg / 300 mg)의 80이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B12]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>jw중외제약 메가 비타민B12 프리미엄 Pro<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>600μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(600μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>jw중외제약 메가 비타민B12 프리미엄 Pro<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>600μg</b> of labelled Vitamin B12 (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>600μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (600μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-003",
+  "productName": "그레인온 골드 브랜드밀효소",
+  "productNameEn": "그레인온 골드 브랜드밀효소",
+  "manufacturer": "주식회사 코스팜",
+  "manufacturerEn": null,
+  "statementNo": "20172880236401",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 분말\n2. 비타민B12 : 표시량(0.72 μg / 3 g)의 80 이상 180 % 미만\n3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 직접 또는 물과 함께 섭취하십시오.",
+   "caution": "1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란하양색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>그레인온 골드 브랜드밀효소<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사 코스팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 B12 <b>0.72μg</b>를 표시량으로 담았습니다(표시 기준 3g당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B12 <b>0.72μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란하양색의 분말 · 주식회사 코스팜 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/3g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>그레인온 골드 브랜드밀효소<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사 코스팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>0.72μg</b> of labelled Vitamin B12 (per 3g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.72μg</b> of Vitamin B12 per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 코스팜</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 3g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-004",
+  "productName": "메가 비타민B12 프리미엄",
+  "productNameEn": "메가 비타민B12 프리미엄",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832360",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제\n(2) 비타민B12 : 표시량(600 μg / 300 mg)의 80이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B12]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메가 비타민B12 프리미엄<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>600μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(600μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메가 비타민B12 프리미엄<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>600μg</b> of labelled Vitamin B12 (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>600μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (600μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-005",
+  "productName": "메가 비타민B12 프리미엄 HMYH",
+  "productNameEn": "메가 비타민B12 프리미엄 HMYH",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832244",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제\n(2) 비타민B12 : 표시량(600 μg / 300 mg)의 80이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B12]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메가 비타민B12 프리미엄 HMYH<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>600μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(600μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메가 비타민B12 프리미엄 HMYH<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>600μg</b> of labelled Vitamin B12 (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>600μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (600μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-006",
+  "productName": "바이오엔:오팜스타",
+  "productNameEn": "바이오엔:오팜스타",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071290",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명한 경질캡슐\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(20분 이내)\n4. 비타민B12 : 표시량(0.72 ㎍/1,350 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1350,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>바이오엔:오팜스타<small>비타민 B12</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>를 표시량으로 담았습니다(표시 기준 1350mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1350mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>바이오엔:오팜스타<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>0.72μg</b> of labelled Vitamin B12 (per 1350mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.72μg</b> of Vitamin B12 per serving (1 capsule)</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1350mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-007",
+  "productName": "비바비 12 캡슐",
+  "productNameEn": "비바비 12 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "manufacturerEn": null,
+  "statementNo": "2016000751597",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12] 정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 내용물을 함유한 투명의 장방형 경질캡슐 \n(2) 비타민B12 : 표시량(1,000㎍/400mg)의 80～180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1캡슐당 400 mg)을 물과 함께 섭취하십시오.",
+   "caution": "[비타민B12] 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 내용물을 함유한 투명의 장방형 경질캡슐",
+   "storage": "실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 400,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비바비 12 캡슐<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사 제이비케이랩 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 B12 <b>1000μg</b>를 표시량으로 담았습니다(표시 기준 400mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B12 <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 내용물을 함유한 투명의 장방형 경질캡슐 · 주식회사 제이비케이랩 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(1000μg/400mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 내용물을 함유한 투명의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비바비 12 캡슐<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사 제이비케이랩 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>1000μg</b> of labelled Vitamin B12 (per 400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000μg</b> of Vitamin B12 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 제이비케이랩</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (1000μg / 400mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 내용물을 함유한 투명의 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-008",
+  "productName": "비타민 B12",
+  "productNameEn": "비타민 B12",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915118",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 분말이 든 갈색의 경질캡슐\n(2) 비타민 B12 : 표시량 ( 100 μg/ 450 mg)의 80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오.\n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 분말이 든 갈색의 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 100μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민 B12<small>비타민 B12</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 B12 <b>100μg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B12 <b>100μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 분말이 든 갈색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(100μg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 분말이 든 갈색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 100μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민 B12<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>100μg</b> of labelled Vitamin B12 (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>100μg</b> of Vitamin B12 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (100μg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 분말이 든 갈색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-009",
+  "productName": "비타민B12 맥스",
+  "productNameEn": "비타민B12 맥스",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832283",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색 원형 정제\n(2) 비타민B12 : 표시량(600 μg / 300 mg)의 80% 이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B12]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색의 원형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민B12 맥스<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>600μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색의 원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(600μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민B12 맥스<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>600μg</b> of labelled Vitamin B12 (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>600μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (600μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 하얀색 또는 노란하얀색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-010",
+  "productName": "셀로맥스 림플래그",
+  "productNameEn": "셀로맥스 림플래그",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031389",
+  "category": "hff",
+  "source": {
+   "mainFunction": "- 비타민 B12 : 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제\n2. 비타민B12 : 표시량(6 ug/1,600 mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 1정 또는 1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 6,
+    "unit": "μg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 6μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀로맥스 림플래그<small>비타민 B12</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>6μg</b>를 표시량으로 담았습니다(표시 기준 1600mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 B12 <b>6μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(6μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 6μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀로맥스 림플래그<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>6μg</b> of labelled Vitamin B12 (per 1600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>6μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (6μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-011",
+  "productName": "셀로맥스 림플래그",
+  "productNameEn": "셀로맥스 림플래그",
+  "manufacturer": "콜마비앤에이치(주)세종3공장",
+  "manufacturerEn": null,
+  "statementNo": "20240028080368",
+  "category": "hff",
+  "source": {
+   "mainFunction": "- 비타민 B12 : 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제\n2. 비타민B12 : 표시량(6 ug/1,600 mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 1정 또는 1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 6,
+    "unit": "μg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 6μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀로맥스 림플래그<small>비타민 B12</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)세종3공장 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>6μg</b>를 표시량으로 담았습니다(표시 기준 1600mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 B12 <b>6μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제 · 콜마비앤에이치(주)세종3공장 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(6μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 6μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀로맥스 림플래그<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)세종3공장 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>6μg</b> of labelled Vitamin B12 (per 1600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>6μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)세종3공장</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (6μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-012",
+  "productName": "셀로맥스 작감아르테",
+  "productNameEn": "셀로맥스 작감아르테",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031575",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1. 비타민B12 : 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2. 비타민B12 : 표시량(21.6 μg/1,950 mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 60분 이내",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 21.6,
+    "unit": "μg",
+    "basisAmount": 1950,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 21.6μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>셀로맥스 작감아르테<small>비타민 B12</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>21.6μg</b>를 표시량으로 담았습니다(표시 기준 1950mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 B12 <b>21.6μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(21.6μg/1950mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 21.6μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>셀로맥스 작감아르테<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>21.6μg</b> of labelled Vitamin B12 (per 1950mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>21.6μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (21.6μg / 1950mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b12-013",
+  "productName": "셀로맥스 큐라맥스",
+  "productNameEn": "셀로맥스 큐라맥스",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200081716",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 황갈색의 투명 장방형 제피 정제\n2. 비타민 B12 : 표시량(2.4ug/1000mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 황갈색의 투명 장방형 제피 정제",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 큐라맥스<small>비타민 B12</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 B12 <b>2.4μg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 비타민 B12의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>2.4μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 황갈색의 투명 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 B12 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 황갈색의 투명 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로맥스 큐라맥스<small>Vitamin B12</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>2.4μg</b> of labelled Vitamin B12 (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2.4μg</b> of Vitamin B12 per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Vitamin B12 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 황갈색의 투명 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B12 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

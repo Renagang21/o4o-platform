@@ -1,0 +1,506 @@
+[
+ {
+  "candidateId": "pantothenic-acid-001",
+  "productName": "NUTRIKIT 판토텐산 200",
+  "productNameEn": "NUTRIKIT 판토텐산 200",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832031",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[판토텐산]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제\n(2) 판토텐산 : 표시량(200 mg/500 mg)의 80% 이상 180% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[판토텐산]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>NUTRIKIT 판토텐산 200<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 판토텐산 <b>200mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 판토텐산 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(200mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>NUTRIKIT 판토텐산 200<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200mg</b> of labelled Pantothenic acid (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200mg</b> of Pantothenic acid per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (200mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-002",
+  "productName": "디자인",
+  "productNameEn": "디자인",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "2011002009954",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[판토텐산]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1)성상 :내용물을 함유한 미백색의 캅셀\r\n2)판토텐산 : 표시량 (54mg/2g)의 80%~180%\r\n3)대장균군 :음성\r\n4)붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 4캡슐을 섭취한다.",
+   "caution": "특이체질 등 알러지 체질인 경우에는 성분을 확인하신 후 취하십시오.",
+   "dosageForm": "내용물을 함유한 미황색의 경질캅셀",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.  \r\n고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 54,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 4,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 54mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>디자인<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 1회 4캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 4캡슐)에 판토텐산 <b>54mg</b>를 표시량으로 담았습니다(표시 기준 2g당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(4캡슐) 섭취로 판토텐산 <b>54mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>내용물을 함유한 미황색의 경질캅셀 · 주식회사 아리너스 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 4캡슐</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(54mg/2g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 내용물을 함유한 미황색의 경질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 54mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>디자인<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · Once a day · 4 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 4 capsules) provides <b>54mg</b> of labelled Pantothenic acid (per 2g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>54mg</b> of Pantothenic acid per serving (4 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">4 capsules per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (54mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 내용물을 함유한 미황색의 경질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-003",
+  "productName": "라이프토콜 DSM 판토텐산 450mg 100캡슐",
+  "productNameEn": "라이프토콜 DSM 판토텐산 450mg 100캡슐",
+  "manufacturer": "주식회사 내츄럴엔",
+  "manufacturerEn": null,
+  "statementNo": "20200012016141",
+  "category": "hff",
+  "source": {
+   "mainFunction": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색 경질캡슐\n2. 판토텐산 : 표시량(450mg/480mg) 80~ 180%\n3. 대장균군 : 음성\n4. 붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐(480mg)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색 경질캡슐",
+   "storage": "직사광선을 피하여 실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 450,
+    "unit": "mg",
+    "basisAmount": 480,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 480,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 450mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프토콜 DSM 판토텐산 450mg 100캡슐<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 내츄럴엔 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 판토텐산 <b>450mg</b>를 표시량으로 담았습니다(표시 기준 480mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 판토텐산 <b>450mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색 경질캡슐 · 주식회사 내츄럴엔 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(450mg/480mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 450mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프토콜 DSM 판토텐산 450mg 100캡슐<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 내츄럴엔 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>450mg</b> of labelled Pantothenic acid (per 480mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>450mg</b> of Pantothenic acid per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 내츄럴엔</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (450mg / 480mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-004",
+  "productName": "비바비 5 캡슐",
+  "productNameEn": "비바비 5 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "manufacturerEn": null,
+  "statementNo": "20160007515117",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 투명 경질캡슐\n(2) 판토텐산 : 표시량(25mg/330mg)의 80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1캡슐당 330 mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[판토텐산] 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 투명 경질캡슐",
+   "storage": "실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "mg",
+    "basisAmount": 330,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 330,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 25mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비바비 5 캡슐<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 제이비케이랩 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 판토텐산 <b>25mg</b>를 표시량으로 담았습니다(표시 기준 330mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 판토텐산 <b>25mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 투명 경질캡슐 · 주식회사 제이비케이랩 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(25mg/330mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 25mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비바비 5 캡슐<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 제이비케이랩 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>25mg</b> of labelled Pantothenic acid (per 330mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>25mg</b> of Pantothenic acid per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 제이비케이랩</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (25mg / 330mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-005",
+  "productName": "웨이크에너지",
+  "productNameEn": "웨이크에너지",
+  "manufacturer": "(주)세종바이오팜",
+  "manufacturerEn": null,
+  "statementNo": "20190009105170",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 이미, 이취가 없고 고유의 향미가 있으며 흰색과 보라색이 섞인 분말\n2. 판토텐산: 표시량(90mg/3g)의 80~180%\n3. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 혹은 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n3) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n5) 섭취량 및 섭취방법을 준수하십시오.\n6) 유통기한이 경과한 제품은 섭취하지 마십시오.\n7) 영·유아, 임신·수유부나 질환보유자 또는 약 복용 중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 흰색과 보라색이 섞인 분말",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 90,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 90mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>웨이크에너지<small>판토텐산</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 판토텐산 <b>90mg</b>를 표시량으로 담았습니다(표시 기준 3g당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 판토텐산 <b>90mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 흰색과 보라색이 섞인 분말 · (주)세종바이오팜 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(90mg/3g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 흰색과 보라색이 섞인 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 90mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>웨이크에너지<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by (주)세종바이오팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 sachet) provides <b>90mg</b> of labelled Pantothenic acid (per 3g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>90mg</b> of Pantothenic acid per serving (1 sachet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세종바이오팜</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (90mg / 3g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 흰색과 보라색이 섞인 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-006",
+  "productName": "케이헬씨 판토텐산",
+  "productNameEn": "케이헬씨 판토텐산",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052317",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[판토텐산] ① 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 판토텐산 : 표시량(5mg/500mg)의 80 ~ 180%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[판토텐산] ① 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케이헬씨 판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 판토텐산 <b>5mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 판토텐산 <b>5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(5mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케이헬씨 판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>5mg</b> of labelled Pantothenic acid (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>5mg</b> of Pantothenic acid per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (5mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-007",
+  "productName": "클린타임",
+  "productNameEn": "클린타임",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "2011002009960",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1)성상 :내용물을 함유한 미백색의 캅셀\n2)판토텐산 : 표시량 (45mg/2000mg)의 80%~180%\n3)대장균군 :음성\n4)붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 4캡슐을 섭취한다.",
+   "caution": "",
+   "dosageForm": "이미, 이취, 이물이 없는 내용물을 함유한 미백색의 경질캅셀",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.  고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.",
+   "shelfLife": "제조일로부터 24개월까지(2년)"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 45,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 4,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 45mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>클린타임<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 1회 4캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 4캡슐)에 판토텐산 <b>45mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(4캡슐) 섭취로 판토텐산 <b>45mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취, 이물이 없는 내용물을 함유한 미백색의 경질캅셀 · 주식회사 아리너스 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 4캡슐</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(45mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취, 이물이 없는 내용물을 함유한 미백색의 경질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지(2년)</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 45mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>클린타임<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · Once a day · 4 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 4 capsules) provides <b>45mg</b> of labelled Pantothenic acid (per 2000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>45mg</b> of Pantothenic acid per serving (4 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">4 capsules per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (45mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취, 이물이 없는 내용물을 함유한 미백색의 경질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지(2년)</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-008",
+  "productName": "판토텐산",
+  "productNameEn": "판토텐산",
+  "manufacturer": "(주)생명과학",
+  "manufacturerEn": null,
+  "statementNo": "200400200388",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 백색의 정제\n2. 판토텐산 : 표시량(30mg/250mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해도 : 건강기능식품공전 III.2 붕해도 시험의 정제제품 시험법에 따라 30분내에 붕해",
+   "intake": "1일 1회, 1회 1정(250mg)씩을 식사후 먹는물로 섭취",
+   "caution": "제품개봉이나 섭취시 포장재에 의해 상처를 입을 수 있어 주의",
+   "dosageForm": "백색의 정제",
+   "storage": "",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 250,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 250,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 판토텐산 <b>30mg</b>를 표시량으로 담았습니다(표시 기준 250mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 판토텐산 <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>백색의 정제 · (주)생명과학 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(30mg/250mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 백색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by (주)생명과학 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>30mg</b> of labelled Pantothenic acid (per 250mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>30mg</b> of Pantothenic acid per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)생명과학</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (30mg / 250mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 백색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-009",
+  "productName": "판토텐산",
+  "productNameEn": "판토텐산",
+  "manufacturer": "주식회사 뉴트리플래닛",
+  "manufacturerEn": null,
+  "statementNo": "2019001602469",
+  "category": "hff",
+  "source": {
+   "mainFunction": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노랑하양 분말을 함유한 흰색의 경질캡슐\n2. 판토텐산 : 표시량 (500 mg/ 600 mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노랑하양 분말을 함유한 흰색의 경질캡슐",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 뉴트리플래닛 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 판토텐산 <b>500mg</b>를 표시량으로 담았습니다(표시 기준 600mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 판토텐산 <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑하양 분말을 함유한 흰색의 경질캡슐 · 주식회사 뉴트리플래닛 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(500mg/600mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑하양 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 뉴트리플래닛 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>500mg</b> of labelled Pantothenic acid (per 600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500mg</b> of Pantothenic acid per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 뉴트리플래닛</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (500mg / 600mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노랑하양 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-010",
+  "productName": "판토텐산",
+  "productNameEn": "판토텐산",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "2018000391599",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말이 든 연한 분홍색의 경질캡슐\n(2) 판토텐산 : 표시량 ( 200 mg/ 450 mg)의 80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오.\n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 분말이 든 연한 분홍색의 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 판토텐산 <b>200mg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 판토텐산 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 분말이 든 연한 분홍색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(200mg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말이 든 연한 분홍색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>200mg</b> of labelled Pantothenic acid (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200mg</b> of Pantothenic acid per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (200mg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말이 든 연한 분홍색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-011",
+  "productName": "판토텐산",
+  "productNameEn": "판토텐산",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052404",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[판토텐산] ① 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 판토텐산 : 표시량(5mg/500mg)의 80 ~ 180%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[판토텐산] ① 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 판토텐산 <b>5mg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 판토텐산 <b>5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(5mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>5mg</b> of labelled Pantothenic acid (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>5mg</b> of Pantothenic acid per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (5mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "pantothenic-acid-012",
+  "productName": "프리미엄 판토텐산",
+  "productNameEn": "프리미엄 판토텐산",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370373",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색의 내용물을 함유한 백색의 경질캡슐\n2) 판토텐산 : 표시량(500 mg / 600 mg)의 80 ~ 180%\n3) 대장균군 : 음성\n4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하얀색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">판토텐산 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 판토텐산<small>판토텐산</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 판토텐산 <b>500mg</b>를 표시량으로 담았습니다(표시 기준 600mg당). 판토텐산의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 판토텐산 <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하얀색의 내용물을 함유한 백색의 경질캡슐 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>판토텐산 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>판토텐산</b> 표시량(500mg/600mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 판토텐산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Pantothenic acid 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 판토텐산<small>Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>500mg</b> of labelled Pantothenic acid (per 600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500mg</b> of Pantothenic acid per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Pantothenic acid nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (500mg / 600mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Pantothenic acid daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

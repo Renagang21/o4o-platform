@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "copper-001",
+  "productName": "iSeanol",
+  "productNameEn": "iSeanol",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701010",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 중갈색 경질캡슐\r\n2) 대장균군 : 음성\r\n3) 붕해도 : 20분이내\r\n4) 구리 : 표시량(0.61mg/900mg)의 80~150%",
+   "intake": "1일1회,1회 3캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 중갈색 경질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 30개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.61,
+    "unit": "mg",
+    "basisAmount": 900,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.61mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>iSeanol<small>구리</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 3캡슐)에 구리 <b>0.61mg</b>를 표시량으로 담았습니다(표시 기준 900mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3캡슐) 섭취로 구리 <b>0.61mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 중갈색 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.61mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 중갈색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 30개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.61mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>iSeanol<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · Once a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 3 capsules) provides <b>0.61mg</b> of labelled Copper (per 900mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.61mg</b> of Copper per serving (3 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.61mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 중갈색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 30개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-002",
+  "productName": "구리",
+  "productNameEn": "구리",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915112",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[구리] ①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰 청록색의 분말이 든 흰색의 경질캡슐\n(2) 구리 : 표시량 (7 mg/ 450 mg)의 80~150%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오. \n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. \n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰 청록색의 분말이 든 흰색의 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 7mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>구리<small>구리</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 구리 <b>7mg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>7mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰 청록색의 분말이 든 흰색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(7mg/450mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰 청록색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 7mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>구리<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>7mg</b> of labelled Copper (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7mg</b> of Copper per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (7mg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰 청록색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-003",
+  "productName": "뉴트리마인 구리",
+  "productNameEn": "뉴트리마인 구리",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "201900163402",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미,이취가 없고 고유의 향미가 있는 연녹색의 원형정제\n2. 구리 : 표시량 (0.8 mg/200mg)의 80~150% 이어야 한다. \n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내 붕해",
+   "intake": "1일 1회, 1회 1정 물과함께 섭취하세요.",
+   "caution": "1) 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 약물투여 중인 분들은 섭취 전 전문가와 상의 하십시오. \n2) 유통기한이 경과된 제품은 섭취하지 마십시오. \n3) 원료 특성산 습기에 매우 민감하여 개봉전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 연녹색의 원형정제",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.8,
+    "unit": "mg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 구리<small>구리</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 구리 <b>0.8mg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>0.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 연녹색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.8mg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 연녹색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 구리<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>0.8mg</b> of labelled Copper (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.8mg</b> of Copper per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.8mg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 연녹색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-004",
+  "productName": "뉴트리마인 미니 구리",
+  "productNameEn": "뉴트리마인 미니 구리",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634039",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰청록색의 원형정제\n2. 구리 : 표시량 (0.8 mg/200mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취하세요.",
+   "caution": "1)과량 섭취 시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오. \n2)소비기한이 경과된 제품은 섭취하지 마십시오. \n3)원료 특성상 습기에 매우 민감하여 개봉 전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰청록색의 원형정제",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.8,
+    "unit": "mg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 미니 구리<small>구리</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 구리 <b>0.8mg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>0.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰청록색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.8mg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰청록색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 미니 구리<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>0.8mg</b> of labelled Copper (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.8mg</b> of Copper per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.8mg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰청록색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-005",
+  "productName": "뉴트리마인 미니 셀레늄",
+  "productNameEn": "뉴트리마인 미니 셀레늄",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634037",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제\n2. 구리 : 표시량 (55 ㎍/15mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취하세요.",
+   "caution": "1)과량 섭취 시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오. \n2)소비기한이 경과된 제품은 섭취하지 마십시오. \n3)원료 특성상 습기에 매우 민감하여 개봉 전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 15,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 미니 셀레늄<small>구리</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 구리 <b>55μg</b>를 표시량으로 담았습니다(표시 기준 15mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(55μg/15mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 미니 셀레늄<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>55μg</b> of labelled Copper (per 15mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>55μg</b> of Copper per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (55μg / 15mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-006",
+  "productName": "셀가디언",
+  "productNameEn": "셀가디언",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "20110020099261",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[구리] ①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미. 이취가 없고 고유의 향미를 가지는 회황색의 장방형 정제\n② 구리 : 표시량(7.5mg/1.8g)의 80~150%\n③ 붕해시험 : 물에서 30분 이내\n④ 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미. 이취가 없고 고유의 향미를 가지는 회황색의 장방형 정제",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7.5,
+    "unit": "mg",
+    "basisAmount": 1.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 7.5mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>셀가디언<small>구리</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>7.5mg</b>를 표시량으로 담았습니다(표시 기준 1.8g당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 구리 <b>7.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미. 이취가 없고 고유의 향미를 가지는 회황색의 장방형 정제 · 주식회사 아리너스 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(7.5mg/1.8g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미. 이취가 없고 고유의 향미를 가지는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 7.5mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>셀가디언<small>Copper</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>7.5mg</b> of labelled Copper (per 1.8g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>7.5mg</b> of Copper per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (7.5mg / 1.8g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미. 이취가 없고 고유의 향미를 가지는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-007",
+  "productName": "카바렉스(Cavalex)",
+  "productNameEn": "카바렉스(Cavalex)",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "201200170107",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 회갈색의 분말을 함유한 투명 경질캡슐\r\n2) 대장균군 : 음성\r\n3) 붕해도 : 20분이내\r\n4) 구리 : 표시량(0.9mg/2.160g)의 80~150%",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회갈색의 분말을 함유한 투명 경질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.9,
+    "unit": "mg",
+    "basisAmount": 2.16,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.9mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>카바렉스(Cavalex)<small>구리</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.9mg</b>를 표시량으로 담았습니다(표시 기준 2.16g당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 구리 <b>0.9mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회갈색의 분말을 함유한 투명 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.9mg/2.16g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회갈색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.9mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>카바렉스(Cavalex)<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>0.9mg</b> of labelled Copper (per 2.16g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>0.9mg</b> of Copper per serving (3 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.9mg / 2.16g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회갈색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-008",
+  "productName": "쿠셀",
+  "productNameEn": "쿠셀",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351595",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 노란 연두색의 내용물을 함유한 투명한 장방형 경질캡슐\n2. 붕해도 : 20분 이내\n3. 구리 : 표시량(6mg/1000mg)의 80~150%\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 노란 연두색의 내용물을 함유한 투명한 장방형 경질캡슐",
+   "storage": "1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 6,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 6mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쿠셀<small>구리</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 구리 <b>6mg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 구리 <b>6mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 밝은 노란 연두색의 내용물을 함유한 투명한 장방형 경질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(6mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 밝은 노란 연두색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 6mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쿠셀<small>Copper</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>6mg</b> of labelled Copper (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>6mg</b> of Copper per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (6mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 밝은 노란 연두색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "copper-009",
+  "productName": "헤마플러스",
+  "productNameEn": "헤마플러스",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "201200170105",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미,이취가 없고 고유의 향미를 가지는 노란 회색의 분말\r\n2) 대장균군 : 음성\r\n3) 구리 : 표시량(1.0mg/5g)의 80~150%",
+   "intake": "1일 2회, 1회 2.5g을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미,이취가 없고 고유의 향미를 가지는 노란 회색의 분말",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1,
+    "unit": "mg",
+    "basisAmount": 5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": null,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 1mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>헤마플러스<small>구리</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>1mg</b>를 표시량으로 담았습니다(표시 기준 5g당). 구리의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회 섭취로 구리 <b>1mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미를 가지는 노란 회색의 분말 · (주)다스코바이오 제조</li></ul>\n  <h2>구리 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(1mg/5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미를 가지는 노란 회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 섭취를 챙기고 싶은 분</li><li>간편한 분말 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 1mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>헤마플러스<small>Copper</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>1mg</b> of labelled Copper (per 5g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1mg</b> of Copper per serving</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Copper nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (1mg / 5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미를 가지는 노란 회색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Copper daily</li><li>Those who prefer a convenient powder form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

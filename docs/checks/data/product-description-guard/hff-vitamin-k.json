@@ -1,0 +1,884 @@
+[
+ {
+  "candidateId": "vitamin-k-001",
+  "productName": "Novaskin",
+  "productNameEn": "Novaskin",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082239",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 혈액응고에 필요②뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 노란하얀색 장방형의 투명 제피 정제\n2. 비타민K : 표시량(21μg/1000mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n항응고제 등 복용시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 노란하얀색 장방형의 투명 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 21,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 21μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>Novaskin<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2정)에 비타민 K <b>21μg</b>를 표시량으로 담았습니다(표시 기준 1000mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 K <b>21μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 노란하얀색 장방형의 투명 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(21μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 노란하얀색 장방형의 투명 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 21μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Novaskin<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 tablets) provides <b>21μg</b> of labelled Vitamin K (per 1000mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>21μg</b> of Vitamin K per serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (21μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 노란하얀색 장방형의 투명 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-002",
+  "productName": "뉴트리마인 미니 비타민K",
+  "productNameEn": "뉴트리마인 미니 비타민K",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634044",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 정상적인 혈액응고에 필요②뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제\n2. 비타민K : 표시량 (70 ㎍/5mg)의 80~180%\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취하세요.",
+   "caution": "1) 항응고제 등 복용 시 전문가와 상담할 것\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 70,
+    "unit": "μg",
+    "basisAmount": 5,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 70μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 미니 비타민K<small>비타민 K</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>70μg</b>를 표시량으로 담았습니다(표시 기준 5mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>70μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(70μg/5mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 70μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 미니 비타민K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>70μg</b> of labelled Vitamin K (per 5mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>70μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (70μg / 5mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-003",
+  "productName": "뉴트리마인 비타민K",
+  "productNameEn": "뉴트리마인 비타민K",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "201900163403",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 혈액응고에 필요②뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 원형정제\n2. 비타민K : 표시량 (70 ㎍ / 200mg)의 80~150% 이어야 한다.\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내 붕해",
+   "intake": "1일 1회, 1회 1정 물과함께 섭취하세요.",
+   "caution": "1) 항응고제 등 복용 시 전문가와 상담할 것\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 원형정제",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 70,
+    "unit": "μg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 70μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 비타민K<small>비타민 K</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>70μg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>70μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(70μg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 70μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 비타민K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>70μg</b> of labelled Vitamin K (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>70μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (70μg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-004",
+  "productName": "메나퀴논 MK7 비타민K2 180μg 영양제",
+  "productNameEn": "메나퀴논 MK7 비타민K2 180μg 영양제",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211712",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ①정상적인 혈액응고에 필요②뼈의 구성에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 타원형 제피정제\n②비타민K : 표시량(180 ㎍/500 mg)의 80~180%\n③대장균군 : 음성\n④붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 타원형 제피정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 180,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 180μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메나퀴논 MK7 비타민K2 180μg 영양제<small>비타민 K</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>180μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>180μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 타원형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(180μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 180μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메나퀴논 MK7 비타민K2 180μg 영양제<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>180μg</b> of labelled Vitamin K (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>180μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (180μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-005",
+  "productName": "메나퀴논 MK7 비타민K2 180μg 영양제 골드",
+  "productNameEn": "메나퀴논 MK7 비타민K2 180μg 영양제 골드",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211897",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K]  (1) 정상적인 혈액응고에 필요, (2) 뼈의 구성에 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색의 타원형 제피정제\n(2)비타민K : 표시량(180 ㎍/500 mg)의 80~180%\n(3)대장균군 : 음성\n(4)붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색의 타원형 제피정제",
+   "storage": "(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 180,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 180μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메나퀴논 MK7 비타민K2 180μg 영양제 골드<small>비타민 K</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>180μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>180μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색의 타원형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요,</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(180μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 180μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메나퀴논 MK7 비타민K2 180μg 영양제 골드<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>180μg</b> of labelled Vitamin K (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>180μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (180μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> (1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-006",
+  "productName": "비바퀴논 캡슐",
+  "productNameEn": "비바퀴논 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "manufacturerEn": null,
+  "statementNo": "2016000751592",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K]\n(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 밝은 연두색의 내용물을 함유한 투명한 장방형 경질캡슐 \n(2) 비타민K : 표시량(1,000㎍/380mg)의 80～180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1캡슐당 380 mg)을 물과 함께 섭취하십시오.",
+   "caution": "[비타민K]\n(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 밝은 연두색의 내용물을 함유한 투명한 장방형 경질캡슐",
+   "storage": "실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 380,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 380,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비바퀴논 캡슐<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 제이비케이랩 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>1000μg</b>를 표시량으로 담았습니다(표시 기준 380mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 밝은 연두색의 내용물을 함유한 투명한 장방형 경질캡슐 · 주식회사 제이비케이랩 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(1000μg/380mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 연두색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비바퀴논 캡슐<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 제이비케이랩 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>1000μg</b> of labelled Vitamin K (per 380mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 제이비케이랩</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (1000μg / 380mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 연두색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-007",
+  "productName": "비타민 K",
+  "productNameEn": "비타민 K",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997236",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 K](1) 정상적인 혈액응고에 필요(2) 뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 백색의 경질캡슐\n2. 비타민K : 표시량(21ug/340mg)의 80~180% \n3. 대장균군 : 음성\n4. 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "실온보관/고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 21,
+    "unit": "μg",
+    "basisAmount": 340,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 21μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민 K<small>비타민 K</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>21μg</b>를 표시량으로 담았습니다(표시 기준 340mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>21μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 백색의 경질캡슐 · (주)파마피아 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(21μg/340mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온보관/고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 21μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민 K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>21μg</b> of labelled Vitamin K (per 340mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>21μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (21μg / 340mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온보관/고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-008",
+  "productName": "비타민 K",
+  "productNameEn": "비타민 K",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "2018000391584",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ① 정상적인 혈액응고에 필요 ② 뼈의 구성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말이 든 흰색의 경질캡슐\n(2) 비타민 K : 표시량 (1,000 μg/ 450 mg)의 80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오. \n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. \n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.\n⑤ 항응고제 등 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말이 든 흰색의 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민 K<small>비타민 K</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>1000μg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말이 든 흰색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(1000μg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민 K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>1000μg</b> of labelled Vitamin K (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (1000μg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말이 든 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-009",
+  "productName": "비타민K",
+  "productNameEn": "비타민K",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052376",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ① 정상적인 혈액응고에 필요 ② 뼈의 구성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 비타민K : 표시량(70μg/500mg)의 80 ~ 180%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[비타민K] ① 항응고제 등 복용 시 전문가와 상담하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 70,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 70μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민K<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>70μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>70μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(70μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 70μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>70μg</b> of labelled Vitamin K (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>70μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (70μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-010",
+  "productName": "비타민K2",
+  "productNameEn": "비타민K2",
+  "manufacturer": "(주)케이지앤에프",
+  "manufacturerEn": null,
+  "statementNo": "20040016020301",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "성상:고유의 향미가 있고 이미,이취가 없는 하얀색의 장방형 정제\n비타민k:표시량 ( 220ug /430 mg)의 80~180%\n대장균군:음성 \n붕해시험: 30분이내",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "항응고제 등 복용 시 전문가와 상담하십시오\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 하얀색의 장방형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 220,
+    "unit": "μg",
+    "basisAmount": 430,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 220μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민K2<small>비타민 K</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>220μg</b>를 표시량으로 담았습니다(표시 기준 430mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>220μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 하얀색의 장방형 정제 · (주)케이지앤에프 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(220μg/430mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 220μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민K2<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)케이지앤에프 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>220μg</b> of labelled Vitamin K (per 430mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>220μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)케이지앤에프</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (220μg / 430mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-011",
+  "productName": "비타민K2 MK-7",
+  "productNameEn": "비타민K2 MK-7",
+  "manufacturer": "(주)비오팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "2024002023355",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] (1) 정상적인 혈액응고에 필요, (2) 뼈의 구성에 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 갈색의 타원형 연질캡슐\r\n(2)비타민K : 표시량(100 μg/150 mg)의 80~180%\r\n(3)붕해시험 : 20분 이내\r\n(4)대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\r\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 갈색의 타원형 연질캡슐",
+   "storage": "실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "μg",
+    "basisAmount": 150,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 100μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민K2 MK-7<small>비타민 K</small></h1><p class=\"sd-meta\">(주)비오팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>100μg</b>를 표시량으로 담았습니다(표시 기준 150mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>100μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 갈색의 타원형 연질캡슐 · (주)비오팜2공장 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요,</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(100μg/150mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 100μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민K2 MK-7<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)비오팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>100μg</b> of labelled Vitamin K (per 150mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>100μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜2공장</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (100μg / 150mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-012",
+  "productName": "뼈 건강 비타민 K2",
+  "productNameEn": "뼈 건강 비타민 K2",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370239",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 포함한 하얀색의 장방형 경질캡슐\n2) 비타민K : 표시량(120 μg / 300 mg)의 80%~180%\n3) 대장균군 : 음성\n4) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 포함한 하얀색의 장방형 경질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건냉한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 120,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 120μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈 건강 비타민 K2<small>비타민 K</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>120μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>120μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 포함한 하얀색의 장방형 경질캡슐 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(120μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 포함한 하얀색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하여 건냉한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 120μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뼈 건강 비타민 K2<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>120μg</b> of labelled Vitamin K (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>120μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (120μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말을 포함한 하얀색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하여 건냉한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-013",
+  "productName": "어스타민 K2 (Ustamin K2)",
+  "productNameEn": "어스타민 K2 (Ustamin K2)",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997242",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 연홍색/백색의 경질캡슐\n2. 비타민 K : 표시량(50ug/340mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 연홍색/백색의 경질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 340,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 50μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>어스타민 K2 (Ustamin K2)<small>비타민 K</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 K <b>50μg</b>를 표시량으로 담았습니다(표시 기준 340mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 K <b>50μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 연홍색/백색의 경질캡슐 · (주)파마피아 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(50μg/340mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 연홍색/백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 50μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>어스타민 K2 (Ustamin K2)<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>50μg</b> of labelled Vitamin K (per 340mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>50μg</b> of Vitamin K per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (50μg / 340mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 내용물을 함유한 연홍색/백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-014",
+  "productName": "오스테온 K2 Osteon K2",
+  "productNameEn": "오스테온 K2 Osteon K2",
+  "manufacturer": "디에이치팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040015102222",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미,이취가 없는 흰색의 원형 정제\n붕해시험 : 30분 이내\n대장균군 : 음성\n비타민K : 표시량(180µg/300mg)의 80～180%",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 흰색의 원형 정제",
+   "storage": "직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관",
+   "shelfLife": "제조일로부터 실온에서 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 180,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 180μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오스테온 K2 Osteon K2<small>비타민 K</small></h1><p class=\"sd-meta\">디에이치팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>180μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>180μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 흰색의 원형 정제 · 디에이치팜(주) 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(180μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 180μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오스테온 K2 Osteon K2<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 디에이치팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>180μg</b> of labelled Vitamin K (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>180μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 디에이치팜(주)</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (180μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 흰색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-015",
+  "productName": "초임계 비타민 K-2 골드",
+  "productNameEn": "초임계 비타민 K-2 골드",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200083088",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] 정상적인 혈액응고에 필요, 뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 원형 제피 정제\n2. 비타민K : 표시량(210㎍/300mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민K] 항응고제 등 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 원형 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 210,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 210μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>초임계 비타민 K-2 골드<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>210μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>210μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 원형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(210μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 210μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>초임계 비타민 K-2 골드<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>210μg</b> of labelled Vitamin K (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>210μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (210μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 원형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-016",
+  "productName": "케이헬씨 비타민K",
+  "productNameEn": "케이헬씨 비타민K",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052304",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ① 정상적인 혈액응고에 필요 ② 뼈의 구성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 비타민K : 표시량(70μg/500mg)의 80 ~ 180%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[비타민K] ① 항응고제 등 복용 시 전문가와 상담하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 70,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 70μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케이헬씨 비타민K<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>70μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>70μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(70μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 70μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케이헬씨 비타민K<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>70μg</b> of labelled Vitamin K (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>70μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (70μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-017",
+  "productName": "퓨어비타민 K1000 플러스",
+  "productNameEn": "퓨어비타민 K1000 플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106402",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ①정상적인 혈액응고에 필요 ②뼈의 구성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 황회색의 원형정제\n② 비타민 K  : 표시량(1000㎍/300mg)의 80 ~ 180%\n③ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n④ 동봉된 방습제(실리카겔)는 섭취하지 마십시오.\n⑤ 항응고제 등 복용 시 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황회색의 원형정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>퓨어비타민 K1000 플러스<small>비타민 K</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>1000μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황회색의 원형정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(1000μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황회색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>씹어 먹는 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>퓨어비타민 K1000 플러스<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1000μg</b> of labelled Vitamin K (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (1000μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 황회색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer a chewable form</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-018",
+  "productName": "프리미엄 비타민K2 메나퀴논 MK-7",
+  "productNameEn": "프리미엄 비타민K2 메나퀴논 MK-7",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041458",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 검정색과 연한 노랑색의 점박이가 있는 흰색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n5) 비타민K: 표시량(180㎍/500mg)의 80~180%",
+   "intake": "1일 1회, 1회 1정씩 물과 함께 섭취",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 검정색과 연한 노랑색의 점박이가 있는 흰색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 180,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 180μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 비타민K2 메나퀴논 MK-7<small>비타민 K</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>180μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>180μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 검정색과 연한 노랑색의 점박이가 있는 흰색의 장방형 제피정제 · 엔피케이(주) 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(180μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 검정색과 연한 노랑색의 점박이가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 180μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 비타민K2 메나퀴논 MK-7<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>180μg</b> of labelled Vitamin K (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>180μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (180μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 검정색과 연한 노랑색의 점박이가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-019",
+  "productName": "플로우1",
+  "productNameEn": "플로우1",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052430",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민K] ① 정상적인 혈액응고에 필요 ② 뼈의 구성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 제피정제\n② 비타민K : 표시량(220㎍ / 2,100mg)의 80 ~ 180%\n③ 대장균군 : 음성\n④ 붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 3정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[비타민K] ① 항응고제 등 복용 시 전문가와 상담하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 제피정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 220,
+    "unit": "μg",
+    "basisAmount": 2100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 220μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>플로우1<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 3정)에 비타민 K <b>220μg</b>를 표시량으로 담았습니다(표시 기준 2100mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 비타민 K <b>220μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 제피정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(220μg/2100mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 220μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>플로우1<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 3 tablets) provides <b>220μg</b> of labelled Vitamin K (per 2100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>220μg</b> of Vitamin K per serving (3 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (220μg / 2100mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-020",
+  "productName": "하이퍼셀 초임계 비타민K2",
+  "productNameEn": "하이퍼셀 초임계 비타민K2",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200083135",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 K] 정상적인 혈액응고에 필요, 뼈의 구성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 회황색의 투명 원형 제피 정제\n2. 비타민 K : 표시량(210μg/300mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민 K] 항응고제 등 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 회황색의 투명 원형 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 210,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 210μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하이퍼셀 초임계 비타민K2<small>비타민 K</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>210μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>210μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 회황색의 투명 원형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(210μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 회황색의 투명 원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 210μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>하이퍼셀 초임계 비타민K2<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>210μg</b> of labelled Vitamin K (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>210μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (210μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 밝은 회황색의 투명 원형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-k-021",
+  "productName": "휴비스트 Hi K2",
+  "productNameEn": "휴비스트 Hi K2",
+  "manufacturer": "(주)휴비스트제약",
+  "manufacturerEn": null,
+  "statementNo": "201800122966",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 녹색의 장방형 제피정제\n②비타민K(%) : 표시량(200ug/450mg)의 80~180%\n③붕해시험 : 적합(제피정제 : 60분 이내)\n④대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 항응고제 등 복용 시 전문가와 상담하십시오.\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십사오.\n(3) 특이체질 및 알레르기 체질이신 분은 성분을 확인한 후 섭취하시기 바랍니다.\n(4) 질환 보유자 또는 약물 복용 중이신 분은 섭취 전에 의사, 약사 등 전문가와 상담하십시오.\n(5) 용기 내 방습제는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 녹색의 장방형 제피정제",
+   "storage": "①직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품 개봉 후 보관 시 흡습 방지를 위해 뚜껑을 꼭 닫아 주십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 K 200μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>휴비스트 Hi K2<small>비타민 K</small></h1><p class=\"sd-meta\">(주)휴비스트제약 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 K <b>200μg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 비타민 K의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 K <b>200μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 녹색의 장방형 제피정제 · (주)휴비스트제약 제조</li></ul>\n  <h2>비타민 K 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 K</b> 표시량(200μg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 녹색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ①직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품 개봉 후 보관 시 흡습 방지를 위해 뚜껑을 꼭 닫아 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 K 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin K 200μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>휴비스트 Hi K2<small>Vitamin K</small></h1><p class=\"sd-meta\">Made by (주)휴비스트제약 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>200μg</b> of labelled Vitamin K (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>200μg</b> of Vitamin K per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)휴비스트제약</li></ul>\n  <h2>Vitamin K nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for normal blood clotting</li><li>Needed for the structure of bone</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin K</b> labelled (200μg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 녹색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ①직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품 개봉 후 보관 시 흡습 방지를 위해 뚜껑을 꼭 닫아 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin K daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

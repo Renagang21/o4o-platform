@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "vitamin-b2-001",
+  "productName": "금단미인 온",
+  "productNameEn": "금단미인 온",
+  "manufacturer": "주식회사 뉴트리플래닛",
+  "manufacturerEn": null,
+  "statementNo": "2019001602478",
+  "category": "hff",
+  "source": {
+   "mainFunction": "체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 투명한 경질캡슐\n2. 비타민B2 : 표시량(1.4mg/800mg)의 80 ~ 180%\n3. 대장균군 : 음성\n4. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐 또는 1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>금단미인 온<small>비타민 B2</small></h1><p class=\"sd-meta\">주식회사 뉴트리플래닛 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 비타민 B2 <b>1.4mg</b>를 표시량으로 담았습니다(표시 기준 800mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 B2 <b>1.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 투명한 경질캡슐 · 주식회사 뉴트리플래닛 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>금단미인 온<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by 주식회사 뉴트리플래닛 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>1.4mg</b> of labelled Vitamin B2 (per 800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1.4mg</b> of Vitamin B2 per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 뉴트리플래닛</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-002",
+  "productName": "금단미인 온",
+  "productNameEn": "금단미인 온",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007263",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①체내 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색분말을 함유한 투명경질캡슐\n② 비타민B2 : 표시량 (1.4 mg/800 mg)의 80~180%\n③ 대장균군 : 음성\n④ 붕해시험 : 적합(20분이내)",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n- 용기 안의 실리카겔(방습제)은 절대 드시지 마십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색분말을 함유한 투명경질캡슐",
+   "storage": "- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>금단미인 온<small>비타민 B2</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 비타민 B2 <b>1.4mg</b>를 표시량으로 담았습니다(표시 기준 800mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 B2 <b>1.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 갈색분말을 함유한 투명경질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 갈색분말을 함유한 투명경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>금단미인 온<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>1.4mg</b> of labelled Vitamin B2 (per 800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1.4mg</b> of Vitamin B2 per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 갈색분말을 함유한 투명경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.- 고온다습(30℃ 이상, 상대습도 75% 이상), 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-003",
+  "productName": "금단미인 온",
+  "productNameEn": "금단미인 온",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211093",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B2] ①체내 에너지 생성에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 황갈색의 내용물을 함유한 투명한 경질캡슐\n②비타민B2 : 표시량(1.4mg/800mg)의 80~180%\n③붕해시험 : 20분이내\n④대장균군 : 음성",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n- 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황갈색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>금단미인 온<small>비타민 B2</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 비타민 B2 <b>1.4mg</b>를 표시량으로 담았습니다(표시 기준 800mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 B2 <b>1.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황갈색의 내용물을 함유한 투명한 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>금단미인 온<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>1.4mg</b> of labelled Vitamin B2 (per 800mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1.4mg</b> of Vitamin B2 per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-004",
+  "productName": "밸런스",
+  "productNameEn": "밸런스",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "2011002009915",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B2]①체내 에너지 생성에 필요",
+   "baseStandard": "1)성상 :이미,이취가 없는 황갈색의 제피정제\r\n2)비타민B2: 표시량(1.4mg/1.6g)의 80~180%\r\n3)붕해시험 : 60분이내\r\n4)대장균군 :음성",
+   "intake": "1일 2회, 1회 2정섭취",
+   "caution": "-특이체질 등 알러지체질인 경우에는 성분을 확인하신 후 취하십시오.\r\n -포장 자재에 의해 다치실 우려가 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없는 황갈색의 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.  \r\n고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 1.6,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>밸런스<small>비타민 B2</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.4mg</b>를 표시량으로 담았습니다(표시 기준 1.6g당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 B2 <b>1.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 황갈색의 제피정제 · 주식회사 아리너스 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1.6g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 황갈색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>밸런스<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>1.4mg</b> of labelled Vitamin B2 (per 1.6g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1.4mg</b> of Vitamin B2 per serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1.6g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 황갈색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-005",
+  "productName": "비타민 B2",
+  "productNameEn": "비타민 B2",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915104",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 체내 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색의 분말이 든 갈색의 경질캡슐\n(2) 비타민 B2 : 표시량 (40 mg/ 450 mg)의 80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오.\n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오.",
+   "dosageForm": "고유의 향미가 있고이미, 이취가 없는 밝은 노란 주황색의 분말이 든 갈색 경질 캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 40,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 40mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민 B2<small>비타민 B2</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 B2 <b>40mg</b>를 표시량으로 담았습니다(표시 기준 450mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B2 <b>40mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고이미, 이취가 없는 밝은 노란 주황색의 분말이 든 갈색 경질 캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(40mg/450mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고이미, 이취가 없는 밝은 노란 주황색의 분말이 든 갈색 경질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 40mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타민 B2<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>40mg</b> of labelled Vitamin B2 (per 450mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>40mg</b> of Vitamin B2 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (40mg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고이미, 이취가 없는 밝은 노란 주황색의 분말이 든 갈색 경질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-006",
+  "productName": "코리긴 디 (KOLIGIN-D)",
+  "productNameEn": "코리긴 디 (KOLIGIN-D)",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028825",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 밝은 적갈색의 연질캡슐\n2. 비타민B2 : 표시량(4mg/850mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해도 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 밝은 적갈색의 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 4,
+    "unit": "mg",
+    "basisAmount": 850,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코리긴 디 (KOLIGIN-D)<small>비타민 B2</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 B2 <b>4mg</b>를 표시량으로 담았습니다(표시 기준 850mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B2 <b>4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 밝은 적갈색의 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(4mg/850mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 밝은 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 4mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코리긴 디 (KOLIGIN-D)<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>4mg</b> of labelled Vitamin B2 (per 850mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>4mg</b> of Vitamin B2 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (4mg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 밝은 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-007",
+  "productName": "코리긴 엑스트라(KOLIGIN EXTRA)",
+  "productNameEn": "코리긴 엑스트라(KOLIGIN EXTRA)",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028824",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐\n2. 비타민B2 : 표시량(2mg/850mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해도 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2,
+    "unit": "mg",
+    "basisAmount": 850,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 2mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코리긴 엑스트라(KOLIGIN EXTRA)<small>비타민 B2</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1캡슐)에 비타민 B2 <b>2mg</b>를 표시량으로 담았습니다(표시 기준 850mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B2 <b>2mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(2mg/850mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 2mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코리긴 엑스트라(KOLIGIN EXTRA)<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 capsule) provides <b>2mg</b> of labelled Vitamin B2 (per 850mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2mg</b> of Vitamin B2 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (2mg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-008",
+  "productName": "풀타임",
+  "productNameEn": "풀타임",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "2011002009961",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①체내 에너지 생성에 필요",
+   "baseStandard": "1)성상 :이미, 이취가 없는 황갈색의 제피정제\n2)비타민B2 : 표시량 (1.4mg/1.6g)의 80%~180%\n3)대장균군 :음성\n4)붕해시험 : 60분이내",
+   "intake": "1일 2회, 1회 2정을 섭취한다.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없는 황갈색의 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.  고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.",
+   "shelfLife": "제조일로부터 24개월까지(2년)"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 1.6,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>풀타임<small>비타민 B2</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.4mg</b>를 표시량으로 담았습니다(표시 기준 1.6g당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 B2 <b>1.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 황갈색의 제피정제 · 주식회사 아리너스 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1.6g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 황갈색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지(2년)</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>풀타임<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>1.4mg</b> of labelled Vitamin B2 (per 1.6g of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1.4mg</b> of Vitamin B2 per serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1.6g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 황갈색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지(2년)</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "vitamin-b2-009",
+  "productName": "프리미엄 고리브맥스(Premium Golivemaxx)",
+  "productNameEn": "프리미엄 고리브맥스(Premium Golivemaxx)",
+  "manufacturer": "케이지랩 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "20040017038145",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 B2] ①체내 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 노랑색의 내용물을 함유한 어두운 갈색의 장방형 연질캅셀\n(2) 비타민 B2 : 표시량 (2.35mg/ 1,400mg)의  80~180%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분이내",
+   "intake": "1일 2회, 1회 1캡슐(700mg)을 물과 함께 섭취하십시오",
+   "caution": "- 제품 개봉 후, 밀봉 보관하여야 하며 가능한 빨리 섭취하여 주십시오.\n- 알레르기 등 특이체질의 경우 성분을 확인한 후 섭취하여 주십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 노랑색의 내용물을 함유한 어두운 갈색의 장방형 연질캅셀",
+   "storage": "실온/ 직사광선이나 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.35,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 700,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 2.35mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>프리미엄 고리브맥스(Premium Golivemaxx)<small>비타민 B2</small></h1><p class=\"sd-meta\">케이지랩 주식회사 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>2.35mg</b>를 표시량으로 담았습니다(표시 기준 1400mg당). 비타민 B2의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 비타민 B2 <b>2.35mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 노랑색의 내용물을 함유한 어두운 갈색의 장방형 연질캅셀 · 케이지랩 주식회사 제조</li></ul>\n  <h2>비타민 B2 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(2.35mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 노랑색의 내용물을 함유한 어두운 갈색의 장방형 연질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선이나 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 2.35mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>프리미엄 고리브맥스(Premium Golivemaxx)<small>Vitamin B2</small></h1><p class=\"sd-meta\">Made by 케이지랩 주식회사 · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product provides <b>2.35mg</b> of labelled Vitamin B2 (per 1400mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2.35mg</b> of Vitamin B2 per serving (1 capsule)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 케이지랩 주식회사</li></ul>\n  <h2>Vitamin B2 nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (2.35mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 노랑색의 내용물을 함유한 어두운 갈색의 장방형 연질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선이나 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Vitamin B2 daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

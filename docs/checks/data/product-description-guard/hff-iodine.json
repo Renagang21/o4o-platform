@@ -1,0 +1,296 @@
+[
+ {
+  "candidateId": "iodine-001",
+  "productName": "뉴트리마인 미니 요오드",
+  "productNameEn": "뉴트리마인 미니 요오드",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634042",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①갑상선 호르몬의 합성에 필요②에너지 생성에 필요③신경발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제\n2. 요오드 : 표시량 (150 ㎍/5mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취하세요.",
+   "caution": "1)과량 섭취 시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오. \n2)소비기한이 경과된 제품은 섭취하지 마십시오. \n3)원료 특성상 습기에 매우 민감하여 개봉 전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.\n4)용기 안에 있는 방습제는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 150,
+    "unit": "μg",
+    "basisAmount": 5,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 150μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 미니 요오드<small>요오드</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>150μg</b>를 표시량으로 담았습니다(표시 기준 5mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>150μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(150μg/5mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 150μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 미니 요오드<small>Iodine</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>150μg</b> of labelled Iodine (per 5mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>150μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (150μg / 5mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-002",
+  "productName": "뉴트리마인 요오드",
+  "productNameEn": "뉴트리마인 요오드",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634012",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①갑상선 호르몬의 합성에 필요②에너지 생성에 필요③신경발달에 필요",
+   "baseStandard": "1. 성상 : 이미,이취가 없고 고유의 향미가 있는 미백색의 원형 정제 \n2. 요오드 : 표시량 (150.0 ㎍ / 200mg)의 80~150% 이어야 한다.\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내 붕해",
+   "intake": "1일 1회, 1회 1정 물과함께 섭취하세요.",
+   "caution": "1) 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 약물투여 중인 분들은 섭취 전 전문가와 상의 하십시오. \n2) 유통기한이 경과된 제품은 섭취하지 마십시오. \n3) 원료 특성산 습기에 매우 민감하여 개봉전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 미백색의 원형 정제",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 150,
+    "unit": "μg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 150μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 요오드<small>요오드</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>150μg</b>를 표시량으로 담았습니다(표시 기준 200mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>150μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 미백색의 원형 정제 · (주)비티엔랩 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(150μg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 미백색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 150μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 요오드<small>Iodine</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>150μg</b> of labelled Iodine (per 200mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>150μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (150μg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 미백색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-003",
+  "productName": "모노 요오드 300 MONO IODINE 300",
+  "productNameEn": "모노 요오드 300 MONO IODINE 300",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832261",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[요오드]\n(가) 갑상선 호르몬의 합성에 필요\n(나) 에너지 생성에 필요\n(다) 신경발달에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 원형 제피정제\n(2) 요오드 : 표시량(300 μg / 300 mg)의 80이상 150% 이하\n(3) 대장균군 : 음성\n(4) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 하얀색의 원형 제피정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 300μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>모노 요오드 300 MONO IODINE 300<small>요오드</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>300μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>300μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 하얀색의 원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(300μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 300μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>모노 요오드 300 MONO IODINE 300<small>Iodine</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>300μg</b> of labelled Iodine (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>300μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (300μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-004",
+  "productName": "셀로맥스 요오드",
+  "productNameEn": "셀로맥스 요오드",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031489",
+  "category": "hff",
+  "source": {
+   "mainFunction": "요오드 : 1)갑상선 호르몬의 합성에 필요 2)에너지 생성에 필요 3)신경발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 장방형 제피정제\n2. 요오드 : 표시량(1,500 ug/650 mg)의 80~150%\n3. 대장균군 : 음성\n4. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. \n2) 원료의 특성상 약간의 색상변화가 있거나 손에 묻어날 수 있으나 품질에는 이상이 없으므로 안심하고 섭취하십시오",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 장방형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1500,
+    "unit": "μg",
+    "basisAmount": 650,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 1500μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 요오드<small>요오드</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>1500μg</b>를 표시량으로 담았습니다(표시 기준 650mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>1500μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 장방형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(1500μg/650mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 1500μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로맥스 요오드<small>Iodine</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1500μg</b> of labelled Iodine (per 650mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1500μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (1500μg / 650mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-005",
+  "productName": "아이오딘 포스 300 Iodine Force 300",
+  "productNameEn": "아이오딘 포스 300 Iodine Force 300",
+  "manufacturer": "디에이치팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040015102225",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 갑상선 호르몬의 합성에 필요\n(2) 에너지 생성에 필요\n(3) 신경발달에 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미,이취가 없는 파란 하양색의 원형 정제\n붕해시험 : 30분 이내\n대장균군 : 음성\n요오드 : 표시량(300µg/300mg)의 80～150%",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 파란 하양색의 원형 정제",
+   "storage": "직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관",
+   "shelfLife": "제조일로부터 실온에서 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 300μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이오딘 포스 300 Iodine Force 300<small>요오드</small></h1><p class=\"sd-meta\">디에이치팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>300μg</b>를 표시량으로 담았습니다(표시 기준 300mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>300μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 파란 하양색의 원형 정제 · 디에이치팜(주) 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(300μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 파란 하양색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 300μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이오딘 포스 300 Iodine Force 300<small>Iodine</small></h1><p class=\"sd-meta\">Made by 디에이치팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>300μg</b> of labelled Iodine (per 300mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>300μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 디에이치팜(주)</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (300μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 파란 하양색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 실온에서 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-006",
+  "productName": "케이헬씨 요오드",
+  "productNameEn": "케이헬씨 요오드",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052310",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[요오드] ① 갑상선 호르몬의 합성에 필요 ② 에너지 생성에 필요 ③ 신경발달에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제\n② 요오드 : 표시량(150ug/500mg)의 80 ~ 150%\n③ 대장균군 : 음성\n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 150,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 150μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케이헬씨 요오드<small>요오드</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>150μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>150μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(150μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 150μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케이헬씨 요오드<small>Iodine</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>150μg</b> of labelled Iodine (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>150μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (150μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "iodine-007",
+  "productName": "티컨트롤요오드1000",
+  "productNameEn": "티컨트롤요오드1000",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141285",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[요오드] \n① 갑상선 호르몬의 합성에 필요 \n② 에너지 생성에 필요\n③ 신경발달에 필요",
+   "baseStandard": "① 성상 : 흰색의 제피정제\n② 요오드 : 표시량(1,000 ㎍/500 mg)의 80~150%\n③ 대장균군 : 음성\n④ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함",
+   "dosageForm": "고유의 향미가 있는 흰색의 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>티컨트롤요오드1000<small>요오드</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 요오드 <b>1000μg</b>를 표시량으로 담았습니다(표시 기준 500mg당). 요오드의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 요오드 <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있는 흰색의 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>요오드 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(1000μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있는 흰색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>티컨트롤요오드1000<small>Iodine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1000μg</b> of labelled Iodine (per 500mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000μg</b> of Iodine per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Iodine nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (1000μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있는 흰색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Iodine daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

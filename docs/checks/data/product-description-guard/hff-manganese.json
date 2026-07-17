@@ -1,0 +1,128 @@
+[
+ {
+  "candidateId": "manganese-001",
+  "productName": "뉴트리마인 망간",
+  "productNameEn": "뉴트리마인 망간",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "201900163404",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미백색~미황색 원형 정제\n2. 망간 : 표시량 (3 mg/100mg)의 80~150% 이어야 한다. \n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내 붕해",
+   "intake": "1일 1회, 1회 1정 물과함께 섭취하세요.",
+   "caution": "1) 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 약물투여 중인 분들은 섭취 전 전문가와 상의 하십시오. \n2) 유통기한이 경과된 제품은 섭취하지 마십시오. \n3) 원료 특성산 습기에 매우 민감하여 개봉전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미백색~미황색 원형정제",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 망간<small>망간</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 망간 <b>3mg</b>를 표시량으로 담았습니다(표시 기준 100mg당). 망간의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 망간 <b>3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미백색~미황색 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>망간 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(3mg/100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미백색~미황색 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 망간<small>Manganese</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>3mg</b> of labelled Manganese (per 100mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>3mg</b> of Manganese per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Manganese nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for bone formation</li><li>Needed for energy utilisation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 100mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미백색~미황색 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Manganese daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "manganese-002",
+  "productName": "뉴트리마인 미니 망간",
+  "productNameEn": "뉴트리마인 미니 망간",
+  "manufacturer": "(주)비티엔랩",
+  "manufacturerEn": null,
+  "statementNo": "2019001634041",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 원형정제\n2. 망간 : 표시량 (3mg/30mg)의 80~150%\n3. 대장균군 : 음성 \n4. 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취하세요.",
+   "caution": "1)과량 섭취 시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오. \n2)소비기한이 경과된 제품은 섭취하지 마십시오. \n3)원료 특성상 습기에 매우 민감하여 개봉 전에도 보관상태에 따라 제품색상이 변하는 흡습현상이 생길 수 있습니다.\n4)용기 안에 있는 방습제는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 원형정제",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 30,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리마인 미니 망간<small>망간</small></h1><p class=\"sd-meta\">(주)비티엔랩 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 망간 <b>3mg</b>를 표시량으로 담았습니다(표시 기준 30mg당). 망간의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 망간 <b>3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 원형정제 · (주)비티엔랩 제조</li></ul>\n  <h2>망간 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(3mg/30mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리마인 미니 망간<small>Manganese</small></h1><p class=\"sd-meta\">Made by (주)비티엔랩 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>3mg</b> of labelled Manganese (per 30mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>3mg</b> of Manganese per serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비티엔랩</li></ul>\n  <h2>Manganese nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for bone formation</li><li>Needed for energy utilisation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 30mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Manganese daily</li><li>Those who prefer tablets</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "manganese-003",
+  "productName": "망간셀",
+  "productNameEn": "망간셀",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351585",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[망간]\n뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명한 장방형 경질캡슐\n2. 붕해도 : 20분 이내\n3. 대장균군 : 음성\n4. 망간 : 표시량(10mg/600mg)의 80~150%",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오. 또는 1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 섭취량 및 섭취방법을 확인한 후 섭취하십시오. \n2. 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오. \n3. 특정성분에 알레르기가 있으신 분은 원재료명을 확인 후 섭취하십시오.\n4. 강력방습제인 실리카겔은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명한 장방형 경질캡슐",
+   "storage": "1) 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 본 제품은 개봉 후 보관 조건에 따라 색상이 짙어지거나 내용물 본연의 취가 날 수 있으니 고온 다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하시고, 혹시나 색상이 짙어 지더라도 제품에는 문제가 없으니 안심하시고 섭취하셔도 됩니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 10mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>망간셀<small>망간</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2캡슐)에 망간 <b>10mg</b>를 표시량으로 담았습니다(표시 기준 600mg당). 망간의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 망간 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명한 장방형 경질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>망간 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(10mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 본 제품은 개봉 후 보관 조건에 따라 색상이 짙어지거나 내용물 본연의 취가 날 수 있으니 고온 다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하시고, 혹시나 색상이 짙어 지더라도 제품에는 문제가 없으니 안심하시고 섭취하셔도 됩니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 영양 균형을 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 10mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>망간셀<small>Manganese</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 capsules) provides <b>10mg</b> of labelled Manganese (per 600mg of product). Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>10mg</b> of Manganese per serving (2 capsules)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Manganese nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for bone formation</li><li>Needed for energy utilisation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (10mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 본 제품은 개봉 후 보관 조건에 따라 색상이 짙어지거나 내용물 본연의 취가 날 수 있으니 고온 다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하시고, 혹시나 색상이 짙어 지더라도 제품에는 문제가 없으니 안심하시고 섭취하셔도 됩니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take Manganese daily</li><li>Those who prefer capsules</li><li>Those who want a convenient way to support their nutrition</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
