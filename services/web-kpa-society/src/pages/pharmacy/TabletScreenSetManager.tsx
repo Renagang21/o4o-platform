@@ -640,8 +640,26 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
 //   저장 = createScreenSet|updateScreenSet + saveScreenSetBlocks(전체 교체). 저장 성공 후 리스트 복귀.
 //   코너 적용/해제는 노출하지 않음(코너별 운영 탭 전용). draft 실미리보기는 후속 WO(placeholder).
 // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 단계 = 업무 3항목 고정(BUILDER_STEPS). 블록은 자동 준비.
+// WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.2:
+//   RichTextEditor.onChange 는 { html, json } 객체를 준다. corner_description.config.body 는 항상 HTML 문자열이어야
+//   한다(공개 렌더 str()·태블릿 ContentRenderer 계약). 과거 잘못된 연결로 body 에 { html, json } 객체가 들어왔을
+//   가능성을 읽기 경계에서 방어. 정규화는 여기(hydrate) 한 곳 + onChange(쓰기) 한 곳으로 끝낸다.
+export function normalizeCornerBody(body: unknown): string {
+  if (typeof body === 'string') return body;
+  if (body && typeof body === 'object' && 'html' in body && typeof (body as { html?: unknown }).html === 'string') {
+    return (body as { html: string }).html;
+  }
+  return '';
+}
+
 const seedInitialBlocks = (detail: ScreenSetDetail | null): ScreenBlock[] =>
-  detail ? detail.blocks.map((b) => ({ ...b, config: b.config ?? {} })) : [];
+  detail
+    ? detail.blocks.map((b) =>
+        b.blockType === 'corner_description'
+          ? { ...b, config: { ...(b.config ?? {}), body: normalizeCornerBody((b.config ?? {}).body) } }
+          : { ...b, config: b.config ?? {} },
+      )
+    : [];
 
 /**
  * 업무 항목이 쓰는 내부 블록을 자동 확보한다(WO-...-BUSINESS-FIELDS-V1 "내부 블록은 템플릿 선택 시 자동 준비").
@@ -714,7 +732,11 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     const timer = setTimeout(() => {
       previewScreenSet({ templateKey, blocks })
         .then((s) => { if (!cancelled) { setLiveScreen(s); setLiveError(null); } })
-        .catch((e: any) => { if (!cancelled) setLiveError(e?.message || '미리보기를 불러오지 못했습니다.'); })
+        .catch((e: any) => {
+          // WO-...-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.5:
+          //   내부 API 오류 메시지를 그대로 노출하지 않는다(진단용 콘솔만). 사용자에겐 표준 문구.
+          if (!cancelled) { console.warn('[TabletPreview] previewScreenSet failed:', e?.message ?? e); setLiveError('입력 내용을 미리보기에 반영하지 못했습니다.'); }
+        })
         .finally(() => { if (!cancelled) setLiveLoading(false); });
     }, 400);
     return () => { cancelled = true; clearTimeout(timer); };
@@ -892,9 +914,12 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               저장 HTML 은 태블릿/QR 모바일 모두 ContentRenderer 로 렌더된다(동일 계약).
               별도 HTML 입력창은 만들지 않는다 — 표준 편집기의 기존 HTML 탭/붙여넣기를 쓴다. */}
           <div className="mt-1">
+            {/* WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.1:
+                onChange 반환은 { html, json } 객체 → html 만 추출해 body(문자열) 저장.
+                value 도 방어적으로 정규화(과거 객체형 body 를 문자열로 표시). */}
             <RichTextEditor
-              value={c.body ?? ''}
-              onChange={(html) => patchConfigOf('corner_description', { body: html })}
+              value={normalizeCornerBody(c.body)}
+              onChange={({ html }) => patchConfigOf('corner_description', { body: html })}
               placeholder="이 코너가 어떤 곳인지, 손님이 무엇을 확인할 수 있는지 3~5줄로 적어 주세요."
               minHeight="220px"
             />
@@ -1116,12 +1141,15 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               <p className="text-[11px] text-slate-500 text-center leading-relaxed py-8">
                 매장 공개 주소를 불러오는 중입니다.<br />잠시 후 미리보기가 표시됩니다.
               </p>
-            ) : liveError ? (
-              <p className="text-[11px] text-red-600 text-center leading-relaxed py-8">{liveError}</p>
             ) : !liveScreen ? (
-              <div className="flex items-center gap-2 text-xs text-slate-400 py-8">
-                <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
-              </div>
+              /* 아직 성공한 미리보기가 없음: 오류면 표준 문구, 아니면 로딩 (§4.5 로딩/오류 구분) */
+              liveError ? (
+                <p className="text-[11px] text-red-600 text-center leading-relaxed py-8">{liveError}</p>
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-slate-400 py-8">
+                  <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
+                </div>
+              )
             ) : liveView === 'tablet' ? (
               <div style={{ position: 'relative', overflow: 'hidden', width: '100%', aspectRatio: '16 / 10', background: '#000', borderRadius: 10 }}>
                 <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
@@ -1131,11 +1159,18 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
                 <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
               </div>
             )}
-            {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) */}
-            {liveLoading && liveScreen && (
+            {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) — 오류 상태에선 오류 배지가 우선 */}
+            {liveLoading && liveScreen && !liveError && (
               <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900/70 text-white text-[10px]">
                 <Loader2 className="w-3 h-3 animate-spin" /> 갱신 중
               </span>
+            )}
+            {/* WO-...-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.5:
+                이전 미리보기는 유지하되 최신 입력이 반영 안 됐음을 명확히 표시(저장 성공과 혼동 방지). */}
+            {liveError && liveScreen && (
+              <div className="absolute top-2 left-2 right-2 flex items-start gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-600/90 text-white text-[11px] font-medium leading-snug">
+                <span>⚠️ {liveError} 아래는 직전에 성공한 화면입니다.</span>
+              </div>
             )}
           </div>
 
