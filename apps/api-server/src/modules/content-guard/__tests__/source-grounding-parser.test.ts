@@ -108,6 +108,34 @@ describe('결손 #6 — 기준량이 "N g 당" 형태일 때 ABSENT 오판', () 
   });
 });
 
+// 결손 #7 (2026-07-17) — 단위 라벨 괄호 "수(CFU/mg)" 오독 → 정상 제품 false-block
+describe('결손 #7 — 단위 라벨 "(CFU/mg)" 를 기준량으로 오독', () => {
+  it('검출: "수(CFU/mg) : 표시량(… CFU/300 mg)" 은 라벨이 아니라 실제 300mg 을 읽는다', () => {
+    const r = parseBasis('프로바이오틱스 수(CFU/mg) : 표시량(500,000,000 CFU/300 mg) 이상');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toEqual({ amount: 300, unit: 'mg' }); // 라벨 오독이면 1mg 이 나온다
+  });
+  it('검출: "수(CFU/g) : 표시량(… CFU/2 g)" 도 라벨 아닌 2g', () => {
+    const r = parseBasis('프로바이오틱스 수(CFU/g) : 표시량(1,000,000,000 (10억) CFU/2 g) 이상');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toEqual({ amount: 2, unit: 'g' });
+  });
+  it('보존: 무괄호 벌크 "CFU/g" 는 여전히 1g 기준(per-gram)', () => {
+    const r = parseBasis('프로바이오틱스 : 5,000,000,000 CFU/g');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toEqual({ amount: 1, unit: 'g' });
+  });
+  it('보존: 정상 "표시량(100억 CFU / 350mg)" 은 350mg 그대로', () => {
+    const r = parseBasis('프로바이오틱스 수 : 표시량(100억 CFU / 350mg) 이상');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind !== 'PARSED') return;
+    expect(r.value).toEqual({ amount: 350, unit: 'mg' });
+  });
+});
+
 describe('결손 #4 — 원문 오타의 조용한 오파싱', () => {
   it('"10.000,000,000" 을 0 으로 읽지 않고 ABNORMAL 로 올린다', () => {
     const r = parseCfu(SRC.typo);

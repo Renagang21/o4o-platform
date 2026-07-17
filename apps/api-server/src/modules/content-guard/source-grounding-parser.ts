@@ -168,15 +168,25 @@ export function parseBasis(baseStandard: string): ParseOutcome<ParsedBasis> {
   if (viaUnit) return { kind: 'PARSED', value: { amount: num(viaUnit[1]), unit: viaUnit[2].toLowerCase() as 'mg' | 'g' }, evidence: viaUnit[0] };
 
   // `\b` 는 전각 ㎎ 뒤에서 성립하지 않는다 → normalizeSource 로 mg 화 + 부정선행 (결손 #3)
-  const m = b.match(/[/]\s*([\d,.]+)?\s*(mg|g)(?![a-zA-Z가-힣])/i);
-  if (!m) return { kind: 'PARSE_FAILED', reason: '기준량 분모를 읽지 못했습니다', raw: b.slice(0, 120) };
-
-  if (m[1] && isMalformedNumber(m[1])) {
-    return { kind: 'ABNORMAL', reason: `기준량 숫자 표기가 비정상입니다("${m[1]}")`, raw: b.slice(0, 120) };
+  //
+  // ⚠️ 결손 #4 (2026-07-17): 단위 라벨 괄호 "수(CFU/mg)" 오독.
+  //   원문 "프로바이오틱스 수(CFU/mg) : 표시량(… CFU/300 mg)" 에서 라벨의 "/mg"(숫자 없음)를
+  //   기준량 분모로 먼저 잡아 amount=1mg 로 오파싱 → 실제 300mg 으로 수기 grounding 시
+  //   PRE-SRC-BASIS-MISMATCH 로 **정상 제품을 오BLOCK**. (실측: 인생 프로바이오틱스 300mg, 코오롱 락토그린 2g)
+  //   해소: **숫자 있는 분모("/300 mg")를 우선** 매치하고, 숫자 없는 "CFU/g"(벌크 per-단위)는 폴백으로만.
+  const numbered = b.match(/[/]\s*([\d,.]+)\s*(mg|g)(?![a-zA-Z가-힣])/i);
+  if (numbered) {
+    if (isMalformedNumber(numbered[1])) {
+      return { kind: 'ABNORMAL', reason: `기준량 숫자 표기가 비정상입니다("${numbered[1]}")`, raw: b.slice(0, 120) };
+    }
+    const amount = num(numbered[1]);
+    if (!(amount > 0)) return { kind: 'ABNORMAL', reason: `기준량이 0 이하입니다(${amount})`, raw: b.slice(0, 120) };
+    return { kind: 'PARSED', value: { amount, unit: numbered[2].toLowerCase() as 'mg' | 'g' }, evidence: numbered[0] };
   }
-  const amount = m[1] ? num(m[1]) : 1; // "cfu/g" → 1g 기준
-  if (!(amount > 0)) return { kind: 'ABNORMAL', reason: `기준량이 0 이하입니다(${amount})`, raw: b.slice(0, 120) };
-  return { kind: 'PARSED', value: { amount, unit: m[2].toLowerCase() as 'mg' | 'g' }, evidence: m[0] };
+  // 숫자 없는 "CFU/g"|"CFU/mg" → 1 단위 기준(벌크 per-단위). viaDang/viaUnit/numbered 가 모두 실패한 경우만 도달.
+  const bare = b.match(/[/]\s*(mg|g)(?![a-zA-Z가-힣])/i);
+  if (!bare) return { kind: 'PARSE_FAILED', reason: '기준량 분모를 읽지 못했습니다', raw: b.slice(0, 120) };
+  return { kind: 'PARSED', value: { amount: 1, unit: bare[1].toLowerCase() as 'mg' | 'g' }, evidence: bare[0] };
 }
 
 // ─── 섭취 ────────────────────────────────────────────────────────────────────
