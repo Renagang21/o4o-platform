@@ -1,9 +1,26 @@
-# CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1 — 제품허가정보 표본 검증 (선행조건 미충족 → 호출 중단)
+# CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1 — 제품허가정보 표본 검증
 
-WO: `WO-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1` · 일자: 2026-07-16 · 상태: **부분 완료 (외부 호출 미실행 — 키 부재)**
+WO: `WO-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1` · 일자: 2026-07-16 · 상태: **차단 (endpoint 확정 · 키 유효 · 데이터셋 미승인 403)**
 근거: [SOURCE-RECOVERY-AUDIT](../investigations/IR-O4O-OTC-OFFICIAL-SOURCE-RECOVERY-AUDIT-V1.md)
 
-> **read-only.** DB write **0** · 콘텐츠 변경 **0** · 코드 변경 **0** · **외부 API 호출 0**(방침에 따라 중단).
+> **read-only.** DB write **0** · 콘텐츠 변경 **0** · 코드 변경 **0** · 유효 응답 저장 **0**(403이라 표본 미확보).
+
+---
+
+## 0. 갱신 결론 (키 주입 후 실측 — 2026-07-16)
+
+> **endpoint 확정 · 키 유효 확인. 남은 차단 하나: 「의약품 제품 허가정보」데이터셋이 이 키에 활용신청 미승인(403).**
+>
+> | 확인 | 결과 |
+> |---|---|
+> | **올바른 endpoint** | `apis.data.go.kr/1471000/**DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07**` (v3~6 은 폐기/부재) |
+> | 키 유효성 | ✅ e약은요·의약외품 **HTTP 200 NORMAL SERVICE** (키 정상) |
+> | 제품허가정보 접근 | ❌ **HTTP 403 Forbidden**(진짜 키) · 401(키 없음) · 200(의약외품) → **키는 인식되나 이 데이터셋 금지** |
+> | 원인 | 원 seed 는 e약은요·의료기기·의약외품만 활용신청. **완제 제품허가정보(dataset 15095677) 미신청** |
+>
+> **필요 조치(사용자)**: 이 키를 소유한 data.go.kr 계정에서 **dataset 15095677「식품의약품안전처_의약품 제품 허가정보」활용신청**. 식약처 API 는 대개 자동승인 → 승인 후 **같은 키로 재호출**(집 PC 에서 바로).
+>
+> 401(키 없음) vs 403(진짜 키) vs 200(의약외품) 3자 비교로 **"endpoint·키 문제 아님, 데이터셋 승인만 남음"** 을 확정.
 
 ---
 
@@ -36,10 +53,11 @@ bulk-fetch CHECK 의 검증된 패턴(`https://apis.data.go.kr/1471000/...`, `se
 
 | 원천 | 서비스/오퍼레이션(후보) | 필드 |
 |---|---|---|
-| **의약품 제품 허가정보(완제의약품 허가상세)** | `DrugPrdtPrmsnInfoService06` / `getDrugPrdtPrmsnDtlInq` 계열 (data.go.kr dataset 15075057) | **NB_DOC_DATA**(사용상주의사항) · EE_DOC_DATA(효능) · UD_DOC_DATA(용법) · **MATERIAL_NAME**(원료약품 및 분량) |
+| **의약품 제품 허가정보** | ✅ **확정** `DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07` (dataset **15095677**) | **NB_DOC_DATA**(사용상주의사항) · EE_DOC_DATA(효능) · UD_DOC_DATA(용법) · **MATERIAL_NAME**(원료약품 및 분량) |
 | 참고 — 기수집 e약은요 | `DrbEasyDrugInfoService/getDrbEasyDrugList` | (유실 원천 — §IR) |
 
-> ⚠️ 정확한 서비스 버전·operation 명은 data.go.kr 로그인 후 명세로 확정 필요(bulk-fetch CHECK §API4 와 동일 주의). **호출 시 첫 표본으로 응답 스키마부터 확인.**
+> **실측으로 endpoint 확정**: v6 = 404(폐기), v3~5 = 500(키 무관 = 경로 오류), **v7/getDrugPrdtPrmsnInq07 = 라우팅됨(403/401)**. 별도 `Dtl` operation 은 404 → **Inq07 이 상세(문서 필드 포함) 반환**으로 추정(승인 후 확인).
+> 파라미터: `item_seq`(품목기준코드) · `type=json` · **User-Agent 필수**.
 
 ---
 
@@ -113,14 +131,18 @@ bulk-fetch CHECK 의 검증된 패턴(`https://apis.data.go.kr/1471000/...`, `se
 
 ---
 
-## 8. 재개 방법 (택1)
+## 8. 재개 방법 — **데이터셋 활용신청 1건만 남음**
 
-| 방법 | 설명 |
+> 방법 B(키를 repo `.env` gitignore 주입)로 진행 완료 — 키 유효 확인. **남은 것은 데이터셋 승인뿐.**
+
+| 단계 | 내용 |
 |---|---|
-| **A. 키 보유 환경에서 호출** | 수집 도구가 있는 회사 머신(`C:\Users\home\coding\o4o-public-data-samples\`)에서 §4 품목기준코드로 표본 호출 → 응답 JSON 을 이 repo 로 전달 |
-| **B. 기존 키를 repo env 주입** | 회사 머신의 기존 serviceKey 를 이 repo `.env`(gitignore) 에 넣고 표본 스크립트 실행. **새 키 발급 아님 · commit 금지** |
+| **1 (사용자)** | 이 키 소유 data.go.kr 계정 로그인 → **dataset 15095677「식품의약품안전처_의약품 제품 허가정보」활용신청** (자동승인 대개 즉시~수시간) |
+| **2 (집 PC)** | 승인 후 **같은 키로** §4 품목기준코드 6건 `getDrugPrdtPrmsnInq07` 호출 → 응답 body 저장(키·URL 배제) |
+| **3 (집 PC)** | NB_DOC 온전성 + MATERIAL_NAME 아스파탐 식별 검증 → 본 CHECK §5 체크리스트 채움 |
+| **4** | 통과 시: composer escape 보강(§6) → 유실 172 복구 → 첨가제 분류(IR §7) |
 
-> 어느 방법이든 **표본(§4)만** 호출하고 DB write 없음. 표본 통과 후: composer escape 보강(§6) → 유실 172 복구 → 첨가제 분류(IR §7).
+> **키 재주입 불필요** — 이미 `.env`(gitignore)에 있음. 승인만 되면 집 PC 에서 바로 재호출.
 
 ---
 
