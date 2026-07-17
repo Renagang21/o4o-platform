@@ -23,7 +23,6 @@ import { useState } from 'react';
 import { QrCode } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { ContentRenderer } from '@o4o/content-editor';
-import { toVideoEmbed } from '../../utils/videoEmbed';
 import type { QrScreenSet, QrScreenSetSection } from '../../api/storeQr';
 
 interface ContentCard {
@@ -46,10 +45,6 @@ interface ProductCard {
   imageUrl?: string | null;
 }
 
-interface IdleItem {
-  type?: 'image' | 'video' | 'youtube' | 'vimeo';
-  url?: string;
-}
 
 function formatPrice(p: ProductCard): string | null {
   if (typeof p.price === 'number' && p.price > 0) return `${p.price.toLocaleString('ko-KR')}원`;
@@ -60,9 +55,10 @@ function formatPrice(p: ProductCard): string | null {
 export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet }) {
   const [openCard, setOpenCard] = useState<ContentCard | null>(null);
 
-  // WO-...-CONTENT-PARITY-FIX-V1: 모바일 제외는 **qr_guide 만**(자기 QR 중복 방지).
-  //   idle_media 는 상단 미디어로 별도 렌더, corner_description 은 헤더에서 렌더 → 본문 섹션 루프에선 제외.
-  const idleSection = screenSet.sections.find((s) => s.blockType === 'idle_media');
+  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR 모바일은 '태블릿 대기화면'을 첫 콘텐츠로 보여주지 않는다.
+  //   대기화면은 무조작 태블릿 전용 개념 — 휴대전화로 열면 코너 안내·상품·추가 콘텐츠를 바로 본다.
+  //   백엔드 resolver 도 QR 경로에서 idle_media 섹션을 내보내지 않으며, 여기서도 제외/미렌더한다.
+  //   (qr_guide = 자기 QR 중복 방지 제외, corner_description = 헤더에서 렌더 → 본문 루프 제외.)
   const bodySections = [...screenSet.sections]
     .filter((s) => s.blockType !== 'qr_guide' && s.blockType !== 'idle_media' && s.blockType !== 'corner_description')
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -76,9 +72,6 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
   return (
     <div style={styles.page}>
       <div style={styles.wrap}>
-        {/* 상단 안내 미디어(대기영상) — 태블릿과 달리 터치 진입 없이 아래 본문을 바로 스크롤한다. */}
-        {idleSection && <IdleMediaBlock section={idleSection} />}
-
         <header style={styles.header}>
           <h1 style={styles.cornerTitle}>{screenSet.name || '코너 안내'}</h1>
           {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명 = 표준 편집기 산출 HTML.
@@ -118,39 +111,6 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
         </div>
       )}
     </div>
-  );
-}
-
-// 상단 안내 미디어 — idle_media 첫 항목. 태블릿 attract(터치 진입)과 달리 모바일은 표시만.
-function IdleMediaBlock({ section }: { section: QrScreenSetSection }) {
-  const items = (section.data?.items as IdleItem[] | undefined) ?? [];
-  const first = items[0];
-  if (!first || !first.url) return null;
-  const type = first.type ?? 'image';
-  const embed = type === 'youtube' || type === 'vimeo' ? toVideoEmbed(first.url).embedUrl : null;
-  return (
-    <section style={styles.idleWrap}>
-      <div style={styles.idleMediaBox}>
-        {type === 'image' && <img src={first.url} alt="" style={styles.idleMedia} />}
-        {type === 'video' && (
-          <video src={first.url} style={styles.idleMedia} controls playsInline preload="metadata" />
-        )}
-        {(type === 'youtube' || type === 'vimeo') && embed && (
-          <iframe
-            src={embed}
-            title="코너 안내 영상"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-            style={styles.idleMedia}
-          />
-        )}
-      </div>
-      {/* 태블릿의 "화면을 터치하세요"는 사용하지 않는다(모바일은 스크롤). */}
-      <p style={styles.idleCaption}>
-        이 코너의 안내 영상을 확인하세요
-        <span style={styles.idleCaptionEn}>Watch this corner introduction</span>
-      </p>
-    </section>
   );
 }
 

@@ -21,7 +21,6 @@ import { queryTabletVisibleProducts, resolveServiceKeys } from './store-public-u
 import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
 import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
-import { parseIdleMediaConfig, resolveIdleMediaItems } from '../store-tablet-idle-block.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
 import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
 
@@ -147,23 +146,41 @@ export async function resolveScreenSetSections(
           const r = await resolveTabletIdleItems(dataSource, tabletContext.tabletId, input.serviceKey, b.config);
           sections.push({ blockType: 'idle_media', sortOrder: b.sortOrder, data: { items: r.items, operatorCommonSource: r.operatorCommonSource } });
         } else {
-          // 태블릿 없음(QR/org): custom_media 만 완전 resolve(legacy/operator 소스 빈 배열). 대기영상 미러 상위에서 제외.
-          const parsed = parseIdleMediaConfig(b.config);
-          if (parsed.ok) {
-            const resolved = resolveIdleMediaItems(parsed.value, { legacyIdlePlaylist: [], operatorCommon: [] });
-            const items = resolved.map((it) => ({ type: it.mediaType, url: it.url, ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}) }));
-            if (items.length > 0) sections.push({ blockType: 'idle_media', sortOrder: b.sortOrder, data: { items } });
-          }
+          // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR/모바일은 '태블릿 대기화면'을 첫 콘텐츠로 보여주지 않는다.
+          //   대기화면은 무조작 태블릿 전용 개념 — 휴대전화로 QR 을 열면 코너 안내·상품·추가 콘텐츠를 바로 봐야 한다.
+          //   따라서 tabletContext 없는 경로에서는 idle_media 섹션을 내보내지 않는다(프론트도 idle-first 렌더 제거).
+          continue;
         }
       } else if (b.blockType === 'product_list') {
         if (productMode === 'skip') continue;
+        // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR/모바일도 태블릿과 상품 parity.
+        //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)하는데,
+        //   QR(tabletContext 없음)은 그동안 configured=false → org 전체 supplier 라 상품이 더 많았다.
+        //   여기서 current_screen_set_id 로 이 Screen Set 의 코너 태블릿을 도출해 supplier 도 진열로 제한한다(local 과 동일 기준).
+        let supplierTabletId: string | null = tabletContext?.tabletId ?? null;
+        let supplierConfigured: boolean = tabletContext?.configured ?? false;
+        if (!tabletContext) {
+          const tRows = await dataSource.query(
+            `SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`,
+            [input.screenSetId, input.organizationId],
+          );
+          const tId: string | null = tRows?.[0]?.id ?? null;
+          if (tId) {
+            const cnt = await dataSource.query(
+              `SELECT COUNT(*)::int AS c FROM store_tablet_displays WHERE tablet_id = $1 AND is_visible = true`,
+              [tId],
+            );
+            supplierTabletId = tId;
+            supplierConfigured = Number(cnt?.[0]?.c || 0) > 0;
+          }
+        }
         const supplierResult: any = await queryTabletVisibleProducts(dataSource, input.storeId, resolveServiceKeys(input.serviceKey), {
           page: 1, limit: 50, sort: 'sort_order', order: 'asc',
-          firstTabletId: tabletContext?.tabletId ?? null,
-          configured: tabletContext?.configured ?? false,
+          firstTabletId: supplierTabletId,
+          configured: supplierConfigured,
         });
         let products: any[] = supplierResult?.data ?? [];
-        // WO(디자인 채우기): QR 모바일 미러는 section.products 만 소비하고 /tablet/products(로컬)를 재조회하지 않는다.
+        // QR 모바일 미러는 section.products 만 소비하고 /tablet/products(로컬)를 재조회하지 않는다.
         //   태블릿 kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products, supplier+local)로 상품을 그린다.
         //   → tabletContext 없는(모바일/QR) 경로에서만 로컬 상품을 section 에 포함해 태블릿과 상품 parity 를 맞춘다.
         //   (태블릿 runtime 경로는 기존과 동일하게 supplier 만 — kiosk 미소비라 무영향.)

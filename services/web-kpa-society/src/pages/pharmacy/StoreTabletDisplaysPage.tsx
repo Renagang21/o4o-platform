@@ -51,12 +51,16 @@ import {
   type OperatorCommonIdleSelection,
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 코너 카드 홈에 현재 화면 세트명/블록수 표시용.
   fetchScreenSets,
+  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 되돌리기(직전 화면 재적용/해제).
+  applyCurrentScreenSet, clearCurrentScreenSet,
 } from '../../api/tabletDisplays';
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
-import TabletScreenSetManager from './TabletScreenSetManager';
+import TabletScreenSetManager, { templateLabel } from './TabletScreenSetManager';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
+// WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 카드에서 바로 여는 '화면 바꾸기'(1동작 교체).
+import TabletCornerSwapModal from './TabletCornerSwapModal';
 
 // WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 콘텐츠 리스트 단독 미리보기 = 코너 문맥 없음 sentinel.
 //   previewApi.fetchProducts 가 이 값이면 백엔드 호출 없이 빈 상품(코너 임의 추정 금지).
@@ -119,7 +123,7 @@ export default function StoreTabletDisplaysPage() {
   // WO-O4O-KPA-TABLET-OPERATION-GUIDE-MODAL-V1: 상단 상시 안내 박스 → 버튼+모달.
   const [showGuide, setShowGuide] = useState(false);
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: currentScreenSetId → {name, blockCount} 인덱스(코너 카드 표시용).
-  const [screenSetIndex, setScreenSetIndex] = useState<Record<string, { name: string; blockCount: number }>>({});
+  const [screenSetIndex, setScreenSetIndex] = useState<Record<string, { name: string; blockCount: number; templateKey: string }>>({});
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1: 실행 주소 원문은 기본 숨김(보조 토글).
   const [showRunUrl, setShowRunUrl] = useState(false);
   useEffect(() => {
@@ -127,8 +131,8 @@ export default function StoreTabletDisplaysPage() {
     fetchScreenSets()
       .then((sets) => {
         if (cancelled) return;
-        const idx: Record<string, { name: string; blockCount: number }> = {};
-        for (const s of sets) idx[s.id] = { name: s.name, blockCount: s.blockCount ?? 0 };
+        const idx: Record<string, { name: string; blockCount: number; templateKey: string }> = {};
+        for (const s of sets) idx[s.id] = { name: s.name, blockCount: s.blockCount ?? 0, templateKey: s.templateKey };
         setScreenSetIndex(idx);
       })
       .catch(() => { /* 코너 카드 부가정보 실패는 무시(카드 자체는 표시) */ });
@@ -320,7 +324,9 @@ export default function StoreTabletDisplaysPage() {
     previewTabletIdRef.current = tabletId;
   }, []);
 
-  const handleOpenPreview = useCallback(async () => {
+  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §3: 코너 카드/상세 공용 미리보기.
+  //   인자로 코너 tabletId 를 받아(카드에서 바로) 그 코너 문맥으로 연다. 없으면 선택 코너 기준.
+  const handleOpenPreview = useCallback(async (tabletId?: string) => {
     setPreviewLoading(true);
     try {
       const slug = await getStoreSlug();
@@ -330,14 +336,37 @@ export default function StoreTabletDisplaysPage() {
       }
       // 저장된 전시 설정 기준(공개 endpoint)
       const saved = await fetchTabletSettings(slug).catch(() => undefined);
-      previewTabletIdRef.current = selectedTabletId; // 선택 태블릿 기준으로 미리보기
+      previewTabletIdRef.current = tabletId ?? selectedTabletId; // 코너 문맥으로 미리보기
       setPreviewSettings(saved);
+      setPreviewView('tablet');
       setPreviewSlug(slug);
       setPreviewOpen(true);
     } finally {
       setPreviewLoading(false);
     }
   }, [selectedTabletId]);
+
+  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: '화면 바꾸기' 적용 후 상위 동기화 + 되돌리기 토스트.
+  const handleSwapApplied = useCallback((tabletId: string, newId: string, prevId: string | null, cornerName: string) => {
+    setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: newId } : t)));
+    setToast({
+      type: 'success',
+      message: `“${cornerName}” 화면을 바꿨어요.`,
+      action: {
+        label: '되돌리기',
+        onClick: async () => {
+          try {
+            if (prevId) await applyCurrentScreenSet(tabletId, prevId);
+            else await clearCurrentScreenSet(tabletId);
+            setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: prevId } : t)));
+            setToast({ type: 'success', message: '이전 화면으로 되돌렸어요.' });
+          } catch (e: any) {
+            setToast({ type: 'error', message: e?.message || '되돌리지 못했습니다.' });
+          }
+        },
+      },
+    });
+  }, []);
 
   const handleClosePreview = useCallback(() => {
     setPreviewOpen(false);
@@ -351,9 +380,14 @@ export default function StoreTabletDisplaysPage() {
   const [registering, setRegistering] = useState(false);
   const [deletingTabletId, setDeletingTabletId] = useState<string | null>(null);
 
-  // Toast
-  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  // Toast — WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 변경 직후 '되돌리기' 액션(선택).
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string; action?: { label: string; onClick: () => void } } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
+  const [swapCorner, setSwapCorner] = useState<{ tabletId: string; name: string } | null>(null);
+  // §3: 미리보기 모달 보기 전환(태블릿=넓게 / 휴대전화=390px).
+  const [previewView, setPreviewView] = useState<'tablet' | 'mobile'>('tablet');
 
   // Toast auto-clear
   useEffect(() => {
@@ -912,43 +946,51 @@ export default function StoreTabletDisplaysPage() {
               <Plus className="w-4 h-4" /> 코너/태블릿 추가
             </button>
           </div>
-          <p className="text-xs text-slate-400">관리할 코너를 선택하세요. 각 코너는 매장 위치 기준의 태블릿 화면입니다.</p>
+          <p className="text-xs text-slate-400">코너마다 지금 어떤 화면이 나오는지 한눈에 보고, 바로 바꿀 수 있습니다. 카드를 누르면 상세 설정으로 들어갑니다.</p>
+          {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 코너 현황판 —
+              각 카드 = 코너명 · 지금 나오는 화면 · 대표 미리보기(경량, kiosk 상시 렌더 아님) · [화면 바꾸기]·[미리보기].
+              내부 용어(화면 세트/블록 수/연결/current) 미노출. 카드 본문 클릭 = 상세 설정. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
             {sortedTablets.map((t) => {
               const set = t.currentScreenSetId ? screenSetIndex[t.currentScreenSetId] : null;
+              const nowName = set ? set.name : '기본 화면';
               return (
                 <div
                   key={t.id}
-                  onClick={() => setSelectedTabletId(t.id)}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3 cursor-pointer hover:border-teal-200 hover:shadow-md transition"
+                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3 hover:border-teal-200 hover:shadow-md transition"
                 >
-                  <div className="min-w-0">
+                  <div
+                    onClick={() => setSelectedTabletId(t.id)}
+                    className="min-w-0 cursor-pointer"
+                    role="button"
+                    title="상세 설정 열기"
+                  >
                     <div className="text-base font-bold text-slate-900 truncate">{cornerPrimary(t)}</div>
                     {cornerSecondary(t) && <div className="text-xs text-slate-400 truncate mt-0.5">{cornerSecondary(t)}</div>}
                   </div>
-                  <div className="space-y-1 text-sm min-w-0">
-                    <div className="text-slate-600 truncate">
-                      화면 세트: <span className="font-medium text-slate-800">{set ? set.name : (t.currentScreenSetId ? '적용됨' : '기본 화면')}</span>
-                    </div>
-                    {set && <div className="text-xs text-slate-400">블록 {set.blockCount}개</div>}
-                    <div className="text-xs">
-                      <span className={t.is_active ? 'text-emerald-600 font-medium' : 'text-slate-400'}>{t.is_active ? '● 연결됨(활성)' : '○ 비활성'}</span>
-                    </div>
+                  {/* 대표 미리보기(경량 · 기존 데이터로 구성): 지금 나오는 화면을 알아볼 수 있게 이름 + 화면 유형을 크게. */}
+                  <div
+                    onClick={() => setSelectedTabletId(t.id)}
+                    className="cursor-pointer rounded-xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 px-3 py-4 min-h-[76px] flex flex-col justify-center"
+                    title="상세 설정 열기"
+                  >
+                    <div className="text-[11px] text-slate-400">지금 나오는 화면</div>
+                    <div className="text-sm font-bold text-slate-800 truncate mt-0.5">{nowName}</div>
+                    {set && <div className="text-[11px] text-teal-600 mt-0.5">{templateLabel(set.templateKey)}</div>}
                   </div>
                   <div className="flex gap-2 mt-auto">
-                    {storeSlug && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); window.open(publicTabletUrl(t.id), '_blank', 'noopener,noreferrer'); }}
-                        className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50"
-                      >
-                        공개 화면 확인
-                      </button>
-                    )}
                     <button
-                      onClick={(e) => { e.stopPropagation(); setSelectedTabletId(t.id); }}
+                      onClick={() => setSwapCorner({ tabletId: t.id, name: cornerPrimary(t) })}
                       className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700"
                     >
-                      관리
+                      화면 바꾸기
+                    </button>
+                    <button
+                      onClick={() => handleOpenPreview(t.id)}
+                      disabled={previewLoading}
+                      className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      미리보기
                     </button>
                   </div>
                 </div>
@@ -1063,7 +1105,7 @@ export default function StoreTabletDisplaysPage() {
                             주소 복사
                           </button>
                           <button
-                            onClick={handleOpenPreview}
+                            onClick={() => handleOpenPreview(selectedTablet.id)}
                             disabled={previewLoading}
                             className="flex-1 min-w-[120px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50"
                           >
@@ -1597,37 +1639,89 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1) */}
+      {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1)
+          WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §3: 미리보기 1종으로 통합 —
+          태블릿/휴대전화 보기 전환 + 보조(새 창에서 열기 · 주소 복사). 코너 카드/상세 모두 이 모달을 연다. */}
       {previewOpen && previewSlug && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100000 }}>
-          {/* 상단 안내 + 닫기 (kiosk fullscreen 위에 표시) */}
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.85)' }}>
+          {/* 상단 바: 보기 전환 + 보조 메뉴 + 닫기 */}
           <div
             style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100001 }}
-            className="flex items-center justify-between gap-3 bg-slate-900/90 text-white px-4 py-2"
+            className="flex items-center justify-between gap-3 bg-slate-900/95 text-white px-4 py-2"
           >
-            <div className="min-w-0">
-              <p className="text-sm font-semibold">태블릿 고객 화면 미리보기</p>
-              <p className="text-[11px] text-slate-300">
-                저장된 진열 구성 기준으로 미리 봅니다(첫 번째 활성 태블릿 · 위치별 태블릿 분리는 후속). 변경 후에는 저장한 다음 확인해 주세요. 실제 크롬 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
-              </p>
+            <div className="flex items-center gap-3 min-w-0">
+              <p className="text-sm font-semibold whitespace-nowrap">고객 화면 미리보기</p>
+              {/* 태블릿 / 휴대전화 보기 */}
+              <div className="flex rounded-lg overflow-hidden border border-white/20">
+                {([
+                  { key: 'tablet', label: '태블릿' },
+                  { key: 'mobile', label: '휴대전화' },
+                ] as const).map((v) => (
+                  <button
+                    key={v.key}
+                    onClick={() => setPreviewView(v.key)}
+                    className={`px-3 py-1 text-xs font-semibold ${previewView === v.key ? 'bg-white text-slate-900' : 'bg-transparent text-slate-200 hover:bg-white/10'}`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <button
-              onClick={handleClosePreview}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap"
-            >
-              <X className="w-4 h-4" /> 닫기
-            </button>
+            <div className="flex items-center gap-2">
+              {/* 보조 메뉴 */}
+              {previewTabletIdRef.current && storeSlug && (
+                <>
+                  <button
+                    onClick={() => window.open(publicTabletUrl(previewTabletIdRef.current as string), '_blank', 'noopener,noreferrer')}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
+                  >
+                    새 창에서 열기
+                  </button>
+                  <button
+                    onClick={() => handleCopyTabletUrl(previewTabletIdRef.current as string)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium whitespace-nowrap"
+                  >
+                    주소 복사
+                  </button>
+                </>
+              )}
+              <button
+                onClick={handleClosePreview}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap"
+              >
+                <X className="w-4 h-4" /> 닫기
+              </button>
+            </div>
           </div>
-          {/* kiosk-core 재사용 (Router 중첩 금지 → slug prop 직접 주입) */}
-          <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
-            <TabletKioskPage
-              api={previewApi}
-              slug={previewSlug}
-              displaySettings={previewSettings}
-              showQrBadge={previewSettings?.showQr !== false}
-            />
+          {/* kiosk-core 재사용 (Router 중첩 금지 → slug prop 직접 주입). 휴대전화 보기 = 390px 프레임. */}
+          <div style={{ position: 'absolute', top: 48, left: 0, right: 0, bottom: 0, overflow: 'auto' }} className="flex justify-center">
+            <div
+              style={
+                previewView === 'mobile'
+                  ? { width: 390, maxWidth: '100%', height: '100%', boxShadow: '0 0 0 1px rgba(255,255,255,0.15)', background: '#fff', overflow: 'hidden' }
+                  : { width: '100%', height: '100%', overflow: 'hidden' }
+              }
+            >
+              <TabletKioskPage
+                api={previewApi}
+                slug={previewSlug}
+                displaySettings={previewSettings}
+                showQrBadge={previewSettings?.showQr !== false}
+              />
+            </div>
           </div>
         </div>
+      )}
+
+      {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 '화면 바꾸기' 모달 */}
+      {swapCorner && (
+        <TabletCornerSwapModal
+          tabletId={swapCorner.tabletId}
+          cornerName={swapCorner.name}
+          onClose={() => setSwapCorner(null)}
+          onApplied={(newId, prevId) => handleSwapApplied(swapCorner.tabletId, newId, prevId, swapCorner.name)}
+          onToast={setToast}
+        />
       )}
 
       {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 공통 영상 선택 모달 */}
@@ -1670,17 +1764,25 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* Toast */}
+      {/* Toast — §2: 변경 직후 '되돌리기' 액션(선택) */}
       {toast && (
         <div
-          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium"
+          className="fixed bottom-6 right-6 z-[100002] px-4 py-3 rounded-xl shadow-lg border text-sm font-medium flex items-center gap-3"
           style={{
             backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
             borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
             color: toast.type === 'success' ? '#166534' : '#991b1b',
           }}
         >
-          {toast.type === 'success' ? '✅' : '❌'} {toast.message}
+          <span>{toast.type === 'success' ? '✅' : '❌'} {toast.message}</span>
+          {toast.action && (
+            <button
+              onClick={() => { const a = toast.action!; setToast(null); a.onClick(); }}
+              className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50"
+            >
+              {toast.action.label}
+            </button>
+          )}
         </div>
       )}
     </div>
