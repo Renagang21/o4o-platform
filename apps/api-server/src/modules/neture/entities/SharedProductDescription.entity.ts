@@ -40,6 +40,7 @@ export type SharedProductDescriptionSourceType =
   | 'mfds_easy_drug' // e약은요(공식 소비자 설명) 파생 — WO-O4O-EASY-DRUG-INFO-CANDIDATE-APPLY-AND-SHARED-DESCRIPTION-DERIVATION-V1
   | 'mfds_drug_otc_nutrition_combo' // 영양제류 복합제 canonical 승격(O4O 가공) — WO-...-NUTRITION-COMBO-CANONICAL-PROMOTION-APPLY-V1
   | 'mfds_drug_otc' // OTC single 그룹(성분·함량·제형) canonical 승격 — WO-O4O-OTC-SINGLE-GROUP-EXPANSION-APPLY-PATH-V1
+  | 'o4o_hff_generated' // 건강기능식품 매장 설명서 — O4O 작성·검수(grounding=MFDS HFF candidate). 본문 제작주체=O4O, source_ref_id=candidate
   | 'migration'
   | 'manual';
 
@@ -52,6 +53,7 @@ export const SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES: SharedProductDescriptionSo
   'mfds_easy_drug',
   'mfds_drug_otc_nutrition_combo',
   'mfds_drug_otc',
+  'o4o_hff_generated',
   'migration',
   'manual',
 ];
