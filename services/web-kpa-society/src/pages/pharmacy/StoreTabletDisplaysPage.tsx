@@ -405,9 +405,8 @@ export default function StoreTabletDisplaysPage() {
         const data = await fetchTablets();
         const active = data.filter((t) => t.is_active);
         setTablets(active);
-        if (active.length > 0) {
-          setSelectedTabletId(active[0].id);
-        }
+        // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 기본 화면 = 코너 현황판(카드).
+        //   자동 선택하지 않는다 — 근무자가 모든 코너를 한눈에 보고 카드를 눌러 들어간다.
       } catch (err: any) {
         setError(err.message || '태블릿 목록을 불러오는데 실패했습니다.');
       } finally {
