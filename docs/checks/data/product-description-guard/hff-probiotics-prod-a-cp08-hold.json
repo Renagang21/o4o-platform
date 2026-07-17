@@ -1,0 +1,22 @@
+[
+  {
+    "candidateId": "23a41e02-9e67-44e7-ab5a-bd0b41e81734",
+    "productName": "유지연의 쾌변엔 장 건강",
+    "manufacturer": "(주)세종바이오팜",
+    "statementNo": "20190009105367",
+    "holdCode": "HOLD_MULTI_FUNCTIONAL",
+    "reason": "식이섬유 표시기준이 프로바이오틱스와 함께 존재하는 복합 기능성 제품(유지연의 쾌변엔 장 건강) — 순수 프로바이오틱스 템플릿 미적용",
+    "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 연한 갈색의 분말 2. 프로바이오틱스: 표시량(300,000,000(3억) CFU/6g) 이상 3. 식이섬유: 표시량(3.9g/6g)의 80% 이상 4. 대장균군: 음성",
+    "intake": "1일 1회, 1회 1포를 그대로 혹은 충분한 물과 함께 섭취하십시오."
+  },
+  {
+    "candidateId": "433a1356-b7d9-4f57-a3e0-a088c5e8aacc",
+    "productName": "닥터유산균프리미엄",
+    "manufacturer": "(주)한풍네이처팜",
+    "statementNo": "20120019007109",
+    "holdCode": "HOLD_SOURCE_ABNORMAL",
+    "reason": "표시량 CFU 표기 분리(닥터유산균프리미엄, `수(CFU/2,000mg):표시량(250,000,000)`) — 파서 CFU PARSE_FAILED·가드 ungrounded, 원문 표기 보완 필요",
+    "baseStandard": "① 성상 : 고유의 향미가 있고 이미∙이취가 없는 분홍빛 하양색의 분말 ② 프로바이오틱스 수(CFU/2,000 mg) : 표시량(250,000,000) 이상 ③ 대장균군 : 음성",
+    "intake": "1일 1회, 1회 1포를 식후에 섭취하십시오."
+  }
+]
