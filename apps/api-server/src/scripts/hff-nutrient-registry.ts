@@ -17,6 +17,13 @@ export function normFn(s: string): string {
 
 // 표준 MFDS 단일 영양소 기능성 ko → en. (여러 영양소가 공유하는 문구 포함: 항산화·에너지 등)
 const RAW_MAP: Array<[string, string]> = [
+  // 비타민 D (복합형 귀속용 — 단일 라인은 VD 별도라 미포함이었음)
+  ['칼슘과 인이 흡수되고 이용되는데 필요', 'Needed for the absorption and utilisation of calcium and phosphorus'],
+  ['뼈의 형성과 유지에 필요', 'Needed for the formation and maintenance of bone'],
+  // 비타민 C
+  ['결합조직 형성과 기능유지에 필요', 'Needed for the formation and maintenance of connective tissue'],
+  ['결합조직 형성과 기능 유지에 필요', 'Needed for the formation and maintenance of connective tissue'],
+  ['철의 흡수에 필요', 'Needed for the absorption of iron'],
   // 항산화 (비타민E·셀레늄·구리·망간·아연 일부)
   ['유해산소로부터 세포를 보호하는데 필요', 'Needed to protect cells from harmful oxygen (free radicals)'],
   // 아연
@@ -128,6 +135,47 @@ export function isRiskReductionFn(ko: string): boolean {
   return /위험\s*감소에?\s*도움/.test(ko);
 }
 
+// ─── 원료별 공식 기능성 ko 세트 (복합형 함수 귀속용, normFn 키) ───
+export const INGREDIENT_FN: Record<string, string[]> = {
+  '비타민D': ['칼슘과 인이 흡수되고 이용되는데 필요', '뼈의 형성과 유지에 필요', '골다공증발생 위험 감소에 도움을 줌'],
+  '아연': ['정상적인 면역기능에 필요', '정상적인 세포분열에 필요'],
+  '칼슘': ['뼈와 치아 형성에 필요', '신경과 근육 기능 유지에 필요', '정상적인 혈액응고에 필요', '골다공증발생 위험 감소에 도움을 줌'],
+  '마그네슘': ['에너지 이용에 필요', '신경과 근육 기능 유지에 필요'],
+  '셀레늄': ['유해산소로부터 세포를 보호하는데 필요'],
+  '비타민C': ['결합조직 형성과 기능유지에 필요', '철의 흡수에 필요', '유해산소로부터 세포를 보호하는데 필요'],
+  '비타민E': ['유해산소로부터 세포를 보호하는데 필요'],
+  '비타민A': ['어두운 곳에서 시각 적응을 위해 필요', '피부와 점막을 형성하고 기능을 유지하는데 필요', '상피세포의 성장과 발달에 필요'],
+  '비타민K': ['정상적인 혈액응고에 필요', '뼈의 구성에 필요'],
+  '비타민B1': ['탄수화물과 에너지 대사에 필요'],
+  '비타민B2': ['체내 에너지 생성에 필요'],
+  '비타민B6': ['단백질 및 아미노산 이용에 필요', '혈액의 호모시스테인 수준을 정상으로 유지하는데 필요'],
+  '비타민B12': ['정상적인 엽산 대사에 필요'],
+  '나이아신': ['체내 에너지 생성에 필요'],
+  '판토텐산': ['지방, 탄수화물, 단백질 대사와 에너지 생성에 필요'],
+  '비오틴': ['지방, 탄수화물, 단백질 대사와 에너지 생성에 필요'],
+  '철': ['체내 산소운반과 혈액생성에 필요', '에너지 생성에 필요'],
+  '엽산': ['세포와 혈액생성에 필요', '태아 신경관의 정상 발달에 필요', '혈액의 호모시스테인 수준을 정상으로 유지하는데 필요'],
+  '구리': ['철의 운반과 이용에 필요', '유해산소로부터 세포를 보호하는데 필요'],
+  '망간': ['뼈 형성에 필요', '에너지 이용에 필요', '유해산소로부터 세포를 보호하는데 필요'],
+  '요오드': ['갑상선 호르몬의 합성에 필요', '에너지 생성에 필요', '신경발달에 필요'],
+  'MSM': ['관절 및 연골건강에 도움을 줄 수 있음', '관절 및 연골 건강에 도움을 줄 수 있음'],
+  '글루코사민': ['관절 및 연골 건강에 도움을 줄 수 있음', '관절 및 연골 건강·피부보습에 도움을 줄 수 있음'],
+  '루테인': ['노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음'],
+  '밀크씨슬': ['간 건강에 도움을 줄 수 있음'],
+  '코엔자임Q10': ['항산화·높은 혈압 감소에 도움을 줄 수 있음', '항산화에 도움을 줄 수 있음', '높은 혈압 감소에 도움을 줄 수 있음'],
+  '식이섬유': ['배변활동 원활에 도움을 줄 수 있음', '혈중 콜레스테롤 개선에 도움을 줄 수 있음', '식후 혈당상승 억제에 도움을 줄 수 있음'],
+  '옥타코사놀': ['지구력 증진에 도움을 줄 수 있음'],
+};
+const INGREDIENT_FN_NORM: Record<string, Set<string>> = {};
+for (const [k, arr] of Object.entries(INGREDIENT_FN)) INGREDIENT_FN_NORM[k] = new Set(arr.map(normFn));
+/** ko 기능성 문구가 해당 원료의 공식 기능성 집합에 속하는가 (normFn 매칭) */
+export function fnBelongsTo(koFn: string, key: string): boolean {
+  const set = INGREDIENT_FN_NORM[key]; if (!set) return false;
+  const n = normFn(koFn); if (set.has(n)) return true;
+  for (const e of set) if (n.includes(e) || e.includes(n)) return true;
+  return false;
+}
+
 export interface NutrientMeta { key: string; slug: string; displayKo: string; displayEn: string; kind?: 'nutrient' | 'functional' }
 export const FUNCTIONAL_META: Record<string, NutrientMeta> = {
   'MSM': { key: 'MSM', slug: 'msm', displayKo: 'MSM', displayEn: 'MSM', kind: 'functional' },
@@ -146,6 +194,8 @@ export const FUNCTIONAL_META: Record<string, NutrientMeta> = {
   '옥타코사놀': { key: '옥타코사놀', slug: 'octacosanol', displayKo: '옥타코사놀', displayEn: 'Octacosanol', kind: 'functional' },
 };
 export const NUTRIENT_META: Record<string, NutrientMeta> = {
+  '비타민D': { key: '비타민D', slug: 'vitamin-d', displayKo: '비타민 D', displayEn: 'Vitamin D' },
+  '비타민C': { key: '비타민C', slug: 'vitamin-c', displayKo: '비타민 C', displayEn: 'Vitamin C' },
   '아연': { key: '아연', slug: 'zinc', displayKo: '아연', displayEn: 'Zinc' },
   '비타민E': { key: '비타민E', slug: 'vitamin-e', displayKo: '비타민 E', displayEn: 'Vitamin E' },
   '칼슘': { key: '칼슘', slug: 'calcium', displayKo: '칼슘', displayEn: 'Calcium' },

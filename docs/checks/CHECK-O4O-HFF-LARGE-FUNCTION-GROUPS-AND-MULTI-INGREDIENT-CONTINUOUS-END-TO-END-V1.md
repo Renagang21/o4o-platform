@@ -80,4 +80,22 @@ M2(2원료) 1,915 · M3(3원료) 1,082 · MX(≥4, 이번 범위 제외) 3,122 �
 
 상위 안정 조합(생산 우선): 비타민D+아연 194 · 셀레늄+아연 189 · 마그네슘+칼슘 127 · 비타민C+아연 94 · 식이섬유+아연 92 · 마그네슘+비타민D+칼슘 86 · 마그네슘+아연+칼슘 63 · 비타민D+칼슘 60 · MSM+비타민D 53 · 루테인+비타민A 48 …
 
+### 5.1 PART B 생산 착수 — M2 4조합 121 LIVE
+
+다중원료 composer(`hff-combo-compose.ts`)·select(`hff-combo-select.ts`)·generate(`hff-combo-generate.ts`) 구현. **원료별 독립 카드**(badge·표시량·기능성 분리, 수치·기능성 혼입 0). 기능성 귀속=INGREDIENT_FN 매칭(부원료/미귀속 기능성→HOLD).
+
+**G-MULTI 가드**(paired test 6/6 PASS): INGREDIENT-COUNT·FUNCTION-COVERAGE·AMOUNT-PAIRING·**AMOUNT-SOURCE**(원문 BASE_STANDARD 라벨 구간에 수치 귀속 — 원료간 수치 이동 검출)·BILINGUAL(순서·개수)·DUPLICATE. 개별 위반 자동 HOLD.
+
+| 조합 | LIVE | 비고 |
+|---|--:|---|
+| 비타민D + 아연 | 38 | 첫 M2. 숨은 3원료(프로바이오틱스 CFU) 136건 정확 격리 |
+| 셀레늄 + 아연 | 26 | |
+| 마그네슘 + 칼슘 | 20 | |
+| 비타민C + 아연 | 37 | 21 auto-HOLD |
+| **소계** | **121** | write 484, 전 조합 독립검증 PASS, BLOCKED 0 |
+
+**규칙화**: 복합 귀속용으로 registry 에 비타민 D·C 기능성 en 매핑 + INGREDIENT_FN(원료별 공식 기능성 집합) 추가. 단일 라인 회귀 BLOCKED 0(zinc/MSM 무변화).
+
+> **세션 누적 LIVE = VD417 + 단일영양소1,036 + 기능성1,427 + 복합형121 = 3,001** → WO 목표 3,000 도달. HFF o4o_hff_generated 전체 master 3,764.
+
 **PART B 생산 재개 지점**: 다중원료 composer 확장 필요 — ① 2~3 원료 각각 badge/표시량/기능성 렌더 ② 원료별 지표성분·기준량 분리(수치 혼입 0) ③ ko/en 원료별 기능성 대응 전수검사(§10) ④ 조합별 20건 내부 게이트 → BLOCKED 0·기능성 누락/추가 0·수치 혼입 0 시 잔여 전량. 가장 큰 안정 M2(비타민D+아연 등)부터. 기존 단일 composer/registry/apply/verify 재사용, 다중 편익 병합만 신규.
