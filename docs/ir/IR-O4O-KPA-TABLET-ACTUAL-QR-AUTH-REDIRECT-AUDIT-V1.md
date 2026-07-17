@@ -11,7 +11,7 @@
 **태블릿 화면의 screen_set QR은 로그인을 요구하지 않는다 — 템플릿 종류와 무관하게 공개다.** 코드·데이터·라이브(로그아웃 + 로그인) 전 경로에서 확인. 현재 배포된 두 보호 샘플 QR로는 **로그인 화면이 재현되지 않는다.**
 
 ```
-템플릿별 인증 차이        없음 (모두 동일 /qr/{slug})
+템플릿별 인증 차이        없음 (5종 전수 확인, 모두 동일 /qr/{slug})
 대기영상형만 로그인       아님
 상품 상세 QR만 로그인     아님
 로그아웃 접속             공개 렌더 (redirect 0)
@@ -70,6 +70,20 @@ chain = `/qr/{slug} → /qr/{slug}`(자기 자신, redirect 0). 최종 = `Public
 ## 10. 로그인 세션에서도 동일
 
 약국 경영자 로그인 상태에서 `/qr/tablet-corner-11` → final `/qr/tablet-corner-11`, redirect 0, content 렌더, `/login` 튕김 없음. 즉 **로그인·비로그인 양쪽 모두 공개.**
+
+## 11. 템플릿 5종 전수 확인 (IR 요건)
+
+이 org 의 5개 렌더 템플릿 각각 대표 세트의 QR slug 를 로그아웃 실측 — **전부 공개**:
+
+| 템플릿 | 대표 세트 | slug | final | login | content |
+|--------|-----------|------|-------|:---:|:---:|
+| corner_information_basic_v1 (기본 안내형) | 피부관리 기본 화면 세트 | tablet-corner-2 | /qr/tablet-corner-2 | ❌ | ✅ |
+| corner_overview_qr (코너 소개형) | 구강관리 기본 화면 세트 | tablet-corner | /qr/tablet-corner | ❌ | ✅ |
+| idle_touch_video (대기 영상형) | 구강관리 대기 영상형 | tablet-corner-8 | /qr/tablet-corner-8 | ❌ | ✅ |
+| product_focus (상품 집중형) | 구강관리 상품 집중형 | tablet-corner-6 | /qr/tablet-corner-6 | ❌ | ✅ |
+| product_grid_qr (제품 진열형) | 구강관리 제품 진열형 | tablet-corner-7 | /qr/tablet-corner-7 | ❌ | ✅ |
+
+**5종 모두 redirect 0 · 로그인 0 · 공개 렌더.** 대기 영상형은 QR 위치만 hero chip(코드상 `qrGuide.url` 동일)이며 인증 차이 없음.
 
 ---
 
