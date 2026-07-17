@@ -1,0 +1,12 @@
+[
+  {
+    "candidateId": "dadea713-9655-48e9-8db9-72b3ede37d82",
+    "productName": "셀립라이프타임가족유산균",
+    "manufacturer": "(주)뉴팜",
+    "statementNo": "20040017014432",
+    "holdCode": "HOLD_SOURCE_ABNORMAL",
+    "reason": "원문 CFU 이중표기(120,000,000(1억2천만))가 파서/가드에 상충값으로 읽힘 — H-COUNT-MISMATCH BLOCKED. 원문 표기 정정 필요",
+    "baseStandard": "- 성상 : 고유의 향미가 있고 이미, 이취가 없는 연보라색의 분말 - 프로바이오틱스 수 : 표시량(120,000,000(1억2천만) cfu/6,000 mg) 이상 - 대장균군 : 음성",
+    "intake": "1일 3회, 1회 1포를 섭취하세요."
+  }
+]

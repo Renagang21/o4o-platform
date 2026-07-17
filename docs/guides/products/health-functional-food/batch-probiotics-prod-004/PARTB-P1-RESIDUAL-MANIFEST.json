@@ -1,0 +1,67 @@
+{
+  "wo": "WO-O4O-HFF-PROBIOTICS-CONTINUOUS-END-TO-END-PRODUCTION-V1 (PART B)",
+  "generatedAt": "2026-07-17",
+  "status": "PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION",
+  "functionality": "프로바이오틱스 단일 기능성(유산균 증식·유해균 억제·배변활동·장 건강)",
+  "poolSurvey": {
+    "source": "poolA-remaining.json(735) 잔여 미사용 100 → P1필터통과 94",
+    "classified": {
+      "KIDS": 63,
+      "WOMENS": 9,
+      "INFANT": 1,
+      "COMBO": 2,
+      "EXPORT_PERSONALIZED": 13,
+      "SOURCE_ABNORMAL_CFU_NULL": 2,
+      "BLACKLIST_P1": 2,
+      "WRITABLE_P1": 2
+    },
+    "note": "파일기반 P1 표준 단일기능성 풀 사실상 소진. 잔여 P1 2건 중 1건 작성/1건 SOURCE_ABNORMAL HOLD."
+  },
+  "production": {
+    "count": 1,
+    "items": [
+      {
+        "statementNo": "20040020016585",
+        "slug": "c-cp01-01-live-probiotics-geurin",
+        "productName": "생유산균 그린",
+        "productNameEn": "Live Probiotics Geurin",
+        "manufacturer": "종근당건강(주)",
+        "dataFile": "hff-probiotics-prod-d-cp01.json",
+        "reviewNote": "PRE-SRC-BASIS-UNVERIFIABLE-003(파서 basis 미판독) — 원문 basis 2g 수동확인 완료, 콘텐츠 위반 아님"
+      }
+    ]
+  },
+  "hold": {
+    "count": 3,
+    "items": [
+      {
+        "statementNo": "20040017014432",
+        "productName": "셀립라이프타임가족유산균",
+        "manufacturer": "(주)뉴팜",
+        "holdCode": "HOLD_SOURCE_ABNORMAL",
+        "reason": "원문 CFU 이중표기(120,000,000(1억2천만))가 파서/가드에 상충값으로 읽힘 — H-COUNT-MISMATCH BLOCKED. 원문 표기 정정 필요"
+      },
+      {
+        "statementNo": "20120019007110",
+        "productName": "일양살아있는프로바이오틱스장용캡슐",
+        "holdCode": "HOLD_SOURCE_ABNORMAL",
+        "reason": "파서 CFU 미판독(값 라벨 분리 / 소수점·천단위 혼용) — 원문 정정 필요: ① 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 장용성 제피된 경질캡슐 ② 프로바이오틱스 수(CFU/500 mg) : 표시량(100,000,000) 이상 ③ 대장균군 : 음성 ④ 붕"
+      },
+      {
+        "statementNo": "202000124466",
+        "productName": "17종 생유산균 프로바이오틱스",
+        "holdCode": "HOLD_SOURCE_ABNORMAL",
+        "reason": "파서 CFU 미판독(값 라벨 분리 / 소수점·천단위 혼용) — 원문 정정 필요: ① 성상 : 고유의 향미가 있고 이미,이취가 없는 노란 하얀색의 분말 ② 프로바이오틱스 : 표시량(300,000.000cfu/2g)의 이상 ③ 대장균군 : 음성"
+      }
+    ]
+  },
+  "applyContract": {
+    "reuse": "hff-b3-store-canonical-apply.ts 계약(loadTargets 를 hff-probiotics-prod-d-cp01.json 로 지정, TARGET=1, env HFF_B3(or D)_CANONICAL_APPLY_CONFIRM=YES)",
+    "expectedWrites": "4 = master1+candidate1+SPD(ko1+en1)",
+    "dbWrite": "미실행(권한 대기)"
+  },
+  "separateLine": {
+    "kidsWomensInfant": 73,
+    "note": "아동·여성·영유아 대상 제품은 별도 검증 패턴(보호자 톤·영유아 주의문구) 필요 — 오케스트레이터 결정 대상, 본 P1 라인 밖."
+  }
+}
