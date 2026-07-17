@@ -1,0 +1,862 @@
+[
+ {
+  "candidateId": "hff-vc:vc-100-01",
+  "productName": "리포좀 비타민C 분말 스틱",
+  "productNameEn": "Liposomal Vitamin C Powder Stick",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007873",
+  "category": "hff",
+  "_slug": "vc-100-01",
+  "source": {
+   "mainFunction": "[비타민C] 결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 2. 비타민C : 표시량(250mg/2000mg)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. 과량 섭취하지 않도록 주의하십시오. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 250,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>리포좀 비타민C 분말 스틱<small>비타민 C</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>250mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>250mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 · (주)한풍네이처팜 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 250 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Liposomal Vitamin C Powder Stick<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Hanpoong Nature Farm · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>250 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>250 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Hanpoong Nature Farm</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (250 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-02",
+  "productName": "지속성 비타민C 12시간 mini",
+  "productNameEn": "Sustained Vitamin C 12 Hours Mini",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200083339",
+  "category": "hff",
+  "_slug": "vc-100-02",
+  "source": {
+   "mainFunction": "[비타민 C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰색의 진한노란색 장방형 제피 정제 2. 비타민C : 표시량(500mg/680mg)의 80~150% 3. 용출 : 초기 1시간 용출률 10~35%, 중간 4시간 용출률 40~65%, 종결 12시간 용출률 75% 이상 4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다. 제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 [비타민 C] 과량 섭취하지 않도록 주의할 것, 신장질환이 있는 경우 섭취 전 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰색의 진한노란색 장방형 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 680,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>지속성 비타민C 12시간 mini<small>비타민 C</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>500mg</b>를 표시량으로 담았습니다(표시 기준 680mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰색의 진한노란색 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/680mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 진한노란색 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Sustained Vitamin C 12 Hours Mini<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Novarex · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>500 mg</b> of labelled vitamin C (per 680 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Novarex</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500 mg / 680 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 진한노란색 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-03",
+  "productName": "진정주 비타민C 1000",
+  "productNameEn": "Jinjeongju Vitamin C 1000",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "20040017062173",
+  "category": "hff",
+  "_slug": "vc-100-03",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 무광택의 백색 장방형 정제 2. 비타민C: 표시량(1,000 mg/1,100 mg)의 80~150% 3. 붕해도: 30분 4. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1. 특정질환, 특이체질, 알레르기 체질인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오. 2. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. 3. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다. 4. 본 제품은 습기가 많은 곳이나, 열, 햇빛 등에 노출되면 변색, 변질되므로 알루미늄 봉지 개봉 후에는 가능한 빨리 섭취하시기 바랍니다. 5. 알루미늄 봉지 안의 습기제거제, 산소흡수제는 드시지 마십시오. 6. 과량 섭취하지 않도록 주의하십시오. 7. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 무광택의 백색 장방형 정제",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>진정주 비타민C 1000<small>비타민 C</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>1000mg</b>를 표시량으로 담았습니다(표시 기준 1100mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 무광택의 백색 장방형 정제 · (주)에스엘에스 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 무광택의 백색 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Jinjeongju Vitamin C 1000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by SLS · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1000 mg</b> of labelled vitamin C (per 1100 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by SLS</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000 mg / 1100 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 무광택의 백색 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-04",
+  "productName": "애터미 바이탈 메가비타민C 2000",
+  "productNameEn": "Atomy Vital Mega Vitamin C 2000",
+  "manufacturer": "콜마비앤에이치(주)세종3공장",
+  "manufacturerEn": null,
+  "statementNo": "202400280804",
+  "category": "hff",
+  "_slug": "vc-100-04",
+  "source": {
+   "mainFunction": "- 비타민 C : (1) 결합조직 형성과 기능유지에 필요 (2) 철의 흡수에 필요 (3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말 2. 비타민C : 표시량(2,000 mg/ 3 g)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. 2) 소비기한이 경과된 제품은 섭취하지 마십시오. 3) 과량 섭취하지 않도록 주의하십시오. 4) 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오. 5) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2000,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 2000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>애터미 바이탈 메가비타민C 2000<small>비타민 C</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)세종3공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>2000mg</b>를 표시량으로 담았습니다(표시 기준 3g당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>2000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말 · 콜마비앤에이치(주)세종3공장 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(2000mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 2000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Atomy Vital Mega Vitamin C 2000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Kolmar BNH (Sejong Plant 3) · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>2000 mg</b> of labelled vitamin C (per 3 g of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Kolmar BNH (Sejong Plant 3)</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Taken directly</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (2000 mg / 3 g), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-05",
+  "productName": "퓨어 비타민C 3000mg",
+  "productNameEn": "Pure Vitamin C 3000mg",
+  "manufacturer": "노비스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020041543",
+  "category": "hff",
+  "_slug": "vc-100-05",
+  "source": {
+   "mainFunction": "(1) 결합조직 형성과 기능유지에 필요 (2) 철의 흡수에 필요 (3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,[비타민 C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 백색의 분말 2. 비타민 C : 표시량(3,000mg/3g)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하거나, 물, 음료 등과 같이 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 백색의 분말",
+   "storage": "습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3000,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 3000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>퓨어 비타민C 3000mg<small>비타민 C</small></h1><p class=\"sd-meta\">노비스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>3000mg</b>를 표시량으로 담았습니다(표시 기준 3g당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>3000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 백색의 분말 · 노비스바이오(주) 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(3000mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 3000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Pure Vitamin C 3000mg<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Novis Bio · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>3000 mg</b> of labelled vitamin C (per 3 g of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>3000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Novis Bio</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (3000 mg / 3 g), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-06",
+  "productName": "트루엔 리포좀 비타민C",
+  "productNameEn": "Truen Liposomal Vitamin C",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483355",
+  "category": "hff",
+  "_slug": "vc-100-06",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흐린 노란 주황색의 타원형 제피정제 2. 비타민C : 표시량 (500mg/1,100mg)의 80~150% 3. 대장균군 : 음성 4. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "• 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. • 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다. • 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하십시오. • 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흐린 노란 주황색의 타원형 제피정제",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트루엔 리포좀 비타민C<small>비타민 C</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>500mg</b>를 표시량으로 담았습니다(표시 기준 1100mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흐린 노란 주황색의 타원형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흐린 노란 주황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Truen Liposomal Vitamin C<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Woori Bio · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>500 mg</b> of labelled vitamin C (per 1100 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Woori Bio</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500 mg / 1100 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흐린 노란 주황색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-07",
+  "productName": "퍼스트펭귄 리포좀 비타민C",
+  "productNameEn": "First Penguin Liposomal Vitamin C",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352821",
+  "category": "hff",
+  "_slug": "vc-100-07",
+  "source": {
+   "mainFunction": "[비타민 C] 결합조직 형성과 기능유지에 필요 철의 흡수에 필요 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 2. 비타민C: 표시량(500mg/2000mg)의 80~150% 3. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>퍼스트펭귄 리포좀 비타민C<small>비타민 C</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>500mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>First Penguin Liposomal Vitamin C<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Cosmax NBT · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>500 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Cosmax NBT</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-08",
+  "productName": "비타민C 밸런스업",
+  "productNameEn": "Vitamin C Balance Up",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107520",
+  "category": "hff",
+  "_slug": "vc-100-08",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상: 연보라색의 원형 정제로 이미, 이취가 없음 (2)대장균군: 음성 (3)비타민C: 표시량(500 mg/2,000mg)의 80~150%",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 분은 성분을 확인한 후, 섭취하시기 바랍니다. ② 영ㆍ유아, 임신ㆍ수유부나 질환보유자 또는 약물 복용중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "연보라색의 원형 정제로 이미, 이취가 없음",
+   "storage": "①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오. ③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민C 밸런스업<small>비타민 C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>500mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연보라색의 원형 정제로 이미, 이취가 없음 · (주)유유헬스케어 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어서 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 연보라색의 원형 정제로 이미, 이취가 없음</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오. ③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Vitamin C Balance Up<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Yuyu Healthcare · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>500 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Yuyu Healthcare</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chewed</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 연보라색의 원형 정제로 이미, 이취가 없음</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오. ③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-09",
+  "productName": "하루틴 리포좀 비타민C 스틱",
+  "productNameEn": "Harutin Liposomal Vitamin C Stick",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071299",
+  "category": "hff",
+  "_slug": "vc-100-09",
+  "source": {
+   "mainFunction": "[비타민C] (1) 결합조직 형성과 기능유지에 필요 (2) 철의 흡수에 필요 (3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고, 이미, 이취가 없는 흰색의 분말 2. 비타민 C : 표시량(500 mg / 3,000 mg)의 80~150% 3. 대장균군 : 음성 (적합)",
+   "intake": "1일 1회, 1회 1포를 그대로 먹거나 물과 함께 섭취하십시오.",
+   "caution": "[비타민C] (가) 과량 섭취하지 않도록 주의할 것 (나) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것 (다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루틴 리포좀 비타민C 스틱<small>비타민 C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>500mg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 · (주)유유헬스케어 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Harutin Liposomal Vitamin C Stick<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Yuyu Healthcare · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>500 mg</b> of labelled vitamin C (per 3000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>500 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Yuyu Healthcare</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500 mg / 3000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-10",
+  "productName": "치얼업 비타민C",
+  "productNameEn": "Cheer Up Vitamin C",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021813",
+  "category": "hff",
+  "_slug": "vc-100-10",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 회백색의 정제 ②비타민C : 표시량(1,000mg/1,700mg)의 80~150% ③붕해시험 : 30분 이내 ④대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "- 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. - 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오. - 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 회백색의 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>치얼업 비타민C<small>비타민 C</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2정)에 비타민 C <b>1000mg</b>를 표시량으로 담았습니다(표시 기준 1700mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 회백색의 정제 · (주)비오팜 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/1700mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 회백색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Cheer Up Vitamin C<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Biopharm · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 tablets) provides <b>1000 mg</b> of labelled vitamin C (per 1700 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000 mg</b> of vitamin C in one daily serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Biopharm</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000 mg / 1700 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 회백색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-11",
+  "productName": "케어랩 비타민C",
+  "productNameEn": "CareLab Vitamin C",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211968",
+  "category": "hff",
+  "_slug": "vc-100-11",
+  "source": {
+   "mainFunction": "[비타민C] (1) 결합조직 형성과 기능유지에 필요, (2)철의 흡수에 필요, (3)항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제 (2)비타민C : 표시량(1,000 mg/1,400 mg) 80~150% (3)대장균군 : 음성 (4)붕해시험 : 적합(60분 이내 붕해)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 과량 섭취하지 않도록 주의할 것 (나) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것 (다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제",
+   "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케어랩 비타민C<small>비타민 C</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>1000mg</b>를 표시량으로 담았습니다(표시 기준 1400mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>CareLab Vitamin C<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Biopharm · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1000 mg</b> of labelled vitamin C (per 1400 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Biopharm</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000 mg / 1400 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-12",
+  "productName": "프리미엄 항산화 비타민C 1000 플러스",
+  "productNameEn": "Premium Antioxidant Vitamin C 1000 Plus",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106423",
+  "category": "hff",
+  "_slug": "vc-100-12",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 미백색의 정제 ② 비타민C : 표시량(1000mg/1100mg)의 80~150% ③ 대장균군 : 음성 ④ 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인한 후 섭취하여 주십시오. ② 특정 또는 특이체질이신 경우 원료의 성분을 확인 후 섭취하십시오. ③ 동봉된 방습제를 섭취하지 않도록 주의하십시오. ④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미백색의 정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 항산화 비타민C 1000 플러스<small>비타민 C</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 2정)에 비타민 C <b>1000mg</b>를 표시량으로 담았습니다(표시 기준 1100mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미백색의 정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미백색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Premium Antioxidant Vitamin C 1000 Plus<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by SK Natural Farm · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 2 tablets) provides <b>1000 mg</b> of labelled vitamin C (per 1100 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000 mg</b> of vitamin C in one daily serving (2 tablets)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by SK Natural Farm</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000 mg / 1100 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미백색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-13",
+  "productName": "퓨어비타민C 1000",
+  "productNameEn": "Pure Vitamin C 1000",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031906",
+  "category": "hff",
+  "_slug": "vc-100-13",
+  "source": {
+   "mainFunction": "- 비타민C : 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 2) 비타민C : 표시량(1,000 mg/1,280 mg)의 80~150% 3) 대장균군 : 음성 4) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제",
+   "storage": "- 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1280,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>퓨어비타민C 1000<small>비타민 C</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1정)에 비타민 C <b>1000mg</b>를 표시량으로 담았습니다(표시 기준 1280mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/1280mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> - 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Pure Vitamin C 1000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Kolmar BNH (Eumseong Plant) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 tablet) provides <b>1000 mg</b> of labelled vitamin C (per 1280 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>1000 mg</b> of vitamin C in one daily serving (1 tablet)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Kolmar BNH (Eumseong Plant)</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000 mg / 1280 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> - 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-14",
+  "productName": "HBB Allinone Detox Vitamin C",
+  "productNameEn": "HBB Allinone Detox Vitamin C",
+  "manufacturer": "콜마비앤에이치(주)세종3공장",
+  "manufacturerEn": null,
+  "statementNo": "2024002808086",
+  "category": "hff",
+  "_slug": "vc-100-14",
+  "source": {
+   "mainFunction": "- 비타민 C : 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 분말 2. 비타민 C : 표시량(550 mg / 2 g)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 분말",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 550,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 550mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>HBB Allinone Detox Vitamin C<small>비타민 C</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)세종3공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>550mg</b>를 표시량으로 담았습니다(표시 기준 2g당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>550mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 분말 · 콜마비앤에이치(주)세종3공장 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(550mg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 550 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>HBB Allinone Detox Vitamin C<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Kolmar BNH (Sejong Plant 3) · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>550 mg</b> of labelled vitamin C (per 2 g of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>550 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Kolmar BNH (Sejong Plant 3)</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (550 mg / 2 g), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-15",
+  "productName": "바노바기 비타민C 2,000mg",
+  "productNameEn": "Banobagi Vitamin C 2000mg",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200083435",
+  "category": "hff",
+  "_slug": "vc-100-15",
+  "source": {
+   "mainFunction": "[비타민 C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 분말 2. 비타민 C : 표시량(2000mg/2000mg)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다. 제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 [비타민 C] 과량 섭취하지 않도록 주의할 것 신장질환이 있는 경우 섭취 전 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 분말",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2000,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 2000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바노바기 비타민C 2,000mg<small>비타민 C</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>2000mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>2000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 분말 · 주식회사 노바렉스 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(2000mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 2000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Banobagi Vitamin C 2000mg<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Novarex · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>2000 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Novarex</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (2000 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-16",
+  "productName": "매일습관 비타민C2000",
+  "productNameEn": "Maeil Habit Vitamin C 2000",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200032769",
+  "category": "hff",
+  "_slug": "vc-100-16",
+  "source": {
+   "mainFunction": "- 비타민 C : 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2) 비타민C : 표시량 (2,000 mg / 3 g)의 80 ~ 150% 3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. 2) 소비기한이 경과된 제품은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2000,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 2000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>매일습관 비타민C2000<small>비타민 C</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>2000mg</b>를 표시량으로 담았습니다(표시 기준 3g당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>2000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(2000mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 2000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Maeil Habit Vitamin C 2000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Kolmar BNH (Eumseong Plant) · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>2000 mg</b> of labelled vitamin C (per 3 g of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Kolmar BNH (Eumseong Plant)</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Taken directly</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (2000 mg / 3 g), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-17",
+  "productName": "바노 비타민 C 2000",
+  "productNameEn": "Bano Vitamin C 2000",
+  "manufacturer": "(주)허브큐어",
+  "manufacturerEn": null,
+  "statementNo": "20040015162526",
+  "category": "hff",
+  "_slug": "vc-100-17",
+  "source": {
+   "mainFunction": "비타민 C (가) 결합조직 형성과 기능유지에 필요 (나) 철의 흡수에 필요 (다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하얀색의 분말 (2) 비타민 C : 표시량(2,000mg/2,000mg)의 80~150% (3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(2 g)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "- 과량 섭취하지 않도록 주의할 것 - 신장질환이 있는 경우 섭취 전 전문가와 상담할 것 - 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하얀색의 분말",
+   "storage": "습기에 약해 변질될 우려가 있으므로, 스틱포 개봉 후에는 바로 섭취하시고 직사광선 및 습기를 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 3년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2000,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 2000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바노 비타민 C 2000<small>비타민 C</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>2000mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>2000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하얀색의 분말 · (주)허브큐어 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(2000mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 3년</div><div class=\"sd-item\"><b>보관</b> 습기에 약해 변질될 우려가 있으므로, 스틱포 개봉 후에는 바로 섭취하시고 직사광선 및 습기를 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 2000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Bano Vitamin C 2000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Herb Cure · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>2000 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Herb Cure</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (2000 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 3년</div><div class=\"sd-item\"><b>Storage</b> 습기에 약해 변질될 우려가 있으므로, 스틱포 개봉 후에는 바로 섭취하시고 직사광선 및 습기를 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-18",
+  "productName": "비타민C 2000",
+  "productNameEn": "Vitamin C 2000",
+  "manufacturer": "(주)원일바이오",
+  "manufacturerEn": null,
+  "statementNo": "2016001213762",
+  "category": "hff",
+  "_slug": "vc-100-18",
+  "source": {
+   "mainFunction": "[비타민C] (1) 결합조직 형성과 기능유지에 필요 (2) 철의 흡수에 필요 (3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 ② 비타민C : 표시량 (2,000mg / 2,000mg)의 80~150% ③ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "[비타민 C] ① 과량 섭취하지 않도록 주의할 것. ② 신장질환이 있는 경우 섭취 전 전문가와 상담할 것. ③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+   "storage": "- 고온다습(30℃ 이상, 상대습도 75% 이상)·직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. - 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2000,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 2000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타민C 2000<small>비타민 C</small></h1><p class=\"sd-meta\">(주)원일바이오 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>2000mg</b>를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>2000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 · (주)원일바이오 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(2000mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> - 고온다습(30℃ 이상, 상대습도 75% 이상)·직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. - 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 2000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Vitamin C 2000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Wonil Bio · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>2000 mg</b> of labelled vitamin C (per 2000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>2000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Wonil Bio</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (2000 mg / 2000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> - 고온다습(30℃ 이상, 상대습도 75% 이상)·직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. - 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-19",
+  "productName": "하모네 메가플러스 비타민C 3000",
+  "productNameEn": "Harmone Mega Plus Vitamin C 3000",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007927",
+  "category": "hff",
+  "_slug": "vc-100-19",
+  "source": {
+   "mainFunction": "[비타민C] 결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 2. 비타민C : 표시량(3000mg/3000mg)의 80~150% 3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질이신 경우 원료를 확인하신 후 섭취하여 주시기 바랍니다. 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다. 과량 섭취하지 않도록 주의하시기 바랍니다. 신장질환이 있는 경우 섭취 전 전문가와 상담하시기 바랍니다. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3000,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 3000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하모네 메가플러스 비타민C 3000<small>비타민 C</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>3000mg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>3000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 분말 · (주)한풍네이처팜 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(3000mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 3000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Harmone Mega Plus Vitamin C 3000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by Hanpoong Nature Farm · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>3000 mg</b> of labelled vitamin C (per 3000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>3000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Hanpoong Nature Farm</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (3000 mg / 3000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "hff-vc:vc-100-20",
+  "productName": "메가 비타민C 3000",
+  "productNameEn": "Mega Vitamin C 3000",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "2022002000297",
+  "category": "hff",
+  "_slug": "vc-100-20",
+  "source": {
+   "mainFunction": "[비타민C] 결합조직 형성과 기능유지에 필요 철의 흡수에 필요 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 하얀색의 입자성이 있는 분말 2) 비타민C : 표시량(3,000 ㎎/ 3,000 ㎎)의 80~150% 3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 과량 섭취하지 않도록 주의하시기 바랍니다. 2) 신장질환이 있는 경우 섭취 전 전문가와 상담하시기 바랍니다. 3) 특이체질, 알레르기체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 확인 후 섭취하십시오. . 4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 하얀색의 입자성이 있는 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3000,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "stick",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 3000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메가 비타민C 3000<small>비타민 C</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 비타민 C <b>3000mg</b>를 표시량으로 담았습니다(표시 기준 3000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>3000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 하얀색의 입자성이 있는 분말 · 이앤에스(주) 제조</li></ul>\n  <h2>비타민 C 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(3000mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 하얀색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 3000 mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Mega Vitamin C 3000<small>Vitamin C</small></h1><p class=\"sd-meta\">Made by E&S · Once a day · 1 stick</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">One daily serving (once a day, 1 stick) provides <b>3000 mg</b> of labelled vitamin C (per 3000 mg of product). Vitamin C is a nutrient needed for the formation and maintenance of connective tissue, needed for the absorption of iron, and to protect cells from harmful oxygen radicals through antioxidant action.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li><b>3000 mg</b> of vitamin C in one daily serving (1 stick)</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by E&S</li></ul>\n  <h2>Vitamin C nutritional functions (officially recognised)</h2><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen radicals through antioxidant action</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (3000 mg / 3000 mg), 80–150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 하얀색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who take vitamin C daily</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not exceed the stated intake · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]

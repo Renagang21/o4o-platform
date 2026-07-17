@@ -1,0 +1,21 @@
+{
+ "note": "batch100 최종본 20건은 전량 단일 [비타민C]·표시량(X/Y) 파싱정상·부피(mL)없음·복합기능성없음·Guard PASS. 아래는 최초 선정에 포함됐다가 격리한 1건(수치깨짐/복합/mL 아님 — 해외 수출등록 규격 이슈).",
+ "heldOut": [
+  {
+   "statementNo": "2024002808052",
+   "productName": "ATOMY VITAMIN C 550mg Powder(말레이시아)",
+   "manufacturer": "콜마비앤에이치(주)세종3공장",
+   "declaredAmount": {
+    "value": 550,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "holdType": "OVERSEAS_EXPORT_SPEC / GUARD_REVIEW_CFU_FALSE_POSITIVE",
+   "reason": "말레이시아 수출 등록건으로 base_standard 에 수출용 미생물·중금속 규격 패널(TAMC/TYMC/Salmonella/E.Coli/납·비소·수은·카드뮴, CFU/g)이 포함됨. 초안에는 CFU 표기가 전혀 없으나 공통 Guard 의 PRE-SRC-CFU-UNVERIFIABLE-003 이 source 텍스트의 CFU/g(미생물 한도)를 CFU 효능주장으로 오탐하여 REVIEW_REQUIRED 발생(BLOCKED 아님). 국내 소비자 완제품과 규격체계가 상이하여 선정 단계에서 제외하고, 국내 규격 clean 대체 1건(HBB Allinone Detox Vitamin C, 동일 제조사·동일 550mg 규격, statementNo 2024002808086)으로 교체하여 목표 20/누적 100 유지. 대체 사유=선정필터 결함 교정(수출등록 배제)이며 콘텐츠 HOLD 드롭 보충이 아님.",
+   "tolerance": "90~150% (표준 80~150% 과 상이 — 동적 파싱으로 정확 반영했으나 격리로 미사용)",
+   "note": "공통 Guard 코드는 수정하지 않음. CFU 룰 개선(미생물 한도 vs 효능 CFU 구분)은 별도 판단 대상으로 보고."
+  }
+ ],
+ "items": []
+}
