@@ -1,0 +1,147 @@
+[
+ {
+  "candidateId": "rg-cp01:025-9308a5b6",
+  "statementNo": "2004001900245",
+  "productName": "홍삼차골드",
+  "holdCode": "HOLD_IDENTITY",
+  "blockedRules": [
+   "PRE-SRC-BULK-004"
+  ]
+ },
+ {
+  "candidateId": "rg-cp02:031-3cb1a850",
+  "statementNo": "20040019002118",
+  "productName": "홍삼차",
+  "holdCode": "HOLD_IDENTITY",
+  "blockedRules": [
+   "PRE-SRC-BULK-004"
+  ]
+ },
+ {
+  "candidateId": "rg-cp02:032-8f37d2fb",
+  "statementNo": "2004002003741",
+  "productName": "고려홍삼차골드",
+  "holdCode": "HOLD_DATA_CONFLICT",
+  "blockedRules": [
+   "F-AGE-BOUNDARY-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp03:043-fc106bde",
+  "statementNo": "2004001707311",
+  "productName": "홍삼차골드",
+  "holdCode": "HOLD_SOURCE_ABNORMAL",
+  "blockedRules": [
+   "H-COUNT-MISMATCH-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp03:046-4cfdc745",
+  "statementNo": "2004002003530",
+  "productName": "6년근고려홍삼차골드",
+  "holdCode": "HOLD_SOURCE_ABNORMAL",
+  "blockedRules": [
+   "H-COUNT-MISMATCH-001"
+  ],
+  "ginsenosideAbsent": true
+ },
+ {
+  "candidateId": "rg-cp05:064-fa7ff544",
+  "statementNo": "20040020013256",
+  "productName": "고려삼분",
+  "holdCode": "HOLD_DATA_CONFLICT",
+  "blockedRules": [
+   "F-AGE-BOUNDARY-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp06:079-653bf08e",
+  "statementNo": "2004001602082",
+  "productName": "에너지보이",
+  "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+  "blockedRules": [
+   "G-FORM-GENERALIZATION-001",
+   "G-WATER-UNGROUNDED-003"
+  ]
+ },
+ {
+  "candidateId": "rg-cp07:081-edf9f056",
+  "statementNo": "20040020013262",
+  "productName": "홍삼분 리미티드",
+  "holdCode": "HOLD_DATA_CONFLICT",
+  "blockedRules": [
+   "F-AGE-BOUNDARY-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp09:101-a5349c69",
+  "statementNo": "2004001801121",
+  "productName": "홍삼타브렛",
+  "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+  "blockedRules": [
+   "G-CHEWABLE-002"
+  ]
+ },
+ {
+  "candidateId": "rg-cp09:104-54cc264f",
+  "statementNo": "200400180116",
+  "productName": "홍삼성분타브렛",
+  "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+  "blockedRules": [
+   "G-CHEWABLE-002"
+  ]
+ },
+ {
+  "candidateId": "rg-cp09:106-3a50feb1",
+  "statementNo": "2021000662218",
+  "productName": "홍삼정부스터",
+  "holdCode": "HOLD_SOURCE_ABNORMAL",
+  "blockedRules": [
+   "PRE-SRC-BASIS-MISMATCH-002"
+  ]
+ },
+ {
+  "candidateId": "rg-cp18:200-17c1adb6",
+  "statementNo": "200400150832435",
+  "productName": "면역 피로개선엔 홍삼",
+  "holdCode": "HOLD_SOURCE_ABNORMAL",
+  "blockedRules": [
+   "Q-TRUNCATED-002"
+  ]
+ },
+ {
+  "candidateId": "rg-cp20:219-162c1c4d",
+  "statementNo": "2007001702345",
+  "productName": "은하고려홍삼정캡슐",
+  "holdCode": "HOLD_DATA_CONFLICT",
+  "blockedRules": [
+   "F-AGE-BOUNDARY-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp21:230-6f63501d",
+  "statementNo": "20190016403211",
+  "productName": "6년근 리얼 홍삼 캡슐",
+  "holdCode": "HOLD_SOURCE_ABNORMAL",
+  "blockedRules": [],
+  "ginsenosideAbsent": true
+ },
+ {
+  "candidateId": "rg-cp22:240-fd079766",
+  "statementNo": "20040015110924",
+  "productName": "동영제 면역강화 발효홍삼 캡슐",
+  "holdCode": "HOLD_IDENTITY",
+  "blockedRules": [
+   "E-NAME-DERIVED-001"
+  ]
+ },
+ {
+  "candidateId": "rg-cp23:249-d38b5ac9",
+  "statementNo": "2004002001395",
+  "productName": "홍삼분캡슐로얄",
+  "holdCode": "HOLD_DATA_CONFLICT",
+  "blockedRules": [
+   "F-AGE-BOUNDARY-001"
+  ]
+ }
+]

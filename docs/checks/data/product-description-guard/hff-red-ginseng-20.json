@@ -1,0 +1,962 @@
+[
+ {
+  "candidateId": "rg-pilot:001-af2a55d2",
+  "productName": "행복을 주는 홍삼정 에프",
+  "productNameEn": "Red Ginseng 6644",
+  "manufacturer": "맥널티바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "2018001246644",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "분말",
+  "_func6": true,
+  "_fnKey": "면역+피로+혈행+기억+항산화+갱년기",
+  "_candId": "af2a55d2-381b-47ad-86cf-d41518e153c4",
+  "source": {
+   "mainFunction": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화·갱년기 여성의 건강에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 황갈색의 분말\n(2) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(25mg/1.6g)의 80% 이상\n(3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(1.6g)을 직접 또는 온수나 냉수에 녹여서 섭취하십시오.",
+   "caution": "당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황갈색의 분말",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "mg",
+    "basisAmount": 1.6,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 1.6,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 25mg / 1.6g</span></div>\n  <h1>행복을 주는 홍삼정 에프<small>홍삼 · 분말</small></h1><p class=\"sd-meta\">맥널티바이오(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 행복을 주는 홍삼정 에프은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 25mg / 1.6g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li><li>갱년기 여성의 건강에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 25mg / 1.6g</b></li><li><b>분말</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>맥널티바이오(주) · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 25mg / 1.6g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 분말</div><div class=\"sd-item\"><b>품목보고번호</b> 2018001246644</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 25 mg / 1.6 g</span></div>\n  <h1>Red Ginseng 6644<small>red ginseng · powder</small></h1><p class=\"sd-meta\">Made by 맥널티바이오(주) · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 6644 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 25 mg / 1.6 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li><li>may help support women’s health during menopause</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 25 mg / 1.6 g</b></li><li><b>powder</b> · Once a day · 1 sachet per serving</li><li>Made by 맥널티바이오(주) · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 25 mg / 1.6 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 분말</div><div class=\"sd-item\"><b>Item report no.</b> 2018001246644</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:002-9fda7393",
+  "productName": "홍삼",
+  "productNameEn": "Red Ginseng 5122",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915122",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "캡슐",
+  "_func6": true,
+  "_fnKey": "면역+피로+혈행+기억+항산화+갱년기",
+  "_candId": "9fda7393-4550-4354-acc6-dc314b3a9bf8",
+  "source": {
+   "mainFunction": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화·갱년기 여성의 건강에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 분말을 함유한 갈색의 투명한 경질캡슐\n(2) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량 (4 mg / 450 mg)의 80% 이상\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오. ",
+   "caution": "(1) 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하십시오\n(2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 분말을 함유한 갈색의 투명한 경질캡슐",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 4,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 4mg / 450mg</span></div>\n  <h1>홍삼<small>홍삼 · 캡슐</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍삼은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 4mg / 450mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li><li>갱년기 여성의 건강에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 4mg / 450mg</b></li><li><b>캡슐</b> · 1일 1회 1회 1캡슐 — 매일 챙기기 쉽게</li><li>(주)팜투팜2공장 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 4mg / 450mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>품목보고번호</b> 20180003915122</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · (1) 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하십시오 · (2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. · (3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 4 mg / 450 mg</span></div>\n  <h1>Red Ginseng 5122<small>red ginseng · capsule</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 5122 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 4 mg / 450 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li><li>may help support women’s health during menopause</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 4 mg / 450 mg</b></li><li><b>capsule</b> · Once a day · 1 capsule per serving</li><li>Made by (주)팜투팜2공장 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 4 mg / 450 mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>Item report no.</b> 20180003915122</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:003-40ef1de8",
+  "productName": "홍삼정",
+  "productNameEn": "Red Ginseng 7986",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107986",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "정제",
+  "_func6": true,
+  "_fnKey": "면역+피로+혈행+기억+항산화+갱년기",
+  "_candId": "40ef1de8-f759-4f64-a15c-eb5c360a80c7",
+  "source": {
+   "mainFunction": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화·갱년기 여성의 건강에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 황회색의 타원형 코팅정제\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(60분 이내)\n4. 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(3 mg/800 mg)의 80% 이상",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연회색의 타원형 정제",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 800mg</span></div>\n  <h1>홍삼정<small>홍삼 · 정제</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍삼정은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 800mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li><li>갱년기 여성의 건강에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 800mg</b></li><li><b>정제</b> · 1일 2회 1회 1정 — 매일 챙기기 쉽게</li><li>(주)유유헬스케어 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 800mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연회색의 타원형 정제</div><div class=\"sd-item\"><b>품목보고번호</b> 20040015107986</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 800 mg</span></div>\n  <h1>Red Ginseng 7986<small>red ginseng · tablet</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Twice a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 7986 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 800 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li><li>may help support women’s health during menopause</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 800 mg</b></li><li><b>tablet</b> · Twice a day · 1 tablet per serving</li><li>Made by (주)유유헬스케어 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Twice a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 800 mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연회색의 타원형 정제</div><div class=\"sd-item\"><b>Item report no.</b> 20040015107986</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:004-6581cf0a",
+  "productName": "홍삼침향단프리미엄",
+  "productNameEn": "Red Ginseng 9233",
+  "manufacturer": "고려인삼과학주식회사",
+  "manufacturerEn": null,
+  "statementNo": "20040015039233",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "환",
+  "_func6": true,
+  "_fnKey": "면역+피로+혈행+기억+항산화+갱년기",
+  "_candId": "6581cf0a-3b19-4403-b127-47c4ccf14d42",
+  "source": {
+   "mainFunction": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화·갱년기 여성의 건강에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 탁한 갈색의 동그란 환 제품으로서 이미,이취가 없어야 한다.\n2) 진세노사이드 Rg1,Rb1 및 Rg3의 합: 표시량(3mg/3750mg)의 80%이상.\n3) 대장균군 : 음성\n",
+   "intake": "1일 1회 1회 1환(3.75g)을 씹어서 물과 함께 섭취 한다.",
+   "caution": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 색택과 향미 가지며 이미,이취 없어야하며 탁한 갈색의 동그란 형태의 환",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 3750,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "pill",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 3.75,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 3750mg</span></div>\n  <h1>홍삼침향단프리미엄<small>홍삼 · 환</small></h1><p class=\"sd-meta\">고려인삼과학주식회사 제조 · 1일 1회 1회 1환</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍삼침향단프리미엄은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 3750mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li><li>갱년기 여성의 건강에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 3750mg</b></li><li><b>환</b> · 1일 1회 1회 1환 — 매일 챙기기 쉽게</li><li>고려인삼과학주식회사 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1환</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 3750mg</div><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미 가지며 이미,이취 없어야하며 탁한 갈색의 동그란 형태의 환</div><div class=\"sd-item\"><b>품목보고번호</b> 20040015039233</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 3750 mg</span></div>\n  <h1>Red Ginseng 9233<small>red ginseng · pill</small></h1><p class=\"sd-meta\">Made by 고려인삼과학주식회사 · Once a day · 1 pill per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 9233 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 3750 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li><li>may help support women’s health during menopause</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 3750 mg</b></li><li><b>pill</b> · Once a day · 1 pill per serving</li><li>Made by 고려인삼과학주식회사 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 pill per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 3750 mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미 가지며 이미,이취 없어야하며 탁한 갈색의 동그란 형태의 환</div><div class=\"sd-item\"><b>Item report no.</b> 20040015039233</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:005-c31e6217",
+  "productName": "건국홍삼캡슐",
+  "productNameEn": "Red Ginseng 8232",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028232",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "캡슐",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "c31e6217-803c-4825-9ead-3a37183d6711",
+  "source": {
+   "mainFunction": "[홍삼제품]①면역력 증진②피로개선③혈소판 응집 억제를 통한 혈액흐름에 도움④기억력 개선⑤항산화에 도움을 줄 수 있음 ",
+   "baseStandard": "1.성상 : 초코렛색의 연질캡슐\r\n2.진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(1mg/600mg)의 80%이상\r\n3.대장균군 : 음성\r\n4.붕해도 : 20분 이내",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.\r\n",
+   "caution": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n- 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오.\r\n- 의약품(당뇨치료제, 혈액항응고제)복용시 섭취에 주의하십시오.\r\n",
+   "dosageForm": "초코렛색의연질캡슐",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 1mg / 600mg</span></div>\n  <h1>건국홍삼캡슐<small>홍삼 · 캡슐</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 3회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 건국홍삼캡슐은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 1mg / 600mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 1mg / 600mg</b></li><li><b>캡슐</b> · 1일 3회 1회 1캡슐 — 매일 챙기기 쉽게</li><li>(주)유니쎌팜 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 1mg / 600mg</div><div class=\"sd-item\"><b>성상</b> 초코렛색의연질캡슐</div><div class=\"sd-item\"><b>품목보고번호</b> 20040020028232</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · [홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · - 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오. · - 의약품(당뇨치료제, 혈액항응고제)복용시 섭취에 주의하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 1 mg / 600 mg</span></div>\n  <h1>Red Ginseng 8232<small>red ginseng · capsule</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 3 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 8232 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 1 mg / 600 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 1 mg / 600 mg</b></li><li><b>capsule</b> · 3 times a day · 1 capsule per serving</li><li>Made by (주)유니쎌팜 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 1 mg / 600 mg</div><div class=\"sd-item\"><b>Appearance</b> 초코렛색의연질캡슐</div><div class=\"sd-item\"><b>Item report no.</b> 20040020028232</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:006-9d832839",
+  "productName": "김정환홍삼차",
+  "productNameEn": "Red Ginseng 0018",
+  "manufacturer": "풍기인삼공사영농조합법인",
+  "manufacturerEn": null,
+  "statementNo": "200600180018",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "과립",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "9d832839-ffff-4e7d-b54d-cac38df8cf9a",
+  "source": {
+   "mainFunction": "(가)면역력증진·피로개선에 도움을 줄 수 있음(나)혈소판 응집억제를 통한 혈액흐름·기억력개선·항산화에도움을줄수있음\n ",
+   "baseStandard": " 1. 성상 : 고유의 향미를 가지며 이미. 이취가 없는 흐린 황갈색의 과립\n2. 진세노사이드Rb1,Rg1 및 Rg3의합 : 표시량(1.2mg/3g)의 80%이상\n3. 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1포를 냉수 또는 온수에 용해 후 음용",
+   "caution": "(가)당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(나)알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다)이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지며 이미. 이취가 없는 흐린 황갈색의 과립",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 1.2mg / 3g</span></div>\n  <h1>김정환홍삼차<small>홍삼 · 과립</small></h1><p class=\"sd-meta\">풍기인삼공사영농조합법인 제조 · 1일 3회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 김정환홍삼차은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 1.2mg / 3g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 1.2mg / 3g</b></li><li><b>과립</b> · 1일 3회 1회 1포 — 매일 챙기기 쉽게</li><li>풍기인삼공사영농조합법인 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 1.2mg / 3g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며 이미. 이취가 없는 흐린 황갈색의 과립</div><div class=\"sd-item\"><b>품목보고번호</b> 200600180018</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 1.2 mg / 3 g</span></div>\n  <h1>Red Ginseng 0018<small>red ginseng · granule</small></h1><p class=\"sd-meta\">Made by 풍기인삼공사영농조합법인 · 3 times a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 0018 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 1.2 mg / 3 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 1.2 mg / 3 g</b></li><li><b>granule</b> · 3 times a day · 1 sachet per serving</li><li>Made by 풍기인삼공사영농조합법인 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 1.2 mg / 3 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며 이미. 이취가 없는 흐린 황갈색의 과립</div><div class=\"sd-item\"><b>Item report no.</b> 200600180018</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:007-cc565b0a",
+  "productName": "진생보감",
+  "productNameEn": "Red Ginseng 1326",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021326",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "환",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "cc565b0a-1168-4474-8d4e-cd0c7d65fa1f",
+  "source": {
+   "mainFunction": "[홍삼제품]면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음\n  ",
+   "baseStandard": "1. 성상: 갈색의 환제\n2. 진세노사이드 Rg1, Rb1 및 Rg3의 합: 표시량(1.68mg/1015mg)의 80%이상\n3. 대장균군:음성이어 한다.\n4. 붕해: 1액 60분. 2액 30분 이내이어야 한다.",
+   "intake": "- 1일 3회, 1회 7환씩 물과 함께 섭취한다. ",
+   "caution": "치아의 손상이 있을 수 있으므로 환제를 깨물지 않도록 주의하십시오.\r\n의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "갈색의 환제",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.68,
+    "unit": "mg",
+    "basisAmount": 1015,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "pill",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 7,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 1.68mg / 1015mg</span></div>\n  <h1>진생보감<small>홍삼 · 환</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 3회 1회 7환</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 진생보감은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 1.68mg / 1015mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 1.68mg / 1015mg</b></li><li><b>환</b> · 1일 3회 1회 7환 — 매일 챙기기 쉽게</li><li>(주)비오팜 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 7환</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 1.68mg / 1015mg</div><div class=\"sd-item\"><b>성상</b> 갈색의 환제</div><div class=\"sd-item\"><b>품목보고번호</b> 20040017021326</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 치아의 손상이 있을 수 있으므로 환제를 깨물지 않도록 주의하십시오. · 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 1.68 mg / 1015 mg</span></div>\n  <h1>Red Ginseng 1326<small>red ginseng · pill</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 3 times a day · 7 pills per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 1326 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 1.68 mg / 1015 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 1.68 mg / 1015 mg</b></li><li><b>pill</b> · 3 times a day · 7 pills per serving</li><li>Made by (주)비오팜 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">7 pills per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 1.68 mg / 1015 mg</div><div class=\"sd-item\"><b>Appearance</b> 갈색의 환제</div><div class=\"sd-item\"><b>Item report no.</b> 20040017021326</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:008-9e44c534",
+  "productName": "고려홍삼정환골드",
+  "productNameEn": "Red Ginseng 2320",
+  "manufacturer": "삼흥인삼 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "2007001702320",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "환",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "9e44c534-e103-4b32-a3db-6b8d0a17dddb",
+  "source": {
+   "mainFunction": "[홍삼제품]면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음\n ",
+   "baseStandard": "1) 성상: 홍삼고유의 향취미를 가진 암갈색의 환 제품\n2) 진세노사이드 Rg1,Rb1 및 Rg3의 합 : 표시량(1.7mg/875mg)의 80%이상\n3) 대장균군 : 음성\n4) 붕해도 : 붕해시험에 적합하여야한다.",
+   "intake": "1일3회,1회 7환을 음용수와 함께 섭취하십시오.",
+   "caution": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하시기 바랍니다.\n섭취시 불쾌감등의 이상이 있을시 섭취를 중단하여 주시기 바랍니다.\n알레르기등 특이체질이신 분은 제품의 성분을 확인후 섭취하십시오.",
+   "dosageForm": "홍삼고유의 향취미를 가진 암갈색의 환 제품",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.7,
+    "unit": "mg",
+    "basisAmount": 875,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "pill",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 7,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 1.7mg / 875mg</span></div>\n  <h1>고려홍삼정환골드<small>홍삼 · 환</small></h1><p class=\"sd-meta\">삼흥인삼 주식회사 제조 · 1일 3회 1회 7환</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 고려홍삼정환골드은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 1.7mg / 875mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 1.7mg / 875mg</b></li><li><b>환</b> · 1일 3회 1회 7환 — 매일 챙기기 쉽게</li><li>삼흥인삼 주식회사 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 7환</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 1.7mg / 875mg</div><div class=\"sd-item\"><b>성상</b> 홍삼고유의 향취미를 가진 암갈색의 환 제품</div><div class=\"sd-item\"><b>품목보고번호</b> 2007001702320</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하시기 바랍니다. · 섭취시 불쾌감등의 이상이 있을시 섭취를 중단하여 주시기 바랍니다. · 알레르기등 특이체질이신 분은 제품의 성분을 확인후 섭취하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 1.7 mg / 875 mg</span></div>\n  <h1>Red Ginseng 2320<small>red ginseng · pill</small></h1><p class=\"sd-meta\">Made by 삼흥인삼 주식회사 · 3 times a day · 7 pills per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 2320 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 1.7 mg / 875 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 1.7 mg / 875 mg</b></li><li><b>pill</b> · 3 times a day · 7 pills per serving</li><li>Made by 삼흥인삼 주식회사 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">7 pills per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 1.7 mg / 875 mg</div><div class=\"sd-item\"><b>Appearance</b> 홍삼고유의 향취미를 가진 암갈색의 환 제품</div><div class=\"sd-item\"><b>Item report no.</b> 2007001702320</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:009-30cc7a29",
+  "productName": "슈퍼키디 홍삼젤리 액티브",
+  "productNameEn": "Red Ginseng 5309",
+  "manufacturer": "(주)바이오 로제트",
+  "manufacturerEn": null,
+  "statementNo": "20040017015309",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "젤리",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "30cc7a29-26e8-4743-9253-ebc27b22c09d",
+  "source": {
+   "mainFunction": "혈소판 응집억제를 통한 혈액흐름․기억력 개선․항산화․면역력 증진․피로개선에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색의 젤리\n(2) 진세노사이드(Rg1, Rb1 및 Rg3의 합) : 표시량(3mg/15g)의 80%이상\n(3) 대장균군 : 음성",
+   "intake": "1일 1회 1포를 잘 씹어서 섭취한다.",
+   "caution": "1) 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하십시오\n2) 유통기한을 확인 후 섭취하시기 바라며, 섭취방법을 준수하시기 바랍니다. \n3) 제품 개봉 또는 섭취 시 절단면에 상처를 입을 수 있으니 주의하시기 바랍니다.\n4) 이상증상 발생 시, 섭취를 중단하고 전문가와 상담하시거나 고객 상담실로 문의하시기 바랍니다.\n ",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 젤리",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 15g</span></div>\n  <h1>슈퍼키디 홍삼젤리 액티브<small>홍삼 · 젤리</small></h1><p class=\"sd-meta\">(주)바이오 로제트 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 슈퍼키디 홍삼젤리 액티브은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 15g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 15g</b></li><li><b>젤리</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>(주)바이오 로제트 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 15g</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 젤리</div><div class=\"sd-item\"><b>품목보고번호</b> 20040017015309</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 1) 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의하십시오 · 2) 유통기한을 확인 후 섭취하시기 바라며, 섭취방법을 준수하시기 바랍니다. · 3) 제품 개봉 또는 섭취 시 절단면에 상처를 입을 수 있으니 주의하시기 바랍니다. · 4) 이상증상 발생 시, 섭취를 중단하고 전문가와 상담하시거나 고객 상담실로 문의하시기 바랍니다.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 15 g</span></div>\n  <h1>Red Ginseng 5309<small>red ginseng · jelly</small></h1><p class=\"sd-meta\">Made by (주)바이오 로제트 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 5309 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 15 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 15 g</b></li><li><b>jelly</b> · Once a day · 1 sachet per serving</li><li>Made by (주)바이오 로제트 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 15 g</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 젤리</div><div class=\"sd-item\"><b>Item report no.</b> 20040017015309</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:010-392f7411",
+  "productName": "고려홍삼골드캅셀",
+  "productNameEn": "Red Ginseng 0945",
+  "manufacturer": "(주)삼진GNF",
+  "manufacturerEn": null,
+  "statementNo": "2006001510945",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "캡슐",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "392f7411-3737-4bb0-845f-2f7ed1d6a9ab",
+  "source": {
+   "mainFunction": "[홍삼제품]①면역력 증진에 도움을 줄 수 있음②피로개선에 도움을 줄 수 있음③혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음④기억력 개선에 도움을 줄 수 있음⑤항산화에 도움을 줄 수 있음\r\n",
+   "baseStandard": "1) 성상 : 적갈색을 지닌 연질캡슐\r\n2) 진세노사이드Rb1, Rg1 및 Rg3 합 : 표시량 (3mg /14.94g)의 80%이상\r\n3) 대장균군 : 음성(-) \r\n4) 붕해도 : 물을 시험액으로 20분내 붕해",
+   "intake": "1일 3회, 1회 6캡슐을 물과 함께 섭취한다.",
+   "caution": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n1)알레르기 체질인 경우 성분을 확인한 후 섭취여부를 결정하십시오.\r\n2)제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\r\n3)개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오.",
+   "dosageForm": "적갈색을 지닌 연질캡슐",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 14.94,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 6,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 14.94g</span></div>\n  <h1>고려홍삼골드캅셀<small>홍삼 · 캡슐</small></h1><p class=\"sd-meta\">(주)삼진GNF 제조 · 1일 3회 1회 6캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 고려홍삼골드캅셀은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 14.94g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 14.94g</b></li><li><b>캡슐</b> · 1일 3회 1회 6캡슐 — 매일 챙기기 쉽게</li><li>(주)삼진GNF · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 6캡슐</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 14.94g</div><div class=\"sd-item\"><b>성상</b> 적갈색을 지닌 연질캡슐</div><div class=\"sd-item\"><b>품목보고번호</b> 2006001510945</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · [홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 1)알레르기 체질인 경우 성분을 확인한 후 섭취여부를 결정하십시오. · 2)제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오. · 3)개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 14.94 g</span></div>\n  <h1>Red Ginseng 0945<small>red ginseng · capsule</small></h1><p class=\"sd-meta\">Made by (주)삼진GNF · 3 times a day · 6 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 0945 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 14.94 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 14.94 g</b></li><li><b>capsule</b> · 3 times a day · 6 capsules per serving</li><li>Made by (주)삼진GNF · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">6 capsules per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 14.94 g</div><div class=\"sd-item\"><b>Appearance</b> 적갈색을 지닌 연질캡슐</div><div class=\"sd-item\"><b>Item report no.</b> 2006001510945</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:011-c2479776",
+  "productName": "트루스 홍삼의 힘",
+  "productNameEn": "Red Ginseng 6784",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006784",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "캡슐",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "c2479776-d1be-4727-99b2-a7cb57fa2ea6",
+  "source": {
+   "mainFunction": "[홍삼제품]①면역력 증진②피로개선③혈소판 응집 억제를 통한 혈액흐름④기억력 개선⑤항산화에 도움을 줄 수 있음 ",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 암갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제\r\n(2) 진세노사이드Rg1과 Rb1 및 Rg3의 합 : 표시량(3mg/1.0g)의 80% 이상\r\n(3) 대장균군 : 음성\r\n(4) 붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐(0.5g)을 충분한 물과 함께 섭취.",
+   "caution": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "암갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 0.5,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 1g</span></div>\n  <h1>트루스 홍삼의 힘<small>홍삼 · 캡슐</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 트루스 홍삼의 힘은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 1g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 1g</b></li><li><b>캡슐</b> · 1일 2회 1회 1캡슐 — 매일 챙기기 쉽게</li><li>(주)서흥 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 1g</div><div class=\"sd-item\"><b>성상</b> 암갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제</div><div class=\"sd-item\"><b>품목보고번호</b> 20040020006784</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · [홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 1 g</span></div>\n  <h1>Red Ginseng 6784<small>red ginseng · capsule</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Twice a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 6784 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 1 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 1 g</b></li><li><b>capsule</b> · Twice a day · 1 capsule per serving</li><li>Made by (주)서흥 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Twice a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 1 g</div><div class=\"sd-item\"><b>Appearance</b> 암갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제</div><div class=\"sd-item\"><b>Item report no.</b> 20040020006784</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:012-265ece03",
+  "productName": "홍삼 면역 젤리",
+  "productNameEn": "Red Ginseng 4203",
+  "manufacturer": "(주)서흥헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20130020024203",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "젤리",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "265ece03-4eb9-422d-973d-648e1f116638",
+  "source": {
+   "mainFunction": "홍삼: (1) 면역력 증진･피로개선에 도움을 줄 수 있음 , (2) 혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음   ",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 젤리\n(2) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(3 mg/15g)의 80% 이상\n(3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(15g)를 씹어서 섭취하십시오.\t",
+   "caution": "(1) 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 젤리",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 15,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 15g</span></div>\n  <h1>홍삼 면역 젤리<small>홍삼 · 젤리</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍삼 면역 젤리은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 15g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 15g</b></li><li><b>젤리</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>(주)서흥헬스케어 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 15g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 젤리</div><div class=\"sd-item\"><b>품목보고번호</b> 20130020024203</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · (1) 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · (2) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · (3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 15 g</span></div>\n  <h1>Red Ginseng 4203<small>red ginseng · jelly</small></h1><p class=\"sd-meta\">Made by (주)서흥헬스케어 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 4203 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 15 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 15 g</b></li><li><b>jelly</b> · Once a day · 1 sachet per serving</li><li>Made by (주)서흥헬스케어 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 15 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 젤리</div><div class=\"sd-item\"><b>Item report no.</b> 20130020024203</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:013-ce50f681",
+  "productName": "홍키통키 튼튼홍삼젤리",
+  "productNameEn": "Red Ginseng 1070",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061070",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "젤리",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "ce50f681-3ff1-4124-96e1-a460b8c2c9a9",
+  "source": {
+   "mainFunction": "[홍삼] ①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 :고유의 향미가 있고 이미, 이취가 없는 어두운 자주색의 스틱형 젤리\n2. 진세노사이드 Rg1, Rb1및 Rg3의 합(%) : 표시량 (3mg/20g)의 80% 이상\n3. 대장균군 : 음성",
+   "intake": "1일 1회 , 1회 1포를 씹어서 섭취하십시오.",
+   "caution": "(가) 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 자주색의 스틱형 젤리",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 20g</span></div>\n  <h1>홍키통키 튼튼홍삼젤리<small>홍삼 · 젤리</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍키통키 튼튼홍삼젤리은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 20g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 20g</b></li><li><b>젤리</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>(주)알피바이오 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 20g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 자주색의 스틱형 젤리</div><div class=\"sd-item\"><b>품목보고번호</b> 200400170061070</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 20 g</span></div>\n  <h1>Red Ginseng 1070<small>red ginseng · jelly</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 1070 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 20 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 20 g</b></li><li><b>jelly</b> · Once a day · 1 sachet per serving</li><li>Made by (주)알피바이오 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 20 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 자주색의 스틱형 젤리</div><div class=\"sd-item\"><b>Item report no.</b> 200400170061070</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:014-b2553141",
+  "productName": "홍이장군 면역젤리",
+  "productNameEn": "Red Ginseng 3455",
+  "manufacturer": "(주)한국인삼공사",
+  "manufacturerEn": null,
+  "statementNo": "20040020013455",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "젤리",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "b2553141-2c68-457e-9d1a-591d16f32d52",
+  "source": {
+   "mainFunction": "[홍삼] 면역력 증진 ･ 피로개선 ･ 혈소판 응집억제를 통한 혈액흐름 ･ 기억력 개선 ･ 항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색의 젤리\n2. 진세노사이드 Rg1, Rb1 및 Rg3의 합(%) : 표시량(3 mg/15 g)의 80% 이상\n3. 대장균군 : 음성",
+   "intake": "1일 1회 1포를 씹어서 섭취하십시오.",
+   "caution": "[홍삼] \n (가)당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n (나)알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n (다)이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색의 젤리",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 15g</span></div>\n  <h1>홍이장군 면역젤리<small>홍삼 · 젤리</small></h1><p class=\"sd-meta\">(주)한국인삼공사 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍이장군 면역젤리은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 15g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 15g</b></li><li><b>젤리</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>(주)한국인삼공사 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 15g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 갈색의 젤리</div><div class=\"sd-item\"><b>품목보고번호</b> 20040020013455</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 15 g</span></div>\n  <h1>Red Ginseng 3455<small>red ginseng · jelly</small></h1><p class=\"sd-meta\">Made by (주)한국인삼공사 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 3455 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 15 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 15 g</b></li><li><b>jelly</b> · Once a day · 1 sachet per serving</li><li>Made by (주)한국인삼공사 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 15 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 갈색의 젤리</div><div class=\"sd-item\"><b>Item report no.</b> 20040020013455</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:015-0171a295",
+  "productName": "씹어먹는 홍삼대보정",
+  "productNameEn": "Red Ginseng 7821",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007821",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "정제",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "0171a295-08a3-4dcf-8218-b09969bb04bc",
+  "source": {
+   "mainFunction": "[홍삼] 면역력 증진, 피로개선, 혈소판 응집억제를 통한 혈액흐름, 기억력 개선, 항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이 있는 흐린 황갈색의 장방형 츄어블 정제\n2. 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(3mg/2400mg)의 80% 이상\n3. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의하십시오.\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이 있는 흐린 황갈색의 장방형 츄어블 정제",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 2400mg</span></div>\n  <h1>씹어먹는 홍삼대보정<small>홍삼 · 정제</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 씹어먹는 홍삼대보정은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 2400mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 2400mg</b></li><li><b>정제</b> · 1일 2회 1회 1정 — 매일 챙기기 쉽게</li><li>(주)한풍네이처팜 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 2400mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이 있는 흐린 황갈색의 장방형 츄어블 정제</div><div class=\"sd-item\"><b>품목보고번호</b> 20120019007821</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. · 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의하십시오. · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 2400 mg</span></div>\n  <h1>Red Ginseng 7821<small>red ginseng · tablet</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Twice a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 7821 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 2400 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 2400 mg</b></li><li><b>tablet</b> · Twice a day · 1 tablet per serving</li><li>Made by (주)한풍네이처팜 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Twice a day</span><span class=\"sd-tag\">1 tablet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 2400 mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이 있는 흐린 황갈색의 장방형 츄어블 정제</div><div class=\"sd-item\"><b>Item report no.</b> 20120019007821</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:016-49bfdb13",
+  "productName": "홍삼부스터",
+  "productNameEn": "Red Ginseng 2215",
+  "manufacturer": "고려인삼주식회사",
+  "manufacturerEn": null,
+  "statementNo": "2021000662215",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "정제",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "49bfdb13-0e60-4b0b-b0a1-c0b1bb8c77c8",
+  "source": {
+   "mainFunction": "(1) 기능성 내용 : 면역력 증진 ･ 피로개선 ･ 혈소판 응집억제를 통한 혈액흐름 ･기억력 개선 ･ 항산화에 도움을 줄 수 있음\n(2) 일일섭취량\n(가) 면역력 증진 ･ 피로개선에 도움을 줄 수 있음 : 진세노사이드 Rg1,Rb1 및 Rg3의 합계로서 3 ~ 80 mg\n(나) 혈소판 응집억제를 통한 혈액흐름 ･ 기억력 개선 ･ 항산화에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 2.4 ~ 80 mg\n",
+   "baseStandard": "1. 성상 :고유의 향미가 있고 이미, 이취가 없는 회갈색의 장방형 제피정제\n2. 진세노사이드Rg1, Rb1 및 Rg3의 합(%): 표시량의 80% 이상 [3mg/500mg]\n3. 대장균군 : 음성\n4. 붕해 : 60분 이내",
+   "intake": "1일1회, 1회 1정 (500mg)",
+   "caution": " (가)당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n (나)알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n (다)이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회갈색의 장방형 제피정제",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 500,
+    "servingTotalWeightUnit": "mg",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 500mg</span></div>\n  <h1>홍삼부스터<small>홍삼 · 정제</small></h1><p class=\"sd-meta\">고려인삼주식회사 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 홍삼부스터은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 500mg 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 500mg</b></li><li><b>정제</b> · 1일 1회 1회 1정 — 매일 챙기기 쉽게</li><li>고려인삼주식회사 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 500mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>품목보고번호</b> 2021000662215</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 500 mg</span></div>\n  <h1>Red Ginseng 2215<small>red ginseng · tablet</small></h1><p class=\"sd-meta\">Made by 고려인삼주식회사 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 2215 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 500 mg, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 500 mg</b></li><li><b>tablet</b> · Once a day · 1 tablet per serving</li><li>Made by 고려인삼주식회사 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 500 mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>Item report no.</b> 2021000662215</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:017-30db8804",
+  "productName": "고려홍삼차골드",
+  "productNameEn": "Red Ginseng 7310",
+  "manufacturer": "김포파주인삼농업협동조합",
+  "manufacturerEn": null,
+  "statementNo": "2004001707310",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "과립",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "30db8804-f740-47fd-bd6a-a0e3d3caecd2",
+  "source": {
+   "mainFunction": "\r\n면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음 ",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 과립\n2. 진세노사이드 Rg1, Rb1및 Rg3의 합 : 표시량(3mg/3g)의 80% 이상\n3. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(3g)을 냉온수에 용해하여 섭취한다.",
+   "caution": "당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의하십시오.\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 과립",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 3,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 3g</span></div>\n  <h1>고려홍삼차골드<small>홍삼 · 과립</small></h1><p class=\"sd-meta\">김포파주인삼농업협동조합 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 고려홍삼차골드은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 3g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 3g</b></li><li><b>과립</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>김포파주인삼농업협동조합 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 3g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 과립</div><div class=\"sd-item\"><b>품목보고번호</b> 2004001707310</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의하십시오. · 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. · 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 3 g</span></div>\n  <h1>Red Ginseng 7310<small>red ginseng · granule</small></h1><p class=\"sd-meta\">Made by 김포파주인삼농업협동조합 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 7310 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 3 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 3 g</b></li><li><b>granule</b> · Once a day · 1 sachet per serving</li><li>Made by 김포파주인삼농업협동조합 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 3 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 과립</div><div class=\"sd-item\"><b>Item report no.</b> 2004001707310</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:018-b100f186",
+  "productName": "한삼인 홍삼차골드",
+  "productNameEn": "Red Ginseng 1421",
+  "manufacturer": "대동고려삼(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020031421",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "과립",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "b100f186-9d22-4d75-b70f-da33b126ef99",
+  "source": {
+   "mainFunction": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 색택과 향미를 가지며 이미･이취가 없는 갈색의 과립분말\n2. 진세노사이드 Rg1+Rb1+Rg3의 합\n   * 최종제품 : 표시량(3mg/9g)의 80%이상\n3. 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1포(3g) 씩 온수 또는 냉수에 타서 드십시오.",
+   "caution": "1. 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n2. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미･이취가 없는 갈색의 과립분말",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 9,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 3,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 9g</span></div>\n  <h1>한삼인 홍삼차골드<small>홍삼 · 과립</small></h1><p class=\"sd-meta\">대동고려삼(주) 제조 · 1일 3회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 한삼인 홍삼차골드은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 9g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 9g</b></li><li><b>과립</b> · 1일 3회 1회 1포 — 매일 챙기기 쉽게</li><li>대동고려삼(주) · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 9g</div><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미･이취가 없는 갈색의 과립분말</div><div class=\"sd-item\"><b>품목보고번호</b> 20040020031421</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 1. 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의 · 2. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음 · 3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 9 g</span></div>\n  <h1>Red Ginseng 1421<small>red ginseng · granule</small></h1><p class=\"sd-meta\">Made by 대동고려삼(주) · 3 times a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. Red Ginseng 1421 contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 9 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 9 g</b></li><li><b>granule</b> · 3 times a day · 1 sachet per serving</li><li>Made by 대동고려삼(주) · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 9 g</div><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미･이취가 없는 갈색의 과립분말</div><div class=\"sd-item\"><b>Item report no.</b> 20040020031421</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:019-896539b3",
+  "productName": "다만복생명6년근홍삼농축액분말파워",
+  "productNameEn": "6",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106348",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "분말",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "896539b3-69bb-4203-83bc-b4132738e6bf",
+  "source": {
+   "mainFunction": "① 면역력 증진․피로개선에 도움을 줄 수 있음 ② 혈소판 응집억제를 통한 혈액흐름․기억력 개선․항산화에 도움을 줄 수 있음 ",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연등색의 분말\n② 진세노사이드 Rg1,Rb1 및 Rg3의 합 : 표시량(3.0mg/10g)의 80% 이상\n③ 대장균군 : 음성\n",
+   "intake": "1일 2회, 1회 1포(5g)을 그대로 섭취하거나 음용수에 타서 섭취하십시오",
+   "caution": "① 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\n② 섭취량 및 섭취방법을 준수하십시오\n③ 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연등색의 분말",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 10,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 5,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">6년근 홍삼</span><span class=\"sd-badge\">진세노사이드 3mg / 10g</span></div>\n  <h1>다만복생명6년근홍삼농축액분말파워<small>6년근 홍삼 · 분말</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>6년근 홍삼</b>. 다만복생명6년근홍삼농축액분말파워은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3mg / 10g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3mg / 10g</b></li><li><b>분말</b> · 1일 2회 1회 1포 — 매일 챙기기 쉽게</li><li>에스케이내추럴팜(주) · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3mg / 10g</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연등색의 분말</div><div class=\"sd-item\"><b>품목보고번호</b> 20040017106348</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 섭취량 및 섭취방법을 준수하십시오 · 과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">6-year-old red ginseng</span><span class=\"sd-badge\">Ginsenosides 3 mg / 10 g</span></div>\n  <h1>6<small>6-year-old red ginseng · powder</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Twice a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. 6 contains 6-year-old red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3 mg / 10 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3 mg / 10 g</b></li><li><b>powder</b> · Twice a day · 1 sachet per serving</li><li>Made by 에스케이내추럴팜(주) · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Twice a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">taken directly</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3 mg / 10 g</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연등색의 분말</div><div class=\"sd-item\"><b>Item report no.</b> 20040017106348</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "rg-pilot:020-b6f19b73",
+  "productName": "데르니에G",
+  "productNameEn": "G",
+  "manufacturer": "(주)케이지앤에프",
+  "manufacturerEn": null,
+  "statementNo": "2004001602077",
+  "category": "hff",
+  "_batch": "pilot",
+  "_form": "분말",
+  "_func6": false,
+  "_fnKey": "면역+피로+혈행+기억+항산화",
+  "_candId": "b6f19b73-d48d-430b-9339-67b2ef4247c1",
+  "source": {
+   "mainFunction": "[홍삼제품]①면역력 증진에 도움을 줄 수 있음②피로개선에 도움을 줄 수 있음③혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음④기억력 개선에 도움을 줄 수 있음⑤항산화에 도움을 줄 수 있음\r\n",
+   "baseStandard": "1. 성상 : 갈색의 색상을 띄는 분말로 이미, 이취가 없다.\r\n2. 진세노사이드 Rg1, Rb1 및 Rg3 의 합 : 표시량(3.6mg/5g)의 80%이상\r\n3. 대장균군 : 음성",
+   "intake": "1일 1회 1회 1포(5g)을 냉.온수에 타서 기호에 따라 설탕이나 꿀을 첨가해 섭취",
+   "caution": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n① 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단한다.\r\n② 섭취 전 제품에 이상이 있는 경우 섭취를 금한다.\r\n",
+   "dosageForm": "갈색의 색상을 띄는 분말로 이미, 이취가 없다.",
+   "storage": null,
+   "shelfLife": ""
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.6,
+    "unit": "mg",
+    "basisAmount": 5,
+    "basisUnit": "g"
+   },
+   "declaredCfu": null,
+   "serving": {
+    "unitType": "sachet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": 5,
+    "servingTotalWeightUnit": "g",
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">홍삼</span><span class=\"sd-badge\">진세노사이드 3.6mg / 5g</span></div>\n  <h1>데르니에G<small>홍삼 · 분말</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">기력이 필요할 때 예부터 찾아온 <b>홍삼</b>. 데르니에G은 홍삼의 지표성분 진세노사이드(Rg1·Rb1·Rg3)를 3.6mg / 5g 담아, 아래 식약처 인정 기능성으로 매일의 건강관리를 돕습니다.</p>\n  <h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>홍삼의 지표성분 <b>진세노사이드 3.6mg / 5g</b></li><li><b>분말</b> · 1일 1회 1회 1포 — 매일 챙기기 쉽게</li><li>(주)케이지앤에프 · 식약처 신고 건강기능식품</li><li>본인용·부모님·가족 선물로도 든든하게</li></ul>\n  <h2>이렇게 드세요</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>지표성분</b> 진세노사이드 Rg1·Rb1·Rg3의 합 3.6mg / 5g</div><div class=\"sd-item\"><b>성상</b> 갈색의 색상을 띄는 분말로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>품목보고번호</b> 2004001602077</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>환절기마다 컨디션이 흔들리는 분</li><li>쉬어도 개운하지 않고 쉽게 지치는 분</li><li>혈액흐름 건강이 신경 쓰이는 분</li><li>집중이 필요한 하루를 보내며 기억력이 신경 쓰이는 분</li><li>부모님·가족의 기력을 챙겨 드리고 싶은 분</li></ul></div>\n  <div class=\"sd-foot\"><b>섭취 시 주의사항</b> · [홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단한다. · 섭취 전 제품에 이상이 있는 경우 섭취를 금한다.</div></div>",
+   "en": "<div class=\"sd-card sd-theme-red\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">red ginseng</span><span class=\"sd-badge\">Ginsenosides 3.6 mg / 5 g</span></div>\n  <h1>G<small>red ginseng · powder</small></h1><p class=\"sd-meta\">Made by (주)케이지앤에프 · Once a day · 1 sachet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">Red ginseng has long been valued when energy is needed. G contains red ginseng with its indicator ginsenosides (Rg1·Rb1·Rg3) at 3.6 mg / 5 g, recognized by Korea’s MFDS for the functions below.</p>\n  <h2>Recognized functions</h2><ul class=\"sd-fn\"><li>may help support immune health</li><li>may help relieve fatigue</li><li>may help blood flow through the inhibition of platelet aggregation</li><li>may help with memory</li><li>may help with antioxidant activity</li></ul>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Indicator <b>ginsenosides 3.6 mg / 5 g</b></li><li><b>powder</b> · Once a day · 1 sachet per serving</li><li>Made by (주)케이지앤에프 · MFDS-notified health functional food</li><li>For yourself, parents, or as a reassuring gift</li></ul>\n  <h2>Directions</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Indicator component</b> Sum of ginsenosides Rg1·Rb1·Rg3 3.6 mg / 5 g</div><div class=\"sd-item\"><b>Appearance</b> 갈색의 색상을 띄는 분말로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Item report no.</b> 2004001602077</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>those whose condition dips at the change of seasons</li><li>those who feel tired even after resting</li><li>those who care about healthy blood flow</li><li>those who care about memory during demanding days</li><li>those looking after the vitality of parents and family</li></ul></div>\n  <div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]
