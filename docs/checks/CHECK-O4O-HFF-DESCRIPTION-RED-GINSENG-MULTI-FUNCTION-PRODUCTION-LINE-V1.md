@@ -131,6 +131,24 @@ HOLD 유형: DATA_CONFLICT 5 · SOURCE_ABNORMAL 5 · IDENTITY 3 · UNSUPPORTED 3
 DB write: 0
 ```
 
-## 11. 커밋
+## 11. 적재 완료 (APPLY LIVE · 2026-07-17)
 
-- 본 CHECK + `data/product-description-guard/hff-red-ginseng-{20,production,hold}.json`. 무관 파일·다른 Agent 미커밋 파일 0. 배포 없음.
+사용자 2단계 승인(dry-run → apply) 후 `rg-canonical-apply.ts --apply` 로 **프로덕션 적재 완료**. 독립 연결 재검증(`rg-verify-committed.ts`) 통과.
+
+| 검증(독립 연결) | 값 |
+|---|---:|
+| 신규 ProductMaster (barcode NULL·건강기능식품) | 271 |
+| candidate approved_new_master + master 연결 | 271 |
+| STORE canonical SPD ko / en | 271 / 271 |
+| source_type=o4o_hff_generated | 542 |
+| (master,type,language) canonical 중복 | 0 |
+| 신고번호 유일 | 271 |
+| **실제 write** | **1,084** |
+| HOLD 16 대상 master 생성(무변경 확인) | 0 |
+
+- 롤백 매니페스트: `scratchpad/rg-apply-rollback-manifest.json` (createdMasters·createdSpd·candIds·snapshot).
+- 태그 `batch:red-ginseng-001` · `wo:hff-red-ginseng-production-line`. HOLD·변형(B)·복합(C)·액상(D) 무변경.
+
+## 12. 커밋
+
+- 본 CHECK + `data/product-description-guard/hff-red-ginseng-{20,production,hold}.json` + `scripts/rg-canonical-apply.ts` + `scripts/rg-verify-committed.ts`. 무관 파일·다른 Agent 미커밋 파일 0. 배포 없음.
