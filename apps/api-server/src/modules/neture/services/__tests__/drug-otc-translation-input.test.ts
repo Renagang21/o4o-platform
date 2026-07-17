@@ -4,7 +4,6 @@
  * CR-021 "소비자 노출 제외 ≠ 번역자 입력에서 제거" 를 잠근다.
  * 회귀 시 ① 주석이 소비자에 노출되거나 ② 오역을 막을 근거가 번역자에게서 사라진다.
  */
-import { describe, it, expect } from 'vitest';
 import {
   deriveTranslatorNote,
   buildDrugOtcTranslationInput,

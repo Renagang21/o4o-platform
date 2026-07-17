@@ -4,7 +4,6 @@
  * 경로 오판은 질정을 "take/swallow" 로 옮기는 오역·오투여로 직결된다(G-01).
  * "제형명으로 추정하지 않는다" 와 "근거 없으면 추정 대신 needs_review" 를 테스트로 잠근다.
  */
-import { describe, it, expect } from 'vitest';
 import { deriveOtcRoute } from '../../drug-import/drug-otc-route.js';
 
 describe('deriveOtcRoute — 신호 우선순위', () => {

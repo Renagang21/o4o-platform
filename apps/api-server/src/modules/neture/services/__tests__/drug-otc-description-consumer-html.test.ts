@@ -4,7 +4,6 @@
  * 소비자 본문의 렌더 소스가 구조화 필드로 고정됐는지 보장한다.
  * 회귀 시 내부 편집 주석(CR-021)이 소비자 화면에 노출되므로 테스트로 잠근다.
  */
-import { describe, it, expect } from 'vitest';
 import { buildDrugOtcConsumerHtml } from '../../drug-import/drug-otc-description-consumer-html.js';
 
 /** P3 나프록센나트륨 275mg 정 — 주석에 "550mg = 전문의약품" 이 있다(소비자 노출 금지). */

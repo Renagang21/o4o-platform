@@ -4,7 +4,6 @@
  * 정책 A 안전 조건을 잠근다: 기존 SPD 보유 master 는 절대 대상이 아니고(UPDATE 0),
  * 같은 master 가 두 번 대상이 되지 않는다(master 당 canonical 1개 계약).
  */
-import { describe, it, expect } from 'vitest';
 import {
   selectPromotionTargets,
   findCrossGroupDuplicateMasters,

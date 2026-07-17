@@ -4,7 +4,6 @@
  * "번역은 그룹당 1회 · 저장은 연결 master 전체에 전개" 구조와 안전 조건을 잠근다.
  * 회귀 시 ① 기존 영문을 덮어쓰거나 ② 한 master 가 두 그룹의 영문을 받는다.
  */
-import { describe, it, expect } from 'vitest';
 import { buildEnFanoutPlan, type EnFanoutRow } from '../../drug-import/drug-otc-en-fanout.js';
 
 const row = (over: Partial<EnFanoutRow>): EnFanoutRow => ({

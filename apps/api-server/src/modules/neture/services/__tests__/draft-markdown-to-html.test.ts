@@ -5,7 +5,6 @@
  * 내부 편집 주석(인용 블록)은 HTML 에 나가지 않는다(CR-021).
  * 일반 문단·제목·표·escape 는 기존 동작을 유지해야 한다(회귀 금지).
  */
-import { describe, it, expect } from 'vitest';
 import { draftMarkdownToHtml } from '../../drug-import/draft-markdown-to-html.js';
 
 /** P3 실물 형태 — 선두 주석에 "550mg = 전문의약품" */
