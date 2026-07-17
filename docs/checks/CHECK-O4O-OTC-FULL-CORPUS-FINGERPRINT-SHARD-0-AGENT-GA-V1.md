@@ -96,6 +96,34 @@ WO: `WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-AUDIT-3-AGENT-V1` · 일자: 2026
 
 ---
 
+## 5-B. grounded ↔ authored bridge (ADDENDUM-...-BRIDGE-V1, shard 부분값)
+
+> 재정의된 목적 = **authored 설명서 1건을 grounded 제품 몇 개로 확장 가능한지**. bridge 키 = `성분|함량|제형|경로` 일치(무성분명 authored 166키 제외 — 이질약 과병합 방지). **확장은 안전지문 대조 후(검토후)만** — 성분·함량·제형만으론 확장 안 함(사용자 원칙). 산출물 `otc-fingerprint-shard-0-bridge-v1.json`.
+
+| bridge 판정 | 그룹 | grounded master |
+|---|---:|---:|
+| **검토후 확장후보**(authored 존재, 성분·함량·제형·경로 일치) | 183 | **953** |
+| 새 설명서 필요(경구·성분명·authored 없음) | 381 | 896 |
+| **주성분코드 필요**(무성분명 — name에 `(성분)` 없어 bridge 불가) | 736 | 2,405 |
+| 비경구(별도 트랙) | 985 | 2,153 |
+| 합 | 2,285 | 6,407 |
+
+> 예: 에르도스테인300캡슐 grounded **52** ↔ authored **1건**(67 master) / 클로닉신125정 grounded 22 ↔ authored 1건 / 트리메부틴150정 grounded 22 ↔ authored 1건. **동일 약의 grounded 지문 분열(§7 144건)이 authored 1건으로 수렴 가능**(검토후) → 이것이 재사용의 핵심.
+> **⚠️ shard 부분값**: 전체 authored 재사용·최종 작성단위 수는 **3 shard 병합 + 안전지문 대조 후** 확정. authored 무성분명(166키, nutrition_combo)·grounded 무성분명(2,405 master)은 **주성분코드(active_ingredients/drug_code) 축**으로 통합단계 보강.
+
+---
+
+## 5-C. 각 shard 추가 집계 (ADDENDUM 요구)
+
+| canonical(master_id 직접) | ko | en | ko+en | 미보유 |
+|---|---:|---:|---:|---:|
+| e약은요 | 6,407 | 0 | 0 | — |
+| authored(mfds_drug_otc·combo) | 0 | 0 | 0 | — |
+| needs_review | 0 | 0 | — | — |
+| **전체** | 6,407(전건 e약은요) | 0 | 0 | **0** |
+
+---
+
 ## 6. 상위 30 그룹
 
 `otc-fingerprint-shard-0-groups-v1.json` 참조. 상위: 에르도스테인300캡슐(52,Tier1) · (무성분명)100캡슐(25) · 클로닉신125정(22) · 트리메부틴150정(22) · 암브록솔30정(19) · 알마게이트500정(18) · 바실루스250캡슐(17) …
