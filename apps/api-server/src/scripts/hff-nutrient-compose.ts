@@ -5,7 +5,7 @@
  * 비타민 D 라인(hff-vd-compose)의 검증된 sd-* 템플릿을 영양소 일반화. 기능성 ko=원문 추출·en=레지스트리.
  * 물(G-WATER)·per-unit 미생성(calc=false)·ko/en 수치 동치·기능성 강화 0 보장.
  */
-import { NUTRIENT_META } from './hff-nutrient-registry.js';
+import { NUTRIENT_META, FUNCTIONAL_META } from './hff-nutrient-registry.js';
 
 export interface NSeed {
   statementNo: string; productName: string; manufacturer: string; nutrient: string;
@@ -74,8 +74,11 @@ function methodChip(seed: NSeed): { ko: string | null; en: string | null } {
 export interface Composed { ko: string; en: string }
 
 export function composeNutrient(seed: NSeed): Composed {
-  const meta = NUTRIENT_META[seed.nutrient];
+  const meta = NUTRIENT_META[seed.nutrient] ?? FUNCTIONAL_META[seed.nutrient];
   const nameKo = meta.displayKo, nameEn = meta.displayEn;
+  const funcKind = meta.kind === 'functional';
+  const fnHdrKo = funcKind ? `${nameKo} 기능성 (공식 인정)` : `${nameKo} 영양기능 (공식 인정 기능성)`;
+  const fnHdrEn = funcKind ? `${nameEn} functional claims (officially recognised)` : `${nameEn} nutritional functions (officially recognised)`;
   const da = seed.grounding.declaredAmount;
   const amt = `${da.value}${da.unit === 'IU' ? ' IU' : da.unit}`;
   const basis = `${da.basisAmount}${da.basisUnit}`;
@@ -91,8 +94,8 @@ export function composeNutrient(seed: NSeed): Composed {
   const dayKo = `1일 ${sd}회`; const dayEn = sd === 1 ? 'Once a day' : `${sd} times a day`;
 
   const introKo = (sd === 1 && perServeKo)
-    ? `이 제품은 1일 섭취량(1회 · ${perServeKo})에 ${nameKo} <b>${amt}</b>를 표시량으로 담았습니다(표시 기준 ${basis}당). ${nameKo}의 영양기능은 아래 공식 인정 범위와 같습니다.`
-    : `이 제품은 ${nameKo} <b>${amt}</b>를 표시량으로 담았습니다(표시 기준 ${basis}당). ${nameKo}의 영양기능은 아래 공식 인정 범위와 같습니다.`;
+    ? `이 제품은 1일 섭취량(1회 · ${perServeKo})에 ${nameKo} <b>${amt}</b>를 표시량으로 담았습니다(표시 기준 ${basis}당). ${nameKo}의 ${funcKind ? '기능성' : '영양기능'}은 아래 공식 인정 범위와 같습니다.`
+    : `이 제품은 ${nameKo} <b>${amt}</b>를 표시량으로 담았습니다(표시 기준 ${basis}당). ${nameKo}의 ${funcKind ? '기능성' : '영양기능'}은 아래 공식 인정 범위와 같습니다.`;
   const introEn = (sd === 1 && perServeEn)
     ? `One daily serving (once a day, ${perServeEn}) provides <b>${amt}</b> of labelled ${nameEn} (per ${basis} of product). Its officially recognised functions are listed below.`
     : `This product provides <b>${amt}</b> of labelled ${nameEn} (per ${basis} of product). Its officially recognised functions are listed below.`;
@@ -128,7 +131,7 @@ export function composeNutrient(seed: NSeed): Composed {
   <h1>${esc(seed.productName)}<small>${nameKo}</small></h1><p class="sd-meta">${esc(seed.manufacturer)} 제조 · ${dayKo}${perServeKo ? ` ${perServeKo}` : ''}</p></div>
   <div class="sd-body"><p class="sd-intro">${introKo}</p>
   <h2>왜 이 제품인가</h2><ul class="sd-why">${li(whyKo)}</ul>
-  <h2>${nameKo} 영양기능 (공식 인정 기능성)</h2><ul class="sd-why">${li(seed.functions.ko.map(esc))}</ul>
+  <h2>${fnHdrKo}</h2><ul class="sd-why">${li(seed.functions.ko.map(esc))}</ul>
   <h2>섭취방법 (공식 표기 그대로)</h2><div class="sd-intake"><span class="sd-chips">${chipsKo.join('')}</span></div>
   <h2>표시 기준</h2><div class="sd-spec">${specKo.join('')}</div>
   <h2>이런 분께</h2><ul class="sd-who">${li(whoKo)}</ul></div><div class="sd-foot"><b>섭취 시 주의사항</b> · ${esc(ckKo)}</div></div>`;
@@ -138,7 +141,7 @@ export function composeNutrient(seed: NSeed): Composed {
   <h1>${esc(seed.productName)}<small>${nameEn}</small></h1><p class="sd-meta">Made by ${esc(seed.manufacturer)} · ${dayEn}${perServeEn ? ` · ${perServeEn}` : ''}</p></div>
   <div class="sd-body"><p class="sd-intro">${introEn}</p>
   <h2>Why this product</h2><ul class="sd-why">${li(whyEn)}</ul>
-  <h2>${nameEn} nutritional functions (officially recognised)</h2><ul class="sd-why">${li(seed.functions.en.map(esc))}</ul>
+  <h2>${fnHdrEn}</h2><ul class="sd-why">${li(seed.functions.en.map(esc))}</ul>
   <h2>Directions (exactly as officially stated)</h2><div class="sd-intake"><span class="sd-chips">${chipsEn.join('')}</span></div>
   <h2>Labelled standard</h2><div class="sd-spec">${specEn.join('')}</div>
   <h2>Who it suits</h2><ul class="sd-who">${li(whoEn)}</ul></div><div class="sd-foot"><b>Precautions</b> · ${esc(ckEn)}</div></div>`;

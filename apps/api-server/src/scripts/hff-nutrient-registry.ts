@@ -68,16 +68,83 @@ const RAW_MAP: Array<[string, string]> = [
 const FUNCTION_MAP: Record<string, string> = {};
 for (const [ko, en] of RAW_MAP) FUNCTION_MAP[normFn(ko)] = en;
 
-export function mapFunctionEn(ko: string): string | null {
-  return FUNCTION_MAP[normFn(ko)] ?? null;
+// ─── 기능성 원료 "…에 도움을 줄 수 있음" 편익 컴포넌트 ko→en (·로 나열) ───
+const COMPONENT: Array<[RegExp, string]> = [
+  [/^항산화(작용)?$/, 'antioxidant activity'],
+  [/^체지방\s*감소$/, 'body-fat reduction'],
+  [/^혈중\s*콜레스테롤\s*개선$/, 'improving blood cholesterol'],
+  [/^혈중\s*중성지질\s*개선$/, 'improving blood triglyceride levels'],
+  [/^혈행\s*개선$/, 'improving blood circulation'],
+  [/^높은?\s*혈압\s*감소$/, 'lowering high blood pressure'],
+  [/^간\s*건강$/, 'liver health'],
+  [/^눈\s*건강$/, 'eye health'],
+  [/건조한\s*눈을?\s*개선하여\s*눈\s*건강/, 'improving dry eyes for eye health'],
+  [/^관절\s*및\s*연골\s*건강$/, 'joint and cartilage health'],
+  [/^관절\s*및\s*연골건강$/, 'joint and cartilage health'],
+  [/^기억력\s*개선$/, 'memory improvement'],
+  [/스트레스로\s*인한\s*긴장완화/, 'relief of stress-induced tension'],
+  [/^지구력\s*증진$/, 'improving endurance'],
+  [/^피로개선$/, 'improving fatigue'],
+  [/^면역력?\s*증진$/, 'supporting immune function'],
+  [/^배변활동\s*원활$/, 'smooth bowel movements'],
+  [/식후\s*혈당상승\s*억제/, 'suppressing the rise in blood sugar after meals'],
+  [/^전립선\s*건강\s*유지$/, 'maintaining prostate health'],
+  [/^전립선\s*건강$/, 'prostate health'],
+  [/구강에서의?\s*항균작용/, 'antibacterial action in the mouth'],
+  [/월경전\s*변화에\s*의한\s*불편한\s*상태\s*개선/, 'easing discomfort related to premenstrual changes'],
+  [/면역과민반응에\s*의한\s*피부상태\s*개선/, 'improving skin condition related to immune hypersensitivity'],
+  [/^피부보습$/, 'skin moisturisation'],
+  [/탄수화물이\s*지방으로\s*합성되는\s*것을\s*억제하여\s*체지방\s*감소/, 'reducing body fat by inhibiting the conversion of carbohydrate into fat'],
+  [/노화로\s*인해\s*감소될?\s*수\s*있는\s*황반색소밀도를?\s*유지하여\s*눈\s*건강/, 'maintaining macular pigment density (which can decline with age) for eye health'],
+  [/황반색소밀도를?\s*유지/, 'maintaining macular pigment density'],
+  [/^혈당\s*조절$/, 'blood sugar regulation'],
+];
+function mapComponent(ko: string): string | null {
+  const c = ko.replace(/\s+/g, ' ').trim();
+  for (const [re, en] of COMPONENT) if (re.test(c)) return en;
+  return null;
 }
+
+/** 기능성 문구 ko → en. ①필요형(레지스트리) ②"…에 도움을 줄 수 있음/줌"형(컴포넌트 분해). 미매핑=null. */
+export function mapFunctionEn(ko: string): string | null {
+  const direct = FUNCTION_MAP[normFn(ko)];
+  if (direct) return direct;
+  const m = ko.replace(/\s+/g, ' ').trim().match(/^(.*?)에?\s*도움을?\s*(?:줄\s*수\s*있(?:음|습니다)|줌|주는)/);
+  if (m) {
+    const benefits = m[1].split(/[·･・‧]/).map((b) => b.trim()).filter(Boolean);
+    const mapped = benefits.map(mapComponent);
+    if (mapped.length && mapped.every((x) => x != null)) return `May help with ${enJoin(mapped as string[])}`;
+    // 단일 편익이 문장형(예: 건조한 눈…)일 수 있음 — 통째 매핑 시도
+    const whole = mapComponent(m[1].trim());
+    if (whole) return `May help with ${whole}`;
+    return null;
+  }
+  return null;
+}
+function enJoin(a: string[]): string { return a.length <= 1 ? (a[0] ?? '') : a.length === 2 ? `${a[0]} and ${a[1]}` : `${a.slice(0, -1).join(', ')}, and ${a[a.length - 1]}`; }
 
 /** 질병 위험감소 기능(허용) 문구 — 사람검수 대상 표시용 */
 export function isRiskReductionFn(ko: string): boolean {
   return /위험\s*감소에?\s*도움/.test(ko);
 }
 
-export interface NutrientMeta { key: string; slug: string; displayKo: string; displayEn: string }
+export interface NutrientMeta { key: string; slug: string; displayKo: string; displayEn: string; kind?: 'nutrient' | 'functional' }
+export const FUNCTIONAL_META: Record<string, NutrientMeta> = {
+  'MSM': { key: 'MSM', slug: 'msm', displayKo: 'MSM', displayEn: 'MSM', kind: 'functional' },
+  '루테인': { key: '루테인', slug: 'lutein', displayKo: '루테인', displayEn: 'Lutein', kind: 'functional' },
+  '밀크씨슬': { key: '밀크씨슬', slug: 'milk-thistle', displayKo: '밀크씨슬', displayEn: 'Milk thistle', kind: 'functional' },
+  '코엔자임Q10': { key: '코엔자임Q10', slug: 'coenzyme-q10', displayKo: '코엔자임Q10', displayEn: 'Coenzyme Q10', kind: 'functional' },
+  '녹차': { key: '녹차', slug: 'green-tea', displayKo: '녹차 카테킨', displayEn: 'Green tea catechin', kind: 'functional' },
+  '가르시니아': { key: '가르시니아', slug: 'garcinia', displayKo: '가르시니아캄보지아 추출물', displayEn: 'Garcinia cambogia extract', kind: 'functional' },
+  '감마리놀렌산': { key: '감마리놀렌산', slug: 'gla', displayKo: '감마리놀렌산', displayEn: 'Gamma-linolenic acid', kind: 'functional' },
+  '글루코사민': { key: '글루코사민', slug: 'glucosamine', displayKo: '글루코사민', displayEn: 'Glucosamine', kind: 'functional' },
+  '프로폴리스': { key: '프로폴리스', slug: 'propolis', displayKo: '프로폴리스', displayEn: 'Propolis', kind: 'functional' },
+  '오메가3': { key: '오메가3', slug: 'omega-3', displayKo: '오메가3', displayEn: 'Omega-3', kind: 'functional' },
+  '식이섬유': { key: '식이섬유', slug: 'dietary-fibre', displayKo: '식이섬유', displayEn: 'Dietary fibre', kind: 'functional' },
+  '테아닌': { key: '테아닌', slug: 'theanine', displayKo: 'L-테아닌', displayEn: 'L-theanine', kind: 'functional' },
+  '은행잎': { key: '은행잎', slug: 'ginkgo', displayKo: '은행잎추출물', displayEn: 'Ginkgo leaf extract', kind: 'functional' },
+  '옥타코사놀': { key: '옥타코사놀', slug: 'octacosanol', displayKo: '옥타코사놀', displayEn: 'Octacosanol', kind: 'functional' },
+};
 export const NUTRIENT_META: Record<string, NutrientMeta> = {
   '아연': { key: '아연', slug: 'zinc', displayKo: '아연', displayEn: 'Zinc' },
   '비타민E': { key: '비타민E', slug: 'vitamin-e', displayKo: '비타민 E', displayEn: 'Vitamin E' },
