@@ -772,6 +772,38 @@ export function ruleG(input: GuardProductInput): GuardFinding[] {
       suggestedAction: '"씹어서 섭취"로 원문 그대로 기술하십시오.',
     });
   }
+
+  // ═══ G-WATER-UNGROUNDED-003 — 원문에 물 섭취 근거 없는데 초안이 "물과 함께" 부가 ═══
+  //
+  // 확정 원칙(347건 소급): 원문에 물 섭취가 **명시된 경우에만** "물과 함께"를 쓴다.
+  //   정제·캡슐이라도 항상 물 복용이 필수는 아니다(츄어블·녹여먹기·직접섭취 분말 예외).
+  //   작성기가 "직접/그대로"만 있는 원문에 "직접 또는 물과 함께"로 물을 부가하던 버그가 있었다.
+  // `물 없이`(부정)는 물 근거가 아니다. 그 외 원문에 물 언급이 있으면 물 표기 허용.
+  {
+    const srcWaterVehicle = /물|음용수/.test(intake) && !/물\s*없이/.test(intake);
+    if (!srcWaterVehicle) {
+      const KO_WATER_DRAFT = /물과\s*함께|충분한\s*물|물\s*등과\s*같이|물에\s*타|음용수|물로\s*삼키/;
+      const EN_WATER_DRAFT = /with\s+water/i;
+      if (KO_WATER_DRAFT.test(ko)) {
+        out.push({
+          ruleId: 'G-WATER-UNGROUNDED-003', severity: 'ERROR', status: 'BLOCKED', language: 'ko',
+          field: 'koDraft', matchedText: (ko.match(KO_WATER_DRAFT) ?? [''])[0],
+          sourceEvidence: `SRV_USE: "${truncate(intake, 80)}" — 물 섭취 언급 없음`,
+          message: '원문에 물 섭취 근거가 없는데 "물과 함께" 등 물 섭취를 기술했습니다(일반 상식·안전 안내 부가 금지).',
+          suggestedAction: '물 문구를 삭제하고 원문의 섭취 단위·횟수·방법(직접/그대로/씹어서/녹여서)만 기술하십시오.',
+        });
+      }
+      if (EN_WATER_DRAFT.test(en)) {
+        out.push({
+          ruleId: 'G-WATER-UNGROUNDED-003', severity: 'ERROR', status: 'BLOCKED', language: 'en',
+          field: 'enDraft', matchedText: (en.match(EN_WATER_DRAFT) ?? [''])[0],
+          sourceEvidence: `SRV_USE: "${truncate(intake, 80)}" — no water in source`,
+          message: 'Draft asserts "with water" but the source states no water intake.',
+          suggestedAction: 'Remove the water phrase; state only the officially stated unit/frequency/method.',
+        });
+      }
+    }
+  }
   void CHEW_KO;
   if (out.length === 0) out.push(ok('G-FORM-GENERALIZATION-001', 'drafts', '제형 기반 추정 검출 없음'));
   return out;

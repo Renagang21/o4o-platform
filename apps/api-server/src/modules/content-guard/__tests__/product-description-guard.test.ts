@@ -213,6 +213,56 @@ describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
     expect(r.findings.some((f) => f.ruleId === 'G-CHEWABLE-002' && f.status === 'BLOCKED')).toBe(true);
   });
 
+  // G-WATER-UNGROUNDED-003 — 원문에 물 근거 없는데 초안이 "물과 함께" 부가 (2026-07-17)
+  it('G-WATER: 원문이 "그대로 섭취"뿐인데 초안에 "물과 함께"를 부가하면 BLOCKED', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 1회, 1회 1포를 그대로 섭취하십시오.' },
+        drafts: { ko: '<p>1일 1회 1포 직접 또는 물과 함께 섭취합니다.</p>', en: '<p>1 stick, directly or with water.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-WATER-UNGROUNDED-003' && f.language === 'ko' && f.status === 'BLOCKED')).toBe(true);
+    expect(r.findings.some((f) => f.ruleId === 'G-WATER-UNGROUNDED-003' && f.language === 'en' && f.status === 'BLOCKED')).toBe(true);
+  });
+
+  it('G-WATER: 원문에 "물과 함께"가 있으면 초안의 "물과 함께"는 위반이 아니다 (보존)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.' },
+        drafts: { ko: '<p>1일 1회 1캡슐을 물과 함께 섭취합니다.</p>', en: '<p>1 capsule with water once a day.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-WATER-UNGROUNDED-003')).toBe(false);
+  });
+
+  it('G-WATER: 원문이 "직접 또는 물과 함께"면 초안의 동일 표기는 위반이 아니다 (보존)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하세요.' },
+        drafts: { ko: '<p>1포 직접 또는 물과 함께 섭취.</p>', en: '<p>1 stick, directly or with water.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-WATER-UNGROUNDED-003')).toBe(false);
+  });
+
+  it('G-WATER: 원문이 씹어서인데 초안에 "물로 삼키는" 대조를 넣으면 BLOCKED (미탐 방지)', () => {
+    const r = runGuard(
+      {
+        ...OK_VIVA_FULL_BASIS,
+        source: { ...OK_VIVA_FULL_BASIS.source, intake: '1일 2회, 1회 1정을 씹어서 섭취하십시오.' },
+        drafts: { ko: '<p>알약을 물로 삼키는 방식이 아닙니다.</p>', en: '<p>Not swallowed with water.</p>' },
+      },
+      { phase: 'post' },
+    );
+    expect(r.findings.some((f) => f.ruleId === 'G-WATER-UNGROUNDED-003' && f.status === 'BLOCKED')).toBe(true);
+  });
+
   // B-SPEC-MINMAX 3분기 — 규격어는 문자열이 아니라 **문맥**으로 판정한다.
   const withEn = (enBody: string) => ({
     ...OK_VIVA_FULL_BASIS,
