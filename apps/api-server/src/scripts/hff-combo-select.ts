@@ -6,12 +6,12 @@
  * 제품 스펙 집합 == 지정 조합(정확히). 원료별 표시량·기능성 **독립 추출**(수치·기능성 혼입 0).
  * 기능성 귀속 = INGREDIENT_FN(원료 공식 기능성 집합) 매칭. 부원료/미귀속 기능성 → HOLD.
  */
+import '../env-loader.js';
 import fs from 'node:fs';
-import readline from 'node:readline';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo } from './hff-nutrient-registry.js';
+import { resolveSource } from './hff-raw-source.js';
 
-const RAW = 'G:/내 드라이브/자료실/public-data-api-samples/mfds-health-functional-food-info-raw.jsonl';
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const COMBO = arg('combo'); const OUT = arg('out');
 if (!COMBO || !OUT) throw new Error('--combo "A,B" --out 필요');
@@ -78,10 +78,8 @@ interface RawItem { ENTRPS?: string; PRDUCT?: string; STTEMNT_NO?: string; DISTB
 const counts: Record<string, number> = {}; const bump = (k: string) => { counts[k] = (counts[k] ?? 0) + 1; };
 const eligible: unknown[] = []; const holds: Array<{ statementNo: string; productName: string; holdCode: string; reason: string }> = []; const seen = new Set<string>();
 
-const rl = readline.createInterface({ input: fs.createReadStream(RAW, { encoding: 'utf8' }), crlfDelay: Infinity });
-for await (const line of rl) {
-  const l = line.trim(); if (!l) continue; let obj: RawItem; try { obj = JSON.parse(l) as RawItem; } catch { continue; }
-  const it = obj.item ?? obj;
+const src = resolveSource(process.argv, process.env);
+for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const base = it.BASE_STANDARD ?? ''; const name = (it.PRDUCT ?? '').trim(); const srv = it.SRV_USE ?? ''; const sungsang = it.SUNGSANG ?? ''; const stmt = (it.STTEMNT_NO ?? '').trim();
   const { byKey, unknown, nonTarget } = extractSpecs(base);
   const keys = [...byKey.keys()].sort().join('|');

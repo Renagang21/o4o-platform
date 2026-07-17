@@ -109,4 +109,17 @@ M2(2원료) 1,915 · M3(3원료) 1,082 · MX(≥4, 이번 범위 제외) 3,122 �
 ### 5.3 PART B 신규 조합 일시 보류 (환경) — PAUSED_ENV_RAW_UNAVAILABLE
 raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 언마운트(`/g/` 접근 불가) → combo-select(raw 스트리밍) 불가. **코드/생산 결함 아님, 외부 인프라.** 기존 LIVE 산출물·파이프라인·커밋 무영향. G: 재마운트 시 다음 조합(마그네슘+비타민D+칼슘 등)부터 즉시 재개.
 
+### 5.4 raw 소스 DB 전환 — 동치검증 PASS · 기본 소스 전환 (G: 비의존)
+
+`G:` 언마운트 재발 방지 위해 combo-select 입력을 `product_candidates.raw_payload` 로 전환. **입력 어댑터 분리**(`hff-raw-source.ts`: `fileJsonlSource`/`dbCandidateSource`, `resolveSource(--source db|file)`, 실사용 소스 stderr 명시). 파이프라인(select/compose/guard)은 동일.
+
+**동치검증(read-only, DB write 0):**
+1. **필드 동치**(`hff-rawpayload-equivalence.ts`): 완료 그룹 7종 756건의 생산 JSON source ↔ DB raw_payload.source 7필드 비교 → 신고번호 결손 0 · 의미차이 0.
+2. **재선정 동치**: `combo-select --source db` 로 비타민D+아연 재선정 → 파일-source 커밋 결과와 **동일 대상 38 · 신고번호 집합 차이 0 · draft 바이트 차이 0**.
+   - 전체 population 차이(mention 1752 vs 1833 등)는 파일 raw 중복행 + DB 적재 시 dedup/수출제외 차이 — **적격 생산 집합은 동일**.
+
+→ **전환 게이트 PASS**. `resolveSource` 기본 소스 = **db**(`--source file` 로 회귀/대조). raw_payload.source 11필드 전부 존재. HFF candidate 41,261.
+
+**재개**: G: 없이 DB 소스로 `마그네슘+비타민D+칼슘`부터 combo-select→generate→dry-run→apply→독립검증 연속 생산 가능.
+
 **PART B 생산 재개 지점**: 다중원료 composer 확장 필요 — ① 2~3 원료 각각 badge/표시량/기능성 렌더 ② 원료별 지표성분·기준량 분리(수치 혼입 0) ③ ko/en 원료별 기능성 대응 전수검사(§10) ④ 조합별 20건 내부 게이트 → BLOCKED 0·기능성 누락/추가 0·수치 혼입 0 시 잔여 전량. 가장 큰 안정 M2(비타민D+아연 등)부터. 기존 단일 composer/registry/apply/verify 재사용, 다중 편익 병합만 신규.
