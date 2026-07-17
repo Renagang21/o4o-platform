@@ -245,17 +245,8 @@ function productPriceText(p: { price?: number; priceDisplay?: string }): string 
 }
 
 // WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1:
-//   qr_guide URL 원문 노출을 피하고 사람이 읽는 짧은 도메인만 보조 표기.
-//   전체 https://... 를 큰 텍스트로 노출하지 않는다(§5.3). 데이터(config)는 바꾸지 않고 렌더링만 정비.
-function shortHost(url: string): string {
-  const raw = (url || '').trim();
-  if (!raw) return '';
-  try {
-    return new URL(raw).hostname.replace(/^www\./, '');
-  } catch {
-    return raw.replace(/^https?:\/\//i, '').replace(/^www\./, '').split('/')[0];
-  }
-}
+// WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1: QR 카드를 헤더 우상단 QR 로 통일하면서
+//   도메인 보조표기(shortHost)를 제거 — 미사용.
 
 function mapSupplierProduct(p: TabletProduct): DisplayProduct {
   return {
@@ -846,16 +837,32 @@ export function TabletKioskPage({
             글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
             설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
       <div style={isProductLayout ? styles.headerCompact : styles.header}>
-        <div style={styles.headerTitleRow}>
-          <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
-          {showQrBadge && displaySettings?.showQr !== false && (
+        <div style={styles.headerMain}>
+          <div style={styles.headerTexts}>
+            <div style={styles.headerTitleRow}>
+              <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
+            </div>
+            {/* legacy(코너 설명 미주입: GP/KCos 등)는 짧은 안내 힌트만 헤더 subtitle 로 유지 */}
+            {!isProductLayout && !cornerInfo?.body && (
+              <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
+            )}
+          </div>
+          {/* WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1: 코너 메인 QR 을 헤더 우상단에 고정.
+              모든 템플릿에서 항상 보인다(product 레이아웃에서 하단으로 밀려 안 보이던 결함 해소).
+              url 은 서버가 Screen Set public_qr_slug 로 도출(임의 URL 아님).
+              idle 은 상단 hero 에 QR chip 이 이미 있어 헤더 QR 은 생략. qrGuide 없으면(legacy) 기존 텍스트 배지 유지. */}
+          {qrGuide?.url && !isIdleTouch && displaySettings?.showQr !== false ? (
+            <div style={styles.headerQr}>
+              <div style={styles.headerQrText}>
+                <span style={styles.headerQrTitle}>휴대전화로 보기</span>
+                <span style={styles.headerQrDesc}>QR 스캔</span>
+              </div>
+              <QrImage url={qrGuide.url} size={60} />
+            </div>
+          ) : (showQrBadge && displaySettings?.showQr !== false && (
             <span style={styles.qrBadge}>QR 코드로 접속</span>
-          )}
+          ))}
         </div>
-        {/* legacy(코너 설명 미주입: GP/KCos 등)는 짧은 안내 힌트만 헤더 subtitle 로 유지 */}
-        {!isProductLayout && !cornerInfo?.body && (
-          <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
-        )}
       </div>
 
       {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
@@ -877,17 +884,8 @@ export function TabletKioskPage({
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1(§5.3·§5.4):
             "라벨 + https://... 원문" 나열 → QR 카드(아이콘 + 행동유도 문구 + 짧은 도메인)로 정비.
             전체 URL 대신 shortHost() 도메인만 보조 표기. 데이터(config label/url)는 변경하지 않음. */}
-      {qrGuide && !isProductLayout && !isIdleTouch && (
-        <div style={styles.qrCard}>
-          {/* WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1: ▣ 아이콘 → 실제 스캔 QR(url 있을 때). url 없으면 아이콘 fallback. */}
-          {qrGuide.url ? <QrImage url={qrGuide.url} size={72} /> : <div style={styles.qrCardIcon} aria-hidden>▣</div>}
-          <div style={styles.qrCardText}>
-            <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
-            <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
-          </div>
-          {shortHost(qrGuide.url) && <span style={styles.qrCardDomain}>{shortHost(qrGuide.url)}</span>}
-        </div>
-      )}
+      {/* WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1:
+          상단 전용 QR 카드 제거 → 헤더 우상단 고정 QR 로 통일(모든 템플릿 일관). */}
 
       {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 섹션(§5.1·§5.3).
           product_list(상품 record)와 분리된 "코너 콘텐츠" 카드 목록. 서버 resolve 카드만 소비.
@@ -987,17 +985,8 @@ export function TabletKioskPage({
       {/* product 레이아웃(product_focus / product_grid_qr, §3.4): qr_guide 는 하단 보조 배너로 배치(있을 때만).
           기본/코너 소개형은 상단에서 이미 렌더됨.
           WO-O4O-KPA-TABLET-TEMPLATE-USABILITY-REFINE-V1: 상단 카드와 동일 정비(도메인만, 원문 URL 미노출). */}
-      {qrGuide && isProductLayout && (
-        // order 7: 제품·콘텐츠 뒤(최하단) 보조 QR 배너 유지.
-        <div style={{ ...styles.qrCardBottom, order: 7 }}>
-          {qrGuide.url ? <QrImage url={qrGuide.url} size={72} /> : <div style={styles.qrCardIcon} aria-hidden>▣</div>}
-          <div style={styles.qrCardText}>
-            <span style={styles.qrCardTitle}>{qrGuide.label || '모바일에서 자세히 보기'}</span>
-            <span style={styles.qrCardDesc}>QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다.</span>
-          </div>
-          {shortHost(qrGuide.url) && <span style={styles.qrCardDomain}>{shortHost(qrGuide.url)}</span>}
-        </div>
-      )}
+      {/* WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1:
+          하단 보조 QR 배너 제거 → 헤더 우상단 고정 QR 로 통일(제품 템플릿에서 QR 이 스크롤 아래로 밀려 안 보이던 결함 해소). */}
 
       {/* WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1: content_list 카드 상세(모달).
           detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
@@ -1261,6 +1250,27 @@ const styles: Record<string, React.CSSProperties> = {
     flexWrap: 'wrap',
     gap: '8px',
   },
+  // WO-O4O-KPA-TABLET-DEMO-ALL-TEMPLATES-AND-CORNER-QR-V1: 헤더 = 제목(좌) + QR(우상단 고정)
+  headerMain: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: '16px',
+  },
+  headerTexts: { minWidth: 0, flex: 1 },
+  headerQr: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '6px 10px 6px 12px',
+    backgroundColor: '#f8fafc',
+    border: '1px solid #e2e8f0',
+    borderRadius: '12px',
+    flexShrink: 0,
+  },
+  headerQrText: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right' },
+  headerQrTitle: { fontSize: 'clamp(11px, 1.3vw, 13px)', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' },
+  headerQrDesc: { fontSize: 'clamp(9px, 1vw, 11px)', color: '#64748b', whiteSpace: 'nowrap' },
   cornerTitle: {
     fontSize: 'clamp(18px, 2.4vw, 26px)',
     fontWeight: 700,
