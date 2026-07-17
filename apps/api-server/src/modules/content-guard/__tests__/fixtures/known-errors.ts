@@ -5,7 +5,7 @@
  * 출처: 5건 파일럿 REVIEW-V1 §2 Q2 정정 / GUARD-20-A~D
  */
 
-import type { GuardProductInput } from '../product-description-guard.types.js';
+import type { GuardProductInput } from '../../product-description-guard.types.js';
 
 const base = (over: Partial<GuardProductInput>): GuardProductInput => ({
   candidateId: 'fixture',
