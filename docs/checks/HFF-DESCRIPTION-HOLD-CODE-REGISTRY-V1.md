@@ -51,6 +51,39 @@
 순수 유산균 라인은 검증된 템플릿(mainFunction = 유산균 3기능)의 범위다.
 다기능은 template 변종을 **생산 중에 즉석 제작하지 않는다** — 미검증 패턴을 라인에 섞지 않는다.
 
+## 하위분류·판정신호 보강 (V1.1 · 2026-07-17, 예외군 분석 채택)
+
+> 근거: `HFF-HOLD-EXCEPTION-ANALYSIS-DRAFT-V1.md` (풀 735 스캔). 제안 A/B/C 채택.
+
+### A. `UNSUPPORTED_DIMENSION` 하위분류 — 액상은 두 톤으로 갈린다
+
+| 하위 | 신호 | 특성 | 모델 확장 시 |
+|------|------|------|-------------|
+| `UNSUPPORTED_DIMENSION:BEVERAGE` | 기준량 65~110 mL/병, 성상 액상 음료 | 1병 섭취, 성인 | "1병당 CFU" 카피 축 |
+| `UNSUPPORTED_DIMENSION:DROP_OIL` | 기준량 0.1~0.3 mL/회, 성상 액상·오일 드롭 | 영유아, 적하 | **영유아 대상 주의문구·보호자 톤 별도 검증** |
+
+밀도 추정·mg 환산 금지 원칙은 공통 유지(액상 밀도 임의 가정 = 창작).
+
+### B. `MULTI_FUNCTIONAL` 판정신호 우선순위 — base 시험항목이 1차
+
+```text
+1차 = BASE_STANDARD 시험항목의 2번째 기능성분 정량기준 (예: "식이섬유 : 표시량(4g/6g)의 80% 이상")
+2차 = mainFunction(mf_raw) 의 2번째 기능성 블록
+주의: 식이섬유형은 mf_raw 에 유산균 기능만 기재되고 식이섬유는 base 에만 나타나는 사례 다수
+      → mf_raw 단독 스캔은 복합형을 놓친다. base 시험항목 스캔이 1차 신호.
+```
+
+### C. `SOURCE_ABNORMAL` 하위패턴 태깅 (원문 정정 트리아지)
+
+| 태그 | 예 | 정정 성격 |
+|------|-----|-----------|
+| `:OPERATOR_TYPO` | `1.0*x10^9`, `2.0 x 100,000,000` | 연산자·계수 표기 정정 |
+| `:DECIMAL_THOUSAND_MIX` | `10.000,000,000` | 소수점/천단위 구분자 혼용 |
+| `:UNIT_LABEL_ABSENT` | `10,000,000,000/350mg`(CFU 라벨 없음) | 단위 라벨 **보완** |
+| `:VALUE_UNIT_SPLIT` | `수(CFU/2,000mg):표시량(250,000,000)` | 수치·단위 분리 정규화 |
+
+`:UNIT_LABEL_ABSENT` 는 GROUNDING 인접이나 **숫자 토큰이 존재**하므로 SOURCE_ABNORMAL 유지(GROUNDING 판정신호 "숫자 토큰 0" 미충족).
+
 ## 격리 기록 형식 (`*-hold.json`)
 
 ```json
