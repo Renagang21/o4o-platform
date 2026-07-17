@@ -1,23 +1,20 @@
 /**
  * TabletContentLibraryList — 태블릿 콘텐츠(화면 세트) O4O 표준 리스트
  *
- * WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1
- *   TabletScreenSetManager(library 모드)의 수제 카드 그리드를 O4O 표준 테이블로 정비.
- *   - @o4o/operator-ux-core: DataTable(selectable) + defineActionPolicy + buildRowActions + useBatchAction
- *   - @o4o/ui: RowActionMenu(kebab) + ActionBar + BulkResultModal
- *   canonical 선례: services/web-kpa-society/src/pages/operator/qr/OperatorQrListPage.tsx
+ * WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1 (기반)
+ * WO-O4O-KPA-TABLET-CONTENT-LIST-SEARCH-PAGINATION-PREVIEW-V1
+ *   - 검색 + 템플릿/상태/사용코너 필터 + 페이지네이션(페이지당 표시 수 선택)
+ *   - 행 단위 미리보기(kebab '미리보기' + 콘텐츠명 클릭) → read-only Screen Set preview 모달(태블릿/QR 모바일)
+ * WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1
+ *   - 사용자 문구 '보관' → '리스트에서 제거'(내부 status/API 는 archived/soft-delete 그대로).
  *
- * 범위(WO 금지선 준수):
- *   - 기존 Screen Set 관리 API(/store/screen-sets)만 사용. API/DB/runtime 변경 없음.
- *   - Screen Set API 는 전체 목록을 반환(서버 페이지네이션 없음) → 검색/상태필터/페이지네이션은 client-side.
- *   - 개별 작업(kebab): 수정 / 보관. 미리보기·복제·삭제(hard)는 후속 WO — 미노출.
- *     ('삭제'는 hard-delete 엔드포인트가 없어 API 변경 없이는 제공 불가. 제거 동작은 '보관'(soft delete)로 일원화.)
- *   - 일괄 작업: 선택 → 보관.
- *   - 코너 적용/해제는 노출하지 않음(코너별 운영 탭 전용).
+ * 범위(금지선 준수): 기존 Screen Set 관리/미리보기 API 만 사용. API/DB/runtime 변경 없음.
+ *   Screen Set API 는 전체 목록 반환 → 검색/필터/페이지네이션은 client-side.
+ *   미리보기 = 기존 previewScreenSet(저장 전 draft resolve) + TabletKioskPage embedded 재사용.
  */
 
 import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Edit3, Archive, Plus, Layers } from 'lucide-react';
+import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import {
@@ -28,14 +25,16 @@ import {
   useBatchAction,
   type ListColumnDef,
 } from '@o4o/operator-ux-core';
-import { archiveScreenSet, type ScreenSet, type ScreenSetStatus } from '../../api/tabletDisplays';
+import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
+import { archiveScreenSet, fetchScreenSet, previewScreenSet, type ScreenSet, type ScreenSetStatus } from '../../api/tabletDisplays';
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
+// WO-...-REMOVE-LABEL-V1: 사용자 화면에서 archived = '리스트에서 제거됨'(내부 status 는 archived 그대로).
 const STATUS_LABEL: Record<ScreenSetStatus, string> = {
   draft: '초안',
   active: '활성',
-  archived: '보관',
+  archived: '리스트에서 제거됨',
   operator_template: '운영자 템플릿',
 };
 const STATUS_BADGE_CLASS: Record<ScreenSetStatus, string> = {
@@ -50,24 +49,25 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
   { value: '', label: '전체' },
   { value: 'draft', label: '초안' },
   { value: 'active', label: '활성' },
-  { value: 'archived', label: '보관' },
+  { value: 'archived', label: '리스트에서 제거됨' },
 ];
 
-const PAGE_LIMIT = 20;
+const PAGE_SIZES = [10, 20, 50];
 
 // ─── Action Policy (개별 작업 = 점 3개 kebab) ─────────────────────────────────
-//   inlineMax:0 → 모든 개별 작업을 kebab 메뉴로. 미리보기/복제/삭제는 후속 WO(미정의 = 미노출).
 const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', {
   inlineMax: 0,
   rules: [
+    { key: 'preview', label: '미리보기' },
     { key: 'edit', label: '수정' },
-    // 보관: 확인은 상위 handleArchive(window.confirm + 적용중 가드)에서 수행 → RowActionMenu confirm 미설정(중복 방지).
-    { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
+    // 리스트에서 제거(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지).
+    { key: 'archive', label: '리스트에서 제거', variant: 'warning', visible: (s) => s.status !== 'archived' },
   ],
 });
 const ACTION_ICONS: Record<string, ReactNode> = {
+  preview: <Eye className="w-4 h-4" />,
   edit: <Edit3 className="w-4 h-4" />,
-  archive: <Archive className="w-4 h-4" />,
+  archive: <Trash2 className="w-4 h-4" />,
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -81,14 +81,17 @@ interface Props {
   usageBySet: Record<string, string[]>;
   /** templateKey → 사람이 읽는 라벨(부모 TEMPLATE_OPTIONS 기준). */
   templateLabel: (key: string | null | undefined) => string;
-  /** 태블릿 화면 만들기 진입(부모 생성 폼 오픈 — 후속 스텝형 제작기 진입점). */
+  /** 태블릿 화면 만들기 진입(부모 생성 폼 오픈). */
   onCreate: () => void;
   /** 개별 수정(부모 인라인 편집 패널 오픈). dirty guard 는 부모에서 처리. */
   onEdit: (id: string) => void;
-  /** 개별 보관(부모 handleArchive — window.confirm + 적용중 가드 + reload 포함). */
+  /** 개별 리스트에서 제거(부모 handleArchive — 확인 + 적용중 가드 + reload 포함). */
   onArchive: (set: ScreenSet) => void;
   /** 일괄 작업 후 목록 갱신. */
   onRefresh: () => void;
+  /** 행 미리보기(kiosk-core 재사용) — 미주입 시 미리보기 비활성. */
+  previewApi?: TabletKioskApi;
+  storeSlug?: string | null;
 }
 
 export default function TabletContentLibraryList({
@@ -101,35 +104,76 @@ export default function TabletContentLibraryList({
   onEdit,
   onArchive,
   onRefresh,
+  previewApi,
+  storeSlug,
 }: Props) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
+  const [templateFilter, setTemplateFilter] = useState<string>('');
+  const [cornerFilter, setCornerFilter] = useState<string>(''); // '' 전체 / '__none__' 미사용 / 코너명
+  const [pageSize, setPageSize] = useState<number>(20);
   const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
+
+  // 미리보기 모달 (WO-...-SEARCH-PAGINATION-PREVIEW-V1)
+  const canPreview = !!previewApi && !!storeSlug;
+  const [preview, setPreview] = useState<{ name: string; screen: TabletScreenResponse; view: 'tablet' | 'mobile' } | null>(null);
+  const [previewBusy, setPreviewBusy] = useState<string | null>(null);
+  const handlePreview = useCallback(async (s: ScreenSet) => {
+    if (!canPreview) { toast.error('매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+    if (previewBusy) return;
+    setPreviewBusy(s.id);
+    try {
+      const detail = await fetchScreenSet(s.id);
+      const screen = await previewScreenSet({ templateKey: detail.templateKey, blocks: detail.blocks });
+      setPreview({ name: s.name, screen, view: 'tablet' });
+    } catch (e: any) {
+      toast.error(e?.message || '미리보기를 불러오지 못했습니다.');
+    } finally { setPreviewBusy(null); }
+  }, [canPreview, previewBusy]);
+
+  // ── 필터 옵션(현재 목록에서 도출) ──
+  const templateOptions = useMemo(() => {
+    const keys = Array.from(new Set(sets.map((s) => s.templateKey)));
+    return keys.map((k) => ({ key: k, label: templateLabel(k) })).sort((a, b) => a.label.localeCompare(b.label, 'ko'));
+  }, [sets, templateLabel]);
+  const cornerOptions = useMemo(() => {
+    const names = new Set<string>();
+    Object.values(usageBySet).forEach((arr) => arr.forEach((n) => names.add(n)));
+    return Array.from(names).sort((a, b) => a.localeCompare(b, 'ko'));
+  }, [usageBySet]);
 
   // ── client-side 필터/검색/정렬 ──
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return sets
       .filter((s) => (statusFilter === '' ? s.status !== 'archived' : s.status === statusFilter))
+      .filter((s) => !templateFilter || s.templateKey === templateFilter)
+      .filter((s) => {
+        if (!cornerFilter) return true;
+        const corners = usageBySet[s.id] ?? [];
+        if (cornerFilter === '__none__') return corners.length === 0;
+        return corners.includes(cornerFilter);
+      })
       .filter((s) => !q || s.name.toLowerCase().includes(q))
       .slice()
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-  }, [sets, search, statusFilter]);
+  }, [sets, search, statusFilter, templateFilter, cornerFilter, usageBySet]);
 
   const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const clampedPage = Math.min(page, totalPages);
   const pageRows = useMemo(
-    () => filtered.slice((page - 1) * PAGE_LIMIT, page * PAGE_LIMIT),
-    [filtered, page],
+    () => filtered.slice((clampedPage - 1) * pageSize, clampedPage * pageSize),
+    [filtered, clampedPage, pageSize],
   );
 
-  // 검색/필터 변경 시 1페이지로 + 선택 해제. 페이지 이동 시에도 선택 해제(선택은 현재 페이지 기준).
-  useEffect(() => { setPage(1); }, [search, statusFilter]);
-  useEffect(() => { setSelectedKeys(new Set()); }, [page, search, statusFilter, sets]);
+  // 검색/필터/페이지크기 변경 시 1페이지로 + 선택 해제.
+  useEffect(() => { setPage(1); }, [search, statusFilter, templateFilter, cornerFilter, pageSize]);
+  useEffect(() => { setSelectedKeys(new Set()); }, [page, search, statusFilter, templateFilter, cornerFilter, pageSize, sets]);
 
-  // ── 일괄 보관 ──
+  // ── 일괄 리스트에서 제거 ──
   const batchArchiveOp = useCallback(
     async (
       ids: string[],
@@ -139,9 +183,9 @@ export default function TabletContentLibraryList({
         const id = ids[i];
         if (r.status === 'fulfilled') return { id, status: 'success' as const };
         const err = r.reason as { code?: string; message?: string } | null;
-        const error = err?.code === 'SCREEN_SET_IN_USE'
-          ? '적용 중 — 먼저 코너에서 적용 해제하세요'
-          : err?.message || '보관에 실패했습니다';
+        const error = (err?.code === 'SCREEN_SET_IN_USE' || err?.code === 'ARCHIVE_BLOCKED_CONNECTED')
+          ? '코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제하세요'
+          : err?.message || '리스트에서 제거하지 못했습니다';
         return { id, status: 'failed' as const, error };
       });
       return { data: { results } };
@@ -152,10 +196,10 @@ export default function TabletContentLibraryList({
   const handleBulkArchive = useCallback(async () => {
     const ids = pageRows.filter((s) => selectedKeys.has(s.id) && s.status !== 'archived').map((s) => s.id);
     if (ids.length === 0) {
-      toast.error('보관할 수 있는 항목이 없습니다. (이미 보관된 항목은 제외됩니다)');
+      toast.error('제거할 수 있는 항목이 없습니다. (이미 제거된 항목은 제외됩니다)');
       return;
     }
-    if (!window.confirm(`선택한 ${ids.length}개 화면 세트를 보관하시겠습니까?\n목록에서 숨겨지며, 적용 중인 세트는 먼저 적용 해제해야 합니다.`)) return;
+    if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 리스트에서 제거하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다.\n(코너에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
     const result = await batch.executeBatch(batchArchiveOp, ids);
     if (result.successCount > 0) {
       setSelectedKeys(new Set());
@@ -196,7 +240,7 @@ export default function TabletContentLibraryList({
     {
       key: 'status',
       header: '상태',
-      width: '80px',
+      width: '110px',
       render: (_v, s) => (
         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${STATUS_BADGE_CLASS[s.status]}`}>
           {STATUS_LABEL[s.status]}
@@ -241,21 +285,24 @@ export default function TabletContentLibraryList({
       render: (_v, s) => (
         <RowActionMenu
           actions={buildRowActions(contentActionPolicy, s, {
+            preview: () => handlePreview(s),
             edit: () => onEdit(s.id),
             archive: () => onArchive(s),
           }, {
             icons: ACTION_ICONS,
-            loading: busy ? { archive: true } : undefined,
+            loading: previewBusy === s.id ? { preview: true } : (busy ? { archive: true } : undefined),
           })}
           inlineMax={contentActionPolicy.inlineMax}
         />
       ),
     },
-  ], [templateLabel, usageBySet, onEdit, onArchive, busy]);
+  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy]);
+
+  const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
   return (
     <div className="space-y-3">
-      {/* ── 도구막대: 검색 + 상태 필터 + 만들기 ── */}
+      {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) + 만들기 ── */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
           <input
@@ -263,9 +310,21 @@ export default function TabletContentLibraryList({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="콘텐츠명 검색"
-            className="min-w-[200px] flex-1 sm:flex-none px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="min-w-[180px] flex-1 sm:flex-none px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
             aria-label="콘텐츠명 검색"
           />
+          {/* 템플릿 필터 */}
+          <select value={templateFilter} onChange={(e) => setTemplateFilter(e.target.value)} className={selectCls} aria-label="템플릿 필터">
+            <option value="">템플릿 전체</option>
+            {templateOptions.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+          </select>
+          {/* 사용 코너 필터 */}
+          <select value={cornerFilter} onChange={(e) => setCornerFilter(e.target.value)} className={selectCls} aria-label="사용 코너 필터">
+            <option value="">코너 전체</option>
+            {cornerOptions.map((n) => <option key={n} value={n}>{n}</option>)}
+            <option value="__none__">미사용</option>
+          </select>
+          {/* 상태 필터 */}
           <div className="flex gap-1.5 flex-wrap">
             {STATUS_FILTERS.map((f) => (
               <button
@@ -290,10 +349,6 @@ export default function TabletContentLibraryList({
         </button>
       </div>
 
-      <div className="text-xs text-slate-500">
-        전체 <span className="font-medium text-slate-700">{total}</span>건
-      </div>
-
       {/* ── 일괄 작업(선택 시) ── */}
       <ActionBar
         selectedCount={selectedKeys.size}
@@ -301,14 +356,14 @@ export default function TabletContentLibraryList({
         actions={[
           {
             key: 'bulk-archive',
-            label: `선택한 콘텐츠 보관 (${archivableSelectedCount})`,
+            label: `선택한 콘텐츠를 리스트에서 제거 (${archivableSelectedCount})`,
             onClick: handleBulkArchive,
             variant: 'default' as const,
-            icon: <Archive className="w-3.5 h-3.5" />,
+            icon: <Trash2 className="w-3.5 h-3.5" />,
             loading: batch.loading,
             group: 'actions',
             visible: selectedKeys.size > 0,
-            tooltip: '선택한 화면 세트를 일괄 보관합니다. (적용 중인 세트는 먼저 적용 해제 필요)',
+            tooltip: '선택한 콘텐츠를 리스트에서 제거합니다(콘텐츠는 삭제되지 않음). 코너에 연결된 콘텐츠는 먼저 연결 해제 필요.',
           },
         ]}
       />
@@ -320,25 +375,76 @@ export default function TabletContentLibraryList({
         onRetry={() => batch.retryFailed()}
       />
 
-      {/* ── 표준 테이블 ── */}
+      {/* ── 표준 테이블 (행/콘텐츠명 클릭 = 미리보기) ── */}
       <DataTable<ScreenSet>
         columns={columns}
         data={pageRows}
         rowKey="id"
         loading={loading}
         emptyMessage={
-          search || statusFilter
+          search || statusFilter || templateFilter || cornerFilter
             ? '조건에 맞는 태블릿 콘텐츠가 없습니다.'
             : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
         }
         tableId="kpa-tablet-content-list"
-        onRowClick={(s) => onEdit(s.id)}
+        onRowClick={(s) => handlePreview(s)}
         selectable
         selectedKeys={selectedKeys}
         onSelectionChange={setSelectedKeys}
       />
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
+      {/* ── 페이지네이션 + 요약 + 페이지당 표시 수 ── */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs text-slate-500">
+          총 <span className="font-medium text-slate-700">{total}</span>건 · {clampedPage} / {totalPages} 페이지 · 페이지당 {pageSize}개
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-slate-500">페이지당
+            <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} className="ml-1 px-2 py-1 rounded border border-slate-200 text-xs" aria-label="페이지당 표시 수">
+              {PAGE_SIZES.map((n) => <option key={n} value={n}>{n}개</option>)}
+            </select>
+          </label>
+          <Pagination page={clampedPage} totalPages={totalPages} onPageChange={setPage} total={total} />
+        </div>
+      </div>
+
+      {/* ── 미리보기 모달(read-only, 태블릿/QR 모바일 전환) ── */}
+      {preview && previewApi && (
+        <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
+          <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-sm font-semibold truncate">{preview.name}</span>
+              <div className="flex gap-1 flex-shrink-0">
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블릿 화면</button>
+                <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일 화면</button>
+              </div>
+            </div>
+            <button onClick={() => setPreview(null)} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium whitespace-nowrap">
+              <X className="w-4 h-4" /> 닫기
+            </button>
+          </div>
+          <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto" onClick={(e) => e.stopPropagation()}>
+            <div style={preview.view === 'tablet'
+              ? { position: 'relative', overflow: 'hidden', width: 'min(100%, 1024px)', aspectRatio: '16 / 10', background: '#000', borderRadius: 12 }
+              : { position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24 }}>
+              <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+            </div>
+          </div>
+          <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            저장된 내용을 보여 주는 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+          </div>
+        </div>
+      )}
+
+      {previewBusy && !preview && (
+        <div className="fixed inset-0 z-[100000] bg-slate-900/40 flex items-center justify-center" role="presentation">
+          <div className="bg-white rounded-xl px-4 py-3 text-sm text-slate-600 inline-flex items-center gap-2 shadow-lg">
+            <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
+          </div>
+        </div>
+      )}
     </div>
   );
 }

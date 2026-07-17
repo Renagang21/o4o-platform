@@ -232,18 +232,19 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
 
   // 적용(교체)/적용 해제는 코너별 운영 탭(TabletCornerContentsPanel)이 연결 모델 기준으로 담당한다.
 
+  // WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1: 사용자 문구 '보관' → '리스트에서 제거'(내부는 archived/soft-delete 그대로).
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
-    if (!window.confirm(`"${set.name}" 세트를 보관하시겠습니까? 목록에서 숨겨지며, 적용 중인 세트는 먼저 적용 해제해야 합니다.`)) return;
+    if (!window.confirm(`“${set.name}” 을(를) 리스트에서 제거하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다.`)) return;
     setBusy(true);
     try {
       await archiveScreenSet(set.id);
-      onToast({ type: 'success', message: '세트를 보관했습니다.' });
+      onToast({ type: 'success', message: '리스트에서 제거했습니다.' });
       await reload();
     } catch (e: any) {
-      const msg = e?.code === 'SCREEN_SET_IN_USE'
-        ? '적용 중인 세트는 보관할 수 없습니다. 먼저 적용 해제하세요.'
-        : (e?.message || '보관에 실패했습니다.');
+      const msg = (e?.code === 'SCREEN_SET_IN_USE' || e?.code === 'ARCHIVE_BLOCKED_CONNECTED')
+        ? '이 콘텐츠는 현재 코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제해 주세요.'
+        : (e?.message || '리스트에서 제거하지 못했습니다.');
       onToast({ type: 'error', message: msg });
     } finally { setBusy(false); }
   };
@@ -295,6 +296,8 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onEdit={openEdit}
           onArchive={handleArchive}
           onRefresh={reload}
+          previewApi={previewApi}
+          storeSlug={storeSlug ?? null}
         />
       </div>
     </div>
