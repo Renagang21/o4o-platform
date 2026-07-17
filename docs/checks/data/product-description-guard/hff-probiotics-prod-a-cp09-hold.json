@@ -1,0 +1,12 @@
+[
+  {
+    "candidateId": "f61b5b93-2fb5-4bba-96bb-58f29b1c1252",
+    "productName": "헬코11플러스혼합유산균",
+    "manufacturer": "(주)한국씨엔에스팜",
+    "statementNo": "200400200071001",
+    "holdCode": "HOLD_SOURCE_ABNORMAL",
+    "reason": "표시량 CFU 표기 `2.0 x 100,000,000`(비정형 표기)로 파서 CFU ABNORMAL — 원문 정정 필요, 교차검증 불가",
+    "baseStandard": "성상 : 고유의 향미가 있고 이미·이취가 없는 연노랑색의 분말 프로바이오틱스 수 : 표시량 이상 (표시량 : 2.0 x 100,000,000 CFU / 4 g) 대장균군 : 음성",
+    "intake": "1일 2회, 1회 1포를 그대로 또는 물과 함께 섭취하십시오."
+  }
+]
