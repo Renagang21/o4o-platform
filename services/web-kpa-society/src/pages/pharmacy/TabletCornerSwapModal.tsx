@@ -24,8 +24,8 @@ interface Props {
   tabletId: string;
   cornerName: string;
   onClose: () => void;
-  /** 적용 성공 시 상위 동기화(새 current id + 직전 current id → 토스트 되돌리기). */
-  onApplied: (newId: string, prevId: string | null) => void;
+  /** 적용 성공 시 상위 동기화(새 current id + 직전 current id + 새 화면 이름 → 상위가 되돌리기 토스트 표시). */
+  onApplied: (newId: string, prevId: string | null, newName: string) => void;
   onToast: (t: Toast) => void;
 }
 
@@ -68,8 +68,8 @@ export default function TabletCornerSwapModal({ tabletId, cornerName, onClose, o
     try {
       await applyCurrentScreenSet(tabletId, screenSetId);
       setCurrentId(screenSetId);
-      onApplied(screenSetId, prevId);
-      onToast({ type: 'success', message: `“${cornerName}” 화면을 ‘${name}’로 바꿨어요.` });
+      // 성공 토스트(+되돌리기)는 상위 onApplied 가 표시한다 — 여기서 onToast 를 또 부르면 되돌리기 토스트를 덮어쓴다.
+      onApplied(screenSetId, prevId, name);
       onClose();
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '화면을 바꾸지 못했습니다.' });

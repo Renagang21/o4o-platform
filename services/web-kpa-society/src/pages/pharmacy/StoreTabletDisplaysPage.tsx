@@ -347,11 +347,11 @@ export default function StoreTabletDisplaysPage() {
   }, [selectedTabletId]);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: '화면 바꾸기' 적용 후 상위 동기화 + 되돌리기 토스트.
-  const handleSwapApplied = useCallback((tabletId: string, newId: string, prevId: string | null, cornerName: string) => {
+  const handleSwapApplied = useCallback((tabletId: string, newId: string, prevId: string | null, cornerName: string, newName: string) => {
     setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: newId } : t)));
     setToast({
       type: 'success',
-      message: `“${cornerName}” 화면을 바꿨어요.`,
+      message: `“${cornerName}” 화면을 ‘${newName}’로 바꿨어요.`,
       action: {
         label: '되돌리기',
         onClick: async () => {
@@ -389,10 +389,10 @@ export default function StoreTabletDisplaysPage() {
   // §3: 미리보기 모달 보기 전환(태블릿=넓게 / 휴대전화=390px).
   const [previewView, setPreviewView] = useState<'tablet' | 'mobile'>('tablet');
 
-  // Toast auto-clear
+  // Toast auto-clear — §2: 되돌리기 액션이 있는 토스트는 눌러볼 시간을 위해 더 오래 유지.
   useEffect(() => {
     if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
+      const timer = setTimeout(() => setToast(null), toast.action ? 8000 : 3000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
@@ -1718,7 +1718,7 @@ export default function StoreTabletDisplaysPage() {
           tabletId={swapCorner.tabletId}
           cornerName={swapCorner.name}
           onClose={() => setSwapCorner(null)}
-          onApplied={(newId, prevId) => handleSwapApplied(swapCorner.tabletId, newId, prevId, swapCorner.name)}
+          onApplied={(newId, prevId, newName) => handleSwapApplied(swapCorner.tabletId, newId, prevId, swapCorner.name, newName)}
           onToast={setToast}
         />
       )}
