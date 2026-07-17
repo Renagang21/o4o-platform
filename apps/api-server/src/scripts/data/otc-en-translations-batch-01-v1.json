@@ -1,0 +1,144 @@
+{
+  "wo": "WO-O4O-OTC-BULK-BATCH-01-EN-TRANSLATION-PERSIST-162-V1",
+  "batch": "batch-01",
+  "guideVersion": "OTC-EN-TRANSLATION-GUIDE V0.5",
+  "glossaryVersion": "OTC-KO-EN-GLOSSARY V0.2",
+  "translations": [
+    {
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "title": "Naproxen Sodium 275 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for osteoarthritis, rheumatoid arthritis and ankylosing spondylitis, tendinitis and bursitis, acute gout, period pain, musculoskeletal disorders (sprains, bruises, back pain), pain after surgery or tooth extraction, and migraine.",
+      "usage": "For pain, take two tablets (550 mg) first, then one tablet (275 mg) every 6–8 hours, not exceeding 1,350 mg a day. It may cause stomach discomfort, so take it after food if your stomach is sensitive, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a peptic ulcer, severe liver or kidney disease, or heart failure; for pain around coronary artery bypass graft (CABG) surgery; if you are pregnant or breastfeeding; or for a child under 2. Because of the risk of cardiovascular clots (heart attack, stroke) and gastrointestinal bleeding, ulcers or perforation, stop taking it and seek advice if you have stomach pain, black stools, a rash or difficulty breathing. If you regularly drink alcohol, there is a risk of stomach bleeding, so check with a pharmacist before taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Naproxen sodium 275 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Period pain, headache, toothache, muscle pain, joint pain, back pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "A long-acting anti-inflammatory painkiller"
+      },
+      "checkNote": "수치 275mg/550mg(2정)/275mg(1정)/6–8h/1,350mg·연령 under 2·금기 CABG·임부수유부·NSAID 심혈관/위장 경고·음주 상담 전건 유지"
+    },
+    {
+      "groupKey": "클로닉신리시네이트|125밀리그램|정",
+      "title": "Clonixin Lysinate 125 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve mild to moderate pain such as muscle pain, nerve pain, pain after injury or surgery, headache, toothache and earache.",
+      "usage": "Adults take one to two tablets (125–250 mg) three times a day. Do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have a peptic ulcer; if you have ever had asthma, hives or an allergy to this medicine, to aspirin or to other anti-inflammatory painkillers; for pain around coronary artery bypass graft (CABG) surgery; if you have severe liver or kidney disease, severe heart failure or inflammatory bowel disease; or if you are pregnant. Talk to a pharmacist before taking it if you have ever had high blood pressure, heart failure, bronchial asthma, or liver or kidney disease.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Clonixin lysinate 125 mg",
+        "How it works": "Relieves pain and inflammation",
+        "Main symptoms": "Muscle and nerve pain, headache, toothache, earache, pain after injury or surgery",
+        "Who should be careful": "Peptic ulcer, severe liver or kidney disease, pregnancy",
+        "Why this one": "An anti-inflammatory painkiller for mild to moderate pain"
+      },
+      "checkNote": "수치 125mg/1~2정(125–250mg)/1일 3회·금기 CABG·임부·NSAID류 과민·상담 조건 유지"
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|정",
+      "title": "Ibuprofen 200 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, back pain, period pain, arthritis, pain after surgery, headache, toothache, muscle pain, nerve pain and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take one to two tablets (200–400 mg) three to four times a day. Take it after food if your stomach is sensitive, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney disease, heart failure or bronchial asthma; for pain around CABG surgery; or in the last 3 months of pregnancy. Because of the risk of cardiovascular clots and gastrointestinal bleeding, stop taking it and seek advice if you have stomach pain, black stools or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 200 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Fever, headache, toothache, period pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A common anti-inflammatory painkiller tablet"
+      },
+      "checkNote": "수치 200mg/1~2정(200–400mg)/1일 3~4회·연령 last 3 months of pregnancy·금기 CABG·NSAID 심혈관/위장 경고 유지"
+    },
+    {
+      "groupKey": "아스피린|100밀리그램|정",
+      "title": "Aspirin 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to prevent clot formation in heart attack, ischemic stroke and unstable angina, to prevent clots after coronary artery bypass or angioplasty, and to reduce risk in people at high cardiovascular risk.",
+      "usage": "Adults take one tablet once a day. As it is an enteric-coated tablet, swallow it whole with plenty of water without crushing or chewing. If you regularly drink three or more drinks, there is a risk of stomach bleeding, so check with a pharmacist before taking it.",
+      "caution": "Do not take this if you have ever reacted to this medicine or to other salicylates; if you have a peptic ulcer, aspirin-induced asthma, hemophilia, severe liver or kidney disease, or a tendency to bleed; or in the third trimester of pregnancy. Because of the bleeding risk, tell your medical team that you take this medicine before any surgery (including dental), and check with a pharmacist about taking it together with anticoagulants or other anti-inflammatory painkillers.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Aspirin 100 mg (enteric-coated)",
+        "How it works": "Inhibits platelet aggregation (prevents clot formation)",
+        "Main symptoms": "Clot prevention in people at cardiovascular risk (heart attack, stroke, angina)",
+        "Who should be careful": "Peptic ulcer, bleeding tendency, aspirin-induced asthma, before surgery",
+        "Why this one": "Low-dose aspirin, enteric-coated"
+      },
+      "checkNote": "수치 100mg/1정 1일 1회·세 잔 이상=three or more drinks·금기 살리실산 과민·아스피린천식·혈우병·임신 3기=third trimester·장용정 부수지말고·수술 전 고지 유지"
+    },
+    {
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "title": "Diphenhydramine Hydrochloride 50 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve occasional sleeplessness.",
+      "usage": "Adults take one capsule once a day before bed. If it makes you too drowsy, you can reduce it to 25 mg. Do not take it continuously or long-term, and do not drink alcohol while taking it.",
+      "caution": "Do not take this if you have breathing difficulty from an asthma attack, emphysema or chronic bronchitis; glaucoma; urination problems such as an enlarged prostate; a seizure disorder; if you are breastfeeding; if you are under 15; or if you have ongoing sleeplessness or have been diagnosed with insomnia. If you feel drowsy or sluggish the next day, do not drive or operate machinery. If it does not help after 2–3 doses, stop taking it and seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diphenhydramine hydrochloride 50 mg",
+        "How it works": "Sedative, helps sleep",
+        "Main symptoms": "Occasional sleeplessness",
+        "Who should be careful": "Glaucoma, enlarged prostate, breathing difficulty; driving or operating machinery",
+        "Why this one": "A sleep aid for short-term use in occasional sleeplessness"
+      },
+      "checkNote": "수치 50mg→25mg·연령 under 15·기간 2–3 doses·금기 녹내장·전립선비대·호흡곤란·수유부·운전 경고 유지"
+    },
+    {
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "title": "Doxylamine Succinate 25 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as an aid for insomnia and for sedation.",
+      "usage": "Adults take one tablet (25 mg) once a day, always 30 minutes before sleep. Do not drink alcohol while taking it, and do not take it for more than 2 weeks without a pharmacist's advice.",
+      "caution": "Do not take this if you have a breathing disorder such as emphysema, chronic bronchitis or asthma; glaucoma; an enlarged prostate; if you are breastfeeding; or for a child aged 15 or under. Talk to a pharmacist before taking it if you are pregnant or may be pregnant. It may cause excessive drowsiness, so take care when driving or operating machinery.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Doxylamine succinate 25 mg",
+        "How it works": "Sedative, helps sleep",
+        "Main symptoms": "Insomnia (aid), sedation",
+        "Who should be careful": "Glaucoma, enlarged prostate, breathing disorder; driving or operating machinery",
+        "Why this one": "A sleep aid for short-term use in occasional sleeplessness"
+      },
+      "checkNote": "수치 25mg/1정 1일 1회/30분 전·기간 2 weeks·연령 aged 15 or under·금기 녹내장·전립선비대·호흡장애·수유부·임부 상담·운전 경고 유지"
+    },
+    {
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "title": "Mecobalamin 500 ㎍ Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for peripheral neuropathy.",
+      "usage": "Adults take three capsules (1,500 ㎍) a day, divided into three doses.",
+      "caution": "Do not take this if you have ever reacted to this medicine or if you have an inherited problem with lactose metabolism. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, and seek advice if there is no improvement or it gets worse after about one month.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Mecobalamin 500 ㎍",
+        "How it works": "Supplies vitamin B12 (for nerves)",
+        "Main symptoms": "Peripheral neuropathy such as tingling in the hands and feet",
+        "Who should be careful": "Seek advice if there is no improvement after one month",
+        "Why this one": "A vitamin B12 preparation that acts on peripheral nerves"
+      },
+      "checkNote": "수치 500㎍/3캡슐(1,500㎍) 3분할·기간 one month·금기 과민·유당 대사 유전질환(원문 수준 유지, 갈락토오스 미추가)·임부수유부 상담 유지"
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "title": "Ibuprofen 200 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, back pain, period pain, arthritis, headache, migraine, toothache, muscle pain, nerve pain and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take one to two capsules (200–400 mg) three to four times a day. For migraine, take one to two capsules but no more than two capsules in 24 hours. Take it after food if your stomach is sensitive.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney disease, heart failure or bronchial asthma; for pain around CABG surgery; or in the last 3 months of pregnancy. Because of the risk of cardiovascular clots and gastrointestinal bleeding, if you have uncontrolled high blood pressure or ischemic heart disease, avoid high doses (2,400 mg a day) and check with a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 200 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Fever, headache, migraine, toothache, period pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A soft-capsule anti-inflammatory painkiller for faster dissolution"
+      },
+      "checkNote": "수치 200mg/1~2캡슐(200–400mg)/1일 3~4회·편두통 2 capsules/24h·고용량 2,400mg 회피·연령 last 3 months of pregnancy·금기 CABG·NSAID 경고 유지"
+    }
+  ]
+}
