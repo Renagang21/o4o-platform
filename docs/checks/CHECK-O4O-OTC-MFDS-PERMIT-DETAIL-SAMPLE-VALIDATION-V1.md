@@ -1,26 +1,48 @@
 # CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1 — 제품허가정보 표본 검증
 
-WO: `WO-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1` · 일자: 2026-07-16 · 상태: **차단 (endpoint 확정 · 키 유효 · 데이터셋 미승인 403)**
+WO: `WO-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1` · 일자: 2026-07-17 · 상태: **완료 (검증 통과 — 전체 재수집 가능)**
 근거: [SOURCE-RECOVERY-AUDIT](../investigations/IR-O4O-OTC-OFFICIAL-SOURCE-RECOVERY-AUDIT-V1.md)
 
-> **read-only.** DB write **0** · 콘텐츠 변경 **0** · 코드 변경 **0** · 유효 응답 저장 **0**(403이라 표본 미확보).
+> **read-only.** DB write **0** · 콘텐츠 변경 **0** · 코드 변경 **0**. 표본 응답 JSON 저장(키·URL 배제 — 유출 0 전수 확인).
 
 ---
 
-## 0. 갱신 결론 (키 주입 후 실측 — 2026-07-16)
+## 0. 결론 (표본 6건 실호출 검증 — 통과)
 
-> **endpoint 확정 · 키 유효 확인. 남은 차단 하나: 「의약품 제품 허가정보」데이터셋이 이 키에 활용신청 미승인(403).**
+> **NB_DOC_DATA(사용상주의사항 원문)가 두 목적을 모두 해결한다 — e약은요 유실 복구 + 첨가제 식별. 전체 재수집 가능.**
+> **핵심 정정: 첨가제 원천은 `MATERIAL_NAME` 이 아니라 `NB_DOC_DATA` 다**(IR §3 정정 — MATERIAL_NAME 은 유효성분만 담음).
 >
-> | 확인 | 결과 |
+> | 검증 | 결과 |
 > |---|---|
-> | **올바른 endpoint** | `apis.data.go.kr/1471000/**DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07**` (v3~6 은 폐기/부재) |
-> | 키 유효성 | ✅ e약은요·의약외품 **HTTP 200 NORMAL SERVICE** (키 정상) |
-> | 제품허가정보 접근 | ❌ **HTTP 403 Forbidden**(진짜 키) · 401(키 없음) · 200(의약외품) → **키는 인식되나 이 데이터셋 금지** |
-> | 원인 | 원 seed 는 e약은요·의료기기·의약외품만 활용신청. **완제 제품허가정보(dataset 15095677) 미신청** |
+> | **endpoint** | ✅ `apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/`**`getDrugPrdtPrmsnDtlInq06`** (서비스 07 / 상세 op 는 06 — 버전 불일치. 목록 Inq07 은 문서필드 없음) |
+> | 필터 | `item_seq`(품목기준코드) 정확 동작 · `type=json` · **User-Agent 필수** |
+> | 접근 | ✅ 활용신청 승인 후 **HTTP 200 NORMAL SERVICE** (dataset 15095677, totalCount 43,030) |
+> | **① NB_DOC 유실 복구** | ✅ 쎄로테정·알드라민정 NB_DOC 에 **`크레아티닌 청소율 &lt; 10mL/min` 온전** (e약은요 유실분이 여기 살아있음) |
+> | **② 첨가제 식별** | ✅ 인테스캡슐200mg(감사=아스파탐) NB_DOC 에 **"아스파탐 … 페닐케톤뇨증 환자에는 투여하지 말 것"** 명시. 비함유 제품 NB_DOC 엔 없음 |
+> | MATERIAL_NAME | ⚠️ **유효성분만**(예: "성분명: 아세틸시스테인, 분량: 200") — **첨가제 미포함 → 첨가제 원천 아님** |
 >
-> **필요 조치(사용자)**: 이 키를 소유한 data.go.kr 계정에서 **dataset 15095677「식품의약품안전처_의약품 제품 허가정보」활용신청**. 식약처 API 는 대개 자동승인 → 승인 후 **같은 키로 재호출**(집 PC 에서 바로).
->
-> 401(키 없음) vs 403(진짜 키) vs 200(의약외품) 3자 비교로 **"endpoint·키 문제 아님, 데이터셋 승인만 남음"** 을 확정.
+> **함의**: 재수집은 **NB_DOC_DATA 하나**를 기준으로 한다. e약은요를 대체/보강하고, 그 안의 첨가제 경고(아스파탐/대두유/색소)로 서브그룹을 식별한다.
+
+### 0-1. 표본 6건 결과
+
+| 품목기준코드 | 제품 | 검증 | 결과 |
+|---|---|---|:---:|
+| 199802620 | 쎄로테정 | NB_DOC 크레아티닌 | ✅ `&lt; 10mL/min` 온전 |
+| 200905228 | 알드라민정 | NB_DOC 크레아티닌 | ✅ `&lt; 10mL/min` 온전 |
+| 199401186 | 무테린캡슐200 | MATERIAL 아스파탐 | 첨가제 미기재(유효성분만) — NB_DOC 로 판정 대상 |
+| 199301063 | 라페론정160 | MATERIAL 아스파탐 | 동 |
+| 199600422 | 뮤세틸캡슐200 | — | ⚠️ **미조회**(item_seq·item_name 모두 total=0 — 취소/변경 품목 추정) |
+| 199300215 | 아이잘정160 | — | ⚠️ **미조회**(동) |
+| (참조)199602408 | 인테스캡슐200mg | NB_DOC 아스파탐 | ✅ **아스파탐/페닐케톤뇨 명시**(첨가제 원천 확정 증거) |
+
+> **미조회 2건**: 해당 품목기준코드가 제품허가정보에 없음(취소/재허가로 seq 변경 추정). 재수집 시 **원문 없는 master 는 어느 그룹에도 배정하지 않음**(임의 분류 금지 원칙 — GROUP-SPLIT §5).
+> **표본 응답 JSON**: `docs/investigations/samples/mfds-permit-detail-v1/<item_seq>.json` (키·URL 배제, 재검증용 보존).
+
+### 0-2. NB_DOC 형식 (재수집 파서 설계)
+
+- XML/HTML 문서: `<DOC>…<SECTION>…<ARTICLE>…<PARAGRAPH><![CDATA[텍스트]]></PARAGRAPH>` 구조.
+- 부등호는 **`&lt;` 엔티티**로 보존(`크레아티닌 청소율 &lt; 10mL/min`) → e약은요 의 bare-`<` 유실과 대조.
+- 파서: PARAGRAPH CDATA 텍스트 추출 + 엔티티 디코드. **composer escape 보강(§6) 은 여전히 필요** — 디코드된 `<` 를 재-compose 시 sanitize 가 삼키지 않도록.
 
 ---
 

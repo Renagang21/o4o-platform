@@ -27,12 +27,14 @@
 
 > 저장 대상은 **응답 body(공개 품목허가 데이터)** 뿐. 응답 body 자체는 공개 데이터라 commit 가능하나, **요청 메타(URL·헤더·키)는 절대 포함하지 않는다.**
 
-## 집 PC 후속 (표본 도착 후, 키 불필요)
+## 검증 결과 (2026-07-17 — 통과)
 
-1. **응답 스키마 확인** → NB_DOC / MATERIAL_NAME 필드 경로 파악.
-2. **NB_DOC 온전성 검증**: 세티리진 2건에 "크레아티닌 청소율 … 10 mL/min 미만"(또는 `< 10`) + 괄호·문장 경계 보존 여부.
-3. **MATERIAL_NAME 첨가제 식별**: 아세틸시스테인·아세트아미노펜 4건에서 아스파탐 성분명 식별 가능 여부.
-4. 결과 → `CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1` **본검증 갱신**(현재 "호출 중단" 상태 → 실측 판정).
-5. 통과 시: **composer escape-before-sanitize 보강**(`easy-drug-shared-description-derive.service.ts:60`) → 유실 복구 → 첨가제 분류.
+> endpoint = `DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06`, 필터 `item_seq`. 상세는 [SAMPLE-VALIDATION CHECK §0](../../../checks/CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1.md).
+
+1. ✅ **NB_DOC 온전**: 쎄로테정·알드라민정 `크레아티닌 청소율 &lt; 10mL/min` 온전(e약은요 유실분 살아있음).
+2. ✅ **첨가제 원천 = NB_DOC_DATA**(정정): 인테스캡슐200mg NB_DOC 에 "아스파탐 … 페닐케톤뇨증 환자에는 투여하지 말 것" 명시.
+   - ⚠️ **MATERIAL_NAME 은 유효성분만** 담음(첨가제 미포함) → 첨가제 원천 아님. (`199602408_aspartame-positive.json` 이 결정 증거)
+3. ⚠️ **미조회 2건**: 뮤세틸캡슐(199600422)·아이잘정(199300215) — item_seq·item_name 모두 total=0(취소/변경 품목 추정). `.byname.json` 은 그 결과 보존.
+4. 다음(대량 준비 완료 후): **composer escape-before-sanitize 보강**(`easy-drug-shared-description-derive.service.ts:60`) → NB_DOC 기준 재수집 → 유실 복구 + 첨가제 분류.
 
 > 근거: [SAMPLE-VALIDATION CHECK](../../../checks/CHECK-O4O-OTC-MFDS-PERMIT-DETAIL-SAMPLE-VALIDATION-V1.md) · [SOURCE-RECOVERY IR](../../IR-O4O-OTC-OFFICIAL-SOURCE-RECOVERY-AUDIT-V1.md)
