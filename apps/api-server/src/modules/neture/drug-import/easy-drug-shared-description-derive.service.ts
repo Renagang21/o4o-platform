@@ -41,8 +41,35 @@ export interface OfficialConsumerText {
 }
 
 /**
+ * 원문 텍스트를 HTML 에 넣기 전 escape (기존 유효 엔티티는 보존).
+ *
+ * WO-O4O-OTC-COMPOSER-ESCAPE-BEFORE-SANITIZE-V1.
+ *
+ * 허가 원문(사용상주의사항 등)은 **plain text** 이지만 `AST<3배`, `혈소판<10만` 처럼
+ * `<` 가 문자·숫자에 바로 붙는 표기를 포함한다. escape 없이 `<p>` 에 넣으면
+ * 뒤이은 sanitize(DOMPurify)가 `<B 이고 C>` 를 `<b>` 태그로 파싱해 **문장을 삼킨다**
+ * (실증: `A<B 이고 C>D` → `A<b>D</b>` 로 "B 이고 C" 유실). 그래서 write-path 진입 전에
+ * bare `< > &` 를 엔티티로 치환한다.
+ *
+ * 단 재수집 원문은 `크레아티닌 청소율 &lt; 10mL/min` 처럼 이미 엔티티로 인코딩된
+ * 구간을 담을 수 있다. `&` 를 무조건 escape 하면 `&lt;` → `&amp;lt;` 이중 escape 가 되어
+ * 화면에 `&lt;` 가 그대로 보인다. 따라서 `&` 는 **유효 엔티티의 시작이 아닐 때만** escape 한다.
+ * 결과적으로 bare `< 10mL/min` 과 `&lt; 10mL/min` 모두 화면에 `< 10mL/min` 로 표시된다.
+ */
+export function escapeHtmlPreservingEntities(text: string): string {
+  return String(text)
+    // 유효 엔티티(`&name;` · `&#123;` · `&#x1F;`)의 시작이 아닌 `&` 만 escape → 이중 escape 방지
+    .replace(/&(?!(?:[a-zA-Z][a-zA-Z0-9]{0,31}|#\d{1,7}|#x[0-9a-fA-F]{1,6});)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/**
  * officialConsumerText → HTML 조합 (PURE). seedFromDrugExtension 과 동일한 섹션 스타일.
  * 값 없는 섹션은 제외. 전 섹션 결측이면 빈 문자열(→ 후보 미생성).
+ *
+ * 원문 값은 plain text 이므로 삽입 전 escape-before-sanitize 로 특수문자 유실을 막는다
+ * (label 은 이 파일의 고정 상수라 escape 대상 아님).
  */
 export function composeEasyDrugContent(oct: OfficialConsumerText | null | undefined): string {
   if (!oct) return '';
@@ -57,7 +84,10 @@ export function composeEasyDrugContent(oct: OfficialConsumerText | null | undefi
   ];
   return sections
     .filter(([, v]) => v != null && String(v).trim().length > 0)
-    .map(([label, v]) => `<p><strong>${label}</strong><br/>${String(v).trim()}</p>`)
+    .map(
+      ([label, v]) =>
+        `<p><strong>${label}</strong><br/>${escapeHtmlPreservingEntities(String(v).trim())}</p>`,
+    )
     .join('\n');
 }
 
