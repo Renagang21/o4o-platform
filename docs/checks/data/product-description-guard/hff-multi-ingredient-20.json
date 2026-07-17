@@ -1,0 +1,803 @@
+[
+  {
+    "candidateId": "93a662af-b9c7-4757-97da-ab0e7b89860a",
+    "productName": "칼맥",
+    "productNameEn": "Calmac",
+    "manufacturer": "한국바이오팜(주)에이치피",
+    "manufacturerEn": "Korea Biopharm HP",
+    "statementNo": "20040020046368",
+    "category": "hff",
+    "combo": "칼슘 + 마그네슘",
+    "source": {
+      "mainFunction": "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④청년기 이전에 적절한 운동과 건강한 식습관을 유지하면서 충분한 칼슘을 섭취하면 향후 골다공증발생의 위험을 감소시킬 수 있음\r\n[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+      "baseStandard": "1. 성상 : 미황색의 장방형 정제\r\n2. 칼슘 : 1일 2회, 1회 1정 섭취 시 표시량(500mg/2,000mg)의 80~150% 이어야 한다.\r\n3. 마그네슘 : 1일 2회, 1회 1정 섭취 시 표시량(249mg/2,000mg)의 80~150% 이어야 한다.\r\n4. 붕해시험 : 30분 이내\r\n5. 대장균군 : 음성 ",
+      "intake": "1일 2회, 1회 1정을 물과 함께 섭취 한다.",
+      "caution": "① 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.\r\n② 어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 아래 섭취하여 주시기 바랍니다.\r\n③ 실리카겔은 제습제로서 섭취를 삼가 합니다.\r\n④ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.",
+      "dosageForm": "미황색의 정제",
+      "storage": "직사광선을 받지 않는 실온에 보관합니다. ",
+      "shelfLife": "24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 500,
+        "unit": "mg",
+        "basisAmount": 2000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 2,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "마그네슘",
+        "declaredLabelAmount": "249mg",
+        "basis": "2,000mg",
+        "recognizedFunction": "에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">칼슘 500mg</span><span class=\"sd-badge\">마그네슘 249mg</span></div>\n  <h1>칼맥<small>칼슘 + 마그네슘 · 뼈 건강</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 2회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 칼슘, 마그네슘을 함께 담은 건강기능식품입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>칼슘 500mg + 마그네슘 249mg — 표시 기준 2,000mg</li><li>칼슘, 마그네슘이 모두 식약처 인정 기능성 원료</li><li>1일 2회 · 1회 1정 · 물과 함께</li><li>한국바이오팜(주)에이치피 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>칼슘 500mg</h3><p>표시 기준 2,000mg당 칼슘 500mg입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">에너지·근육 기능성</span><h3>마그네슘 249mg</h3><p>표시 기준 2,000mg당 마그네슘 249mg입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>칼슘</b> 2,000mg당 500mg</div><div class=\"sd-item\"><b>마그네슘</b> 2,000mg당 249mg</div><div class=\"sd-item\"><b>성상</b> 미황색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>뼈·치아 건강을 챙기고 싶은 분</li><li>칼슘과 마그네슘을 한 정에 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기·특이체질이신 경우 성분을 확인한 후 섭취 · 어린이는 목에 걸릴 우려가 있으니 보호자 관리 아래 섭취 · 동봉된 제습제(실리카겔)는 섭취하지 말 것 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Calcium 500 mg</span><span class=\"sd-badge\">Magnesium 249 mg</span></div>\n  <h1>Calmac<small>Calcium + Magnesium · Bone health</small></h1><p class=\"sd-meta\">Made by Korea Biopharm HP · 2 times a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Calcium, Magnesium. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Calcium 500 mg + Magnesium 249 mg — per the labelled 2,000 mg basis</li><li>Calcium, Magnesium are all MFDS-recognized functional ingredients</li><li>2 times a day · 1 tablet per serving · With water</li><li>Made by Korea Biopharm HP · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Calcium 500 mg</h3><p>The labelled amount is 500 mg of Calcium per 2,000 mg. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Energy & muscle function</span><h3>Magnesium 249 mg</h3><p>The labelled amount is 249 mg of Magnesium per 2,000 mg. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Calcium</b> 500 mg per 2,000 mg</div><div class=\"sd-item\"><b>Magnesium</b> 249 mg per 2,000 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after bone and teeth health</li><li>Those who want calcium and magnesium in one tablet</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · If you have allergies or a sensitive constitution, check the ingredients before use · Children should take it under guardian supervision to avoid choking · Do not swallow the enclosed desiccant (silica gel) · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "d4e54c26-173e-44b2-a2aa-51777b0c9e50",
+    "productName": "칼큐민",
+    "productNameEn": "Calqmin",
+    "manufacturer": "주식회사한미양행",
+    "manufacturerEn": "Hanmi Fine Chemical",
+    "statementNo": "200400150832199",
+    "category": "hff",
+    "combo": "칼슘 + 비타민D",
+    "source": {
+      "mainFunction": "[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌\n[칼슘]\n(가) 뼈와 치아 형성에 필요\n(나) 신경과 근육 기능 유지에 필요\n(다) 정상적인 혈액응고에 필요\n(라) 골다공증 발생 위험 감소에 도움을 줌",
+      "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 진한 자주색과 탁한 자줏빛 분홍색의 점박이가 있는 밝은 회분홍색 또는 회분홍색의 장방형 제피정제\n(2) 칼슘 : 표시량(420 mg/2,800 mg)의 80% 이상 150% 이하 \n(3) 비타민D : 표시량(10 μg/2,800 mg)의 80% 이상 180% 이하 \n(4) 납(mg/kg) : 3.0 이하\n(5) 대장균군 : 음성\n(6) 붕해시험 : 60분 이내",
+      "intake": "1일 2회, 1회 2정씩 씹어서 드시거나 물과 함께 섭취.",
+      "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민D]\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 진한 자주색과 탁한 자줏빛 분홍색의 점박이가 있는 밝은 회분홍색 또는 회분홍색의 장방형 제피정제",
+      "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+      "shelfLife": "제조일로부터 24개월까지"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 420,
+        "unit": "mg",
+        "basisAmount": 2800,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 2,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민D",
+        "declaredLabelAmount": "10μg",
+        "basis": "2,800mg",
+        "recognizedFunction": "칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">칼슘 420mg</span><span class=\"sd-badge\">비타민D 10μg</span></div>\n  <h1>칼큐민<small>칼슘 + 비타민D · 뼈 건강</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회, 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 칼슘, 비타민D를 함께 담은 건강기능식품입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>칼슘 420mg + 비타민D 10μg — 표시 기준 2,800mg</li><li>칼슘, 비타민D가 모두 식약처 인정 기능성 원료</li><li>1일 2회 · 1회 2정 · 씹거나 물과 함께</li><li>주식회사한미양행 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>칼슘 420mg</h3><p>표시 기준 2,800mg당 칼슘 420mg입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">칼슘 흡수 기능성</span><h3>비타민D 10μg</h3><p>표시 기준 2,800mg당 비타민D 10μg입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹거나 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>칼슘</b> 2,800mg당 420mg</div><div class=\"sd-item\"><b>비타민D</b> 2,800mg당 10μg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 밝은 회분홍색 또는 회분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>뼈 건강과 칼슘 흡수를 함께 챙기고 싶은 분</li><li>칼슘과 비타민D를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질이신 경우 성분을 확인한 후 섭취 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Calcium 420 mg</span><span class=\"sd-badge\">Vitamin D 10 μg</span></div>\n  <h1>Calqmin<small>Calcium + Vitamin D · Bone health</small></h1><p class=\"sd-meta\">Made by Hanmi Fine Chemical · 2 times a day, 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Calcium, Vitamin D. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Calcium 420 mg + Vitamin D 10 μg — per the labelled 2,800 mg basis</li><li>Calcium, Vitamin D are all MFDS-recognized functional ingredients</li><li>2 times a day · 2 tablets per serving · Chew or with water</li><li>Made by Hanmi Fine Chemical · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Calcium 420 mg</h3><p>The labelled amount is 420 mg of Calcium per 2,800 mg. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Calcium absorption function</span><h3>Vitamin D 10 μg</h3><p>The labelled amount is 10 μg of Vitamin D per 2,800 mg. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Calcium</b> 420 mg per 2,800 mg</div><div class=\"sd-item\"><b>Vitamin D</b> 10 μg per 2,800 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after bone health and calcium absorption together</li><li>Those who want calcium with vitamin D</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · If you have an allergic constitution, check the ingredients before use · Consult a professional if you have hypercalcemia or take medication · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "282c833a-226c-450d-ae8c-9283625965be",
+    "productName": "칼마디",
+    "productNameEn": "Calmadi",
+    "manufacturer": "이앤에스(주)",
+    "manufacturerEn": "E&S",
+    "statementNo": "2022002000230",
+    "category": "hff",
+    "combo": "칼슘 + 마그네슘 + 비타민D",
+    "source": {
+      "mainFunction": "[칼슘]       뼈와 치아 형성에 필요\n\t\t신경과 근육 기능 유지에 필요\n\t\t정상적인 혈액응고에 필요\n\t\t골다공증발생 위험 감소에 도움을 줌\n[마그네슘]\t에너지 이용에 필요\n\t\t신경과 근육 기능 유지에 필요\n[비타민D]\t칼슘과 인이 흡수되고 이용되는데 필요\n\t\t뼈의 형성과 유지에 필요\n\t\t골다공증발생 위험 감소에 도움을 줌",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없으며, 흰색, 회색의 점박이가 있는 연한 회색의 장방형 제피 정제\n2) 칼슘 : 표시량(300 ㎎/1.8 g)의 80 ~150%\n3) 마그네슘 : 표시량(150 ㎎/1.8 g)의 80 ~150%\n4) 비타민 D : 표시량(10 ㎍/1.8 g)의 80 ~180%\n5) 대장균군 : 음성\n6) 붕해 : 60분 이내",
+      "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+      "caution": "1) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하시기 바랍니다.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n3) 소비기한을 확인하시기 바라며, 권장섭취량 및 섭취방법을 준수하시기 바랍니다.\n4) 특정질환, 특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n5) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 위험이 있으니 주의하시기 바랍니다.\n6) 영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없으며, 흰색, 회색의 점박이가 있는 연한 회색의 장방형 제피 정제",
+      "storage": "직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월 까지"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 300,
+        "unit": "mg",
+        "basisAmount": 1.8,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "마그네슘",
+        "declaredLabelAmount": "150mg",
+        "basis": "1.8g",
+        "recognizedFunction": "에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다."
+      },
+      "_thirdFunctional": {
+        "ingredient": "비타민D",
+        "declaredLabelAmount": "10μg",
+        "basis": "1.8g",
+        "recognizedFunction": "칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">칼슘 300mg</span><span class=\"sd-badge\">마그네슘 150mg</span><span class=\"sd-badge\">비타민D 10μg</span></div>\n  <h1>칼마디<small>칼슘 + 마그네슘 + 비타민D · 뼈 건강</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회, 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 칼슘, 마그네슘, 비타민D를 함께 담은 건강기능식품입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>칼슘 300mg + 마그네슘 150mg + 비타민D 10μg — 표시 기준 1.8g</li><li>칼슘, 마그네슘, 비타민D가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 2정 · 물과 함께</li><li>이앤에스(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>칼슘 300mg</h3><p>표시 기준 1.8g당 칼슘 300mg입니다. 칼슘은 뼈와 치아 형성에 필요하고 신경과 근육 기능 유지·정상적인 혈액응고에 필요하며, 충분히 섭취하면 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">에너지·근육 기능성</span><h3>마그네슘 150mg</h3><p>표시 기준 1.8g당 마그네슘 150mg입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">칼슘 흡수 기능성</span><h3>비타민D 10μg</h3><p>표시 기준 1.8g당 비타민D 10μg입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>칼슘</b> 1.8g당 300mg</div><div class=\"sd-item\"><b>마그네슘</b> 1.8g당 150mg</div><div class=\"sd-item\"><b>비타민D</b> 1.8g당 10μg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며, 흰색, 회색의 점박이가 있는 연한 회색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>뼈 건강을 위해 칼슘·마그네슘·비타민D를 한 번에 챙기고 싶은 분</li><li>정제 한 번으로 세 원료를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 특이체질·알레르기 체질인 경우 원료를 확인 후 섭취 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Calcium 300 mg</span><span class=\"sd-badge\">Magnesium 150 mg</span><span class=\"sd-badge\">Vitamin D 10 μg</span></div>\n  <h1>Calmadi<small>Calcium + Magnesium + Vitamin D · Bone health</small></h1><p class=\"sd-meta\">Made by E&amp;S · Once a day, 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Calcium, Magnesium, Vitamin D. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Calcium 300 mg + Magnesium 150 mg + Vitamin D 10 μg — per the labelled 1.8 g basis</li><li>Calcium, Magnesium, Vitamin D are all MFDS-recognized functional ingredients</li><li>Once a day · 2 tablets per serving · With water</li><li>Made by E&S · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Calcium 300 mg</h3><p>The labelled amount is 300 mg of Calcium per 1.8 g. Calcium is an MFDS-recognized ingredient needed for the formation of bones and teeth, for maintaining nerve and muscle function and normal blood clotting, and adequate intake may help reduce the risk of osteoporosis.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Energy & muscle function</span><h3>Magnesium 150 mg</h3><p>The labelled amount is 150 mg of Magnesium per 1.8 g. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Calcium absorption function</span><h3>Vitamin D 10 μg</h3><p>The labelled amount is 10 μg of Vitamin D per 1.8 g. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Calcium</b> 300 mg per 1.8 g</div><div class=\"sd-item\"><b>Magnesium</b> 150 mg per 1.8 g</div><div class=\"sd-item\"><b>Vitamin D</b> 10 μg per 1.8 g</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want calcium, magnesium and vitamin D together for bone health</li><li>Those who prefer all three ingredients in one tablet</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcemia or take medication · Check the ingredients before use if you have a sensitive or allergic constitution · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "c058fdd1-14cc-4048-8d14-b1e44f112e5d",
+    "productName": "유스비타",
+    "productNameEn": "Usvita",
+    "manufacturer": "(주)비오팜",
+    "manufacturerEn": "Biofarm",
+    "statementNo": "200400170211951",
+    "category": "hff",
+    "combo": "비타민D + 아연",
+    "source": {
+      "mainFunction": "[비타민D] (1) 칼슘과 인이 흡수되고 이용되는데 필요, (2) 뼈의 형성과 유지에 필요, (3) 골다공증발생 위험 감소에 도움을 줌\n[아연] (1) 정상적인 면역기능에 필요, (2) 정상적인 세포분열에 필요",
+      "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 원형 제피정제\n(2)비타민D : 표시량(50 ㎍/250 mg)의 80~180%\n(3)아연 : 표시량(8.5 mg/250 mg)의 80~150%\n(4)대장균군 : 음성\n(5)붕해시험 : 적합(물 60분 이내)",
+      "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+      "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 원형 제피정제",
+      "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월 "
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 50,
+        "unit": "μg",
+        "basisAmount": 250,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "아연",
+        "declaredLabelAmount": "8.5mg",
+        "basis": "250mg",
+        "recognizedFunction": "정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민D 50μg</span><span class=\"sd-badge\">아연 8.5mg</span></div>\n  <h1>유스비타<small>비타민D + 아연 · 뼈·면역</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민D, 아연을 함께 담은 건강기능식품입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>비타민D 50μg + 아연 8.5mg — 표시 기준 250mg</li><li>비타민D, 아연이 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 물과 함께</li><li>(주)비오팜 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>비타민D 50μg</h3><p>표시 기준 250mg당 비타민D 50μg입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">면역·세포분열 기능성</span><h3>아연 8.5mg</h3><p>표시 기준 250mg당 아연 8.5mg입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민D</b> 250mg당 50μg</div><div class=\"sd-item\"><b>아연</b> 250mg당 8.5mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>뼈 건강과 면역 관리를 함께 챙기고 싶은 분</li><li>비타민D와 아연을 한 정으로 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 50 μg</span><span class=\"sd-badge\">Zinc 8.5 mg</span></div>\n  <h1>Usvita<small>Vitamin D + Zinc · Bone &amp; immunity</small></h1><p class=\"sd-meta\">Made by Biofarm · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Vitamin D, Zinc. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Vitamin D 50 μg + Zinc 8.5 mg — per the labelled 250 mg basis</li><li>Vitamin D, Zinc are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With water</li><li>Made by Biofarm · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Vitamin D 50 μg</h3><p>The labelled amount is 50 μg of Vitamin D per 250 mg. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Immunity & cell division function</span><h3>Zinc 8.5 mg</h3><p>The labelled amount is 8.5 mg of Zinc per 250 mg. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> 50 μg per 250 mg</div><div class=\"sd-item\"><b>Zinc</b> 8.5 mg per 250 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after bone health and immunity together</li><li>Those who want vitamin D and zinc in one tablet</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcemia or take medication · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "06fb47fe-bb77-4ecf-a163-c1b928132352",
+    "productName": "원퀵",
+    "productNameEn": "Wonquick",
+    "manufacturer": "엔피케이(주)",
+    "manufacturerEn": "NPK",
+    "statementNo": "201000190041332",
+    "category": "hff",
+    "combo": "비타민C + 아연",
+    "source": {
+      "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 회황색의 점박이가 있는 황회색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해도 : 60분 이내\n4) 비타민C : 표시량(100mg/1,000mg)의 80~150%\n5) 아연 : 표시량(8.5mg/1,000mg)의 80~150%",
+      "intake": "1일 2회, 1회 1정을 물과 함께 섭취",
+      "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색의 점박이가 있는 황회색의 장방형 제피정제",
+      "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 100,
+        "unit": "mg",
+        "basisAmount": 1000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 2,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "아연",
+        "declaredLabelAmount": "8.5mg",
+        "basis": "1,000mg",
+        "recognizedFunction": "정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민C 100mg</span><span class=\"sd-badge\">아연 8.5mg</span></div>\n  <h1>원퀵<small>비타민C + 아연 · 항산화·면역</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 2회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민C, 아연을 함께 담은 건강기능식품입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>비타민C 100mg + 아연 8.5mg — 표시 기준 1,000mg</li><li>비타민C, 아연이 모두 식약처 인정 기능성 원료</li><li>1일 2회 · 1회 1정 · 물과 함께</li><li>엔피케이(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">항산화 기능성</span><h3>비타민C 100mg</h3><p>표시 기준 1,000mg당 비타민C 100mg입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">면역·세포분열 기능성</span><h3>아연 8.5mg</h3><p>표시 기준 1,000mg당 아연 8.5mg입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민C</b> 1,000mg당 100mg</div><div class=\"sd-item\"><b>아연</b> 1,000mg당 8.5mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 회황색의 점박이가 있는 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>항산화와 면역 관리를 함께 챙기고 싶은 분</li><li>비타민C와 아연을 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취 시 부작용이 있을 수 있음 · 특정 원료에 알레르기가 있거나 약물 투여 중인 분은 섭취 전 전문가와 상의 · 비타민C는 과량 섭취하지 않도록 주의하고 신장질환이 있는 경우 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 100 mg</span><span class=\"sd-badge\">Zinc 8.5 mg</span></div>\n  <h1>Wonquick<small>Vitamin C + Zinc · Antioxidant &amp; immunity</small></h1><p class=\"sd-meta\">Made by NPK · 2 times a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Vitamin C, Zinc. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Vitamin C 100 mg + Zinc 8.5 mg — per the labelled 1,000 mg basis</li><li>Vitamin C, Zinc are all MFDS-recognized functional ingredients</li><li>2 times a day · 1 tablet per serving · With water</li><li>Made by NPK · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Antioxidant function</span><h3>Vitamin C 100 mg</h3><p>The labelled amount is 100 mg of Vitamin C per 1,000 mg. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Immunity & cell division function</span><h3>Zinc 8.5 mg</h3><p>The labelled amount is 8.5 mg of Zinc per 1,000 mg. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> 100 mg per 1,000 mg</div><div class=\"sd-item\"><b>Zinc</b> 8.5 mg per 1,000 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after antioxidant care and immunity together</li><li>Those who want vitamin C with zinc</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Excessive intake may cause side effects · If you are allergic to a specific ingredient or on medication, consult a professional before use · Do not overconsume vitamin C; consult a professional if you have kidney disease · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "09702f05-962a-4ebd-984f-fe213607c850",
+    "productName": "비타민C1000+D",
+    "productNameEn": "Vitamin C1000+D",
+    "manufacturer": "이앤에스(주)",
+    "manufacturerEn": "E&S",
+    "statementNo": "201200170022",
+    "category": "hff",
+    "combo": "비타민C + 비타민D",
+    "source": {
+      "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n",
+      "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없으며 광택이 없는 하얀색의 장방형 정제\n② 비타민C 함량 : 표시량(1000mg/1,100mg)의 80~150%\n③ 비타민D 함량 : 표시량(10㎍, 400 IU/1,100mg)의 80~180%\n④ 대장균군 : 음성\n⑤ 붕해도 : 30분 이내",
+      "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+      "caution": "1. 과량 섭취하지 않도록 주의하십시오.\n2. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.\n3. 공복에 섭취 시 위장장애를 유발할 수 있으니 식후에 섭취하십시오.\n4. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n5. 본 제품은 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.\n6. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n7. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 광택이 없는 하얀색의 장방형 정제",
+      "storage": "직사광선 및 습기를 피해 서늘하고, 통풍이 잘되는 실온에 보관하십시오.",
+      "shelfLife": "24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 1000,
+        "unit": "mg",
+        "basisAmount": 1100,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민D",
+        "declaredLabelAmount": "10μg",
+        "basis": "1,100mg",
+        "recognizedFunction": "칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민C 1000mg</span><span class=\"sd-badge\">비타민D 10μg</span></div>\n  <h1>비타민C1000+D<small>비타민C + 비타민D · 항산화·뼈</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민C, 비타민D를 함께 담은 건강기능식품입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>비타민C 1000mg + 비타민D 10μg — 표시 기준 1,100mg</li><li>비타민C, 비타민D가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 물과 함께</li><li>이앤에스(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">항산화 기능성</span><h3>비타민C 1000mg</h3><p>표시 기준 1,100mg당 비타민C 1000mg입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>비타민D 10μg</h3><p>표시 기준 1,100mg당 비타민D 10μg입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민C</b> 1,100mg당 1000mg</div><div class=\"sd-item\"><b>비타민D</b> 1,100mg당 10μg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 광택이 없는 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>비타민C를 넉넉히 챙기면서 뼈 건강도 함께 관리하고 싶은 분</li><li>비타민C와 비타민D를 한 정으로 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취하지 않도록 주의하고 신장질환이 있는 경우 전문가와 상담 · 공복 섭취 시 위장장애를 유발할 수 있으니 식후에 섭취 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000 mg</span><span class=\"sd-badge\">Vitamin D 10 μg</span></div>\n  <h1>Vitamin C1000+D<small>Vitamin C + Vitamin D · Antioxidant &amp; bone</small></h1><p class=\"sd-meta\">Made by E&amp;S · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Vitamin C, Vitamin D. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Vitamin C 1000 mg + Vitamin D 10 μg — per the labelled 1,100 mg basis</li><li>Vitamin C, Vitamin D are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With water</li><li>Made by E&S · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Antioxidant function</span><h3>Vitamin C 1000 mg</h3><p>The labelled amount is 1000 mg of Vitamin C per 1,100 mg. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Vitamin D 10 μg</h3><p>The labelled amount is 10 μg of Vitamin D per 1,100 mg. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> 1000 mg per 1,100 mg</div><div class=\"sd-item\"><b>Vitamin D</b> 10 μg per 1,100 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want ample vitamin C together with bone-health support</li><li>Those who want vitamin C and vitamin D in one tablet</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Do not overconsume; consult a professional if you have kidney disease · May cause stomach upset on an empty stomach, so take it after meals · Consult a professional if you have hypercalcemia or take medication · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "9afcff42-ee16-4a2c-8f00-cfef8f15120d",
+    "productName": "트리엔철",
+    "productNameEn": "Trien Iron",
+    "manufacturer": "한국바이오팜(주)에이치피",
+    "manufacturerEn": "Korea Biopharm HP",
+    "statementNo": "20040020046446",
+    "category": "hff",
+    "combo": "철 + 비타민C",
+    "source": {
+      "mainFunction": "[철]①체내 산소운반과 혈액생성에 필요②에너지 생성에 필요\n[비타민C]①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 검은색의 내용물을 함유한 연한 갈색의 경질캡슐\n2) 철 : 표시량(20.0mg/1,000mg)의 80~150%\n3) 비타민C : 표시량(100.0mg/1,000mg)의 80~150%\n4) 붕해시험 : 20분 이내\n5) 대장균군 : 음성",
+      "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취한다.",
+      "caution": "① 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n② 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\n③ 특히 6세 이하는 과량섭취하지 않도록 주의하시기 바랍니다.",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 검은색의 내용물을 함유한 연한 갈색의 경질캡슐",
+      "storage": "직사광선을 받지 않는 실온에 보관한다.",
+      "shelfLife": "24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 20,
+        "unit": "mg",
+        "basisAmount": 1000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 2,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민C",
+        "declaredLabelAmount": "100mg",
+        "basis": "1,000mg",
+        "recognizedFunction": "결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">철 20mg</span><span class=\"sd-badge\">비타민C 100mg</span></div>\n  <h1>트리엔철<small>철 + 비타민C · 혈액·활력</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 2회, 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 철, 비타민C를 함께 담은 건강기능식품입니다. 철은 체내 산소 운반과 혈액 생성, 에너지 생성에 필요한 기능성 원료입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>철 20mg + 비타민C 100mg — 표시 기준 1,000mg</li><li>철, 비타민C가 모두 식약처 인정 기능성 원료</li><li>1일 2회 · 1회 1캡슐 · 물과 함께</li><li>한국바이오팜(주)에이치피 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">혈액 생성 기능성</span><h3>철 20mg</h3><p>표시 기준 1,000mg당 철 20mg입니다. 철은 체내 산소 운반과 혈액 생성, 에너지 생성에 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">철 흡수·항산화 기능성</span><h3>비타민C 100mg</h3><p>표시 기준 1,000mg당 비타민C 100mg입니다. 비타민C는 결합조직 형성과 기능 유지, 철의 흡수, 그리고 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>철</b> 1,000mg당 20mg</div><div class=\"sd-item\"><b>비타민C</b> 1,000mg당 100mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 검은색의 내용물을 함유한 연한 갈색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>철분 섭취와 활력 관리가 신경 쓰이는 분</li><li>철과 비타민C를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기·특이체질이신 경우 성분을 확인한 후 섭취 · 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의 · 특히 어린이는 과량 섭취하지 않도록 주의 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iron 20 mg</span><span class=\"sd-badge\">Vitamin C 100 mg</span></div>\n  <h1>Trien Iron<small>Iron + Vitamin C · Blood &amp; vitality</small></h1><p class=\"sd-meta\">Made by Korea Biopharm HP · 2 times a day, 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Iron, Vitamin C. Iron is an MFDS-recognized ingredient needed for oxygen transport and blood formation in the body and for energy production. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Iron 20 mg + Vitamin C 100 mg — per the labelled 1,000 mg basis</li><li>Iron, Vitamin C are all MFDS-recognized functional ingredients</li><li>2 times a day · 1 capsule per serving · With water</li><li>Made by Korea Biopharm HP · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Blood formation function</span><h3>Iron 20 mg</h3><p>The labelled amount is 20 mg of Iron per 1,000 mg. Iron is an MFDS-recognized ingredient needed for oxygen transport and blood formation in the body and for energy production.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Iron absorption & antioxidant function</span><h3>Vitamin C 100 mg</h3><p>The labelled amount is 100 mg of Vitamin C per 1,000 mg. Vitamin C is an MFDS-recognized ingredient needed for the formation and maintenance of connective tissue, for the absorption of iron, and for antioxidant protection of cells from free radicals.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iron</b> 20 mg per 1,000 mg</div><div class=\"sd-item\"><b>Vitamin C</b> 100 mg per 1,000 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who care about iron intake and everyday vitality</li><li>Those who want iron together with vitamin C</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · If you have allergies or a sensitive constitution, check the ingredients before use · Take care not to be hurt by the packaging when opening or taking it · Take particular care that children do not overconsume · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "e9bc95c0-d6d4-4c73-9bad-76d5799bc8bd",
+    "productName": "엽산&비타민B12",
+    "productNameEn": "Folate & Vitamin B12",
+    "manufacturer": "에스케이내추럴팜(주)",
+    "manufacturerEn": "SK Natural Farm",
+    "statementNo": "20040017106377",
+    "category": "hff",
+    "combo": "엽산 + 비타민B12",
+    "source": {
+      "mainFunction": "[엽산] ① 세포와 혈액생성에 필요 ② 태아 신경관의 정상 발달에 필요 ③ 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B12] ① 정상적인 엽산 대사에 필요",
+      "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 정제\n② 엽산 : 표시량(600㎍/500mg)의 80~150%\n③ 비타민B12 : 표시량(2.4㎍/500mg)의 80~180%\n④ 대장균군 : 음성\n⑤ 붕해도 : 30분 이내",
+      "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+      "caution": "① 섭취량 및 섭취방법을 확인한 후 섭취하여 주십시오.\n② 특정 또는 특이체질이실 경우 성분 확인 후 섭취하십시오.\n③ 이상증상이 생길 경우 즉시 섭취를 중단하고 전문가와 상담하십시오.\n④ 동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+      "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 정제",
+      "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 600,
+        "unit": "μg",
+        "basisAmount": 500,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민B12",
+        "declaredLabelAmount": "2.4μg",
+        "basis": "500mg",
+        "recognizedFunction": "정상적인 엽산 대사에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">엽산 600μg</span><span class=\"sd-badge\">비타민B12 2.4μg</span></div>\n  <h1>엽산&amp;비타민B12<small>엽산 + 비타민B12 · 혈액·호모시스테인</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 엽산, 비타민B12를 함께 담은 건강기능식품입니다. 엽산은 세포와 혈액 생성, 태아 신경관의 정상 발달에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다. 비타민B12는 정상적인 엽산 대사에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>엽산 600μg + 비타민B12 2.4μg — 표시 기준 500mg</li><li>엽산, 비타민B12가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 충분한 물과 함께</li><li>에스케이내추럴팜(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">혈액 생성 기능성</span><h3>엽산 600μg</h3><p>표시 기준 500mg당 엽산 600μg입니다. 엽산은 세포와 혈액 생성, 태아 신경관의 정상 발달에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산 대사 기능성</span><h3>비타민B12 2.4μg</h3><p>표시 기준 500mg당 비타민B12 2.4μg입니다. 비타민B12는 정상적인 엽산 대사에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">충분한 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>엽산</b> 500mg당 600μg</div><div class=\"sd-item\"><b>비타민B12</b> 500mg당 2.4μg</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>혈액 생성과 호모시스테인 관리가 신경 쓰이는 분</li><li>엽산과 비타민B12를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취량 및 섭취방법을 확인한 후 섭취 · 특정·특이체질이실 경우 성분 확인 후 섭취 · 이상증상이 생길 경우 즉시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Folate 600 μg</span><span class=\"sd-badge\">Vitamin B12 2.4 μg</span></div>\n  <h1>Folate &amp; Vitamin B12<small>Folate + Vitamin B12 · Blood &amp; homocysteine</small></h1><p class=\"sd-meta\">Made by SK Natural Farm · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Folate, Vitamin B12. Folate is an MFDS-recognized ingredient needed for cell and blood formation, for normal fetal neural-tube development, and for keeping blood homocysteine at a normal level. Vitamin B12 is an MFDS-recognized ingredient needed for normal folate metabolism. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Folate 600 μg + Vitamin B12 2.4 μg — per the labelled 500 mg basis</li><li>Folate, Vitamin B12 are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With plenty of water</li><li>Made by SK Natural Farm · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Blood formation function</span><h3>Folate 600 μg</h3><p>The labelled amount is 600 μg of Folate per 500 mg. Folate is an MFDS-recognized ingredient needed for cell and blood formation, for normal fetal neural-tube development, and for keeping blood homocysteine at a normal level.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Folate metabolism function</span><h3>Vitamin B12 2.4 μg</h3><p>The labelled amount is 2.4 μg of Vitamin B12 per 500 mg. Vitamin B12 is an MFDS-recognized ingredient needed for normal folate metabolism.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With plenty of water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Folate</b> 600 μg per 500 mg</div><div class=\"sd-item\"><b>Vitamin B12</b> 2.4 μg per 500 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who care about blood formation and homocysteine</li><li>Those who want folate together with vitamin B12</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Check the intake amount and method before use · Check the ingredients before use if you have a sensitive constitution · Stop use immediately and consult a professional if any abnormal symptoms occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "f007ca94-eacc-4e56-b8f1-2d18020f2a86",
+    "productName": "엽산600",
+    "productNameEn": "Folate 600",
+    "manufacturer": "(주)유유헬스케어",
+    "manufacturerEn": "Yuyu Healthcare",
+    "statementNo": "20040015107552",
+    "category": "hff",
+    "combo": "엽산 + 비타민B6 + 비타민B12",
+    "source": {
+      "mainFunction": "[엽산]①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n[비타민B12]①정상적인 엽산 대사에 필요\r\n",
+      "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색 장방형 정제\r\n② 엽산 : 표시량(600 ㎍/600 mg)의 80~150%\r\n③ 비타민B6 : 표시량(1.02 mg/600 mg)의 80~150%\r\n④ 비타민B12 : 표시량(14.4 ㎍/600 mg)의 80~180%\r\n⑤ 대장균군 : 음성\r\n⑥ 붕해시험 : 적합",
+      "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+      "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취 여부를 결정\r\n② PTP포장의 경우 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의",
+      "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색 장방형 정제",
+      "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 600,
+        "unit": "μg",
+        "basisAmount": 600,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민B6",
+        "declaredLabelAmount": "1.02mg",
+        "basis": "600mg",
+        "recognizedFunction": "단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다."
+      },
+      "_thirdFunctional": {
+        "ingredient": "비타민B12",
+        "declaredLabelAmount": "14.4μg",
+        "basis": "600mg",
+        "recognizedFunction": "정상적인 엽산 대사에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">엽산 600μg</span><span class=\"sd-badge\">비타민B6 1.02mg</span><span class=\"sd-badge\">비타민B12 14.4μg</span></div>\n  <h1>엽산600<small>엽산 + 비타민B6 + 비타민B12 · 혈액·호모시스테인</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 엽산, 비타민B6, 비타민B12를 함께 담은 건강기능식품입니다. 엽산은 세포와 혈액 생성, 태아 신경관의 정상 발달에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다. 비타민B6는 단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다. 비타민B12는 정상적인 엽산 대사에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>엽산 600μg + 비타민B6 1.02mg + 비타민B12 14.4μg — 표시 기준 600mg</li><li>엽산, 비타민B6, 비타민B12가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 물과 함께</li><li>(주)유유헬스케어 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">혈액 생성 기능성</span><h3>엽산 600μg</h3><p>표시 기준 600mg당 엽산 600μg입니다. 엽산은 세포와 혈액 생성, 태아 신경관의 정상 발달에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">호모시스테인 기능성</span><h3>비타민B6 1.02mg</h3><p>표시 기준 600mg당 비타민B6 1.02mg입니다. 비타민B6는 단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산 대사 기능성</span><h3>비타민B12 14.4μg</h3><p>표시 기준 600mg당 비타민B12 14.4μg입니다. 비타민B12는 정상적인 엽산 대사에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>엽산</b> 600mg당 600μg</div><div class=\"sd-item\"><b>비타민B6</b> 600mg당 1.02mg</div><div class=\"sd-item\"><b>비타민B12</b> 600mg당 14.4μg</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>혈액 생성과 호모시스테인 관리를 함께 챙기고 싶은 분</li><li>엽산에 비타민B6·B12를 더해 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질이신 경우 성분을 확인한 후 섭취 여부를 결정 · PTP 포장의 경우 개봉·섭취 시 포장재에 의해 상처를 입을 수 있으니 주의 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Folate 600 μg</span><span class=\"sd-badge\">Vitamin B6 1.02 mg</span><span class=\"sd-badge\">Vitamin B12 14.4 μg</span></div>\n  <h1>Folate 600<small>Folate + Vitamin B6 + Vitamin B12 · Blood &amp; homocysteine</small></h1><p class=\"sd-meta\">Made by Yuyu Healthcare · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Folate, Vitamin B6, Vitamin B12. Folate is an MFDS-recognized ingredient needed for cell and blood formation, for normal fetal neural-tube development, and for keeping blood homocysteine at a normal level. Vitamin B6 is an MFDS-recognized ingredient needed for protein and amino-acid utilization and for keeping blood homocysteine at a normal level. Vitamin B12 is an MFDS-recognized ingredient needed for normal folate metabolism. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Folate 600 μg + Vitamin B6 1.02 mg + Vitamin B12 14.4 μg — per the labelled 600 mg basis</li><li>Folate, Vitamin B6, Vitamin B12 are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With water</li><li>Made by Yuyu Healthcare · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Blood formation function</span><h3>Folate 600 μg</h3><p>The labelled amount is 600 μg of Folate per 600 mg. Folate is an MFDS-recognized ingredient needed for cell and blood formation, for normal fetal neural-tube development, and for keeping blood homocysteine at a normal level.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Homocysteine function</span><h3>Vitamin B6 1.02 mg</h3><p>The labelled amount is 1.02 mg of Vitamin B6 per 600 mg. Vitamin B6 is an MFDS-recognized ingredient needed for protein and amino-acid utilization and for keeping blood homocysteine at a normal level.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Folate metabolism function</span><h3>Vitamin B12 14.4 μg</h3><p>The labelled amount is 14.4 μg of Vitamin B12 per 600 mg. Vitamin B12 is an MFDS-recognized ingredient needed for normal folate metabolism.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Folate</b> 600 μg per 600 mg</div><div class=\"sd-item\"><b>Vitamin B6</b> 1.02 mg per 600 mg</div><div class=\"sd-item\"><b>Vitamin B12</b> 14.4 μg per 600 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after blood formation and homocysteine together</li><li>Those who want folate plus vitamins B6 and B12</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · If you have an allergic constitution, decide whether to take it after checking the ingredients · With PTP packaging, take care not to be hurt by the packaging when opening or taking it · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "c42a1b05-adb0-4f2f-93d7-64e97af0db63",
+    "productName": "마그셀비",
+    "productNameEn": "Magcelbi",
+    "manufacturer": "엔피케이(주)",
+    "manufacturerEn": "NPK",
+    "statementNo": "201000190041497",
+    "category": "hff",
+    "combo": "마그네슘 + 비타민B6",
+    "source": {
+      "mainFunction": "[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 비타민B6 : 표시량(10mg/1,200mg)의 80~150%\n5) 마그네슘 : 표시량(350mg/1,200mg)의 80~150%",
+      "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+      "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[비타민B6]\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회색의 장방형 제피정제",
+      "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 350,
+        "unit": "mg",
+        "basisAmount": 1200,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민B6",
+        "declaredLabelAmount": "10mg",
+        "basis": "1,200mg",
+        "recognizedFunction": "단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 350mg</span><span class=\"sd-badge\">비타민B6 10mg</span></div>\n  <h1>마그셀비<small>마그네슘 + 비타민B6 · 에너지·신경</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘, 비타민B6를 함께 담은 건강기능식품입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다. 비타민B6는 단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>마그네슘 350mg + 비타민B6 10mg — 표시 기준 1,200mg</li><li>마그네슘, 비타민B6가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 물과 함께</li><li>엔피케이(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">에너지·근육 기능성</span><h3>마그네슘 350mg</h3><p>표시 기준 1,200mg당 마그네슘 350mg입니다. 마그네슘은 에너지 이용에 필요하고 신경과 근육 기능 유지에 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">호모시스테인 기능성</span><h3>비타민B6 10mg</h3><p>표시 기준 1,200mg당 비타민B6 10mg입니다. 비타민B6는 단백질 및 아미노산 이용에 필요하고, 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 1,200mg당 350mg</div><div class=\"sd-item\"><b>비타민B6</b> 1,200mg당 10mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>에너지 이용과 신경·근육 기능 유지가 신경 쓰이는 분</li><li>마그네슘과 비타민B6를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 과량 섭취 시 부작용이 있을 수 있음 · 특정 원료에 알레르기가 있거나 약물 투여 중인 분은 섭취 전 전문가와 상의 · 비타민B6는 손발 따끔거림·작열감·저림 등 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 350 mg</span><span class=\"sd-badge\">Vitamin B6 10 mg</span></div>\n  <h1>Magcelbi<small>Magnesium + Vitamin B6 · Energy &amp; nerves</small></h1><p class=\"sd-meta\">Made by NPK · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Magnesium, Vitamin B6. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function. Vitamin B6 is an MFDS-recognized ingredient needed for protein and amino-acid utilization and for keeping blood homocysteine at a normal level. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Magnesium 350 mg + Vitamin B6 10 mg — per the labelled 1,200 mg basis</li><li>Magnesium, Vitamin B6 are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With water</li><li>Made by NPK · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Energy & muscle function</span><h3>Magnesium 350 mg</h3><p>The labelled amount is 350 mg of Magnesium per 1,200 mg. Magnesium is an MFDS-recognized ingredient needed for energy utilization and for maintaining nerve and muscle function.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Homocysteine function</span><h3>Vitamin B6 10 mg</h3><p>The labelled amount is 10 mg of Vitamin B6 per 1,200 mg. Vitamin B6 is an MFDS-recognized ingredient needed for protein and amino-acid utilization and for keeping blood homocysteine at a normal level.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> 350 mg per 1,200 mg</div><div class=\"sd-item\"><b>Vitamin B6</b> 10 mg per 1,200 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who care about energy utilization and nerve and muscle function</li><li>Those who want magnesium together with vitamin B6</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Excessive intake may cause side effects · If you are allergic to a specific ingredient or on medication, consult a professional before use · For vitamin B6, stop use and consult a professional if tingling, burning or numbness of the hands and feet occurs · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "4be38aac-5d1d-47f1-98b3-f7a0ac670c1b",
+    "productName": "엠뮨",
+    "productNameEn": "Mmune",
+    "manufacturer": "코스맥스엔비티(주)",
+    "manufacturerEn": "Cosmax NBT",
+    "statementNo": "200700170351996",
+    "category": "hff",
+    "combo": "프로바이오틱스 + 아연",
+    "source": {
+      "mainFunction": "[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장 건강에 도움을 줄 수 있음\n[아연]\n①정상적인 면역기능에 필요\n②정상적인 세포분열에 필요",
+      "baseStandard": "1. 성상: 고유의 향미가 있고 이미,이취가 없는 흰보라 또는 흐린보라색의 입자성이 있는 분말\n2. 대장균군: 음성\n3. 프로바이오틱스 수: 표시량(10,000,000,000 CFU/2,000mg) 이상\n4. 아연: 표시량(2.55mg/2,000mg)의 80~150%",
+      "intake": "1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+      "caution": "질환이 있거나 의약품 복용 시 전문가와 상담할 것\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n섭취 전에 유통기한을 확인 후 섭취할 것. 또한 유통기한이 경과한 제품은 섭취하지 말 것\n섭취량 및 섭취방법을 확인 후 섭취할 것",
+      "dosageForm": "고유의 향미가 있고 이미,이취가 없는 흰보라 또는 흐린보라색의 입자성이 있는 분말",
+      "storage": "실온/ 1. 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2. 영•유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월까지"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 100,
+        "unit": "억 CFU",
+        "basisAmount": 2000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "declaredCfu": {
+        "absolute": 10000000000
+      },
+      "_secondFunctional": {
+        "ingredient": "아연",
+        "declaredLabelAmount": "2.55mg",
+        "basis": "2,000mg",
+        "recognizedFunction": "정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2,000mg당 100억 CFU 이상</span><span class=\"sd-badge\">아연 2.55mg</span></div>\n  <h1>엠뮨<small>프로바이오틱스 + 아연 · 장 건강·면역</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회, 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 프로바이오틱스, 아연을 함께 담은 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 100억 CFU + 아연 2.55mg — 표시 기준 2,000mg</li><li>프로바이오틱스, 아연이 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1포 · 직접 또는 물과 함께</li><li>코스맥스엔비티(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 100억 CFU</h3><p>표시 기준 2,000mg당 프로바이오틱스 100억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">면역·세포분열 기능성</span><h3>아연 2.55mg</h3><p>표시 기준 2,000mg당 아연 2.55mg입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 2,000mg당 100억 CFU 이상</div><div class=\"sd-item\"><b>아연</b> 2,000mg당 2.55mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 흰보라 또는 흐린보라색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>장 건강과 면역 관리를 함께 챙기고 싶은 분</li><li>유산균과 아연을 한 포로 간편하게 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 10 billion CFU per 2,000 mg</span><span class=\"sd-badge\">Zinc 2.55 mg</span></div>\n  <h1>Mmune<small>Probiotics + Zinc · Gut health &amp; immunity</small></h1><p class=\"sd-meta\">Made by Cosmax NBT · Once a day, 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Probiotics, Zinc. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>10 billion CFU of probiotics + Zinc 2.55 mg — per the labelled 2,000 mg basis</li><li>Probiotics, Zinc are all MFDS-recognized functional ingredients</li><li>Once a day · 1 stick per serving · Directly or with water</li><li>Made by Cosmax NBT · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 10 billion CFU</h3><p>The labelled standard for this product is at least 10 billion CFU of probiotics per 2,000 mg. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Immunity & cell division function</span><h3>Zinc 2.55 mg</h3><p>The labelled amount is 2.55 mg of Zinc per 2,000 mg. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 10 billion CFU per 2,000 mg</div><div class=\"sd-item\"><b>Zinc</b> 2.55 mg per 2,000 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those looking after gut health and immunity together</li><li>Those who want probiotics and zinc in one convenient stick</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "599ab418-3f66-40a5-bbc2-edb2eabe16e7",
+    "productName": "워터 바이오틱스",
+    "productNameEn": "Water Biotics",
+    "manufacturer": "코스맥스엔비티(주)",
+    "manufacturerEn": "Cosmax NBT",
+    "statementNo": "200700170352005",
+    "category": "hff",
+    "combo": "프로바이오틱스 + 프락토올리고당",
+    "source": {
+      "mainFunction": "[프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음\n\n[프락토올리고당] 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
+      "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 연한 노란 하얀색의 입자성이 있는 분말\n2) 프로바이오틱스 수: 표시량 (1,000,000,000 CFU/6,000 mg)의 이상\n3) 프락토올리고당: 표시량(3 g/6,000 mg)의 80~120%\n4) 납(mg/kg) : 1.0 이하\n5) 대장균군: 음성",
+      "intake": "1일 1회, 1회 1포를 물 100ml에 타서 섭취하십시오.",
+      "caution": "질환이 있거나 의약품 복용 시 전문가와 상담할 것\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n섭취 시 가스참, 트림, 복통, 복부팽만감 등이 발생할 수 있음",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 노란 하얀색의 입자성이 있는 분말",
+      "storage": "실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 즉시 섭취하시기 바랍니다.",
+      "shelfLife": "제조일로부터 24개월까지"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 10,
+        "unit": "억 CFU",
+        "basisAmount": 6000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "declaredCfu": {
+        "absolute": 1000000000
+      },
+      "_secondFunctional": {
+        "ingredient": "프락토올리고당",
+        "declaredLabelAmount": "3g",
+        "basis": "6,000mg",
+        "recognizedFunction": "장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">6,000mg당 10억 CFU 이상</span><span class=\"sd-badge\">프락토올리고당 3g</span></div>\n  <h1>워터 바이오틱스<small>프로바이오틱스 + 프락토올리고당 · 장 건강</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회, 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 프로바이오틱스, 프락토올리고당을 함께 담은 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다. 프락토올리고당은 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 10억 CFU + 프락토올리고당 3g — 표시 기준 6,000mg</li><li>프로바이오틱스, 프락토올리고당이 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1포 · 물 100ml에 타서</li><li>코스맥스엔비티(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 10억 CFU</h3><p>표시 기준 6,000mg당 프로바이오틱스 10억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">유익균 증식 기능성</span><h3>프락토올리고당 3g</h3><p>표시 기준 6,000mg당 프락토올리고당 3g입니다. 프락토올리고당은 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있는 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물 100ml에 타서</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 6,000mg당 10억 CFU 이상</div><div class=\"sd-item\"><b>프락토올리고당</b> 6,000mg당 3g</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 노란 하얀색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>유산균과 프리바이오틱스(프락토올리고당)를 함께 챙기고 싶은 분</li><li>물에 타서 마시는 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 섭취 시 가스참·트림·복통·복부팽만감 등이 발생할 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 1 billion CFU per 6,000 mg</span><span class=\"sd-badge\">Fructooligosaccharide 3 g</span></div>\n  <h1>Water Biotics<small>Probiotics + Fructooligosaccharide · Gut health</small></h1><p class=\"sd-meta\">Made by Cosmax NBT · Once a day, 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Probiotics, Fructooligosaccharide. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Fructooligosaccharide may help increase beneficial gut bacteria and help with smooth bowel movement. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>1 billion CFU of probiotics + Fructooligosaccharide 3 g — per the labelled 6,000 mg basis</li><li>Probiotics, Fructooligosaccharide are all MFDS-recognized functional ingredients</li><li>Once a day · 1 stick per serving · Mixed in 100 ml of water</li><li>Made by Cosmax NBT · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 1 billion CFU</h3><p>The labelled standard for this product is at least 1 billion CFU of probiotics per 6,000 mg. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Beneficial-bacteria growth function</span><h3>Fructooligosaccharide 3 g</h3><p>The labelled amount is 3 g of Fructooligosaccharide per 6,000 mg. Fructooligosaccharide may help increase beneficial gut bacteria and help with smooth bowel movement.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Mixed in 100 ml of water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 1 billion CFU per 6,000 mg</div><div class=\"sd-item\"><b>Fructooligosaccharide</b> 3 g per 6,000 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want probiotics with a prebiotic (fructooligosaccharide)</li><li>Those who prefer a drink mixed in water</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Gas, belching, abdominal pain or bloating may occur · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "ad8e358d-a334-41f2-b10e-d8dd6b31d2f6",
+    "productName": "에버비건유산균",
+    "productNameEn": "Everbegin Probiotics",
+    "manufacturer": "맥널티바이오(주)",
+    "manufacturerEn": "McNulty Bio",
+    "statementNo": "2018001246674",
+    "category": "hff",
+    "combo": "프로바이오틱스 + 아연 + 셀레늄",
+    "source": {
+      "mainFunction": "[프로바이오틱스] 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n[아연] (1) 정상적인 면역기능에 필요\n          (2) 정상적인 세포분열에 필요\n\n[셀레늄] (1) 유해산소로부터 세포를 보호하는데 필요",
+      "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말\n(2) 프로바이오틱스 수 : 2,000,000,000(20억)CFU/2g 이상 (표시량 이상)\n(3) 아연 : 표시량(8.5mg/2g)의 80~150%\n(4) 셀레늄 : 표시량(55μg/2g)의 80~150%\n(5) 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포(2g)를 직접 또는 물과 함께 섭취하십시오.",
+      "caution": "(가) 질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다) 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 분말",
+      "storage": "실온보관 / 직사광선을 피하고 서늘하고 건조한 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 18개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 20,
+        "unit": "억 CFU",
+        "basisAmount": 2,
+        "basisUnit": "g"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "declaredCfu": {
+        "absolute": 2000000000
+      },
+      "_secondFunctional": {
+        "ingredient": "아연",
+        "declaredLabelAmount": "8.5mg",
+        "basis": "2g",
+        "recognizedFunction": "정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다."
+      },
+      "_thirdFunctional": {
+        "ingredient": "셀레늄",
+        "declaredLabelAmount": "55μg",
+        "basis": "2g",
+        "recognizedFunction": "항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 20억 CFU 이상</span><span class=\"sd-badge\">아연 8.5mg</span><span class=\"sd-badge\">셀레늄 55μg</span></div>\n  <h1>에버비건유산균<small>프로바이오틱스 + 아연 + 셀레늄 · 장 건강·항산화</small></h1><p class=\"sd-meta\">맥널티바이오(주) 제조 · 1일 1회, 1회 1포(2g)</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 프로바이오틱스, 아연, 셀레늄을 함께 담은 건강기능식품입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다. 셀레늄은 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>프로바이오틱스 20억 CFU + 아연 8.5mg, 셀레늄 55μg — 표시 기준 2g</li><li>프로바이오틱스, 아연, 셀레늄이 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1포(2g) · 직접 또는 물과 함께</li><li>맥널티바이오(주) 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">장 건강 기능성</span><h3>프로바이오틱스 20억 CFU</h3><p>표시 기준 2g당 프로바이오틱스 20억 CFU 이상입니다. 프로바이오틱스는 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">면역·세포분열 기능성</span><h3>아연 8.5mg</h3><p>표시 기준 2g당 아연 8.5mg입니다. 아연은 정상적인 면역기능과 정상적인 세포분열에 필요한 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">항산화 기능성</span><h3>셀레늄 55μg</h3><p>표시 기준 2g당 셀레늄 55μg입니다. 셀레늄은 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포(2g)</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 2g당 20억 CFU 이상</div><div class=\"sd-item\"><b>아연</b> 2g당 8.5mg</div><div class=\"sd-item\"><b>셀레늄</b> 2g당 55μg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>장 건강에 항산화·면역 관리까지 함께 챙기고 싶은 분</li><li>유산균에 아연·셀레늄을 더해 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 2 billion CFU per 2 g</span><span class=\"sd-badge\">Zinc 8.5 mg</span><span class=\"sd-badge\">Selenium 55 μg</span></div>\n  <h1>Everbegin Probiotics<small>Probiotics + Zinc + Selenium · Gut health &amp; antioxidant</small></h1><p class=\"sd-meta\">Made by McNulty Bio · Once a day, 1 stick (2 g) per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Probiotics, Zinc, Selenium. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division. Selenium is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 billion CFU of probiotics + Zinc 8.5 mg, Selenium 55 μg — per the labelled 2 g basis</li><li>Probiotics, Zinc, Selenium are all MFDS-recognized functional ingredients</li><li>Once a day · 1 stick (2 g) per serving · Directly or with water</li><li>Made by McNulty Bio · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Gut health function</span><h3>Probiotics 2 billion CFU</h3><p>The labelled standard for this product is at least 2 billion CFU of probiotics per 2 g. Probiotics may help promote the growth of beneficial bacteria and suppress harmful bacteria, may help with smooth bowel movement, and may help with gut health.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Immunity & cell division function</span><h3>Zinc 8.5 mg</h3><p>The labelled amount is 8.5 mg of Zinc per 2 g. Zinc is an MFDS-recognized ingredient needed for normal immune function and normal cell division.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Antioxidant function</span><h3>Selenium 55 μg</h3><p>The labelled amount is 55 μg of Selenium per 2 g. Selenium is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick (2 g) per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 2 billion CFU per 2 g</div><div class=\"sd-item\"><b>Zinc</b> 8.5 mg per 2 g</div><div class=\"sd-item\"><b>Selenium</b> 55 μg per 2 g</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want gut health plus antioxidant and immunity care</li><li>Those who want probiotics plus zinc and selenium</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "7c3f8257-ac6a-4798-8245-684d8360f3c4",
+    "productName": "비타민D3&K2",
+    "productNameEn": "Vitamin D3 & K2",
+    "manufacturer": "주식회사 노바렉스",
+    "manufacturerEn": "Novarex",
+    "statementNo": "200400200083107",
+    "category": "hff",
+    "combo": "비타민D + 비타민K",
+    "source": {
+      "mainFunction": "[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌\n[비타민K] 정상적인 혈액응고에 필요, 뼈의 구성에 필요",
+      "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰색의 흰색 장방형 제피정제\n2. 비타민K : 표시량(70㎍/800mg)의 80~180%\n3. 비타민D : 표시량(25㎍/800mg)의 80~180%\n4. 대장균군 : 음성\n5. 붕해 : 60분 이내",
+      "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+      "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D] 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n[비타민K] 항응고제 등 복용 시 전문가와 상담할 것",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰색의 흰색 장방형 제피정제",
+      "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 25,
+        "unit": "μg",
+        "basisAmount": 800,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "tablet",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민K",
+        "declaredLabelAmount": "70μg",
+        "basis": "800mg",
+        "recognizedFunction": "정상적인 혈액응고에 필요하고 뼈의 구성에 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민D 25μg</span><span class=\"sd-badge\">비타민K 70μg</span></div>\n  <h1>비타민D3&amp;K2<small>비타민D + 비타민K · 뼈 건강</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회, 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민D, 비타민K를 함께 담은 건강기능식품입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다. 비타민K는 정상적인 혈액응고에 필요하고 뼈의 구성에 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>비타민D 25μg + 비타민K 70μg — 표시 기준 800mg</li><li>비타민D, 비타민K가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1정 · 물과 함께</li><li>주식회사 노바렉스 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">뼈 건강 기능성</span><h3>비타민D 25μg</h3><p>표시 기준 800mg당 비타민D 25μg입니다. 비타민D는 칼슘과 인이 흡수·이용되는 데 필요하고 뼈의 형성과 유지에 필요하며, 골다공증 발생 위험 감소에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">혈액응고·뼈 구성 기능성</span><h3>비타민K 70μg</h3><p>표시 기준 800mg당 비타민K 70μg입니다. 비타민K는 정상적인 혈액응고에 필요하고 뼈의 구성에 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민D</b> 800mg당 25μg</div><div class=\"sd-item\"><b>비타민K</b> 800mg당 70μg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰색의 흰색 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>뼈 건강을 비타민D와 비타민K로 함께 챙기고 싶은 분</li><li>두 지용성 비타민을 한 정으로 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 비타민K는 항응고제 등 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 25 μg</span><span class=\"sd-badge\">Vitamin K 70 μg</span></div>\n  <h1>Vitamin D3 &amp; K2<small>Vitamin D + Vitamin K · Bone health</small></h1><p class=\"sd-meta\">Made by Novarex · Once a day, 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Vitamin D, Vitamin K. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis. Vitamin K is an MFDS-recognized ingredient needed for normal blood clotting and for bone composition. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Vitamin D 25 μg + Vitamin K 70 μg — per the labelled 800 mg basis</li><li>Vitamin D, Vitamin K are all MFDS-recognized functional ingredients</li><li>Once a day · 1 tablet per serving · With water</li><li>Made by Novarex · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Bone health function</span><h3>Vitamin D 25 μg</h3><p>The labelled amount is 25 μg of Vitamin D per 800 mg. Vitamin D is an MFDS-recognized ingredient needed for the absorption and use of calcium and phosphorus and for the formation and maintenance of bone, and may help reduce the risk of osteoporosis.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Blood clotting & bone composition function</span><h3>Vitamin K 70 μg</h3><p>The labelled amount is 70 μg of Vitamin K per 800 mg. Vitamin K is an MFDS-recognized ingredient needed for normal blood clotting and for bone composition.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> 25 μg per 800 mg</div><div class=\"sd-item\"><b>Vitamin K</b> 70 μg per 800 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want bone-health support from vitamin D and vitamin K</li><li>Those who want both fat-soluble vitamins in one tablet</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcemia or take medication · For vitamin K, consult a professional if you take anticoagulants · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "becb1339-5f01-4d04-9ecd-26bbe17143a4",
+    "productName": "세노메가",
+    "productNameEn": "Cenomega",
+    "manufacturer": "(주)알피바이오",
+    "manufacturerEn": "RP Bio",
+    "statementNo": "200400170061192",
+    "category": "hff",
+    "combo": "EPA·DHA + 비타민E",
+    "source": {
+      "mainFunction": "[EPA 및 DHA 함유 유지]\n혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E]\n①유해산소로부터 세포를 보호하는데 필요",
+      "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 장방형의 장용성 연질캡슐\n2) EPA와 DHA의 합 : 표시량(500mg/740mg)의 80~120%\n3) 비타민E : 표시량(11mg α-TE/740mg)의 80~150%\n4) 납 : 3.0mg/kg 이하\n5) 카드뮴 : 1.0mg/kg 이하\n6) 수은 : 0.5mg/kg 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 적합(장용성 : 1액에서 120분 이내 내용물이 방출안됨, 2액에서 60분 이내 붕해)",
+      "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+      "caution": "[EPA 및 DHA 함유 유지]\n(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n",
+      "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 장방형의 장용성 연질캡슐",
+      "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 500,
+        "unit": "mg",
+        "basisAmount": 740,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "capsule",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "비타민E",
+        "declaredLabelAmount": "11mg",
+        "basis": "740mg",
+        "recognizedFunction": "항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">EPA·DHA 함유 유지 500mg</span><span class=\"sd-badge\">비타민E 11mg</span></div>\n  <h1>세노메가<small>EPA·DHA 함유 유지 + 비타민E · 혈행·항산화</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회, 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 EPA·DHA 함유 유지, 비타민E를 함께 담은 건강기능식품입니다. EPA·DHA 함유 유지는 혈중 중성지질 개선과 혈행 개선에 도움을 줄 수 있는 기능성 원료입니다. 비타민E는 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>EPA·DHA 함유 유지 500mg + 비타민E 11mg — 표시 기준 740mg</li><li>EPA·DHA 함유 유지, 비타민E가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1캡슐 · 충분한 물과 함께</li><li>(주)알피바이오 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">혈행 개선 기능성</span><h3>EPA·DHA 함유 유지 500mg</h3><p>표시 기준 740mg당 EPA·DHA 함유 유지 EPA와 DHA의 합 500mg입니다. EPA·DHA 함유 유지는 혈중 중성지질 개선과 혈행 개선에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">항산화 기능성</span><h3>비타민E 11mg</h3><p>표시 기준 740mg당 비타민E 11mg입니다. 비타민E는 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">충분한 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>EPA·DHA 함유 유지</b> 740mg당 500mg</div><div class=\"sd-item\"><b>비타민E</b> 740mg당 11mg</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 장방형의 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>혈중 중성지질과 혈행 관리가 신경 쓰이는 분</li><li>오메가와 항산화(비타민E)를 함께 섭취하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 의약품(항응고제·항혈소판제·혈압강하제 등) 복용 시 전문가와 상담 · 개인에 따라 피부 관련 이상반응이 발생할 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">EPA/DHA-containing oil 500 mg</span><span class=\"sd-badge\">Vitamin E 11 mg</span></div>\n  <h1>Cenomega<small>EPA/DHA oil + Vitamin E · Circulation &amp; antioxidant</small></h1><p class=\"sd-meta\">Made by RP Bio · Once a day, 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines EPA/DHA-containing oil, Vitamin E. EPA/DHA-containing oil may help with blood triglyceride levels and blood circulation. Vitamin E is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>EPA/DHA-containing oil 500 mg + Vitamin E 11 mg — per the labelled 740 mg basis</li><li>EPA/DHA-containing oil, Vitamin E are all MFDS-recognized functional ingredients</li><li>Once a day · 1 capsule per serving · With plenty of water</li><li>Made by RP Bio · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Blood-circulation function</span><h3>EPA/DHA-containing oil 500 mg</h3><p>The labelled amount is 500 mg of EPA/DHA-containing oil per 740 mg. EPA/DHA-containing oil may help with blood triglyceride levels and blood circulation.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Antioxidant function</span><h3>Vitamin E 11 mg</h3><p>The labelled amount is 11 mg of Vitamin E per 740 mg. Vitamin E is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With plenty of water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>EPA/DHA-containing oil</b> 500 mg per 740 mg</div><div class=\"sd-item\"><b>Vitamin E</b> 11 mg per 740 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who care about blood triglyceride levels and circulation</li><li>Those who want omega with antioxidant vitamin E</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you take medication such as anticoagulants, antiplatelets or antihypertensives · Skin-related reactions may occur in some individuals · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  },
+  {
+    "candidateId": "ccc46933-fdfb-4dc0-92fa-cbc4316ee844",
+    "productName": "메모리메이트",
+    "productNameEn": "Memory Mate",
+    "manufacturer": "주식회사 노바렉스",
+    "manufacturerEn": "Novarex",
+    "statementNo": "200400200083055",
+    "category": "hff",
+    "combo": "은행잎추출물 + 포스파티딜세린 + 비타민E",
+    "source": {
+      "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+      "baseStandard": "[은행잎추출물정제]\n1. 성상 :고유의 향미가 있고 이미∙이취가 없는 점박이를 포함한 흐린 녹갈색의 투명 장방형 제피정제\n2. 플라보놀배당체 : 표시량(28mg/2100mg)의 80~120%\n3. 비타민E : 표시량(11mg α-TE/2100mg)의 80~150%\n4. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 1.0 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해 : 60분 이내\n\n[포스파티딜세린정제]\n1. 성상 : 고유의 향미가 있고 이미∙이취가 없는 점박이를 포함한 분홍빛 하얀색의 갈회색 장방형 제피정제\n2. 포스파티딜세린 : 표시량(300mg/2100mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 60분 이내",
+      "intake": "1일 1회, 1회 1포(은행잎추출물정제 500mg X 1T, 포스파티딜세린정제 800mg X 2T)를 물과 함께 섭취하십시오.",
+      "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n[은행잎추출물] \n어린이, 임산부 및 수유부는 섭취를 피할 것\n수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n[포스파티딜세린] 임산부 및 수유부는 섭취를 피할 것",
+      "dosageForm": "[은행잎추출물정제] 고유의 향미가 있고 이미∙이취가 없는 점박이를 포함한 흐린 녹갈색의 투명 장방형 제피정제 [포스파티딜세린정제] 고유의 향미가 있고 이미∙이취가 없는 점박이를 포함한 분홍빛 하얀색의 갈회색 장방형 제피정제",
+      "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredAmount": {
+        "value": 28,
+        "unit": "mg",
+        "basisAmount": 2100,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingsPerDay": 1,
+        "servingTotalWeight": null,
+        "dailyTotalWeight": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null,
+      "_secondFunctional": {
+        "ingredient": "포스파티딜세린",
+        "declaredLabelAmount": "300mg",
+        "basis": "2,100mg",
+        "recognizedFunction": "노화로 인해 저하된 인지력 개선에 도움을 줄 수 있는 기능성 원료입니다."
+      },
+      "_thirdFunctional": {
+        "ingredient": "비타민E",
+        "declaredLabelAmount": "11mg",
+        "basis": "2,100mg",
+        "recognizedFunction": "항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다."
+      }
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">포스파티딜세린 300mg</span><span class=\"sd-badge\">비타민E 11mg</span></div>\n  <h1>메모리메이트<small>은행잎추출물 + 포스파티딜세린 + 비타민E · 기억력·혈행</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회, 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물, 포스파티딜세린, 비타민E를 함께 담은 건강기능식품입니다. 은행잎추출물은 기억력 개선과 혈행 개선에 도움을 줄 수 있는 기능성 원료입니다. 포스파티딜세린은 노화로 인해 저하된 인지력 개선에 도움을 줄 수 있는 기능성 원료입니다. 비타민E는 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다. 각 원료는 모두 식약처가 인정한 기능성 원료이며, 아래에서 원료별 표시량과 인정 기능성을 확인하실 수 있습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>은행잎추출물 28mg + 포스파티딜세린 300mg + 비타민E 11mg — 표시 기준 2,100mg</li><li>은행잎추출물, 포스파티딜세린, 비타민E가 모두 식약처 인정 기능성 원료</li><li>1일 1회 · 1회 1포 · 물과 함께</li><li>주식회사 노바렉스 제조 · 건강기능식품</li><li>대장균군 음성 — 식약처 신고 기준 적합</li></ul>\n  <h2>핵심 구성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">기억력·혈행 기능성</span><h3>은행잎추출물 28mg</h3><p>표시 기준 2,100mg당 은행잎추출물 지표성분 플라보놀배당체 28mg입니다. 은행잎추출물은 기억력 개선과 혈행 개선에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">인지력 기능성</span><h3>포스파티딜세린 300mg</h3><p>표시 기준 2,100mg당 포스파티딜세린 300mg입니다. 포스파티딜세린은 노화로 인해 저하된 인지력 개선에 도움을 줄 수 있는 기능성 원료입니다.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">항산화 기능성</span><h3>비타민E 11mg</h3><p>표시 기준 2,100mg당 비타민E 11mg입니다. 비타민E는 항산화 작용을 하여 유해산소로부터 세포를 보호하는 데 필요한 기능성 원료입니다.</p></div></div>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 2,100mg당 28mg</div><div class=\"sd-item\"><b>포스파티딜세린</b> 2,100mg당 300mg</div><div class=\"sd-item\"><b>비타민E</b> 2,100mg당 11mg</div><div class=\"sd-item\"><b>성상</b> 은행잎추출물정제와 포스파티딜세린정제로 구성된 1포입니다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>기억력과 혈행 관리가 신경 쓰이는 분</li><li>은행잎추출물에 포스파티딜세린·비타민E를 더해 챙기고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 은행잎추출물은 어린이·임산부·수유부·수술 전후에는 섭취에 주의 · 의약품(항응고제) 복용 시 섭취에 주의 · 과잉 섭취 시 위장장애나 불면증을 유발할 수 있음 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 궁금한 점은 매장 담당자 또는 관련 전문가에게 문의해 주세요.</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28 mg</span><span class=\"sd-badge\">Phosphatidylserine 300 mg</span><span class=\"sd-badge\">Vitamin E 11 mg</span></div>\n  <h1>Memory Mate<small>Ginkgo + Phosphatidylserine + Vitamin E · Memory &amp; circulation</small></h1><p class=\"sd-meta\">Made by Novarex · Once a day, 1 pouch per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This health functional food combines Ginkgo leaf extract, Phosphatidylserine, Vitamin E. Ginkgo leaf extract may help with memory and blood circulation. Phosphatidylserine may help with age-related decline in cognition. Vitamin E is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals. Each ingredient is recognized by Korea's MFDS, and the labelled amount and recognized function of each are shown below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Ginkgo leaf extract 28 mg + Phosphatidylserine 300 mg + Vitamin E 11 mg — per the labelled 2,100 mg basis</li><li>Ginkgo leaf extract, Phosphatidylserine, Vitamin E are all MFDS-recognized functional ingredients</li><li>Once a day · 1 pouch per serving · With water</li><li>Made by Novarex · Health Functional Food</li><li>Coliform negative — meets its MFDS notified standard</li></ul>\n  <h2>Key composition</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">Memory & circulation function</span><h3>Ginkgo leaf extract 28 mg</h3><p>The labelled amount is 28 mg of Ginkgo leaf extract per 2,100 mg. Ginkgo leaf extract may help with memory and blood circulation.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Cognition function</span><h3>Phosphatidylserine 300 mg</h3><p>The labelled amount is 300 mg of Phosphatidylserine per 2,100 mg. Phosphatidylserine may help with age-related decline in cognition.</p></div><div class=\"sd-item\"><span class=\"sd-tag\">Antioxidant function</span><h3>Vitamin E 11 mg</h3><p>The labelled amount is 11 mg of Vitamin E per 2,100 mg. Vitamin E is an MFDS-recognized ingredient needed for antioxidant protection of cells from free radicals.</p></div></div>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 pouch per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> 28 mg per 2,100 mg</div><div class=\"sd-item\"><b>Phosphatidylserine</b> 300 mg per 2,100 mg</div><div class=\"sd-item\"><b>Vitamin E</b> 11 mg per 2,100 mg</div><div class=\"sd-item\"><b>Appearance</b> As officially described</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 months</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who care about memory and blood circulation</li><li>Those who want ginkgo plus phosphatidylserine and vitamin E</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Ginkgo extract: use with caution for children, pregnant or nursing women, and around surgery · Use with caution if you take anticoagulant medication · Excessive intake may cause stomach upset or insomnia · Stop use and consult a professional if adverse effects occur · For any questions, please ask a store staff member or a relevant professional.</div></div>"
+    }
+  }
+]
