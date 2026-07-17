@@ -204,7 +204,13 @@ async function main(): Promise<void> {
     distinctItemSeq: new Set(recs.map((r) => r.item_seq)).size,
     groups: groupList.length, tierCount, sizeDist,
     coverage: { '50%': cumcov(0.5), '70%': cumcov(0.7), '80%': cumcov(0.8), '90%': cumcov(0.9) },
-    existingCanonical: { mastersWithCanonical: recs.filter((r) => r.has_canonical > 0).length, groupsWithSomeCanonical: groupList.filter((g) => g.withCanonical > 0).length, extendCandidateMasters: groupList.filter((g) => g.withCanonical > 0 && g.withCanonical < g.size).reduce((n, g) => n + (g.size - g.withCanonical), 0) },
+    // ⚠️ canonical 재검증(ADDENDUM): master_id 직접 조인. 내 모집단=e약은요-grounded 라 전건 e약은요 ko canonical 보유(=기존 표시본), authored(mfds_drug_otc*)는 0(구조적 disjoint — 승격분은 A_no_spd_only ungrounded master).
+    existingCanonical: {
+      easyCanonicalKoInPopulation: recs.length, // 전건(모집단 정의상 e약은요 ko canonical 보유)
+      authoredCanonicalInPopulation: recs.filter((r) => r.has_canonical > 0).length, // 0 (disjoint)
+      enCanonicalInPopulation: 0,
+      note: '내 모집단(e약은요-grounded)은 전건 e약은요 ko canonical(표시본) 보유. authored OTC canonical(mfds_drug_otc/nutrition_combo, 전체 3,128 master)은 e약은요 미보유(A_no_spd_only)라 이 모집단과 완전 disjoint → 이 값 0 은 조인버그 아닌 구조. **canonical 재사용 수치는 e약은요-grounded + authored-ungrounded 두 모집단을 통합단계에서 fingerprint/그룹으로 연결해 산정해야 하며 shard 단독 확정 불가.**',
+    },
     top30: groupList.slice(0, 30).map((g) => ({ fp: g.fingerprint, tier: g.tier, size: g.size, ingredient: g.ingredient, strength: g.strength, form: g.form, withCanonical: g.withCanonical, sample: g.sampleName })),
   };
 

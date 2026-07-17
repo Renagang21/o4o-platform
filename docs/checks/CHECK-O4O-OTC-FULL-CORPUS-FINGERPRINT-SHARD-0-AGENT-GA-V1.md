@@ -70,14 +70,29 @@ WO: `WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-AUDIT-3-AGENT-V1` · 일자: 2026
 
 ---
 
-## 5. 기존 canonical
+## 5. 기존 canonical — ⚠️ ADDENDUM 재검증 (canonical 연결)
 
-| 항목 | 값 |
-|---|---:|
-| shard 0 master 중 mfds_drug_otc STORE canonical 보유 | **0** |
-| canonical 보유 그룹 / 확장 후보 master | 0 / 0 |
+> `기존 canonical 0` 신호를 ADDENDUM 로직(master_id 직접 조인, 전 source_type·language·status)으로 재검증. **조인 버그 아님 — 구조적 disjoint 확인. 단 재사용 수치는 통합단계 전 확정 금지.**
 
-> shard 0 에는 기 승격 제품 없음(Batch 01·복합제 등은 특정 그룹/타 shard). 전량 신규 대상.
+| 연결 방식(master_id 직접) | ko | en | ko+en | 미보유 |
+|---|---:|---:|---:|---:|
+| **e약은요**(mfds_easy_drug) canonical | **6,407** | 0 | 0 | 0 |
+| **authored**(mfds_drug_otc·nutrition_combo) canonical | **0** | **0** | 0 | — |
+| needs_review(ko·en) | 0 | 0 | — | — |
+| 통합 판정 | 전건 e약은요 ko 표시본 보유 · authored/en 0 | | | none 0 |
+
+**원인 = 구조적 disjoint (조인·조건 문제 아님)**:
+- 내 모집단 = **e약은요-grounded OTC**(19,131). master_id 직접 조인상 **전건 e약은요 ko canonical 보유**(=현재 표시본). source_ref_id 아닌 master_id 조인이며 결과 동일(과잉조건 아님).
+- **authored OTC canonical 은 전량 e약은요 미보유**: mfds_drug_otc ko 1,213 + nutrition_combo 1,915 = **3,128 master, 그중 e약은요 보유 0**(승격이 A_no_spd_only=STORE canonical 없는 master 대상). shard 분포 0:1,093 / 1:979 / 2:1,056.
+- 따라서 authored canonical 은 내 e약은요-grounded 모집단과 **완전 disjoint** → shard 0 값 0 은 정상.
+
+**⚠️ 함의 (재사용 수치 미확정)**:
+1. OTC master 는 **3집단**: ①e약은요-grounded(19,131, 표시본=e약은요) ②authored-ungrounded(3,128, 표시본=우리 작성) ③무canonical(나머지).
+2. 내 audit 은 ①만 지문화. ②(shard0 ~1,093)는 모집단 밖.
+3. **"canonical 재사용"은 ①의 e약은요 표시본 + ②의 authored 표시본을 통합단계에서 fingerprint/그룹으로 연결해 산정**해야 하며 **shard 단독·현 시점 확정 불가**.
+4. 같은 약이 ①(grounded)·②(ungrounded)에 나뉘어 있을 수 있음(그룹의 grounded=e약은요 / ungrounded=authored) → 통합단계 병합 대상.
+
+> **정정**: summary JSON `existingCanonical` = `{easy 6,407, authored 0, en 0}` 로 재산출(초기 authored-only 집계의 `0` 은 e약은요 표시본을 누락 표현). fingerprint·Tier 결과 불변.
 
 ---
 
