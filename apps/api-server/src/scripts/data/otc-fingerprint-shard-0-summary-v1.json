@@ -1,0 +1,360 @@
+{
+  "wo": "WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-AUDIT-3-AGENT-V1",
+  "agent": "가",
+  "shard": 0,
+  "dbWrite": 0,
+  "safetyConsolidation": {
+    "oralMasters": 4250,
+    "safetyGroups": 1244,
+    "coverage": {
+      "50%": 283,
+      "70%": 533,
+      "80%": 692,
+      "90%": 904
+    },
+    "note": "경구·단일제만. 성분·함량·제형·경로+안전지문 동일 → 문구변이 무시하고 대표 1건 공유 가능(통합단계 후보). content-fp 보다 훨씬 적음 = 문구변이로 인한 fp 분열 규모"
+  },
+  "shardMasters": 6407,
+  "extractOk": 6407,
+  "extractFail": 0,
+  "distinctItemSeq": 1560,
+  "groups": 2285,
+  "tierCount": {
+    "Tier1": {
+      "masters": 4158,
+      "groups": 1287
+    },
+    "Tier5": {
+      "masters": 2157,
+      "groups": 986
+    },
+    "Tier3": {
+      "masters": 61,
+      "groups": 8
+    },
+    "Tier2": {
+      "masters": 31,
+      "groups": 4
+    }
+  },
+  "sizeDist": {
+    "1": 804,
+    "2-5": 1247,
+    "6-20": 227,
+    "21-50": 6,
+    "51+": 1
+  },
+  "coverage": {
+    "50%": 506,
+    "70%": 924,
+    "80%": 1243,
+    "90%": 1645
+  },
+  "existingCanonical": {
+    "mastersWithCanonical": 0,
+    "groupsWithSomeCanonical": 0,
+    "extendCandidateMasters": 0
+  },
+  "top30": [
+    {
+      "fp": "d4482002d924d5da",
+      "tier": "Tier1",
+      "size": 52,
+      "ingredient": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "엘다인캡슐(에르도스테인)"
+    },
+    {
+      "fp": "a699684548af2f2f",
+      "tier": "Tier5",
+      "size": 34,
+      "ingredient": "디클로페낙나트륨",
+      "strength": "15밀리그램",
+      "form": "첩부제",
+      "withCanonical": 0,
+      "sample": "트라스트디펜플라스타(디클로페낙나트륨)"
+    },
+    {
+      "fp": "981488eef906287b",
+      "tier": "Tier1",
+      "size": 25,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "새로모아캡슐"
+    },
+    {
+      "fp": "e59b9eb746ed12e8",
+      "tier": "Tier1",
+      "size": 22,
+      "ingredient": "클로닉신리시네이트",
+      "strength": "125밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "노리스정(클로닉신리시네이트)"
+    },
+    {
+      "fp": "83b688a8b29e036b",
+      "tier": "Tier1",
+      "size": 22,
+      "ingredient": "",
+      "strength": "20밀리리터",
+      "form": "액",
+      "withCanonical": 0,
+      "sample": "리버베타액"
+    },
+    {
+      "fp": "fd5d12290c40af99",
+      "tier": "Tier1",
+      "size": 22,
+      "ingredient": "트리메부틴말레산염",
+      "strength": "150밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "포리부틴정150mg(트리메부틴말레산염)"
+    },
+    {
+      "fp": "613223c138319bda",
+      "tier": "Tier1",
+      "size": 21,
+      "ingredient": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "엘도란트캡슐(에르도스테인)"
+    },
+    {
+      "fp": "4c23d6b38ba74922",
+      "tier": "Tier1",
+      "size": 19,
+      "ingredient": "암브록솔염산염",
+      "strength": "30밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "뮤코펙트정(암브록솔염산염)"
+    },
+    {
+      "fp": "5aab0e0cd1802e58",
+      "tier": "Tier3",
+      "size": 18,
+      "ingredient": "세티리진염산염",
+      "strength": "10밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "코졸텍정(세티리진염산염)"
+    },
+    {
+      "fp": "dda84e392917f4e6",
+      "tier": "Tier1",
+      "size": 18,
+      "ingredient": "알마게이트",
+      "strength": "500밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "알마제트정(알마게이트)"
+    },
+    {
+      "fp": "7965d7979fa60318",
+      "tier": "Tier1",
+      "size": 18,
+      "ingredient": "클로닉신리시네이트",
+      "strength": "125밀리그램",
+      "form": "연질캡슐",
+      "withCanonical": 0,
+      "sample": "클로나인연질캡슐(클로닉신리시네이트)"
+    },
+    {
+      "fp": "f2a2e47645402655",
+      "tier": "Tier5",
+      "size": 17,
+      "ingredient": "플루르비프로펜",
+      "strength": "20밀리그램",
+      "form": "첩부제",
+      "withCanonical": 0,
+      "sample": "파워스탑플라스타(플루르비프로펜)"
+    },
+    {
+      "fp": "01a3d3748a9c1f73",
+      "tier": "Tier1",
+      "size": 17,
+      "ingredient": "바실루스리케니포르미스균",
+      "strength": "250밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "락비오캡슐(바실루스리케니포르미스균)"
+    },
+    {
+      "fp": "e80a8de63fec9b4c",
+      "tier": "Tier5",
+      "size": 14,
+      "ingredient": "케토프로펜",
+      "strength": "30밀리그램",
+      "form": "첩부제",
+      "withCanonical": 0,
+      "sample": "케토진첩부제(케토프로펜)"
+    },
+    {
+      "fp": "5f3657f34f98cec1",
+      "tier": "Tier5",
+      "size": 14,
+      "ingredient": "디클로페낙나트륨",
+      "strength": "21밀리그램",
+      "form": "첩부제",
+      "withCanonical": 0,
+      "sample": "게보핏파워플라스타(디클로페낙나트륨)"
+    },
+    {
+      "fp": "1c2e38232d471a9e",
+      "tier": "Tier1",
+      "size": 14,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "휴비스트아스피린장용정"
+    },
+    {
+      "fp": "3f45a385d23b8a7a",
+      "tier": "Tier1",
+      "size": 14,
+      "ingredient": "아스피린",
+      "strength": "100밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "뉴스피린장용정100밀리그램(아스피린)"
+    },
+    {
+      "fp": "37afed07cf8c1558",
+      "tier": "Tier1",
+      "size": 14,
+      "ingredient": "브로멜라인",
+      "strength": "100밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "키도멜라인장용정(브로멜라인)"
+    },
+    {
+      "fp": "73d99b7bdc15bbcd",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "",
+      "strength": "10밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]"
+    },
+    {
+      "fp": "f55debd2caae4fbc",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "신일트리메부틴말레산염정"
+    },
+    {
+      "fp": "72abe338953636a2",
+      "tier": "Tier5",
+      "size": 13,
+      "ingredient": "아모롤핀염산염",
+      "strength": "5밀리리터",
+      "form": "기타",
+      "withCanonical": 0,
+      "sample": "클리넬네일라카(아모롤핀염산염)"
+    },
+    {
+      "fp": "61f741e57e9675c9",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "아세틸시스테인",
+      "strength": "200밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "엔테인캡슐(아세틸시스테인)"
+    },
+    {
+      "fp": "415fbf45d2d828e8",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "",
+      "strength": "155밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "훼너지캡슐"
+    },
+    {
+      "fp": "eed78cefff129904",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "",
+      "strength": "125밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "시알딘정"
+    },
+    {
+      "fp": "0b0338946ba4c16c",
+      "tier": "Tier1",
+      "size": 13,
+      "ingredient": "",
+      "strength": "5밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "둘코락스에스장용정"
+    },
+    {
+      "fp": "39f835a490ddf988",
+      "tier": "Tier1",
+      "size": 12,
+      "ingredient": "알벤다졸",
+      "strength": "400밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "젠타졸정(알벤다졸)"
+    },
+    {
+      "fp": "7baab91116fdca2d",
+      "tier": "Tier5",
+      "size": 12,
+      "ingredient": "",
+      "strength": "2밀리그램",
+      "form": "정",
+      "withCanonical": 0,
+      "sample": "세나서트2밀리그람질정"
+    },
+    {
+      "fp": "cf697193927fd3ca",
+      "tier": "Tier5",
+      "size": 12,
+      "ingredient": "",
+      "strength": "0.15그램",
+      "form": "기타",
+      "withCanonical": 0,
+      "sample": "한창멸균포비돈스왑스틱"
+    },
+    {
+      "fp": "ccfa8e92341197b3",
+      "tier": "Tier3",
+      "size": 12,
+      "ingredient": "아세틸시스테인",
+      "strength": "200밀리그램",
+      "form": "캡슐",
+      "withCanonical": 0,
+      "sample": "세티레인캡슐200mg(아세틸시스테인)"
+    },
+    {
+      "fp": "dffdd1571a46b2a8",
+      "tier": "Tier5",
+      "size": 12,
+      "ingredient": "리도카인",
+      "strength": "500그램",
+      "form": "크림",
+      "withCanonical": 0,
+      "sample": "리카엘크림(리도카인)"
+    }
+  ]
+}
