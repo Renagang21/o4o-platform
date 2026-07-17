@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-BULK-BATCH-01B-KO-DRAFT-CORRECTION-AGENT-GA-V1",
+  "group": "결정글루코사민황산염|250밀리그램|캡슐",
+  "reason": "황색5호 신중 경고 — grounded 10/10 함유이나 이 ungrounded(원문없음) 승격대상은 함유 미확정. NB_DOC 첨가제 원천으로 함유 확정 후 서브그룹 분리(첨가제 트랙).",
+  "ungroundedTargets": [
+    {
+      "master_id": "cdf7db47-1544-4c13-9e16-4984463c84cd",
+      "name": "오라테오캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "b9a05c58-bc7a-4c58-ae1e-de335ebd27f2",
+      "name": "오라테오캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "4c342745-a96c-48b7-981f-d8e9d9092c86",
+      "name": "코스민캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "6cc7a7fa-66e5-417e-87a4-1466dbabfcb1",
+      "name": "코스민캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "fcd9b9d6-d3d3-4fc3-9246-4896350c5ef8",
+      "name": "코스민캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "bb3b6b34-3e57-471f-b76d-f925dd43c2a1",
+      "name": "코스민캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "94958423-07f4-480b-b852-6b8f26017fad",
+      "name": "오라테오캡슐(결정글루코사민황산염)"
+    },
+    {
+      "master_id": "392569e9-58f6-4730-aa75-a67128c84656",
+      "name": "코스민캡슐(결정글루코사민황산염)"
+    }
+  ]
+}
