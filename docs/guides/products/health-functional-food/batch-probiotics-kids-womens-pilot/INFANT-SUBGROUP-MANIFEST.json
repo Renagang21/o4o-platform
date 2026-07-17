@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-HFF-PROBIOTICS-KIDS-WOMENS-EXPANSION-V1 (INFANT 소그룹)",
+  "generatedAt": "2026-07-18",
+  "status": "PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION",
+  "reReview": "별도 재검 대상(규제 민감) — 오케스트레이터 별도 재검 후 적재",
+  "criterion": "원문에 분유·젖병·이유식 급여 명시된 영유아 제품만. 급여방법 bullet=원문 근거만. blacklist 포맷 제외.",
+  "production": {
+    "count": 2,
+    "items": [
+      {
+        "statementNo": "20040017014444",
+        "slug": "c-cp01-01-beibi-kijeu-live-probiotics",
+        "target": "INFANT",
+        "productName": "베이비&키즈 생유산균",
+        "productNameEn": "Beibi&Kijeu Live Probiotics",
+        "manufacturer": "(주)뉴팜",
+        "dataFile": "hff-probiotics-kw-inf-cp01.json"
+      },
+      {
+        "statementNo": "20040017014505",
+        "slug": "c-cp01-02-raktorium-probiotics-kijeuae",
+        "target": "INFANT",
+        "productName": "락토리움 프로바이오틱스 키즈앤베이비 생유산균",
+        "productNameEn": "Raktorium Probiotics Kijeuaenbeibi Live Probiotics",
+        "manufacturer": "(주)뉴팜",
+        "dataFile": "hff-probiotics-kw-inf-cp01.json"
+      }
+    ]
+  },
+  "hold": {
+    "count": 0,
+    "items": []
+  },
+  "applyContract": {
+    "reuse": "hff-b3-store-canonical-apply.ts(loadTargets → kw-inf-cp01, TARGET=2)",
+    "expectedWrites": "8 = master2+candidate2+SPD(ko2+en2)",
+    "dbWrite": "미실행(권한 대기)"
+  }
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "candidateId": "c-cp01:c-cp01-01-beibi-kijeu-live-probiotics",
+    "productName": "베이비&키즈 생유산균",
+    "productNameEn": "Beibi&Kijeu Live Probiotics",
+    "manufacturer": "(주)뉴팜",
+    "manufacturerEn": "Newpharm",
+    "statementNo": "20040017014444",
+    "category": "hff",
+    "_bucket": "유산균/장",
+    "_slug": "c-cp01-01-beibi-kijeu-live-probiotics",
+    "_target": "INFANT",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "- 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말 - 프로바이오틱스 수 : 표시량(500,000,000(5억) cfu/2,000 mg) - 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 직접 또는 물, 우유, 이유식 등과 함께 섭취하세요.",
+      "caution": "- 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n- 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n- 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n- 섭취량 및 섭취방법을 확인하시고 섭취하여 주십시오.\n- 소비기한이 경과된 제품은 섭취하지 않도록 주의하십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말",
+      "storage": "직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 500000000
+      },
+      "declaredAmount": {
+        "value": 5,
+        "unit": "억 CFU",
+        "basisAmount": 2000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2000mg당 5억 CFU</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>베이비&키즈 생유산균<small>프로바이오틱스 · 아이 장 건강</small></h1><p class=\"sd-meta\">(주)뉴팜 제조 · 보호자 안내</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">아이의 장 건강을 챙기려는 보호자를 위한 제품입니다. 표시 기준은 <b>2000mg당 5억 CFU</b>이며, 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2000mg당 5억 CFU</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말 · (주)뉴팜 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(500,000,000(5억) cfu/2,000 mg)</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>보호자 안내</h2><ul class=\"sd-who\"><li>아이에게 먹이기 전 공식 <b>일일섭취량과 섭취방법</b>을 지켜 주세요</li><li>물 외에 우유·이유식 등에 타서 먹일 수 있습니다 — 공식 표기</li><li>알레르기 체질은 개인에 따라 과민반응이 있을 수 있으니 주의해 주세요</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">500 million CFU per 2000mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Beibi&Kijeu Live Probiotics<small>Probiotics · Children's gut health</small></h1><p class=\"sd-meta\">Made by Newpharm · For guardians</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">For parents caring for a child's gut health. The labelled standard is <b>500 million CFU per 2000mg</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is <b>500 million CFU per 2000mg</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Newpharm</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> 500 million CFU per 2000mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>For guardians</h2><ul class=\"sd-who\"><li>Follow the official <b>daily intake and directions</b> before giving it to a child</li><li>Besides water, it can be mixed into milk, baby food — as officially stated</li><li>Allergic individuals may react differently — please take care</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  },
+  {
+    "candidateId": "c-cp01:c-cp01-02-raktorium-probiotics-kijeuae",
+    "productName": "락토리움 프로바이오틱스 키즈앤베이비 생유산균",
+    "productNameEn": "Raktorium Probiotics Kijeuaenbeibi Live Probiotics",
+    "manufacturer": "(주)뉴팜",
+    "manufacturerEn": "Newpharm",
+    "statementNo": "20040017014505",
+    "category": "hff",
+    "_bucket": "유산균/장",
+    "_slug": "c-cp01-02-raktorium-probiotics-kijeuae",
+    "_target": "INFANT",
+    "source": {
+      "mainFunction": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+      "baseStandard": "성상 : 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말 프로바이오틱스 수 : 표시량(800,000,000 cfu/2,000mg) 이상 대장균군 : 음성",
+      "intake": "1일 1회, 1회 1포를 직접 또는 물 또는 우유, 이유식 등에 타거나 직접 섭취하십시오.",
+      "caution": "- 특이체질, 질병 치료 중인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n- 과량 섭취 시 부작용 가능성이 있습니다\n- 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n- 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n- 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n- 소비기한이 경과된 제품은 섭취하지 않도록 주의하십시오.",
+      "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말",
+      "storage": "직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.",
+      "shelfLife": "제조일로부터 24개월"
+    },
+    "grounding": {
+      "declaredCfu": {
+        "absolute": 800000000
+      },
+      "declaredAmount": {
+        "value": 8,
+        "unit": "억 CFU",
+        "basisAmount": 2000,
+        "basisUnit": "mg"
+      },
+      "serving": {
+        "unitType": "stick",
+        "unitWeight": null,
+        "unitWeightUnit": null,
+        "unitsPerServing": 1,
+        "servingTotalWeight": null,
+        "servingTotalWeightUnit": null,
+        "servingsPerDay": 1,
+        "servingsPerDayMax": null
+      },
+      "calculationAllowed": false,
+      "ageBandsRaw": null
+    },
+    "drafts": {
+      "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2000mg당 8억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>락토리움 프로바이오틱스 키즈앤베이비 생유산균<small>프로바이오틱스 · 아이 장 건강</small></h1><p class=\"sd-meta\">(주)뉴팜 제조 · 보호자 안내</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">아이의 장 건강을 챙기려는 보호자를 위한 제품입니다. 표시 기준은 <b>2000mg당 8억 CFU 이상</b>이며, 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2000mg당 8억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li><b>직접 섭취</b> 가능 — 공식 표기</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말 · (주)뉴팜 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">직접 또는 물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(800,000,000 cfu/2,000mg) 이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>보호자 안내</h2><ul class=\"sd-who\"><li>아이에게 먹이기 전 공식 <b>일일섭취량과 섭취방법</b>을 지켜 주세요</li><li>물 외에 우유·이유식 등에 타서 먹일 수 있습니다 — 공식 표기</li><li>알레르기 체질은 개인에 따라 과민반응이 있을 수 있으니 주의해 주세요</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+      "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">at least 800 million CFU per 2000mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Raktorium Probiotics Kijeuaenbeibi Live Probiotics<small>Probiotics · Children's gut health</small></h1><p class=\"sd-meta\">Made by Newpharm · For guardians</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">For parents caring for a child's gut health. The labelled standard is at least <b>800 million CFU per 2000mg</b>. <b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count. Probiotics are recognized by Korea's MFDS as an ingredient that may help promote lactic acid bacteria growth and suppress harmful bacteria, may help support smooth bowel movement, and may help support gut health.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>The labelled standard for this product is at least <b>800 million CFU per 2000mg</b></li><li><b>The weight of one stick is not stated in the official text</b>, so this page does not calculate a per-stick count</li><li><b>Can be taken directly</b> — as officially stated</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by Newpharm</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">Directly or with water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Probiotic count</b> at least 800 million CFU per 2000mg</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 연한 노란 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>For guardians</h2><ul class=\"sd-who\"><li>Follow the official <b>daily intake and directions</b> before giving it to a child</li><li>Besides water, it can be mixed into milk, baby food — as officially stated</li><li>Allergic individuals may react differently — please take care</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children and follow the stated daily intake · Stop use and consult a professional if adverse effects occur</div></div>"
+    }
+  }
+]
