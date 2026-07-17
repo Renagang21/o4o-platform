@@ -1,0 +1,33 @@
+{
+  "wo": "WO-O4O-OTC-BULK-BATCH-02-KO-FINALIZE-DRYRUN-AGENT-NA-V1",
+  "agent": "나",
+  "batch": "Batch 02",
+  "policy": "A_no_spd_only (NOT EXISTS canonical)",
+  "sourceType": "mfds_drug_otc",
+  "language": "ko",
+  "descriptionType": "STORE",
+  "dryRunVerified": true,
+  "dbWriteThisWo": 0,
+  "enumeration": {
+    "groupBase": "regulatory_type=DRUG AND drug_category=otc AND name LIKE '%(성분)' AND split_part(spec,' / ',1)=함량 AND formCase=formKeyword",
+    "formCase": "연질캡슐 우선 → 캡슐 → 정 (master당 정확히 하나)",
+    "promotable": "그룹 master 중 canonical 전무(NOT EXISTS status=canonical)"
+  },
+  "totals": { "groups": 8, "newKoCanonical": 66, "enUnfold": 66, "batch01Intersection": 0, "internalDup": 0, "canonicalConflict": 0 },
+  "groups": [
+    { "key": "나프록센|250밀리그램|연질캡슐", "ingredient": "나프록센", "dose": "250밀리그램", "formKeyword": "연질캡슐", "candidateId": "02355c78-3d6d-4f6b-8120-de9ff7f14673", "groupTotal": 101, "newInsert": 14, "verdict": "승격 가능", "route": "oral", "rx": 0 },
+    { "key": "알파칼시돌|1마이크로그램|연질캡슐", "ingredient": "알파칼시돌", "dose": "1마이크로그램", "formKeyword": "연질캡슐", "candidateId": "06a1eed0-e249-402a-a4f0-e234d1f952ed", "groupTotal": 20, "newInsert": 10, "verdict": "승격 가능(검토 강화)", "route": "oral", "rx": 0, "note": "제품별 적응증 동일(easydrug 2변형=용법 표현차이만). low_ground(10/20 무source)" },
+    { "key": "아르기닌티디아시케이트|200밀리그램|연질캡슐", "ingredient": "아르기닌티디아시케이트", "dose": "200밀리그램", "formKeyword": "연질캡슐", "candidateId": "20d395df-0846-428a-b5e1-684cb9e08fb6", "groupTotal": 17, "newInsert": 10, "verdict": "승격 가능(현행 draft, 보정 불가)", "route": "oral", "rx": 0, "note": "효능=허가원문 verbatim(한 문장). 보강 grounding 없음 → draft 미수정. apply 여부 사용자 승인 권고" },
+    { "key": "이부프로펜|400밀리그램|연질캡슐", "ingredient": "이부프로펜", "dose": "400밀리그램", "formKeyword": "연질캡슐", "candidateId": "01a08a82-92c6-4436-889e-4409bb0e0b47", "groupTotal": 36, "newInsert": 8, "verdict": "승격 가능", "route": "oral", "rx": 0 },
+    { "key": "클로닉신리시네이트|125밀리그램|연질캡슐", "ingredient": "클로닉신리시네이트", "dose": "125밀리그램", "formKeyword": "연질캡슐", "candidateId": "03de1849-7d18-4ea4-8896-63a3658540c4", "groupTotal": 36, "newInsert": 7, "verdict": "승격 가능", "route": "oral", "rx": 0 },
+    { "key": "플루벤다졸|500밀리그램|정", "ingredient": "플루벤다졸", "dose": "500밀리그램", "formKeyword": "정", "candidateId": "0edb60a6-884b-43c5-b285-6de48db71bb2", "groupTotal": 14, "newInsert": 7, "verdict": "승격 가능", "route": "oral", "rx": 0 },
+    { "key": "이부프로펜아르기닌|368.9밀리그램|정", "ingredient": "이부프로펜아르기닌", "dose": "368.9밀리그램", "formKeyword": "정", "candidateId": "11b84cc1-a386-47b5-9337-6643dc1ab438", "groupTotal": 14, "newInsert": 6, "verdict": "승격 가능", "route": "oral", "rx": 0 },
+    { "key": "L-시스틴|500밀리그램|연질캡슐", "ingredient": "L-시스틴", "dose": "500밀리그램", "formKeyword": "연질캡슐", "candidateId": "1167c6d5-0cfd-4594-b15d-20f51e72521b", "groupTotal": 12, "newInsert": 4, "verdict": "승격 가능", "route": "oral", "rx": 0 }
+  ],
+  "gates": { "buildMissing": 0, "hasTable": 0, "hasComment": 0, "sdWarnAll": true, "nonoral": 0, "rxMix": 0 },
+  "excludedFromBatch": [
+    { "key": "클로트리마졸|100밀리그램|정", "reason": "비경구 질정(name 질정 40/40)", "track": "별도 비경구" },
+    { "key": "파모티딘|10밀리그램|정", "reason": "rx 혼입 3", "track": "별도" },
+    { "key": "펙소페나딘염산염|60밀리그램|정", "reason": "rx 혼입 2", "track": "별도" }
+  ]
+}
