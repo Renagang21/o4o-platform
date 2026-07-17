@@ -54,6 +54,9 @@ const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
 
 const PAGE_SIZES = [10, 20, 50];
 
+// WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 단독 미리보기는 코너 문맥 없음 → 상품 미표시(페이지 previewApi 와 동일 sentinel).
+const PREVIEW_NO_CORNER = '__none__';
+
 // ─── Action Policy (개별 작업 = 점 3개 kebab) ─────────────────────────────────
 const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', {
   inlineMax: 0,
@@ -92,6 +95,8 @@ interface Props {
   /** 행 미리보기(kiosk-core 재사용) — 미주입 시 미리보기 비활성. */
   previewApi?: TabletKioskApi;
   storeSlug?: string | null;
+  /** WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 미리보기 코너 문맥. 리스트 단독은 코너 없음(상품 미표시). */
+  onPreviewContext?: (tabletId: string | null) => void;
 }
 
 export default function TabletContentLibraryList({
@@ -106,6 +111,7 @@ export default function TabletContentLibraryList({
   onRefresh,
   previewApi,
   storeSlug,
+  onPreviewContext,
 }: Props) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
@@ -123,6 +129,8 @@ export default function TabletContentLibraryList({
   const handlePreview = useCallback(async (s: ScreenSet) => {
     if (!canPreview) { toast.error('매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
     if (previewBusy) return;
+    // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 단독 미리보기 = 코너 문맥 없음 → Screen Set 원본 기준(상품 미표시).
+    onPreviewContext?.(PREVIEW_NO_CORNER);
     setPreviewBusy(s.id);
     try {
       const detail = await fetchScreenSet(s.id);
@@ -249,13 +257,14 @@ export default function TabletContentLibraryList({
     },
     {
       key: 'usage',
-      header: '사용 중인 코너',
+      // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: usageBySet = '현재 화면으로 적용된' 코너(연결만은 미포함) → 정확한 라벨.
+      header: '현재 적용 코너',
       render: (_v, s) => {
         const corners = usageBySet[s.id] ?? [];
         return corners.length > 0 ? (
-          <span className="text-xs text-emerald-700 truncate" title={corners.join(', ')}>{corners.join(', ')}</span>
+          <span className="text-xs text-emerald-700 truncate" title={`현재 적용 코너: ${corners.join(', ')}`}>{corners.join(', ')}</span>
         ) : (
-          <span className="text-xs text-slate-400">—</span>
+          <span className="text-xs text-slate-400" title="현재 어느 코너에도 적용되지 않음(연결만 되어 있을 수 있음)">현재 미적용</span>
         );
       },
     },
@@ -318,11 +327,11 @@ export default function TabletContentLibraryList({
             <option value="">템플릿 전체</option>
             {templateOptions.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
           </select>
-          {/* 사용 코너 필터 */}
-          <select value={cornerFilter} onChange={(e) => setCornerFilter(e.target.value)} className={selectCls} aria-label="사용 코너 필터">
-            <option value="">코너 전체</option>
+          {/* 현재 적용 코너 필터 */}
+          <select value={cornerFilter} onChange={(e) => setCornerFilter(e.target.value)} className={selectCls} aria-label="현재 적용 코너 필터">
+            <option value="">현재 적용 코너 전체</option>
             {cornerOptions.map((n) => <option key={n} value={n}>{n}</option>)}
-            <option value="__none__">미사용</option>
+            <option value="__none__">현재 미적용</option>
           </select>
           {/* 상태 필터 */}
           <div className="flex gap-1.5 flex-wrap">

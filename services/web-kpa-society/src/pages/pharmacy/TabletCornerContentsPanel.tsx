@@ -48,6 +48,8 @@ interface Props {
   /** 미리보기(kiosk-core 재사용) — 미주입 시 미리보기 비활성. */
   previewApi?: TabletKioskApi;
   storeSlug?: string | null;
+  /** WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 미리보기 상품을 이 코너 진열로 resolve 하도록 문맥 지정. */
+  onPreviewContext?: (tabletId: string | null) => void;
 }
 
 // WO-O4O-KPA-TABLET-CORNER-MANAGEMENT-RESPONSIVE-UI-V1: 콘텐츠별 점3개 메뉴.
@@ -97,7 +99,7 @@ const STATUS_LABEL: Record<ScreenSetStatus, string> = {
 
 const btn = 'min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl inline-flex items-center justify-center gap-1.5';
 
-export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, onToast, previewApi, storeSlug }: Props) {
+export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, onToast, previewApi, storeSlug, onPreviewContext }: Props) {
   const [items, setItems] = useState<CornerContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -110,6 +112,8 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
   const handlePreview = async (it: CornerContent) => {
     if (!canPreview) { onToast({ type: 'error', message: '매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.' }); return; }
     if (previewBusy) return;
+    // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 이 코너의 실제 진열 상품으로 미리보기(공개 화면과 동일 resolve).
+    onPreviewContext?.(tabletId);
     setPreviewBusy(it.screenSetId);
     try {
       const detail = await fetchScreenSet(it.screenSetId);           // 저장된 원본 읽기(read-only)

@@ -58,6 +58,10 @@ import TabletScreenSetManager from './TabletScreenSetManager';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
 
+// WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 콘텐츠 리스트 단독 미리보기 = 코너 문맥 없음 sentinel.
+//   previewApi.fetchProducts 가 이 값이면 백엔드 호출 없이 빈 상품(코너 임의 추정 금지).
+const PREVIEW_NO_CORNER = '__none__';
+
 // ==================== Types ====================
 
 interface DisplayEntry {
@@ -285,18 +289,36 @@ export default function StoreTabletDisplaysPage() {
   };
 
   // 미리보기 전용 api: products 는 공개 조회, 상담은 실제 전송하지 않고 안내만.
+  // WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1:
+  //   미리보기 상품은 kiosk 의 fetchProducts 가 담당(previewScreenSet 은 sections 만).
+  //   previewTabletIdRef 로 코너 문맥 전달 — 코너 미리보기는 그 코너 tabletId(실제 진열 상품),
+  //   콘텐츠 리스트 단독 미리보기는 '__none__'(코너 임의 추정 금지 → 상품 없음, Screen Set 원본 기준).
   const previewApi = useMemo<TabletKioskApi>(() => ({
-    fetchProducts: (slug, params) =>
-      fetchTabletProducts(slug, { ...params, tabletId: previewTabletIdRef.current ?? undefined }),
+    fetchProducts: (slug, params) => {
+      const ctx = previewTabletIdRef.current;
+      if (ctx === PREVIEW_NO_CORNER) {
+        return Promise.resolve({ data: [], meta: { page: 1, limit: params?.limit ?? 20, total: 0, totalPages: 1 } });
+      }
+      return fetchTabletProducts(slug, { ...params, tabletId: ctx ?? undefined });
+    },
     submitInterest: async () => {
       throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
     },
     checkStatus: async () => {
       throw new Error('미리보기에서는 상담 요청이 전송되지 않습니다.');
     },
-    // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: 미리보기도 적용 screen set 반영
-    fetchScreen: (slug) => fetchTabletScreen(slug, previewTabletIdRef.current ?? undefined),
+    // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: 미리보기도 적용 screen set 반영.
+    //   단, 패널/리스트 모달은 previewScreen 을 직접 주입하므로 fetchScreen 은 호출되지 않는다(안전상 유지).
+    fetchScreen: (slug) => {
+      const ctx = previewTabletIdRef.current;
+      return fetchTabletScreen(slug, ctx === PREVIEW_NO_CORNER ? undefined : (ctx ?? undefined));
+    },
   }), []);
+
+  // 미리보기 코너 문맥 지정(패널/리스트가 모달 열기 직전 호출).
+  const setPreviewContext = useCallback((tabletId: string | null) => {
+    previewTabletIdRef.current = tabletId;
+  }, []);
 
   const handleOpenPreview = useCallback(async () => {
     setPreviewLoading(true);
@@ -1112,6 +1134,7 @@ export default function StoreTabletDisplaysPage() {
                   onToast={setToast}
                   previewApi={previewApi}
                   storeSlug={storeSlug}
+                  onPreviewContext={setPreviewContext}
                 />
               )}
 
@@ -1569,6 +1592,7 @@ export default function StoreTabletDisplaysPage() {
             tablets={tablets}
             previewApi={previewApi}
             storeSlug={storeSlug}
+            onPreviewContext={setPreviewContext}
           />
         </div>
       )}

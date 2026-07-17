@@ -52,6 +52,8 @@ interface Props {
   //   kiosk-core 재사용 미리보기 = previewApi(상품 조회) + storeSlug(공개 slug). 미주입 시 미리보기 비활성.
   previewApi?: TabletKioskApi;
   storeSlug?: string | null;
+  // WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 미리보기 코너 문맥(단독=코너 없음) 전달.
+  onPreviewContext?: (tabletId: string | null) => void;
 }
 
 // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 블록 유형 목록/라벨(BLOCK_TYPES·BLOCK_LABEL) 제거 —
@@ -182,7 +184,7 @@ function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
 // WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 대기 화면 소스 선택 UI 제거 → IDLE_SOURCES 불필요.
 //   (콘텐츠마다 YouTube/Vimeo URL 1개만 사용. 저장은 custom_media.items[] 계약 그대로.)
 
-export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug }: Props) {
+export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext }: Props) {
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -298,6 +300,7 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onRefresh={reload}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}
+          onPreviewContext={onPreviewContext}
         />
       </div>
     </div>
