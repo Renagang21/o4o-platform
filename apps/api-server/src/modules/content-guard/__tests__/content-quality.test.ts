@@ -54,6 +54,19 @@ describe('Q-2 원문 절단 — 원문 근거 기반', () => {
     expect(r.findings.some((f) => f.ruleId === 'Q-TRUNCATED-002' && f.status === 'BLOCKED')).toBe(false);
   });
 
+  // 오탐 방지(A-CP03 에이엠비 실측): 원문이 **전각 닫음괄호 ｝** 로 절을 닫으면(표시량｛…｝ 3) 대장균군)
+  //   전각 ｝ 는 셀에서 TRAILING_JUNK 로 제거되고 원문엔 남아 next=｝ 가 되는데, 이는 어절 경계다 → 절단 아님.
+  it('전각 닫음괄호 ｝ 로 끝나는 규격 인용을 절단으로 오탐하지 않는다 (A-CP03 실측)', () => {
+    const src = '1) 성상 : 흰색 분말 2) 프로바이오틱스 수 : 표시량｛100,000,000 CFU/2,000mg(1포) 이상｝ 3) 대장균군 : 음성';
+    const input = {
+      ...OK_VIVA_FULL_BASIS,
+      source: { ...OK_VIVA_FULL_BASIS.source, baseStandard: src },
+      drafts: { ko: '<div class="sd-item"><b>프로바이오틱스 수</b> 표시량｛100,000,000 CFU/2,000mg(1포) 이상｝</div>', en: '<p>x</p>' },
+    };
+    const r = runGuard(input, { phase: 'post' });
+    expect(r.findings.some((f) => f.ruleId === 'Q-TRUNCATED-002' && f.status === 'BLOCKED')).toBe(false);
+  });
+
   it('**정상 한국어(하는 분/있는 것)를 절단으로 오탐하지 않는다** — 93건 전수 오탐의 원인이었다', () => {
     for (const ko of ['<ul class="sd-who"><li>캡슐 형태를 선호하는 분</li></ul>',
       '<ul class="sd-who"><li>하루 한 번으로 관리하고 싶은 분</li></ul>',

@@ -810,7 +810,7 @@ function findTruncation(cell: string, sources: string[]): { evidence: string; fr
     const i = ti; // 원문에서 꼬리가 시작하는 위치
     const next = src[i + tail.length];
     if (next === undefined) return null;           // 원문 끝까지 = 완전 인용
-    if (/[\s.,)\]}·ㆍ]/.test(next)) return null;  // 어절 경계에서 끝남 = 정상
+    if (/[\s.,)\]}·ㆍ）］｝」』]/.test(next)) return null;  // 어절 경계에서 끝남 = 정상(전각 닫음괄호 포함)
     // 단어 중간에서 끊겼다. 다만 **결과가 읽히는지**는 마지막 어절 길이로 갈린다:
     //   "…함유한 투"   → 마지막 어절 1음절 = 파편 → 확실한 파손
     //   "…곳에 보관"   → 원문은 "보관하십시오" 지만 "보관" 자체가 단어 → 읽힌다(요약형)
