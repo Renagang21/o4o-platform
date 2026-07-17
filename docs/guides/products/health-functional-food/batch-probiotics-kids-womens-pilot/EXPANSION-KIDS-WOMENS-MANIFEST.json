@@ -1,0 +1,452 @@
+{
+  "wo": "WO-O4O-HFF-PROBIOTICS-KIDS-WOMENS-EXPANSION-V1",
+  "generatedAt": "2026-07-18",
+  "status": "PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION",
+  "pattern": "파일럿 검증 kwp-write 그대로(보호자 톤·무창작·인정 기능성 verbatim·질병/성장/면역 주장 0). 신규 실패유형 0.",
+  "checkpoints": "KW-CP02(20)+KW-CP03(19)+KW-CP04(7) = 46 작성 / HOLD 2(NAME_UNGROUNDED_CLAIM: AntiAller·immStar)",
+  "targetMix": {
+    "KIDS": 42,
+    "WOMENS": 4
+  },
+  "production": {
+    "count": 46,
+    "items": [
+      {
+        "statementNo": "200700170351587",
+        "slug": "c-cp02-01-ponyu-kijeu-probiotics",
+        "target": "KIDS",
+        "productName": "포뉴 키즈 프로바이오틱스",
+        "productNameEn": "Ponyu Kijeu Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200201144",
+        "slug": "c-cp02-02-super-umeon-probiotics",
+        "target": "WOMENS",
+        "productName": "슈퍼 우먼 프로바이오틱스",
+        "productNameEn": "Super Umeon Probiotics",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20180012174332",
+        "slug": "c-cp02-03-waijeubaiom-kijeu-y-s-biome-",
+        "target": "KIDS",
+        "productName": "와이즈바이옴 키즈 (Y's BIOME KIDS)",
+        "productNameEn": "Y's BIOME KIDS",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200081951",
+        "slug": "c-cp02-04-kijeu-probiotics-premium",
+        "target": "KIDS",
+        "productName": "키즈 프로바이오틱스 프리미엄",
+        "productNameEn": "Kijeu Probiotics Premium",
+        "manufacturer": "주식회사 노바렉스",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200061841",
+        "slug": "c-cp02-05-bebe-c-geot-care",
+        "target": "KIDS",
+        "productName": "베베 C 것 케어",
+        "productNameEn": "Bebe C Geot Care",
+        "manufacturer": "(주)서흥",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20040017059121",
+        "slug": "c-cp02-06-dr-peuroba-beibi",
+        "target": "KIDS",
+        "productName": "닥터프로바 베이비",
+        "productNameEn": "Dr. Peuroba Beibi",
+        "manufacturer": "(주)씨티씨바이오",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "2014002007312",
+        "slug": "c-cp02-07-seltiai-beibi-cellti-baby",
+        "target": "KIDS",
+        "productName": "셀티아이 베이비(CellTi Baby)",
+        "productNameEn": "CellTi Baby",
+        "manufacturer": "주식회사 셀로닉스",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200700170351771",
+        "slug": "c-cp02-08-seumailren-live-probiotics-k",
+        "target": "KIDS",
+        "productName": "스마일렌 생유산균 키즈 17종",
+        "productNameEn": "Seumailren Live Probiotics Kijeu 17jong",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200201160",
+        "slug": "c-cp02-09-syupeuriumeonv-probiotics-su",
+        "target": "WOMENS",
+        "productName": "슈프리우먼V프로바이오틱스(SUPRE WOMEN V PROBIOTICS)",
+        "productNameEn": "SUPRE WOMEN V PROBIOTICS",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20180012174368",
+        "slug": "c-cp02-10-cetimil-setimil-beibi",
+        "target": "KIDS",
+        "productName": "cetimil 세티밀 베이비",
+        "productNameEn": "Cetimil Setimil Beibi",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200081952",
+        "slug": "c-cp02-11-beibi-probiotics-premium",
+        "target": "KIDS",
+        "productName": "베이비 프로바이오틱스 프리미엄",
+        "productNameEn": "Beibi Probiotics Premium",
+        "manufacturer": "주식회사 노바렉스",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200061925",
+        "slug": "c-cp02-12-maikijeu-bifidus-probiotics",
+        "target": "KIDS",
+        "productName": "마이키즈 비피더스 유산균",
+        "productNameEn": "Maikijeu Bifidus Probiotics",
+        "manufacturer": "(주)서흥",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20040017059153",
+        "slug": "c-cp02-13-probiotics-beibi",
+        "target": "KIDS",
+        "productName": "프로바이오틱스 베이비",
+        "productNameEn": "Probiotics Beibi",
+        "manufacturer": "(주)씨티씨바이오",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "2014002007314",
+        "slug": "c-cp02-14-seltiai-junieo-cellti-junior",
+        "target": "KIDS",
+        "productName": "셀티아이 주니어(CellTi Junior)",
+        "productNameEn": "CellTi Junior",
+        "manufacturer": "주식회사 셀로닉스",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200700170351796",
+        "slug": "c-cp02-15-rakpido-probiotics-kijeu-plu",
+        "target": "KIDS",
+        "productName": "락피도 프로바이오틱스 키즈 플러스",
+        "productNameEn": "Rakpido Probiotics Kijeu Plus",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20040020020364",
+        "slug": "c-cp02-16-emeseu-plus-eorini-probiotic",
+        "target": "KIDS",
+        "productName": "엠에스 플러스 어린이 유산균",
+        "productNameEn": "Emeseu Plus Eorini Probiotics",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20180012174382",
+        "slug": "c-cp02-17-jewangbebe-todeulreo-probiot",
+        "target": "KIDS",
+        "productName": "제왕베베 토들러 유산균 스텝 2",
+        "productNameEn": "Jewangbebe Todeulreo Probiotics Seutep 2",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200083172",
+        "slug": "c-cp02-18-kijeu-paekit",
+        "target": "KIDS",
+        "productName": "키즈 패킷",
+        "productNameEn": "Kijeu Paekit",
+        "manufacturer": "주식회사 노바렉스",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200400200062068",
+        "slug": "c-cp02-19-nyu-care-maikijeu-bifidus-pr",
+        "target": "KIDS",
+        "productName": "뉴케어 마이키즈 비피더스 유산균",
+        "productNameEn": "Nyu Care Maikijeu Bifidus Probiotics",
+        "manufacturer": "(주)서흥",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "200700170351801",
+        "slug": "c-cp02-20-probiotics-beibi-plus",
+        "target": "KIDS",
+        "productName": "프로바이오틱스 베이비 플러스",
+        "productNameEn": "Probiotics Beibi Plus",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp02.json"
+      },
+      {
+        "statementNo": "20040020020603",
+        "slug": "c-cp03-01-papa-probiotics-beibi",
+        "target": "KIDS",
+        "productName": "파파유산균 베이비",
+        "productNameEn": "Papa Probiotics Beibi",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20180012174383",
+        "slug": "c-cp03-02-jewangbebe-beibi-probiotics-",
+        "target": "KIDS",
+        "productName": "제왕베베 베이비 유산균 스텝 1",
+        "productNameEn": "Jewangbebe Beibi Probiotics Seutep 1",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200400200083414",
+        "slug": "c-cp03-03-ponyu-kijeu-probiotics",
+        "target": "KIDS",
+        "productName": "포뉴 키즈 프로바이오틱스",
+        "productNameEn": "Ponyu Kijeu Probiotics",
+        "manufacturer": "주식회사 노바렉스",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170351804",
+        "slug": "c-cp03-04-gut-injeongsin-ebeuridei-koe",
+        "target": "KIDS",
+        "productName": "장인정신 에브리데이 코어 포스트바이옴 베이비",
+        "productNameEn": "Gut Injeongsin Ebeuridei Koeo Poseuteubaiom Beibi",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20040020020659",
+        "slug": "c-cp03-05-tedichontedibeeo-probiotics-",
+        "target": "KIDS",
+        "productName": "테디촌테디베어 프로바이오틱스 키즈",
+        "productNameEn": "Tedichontedibeeo Probiotics Kijeu",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "2018001217440",
+        "slug": "c-cp03-06-beibi-probiotics-gold",
+        "target": "KIDS",
+        "productName": "베이비 프로바이오틱스 골드",
+        "productNameEn": "Beibi Probiotics Gold",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170351842",
+        "slug": "c-cp03-07-raktogeulrou-kijeu-probiotic",
+        "target": "KIDS",
+        "productName": "락토글로우 키즈 프로바이오틱스",
+        "productNameEn": "Raktogeulrou Kijeu Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20040020020706",
+        "slug": "c-cp03-08-seltiba-probiotics-kijeu",
+        "target": "KIDS",
+        "productName": "셀티바 프로바이오틱스 키즈",
+        "productNameEn": "Seltiba Probiotics Kijeu",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "2018001217442",
+        "slug": "c-cp03-09-kijeu-probiotics-gold",
+        "target": "KIDS",
+        "productName": "키즈 프로바이오틱스 골드",
+        "productNameEn": "Kijeu Probiotics Gold",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170351852",
+        "slug": "c-cp03-10-paseutoereu-beibi-live-probi",
+        "target": "KIDS",
+        "productName": "파스퇴르 베이비 생유산균",
+        "productNameEn": "Paseutoereu Beibi Live Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20040020020710",
+        "slug": "c-cp03-11-kijeu-live-probiotics-premiu",
+        "target": "KIDS",
+        "productName": "키즈 생유산균 프리미엄",
+        "productNameEn": "Kijeu Live Probiotics Premium",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20180012174473",
+        "slug": "c-cp03-12-kijeu-saeng-probiotics-probi",
+        "target": "KIDS",
+        "productName": "키즈 생 유산균 프로바이오틱스",
+        "productNameEn": "Kijeu Saeng Probiotics Probiotics",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170351858",
+        "slug": "c-cp03-13-yuginong-agi-gut-gun",
+        "target": "KIDS",
+        "productName": "유기농 아기장군",
+        "productNameEn": "Yuginong Agi Gut Gun",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20040020020749",
+        "slug": "c-cp03-14-seltiba-probiotics-umeon",
+        "target": "WOMENS",
+        "productName": "셀티바 프로바이오틱스 우먼",
+        "productNameEn": "Seltiba Probiotics Umeon",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20180012174495",
+        "slug": "c-cp03-15-barobaiotikseu-kids-5-billio",
+        "target": "KIDS",
+        "productName": "바로바이오틱스 kids 50억 딸기맛",
+        "productNameEn": "Barobaiotikseu Kids 5 Billion Ttalgimat",
+        "manufacturer": "(주)메디오젠 충주공장",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170351986",
+        "slug": "c-cp03-16-yuginong-gut-daewon-kijeu",
+        "target": "KIDS",
+        "productName": "유기농 장대원 키즈",
+        "productNameEn": "Yuginong Gut Daewon Kijeu",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "20040020020811",
+        "slug": "c-cp03-17-emeseu-kijeuchyueobeul-probi",
+        "target": "KIDS",
+        "productName": "엠에스 키즈츄어블유산균",
+        "productNameEn": "Emeseu Kijeuchyueobeul Probiotics",
+        "manufacturer": "엠에스바이오텍(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170352001",
+        "slug": "c-cp03-18-seltiba-probiotics-kijeu-chy",
+        "target": "KIDS",
+        "productName": "셀티바 프로바이오틱스 키즈 츄어블정",
+        "productNameEn": "Seltiba Probiotics Kijeu Chyueobeuljeong",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170352127",
+        "slug": "c-cp03-19-paseutoereu-beibi-jewang-liv",
+        "target": "KIDS",
+        "productName": "파스퇴르 베이비 제왕 생유산균",
+        "productNameEn": "Paseutoereu Beibi Jewang Live Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp03.json"
+      },
+      {
+        "statementNo": "200700170352232",
+        "slug": "c-cp04-01-kids-garden-angelflora-probi",
+        "target": "KIDS",
+        "productName": "Kids Garden® AngelFlora™ Probiotics Powder",
+        "productNameEn": "Kids Garden® AngelFlora™ Probiotics Powder",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170352406",
+        "slug": "c-cp04-02-uri-agireul-wihan-probiotics",
+        "target": "KIDS",
+        "productName": "우리 아기를 위한 프로바이오틱스 유산균 베이비&키즈",
+        "productNameEn": "Uri Agireul Wihan Probiotics Probiotics Beibi&Kijeu",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170352425",
+        "slug": "c-cp04-03-peurombaio-probiotics-for-um",
+        "target": "WOMENS",
+        "productName": "프롬바이오 유산균 for 우먼",
+        "productNameEn": "Peurombaio Probiotics For Umeon",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170352646",
+        "slug": "c-cp04-04-kijeu-probiotics-probiotics-",
+        "target": "KIDS",
+        "productName": "키즈 유산균 프로바이오틱스 분말스틱",
+        "productNameEn": "Kijeu Probiotics Probiotics Bunmal Stick",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170352834",
+        "slug": "c-cp04-05-premium-beibi-probiotics",
+        "target": "KIDS",
+        "productName": "프리미엄 베이비 프로바이오틱스",
+        "productNameEn": "Premium Beibi Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170352838",
+        "slug": "c-cp04-06-hamsoa-eorini-probiotics",
+        "target": "KIDS",
+        "productName": "함소아 어린이 유산균",
+        "productNameEn": "Hamsoa Eorini Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      },
+      {
+        "statementNo": "200700170353134",
+        "slug": "c-cp04-07-betuki-elkijeu-probiotics",
+        "target": "KIDS",
+        "productName": "베투키 엘키즈 유산균",
+        "productNameEn": "Betuki Elkijeu Probiotics",
+        "manufacturer": "코스맥스엔비티(주)",
+        "dataFile": "hff-probiotics-kw-cp04.json"
+      }
+    ]
+  },
+  "hold": {
+    "count": 2,
+    "items": [
+      {
+        "statementNo": "200700170352210",
+        "productName": "Kids Garden® AntiAller Pro Probiotics Powder",
+        "holdCode": "HOLD_NAME_UNGROUNDED_CLAIM",
+        "reason": "제품명에 'AntiAller'(항알러지) 포함 — 아동 알레르기 예방 함의(인정 기능성 장건강 범위 밖). 규제 민감으로 격리, 명칭 정정/기능성 재확인 필요"
+      },
+      {
+        "statementNo": "200700170353212",
+        "productName": "키즈가든®아임스타®베타 키즈  Kids Garden® immStar® Beta Kids",
+        "holdCode": "HOLD_NAME_UNGROUNDED_CLAIM",
+        "reason": "제품명에 'immStar'(면역 함의) 포함 — 아동 면역강화 함의(인정 기능성 장건강 범위 밖). 규제 민감으로 격리"
+      }
+    ]
+  },
+  "applyContract": {
+    "reuse": "hff-b3-store-canonical-apply.ts(loadTargets → kw-cp02/03/04, TARGET=46)",
+    "expectedWrites": "184 = master46+candidate46+SPD(ko46+en46)",
+    "dbWrite": "미실행(권한 대기)"
+  }
+}
