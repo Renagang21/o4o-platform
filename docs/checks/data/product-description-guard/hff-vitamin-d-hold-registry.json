@@ -1,0 +1,1377 @@
+{
+ "summary": {
+  "HOLD_MULTI_FUNCTIONAL": 8983,
+  "HOLD_EXPORT_ONLY": 28,
+  "HOLD_GROUNDING": 151,
+  "BULK": 7,
+  "HOLD_UNSUPPORTED_DIMENSION": 41
+ },
+ "transferNote": {
+  "HOLD_MULTI_FUNCTIONAL": "Agent D (복합)",
+  "HOLD_UNSUPPORTED_DIMENSION": "Agent F (액상)"
+ },
+ "items": [
+  {
+   "statementNo": "20040020046682",
+   "productName": "Akker Strength(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200700170352498",
+   "productName": "D-CAL Golden Sachets Liquid Vitamin D3 (전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "2004002001831",
+   "productName": "DS-BIO 츄어블비타민D4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20110017019172",
+   "productName": "Ento Vitamin D3 Chewable (전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "20120017002141",
+   "productName": "Extra D(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200073419",
+   "productName": "FULFAS® Lycopene",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001606153",
+   "productName": "HK표고버섯 비타민D",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "2004001606162",
+   "productName": "HK표고버섯 비타민D 300",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "200700170353028",
+   "productName": "Joint Easi-Move+2260(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200023824",
+   "productName": "Khaitan Vitamin D3 2000IU(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200023739",
+   "productName": "Kids Garden® LifeVision® Liquid Calcium Plus(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200073411",
+   "productName": "Lacrivita",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20190009483742",
+   "productName": "Liver Young (전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400170061141",
+   "productName": "PNT 비타민D 5000IU 하트츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351766",
+   "productName": "PUNDARIKA NMN 9600(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200082614",
+   "productName": "Supreme HG(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "201000190041117",
+   "productName": "THE DAY 버섯 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352993",
+   "productName": "UndoAge VITAMIN D3 400IU(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "2024002023320",
+   "productName": "Vitamin D3 Softgel (1,000 IU)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "2024002023321",
+   "productName": "Vitamin D3 Softgel (10,000 IU)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "2024002023319",
+   "productName": "Vitamin D3 Softgel (2,000 IU)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "2024002023318",
+   "productName": "Vitamin D3 Softgel (5,000 IU)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200700170353166",
+   "productName": "Watoo Vitamin D3 Gummies 1000IU(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200700170352560",
+   "productName": "Yeast & High Vitamin D3 & Whey protein chewables(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200023753",
+   "productName": "lalavita SuperYouth NMN Mix Powder 2G(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200023752",
+   "productName": "lalavita SuperYouth NMNH Mix 400mg(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200201503",
+   "productName": "simplus 비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001603478",
+   "productName": "내 몸엔 시리즈 D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200141157",
+   "productName": "내몸애(愛)비타민D2,400 IU",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "200400200073084",
+   "productName": "네트라비젼 SIC(Netravision SIC)",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2023000462446",
+   "productName": "녹용 콘드로이친 트리플업 (전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400151071165",
+   "productName": "눈 내리는 소리",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "20120017002182",
+   "productName": "뉴메이트 비타민D 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072069",
+   "productName": "뉴트리메이드 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351931",
+   "productName": "뉴트리미 하이비타민D 2000",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072529",
+   "productName": "뉴트리카인드 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073403",
+   "productName": "뉴트맘스 유기농 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072802",
+   "productName": "뉴트원 유기농 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351155",
+   "productName": "다나음 비타민 D-드롭 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170351512",
+   "productName": "닥터드랍디",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006945",
+   "productName": "닥터리브 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072492",
+   "productName": "닥터린 유기농 비타민D1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170353230",
+   "productName": "닥터스드림 비타민D 1000 IU 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20220020002136",
+   "productName": "닥터스드림 비타민D 2000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20070017035950",
+   "productName": "닥터썬데이 D 패밀리",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170351002",
+   "productName": "닥터썬데이D 골드",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519154",
+   "productName": "닥터썬디드롭스 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519153",
+   "productName": "닥터썬디드롭스 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170351614",
+   "productName": "닥터썬비타디드롭스 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170353190",
+   "productName": "닥터에디션 써니디 드롭스 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170353189",
+   "productName": "닥터에디션 써니디 드롭스 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040015107999",
+   "productName": "닥터오엔:오본(本)",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400151071078",
+   "productName": "닥터오엔:오본(本)프로",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400151071088",
+   "productName": "닥터오엔:오윤",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400151071090",
+   "productName": "닥터오엔:오청(淸)",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080545",
+   "productName": "닥터퀼리 츄어블 비타민D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072656",
+   "productName": "닥터트루 프리미엄 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072976",
+   "productName": "닥터트루 프리미엄 유기농 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072651",
+   "productName": "닥터트루 프리미엄 유기농 비타민D 3000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351316",
+   "productName": "닥터피엔티 에브리D 키즈 플러스",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006922",
+   "productName": "대웅비타D 2800IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072254",
+   "productName": "더:해 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200600200031178",
+   "productName": "더팜 썬디 츄어블 1000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080183",
+   "productName": "더팜 썬디 츄어블 1000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006921",
+   "productName": "더팜 썬디 츄어블 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001519146",
+   "productName": "더팜 썬디드롭스 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519149",
+   "productName": "더팜 썬디드롭스 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200073165",
+   "productName": "데일리 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200900190086",
+   "productName": "데일리 캅셀",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20160012132115",
+   "productName": "디뉴비타민D5000",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "202500183106",
+   "productName": "라이프토콜 비타민D 5000IU 200정",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2025001831014",
+   "productName": "라이프토콜 비타민D3 2000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200201021",
+   "productName": "락티브 베베&키즈 츄어블 비타민D3 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351753",
+   "productName": "락티브 우리아이 비타민 D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519174",
+   "productName": "락피도 비타민D 드롭스 1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519175",
+   "productName": "락피도 비타민D 드롭스 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006906",
+   "productName": "락피도 비타민D 츄어블 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352236",
+   "productName": "랄츠비비타민D리퀴드1000IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200073330",
+   "productName": "루텔즈 유기농 비타민D 5000IU 엘리트",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072799",
+   "productName": "리노브 유기농 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20110017019100",
+   "productName": "마이니 비타민D3 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006825",
+   "productName": "마이핏 ORIGIN 비타민 D3 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351867",
+   "productName": "맘스 앱솔루트 비타민 D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200071391",
+   "productName": "맘앙떼 비타D 1000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073350",
+   "productName": "맘앙떼 플러스 비타D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015039263",
+   "productName": "메가 비타민D 알파",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200600200032775",
+   "productName": "메가 비타민D3 2000IU 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2016000600556",
+   "productName": "메가도스D 비타민D3 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061024",
+   "productName": "메가비타민D3 2500",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006469",
+   "productName": "모비타 비타민D3 츄어블 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351636",
+   "productName": "미토셀",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20210016229118",
+   "productName": "밀키튼 쑥쑥 비타민D",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170352920",
+   "productName": "바이오메라 베이비드롭 비타민D",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006923",
+   "productName": "바이탈썸 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352444",
+   "productName": "배배쓰담 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170351617",
+   "productName": "베라벨 비타민D드롭 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400150831036",
+   "productName": "본D 황정맥스",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015107660",
+   "productName": "본채우는 비타민D+",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072119",
+   "productName": "본포본",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200071836",
+   "productName": "뷰티소야(Beauty Soya)",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2016000751588",
+   "productName": "비바디 키즈 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400151071109",
+   "productName": "비바라엔:오",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015107960",
+   "productName": "비앤채엔:오큐",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040020001310",
+   "productName": "비타D 400IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006948",
+   "productName": "비타디포르테 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015104271",
+   "productName": "비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072482",
+   "productName": "비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200071976",
+   "productName": "비타민D 1000IU+",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200071428",
+   "productName": "비타민D 2000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20120017002118",
+   "productName": "비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072600",
+   "productName": "비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2021001827721",
+   "productName": "비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061440",
+   "productName": "비타민D 2000IU 에센스",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040020028567",
+   "productName": "비타민D 2000IU 츄어블 키즈",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072481",
+   "productName": "비타민D 2000IU 프리미엄",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080398",
+   "productName": "비타민D 3000IU 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006872",
+   "productName": "비타민D 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072926",
+   "productName": "비타민D 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2018000391555",
+   "productName": "비타민D 4000IU 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073067",
+   "productName": "비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170211623",
+   "productName": "비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200071730",
+   "productName": "비타민D 500IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352542",
+   "productName": "비타민D 드롭스 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170352763",
+   "productName": "비타민D 럭스 500IU 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200072392",
+   "productName": "비타민D 맥스 2600IU D3",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073311",
+   "productName": "비타민D 밸런스",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006789",
+   "productName": "비타민D 복합제(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400170061091",
+   "productName": "비타민D 츄어블 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2009001702324",
+   "productName": "비타민D2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072351",
+   "productName": "비타민D3 2600IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073185",
+   "productName": "비타민D3 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170353006",
+   "productName": "비타민D3드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200600200031020",
+   "productName": "비타민D4000IU츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080419",
+   "productName": "비타민D4000IU츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073422",
+   "productName": "뼈 건강 비타민D3 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200141421",
+   "productName": "뼈건강에 이롭 비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "201000190041377",
+   "productName": "뼈건강에 이롭 비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017106448",
+   "productName": "뼈형성애 비타민D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061389",
+   "productName": "성인건강 비타민D 2000IU 연질캡슐",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061397",
+   "productName": "성인건강 비타민D 5000IU 연질캡슐",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061831",
+   "productName": "세비톨 비타민 D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072699",
+   "productName": "셀가 유기농 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20070017035905",
+   "productName": "셀로맥스 비타민D드롭(Cellromax Vitamin D Drop)",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006732",
+   "productName": "스몰윈도우 스쿠알렌",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006775",
+   "productName": "스몰윈도우 스쿠알렌 에스",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400150832407",
+   "productName": "스트롱 본 액티브",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072542",
+   "productName": "식물성 비타민 D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061339",
+   "productName": "식물성 비타민D3 2,000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2011001701941",
+   "productName": "썬 츄어블 비타민D (복숭아맛)",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001519147",
+   "productName": "썬디드롭스 600IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001519148",
+   "productName": "썬디드롭스200IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040017006685",
+   "productName": "썬타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015107678",
+   "productName": "쏠라D 츄어블 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001519161",
+   "productName": "아이누리 비타D 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400170545",
+   "productName": "아이디드롭 400IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200072614",
+   "productName": "아임비타민:D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061126",
+   "productName": "아크 어써라이즈 비타민 D3 2630IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061285",
+   "productName": "앙팡 츄어블 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "202100162299",
+   "productName": "어린이 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040020028782",
+   "productName": "어린이 츄어블 비타민D 1000(수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200700170352237",
+   "productName": "에이토솔루션 아이쑥쑥 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170352101",
+   "productName": "엑스퍼트 비타민D 드롭스",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400151071037",
+   "productName": "엔:오해피드림 오리지널",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073031",
+   "productName": "여에스더 유기농 비타민D3 3000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200023735",
+   "productName": "엽록소 식물혼합 분말(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "20040016020328",
+   "productName": "영롱 비건 효모 비타민D",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "200900190084",
+   "productName": "오리지널 캅셀",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200900190085",
+   "productName": "오리지널캅셀(수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400200072889",
+   "productName": "우디선샤인 유기농 비타민D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072463",
+   "productName": "우리가족 비타민D 2200IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352840",
+   "productName": "우리아기 비타민D 1초 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200400200141596",
+   "productName": "우리아이 비타민D 1000IU 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352243",
+   "productName": "우리아이 비타민D 400IU 드롭스",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200700170351338",
+   "productName": "우아닥터 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "200600200032534",
+   "productName": "원퍼데이 비타민D 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080181",
+   "productName": "원퍼데이 비타민D 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080411",
+   "productName": "원퍼데이 비타민D3 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040020046304",
+   "productName": "웰러스비타민D",
+   "holdCode": "BULK",
+   "reason": "소비자용 1일 섭취법(1일 N회)이 성립하지 않음"
+  },
+  {
+   "statementNo": "200400200072924",
+   "productName": "웰키커(Wellkicker) 어린이 비타민D 1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072929",
+   "productName": "위타민 D3 부스터 weetamin D3 BOOSTER",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072491",
+   "productName": "유기농 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072892",
+   "productName": "유기농 비타민D3 코어",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073002",
+   "productName": "유기농 썬 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072843",
+   "productName": "유기농 프리미엄 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006762",
+   "productName": "유어피엔티 비타민D 1000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072871",
+   "productName": "유유 비타민D2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015102183",
+   "productName": "이오스타 이너 바이오코드 티디",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072326",
+   "productName": "인빅터스 비타민 D3 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072055",
+   "productName": "인빅터스 비타민 D3 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072045",
+   "productName": "일동 라이프케어 비타민D 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061115",
+   "productName": "일동 비타민D3 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20120017002130",
+   "productName": "일양 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073271",
+   "productName": "정직한 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352883",
+   "productName": "정직한 아기 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2015001000250",
+   "productName": "제노뮨 디오케이",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2015001000283",
+   "productName": "제노뮨 디오케이 II",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073133",
+   "productName": "지에이치 포뮬라 유기농 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20130020008271",
+   "productName": "진솔한이유 비타민D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015039227",
+   "productName": "진진키드(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "20040017006518",
+   "productName": "츄어블 비타D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015107580",
+   "productName": "츄어블 비타민D3",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006522",
+   "productName": "츄어블 비타민D3 3000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006807",
+   "productName": "커스텀바이오 비타민D부족엔 2000+",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040016011100",
+   "productName": "케어비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040016011101",
+   "productName": "케어비타민D 4000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20070017035820",
+   "productName": "키즈비타D-드롭 500IU",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2020001201642",
+   "productName": "토닥 효모 비타민D 2500IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170351612",
+   "productName": "톡톡 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "20040015039180",
+   "productName": "톨키드(TALL KID)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "200400151101175",
+   "productName": "트루엔키즈 햇살 비타D",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072641",
+   "productName": "팜엔탑 비타민D 4000 D3 프리미엄",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006833",
+   "productName": "포뉴 비타민D 5000IU D3",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061256",
+   "productName": "포뉴 비타민D1000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200700170352592",
+   "productName": "포베라 순수 비타민D 드롭",
+   "holdCode": "HOLD_UNSUPPORTED_DIMENSION",
+   "reason": "액상·드롭·mL 기반"
+  },
+  {
+   "statementNo": "2004001606159",
+   "productName": "표고버섯유래 리체 비타D 4000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "2004001606160",
+   "productName": "표고버섯유래 비타D 4000 IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200073405",
+   "productName": "퓨어팅 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017006881",
+   "productName": "프리미엄 비타민D 2000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072949",
+   "productName": "프리미엄 비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20240028080207",
+   "productName": "프리미엄 비타민D3 4000IU 츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040017106436",
+   "productName": "프리미엄 안심 비타민D 3000IU 플러스",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400200072989",
+   "productName": "프리미엄 유기농 비타민D 5000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200600200031958",
+   "productName": "프리미엄비타민D4000IU츄어블",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015110786",
+   "productName": "한미비타민D(Vitamin D, 전량 수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  },
+  {
+   "statementNo": "20040020013382",
+   "productName": "햇살 가득 버섯 비타민D 스틱파우더",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "200400170061109",
+   "productName": "헬스레시피 츄어블 비타민D3 3000IU",
+   "holdCode": "HOLD_GROUNDING",
+   "reason": "비타민D 표시량 추출 실패"
+  },
+  {
+   "statementNo": "20040015039171",
+   "productName": "히어로키드(HERO KID,)(전량수출용)",
+   "holdCode": "HOLD_EXPORT_ONLY",
+   "reason": "수출전용"
+  }
+ ]
+}
