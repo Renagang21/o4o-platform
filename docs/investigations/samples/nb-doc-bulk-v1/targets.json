@@ -1,0 +1,2335 @@
+{
+  "generatedFor": "WO-O4O-OTC-NB-DOC-BULK-FETCH-V1",
+  "total": 236,
+  "setA": 136,
+  "setB": 100,
+  "overlap": 0,
+  "creatinine": 27,
+  "parenSuspect": 109,
+  "targets": [
+    {
+      "item_seq": "197000040",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 19,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "198300018",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "198500172",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "198700315",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "198700477",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "198901310",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "198901710",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199001917",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "199100705",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199300215",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "199300224",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199301063",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "199302363",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199401186",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "199500435",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 10,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199500491",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "199501735",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199502156",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "199600422",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "199700265",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199700906",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "199701033",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199701269",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 6
+    },
+    {
+      "item_seq": "199701398",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 11,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199701674",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 6
+    },
+    {
+      "item_seq": "199701900",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 14,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199701908",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 8,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199702829",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199702846",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199703045",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "199703153",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199801611",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 8
+    },
+    {
+      "item_seq": "199801950",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "199802009",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199802497",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199802620",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199803095",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 10,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "199900511",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200000914",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "사카로마이세스보울라르디균|282.5밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "200001515",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200001634",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200003096",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "200300100",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200300251",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200300269",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200300463",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200300579",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200300719",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 7
+    },
+    {
+      "item_seq": "200300769",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301033",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301252",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301507",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 8,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301610",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301618",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200301833",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200302457",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400009",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400151",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400233",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400668",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400812",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200400830",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200400951",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200401209",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "200401321",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200401445",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200402284",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200402328",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200402458",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200402508",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200402699",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200402881",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "200402912",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200403090",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200403246",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200403710",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200404048",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200404437",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200404779",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 9,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200410902",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 7,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200411048",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200501040",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "200502294",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "200503294",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "200608160",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 8,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200610765",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200610785",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 7,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200701766",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "200702709",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200705432",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "200801156",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "바실루스리케니포르미스균|250밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "200803434",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 11,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200805633",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200809417",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 6,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200903349",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200903388",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200904150",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200904774",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200904776",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "200904823",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "200905228",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200905350",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "200905403",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 10,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "200905891",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "200906499",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201109594",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "201205361",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201205362",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201205364",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201206776",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201403677",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201405818",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201406195",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201500050",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201500197",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201505921",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201506556",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201507256",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 6
+    },
+    {
+      "item_seq": "201507696",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201508010",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201508139",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201508301",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201508319",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201600445",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201600895",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201601174",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201601245",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201601506",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201601614",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201601896",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201602096",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201602144",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201602381",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "바실루스리케니포르미스균|250밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201602501",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201602640",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201602679",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201602684",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201602706",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201602871",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201603166",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201603171",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201603990",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 6
+    },
+    {
+      "item_seq": "201604402",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201604680",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "201605007",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201605325",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201606935",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201607229",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201700418",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 5,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201700567",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201701108",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201701140",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201701882",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201706346",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201706739",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201707212",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201708145",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201801702",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201801843",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201802315",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201802357",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201802416",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201802652",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201802766",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201802993",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201803233",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201803487",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201803649",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201804394",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201804395",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201804440",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201805153",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201805240",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201900054",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201900172",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201900183",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201900596",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201900892",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201900928",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201901122",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "201901135",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "201901211",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "201901374",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201901574",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "201901688",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 6
+    },
+    {
+      "item_seq": "201901963",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201902226",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201903071",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201903082",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201903606",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201904586",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|200밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201904700",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201904785",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "201905363",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201905435",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201905784",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201905990",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906059",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906326",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906400",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906544",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906886",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "201906929",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "201907203",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "201908418",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202000054",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202000200",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202000875",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "202002172",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "202002174",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "202002625",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 8,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202003114",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202003523",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 1
+    },
+    {
+      "item_seq": "202003675",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202003868",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202004092",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "202004192",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202006765",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 7
+    },
+    {
+      "item_seq": "202201616",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202202575",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202202609",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202203978",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 3,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202300418",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "202401392",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "202402193",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 8
+    },
+    {
+      "item_seq": "202403084",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202500894",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 4
+    },
+    {
+      "item_seq": "202500897",
+      "setA": true,
+      "lossReason": "paren_suspect",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 2,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202501708",
+      "setA": true,
+      "lossReason": "creatinine",
+      "setB": false,
+      "groupKeys": [],
+      "mastersA": 4,
+      "mastersB": 0
+    },
+    {
+      "item_seq": "202501936",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 5
+    },
+    {
+      "item_seq": "202501994",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "202502742",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "202502846",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202502896",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "mastersA": 0,
+      "mastersB": 3
+    },
+    {
+      "item_seq": "202502925",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    },
+    {
+      "item_seq": "202502933",
+      "setA": false,
+      "lossReason": null,
+      "setB": true,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "mastersA": 0,
+      "mastersB": 2
+    }
+  ]
+}

@@ -1,0 +1,3728 @@
+{
+  "wo": "WO-O4O-OTC-NB-DOC-BULK-FETCH-V1",
+  "note": "응답 body 는 responses/. 첨가제 mention=NB_DOC 언급, contains=함유 근접(정밀 판정은 후속 분리 WO).",
+  "aggregate": {
+    "target": 236,
+    "ok": 197,
+    "no_item": 39,
+    "no_nbdoc": 0,
+    "parse_error": 0,
+    "error": 0,
+    "setA_total": 136,
+    "setB_total": 100,
+    "creatinineLoss_total": 27,
+    "creatinineLoss_recovered": 26,
+    "creatinineLoss_no_item": 0,
+    "parenSuspect_total": 109,
+    "parenSuspect_ok": 109,
+    "additive_mention": {
+      "아스파탐": 1,
+      "대두유": 2,
+      "유당": 81,
+      "색소": 83
+    },
+    "additive_contains": {
+      "아스파탐": 1,
+      "대두유": 2,
+      "유당": 81,
+      "색소": 82
+    }
+  },
+  "items": [
+    {
+      "item_seq": "197000040",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 4326,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "대두유",
+        "색소"
+      ],
+      "additivesContains": [
+        "대두유",
+        "색소"
+      ],
+      "itemName": "대웅우루사연질캡슐"
+    },
+    {
+      "item_seq": "198300018",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "198500172",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2960,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "니라벤캡슐(니푸록사지드)(수출용)"
+    },
+    {
+      "item_seq": "198700315",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16242,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "캐롤시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "198700477",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2960,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "자이드캡슐(니푸록사지드)"
+    },
+    {
+      "item_seq": "198901310",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 15974,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "콜대원키즈이부펜시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "198901710",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16242,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "이부날시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "199001917",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199100705",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16242,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "어린이알리펜시럽(이부프로펜)(수출명:이부돌시럽)"
+    },
+    {
+      "item_seq": "199300215",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199300224",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16380,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "베비잘시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "199301063",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 8367,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "라페론정160밀리그람(아세트아미노펜)"
+    },
+    {
+      "item_seq": "199302363",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16240,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "이부서스펜시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "199401186",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 6219,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "무테린캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "199500435",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "199500491",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199501735",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16412,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "넬슨이부프로펜정200밀리그램(이부프로펜)"
+    },
+    {
+      "item_seq": "199502156",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세트아미노펜|160밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199600422",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199700265",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7331,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알레리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199700906",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199701033",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7320,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "코나진정(세티리진염산염)(수출명:알리코염산세티리진정,보파세티리진나정,자이조세트정)"
+    },
+    {
+      "item_seq": "199701269",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "센티펙정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199701398",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7340,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "아루텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199701674",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7320,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "리진정(세티리진염산염)(수출용)"
+    },
+    {
+      "item_seq": "199701900",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7320,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알티린정(세티리진염산염)(수출명:Vilex, Cetirin)"
+    },
+    {
+      "item_seq": "199701908",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알러텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199702829",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7331,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "세리텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199702846",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7325,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "하원세티리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199703045",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199703153",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7400,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "씨즈날정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199801611",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199801950",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "199802009",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7324,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "러지텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199802497",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "쎄르텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199802620",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7331,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "쎄로테정(세티리진염산염)"
+    },
+    {
+      "item_seq": "199803095",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "지엘세티리진염산염정"
+    },
+    {
+      "item_seq": "199900511",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 31876,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "대웅이부펜시럽(이부프로펜)(수출명:SOTSTOPsyrup)"
+    },
+    {
+      "item_seq": "200000914",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "사카로마이세스보울라르디균|282.5밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200001515",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7319,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알레드정(세티리진염산염)"
+    },
+    {
+      "item_seq": "200001634",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "세진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "200003096",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7321,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "티리진정10밀리그램(세티리진염산염)"
+    },
+    {
+      "item_seq": "200300100",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2701,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도란트캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200300251",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2730,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘펙트캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200300269",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "알도스텐캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "200300463",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3177,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "이알디캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200300579",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "도스틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200300719",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200300769",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3169,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엔디스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200301033",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2864,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘부날캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200301252",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200301507",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도스탐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200301610",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2816,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도랄정(에르도스테인)"
+    },
+    {
+      "item_seq": "200301618",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2887,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에도스텐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200301833",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2910,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도인캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "200302457",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2730,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "유니펙탄캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400009",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에도날캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400151",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400233",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2610,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "에도인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400668",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2999,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "에르딘캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400812",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200400830",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도신캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200400951",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도스타캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200401209",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1193,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "진트로이정(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "200401321",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7386,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "속코정"
+    },
+    {
+      "item_seq": "200401445",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘로틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402284",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2907,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402328",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3348,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘도스틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402458",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘펙탄캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402508",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3048,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402699",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200402881",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2730,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "알파에르도스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200402912",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2967,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도린캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200403090",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "뮤코메드캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200403246",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에르도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200403710",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2992,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도코프캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200404048",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2912,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "비도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200404437",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3052,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘도펙트캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "200404779",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2701,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200410902",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3166,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "에르건캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200411048",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2730,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도텍캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200501040",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200502294",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1515,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "트리앤정(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "200503294",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200608160",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 19886,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "맥시부펜시럽(덱시부프로펜)"
+    },
+    {
+      "item_seq": "200610765",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7305,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "지르텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "200610785",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16314,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "애드빌리퀴겔연질캡슐(이부프로펜)"
+    },
+    {
+      "item_seq": "200701766",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200702709",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "뮤레스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "200705432",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200801156",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "바실루스리케니포르미스균|250밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200803434",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7320,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "기스톱정(세티리진염산염)"
+    },
+    {
+      "item_seq": "200805633",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200809417",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 5167,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [],
+      "itemName": "록펜텍카타플라스마(록소프로펜나트륨수화물)"
+    },
+    {
+      "item_seq": "200903349",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200903388",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200904150",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7339,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "세레지아정(세티리진염산염)(수출용)"
+    },
+    {
+      "item_seq": "200904774",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200904776",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200904823",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200905228",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7320,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알드라민정(세티리진염산염)"
+    },
+    {
+      "item_seq": "200905350",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "니푸록사지드|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200905403",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알세진정10밀리그램(세티리진염산염)"
+    },
+    {
+      "item_seq": "200905891",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "200906499",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201109594",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2342,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "무코테인캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201205361",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 6190,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "크레온캡슐10000(판크레아스 분말)"
+    },
+    {
+      "item_seq": "201205362",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 6178,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "크레온캡슐25000(판크레아스 분말)"
+    },
+    {
+      "item_seq": "201205364",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 6190,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "크레온캡슐40000(판크레아스 분말)"
+    },
+    {
+      "item_seq": "201206776",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 6480,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "뮤코텍캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201403677",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16618,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "대두유"
+      ],
+      "additivesContains": [
+        "대두유"
+      ],
+      "itemName": "코리투살에프시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "201405818",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 15973,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "비알이부펜시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "201406195",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2618,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "유유테란캡슐(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201500050",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201500197",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 15970,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "키즈앤펜시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "201505921",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3132,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘다인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201506556",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 6495,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "뮤코레스캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201507256",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3243,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "클로딘연질캡슐(로라타딘)"
+    },
+    {
+      "item_seq": "201507696",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "알바스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201508010",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2796,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "브론펙트캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201508139",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘코스텐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201508301",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201508319",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201600445",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘스틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201600895",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201601174",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도진캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "201601245",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘리도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201601506",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2967,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘스타캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201601614",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2788,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에스텐캡슐300mg(에르도스테인)"
+    },
+    {
+      "item_seq": "201601896",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에리텐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201602096",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2730,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도라캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201602144",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3239,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "알로스탑연질캡슐(로라타딘)"
+    },
+    {
+      "item_seq": "201602381",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "바실루스리케니포르미스균|250밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201602501",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에르펜캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201602640",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201602679",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2788,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "뮤코원캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201602684",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도민캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "201602706",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2913,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도스인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201602871",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "뉴에르도테캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201603166",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "일스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201603171",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도원캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201603990",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201604402",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 15968,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "챔프이부펜시럽(이부프로펜)"
+    },
+    {
+      "item_seq": "201604680",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201605007",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3165,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "렘피드캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201605325",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "알두스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201606935",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3165,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "동성에르도스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201607229",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16903,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "이부뉴펜연질캡슐(이부프로펜)"
+    },
+    {
+      "item_seq": "201700418",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3165,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "에르테인캡슐 (에르도스테인)"
+    },
+    {
+      "item_seq": "201700567",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "유니도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201701108",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2698,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도프로정(에르도스테인)"
+    },
+    {
+      "item_seq": "201701140",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 17312,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "프리스펜연질캡슐(이부프로펜)"
+    },
+    {
+      "item_seq": "201701882",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2787,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "에르도민캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201706346",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201706739",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2905,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘로인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201707212",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "이스탄캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201708145",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2700,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "유스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201801702",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2733,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘타인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201801843",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2704,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "에르도캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "201802315",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201802357",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "에르코프캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201802416",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7326,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "세지날정(세티리진염산염)"
+    },
+    {
+      "item_seq": "201802652",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "에르덱스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201802766",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "no_item"
+    },
+    {
+      "item_seq": "201802993",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 4264,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "암브로엠정(암브록솔염산염)"
+    },
+    {
+      "item_seq": "201803233",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3080,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "엘도브론정(에르도스테인)"
+    },
+    {
+      "item_seq": "201803487",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도스테인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201803649",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도클캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201804394",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2817,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘스테인정(에르도스테인)"
+    },
+    {
+      "item_seq": "201804395",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2703,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "에르스토캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201804440",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2613,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "목테인캡슐(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201805153",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3080,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "동화엘텐정(에르도스테인)"
+    },
+    {
+      "item_seq": "201805240",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3080,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "엘뮤코정(에르도스테인)"
+    },
+    {
+      "item_seq": "201900054",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 6597,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "셀티린정(세티리진염산염)"
+    },
+    {
+      "item_seq": "201900172",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2779,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "뮤라스텐캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201900183",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도테크캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201900596",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2613,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "뮤코크린캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201900892",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도스트캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "201900928",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2788,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도캅캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201901122",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1974,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "애니틴정100밀리그램(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "201901135",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1974,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "애니티닌정100밀리그램(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "201901211",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1506,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "다나부틴정100mg(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "201901374",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2702,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도네오캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201901574",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "아이도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201901688",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2613,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "아시테인캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201901963",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2352,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "인코반캡슐200mg(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201902226",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3080,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "엘도에스정(에르도스테인)"
+    },
+    {
+      "item_seq": "201903071",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도씽캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201903082",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "현대에르도스테인캡슐"
+    },
+    {
+      "item_seq": "201903606",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3080,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "에르펙토정(에르도스테인)"
+    },
+    {
+      "item_seq": "201904586",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|200밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1801,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "마이부틴정200밀리그램(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "201904700",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2788,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "잘도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201904785",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3166,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "에르도스틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201905363",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2350,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "태극아세틸에스캡슐(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201905435",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7325,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "엔티리진정10밀리그램(세티리진염산염)"
+    },
+    {
+      "item_seq": "201905784",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 6478,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "다세틸캡슐(아세틸시스테인)"
+    },
+    {
+      "item_seq": "201905990",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2788,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘코프캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201906059",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 16862,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "팜페인이부연질캡슐(이부프로펜)"
+    },
+    {
+      "item_seq": "201906326",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 1812,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘드로캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201906400",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7069,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "세노바퀵연질캡슐(세티리진염산염) "
+    },
+    {
+      "item_seq": "201906544",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도텐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201906886",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3170,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘도비캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "201906929",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 3670,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "암브린정(암브록솔염산염)"
+    },
+    {
+      "item_seq": "201907203",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 6584,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "알레지르정(세티리진염산염)"
+    },
+    {
+      "item_seq": "201908418",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "휴도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202000054",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘로스틴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202000200",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 3058,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "엘도테인정(에르도스테인)"
+    },
+    {
+      "item_seq": "202000875",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3166,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "원광에도원캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202002172",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3166,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "에르도스텐캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202002174",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7306,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "코프텍정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202002625",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "지엘도스캡슐300밀리그램(에르도스테인)"
+    },
+    {
+      "item_seq": "202003114",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2628,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "뮤틸캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "202003523",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "암브록솔염산염|30밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 4364,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "아스파탐",
+        "유당"
+      ],
+      "additivesContains": [
+        "아스파탐",
+        "유당"
+      ],
+      "itemName": "에이펙트정(암브록솔염산염)"
+    },
+    {
+      "item_seq": "202003675",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2365,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "아틸스캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "item_seq": "202003868",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엘도트린캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202004092",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3166,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엘도킴캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202004192",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1506,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "트리멘정100밀리그램(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "202006765",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2731,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘피스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202201616",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7311,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "경남세티리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202202575",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 10153,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당",
+        "색소"
+      ],
+      "additivesContains": [
+        "유당",
+        "색소"
+      ],
+      "itemName": "엔디콜플러스정"
+    },
+    {
+      "item_seq": "202202609",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7543,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "토탈코프플루연질캡슐 "
+    },
+    {
+      "item_seq": "202203978",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7425,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "유한세티리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202300418",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "로라타딘|10밀리그램|연질캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 3552,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "에치팡연질캡슐(로라타딘)"
+    },
+    {
+      "item_seq": "202401392",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1899,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "비고비정(시트룰린말산염)"
+    },
+    {
+      "item_seq": "202402193",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "트리메부틴말레산염|100밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1235,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "메라부틴정(트리메부틴말레산염)"
+    },
+    {
+      "item_seq": "202403084",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7425,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "바로세티정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202500894",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2971,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "엠도스캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202500897",
+      "setA": true,
+      "setB": false,
+      "lossReason": "paren_suspect",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 2699,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "엘도레인캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202501708",
+      "setA": true,
+      "setB": false,
+      "lossReason": "creatinine",
+      "groupKeys": [],
+      "status": "ok",
+      "nbLen": 7313,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "제트리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202501936",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1899,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "삼성시트룰린정(시트룰린말산염)"
+    },
+    {
+      "item_seq": "202501994",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 7297,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "신신세티리진정(세티리진염산염)"
+    },
+    {
+      "item_seq": "202502742",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "세티리진염산염|10밀리그램|연질캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 7066,
+      "creatinineComplete": true,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "동아제약알지원큐연질캡슐(세티리진염산염)"
+    },
+    {
+      "item_seq": "202502846",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1557,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "메가엑트정(시트룰린말산염)"
+    },
+    {
+      "item_seq": "202502896",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "시트룰린말산염|500밀리그램|정"
+      ],
+      "status": "ok",
+      "nbLen": 1566,
+      "creatinineComplete": false,
+      "additivesMention": [],
+      "additivesContains": [],
+      "itemName": "라이트시트룰정(시트룰린말산염)"
+    },
+    {
+      "item_seq": "202502925",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "에르도스테인|300밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2906,
+      "creatinineComplete": true,
+      "additivesMention": [
+        "색소"
+      ],
+      "additivesContains": [
+        "색소"
+      ],
+      "itemName": "가렌쿨캡슐(에르도스테인)"
+    },
+    {
+      "item_seq": "202502933",
+      "setA": false,
+      "setB": true,
+      "lossReason": null,
+      "groupKeys": [
+        "아세틸시스테인|200밀리그램|캡슐"
+      ],
+      "status": "ok",
+      "nbLen": 2633,
+      "creatinineComplete": false,
+      "additivesMention": [
+        "유당"
+      ],
+      "additivesContains": [
+        "유당"
+      ],
+      "itemName": "아세나캡슐(아세틸시스테인)"
+    }
+  ]
+}
