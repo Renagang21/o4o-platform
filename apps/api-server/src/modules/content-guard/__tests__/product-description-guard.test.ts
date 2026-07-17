@@ -233,6 +233,22 @@ describe('V1.1 — 위험 신호와 정보성 신호 분리', () => {
     expect(f.status).toBe('REVIEW_REQUIRED');
   });
 
+  // 오탐 방지: 제품명 "Thank You" 의 "Than"k 가 비교어 `than` 으로 오탐되면 안 된다(단어 경계).
+  it('B-SPEC-MINMAX: 제품명 "Thank You" 는 비교(COMPARE-004)로 오탐되지 않고 규격 인용(INFO)', () => {
+    const r = runGuard(withEn('Thank You Probiotics contains at least 1 billion CFU per labelled basis.'), { phase: 'post' });
+    const f = r.findings.find((x) => x.ruleId.startsWith('B-SPEC-MINMAX'))!;
+    expect(f.ruleId).toBe('B-SPEC-MINMAX-003');
+    expect(f.status).toBe('INFO');
+  });
+
+  // 검출력 유지: 진짜 비교("more … than other brands")는 여전히 BLOCKED.
+  it('B-SPEC-MINMAX: 실제 비교어(than other brands)는 COMPARE-004 BLOCKED 유지', () => {
+    const r = runGuard(withEn('Has more live cultures than other brands, at least 1 billion CFU per basis.'), { phase: 'post' });
+    const f = r.findings.find((x) => x.ruleId === 'B-SPEC-MINMAX-COMPARE-004')!;
+    expect(f).toBeDefined();
+    expect(f.status).toBe('BLOCKED');
+  });
+
   // D-SHELFLIFE-GUARANTEE (V1.2) — 표본검수에서 발견된 신규 실패 유형.
   //   BASE_STANDARD 는 "표시량 … 이상" 이라는 **규격**만 진술한다.
   //   "유통기한까지 보장" 은 규제 일반지식을 끌어온 추론 확장이다.

@@ -346,7 +346,8 @@ export function ruleB(input: GuardProductInput): GuardFinding[] {
         /(\bCFU\b|\d\s*(?:mg|g|billion|million)\b|\bbillion\b|\bmillion\b|labelled basis|\bper\s)/i;
       const specQuote = srcHasSpecBound && SPEC_QUOTE_CTX.test(ctx);
       // 제품·그룹 비교 문맥이면 규격 인용이 아니다
-      const comparative = /(than|in this group|compared|other products|competitors)/i.test(ctx);
+      // ⚠️ `than` 은 반드시 단어 경계로 — 제품명 "Thank You"의 "Than"k 가 비교로 오탐된다(오탐 방지).
+      const comparative = /(\bthan\b|in this group|compared|other products|competitors)/i.test(ctx);
       if (specQuote && !comparative) {
         out.push({
           ruleId: 'B-SPEC-MINMAX-003', severity: 'INFO', status: 'INFO', language: 'en',
