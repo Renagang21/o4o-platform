@@ -1,0 +1,528 @@
+{
+ "wo": "WO-O4O-OTC-FULL-CORPUS-AUTHORED-BRIDGE-INTEGRATION-V1",
+ "authoredConflictKeys": [
+  "atc:A11JC|500밀리그램|연질캡슐|oral",
+  "ing:에르도스테인|300밀리그램|캡슐|oral",
+  "atc:A11JC|2밀리그램|연질캡슐|oral",
+  "atc:A11JC|100밀리그램|정|oral",
+  "ing:수출용|100밀리그램|정|oral",
+  "atc:A11JB|500밀리그램|연질캡슐|oral",
+  "ing:세티리진염산염|10밀리그램|정|oral",
+  "ing:아세틸시스테인|200밀리그램|캡슐|oral",
+  "atc:A11JC|296.7밀리그램|연질캡슐|oral",
+  "ing:아세트아미노펜|160밀리그램|정|oral",
+  "ing:로라타딘|10밀리그램|연질캡슐|oral",
+  "ing:암브록솔염산염|30밀리그램|정|oral"
+ ],
+ "authoredSafetyConflictKeys": [
+  "ing:에르도스테인|300밀리그램|캡슐|oral",
+  "ing:세티리진염산염|10밀리그램|정|oral",
+  "ing:아세틸시스테인|200밀리그램|캡슐|oral",
+  "ing:아세트아미노펜|160밀리그램|정|oral",
+  "ing:로라타딘|10밀리그램|연질캡슐|oral",
+  "ing:암브록솔염산염|30밀리그램|정|oral"
+ ],
+ "grounded_none_pharmKey": [],
+ "안전지문불일치_샘플": [
+  {
+   "master_id": "3b034fb4-d6c3-4c5c-9799-b7a4d3785788",
+   "name": "니타딘정(니자티딘)",
+   "pharmKey": "ing:니자티딘|75밀리그램|정|oral"
+  },
+  {
+   "master_id": "32782207-f9e1-4154-a2f0-e8a0774e04f5",
+   "name": "에스빌이부연질캡슐200밀리그램(이부프로펜)",
+   "pharmKey": "ing:이부프로펜|200밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "30b54d7b-f4dc-4742-9f02-c2f0968e21ca",
+   "name": "플라낙스정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "16c7a383-96e2-47ab-aaae-ab7161131f97",
+   "name": "정장생캡슐(바실루스리케니포르미스균)",
+   "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "f4888b61-046e-4746-9e6b-f5d42e5b491c",
+   "name": "칼비타디정",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "d972d4ab-a125-44ab-8836-b725595af261",
+   "name": "나프롱정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "40fbe052-cd83-423e-a504-016409cf1dcc",
+   "name": "마그바이타민연질캡슐",
+   "pharmKey": "atc:A11JC|400밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "f3e4298f-186d-4f58-85d3-f60635e5935b",
+   "name": "레피즈캡슐(니푸록사지드)",
+   "pharmKey": "ing:니푸록사지드|200밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "38faf544-670c-4d24-b605-eb788fae6b36",
+   "name": "웰리드연질캡슐",
+   "pharmKey": "atc:A11JC|200밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "cb6d245c-912e-47b4-8fde-77d8d7c16e3c",
+   "name": "콘센비타프리미엄800정",
+   "pharmKey": "atc:A11JC|800밀리그램|정|oral"
+  },
+  {
+   "master_id": "d4bd6d02-4a7f-4ff7-963e-3483896b921d",
+   "name": "애드칼정",
+   "pharmKey": "atc:A12AX|271.8밀리그램|정|oral"
+  },
+  {
+   "master_id": "f3fe3840-bef1-484a-96fb-f29f1055f8bb",
+   "name": "비타미니아정",
+   "pharmKey": "atc:A11EB|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "2c739b9a-d782-4bed-af0e-41b7647a10d9",
+   "name": "디카테오400정",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "51967ab7-7c2d-45cb-b0ff-7914a8893fba",
+   "name": "엘도테인정(에르도스테인)",
+   "pharmKey": "ing:에르도스테인|300밀리그램|정|oral"
+  },
+  {
+   "master_id": "4c45d348-2704-453c-b15c-2b51c81b663c",
+   "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+   "pharmKey": "ing:브로멜라인|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "9b4bb883-6fcb-401c-a842-4f5d50d0affd",
+   "name": "알카본플러스정",
+   "pharmKey": "atc:A12AX|1250밀리그램|정|oral"
+  },
+  {
+   "master_id": "24e9ed86-66f9-4b00-8f81-9c58675e56f4",
+   "name": "브로나인장용정(브로멜라인)",
+   "pharmKey": "ing:브로멜라인|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "d88fd752-9d75-4af6-a54b-c57ad74d2ae0",
+   "name": "알레지엔정120밀리그램(펙소페나딘염산염)",
+   "pharmKey": "ing:펙소페나딘염산염|120밀리그램|정|oral"
+  },
+  {
+   "master_id": "b2f9d98a-c85f-4491-bbbb-a5553566ad5e",
+   "name": "나프롱정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "f8e48117-6577-4fb3-b9a9-0f7f6a3f1c4b",
+   "name": "디카듀오정100/1000",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "aa7e7cde-bbfa-4732-af85-17f78270a71a",
+   "name": "파워콘친골드연질캡슐",
+   "pharmKey": "atc:A11JC|300밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "ebe2cbe7-f2dd-423e-b6d9-a2f7b6bd63e1",
+   "name": "아나프록스정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "7f050ae2-a5b3-4fcc-8df7-25baa146b7a3",
+   "name": "파날디정(덱시부프로펜)",
+   "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral"
+  },
+  {
+   "master_id": "1cbc9dfb-abf5-4eef-ac5a-48965e77ecbe",
+   "name": "에르틴정(엘카르니틴)",
+   "pharmKey": "ing:엘카르니틴|330밀리그램|정|oral"
+  },
+  {
+   "master_id": "2c4c6320-ea3b-4c3e-b499-026f291a7617",
+   "name": "리도펜연질캡슐(이부프로펜)",
+   "pharmKey": "ing:이부프로펜|200밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "ff26f029-967b-4003-98bf-b1593b089c9b",
+   "name": "스노핀정275밀리그램(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "3393b879-ba5b-4a2c-b4d4-e5a5dc0fccbb",
+   "name": "알마시드정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "9a7dd0cf-aa9e-4852-9055-479b4d205325",
+   "name": "메디알정500mg(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "75902834-5046-482f-ab21-5121d7f139de",
+   "name": "비스콘틴엠800정",
+   "pharmKey": "atc:A11JC|800밀리그램|정|oral"
+  },
+  {
+   "master_id": "1565cbd9-0ef8-416e-8588-ff22a8429263",
+   "name": "엘비페롤플러스정",
+   "pharmKey": "atc:A12AX|475밀리그램|정|oral"
+  },
+  {
+   "master_id": "0866cf74-12e6-4446-945d-4cae8d8f5e24",
+   "name": "본디칼플러스정",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "d71f6e10-19d0-46c9-b7f8-77b30be44464",
+   "name": "벤다졸정(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "14ddfed7-5d1a-479a-b48d-ed6b5b67c7d6",
+   "name": "알마겐트정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "174a15fb-3232-4f6c-8d22-200b09c1db4e",
+   "name": "탐부틴정200밀리그램(트리메부틴말레산염)",
+   "pharmKey": "ing:트리메부틴말레산염|200밀리그램|정|oral"
+  },
+  {
+   "master_id": "fb866ccd-ca5a-43f5-b900-bc3da04f9398",
+   "name": "에스프로펜정(덱시부프로펜)",
+   "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral"
+  },
+  {
+   "master_id": "897b5b82-3736-4e28-9973-5006de6cf9ac",
+   "name": "로파인캡슐(로페라미드염산염)",
+   "pharmKey": "ing:로페라미드염산염|2밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "4899df6e-2812-4cfc-b9aa-35190d6dd94c",
+   "name": "알바트정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "d574692e-c495-4859-9efc-51cfad87a2a3",
+   "name": "네오칼디정",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "b74ca121-d322-47d6-b00a-9ca39916f2c2",
+   "name": "미래트리메부틴정(트리메부틴말레산염)",
+   "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "23364626-3b8b-457a-a69c-23fc36f1c42d",
+   "name": "미래트리메부틴정(트리메부틴말레산염)",
+   "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "21f34f2a-770b-438f-85cd-3af380f51464",
+   "name": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+   "pharmKey": "ing:알파칼시돌|1마이크로그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "acc9c9b5-d599-4322-a5d0-ad6f7c9cdc68",
+   "name": "칼디맥정",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "dcd968ae-9839-4ad6-87af-dd462e50d892",
+   "name": "캐롤엔연질캡슐(나프록센)",
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "ca82a4ac-c922-4fab-8601-aa5345bc313a",
+   "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+   "pharmKey": "ing:알파칼시돌|0.5마이크로그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "6cac9c07-1858-4b11-929e-be324ee91d65",
+   "name": "에디맥스디정",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "6c371139-1397-4713-9f94-0de9bba1eb92",
+   "name": "알킬정(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "3b097bec-e1da-40b9-a415-bad6e3d09d25",
+   "name": "팩트라민정",
+   "pharmKey": "atc:A11JB|50밀리그램|정|oral"
+  },
+  {
+   "master_id": "056462c4-5325-4a2a-89f6-4afa2bc5bb8d",
+   "name": "제이프록센정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "9f82042d-5b62-4f94-a4a6-1ef8e3bb59ee",
+   "name": "메디오스정600밀리그램(디오스민)",
+   "pharmKey": "ing:디오스민|600밀리그램|정|oral"
+  },
+  {
+   "master_id": "8ed0dcbe-2156-4342-b2de-bba047e8f7d9",
+   "name": "다졸정(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "4c7f6332-d761-4182-8600-84094a9267e7",
+   "name": "동인당나프록센정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "6fc135f2-8cbc-44dc-a6dc-355f7db6775f",
+   "name": "안페라캡슐(포도엽건조엑스)",
+   "pharmKey": "ing:포도엽건조엑스|180밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "ae73815d-6806-48f1-b6dd-33da9338ba23",
+   "name": "더마그램연질캡슐(L-시스틴)",
+   "pharmKey": "ing:L-시스틴|500밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "41bdf18e-e7b8-453c-bf7a-3970196b41a6",
+   "name": "본에이디에스정",
+   "pharmKey": "atc:A12AX|475밀리그램|정|oral"
+  },
+  {
+   "master_id": "b521f931-855d-4352-8990-2032891f2f4f",
+   "name": "나프록신정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "dea8c5d8-6a0f-481b-aa05-2a42bbf74816",
+   "name": "유미칼디정",
+   "pharmKey": "atc:A12AX|475밀리그램|정|oral"
+  },
+  {
+   "master_id": "5eac72e9-f814-4b27-a67e-2b2126424d5a",
+   "name": "알비정400mg(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "066de9ab-9f0d-4b12-8038-d9205b72cc2e",
+   "name": "바로닉신정125밀리그램(클로닉신리시네이트)",
+   "pharmKey": "ing:클로닉신리시네이트|125밀리그램|정|oral"
+  },
+  {
+   "master_id": "34b095dd-c7e1-441b-a987-59f3a24fc276",
+   "name": "나프로센연질캡슐(나프록센)",
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "abcc3e77-5f92-45b4-bf01-4df7c1743320",
+   "name": "알레드제로정120밀리그램(펙소페나딘염산염)",
+   "pharmKey": "ing:펙소페나딘염산염|120밀리그램|정|oral"
+  },
+  {
+   "master_id": "af84194e-30b3-4e04-a90d-639920b38a65",
+   "name": "칼디맥정",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "d3894091-69e9-4d0f-8c02-5ac6bca70b9f",
+   "name": "애드민플러스정",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "77173143-e1a7-4505-a147-aa8796220d7b",
+   "name": "액티몰스정(시트룰린말산염)",
+   "pharmKey": "ing:시트룰린말산염|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "3de7a180-8c2e-4cbf-8faa-f6ff8391fcab",
+   "name": "아이멜라인장용정(브로멜라인)",
+   "pharmKey": "ing:브로멜라인|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "e3efdfaf-e2c4-432c-8b00-a59a68bbe76f",
+   "name": "알게나정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "c1446413-a7d0-4b8b-b6b3-9ff3605ce17b",
+   "name": "알삭센정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "6351ae13-8687-4712-8c58-821af40348fc",
+   "name": "마그밀정(수산화마그네슘)",
+   "pharmKey": "ing:수산화마그네슘|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "60b887e6-bf2e-4915-b4b6-0a71190f0e5c",
+   "name": "알마티정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "d6089cfd-d798-4661-9c46-5d1347692f5c",
+   "name": "프라스칼-디정750밀리그람",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "a4469022-2375-4e06-857b-088e28491b94",
+   "name": "젠텔정400밀리그람(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "b486cee9-a93d-4e96-98df-5f0be6d5d403",
+   "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+   "pharmKey": "ing:트리메부틴말레산염|200밀리그램|정|oral"
+  },
+  {
+   "master_id": "f5f1774c-9d88-46c3-82da-c0323c7cc441",
+   "name": "자비론정(독시라민숙신산염)",
+   "pharmKey": "ing:독시라민숙신산염|25밀리그램|정|oral"
+  },
+  {
+   "master_id": "67e10529-e432-4bc6-b351-d3d5389aeb55",
+   "name": "동인당나프록센정(나프록센나트륨)",
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral"
+  },
+  {
+   "master_id": "4085b2b3-0394-4a61-8993-9866b7b56993",
+   "name": "이지페인클린연질캡슐(클로닉신리시네이트)",
+   "pharmKey": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "4191aca5-1051-436b-a9d4-c176d0a5fe64",
+   "name": "고칼디정",
+   "pharmKey": "atc:A12AX|1250밀리그램|정|oral"
+  },
+  {
+   "master_id": "f91c4cd0-cea5-41fc-911e-337fed8eb623",
+   "name": "삼남로페라마이드캡슐(로페라미드염산염)",
+   "pharmKey": "ing:로페라미드염산염|2밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "26025f55-8d9b-46c6-9b9b-8efe090553b5",
+   "name": "발란시드정(탄산수소나트륨)",
+   "pharmKey": "ing:탄산수소나트륨|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "8742d2b7-bc01-4cf1-bd8b-823ebf205d5d",
+   "name": "디펙타민연질캡슐(디펜히드라민염산염)",
+   "pharmKey": "ing:디펜히드라민염산염|50밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "83a64d79-d86d-4071-92aa-a7c5995ec741",
+   "name": "프라디오정(디오스민)",
+   "pharmKey": "ing:디오스민|600밀리그램|정|oral"
+  },
+  {
+   "master_id": "a7687c55-73c2-436d-afff-9bd5ae93333c",
+   "name": "덱시파인정(덱시부프로펜)",
+   "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral"
+  },
+  {
+   "master_id": "cc48a440-e2d8-4557-bb88-9f047a476206",
+   "name": "네오칼디정",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "bdea2b4a-cade-4593-a2db-8940336e6174",
+   "name": "쎄이칼정(수출명:칼슘포르트씨디(CalciumFortCD))",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "f7aa7240-462f-4bc1-afd7-a5b805f55e74",
+   "name": "알파디연질캡슐(알파칼시돌)",
+   "pharmKey": "ing:알파칼시돌|0.5마이크로그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "6ce47601-f66b-4b35-9d43-7c02b7868157",
+   "name": "모아졸정(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "f902ec65-6355-415c-a19d-2045dd9185c2",
+   "name": "레피즈캡슐(니푸록사지드)",
+   "pharmKey": "ing:니푸록사지드|200밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "6d4404e1-7d0e-4d2b-b47c-72f42c088256",
+   "name": "알게나정(알마게이트)",
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral"
+  },
+  {
+   "master_id": "dff90729-8713-49ee-a52f-4a356fb7017d",
+   "name": "나콕스펜연질캡슐(나프록센)",
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "a3226983-63a8-427e-8ce7-5d58f8f35d8d",
+   "name": "무로펜정(덱시부프로펜)",
+   "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral"
+  },
+  {
+   "master_id": "64bf28e7-24f0-4768-945f-3479a60744a1",
+   "name": "아스텍션장용정100밀리그램(아스피린)",
+   "pharmKey": "ing:아스피린|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "f22fe18d-ded9-4d65-906d-ddd5ec6080ca",
+   "name": "로타인정(로라타딘)",
+   "pharmKey": "ing:로라타딘|10밀리그램|정|oral"
+  },
+  {
+   "master_id": "62fe32af-ba19-4a4d-9160-e54874314696",
+   "name": "브로아제장용정(브로멜라인)",
+   "pharmKey": "ing:브로멜라인|100밀리그램|정|oral"
+  },
+  {
+   "master_id": "bd284b8a-0e88-4804-9655-a7b9ef44c1b5",
+   "name": "쎄이칼정(수출명:칼슘포르트씨디(CalciumFortCD))",
+   "pharmKey": "atc:A12AX|750밀리그램|정|oral"
+  },
+  {
+   "master_id": "1fbd7768-553a-43cf-8afe-d353c424d104",
+   "name": "마그스더블액션연질캡슐",
+   "pharmKey": "atc:A11JC|400밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "76e45140-2e9a-4e16-8b0e-4365dec31c43",
+   "name": "벤다졸정(알벤다졸)",
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral"
+  },
+  {
+   "master_id": "186abcd4-93d4-4196-9cfd-1f87fdc19802",
+   "name": "알지엔스피드연질캡슐10밀리그램(세티리진염산염)",
+   "pharmKey": "ing:세티리진염산염|10밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "7d6e555e-3d94-47b8-b9a2-a63e0f215102",
+   "name": "락토셀캡슐(바실루스리케니포르미스균)",
+   "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral"
+  },
+  {
+   "master_id": "8fd232c1-700c-4e27-bf96-fdc39990117c",
+   "name": "나쎈연질캡슐(나프록센)",
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral"
+  },
+  {
+   "master_id": "8af2f1e1-8dbc-4bf1-8aa8-a0845d05ec27",
+   "name": "이알펜8시간서방정(아세트아미노펜)",
+   "pharmKey": "ing:아세트아미노펜|650밀리그램|정|oral"
+  },
+  {
+   "master_id": "bed400f3-2af2-42d7-96ad-56d96ddf120a",
+   "name": "본디칼정",
+   "pharmKey": "atc:A12AX|250밀리그램|정|oral"
+  },
+  {
+   "master_id": "9c474b52-72c2-41f5-8ac6-524490ffd7a9",
+   "name": "팜페인파워연질캡슐(나프록센)",
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral"
+  }
+ ]
+}

@@ -1,0 +1,346 @@
+{
+ "wo": "WO-O4O-OTC-FULL-CORPUS-AUTHORED-BRIDGE-INTEGRATION-V1",
+ "dbWrite": 0,
+ "readOnly": true,
+ "inputs": {
+  "grounded_commit": "0aa64a0ef",
+  "authored_commit": "d7b3017ad",
+  "unifiedRule": "shard-1/authored-audit 계승, 단일 규칙 글로벌 재계산"
+ },
+ "gate": {
+  "integrity_grounded_no_dup": true,
+  "integrity_authored_no_dup": true,
+  "grounded_distinct": 19131,
+  "gate_grounded_19131": true,
+  "authored_distinct": 3149,
+  "authored_baseline_3128": 3128,
+  "authored_drift": 21,
+  "authored_no_loss": true,
+  "grounded_groups_recomputed": 6261,
+  "groups_baseline_6216": 6216,
+  "groups_drift": 45,
+  "authored_conflict_groups": 12,
+  "authored_safety_conflict_groups": 6,
+  "conflict_baseline_12": 12,
+  "safety_conflict_baseline_6": 6,
+  "driftNote": "grounded 19,131 불변(중복·손실 0). authored 는 12:37 audit(d7b3017ad) 이후 동시 OTC 배치 세션이 mfds_drug_otc ko 21건을 canonical 승격(created_at 신규 0, status 전환) → 3128→실측. 손실 없음(superset). groups 6,216 은 shard-merge 근사, 본 스크립트는 전량 단일패스 재계산이라 정본. 충돌 정의는 전체 content 지문(audit 계승).",
+  "dbWrite": 0
+ },
+ "masterPartition": {
+  "authored그대로확장": 1201,
+  "검토후확장": 1182,
+  "안전지문불일치": 1424,
+  "새설명서필요": 9101,
+  "비경구별도트랙": 6223
+ },
+ "groupPartition": {
+  "검토후확장": {
+   "groups": 193,
+   "masters": 1179
+  },
+  "authored그대로확장": {
+   "groups": 157,
+   "masters": 1198
+  },
+  "새설명서필요": {
+   "groups": 2882,
+   "masters": 9102
+  },
+  "비경구별도트랙": {
+   "groups": 2619,
+   "masters": 6223
+  },
+  "안전지문불일치": {
+   "groups": 410,
+   "masters": 1429
+  }
+ },
+ "required": {
+  "authored289그룹_중_grounded연결가능_그룹수": 115,
+  "기존authored로_확장가능_grounded제품수": {
+   "그대로확장_확정": 1201,
+   "검토후확장_후보": 1182,
+   "합": 2383
+  },
+  "무성분명_ATC_bridge결과": {
+   "대상": 7301,
+   "ATC코드없음": 0,
+   "authored그대로확장": 295,
+   "검토후확장": 314,
+   "안전지문불일치": 418,
+   "새설명서필요": 6274
+  },
+  "안전지문불일치": {
+   "제품수": 1424,
+   "그룹수": 410
+  },
+  "최종_신규작성필요_그룹수": 2882,
+  "최종_신규작성필요_제품수": 9101,
+  "커버리지_대표설명서": {
+   "top10": {
+    "reps": 10,
+    "grounded": 1334,
+    "pct": 56
+   },
+   "top50": {
+    "reps": 50,
+    "grounded": 2058,
+    "pct": 86.4
+   },
+   "top100": {
+    "reps": 100,
+    "grounded": 2304,
+    "pct": 96.7
+   },
+   "총apply대상": 2383,
+   "대표설명서총수": 134
+  }
+ },
+ "경구apply가능_상위30": [
+  {
+   "pharmKey": "ing:에르도스테인|300밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "태극에르도스테인캡슐(에르도스테인)",
+   "authored": 67,
+   "groundedApply": 0,
+   "groundedReview": 373
+  },
+  {
+   "pharmKey": "ing:아세틸시스테인|200밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "뮤세틸캡슐200mg(아세틸시스테인)",
+   "authored": 59,
+   "groundedApply": 0,
+   "groundedReview": 228
+  },
+  {
+   "pharmKey": "ing:세티리진염산염|10밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "알러스탑정(세티리진염산염)",
+   "authored": 72,
+   "groundedApply": 0,
+   "groundedReview": 163
+  },
+  {
+   "pharmKey": "atc:A11JC|100밀리그램|정|oral",
+   "keyType": "atc",
+   "sample": "벤포벨브이정",
+   "authored": 98,
+   "groundedApply": 0,
+   "groundedReview": 129
+  },
+  {
+   "pharmKey": "atc:A11JC|500밀리그램|연질캡슐|oral",
+   "keyType": "atc",
+   "sample": "마투탑플러스연질캡슐",
+   "authored": 151,
+   "groundedApply": 0,
+   "groundedReview": 103
+  },
+  {
+   "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "메라부틴정(트리메부틴말레산염)",
+   "authored": 38,
+   "groundedApply": 85,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:암브록솔염산염|30밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "암브로엠정(암브록솔염산염)",
+   "authored": 15,
+   "groundedApply": 0,
+   "groundedReview": 71
+  },
+  {
+   "pharmKey": "ing:아스피린|100밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "아스쿨장용정(아스피린)",
+   "authored": 23,
+   "groundedApply": 67,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "투투락캡슐(바실루스리케니포르미스균)",
+   "authored": 8,
+   "groundedApply": 62,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "atc:A11JB|500밀리그램|연질캡슐|oral",
+   "keyType": "atc",
+   "sample": "크램스탑연질캡슐",
+   "authored": 73,
+   "groundedApply": 0,
+   "groundedReview": 53
+  },
+  {
+   "pharmKey": "ing:알벤다졸|400밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "지벤다졸정(알벤다졸)",
+   "authored": 33,
+   "groundedApply": 45,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:디오스민|300밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "치지랜캡슐(디오스민)",
+   "authored": 12,
+   "groundedApply": 42,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "atc:A12AX|475밀리그램|정|oral",
+   "keyType": "atc",
+   "sample": "칼디본플러스정",
+   "authored": 62,
+   "groundedApply": 39,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:로라타딘|10밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "에치타딘정(로라타딘)",
+   "authored": 13,
+   "groundedApply": 38,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:알마게이트|500밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "알제스정(알마게이트)",
+   "authored": 26,
+   "groundedApply": 37,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:트리메부틴말레산염|150밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "마부탄정150mg(트리메부틴말레산염)",
+   "authored": 39,
+   "groundedApply": 35,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "나프쎈연질캡슐(나프록센)",
+   "authored": 14,
+   "groundedApply": 29,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "인크로신연질캡슐(클로닉신리시네이트)",
+   "authored": 7,
+   "groundedApply": 27,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:클로닉신리시네이트|125밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "클리타정(클로닉신리시네이트)",
+   "authored": 29,
+   "groundedApply": 26,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:에르도스테인|300밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "엘도씽정(에르도스테인)",
+   "authored": 9,
+   "groundedApply": 26,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:트리메부틴말레산염|200밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "마이부틴정200밀리그램(트리메부틴말레산염)",
+   "authored": 3,
+   "groundedApply": 24,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "atc:A11JC|296.7밀리그램|연질캡슐|oral",
+   "keyType": "atc",
+   "sample": "아이뷰연질캡슐",
+   "authored": 40,
+   "groundedApply": 0,
+   "groundedReview": 22
+  },
+  {
+   "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "엔티펜정300밀리그램(덱시부프로펜)",
+   "authored": 15,
+   "groundedApply": 22,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:브로멜라인|100밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "캐롤라인장용정(브로멜라인)",
+   "authored": 29,
+   "groundedApply": 22,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:니자티딘|75밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "틴자정(니자티딘)",
+   "authored": 33,
+   "groundedApply": 18,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:엘카르니틴|330밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "미엘카틴정(엘카르니틴)",
+   "authored": 12,
+   "groundedApply": 18,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:아세트아미노펜|325밀리그램|연질캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "스피드싹연질캡슐(아세트아미노펜)",
+   "authored": 2,
+   "groundedApply": 18,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral",
+   "keyType": "ingredient",
+   "sample": "나프록정(나프록센나트륨)",
+   "authored": 40,
+   "groundedApply": 15,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:소브레롤|200밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "소롤캡슐(소브레롤)",
+   "authored": 3,
+   "groundedApply": 15,
+   "groundedReview": 0
+  },
+  {
+   "pharmKey": "ing:아세틸시스테인|100밀리그램|캡슐|oral",
+   "keyType": "ingredient",
+   "sample": "코푸렌캡슐100mg(아세틸시스테인)",
+   "authored": 3,
+   "groundedApply": 15,
+   "groundedReview": 0
+  }
+ ],
+ "safety_notes": [
+  "약학적 키 충돌 12그룹(안전상충 6 포함)은 검토후확장으로 분류 — 자동 확장 금지(WO 안전조건).",
+  "안전지문 불일치는 하위 그룹 분리(오병합 방지).",
+  "source_type 실제값 mfds_drug_otc / mfds_drug_otc_nutrition_combo 사용."
+ ]
+}
