@@ -1,0 +1,142 @@
+{
+ "wo": "WO-O4O-OTC-FULL-CORPUS-FINGERPRINT-INTEGRATION-V1",
+ "extractFailPerShard": [
+  0,
+  0,
+  0
+ ],
+ "extractFailTotal": 0,
+ "tierInconsistentFingerprints": [
+  {
+   "fp": "57fb00c6bc2550f0",
+   "tiers": [
+    "Tier1",
+    "Tier2",
+    "Tier1"
+   ],
+   "bridgeKey": "파모티딘|10밀리그램|정|oral",
+   "size": 28
+  },
+  {
+   "fp": "903e104ec6ed05ac",
+   "tiers": [
+    "Tier1",
+    "Tier3",
+    "Tier3"
+   ],
+   "bridgeKey": "|475밀리그램|정|oral",
+   "size": 27
+  },
+  {
+   "fp": "e3baf5774d136685",
+   "tiers": [
+    "Tier2",
+    "Tier1",
+    "Tier1"
+   ],
+   "bridgeKey": "알마게이트|500밀리그램|정|oral",
+   "size": 18
+  },
+  {
+   "fp": "e4b46ea3f859f46a",
+   "tiers": [
+    "Tier3",
+    "Tier1"
+   ],
+   "bridgeKey": "나프록센|250밀리그램|연질캡슐|oral",
+   "size": 17
+  },
+  {
+   "fp": "66bd7d9269c1258d",
+   "tiers": [
+    "Tier1",
+    "Tier3"
+   ],
+   "bridgeKey": "|60밀리그램|정|oral",
+   "size": 16
+  },
+  {
+   "fp": "ec7e07842026944d",
+   "tiers": [
+    "Tier1",
+    "Tier2",
+    "Tier1"
+   ],
+   "bridgeKey": "L-아스파르트산-L-오르니틴|15그램|액|oral",
+   "size": 15
+  },
+  {
+   "fp": "2422e9ce800ca999",
+   "tiers": [
+    "Tier3",
+    "Tier1"
+   ],
+   "bridgeKey": "덱시부프로펜|300밀리그램|정|oral",
+   "size": 15
+  },
+  {
+   "fp": "950aba51b9bd0888",
+   "tiers": [
+    "Tier2",
+    "Tier1"
+   ],
+   "bridgeKey": "|150밀리그램|캡슐|oral",
+   "size": 13
+  },
+  {
+   "fp": "a8bd7ba09d81d9b4",
+   "tiers": [
+    "Tier3",
+    "Tier3",
+    "Tier1"
+   ],
+   "bridgeKey": "나프록센|250밀리그램|연질캡슐|oral",
+   "size": 12
+  },
+  {
+   "fp": "74469b30c6fc4a1d",
+   "tiers": [
+    "Tier1",
+    "Tier2"
+   ],
+   "bridgeKey": "아세트아미노펜제피세립|325밀리그램|정|oral",
+   "size": 12
+  },
+  {
+   "fp": "d3f1e831e75f98c2",
+   "tiers": [
+    "Tier2",
+    "Tier1"
+   ],
+   "bridgeKey": "아세트아미노펜|325밀리그램|정|oral",
+   "size": 10
+  },
+  {
+   "fp": "006307c97e222caf",
+   "tiers": [
+    "Tier1",
+    "Tier2"
+   ],
+   "bridgeKey": "아세트아미노펜|160밀리그램|정|oral",
+   "size": 10
+  },
+  {
+   "fp": "1c430656ccef202e",
+   "tiers": [
+    "Tier1",
+    "Tier3"
+   ],
+   "bridgeKey": "|150밀리그램|정|oral",
+   "size": 8
+  }
+ ],
+ "extendabilityInconsistentFingerprints": [
+  {
+   "fp": "2786f97032b41691",
+   "bridgeKey": "비오틴|5밀리그램|정|oral",
+   "size": 6
+  }
+ ],
+ "bridgeKeyInconsistentFingerprints": [],
+ "note": "extract 실패 0. 예외 = shard 간 tier/extendability 미세 불일치(가·나·다 스크립트 진화 차) — collided fingerprint 세부 tier 재계산 필요 목록. bridgeKey-inconsistent=0(fingerprint 규칙 동일 확증)."
+}

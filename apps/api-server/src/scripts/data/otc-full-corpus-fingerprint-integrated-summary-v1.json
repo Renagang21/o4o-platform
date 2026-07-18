@@ -1,0 +1,500 @@
+{
+  "wo": "WO-O4O-OTC-FULL-CORPUS-FINGERPRINT-INTEGRATION-V1",
+  "dbWrite": 0,
+  "readOnly": true,
+  "inputs": [
+    "otc-fingerprint-shard-0-{summary,groups,bridge}-v1.json",
+    "otc-fingerprint-shard-1-{summary,groups,bridge}-v1.json",
+    "otc-fingerprint-shard-2-{summary,groups,bridge}-v1.json"
+  ],
+  "gate": {
+    "perShardMasters": [
+      6407,
+      6452,
+      6272
+    ],
+    "threeShardSum": 19131,
+    "bridgeSizeSum": [
+      6407,
+      6452,
+      6272
+    ],
+    "groupsSizeSum": [
+      6407,
+      6452,
+      6272
+    ],
+    "totalMasters": 19131,
+    "extractFail": [
+      0,
+      0,
+      0
+    ],
+    "gate_sum_19131": true,
+    "gate_bridge_eq_summary": true,
+    "gate_groups_eq_summary": true,
+    "gate_extractFail_zero": true,
+    "dbWrite": 0
+  },
+  "consistency": {
+    "perShardGroupRows": [
+      2285,
+      2232,
+      2265
+    ],
+    "integratedGroups": 6216,
+    "mergedAway": 566,
+    "collidedFingerprints": 433,
+    "collidedIn2Shards": 300,
+    "collidedIn3Shards": 133,
+    "bridgeKeyInconsistent": 0,
+    "extendabilityInconsistent": 1,
+    "tierInconsistentAcrossShards": 13,
+    "note": "fingerprint 규칙 동일 근거: bridgeKey-inconsistent=0. tier-inconsistent 및 collided fp 의 Tier1/2/3 세부는 shard 경계 넘는 raw/norm-full 원문 비교가 필요 → 파일만으로 정밀 재계산 불가. 병합 tier 는 shard subgroup 중 최악(보수적)으로 표기하고, collided 수를 세부 불확실성 상한으로 명시."
+  },
+  "totals": {
+    "groundedOtcMasters": 19131,
+    "fingerprintGroups": 6216,
+    "singletonGroups": 2130,
+    "oralSingleMasters": 12908,
+    "nonOralOrMultiMasters": 6223,
+    "sizeDist": {
+      "1": 2130,
+      "2-5": 3403,
+      "6-20": 637,
+      "21-50": 36,
+      "51+": 10
+    }
+  },
+  "tierDist": {
+    "Tier1": {
+      "groups": 3586,
+      "masters": 12468
+    },
+    "Tier3": {
+      "groups": 15,
+      "masters": 310
+    },
+    "Tier5": {
+      "groups": 2604,
+      "masters": 6223
+    },
+    "Tier2": {
+      "groups": 11,
+      "masters": 130
+    }
+  },
+  "coverage": {
+    "topN": [
+      {
+        "topN": 10,
+        "masters": 762,
+        "pct": 3.98
+      },
+      {
+        "topN": 50,
+        "masters": 1965,
+        "pct": 10.27
+      },
+      {
+        "topN": 100,
+        "masters": 2758,
+        "pct": 14.42
+      },
+      {
+        "topN": 500,
+        "masters": 6196,
+        "pct": 32.39
+      }
+    ],
+    "groupsNeededForCoverage": {
+      "50%": 1187,
+      "70%": 2361,
+      "80%": 3238,
+      "90%": 4303
+    }
+  },
+  "fourPartition": [
+    {
+      "partition": "검토후확장후보",
+      "masters": 2732,
+      "groups": 400
+    },
+    {
+      "partition": "새설명서필요",
+      "masters": 2879,
+      "groups": 1071
+    },
+    {
+      "partition": "주성분코드필요(무성분명)",
+      "masters": 7301,
+      "groups": 2142
+    },
+    {
+      "partition": "비경구-별도트랙",
+      "masters": 6219,
+      "groups": 2603
+    }
+  ],
+  "authoredReuse": {
+    "기존authored확장가능_제품수": 2732,
+    "확장가능_authored대표설명서수": 60,
+    "신규작성필요_그룹수": 1071,
+    "신규작성필요_제품수": 2879,
+    "비경구별도트랙_제품수": 6219
+  },
+  "authoredCorpus": {
+    "perShardKoCanonicalMasters": [
+      null,
+      null,
+      1213
+    ],
+    "perShardBridgeKeys": [
+      null,
+      null,
+      55
+    ],
+    "note": "authored OTC canonical 코퍼스는 각 shard 가 전량(shard 비제한) 재로딩 → item_seq 샤딩과 무관·중복. 통합 재사용 대표수는 검토후확장후보 fingerprint 의 authoredSourceRefIds 합집합으로 산정."
+  },
+  "atcBridge": {
+    "통합_무성분명경구단일_대상": 7301,
+    "통합_무성분명_전체_경구비경구": 9622,
+    "perShard_안전매칭_방법론상이": [
+      {
+        "shard": 0,
+        "atc": null
+      },
+      {
+        "shard": 1,
+        "atc": {
+          "buckets": {
+            "ATC 후보 있음": 3014,
+            "ATC 후보 + 안전지문 일치": 2883,
+            "ATC 후보 있으나 안전지문 불일치": 131,
+            "ATC 후보 없음": 127,
+            "ATC 코드 없음": 0
+          },
+          "noIngredientMasters": 3141,
+          "safetyMatch": 2883,
+          "safetyMismatch": 131,
+          "note": "후보 연결 키=atc_code|함량|제형|경로(후보 풀=shard 내 grounded 전체, 명명+무성분명). 안전지문(용법수치·연령·기간·금기·임신·첨가제·상호작용·단일복합)=최종 분리 키. ⚠️shard-local 값 — twin 이 item_seq 해시로 타 shard 산재 가능 → 전량 후보 수는 통합단계 확정."
+        }
+      },
+      {
+        "shard": 2,
+        "atc": {
+          "대상_무성분명경구단일": 2465,
+          "ATC코드없음": 0,
+          "ATC후보없음": 2044,
+          "ATC후보있음": 421,
+          "ATC후보있음_안전지문일치": 213,
+          "ATC후보있음_안전지문불일치": 208,
+          "note": "ATC=후보 연결 키 / 안전지문=최종 분리 키. 같은 ATC라도 안전정보 다르면 분리. 안전 대조는 grounded-named 후보(shard-local) 기준 — cross-shard named twin 은 통합단계 보강. authored-only 후보는 e약은요 미보유라 안전 대조 불가 → 불일치(별도 확인)로 보수 분류."
+        }
+      }
+    ],
+    "resolution": "安全 매칭(ATC후보있음/안전지문일치/불일치)은 shard 별 후보풀·대상 정의 상이(shard1=명명+무성분명 pool, shard2=무성분명·grounded-named, shard0=필드 부재) → 산술 합산 부당. 대상 모집단(무성분명 경구·단일 7,301)만 통합 확정. 안전지문 대조는 단일 규칙 글로벌 재계산(DB 백드 후속 WO)으로 확정. 고정 원칙 유지: ATC=후보 연결 키 / 안전지문=최종 분리 키."
+  },
+  "top30": [
+    {
+      "fp": "d4482002d924d5da",
+      "size": 190,
+      "tier": "Tier1",
+      "bridgeKey": "에르도스테인|300밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 67
+    },
+    {
+      "fp": "ccfa8e92341197b3",
+      "size": 90,
+      "tier": "Tier3",
+      "bridgeKey": "아세틸시스테인|200밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 59
+    },
+    {
+      "fp": "3f45a385d23b8a7a",
+      "size": 67,
+      "tier": "Tier1",
+      "bridgeKey": "아스피린|100밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 23
+    },
+    {
+      "fp": "5b48970fb9c3026a",
+      "size": 66,
+      "tier": "Tier1",
+      "bridgeKey": "트리메부틴말레산염|100밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 38
+    },
+    {
+      "fp": "61f741e57e9675c9",
+      "size": 63,
+      "tier": "Tier1",
+      "bridgeKey": "아세틸시스테인|200밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 59
+    },
+    {
+      "fp": "613223c138319bda",
+      "size": 62,
+      "tier": "Tier1",
+      "bridgeKey": "에르도스테인|300밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 67
+    },
+    {
+      "fp": "981488eef906287b",
+      "size": 60,
+      "tier": "Tier1",
+      "bridgeKey": "|100밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "4c23d6b38ba74922",
+      "size": 56,
+      "tier": "Tier1",
+      "bridgeKey": "암브록솔염산염|30밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 15
+    },
+    {
+      "fp": "01a3d3748a9c1f73",
+      "size": 56,
+      "tier": "Tier1",
+      "bridgeKey": "바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 8
+    },
+    {
+      "fp": "1c2e38232d471a9e",
+      "size": 52,
+      "tier": "Tier1",
+      "bridgeKey": "|100밀리그램|정|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "a699684548af2f2f",
+      "size": 50,
+      "tier": "Tier5",
+      "bridgeKey": "디클로페낙나트륨|15밀리그램|첩부제|topical",
+      "route": "topical",
+      "ext": "비경구-별도트랙",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "f19bf322f89a0ab2",
+      "size": 49,
+      "tier": "Tier5",
+      "bridgeKey": "수출명:KEFEN|30밀리그램|첩부제|topical",
+      "route": "topical",
+      "ext": "비경구-별도트랙",
+      "crossShard": false,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "7bfaaab7c078c2a6",
+      "size": 48,
+      "tier": "Tier5",
+      "bridgeKey": "1회용|0.5밀리리터|점안액|ophthalmic",
+      "route": "ophthalmic",
+      "ext": "비경구-별도트랙",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "415fbf45d2d828e8",
+      "size": 46,
+      "tier": "Tier1",
+      "bridgeKey": "|155밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "b8f0b8ec7fc79b50",
+      "size": 41,
+      "tier": "Tier1",
+      "bridgeKey": "|150밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "5aab0e0cd1802e58",
+      "size": 40,
+      "tier": "Tier3",
+      "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 72
+    },
+    {
+      "fp": "39f835a490ddf988",
+      "size": 38,
+      "tier": "Tier1",
+      "bridgeKey": "알벤다졸|400밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 33
+    },
+    {
+      "fp": "5c025945deefdefa",
+      "size": 38,
+      "tier": "Tier1",
+      "bridgeKey": "디오스민|300밀리그램|캡슐|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 12
+    },
+    {
+      "fp": "863b085ec21a2c8e",
+      "size": 38,
+      "tier": "Tier1",
+      "bridgeKey": "|20밀리리터|액|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "4ce2b6ed0354b2e5",
+      "size": 38,
+      "tier": "Tier1",
+      "bridgeKey": "로라타딘|10밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 13
+    },
+    {
+      "fp": "dda84e392917f4e6",
+      "size": 37,
+      "tier": "Tier1",
+      "bridgeKey": "알마게이트|500밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 26
+    },
+    {
+      "fp": "f55debd2caae4fbc",
+      "size": 37,
+      "tier": "Tier1",
+      "bridgeKey": "|100밀리그램|정|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "83b688a8b29e036b",
+      "size": 36,
+      "tier": "Tier1",
+      "bridgeKey": "|20밀리리터|액|oral",
+      "route": "oral",
+      "ext": "주성분코드필요(무성분명)",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "f2a2e47645402655",
+      "size": 33,
+      "tier": "Tier5",
+      "bridgeKey": "플루르비프로펜|20밀리그램|첩부제|topical",
+      "route": "topical",
+      "ext": "비경구-별도트랙",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "049369deaf8000d4",
+      "size": 31,
+      "tier": "Tier5",
+      "bridgeKey": "1회용|0.5밀리리터|점안액|ophthalmic",
+      "route": "ophthalmic",
+      "ext": "비경구-별도트랙",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "92abbf6c52d54753",
+      "size": 31,
+      "tier": "Tier1",
+      "bridgeKey": "시트룰린말산염|20밀리리터|액|oral",
+      "route": "oral",
+      "ext": "새설명서필요",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "da3231f120a8773e",
+      "size": 31,
+      "tier": "Tier3",
+      "bridgeKey": "이부프로펜|400밀리그램|정|oral",
+      "route": "oral",
+      "ext": "새설명서필요",
+      "crossShard": false,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "5f3657f34f98cec1",
+      "size": 30,
+      "tier": "Tier5",
+      "bridgeKey": "디클로페낙나트륨|21밀리그램|첩부제|topical",
+      "route": "topical",
+      "ext": "비경구-별도트랙",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    },
+    {
+      "fp": "fd5d12290c40af99",
+      "size": 28,
+      "tier": "Tier1",
+      "bridgeKey": "트리메부틴말레산염|150밀리그램|정|oral",
+      "route": "oral",
+      "ext": "검토후확장후보",
+      "crossShard": true,
+      "authoredMastersByBk": 39
+    },
+    {
+      "fp": "57fb00c6bc2550f0",
+      "size": 28,
+      "tier": "Tier2",
+      "bridgeKey": "파모티딘|10밀리그램|정|oral",
+      "route": "oral",
+      "ext": "새설명서필요",
+      "crossShard": true,
+      "authoredMastersByBk": 0
+    }
+  ]
+}

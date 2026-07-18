@@ -1,0 +1,1676 @@
+{
+ "wo": "WO-O4O-OTC-FULL-CORPUS-FINGERPRINT-INTEGRATION-V1",
+ "note": "ATC=후보 연결 키 / 안전지문=최종 분리 키. authored bridge=성분|함량|제형|경로 일치(무성분명 제외). 안전 매칭은 글로벌 재계산 대상(atcBridge.resolution).",
+ "fourPartition": [
+  {
+   "partition": "검토후확장후보",
+   "masters": 2732,
+   "groups": 400
+  },
+  {
+   "partition": "새설명서필요",
+   "masters": 2879,
+   "groups": 1071
+  },
+  {
+   "partition": "주성분코드필요(무성분명)",
+   "masters": 7301,
+   "groups": 2142
+  },
+  {
+   "partition": "비경구-별도트랙",
+   "masters": 6219,
+   "groups": 2603
+  }
+ ],
+ "authoredReuse": {
+  "기존authored확장가능_제품수": 2732,
+  "확장가능_authored대표설명서수": 60,
+  "신규작성필요_그룹수": 1071,
+  "신규작성필요_제품수": 2879,
+  "비경구별도트랙_제품수": 6219
+ },
+ "atcBridge": {
+  "통합_무성분명경구단일_대상": 7301,
+  "통합_무성분명_전체_경구비경구": 9622,
+  "perShard_안전매칭_방법론상이": [
+   {
+    "shard": 0,
+    "atc": null
+   },
+   {
+    "shard": 1,
+    "atc": {
+     "buckets": {
+      "ATC 후보 있음": 3014,
+      "ATC 후보 + 안전지문 일치": 2883,
+      "ATC 후보 있으나 안전지문 불일치": 131,
+      "ATC 후보 없음": 127,
+      "ATC 코드 없음": 0
+     },
+     "noIngredientMasters": 3141,
+     "safetyMatch": 2883,
+     "safetyMismatch": 131,
+     "note": "후보 연결 키=atc_code|함량|제형|경로(후보 풀=shard 내 grounded 전체, 명명+무성분명). 안전지문(용법수치·연령·기간·금기·임신·첨가제·상호작용·단일복합)=최종 분리 키. ⚠️shard-local 값 — twin 이 item_seq 해시로 타 shard 산재 가능 → 전량 후보 수는 통합단계 확정."
+    }
+   },
+   {
+    "shard": 2,
+    "atc": {
+     "대상_무성분명경구단일": 2465,
+     "ATC코드없음": 0,
+     "ATC후보없음": 2044,
+     "ATC후보있음": 421,
+     "ATC후보있음_안전지문일치": 213,
+     "ATC후보있음_안전지문불일치": 208,
+     "note": "ATC=후보 연결 키 / 안전지문=최종 분리 키. 같은 ATC라도 안전정보 다르면 분리. 안전 대조는 grounded-named 후보(shard-local) 기준 — cross-shard named twin 은 통합단계 보강. authored-only 후보는 e약은요 미보유라 안전 대조 불가 → 불일치(별도 확인)로 보수 분류."
+    }
+   }
+  ],
+  "resolution": "安全 매칭(ATC후보있음/안전지문일치/불일치)은 shard 별 후보풀·대상 정의 상이(shard1=명명+무성분명 pool, shard2=무성분명·grounded-named, shard0=필드 부재) → 산술 합산 부당. 대상 모집단(무성분명 경구·단일 7,301)만 통합 확정. 안전지문 대조는 단일 규칙 글로벌 재계산(DB 백드 후속 WO)으로 확정. 고정 원칙 유지: ATC=후보 연결 키 / 안전지문=최종 분리 키."
+ },
+ "applyCandidatesTop100": [
+  {
+   "fingerprint": "d4482002d924d5da",
+   "size": 190,
+   "tier": "Tier1",
+   "bridgeKey": "에르도스테인|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "00065e32-c23e-4e84-b818-0b25779dc014"
+   ],
+   "authoredMastersByBk": 67,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "ccfa8e92341197b3",
+   "size": 90,
+   "tier": "Tier3",
+   "bridgeKey": "아세틸시스테인|200밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0112b8e0-cc26-411b-84d7-4a1b66bfbe24"
+   ],
+   "authoredMastersByBk": 59,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "3f45a385d23b8a7a",
+   "size": 67,
+   "tier": "Tier1",
+   "bridgeKey": "아스피린|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0052dc6c-639a-400b-b7a3-144d84ae5c14"
+   ],
+   "authoredMastersByBk": 23,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "5b48970fb9c3026a",
+   "size": 66,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "003beef8-82c4-4897-a176-d0ea8a695699"
+   ],
+   "authoredMastersByBk": 38,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "61f741e57e9675c9",
+   "size": 63,
+   "tier": "Tier1",
+   "bridgeKey": "아세틸시스테인|200밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0112b8e0-cc26-411b-84d7-4a1b66bfbe24"
+   ],
+   "authoredMastersByBk": 59,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "613223c138319bda",
+   "size": 62,
+   "tier": "Tier1",
+   "bridgeKey": "에르도스테인|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "00065e32-c23e-4e84-b818-0b25779dc014"
+   ],
+   "authoredMastersByBk": 67,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "4c23d6b38ba74922",
+   "size": 56,
+   "tier": "Tier1",
+   "bridgeKey": "암브록솔염산염|30밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "00b4e7ff-ce10-4bc7-a943-039d80c94b5a"
+   ],
+   "authoredMastersByBk": 15,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "01a3d3748a9c1f73",
+   "size": 56,
+   "tier": "Tier1",
+   "bridgeKey": "바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "022f4af0-1219-428b-bd69-fa39a5e7fe7f"
+   ],
+   "authoredMastersByBk": 8,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "5aab0e0cd1802e58",
+   "size": 40,
+   "tier": "Tier3",
+   "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+   ],
+   "authoredMastersByBk": 72,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "39f835a490ddf988",
+   "size": 38,
+   "tier": "Tier1",
+   "bridgeKey": "알벤다졸|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0178f85b-94d7-4ac9-a061-ac4c2d9ad750"
+   ],
+   "authoredMastersByBk": 33,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "5c025945deefdefa",
+   "size": 38,
+   "tier": "Tier1",
+   "bridgeKey": "디오스민|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "05be62a5-89dc-4f20-95f9-cb6187f5ab35"
+   ],
+   "authoredMastersByBk": 12,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "4ce2b6ed0354b2e5",
+   "size": 38,
+   "tier": "Tier1",
+   "bridgeKey": "로라타딘|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0a7dee0b-e578-4015-967a-fad092071eef"
+   ],
+   "authoredMastersByBk": 13,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "dda84e392917f4e6",
+   "size": 37,
+   "tier": "Tier1",
+   "bridgeKey": "알마게이트|500밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01a231cd-b471-4d93-8071-b271f8c4627d"
+   ],
+   "authoredMastersByBk": 26,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "92abbf6c52d54753",
+   "size": 31,
+   "tier": "Tier1",
+   "bridgeKey": "시트룰린말산염|20밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "da3231f120a8773e",
+   "size": 31,
+   "tier": "Tier3",
+   "bridgeKey": "이부프로펜|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "fd5d12290c40af99",
+   "size": 28,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|150밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "00f0325a-c5a4-4d3c-b900-1774a24509f5"
+   ],
+   "authoredMastersByBk": 39,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "57fb00c6bc2550f0",
+   "size": 28,
+   "tier": "Tier2",
+   "bridgeKey": "파모티딘|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "7965d7979fa60318",
+   "size": 27,
+   "tier": "Tier1",
+   "bridgeKey": "클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "03de1849-7d18-4ea4-8896-63a3658540c4"
+   ],
+   "authoredMastersByBk": 7,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "e59b9eb746ed12e8",
+   "size": 26,
+   "tier": "Tier1",
+   "bridgeKey": "클로닉신리시네이트|125밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01994863-920a-45ea-97d1-f493416cafa7"
+   ],
+   "authoredMastersByBk": 29,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "ab96ddd07a5d03d4",
+   "size": 26,
+   "tier": "Tier1",
+   "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+   ],
+   "authoredMastersByBk": 72,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "6cb701ae85396482",
+   "size": 26,
+   "tier": "Tier1",
+   "bridgeKey": "에르도스테인|300밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "03e0af9d-5236-460a-86d4-1af8b0c00c61"
+   ],
+   "authoredMastersByBk": 9,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "b8118cd1c200ecc8",
+   "size": 22,
+   "tier": "Tier3",
+   "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+   ],
+   "authoredMastersByBk": 72,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "aeea3fe65ddc91a4",
+   "size": 22,
+   "tier": "Tier1",
+   "bridgeKey": "브로멜라인|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a"
+   ],
+   "authoredMastersByBk": 29,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "59d9c7b8ba02a8e3",
+   "size": 21,
+   "tier": "Tier1",
+   "bridgeKey": "파모티딘|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "eccfefbd5ab69b85",
+   "size": 20,
+   "tier": "Tier1",
+   "bridgeKey": "클로닉신리시네이트|125밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01994863-920a-45ea-97d1-f493416cafa7"
+   ],
+   "authoredMastersByBk": 29,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "9840608ed4791455",
+   "size": 19,
+   "tier": "Tier1",
+   "bridgeKey": "아스피린|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0052dc6c-639a-400b-b7a3-144d84ae5c14"
+   ],
+   "authoredMastersByBk": 23,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "99022d479650435a",
+   "size": 19,
+   "tier": "Tier1",
+   "bridgeKey": "알벤다졸|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0178f85b-94d7-4ac9-a061-ac4c2d9ad750"
+   ],
+   "authoredMastersByBk": 33,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "dc9a8c2ae968f8d5",
+   "size": 18,
+   "tier": "Tier1",
+   "bridgeKey": "아세트아미노펜|325밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7"
+   ],
+   "authoredMastersByBk": 2,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "e3baf5774d136685",
+   "size": 18,
+   "tier": "Tier2",
+   "bridgeKey": "알마게이트|500밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01a231cd-b471-4d93-8071-b271f8c4627d"
+   ],
+   "authoredMastersByBk": 26,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "09a06982f9d47e14",
+   "size": 18,
+   "tier": "Tier1",
+   "bridgeKey": "니자티딘|75밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "048ba86f-f85e-42f8-97fd-7bc4e46cc092"
+   ],
+   "authoredMastersByBk": 33,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "8b6d93df5cba542e",
+   "size": 17,
+   "tier": "Tier1",
+   "bridgeKey": "알벤다졸|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0178f85b-94d7-4ac9-a061-ac4c2d9ad750"
+   ],
+   "authoredMastersByBk": 33,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "e4b46ea3f859f46a",
+   "size": 17,
+   "tier": "Tier3",
+   "bridgeKey": "나프록센|250밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "02355c78-3d6d-4f6b-8120-de9ff7f14673"
+   ],
+   "authoredMastersByBk": 14,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "37afed07cf8c1558",
+   "size": 16,
+   "tier": "Tier1",
+   "bridgeKey": "브로멜라인|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a"
+   ],
+   "authoredMastersByBk": 29,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "e0a761ffc97f3e5b",
+   "size": 16,
+   "tier": "Tier1",
+   "bridgeKey": "엘카르니틴|330밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "035efa8f-cc53-4e64-a111-c4528689f457"
+   ],
+   "authoredMastersByBk": 12,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "81002188132575eb",
+   "size": 15,
+   "tier": "Tier1",
+   "bridgeKey": "에르도스테인|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "00065e32-c23e-4e84-b818-0b25779dc014"
+   ],
+   "authoredMastersByBk": 67,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "0e8f31b0d0241d7b",
+   "size": 15,
+   "tier": "Tier1",
+   "bridgeKey": "아셀렌산나트륨오수화물|2밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "ec7e07842026944d",
+   "size": 15,
+   "tier": "Tier2",
+   "bridgeKey": "L-아스파르트산-L-오르니틴|15그램|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "8241c8edc5b3ad66",
+   "size": 15,
+   "tier": "Tier1",
+   "bridgeKey": "아세틸시스테인|100밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4"
+   ],
+   "authoredMastersByBk": 3,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "2422e9ce800ca999",
+   "size": 15,
+   "tier": "Tier3",
+   "bridgeKey": "덱시부프로펜|300밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "002c309a-8576-48ec-938a-19bc1478bacb"
+   ],
+   "authoredMastersByBk": 15,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "3927a1830ab2ee54",
+   "size": 15,
+   "tier": "Tier1",
+   "bridgeKey": "나프록센나트륨|275밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "006f1a2b-f1f7-40a6-ac10-7f0093a150a1"
+   ],
+   "authoredMastersByBk": 40,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "469d77bf7481d3a9",
+   "size": 15,
+   "tier": "Tier1",
+   "bridgeKey": "소브레롤|200밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0ff909f4-20dc-49d1-b8c5-91794ab62df6"
+   ],
+   "authoredMastersByBk": 3,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "35e85c7942996503",
+   "size": 14,
+   "tier": "Tier1",
+   "bridgeKey": "L-아스파르트산-L-아르기닌수화물|20밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "7d2da3f31854e3da",
+   "size": 14,
+   "tier": "Tier1",
+   "bridgeKey": "플루르비프로펜|8.75밀리그램|기타|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "fb8d5de974d9e21d",
+   "size": 14,
+   "tier": "Tier1",
+   "bridgeKey": "엔테로코쿠스페슘스트레인세르넬레68균|30밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "02ff5784b75c7713",
+   "size": 14,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:VilexCetirin|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "4ec78870b3318967",
+   "size": 13,
+   "tier": "Tier1",
+   "bridgeKey": "락토바실루스아시도필루스균|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "177466cf-a57b-4381-b1ff-44bc87c12673"
+   ],
+   "authoredMastersByBk": 13,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "8f93b0ec1453b12d",
+   "size": 13,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|200밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0175e433-a171-44ec-b601-ad65a805171d"
+   ],
+   "authoredMastersByBk": 3,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "f6b3ca0c5a4dba3a",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "파모티딘|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "012268885dfa6850",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+   ],
+   "authoredMastersByBk": 72,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "34bdc5256acdc531",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "003beef8-82c4-4897-a176-d0ea8a695699"
+   ],
+   "authoredMastersByBk": 38,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "821ce3ceb7f32409",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "알파칼시돌|0.5마이크로그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "a8bd7ba09d81d9b4",
+   "size": 12,
+   "tier": "Tier3",
+   "bridgeKey": "나프록센|250밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "02355c78-3d6d-4f6b-8120-de9ff7f14673"
+   ],
+   "authoredMastersByBk": 14,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "820ebe31bc395c5d",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "덱시부프로펜|300밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "967cfaa736a9b9fc",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "나프록센나트륨|275밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "006f1a2b-f1f7-40a6-ac10-7f0093a150a1"
+   ],
+   "authoredMastersByBk": 40,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "e7ef0ecbd56450d8",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "폴리크레줄렌액50%|5밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "74469b30c6fc4a1d",
+   "size": 12,
+   "tier": "Tier2",
+   "bridgeKey": "아세트아미노펜제피세립|325밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "9a76d38ecd70296a",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "세티리진염산염|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+   ],
+   "authoredMastersByBk": 71,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "f0c3538a5dbba637",
+   "size": 12,
+   "tier": "Tier1",
+   "bridgeKey": "락티톨일수화물|15밀리리터|시럽|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "e43ec3ea81e8b058",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "L-아스파르트산-L-아르기닌수화물|20밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "9474c313fa9093d9",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "003beef8-82c4-4897-a176-d0ea8a695699"
+   ],
+   "authoredMastersByBk": 38,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "7b3f0c1cbe6b7ddc",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "시트룰린말산염|10밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "30275ecf8b318b83",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "이부프로펜|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "7153977f6c8d0902",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "건조수산화알루미늄겔|392밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "b24290d7b64a7f9c",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "덱시부프로펜|300밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "b6ea0271da7b8c9b",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "덱시부프로펜|300밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "002c309a-8576-48ec-938a-19bc1478bacb"
+   ],
+   "authoredMastersByBk": 15,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "b549517445bfb595",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:돌핀정|250밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "31567e87cf8660ff",
+   "size": 11,
+   "tier": "Tier3",
+   "bridgeKey": "이부프로펜|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "c28985a4cd7e1f3b",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:UPRO400IBUFEN|400밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "b32dfadb77d8e83f",
+   "size": 11,
+   "tier": "Tier1",
+   "bridgeKey": "글루타티온|50밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "cac5913b0a19fbd5",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "아세틸시스테인|200밀리그램|기타|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "d3f1e831e75f98c2",
+   "size": 10,
+   "tier": "Tier2",
+   "bridgeKey": "아세트아미노펜|325밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "b147f9d7f72a669c",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "메코발라민|500마이크로그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0908968f-30c8-4c9b-95ed-5631212adbc9"
+   ],
+   "authoredMastersByBk": 8,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "af6ec3694ee42ca1",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "결정글루코사민황산염|250밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "3d39dc9b84936c5c",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "우르소데옥시콜산|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "006307c97e222caf",
+   "size": 10,
+   "tier": "Tier2",
+   "bridgeKey": "아세트아미노펜|160밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0175d449-aa46-4e13-8b94-2b84fa1c19ec"
+   ],
+   "authoredMastersByBk": 12,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "2a0d05fa47235494",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:CLICINTab|125밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "8f302bc26f067a73",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "파모티딘|10밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "bdedab9e18b893e9",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "락툴로오스농축액|15밀리리터|시럽|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "3b9e003dc83b6f0c",
+   "size": 10,
+   "tier": "Tier1",
+   "bridgeKey": "수출용|300밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "2e9a30403ba98494",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:PERASTINE200mg|200밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "0f0a09166b0e712a",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "덱스판테놀|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0d2b2ef8-cce5-4771-9ed7-159fd10c1715"
+   ],
+   "authoredMastersByBk": 4,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "7eabf935e3459bd9",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "아세트아미노펜|10밀리리터|시럽|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "d1962e259762ffaf",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "나프록센나트륨|275밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "006f1a2b-f1f7-40a6-ac10-7f0093a150a1"
+   ],
+   "authoredMastersByBk": 40,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "3eedf6cfd62a2480",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "003beef8-82c4-4897-a176-d0ea8a695699"
+   ],
+   "authoredMastersByBk": 38,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "51247b3ebf796627",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "수출용|25밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "c5af668902e6403a",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "L-아르기닌염산염|5밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "656e84187ff7751d",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:BIVOTUMEBIVO|8밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "fcb0767832bca170",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "아세트아미노펜|5밀리리터|시럽|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "29338949df2f5527",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "L-아스파르트산-L-아르기닌수화물|20밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "3486cbdad3e1690b",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "펙소페나딘염산염|60밀리그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "d92724761df19372",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "알마게이트|15밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    0,
+    1
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "3ef05f826f2f2828",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "아스피린|100밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0052dc6c-639a-400b-b7a3-144d84ae5c14"
+   ],
+   "authoredMastersByBk": 23,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "80f0cef15e1326cc",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "디옥타헤드랄스멕타이트|20밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "683cb5a97f32e78e",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "알파칼시돌|0.5마이크로그램|연질캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "060da450de255ccb",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "아스피린|100밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "908afc4306148b93",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "폴산|1밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "068e2176-ee92-4e94-a47d-2dc632bacf53"
+   ],
+   "authoredMastersByBk": 8,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "0adf3bfb3237adc2",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "침강탄산칼슘|500밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "9f91c8ef6be316e2",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "폴리말토오스수산화제이철착염|5밀리리터|액|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    1,
+    2
+   ],
+   "crossShard": true
+  },
+  {
+   "fingerprint": "43bdd97d6c3ac450",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "수출명:NEOCOMIN|250밀리그램|캡슐|oral",
+   "route": "oral",
+   "extendability": "새설명서필요",
+   "authoredRefs": [],
+   "authoredMastersByBk": 0,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  },
+  {
+   "fingerprint": "57c87d7373a35f5d",
+   "size": 9,
+   "tier": "Tier1",
+   "bridgeKey": "트리메부틴말레산염|200밀리그램|정|oral",
+   "route": "oral",
+   "extendability": "검토후확장후보",
+   "authoredRefs": [
+    "0175e433-a171-44ec-b601-ad65a805171d"
+   ],
+   "authoredMastersByBk": 3,
+   "shardsPresent": [
+    2
+   ],
+   "crossShard": false
+  }
+ ]
+}
