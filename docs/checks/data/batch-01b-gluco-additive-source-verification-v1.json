@@ -1,0 +1,226 @@
+{
+  "wo": "WO-O4O-OTC-BATCH-01B-GLUCOSAMINE-ADDITIVE-SOURCE-VERIFY-AGENT-GA-V1",
+  "mode": "read-only",
+  "db_write": 0,
+  "channel": "Cloud SQL Auth Proxy :5442 → production o4o_platform (SELECT only)",
+  "target_count": 8,
+  "diagnostics": {
+    "masters_found": 8,
+    "with_item_seq": 8,
+    "distinct_item_seq": 2,
+    "target_item_seqs": [
+      "200000936",
+      "200003542"
+    ],
+    "note": "8 master → 2 distinct itemSeq (코스민/영풍제약=200003542, 오라테오/바이넥스=200000936). 두 itemSeq 전 소스 후보 0(표준코드 레지스트리만 master 매칭)."
+  },
+  "conclusions": {
+    "1_source_secured_of_8": 0,
+    "2_yellow5_confirmed": 0,
+    "3_yellow5_not_present": 0,
+    "4_other_dye_present": 0,
+    "5_source_missing_or_conflict": 8,
+    "6_shared_draft_patchable": "NO",
+    "7_subgroup_split_needed": false,
+    "8_directly_promotable": 0
+  },
+  "verdict_counts": {
+    "YELLOW_5_CONFIRMED": 0,
+    "YELLOW_5_NOT_PRESENT": 0,
+    "OTHER_DYE_PRESENT": 0,
+    "SOURCE_MISSING": 8,
+    "SOURCE_CONFLICT": 0
+  },
+  "control_group_context": {
+    "note": "추정 근거 아님 — 같은 성분·함량·제형 grounded 의 황색5호 언급(맥락). ⚠️ 제조사 대조 필수: grounded 제조사와 target 제조사가 다르면 전이 불가.",
+    "grounded_distinct_products": 2,
+    "grounded_yellow5_products": 2,
+    "grounded_manufacturers": [
+      "삼진제약(주)",
+      "신일제약(주)"
+    ],
+    "target_manufacturers": [
+      "영풍제약(주)",
+      "(주)바이넥스"
+    ],
+    "manufacturer_overlap": [],
+    "products": [
+      {
+        "seq": "198801103",
+        "name": "오스테민캡슐(결정글루코사민황산염)",
+        "manufacturer": "삼진제약(주)",
+        "y5": true,
+        "y5_snippet": "여성 및 수유부, 간장애, 신장애, 황색5호에 과민증 환자, 당뇨병, 심혈관 질"
+      },
+      {
+        "seq": "199902612",
+        "name": "골사민캡슐(결정글루코사민황산염)(수출명:NEOCOMIN)",
+        "manufacturer": "신일제약(주)",
+        "y5": true,
+        "y5_snippet": "여성 및 수유부, 간장애, 신장애, 황색5호에 과민증 환자, 당뇨병, 심혈관 질"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "master_id": "392569e9-58f6-4730-aa75-a67128c84656",
+      "name": "코스민캡슐(결정글루코사민황산염)",
+      "manufacturer": "영풍제약(주)",
+      "item_seq": "200003542",
+      "korea_drug_code": "8806619015952",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 540 / 캡슐 / 병",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "4c342745-a96c-48b7-981f-d8e9d9092c86",
+      "name": "코스민캡슐(결정글루코사민황산염)",
+      "manufacturer": "영풍제약(주)",
+      "item_seq": "200003542",
+      "korea_drug_code": "8806619015914",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 30 / 캡슐 / 병",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "6cc7a7fa-66e5-417e-87a4-1466dbabfcb1",
+      "name": "코스민캡슐(결정글루코사민황산염)",
+      "manufacturer": "영풍제약(주)",
+      "item_seq": "200003542",
+      "korea_drug_code": "8806619016157",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 180 / 캡슐 / PTP",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "94958423-07f4-480b-b852-6b8f26017fad",
+      "name": "오라테오캡슐(결정글루코사민황산염)",
+      "manufacturer": "(주)바이넥스",
+      "item_seq": "200000936",
+      "korea_drug_code": "8806431015406",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 0",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "b9a05c58-bc7a-4c58-ae1e-de335ebd27f2",
+      "name": "오라테오캡슐(결정글루코사민황산염)",
+      "manufacturer": "(주)바이넥스",
+      "item_seq": "200000936",
+      "korea_drug_code": "8806431015413",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 100 / 캡슐 / PTP",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "bb3b6b34-3e57-471f-b76d-f925dd43c2a1",
+      "name": "코스민캡슐(결정글루코사민황산염)",
+      "manufacturer": "영풍제약(주)",
+      "item_seq": "200003542",
+      "korea_drug_code": "8806619015945",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 500 / 캡슐 / 병",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "cdf7db47-1544-4c13-9e16-4984463c84cd",
+      "name": "오라테오캡슐(결정글루코사민황산염)",
+      "manufacturer": "(주)바이넥스",
+      "item_seq": "200000936",
+      "korea_drug_code": "8806431015420",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 200 / 캡슐 / PTP",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "master_id": "fcd9b9d6-d3d3-4fc3-9246-4896350c5ef8",
+      "name": "코스민캡슐(결정글루코사민황산염)",
+      "manufacturer": "영풍제약(주)",
+      "item_seq": "200003542",
+      "korea_drug_code": "8806619015921",
+      "atc": "M01AX05",
+      "spec": "250밀리그램 / 100 / 캡슐 / 병",
+      "matched_source_labels": [
+        "mfds-drug-master-standard-code_2025-10-31"
+      ],
+      "easydrug_present": false,
+      "additive_bearing_source_present": false,
+      "yellow5": false,
+      "yellow5_snippet": null,
+      "other_dye": false,
+      "existing_spd": [],
+      "source_evidence": "NONE (only barcode/standard-code registry, no additive text)",
+      "verdict": "SOURCE_MISSING"
+    }
+  ]
+}
