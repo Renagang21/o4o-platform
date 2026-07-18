@@ -1,6 +1,8 @@
 # CHECK-O4O-HFF-COMBO-LUTEIN-VA-READONLY-INVESTIGATION-V1 — 루테인+비타민A 복합형 read-only 조사 + dry-run 설계 (에이전트 가)
 
-WO: PART B 복합형 3번째 조합(루테인+비타민A) · 일자: 2026-07-18 · 상태: **조사 완료 · dry-run 설계 완료 · apply 승인 대기**
+WO: PART B 복합형 3번째 조합(루테인+비타민A) · 일자: 2026-07-18 · 상태: **완료 — PASS 7건 apply LIVE (28 write)**
+
+> **apply 결과(사용자 승인 봉투)**: 단일 TX COMMIT · write 28/28 · in-TX verify masters/candidate/ko/en=7·dup 0 · 독립검증 PASS(barcode NULL 7) · rollback manifest 유효 · 재실행 no-op(ALREADY_PROMOTED 7). tag=`batch:single-nutrient-combo-lu-va`.
 채널: **Cloud SQL Auth Proxy(:5442) → production `o4o_platform`, SELECT only.** DB write **0**.
 
 ---
