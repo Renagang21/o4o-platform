@@ -1,0 +1,1082 @@
+{
+  "wo": "WO-O4O-OTC-CANONICAL-APPLY-PILOT — 중단·재검토 후속 Model A 감사",
+  "dbWrite": 0,
+  "readOnly": true,
+  "기준": "ATC후보+안전지문일치 338제품 / 25 atc-key. Model A = authored 대표 e약은요 보유 + 원문(contentSig, 성분무관) 완전 일치 + 기존 canonical 0.",
+  "총_안전일치_대상": 338,
+  "atc_key_수": 25,
+  "authored대표_e약은요보유_atc_key수": 0,
+  "modelA_viable_atc_key수": 0,
+  "modelA_후보_fingerprint그룹": [],
+  "제안_새첫파일럿": null,
+  "atcReport": [
+    {
+      "atcKey": "B01AC06|100밀리그램|정|oral",
+      "targetMasters": 60,
+      "authoredRefs": [
+        "0052dc6c-639a-400b-b7a3-144d84ae5c14"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "1c2e38232d471a9e",
+          "masters": 52,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0728ee9c-b2e0-493d-9390-b905320bc08d",
+            "07adf08b-dc39-45e0-b6b5-27449d156e51",
+            "0a128a74-5d8e-4fca-8baa-eefc8eba55f6",
+            "0c380954-2ed6-4243-851b-411137e884a0",
+            "11d24580-070d-43c1-8077-5064037a4e0b",
+            "174d046c-8a9f-4a59-a57a-837f35012139",
+            "18753d85-72a0-4151-b53f-3dda13230c34",
+            "1e89b475-441f-41a0-a225-81385b9a156b",
+            "28ceeda2-9b2f-4919-be77-adbb0b0389e3",
+            "2dd51ae2-aa6d-4c90-b6c1-9e060e06cb40",
+            "2f129bfe-fc79-47be-b5aa-bc5f3503dcd7",
+            "2f25b532-52d8-4b87-97b4-2d5cc4aec1d2",
+            "31081a5e-b2b1-4fc5-953d-2b13ba3ed594",
+            "3c7ecb84-28ef-4bfe-b6b2-5b7faaef8821",
+            "3d1fc979-d59b-4357-b6f7-7da143556860",
+            "4567f58d-4886-4611-89eb-db88afda989f",
+            "466e4f70-0272-4bfc-84a7-eb05dc84b39a",
+            "4aa1cb7d-dcde-4d37-bf06-a713c8904d2f",
+            "5299c37e-7add-4615-a3f1-9bddf905536e",
+            "5b523e99-84a1-408a-891c-820ff876d921",
+            "68c0c020-95e9-4443-8c69-dfa6719ea9e6",
+            "69e21ccc-aff8-445d-b57c-8daffa65197a",
+            "6fd42e89-0b35-46c2-a400-8927281c88cd",
+            "712630b5-f6cd-47b1-904c-840d9bf2b3fa",
+            "75070801-95fd-4384-bcbb-b366ac85e2a2",
+            "760a2075-a2f6-4c6b-bb7a-e7eff5fa4b40",
+            "78c1f77b-daa9-418b-8620-b1e4966459d3",
+            "7d9f98fd-5f8f-4d35-bb87-43443a8a929e",
+            "7de6470f-e664-40ff-8167-194b40dde73c",
+            "86385ec0-70ee-4d5e-a052-56884a18585e",
+            "8a9984c8-dab2-42a2-9ba8-b908b10864f0",
+            "9adfe774-f8a7-448f-97d0-e9f2c09cf7e6",
+            "9cfada26-aabd-4f91-a84f-99351c4f2d6b",
+            "a3fde5de-b216-4cb1-bf25-fef96cd1581c",
+            "af88e31a-ab5d-4adf-b446-6ff9b80f3213",
+            "b3821f8f-68a8-4183-8ddc-295bb0b7f0df",
+            "be96dee4-6c13-472b-b201-a15233260a41",
+            "c35eb6a0-47ce-46e2-9f11-9b9bebef3e2c",
+            "c8a19ee3-ff9c-4293-ae4d-ba0313527401",
+            "c97ce1a3-a473-4d53-a1a6-1a195a818e78",
+            "ca55fd9f-a7ea-48d5-8d07-b9ea234f6127",
+            "d2e92a0e-f5ff-404c-9ab3-4b149a6df188",
+            "d5c8df91-5825-497d-9e54-66c36dbcc252",
+            "da19107e-4d60-486b-93e3-452205ff5059",
+            "df5d01fb-0924-430d-8a9f-2c643685cfb9",
+            "e4418664-b66a-4be9-8e62-f048a39574d8",
+            "e8f55275-d078-441e-81f8-83ead06ea584",
+            "eb3b8ef5-2d3f-419e-af86-993d666a54ec",
+            "f0f20a08-7a54-4a20-99d5-d9d3db93148f",
+            "f33b4fca-fc9d-41a2-8cfb-0765e1693426",
+            "f3f26b71-0605-44c9-91fa-736f8ed9a3ac",
+            "f6c6b8e3-6066-4b45-9db0-53c0981a3116"
+          ]
+        },
+        {
+          "fingerprint": "6e2030058d0db10e",
+          "masters": 8,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0d0ea654-6ec4-4015-afd1-65822e1abbd6",
+            "199efdb4-5e74-4aff-a3c4-fa979f232a2c",
+            "38b9a033-96d9-4f23-925b-9ecaa8438554",
+            "3bbc498d-0c90-4a26-b932-f6a35a942751",
+            "a28ec75d-84cb-47bd-ac3e-f2ab0639e8d2",
+            "c91d75e7-5733-4c92-8c9d-72a2fa14cbee",
+            "eb81957e-7ddb-4717-afa9-359c412c0d8b",
+            "ff096052-4a38-4098-b9b5-bbfbe38534af"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "A03AA05|100밀리그램|정|oral",
+      "targetMasters": 37,
+      "authoredRefs": [
+        "003beef8-82c4-4897-a176-d0ea8a695699"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "f55debd2caae4fbc",
+          "masters": 37,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0a1d50c3-26a4-428f-8b09-dacb61876258",
+            "13673c17-3839-4ada-9c37-a8f9be88bad1",
+            "144ab4e0-10a8-4f19-87c1-f25ecbb90990",
+            "193d777d-69a2-44e7-a234-62e5768ada1e",
+            "1f86b8d2-fdc4-41af-8915-2c7b406c4e53",
+            "28cf4423-95a3-4c29-a653-a3d4d4217946",
+            "2dd04851-7d52-433e-8207-9cbd3a92ba87",
+            "3a04f212-54b5-47b6-be98-2c5eecea5445",
+            "494d0c07-c564-4c53-bf2b-f4de9d8d24b8",
+            "5092c630-ddbe-4bbb-b016-57f5ead14e18",
+            "54fff26a-a6cc-4496-837f-d6ccdf7d3472",
+            "5ea27714-eb92-4213-a8a5-e3902d61c55e",
+            "6509388b-e6a0-4494-8f65-6087a40259a4",
+            "725ecc2b-c1fe-4cad-8fb9-4d63cf277641",
+            "76021762-ad9b-4f60-b862-59d7d2d06392",
+            "7b801d4f-d24a-4962-99f6-285404dad8ff",
+            "93634cd3-85b1-4585-913f-ac29962424fc",
+            "94ea2e7e-d138-485c-b8e8-bf76fd77d884",
+            "9ab0d73e-6fc8-432d-adef-b1358d20c0b7",
+            "9f4c8f3e-5751-4258-a06e-fdc4d7f08c82",
+            "9fe7b7ce-de91-494c-9d0c-10ef4928171b",
+            "a1002559-9121-4e09-9679-c0ccf6e502d3",
+            "aa58bf22-d17a-4aab-b086-d85563c93f25",
+            "af1dfd0a-5925-4525-bb31-243ca4e93bfa",
+            "bb5e4109-5d22-418e-8be2-60d3f9bf69f8",
+            "bc519c23-88ba-4121-b592-59dbb27c2495",
+            "be2599a1-8165-4c74-ae88-dc6bfa77c186",
+            "c1581c32-3e0c-446a-bdc5-5b1f893e7072",
+            "c47fbb9b-45fb-43bc-b9d4-887101001096",
+            "c778d00e-51b0-411c-8d31-1df0b68eb3d2",
+            "c9fe6af5-7aa8-409f-8f3e-c1902b17b2d7",
+            "cc8e9bf9-400c-450a-8e7b-15e4190c0fb3",
+            "d263023e-180b-4090-af81-5a3b6ed6c129",
+            "d42b87f9-6d08-446a-804b-1e05ae45de4f",
+            "da0ce527-5ea7-4391-b104-118c9a4bf285",
+            "dc21ca42-19ca-49e3-b13e-ae19259a6ee8",
+            "fac2522a-262e-4641-b44a-22c05257c325"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "A02AD03|500밀리그램|정|oral",
+      "targetMasters": 33,
+      "authoredRefs": [
+        "01a231cd-b471-4d93-8071-b271f8c4627d"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "eac58291c51cb3e8",
+          "masters": 22,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "04b6fb3f-9c0e-43be-9c37-bd4f196fe33e",
+            "27d654d8-cb9d-4bf7-89f1-990539149646",
+            "32814a33-461c-458f-82b9-084cead54bea",
+            "3d1ed238-f373-49aa-951f-316eead08619",
+            "4b0b3e5f-26c5-4835-8bcc-2f7fda33ddc4",
+            "5bd16ff7-fa7d-4150-90b0-a7e5e65095cf",
+            "5f5d8efb-dcd1-4da4-b9fd-8bf625462a4a",
+            "813fde23-3217-4c06-b3d5-77c08a89b5bf",
+            "97074e7f-d0d0-426f-bb4e-caa479efba3d",
+            "a1d6d78a-717b-4598-a237-76bb9b9ee6b8",
+            "a5b86f2b-f8b4-4bf3-aaf3-b9436f90305b",
+            "ae3dc1fd-b1ad-4eeb-a04c-8e734fe8ee5d",
+            "b8495629-83f0-4e05-9cad-3ef462bc4d14",
+            "c27d06e1-fa3e-4df5-b1bb-44d29888f7b5",
+            "c87e665e-e6b8-49e2-91ca-3a5839a637e8",
+            "c9c80cac-d20c-417e-bdfb-7fb3e121b550",
+            "c9df81b6-d7d7-42a8-b5e9-259856d63a0e",
+            "d10905e2-e4d5-4175-b161-b4479151fe53",
+            "d7cf98e1-06da-4504-a121-21168bcb31f5",
+            "dbf8b34d-0679-4af3-b319-f231f85a4b7e",
+            "f3d7810d-21fb-4318-be5d-20a56cf38cc8",
+            "fece91e4-e606-4c1e-82f8-2a2b3f0aeafe"
+          ]
+        },
+        {
+          "fingerprint": "ef5a1024e1ed1e9f",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "2d2f51ce-94e2-44ec-8d24-1cf9ecfb2ff3",
+            "363e18bb-78ac-4a50-8faf-913ec8b2a642",
+            "acd23966-3022-4d3e-9671-1df7948d44c7"
+          ]
+        },
+        {
+          "fingerprint": "f67c0a1686166899",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "384cde72-3980-47e5-a329-2d09d8501cfe",
+            "8dca00cf-d1bf-4204-a0dd-e0eacea0dff1",
+            "d2e4750d-551e-4dde-aa94-6cd9a2c1d60e"
+          ]
+        },
+        {
+          "fingerprint": "1831332aefa41b25",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "3d25de38-9add-4327-8855-4df5e05f3ae9",
+            "67562914-2d91-4b7d-b039-1a5caff9656b",
+            "c9658189-af6c-41dc-b320-a06eba24c0b7"
+          ]
+        },
+        {
+          "fingerprint": "38dd99197c2d4aa8",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "157342b9-3f29-4040-ad3c-bd536db9d58d",
+            "5fc7dabb-810a-493d-b100-a76d0136f04b"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R06AE07|10밀리그램|정|oral",
+      "targetMasters": 29,
+      "authoredRefs": [
+        "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "73d99b7bdc15bbcd",
+          "masters": 13,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "070833ab-afb8-465f-89d2-365940886ba2",
+            "09e5c88f-8b63-4a4a-ab65-512b7e2daf7f",
+            "2bcd2de9-1a59-4630-ab0d-00f2be5d5a7f",
+            "2c3b9221-0ec0-4fb3-bc17-d68ffabdbd95",
+            "2dc98bb9-fc6f-424a-83a9-39cd85efc5b5",
+            "3b15aed6-be59-4e33-8635-fdb75e8da24c",
+            "77717a8e-b0a5-4dca-95dc-66ea62ed06b5",
+            "7c7e47a0-fbae-4770-95eb-029d2fb9c024",
+            "972d4111-6e82-4a57-b83e-c32fee6477a3",
+            "d2dddef5-1970-46cc-8ab9-e8bfd28a1dea",
+            "de120565-b6be-4a22-879c-831a59b2184a",
+            "df7463f1-7915-46d8-abcb-56c50f5c0a37",
+            "eadcecdd-7ca2-4104-a94d-582495fd6f30"
+          ]
+        },
+        {
+          "fingerprint": "b3baec3061c29288",
+          "masters": 10,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "040da8b0-7747-49bd-b734-8a9f9f17775c",
+            "1be8f0a1-7b4e-428d-92bb-7a01b16deead",
+            "1d66bb30-3207-40a7-8649-4dfe2e367a6b",
+            "2500bd3b-3bde-4557-a89c-59c29102d62e",
+            "492dec2e-2657-4690-92d4-a4ceb0c8aa5e",
+            "5ca399a2-33cf-4429-b218-336a27c4ac05",
+            "5fa4f554-ef6d-4b32-9432-18776ffc91ba",
+            "751a908d-50db-4340-a38d-33a057884676",
+            "884c0a94-83f4-4639-bc7d-9560fcd33a72",
+            "b8b1e501-0a3f-4760-8c1e-f7b1337182c2"
+          ]
+        },
+        {
+          "fingerprint": "07139d7435a255ce",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "1c65e85e-b8ae-43ae-9dd4-d99fc3cbe8d0",
+            "2e8f93da-1fb7-4fff-a8b4-e1271340336a",
+            "a616bcee-bddd-4725-81de-c1ee28d0e7c6",
+            "b93695c6-02a7-48bc-b8be-e8ba472a28fe",
+            "bbfdec02-80ef-4cf0-b204-e63f316d3861",
+            "f54116a7-7631-4f97-b298-ec32c7f3fc08"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "P02CA03|400밀리그램|정|oral",
+      "targetMasters": 27,
+      "authoredRefs": [
+        "0178f85b-94d7-4ac9-a061-ac4c2d9ad750"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "f578a55082e07332",
+          "masters": 11,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "3a117d29-0519-4840-afe8-9f9f8d990d90",
+            "3e252344-c726-444d-91f6-eece9deab297",
+            "3f116251-c1c1-4c8d-99b0-f1e14a8bc1e3",
+            "50e5f7e8-4464-4b28-90f1-f4547828a95a",
+            "6666eb30-021c-4272-9300-c28ea29daf8f",
+            "6684d97d-5def-49ec-b5cc-8d1c65b724c2",
+            "74fe4a68-20c7-4ba0-9410-808bbe0b3dae",
+            "7f7384d8-cc67-489d-bb22-a040175cc887",
+            "ac6f7e75-d68c-489c-94c7-e3fd3ba441eb",
+            "e6675def-63f4-40ca-8cde-aad092eb9ac0",
+            "f6657182-21a0-4428-bdcc-2c30a34202c8"
+          ]
+        },
+        {
+          "fingerprint": "18418d1ccde924cc",
+          "masters": 10,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "241bc9a5-1517-40ae-8238-dad3abc60efb",
+            "58b20537-9034-467d-8534-bff42f3d79a1",
+            "6c22384c-93fa-4bf4-876c-706c0be827f5",
+            "93559512-9287-4ee8-890b-ecd700b2fef5",
+            "946c373d-7123-4b09-908f-9074a742b9ce",
+            "9dd02374-5797-499a-b0e5-218658f091be",
+            "a9adcbc2-056d-4474-9f0d-258d3a6415cb",
+            "aaba5ca8-d0d7-43f8-9b92-c629d1be7a44",
+            "ace4e759-327e-4219-8c24-f0a4219a8c4c",
+            "f83cd5f8-37c5-44a7-b2bc-1db4a63b7331"
+          ]
+        },
+        {
+          "fingerprint": "47336dee196b743d",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0d3824e9-4631-4366-a838-d4f48f95cffc",
+            "1e3f2093-3a95-4ac5-9dec-e4556a3ac869",
+            "3aade5aa-7435-4c27-a0f8-e6369ecc9c76",
+            "81be8696-75b8-405b-91d8-16b2e12a0181",
+            "9b252852-e114-42a2-a6f6-63bfdd77709d",
+            "fb34e400-9137-49ba-a6fe-e5e08b5ac6ac"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R05CB06|30밀리그램|정|oral",
+      "targetMasters": 25,
+      "authoredRefs": [
+        "00b4e7ff-ce10-4bc7-a943-039d80c94b5a"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "ce8b7099774477c3",
+          "masters": 22,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0b331162-589d-40bf-b0fc-8a1327920f9b",
+            "0ec2d104-37c6-43b0-bd82-ee2fb09d66f8",
+            "1a7a7326-df05-45da-8cf7-40afd6ac4f00",
+            "2b34316b-e32c-48ec-8737-2e7baceb875f",
+            "2eb50025-2f18-472b-a9ca-e3b04598bf25",
+            "3987f1fb-91be-4f4d-b1a9-d3c48f2bad5f",
+            "471ab44a-2689-453a-8d3e-ec965a2692dd",
+            "48f02abe-4871-42a6-896a-82f2e027ccaf",
+            "4be40460-21d3-4a5d-a13b-5c75ad250514",
+            "566a16a4-c680-4645-a088-6b3cd6b2164a",
+            "6f6c3c83-c1d9-498b-afcd-29dbc586b44c",
+            "7624ed72-9803-4f7a-9d95-e6da85a1d0b9",
+            "84a23705-8852-4a8b-bb98-f99c14ef3572",
+            "8d80bb6a-cd23-49f2-bc95-f7e40b32ad93",
+            "90d040c5-4026-4d3a-9788-f06014371c0d",
+            "9898bfd1-f6ee-4dd6-8b31-9a354f523a01",
+            "9cb9e65e-5bbd-4830-88d9-ccec99961acc",
+            "9dd3af7b-0d8c-49d7-be8e-5351afb44148",
+            "b030935b-9988-45a0-bd17-ce55a0fa6ca1",
+            "b15923bb-f7e1-4de1-8034-c46531dfdc32",
+            "d6f18b89-b282-449d-87db-747f1180ecfd",
+            "e286f8af-9d9d-4945-bf8b-42d50ae9c956"
+          ]
+        },
+        {
+          "fingerprint": "69b6f45985a7510b",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "3f54f45a-e371-45e2-88c8-392267c2a587",
+            "c469f95b-d8c1-41c8-9e8d-537eb0118252",
+            "ffe856c3-99a3-4b21-a945-77e37659f883"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R05CB01|200밀리그램|캡슐|oral",
+      "targetMasters": 22,
+      "authoredRefs": [
+        "0112b8e0-cc26-411b-84d7-4a1b66bfbe24"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "aebf85303d7609a7",
+          "masters": 16,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "1d5674d7-3d22-438d-9bf6-5a0c29f62d1f",
+            "20e31fb0-ea0f-474d-a6ca-75db3f60a2db",
+            "301c3fea-8b7f-4953-ad32-77780036440b",
+            "365d96b2-e394-4ec6-a626-bd40e736542b",
+            "4492d060-73ac-42f7-9bb4-145444a2aa9c",
+            "58cc9dbd-bb0f-4bf3-8788-062bc716d253",
+            "591fc3be-3172-46b7-b651-886036a4bbc7",
+            "5d0976ac-a76a-4c40-bdcd-d48d2c812db6",
+            "6f56dd23-ed21-4e6c-a54e-4841bad845de",
+            "8709e7c1-5029-46e0-a96a-b27e6d5e8cd9",
+            "a1791cdc-b7ea-4a29-b5f7-e4c612fb3199",
+            "a5824ca7-3176-4e2d-b8c9-efab94bee5b5",
+            "a58e247f-e0f8-4757-ac05-482003754991",
+            "d79c72b1-09ad-4118-b6eb-45543651eb86",
+            "ee8d1a49-0e4a-4b30-bc00-f8618f0781e1",
+            "f477c38f-f3bc-4f9c-9f2c-fe3555d8eedd"
+          ]
+        },
+        {
+          "fingerprint": "05c4c1615896f682",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "3901fc1b-3aa4-496d-b656-27a43b5ba8fd",
+            "65a33c53-b2e9-4ef9-8d5c-068b104bcd4a",
+            "9552aea5-9ee9-43b3-9192-12d6a4204e21",
+            "9dfb6aa9-53ea-4612-a454-5d121ae878cd",
+            "d079c16e-cd0c-4584-86c8-ab38d46f4ec8",
+            "d097dbdb-966f-4758-b102-d58493ca643d"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AX|125밀리그램|정|oral",
+      "targetMasters": 13,
+      "authoredRefs": [
+        "01994863-920a-45ea-97d1-f493416cafa7"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "174a9564a7e8f570",
+          "masters": 9,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "0ed2abae-4eb1-468f-826d-305e00384699",
+            "22c582ee-67ca-4677-870f-c39aa2b3c8d0",
+            "2504b448-4fb1-4961-97c1-6bff3f813678",
+            "31b29cef-34af-4ced-93f0-81dbc7407b6f",
+            "5f1510bd-6db0-4d5b-b061-463ed5c9a7a5",
+            "64171a4c-0473-4ec5-b39d-980cfa8604cb",
+            "715c3fdb-37a1-45ce-9d52-0aa1367d562c",
+            "cd27cc66-6d34-4e83-b827-49beba917747",
+            "e49c9dc3-c0a3-41f8-9e4d-95b09a2df865"
+          ]
+        },
+        {
+          "fingerprint": "b4fa60c0376bc1e5",
+          "masters": 4,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "2eca99d8-4a93-447b-ac03-4304cb5db4a5",
+            "641e73d9-261a-4c7f-9121-389ae4069c2d",
+            "e6e2f435-2203-4d22-8e7f-db59491779d1",
+            "f4096a02-d7b4-4c56-b071-9986782870c1"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "V06DD|500밀리그램|연질캡슐|oral",
+      "targetMasters": 12,
+      "authoredRefs": [
+        "1167c6d5-0cfd-4594-b15d-20f51e72521b"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "d78b8219429b4c12",
+          "masters": 12,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "001cbde1-175d-4e40-8ecf-a6c600144fc1",
+            "066086fd-41cd-416e-a7bf-5910ae622459",
+            "17083ca1-9b65-4efd-b3e2-cce4f2ae09c0",
+            "2c411c2f-7736-41c8-861a-7a6f51447408",
+            "4e1d4e4a-cf54-4746-b03c-412cb68c8184",
+            "4eb8a723-c4bd-4c5b-bbc3-00709024cd2a",
+            "5234bbe9-8569-46e9-9c4d-56168bd4595e",
+            "5ab5e288-5c7e-4a3b-8abb-a473e8050cba",
+            "85ddd847-b4fb-4f8f-bf23-830e46c0d3ae",
+            "8c11615c-9e28-4c17-a762-b4171925dc1e",
+            "9273d481-f8a4-42e3-8409-ad719a201efd",
+            "b4328785-b0a4-4798-b975-6b8ce21c5626"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R06AX13|10밀리그램|정|oral",
+      "targetMasters": 10,
+      "authoredRefs": [
+        "0a7dee0b-e578-4015-967a-fad092071eef"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "1e6622403467c045",
+          "masters": 10,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "07896474-6fc5-4fdc-955a-8a92c2e1991d",
+            "183acc9e-70d7-4c97-8b15-b382df06ef49",
+            "1842e7b4-bee7-4b03-b117-ade8c41e77a8",
+            "42d61adc-7ccf-4885-b869-7df58883c612",
+            "62b0a570-523c-4886-8b42-8404736dba2b",
+            "6e0ea9d4-082a-4554-8418-1c056c482187",
+            "7b32f8f6-7f11-4886-9d7d-5ac97842c622",
+            "d59b0da4-860a-4d3e-bbfc-d1a0b0445ae9",
+            "f087bb1f-d746-472b-8c73-c67084a01d2d",
+            "f8ffdf3a-c5e6-41bd-93dd-11efe25fd341"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "B03BB01|1밀리그램|정|oral",
+      "targetMasters": 10,
+      "authoredRefs": [
+        "068e2176-ee92-4e94-a47d-2dc632bacf53"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "baa17f79becdcf66",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "38fd752a-cd2b-47de-8cc3-8df3a0e4b9b5",
+            "7b55d855-2e31-41cb-90c7-d6983c05d152",
+            "a983e5f8-89a1-4eea-9e1f-2a10a4f35356",
+            "b745d5d8-d013-4695-a896-03efba6f818e",
+            "ba51107c-1f5f-4106-879d-14b402fcf8e9",
+            "ba7283d0-df3c-4693-9a92-714ed97112ae"
+          ]
+        },
+        {
+          "fingerprint": "5d3ee57ff439c1de",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "33ce7d43-c93b-4fd9-8b19-081762453961",
+            "4ddb22bf-64ed-47ff-aee7-8ee919f52530"
+          ]
+        },
+        {
+          "fingerprint": "3edf63843230047b",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "489ed873-bccb-4782-a6c5-eab805787b92",
+            "93476f02-30d1-400a-b77c-891106730e8b"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "A03AA05|200밀리그램|정|oral",
+      "targetMasters": 10,
+      "authoredRefs": [
+        "0175e433-a171-44ec-b601-ad65a805171d"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "1795b95ad93bb3f6",
+          "masters": 10,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "48bac3e7-afd5-4267-b387-15ea9bec808d",
+            "6e98afa5-c9a0-4acc-8891-41e1aac4eb06",
+            "706d816b-67ce-4819-a2fc-6ecead7b0717",
+            "7303e975-44ae-49d5-9b15-0c3b885a4d11",
+            "7937063e-daab-4d5e-91c1-afd2cad76e2d",
+            "98fa446c-0bc5-4808-b0b2-f04942870a82",
+            "9e6f306b-d818-448c-b7cd-ab87eb26b23d",
+            "d507fc2a-6f7e-4756-b2b8-627032fe1a25",
+            "d91d6324-fc1d-4772-b889-254d68e70ed0",
+            "e9b85727-530b-4019-97c4-a36336290000"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "A07FA01|250밀리그램|캡슐|oral",
+      "targetMasters": 9,
+      "authoredRefs": [
+        "022f4af0-1219-428b-bd69-fa39a5e7fe7f"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "d42e9766a777366e",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "4cc732f9-43ae-4944-a2b8-fbebbf7bb94c",
+            "56b4a59c-7612-4c03-b210-a3963da520e6",
+            "61dc61da-7b01-4deb-a990-0742da30227f",
+            "63a78db7-24d7-40b2-b1db-c91fcb373f47",
+            "a003435e-696f-4fdd-971f-97402b43cbe6",
+            "f4f34f15-fcd0-4ef8-9c88-0eb5a80e4ff7"
+          ]
+        },
+        {
+          "fingerprint": "01805262e840eaa9",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "57d1cea6-236a-4346-8d44-ffa36cc072ee",
+            "5aee5b60-86f0-451c-9436-35e8b8558ed8",
+            "c14262dc-3234-4e27-aa34-c17391fb8b98"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AE02|275밀리그램|정|oral",
+      "targetMasters": 6,
+      "authoredRefs": [
+        "006f1a2b-f1f7-40a6-ac10-7f0093a150a1"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "9aedd22777425fa2",
+          "masters": 5,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "08ff17cc-9d03-4f4d-b556-5ff23cc4f6de",
+            "26d536a3-d340-4552-afbd-f35210eda5c2",
+            "6639a029-83ec-451b-9848-6541a00a57bb",
+            "a7829171-f1ad-4da1-a13c-72e56ba17dac",
+            "b0f3f388-cf45-43c5-9980-2ce443cb6372"
+          ]
+        },
+        {
+          "fingerprint": "e5393cdf7c0917cb",
+          "masters": 1,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "398b5256-b5f5-42b4-8a0d-c4fbb2dd63d3"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "C05CA03|300밀리그램|캡슐|oral",
+      "targetMasters": 6,
+      "authoredRefs": [
+        "05be62a5-89dc-4f20-95f9-cb6187f5ab35"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "17e1b3a23cfed037",
+          "masters": 6,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "2bc35d2f-d2ac-4ea7-a29f-94e5ac18e96b",
+            "4e79f1d4-8bbc-4b02-853b-53a9174c41e7",
+            "83f4e410-5a06-47b6-92af-92ef1f0895f6",
+            "9deb6246-01cf-407a-b2ca-8b04fd2af2b8",
+            "d643988a-6e29-4f67-9d73-2901011af7b6",
+            "f5b45120-c2a1-43cb-9b18-64f668cdb61c"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M09AB03|100밀리그램|정|oral",
+      "targetMasters": 5,
+      "authoredRefs": [
+        "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "3a6bcce15e148afe",
+          "masters": 5,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "2605c8e9-c3d6-4f6a-baf3-ce788552084e",
+            "99119e5a-2075-4647-9d0c-4db64f2f3689",
+            "c4af1f38-f884-4875-a80b-7910a463aec4",
+            "e8679ee8-7d66-4c14-aa97-dd4dbcbf0968",
+            "ed24dd52-77a4-42ec-8776-b5605dc33bfe"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R05CB15|300밀리그램|캡슐|oral",
+      "targetMasters": 4,
+      "authoredRefs": [
+        "00065e32-c23e-4e84-b818-0b25779dc014"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "2c42fe1b3497584b",
+          "masters": 4,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "419f60ce-6168-4ab7-98dc-08321067ff40",
+            "4a30dee0-8722-4f35-bcca-8d2595ece1e0",
+            "507e0b63-9ee8-4b5c-9408-8c6d670862a9",
+            "b2f55cd3-54e5-4eae-a123-d3768bd57e9c"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "R05CB07|200밀리그램|캡슐|oral",
+      "targetMasters": 4,
+      "authoredRefs": [
+        "0ff909f4-20dc-49d1-b8c5-91794ab62df6"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "b42e5981d2c007ee",
+          "masters": 4,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "5efa88ec-ab6b-4f61-9d9b-a1626d992d25",
+            "86a157a8-ee43-4a23-b696-01a35ff83820",
+            "8b57cbff-d31d-4b01-b65a-638e300f6ef4",
+            "e5608789-0850-4778-80ed-ef7a1a431329"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AE01|200밀리그램|연질캡슐|oral",
+      "targetMasters": 3,
+      "authoredRefs": [
+        "0203e1b4-7237-4641-b2b5-a918867b3514"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "d92bae4db70d1a96",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "047f13ee-45ca-4604-aeea-fd3fa98ec283",
+            "20d03ee7-7a64-4a5d-8940-47e714e1a9c5"
+          ]
+        },
+        {
+          "fingerprint": "61c0b8655a6b4b10",
+          "masters": 1,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "35da9d3c-5cfe-48a0-ab38-e0668d6aa9cf"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AE02|250밀리그램|연질캡슐|oral",
+      "targetMasters": 3,
+      "authoredRefs": [
+        "02355c78-3d6d-4f6b-8120-de9ff7f14673"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "19d6f965a8d0e636",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "24f127f9-1b3a-4d63-933a-b937861b5327",
+            "a766708c-f81b-4fbf-8876-52ab11c9f5dc"
+          ]
+        },
+        {
+          "fingerprint": "26a34969ebdcadcc",
+          "masters": 1,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "b9758bad-b42d-4f1f-a03f-066ec02e2ea9"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "A07FA02|282.5밀리그램|캡슐|oral",
+      "targetMasters": 3,
+      "authoredRefs": [
+        "16f0c2ef-44eb-4629-a82c-e7fc69511b94"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "475003297fe868b3",
+          "masters": 3,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "2ae1f4d7-492a-483a-9d1a-3ccfb8ac3087",
+            "60bbc933-f9b2-4dc9-a82e-47d10a850f13",
+            "b12287df-d8d2-4d2e-89cf-7250b8ce6b7c"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "N05CM|25밀리그램|정|oral",
+      "targetMasters": 2,
+      "authoredRefs": [
+        "0be1a647-aadf-4b76-9814-5f9a1d60a321"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "d0743cd6189571d6",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "088d48aa-bc04-4eb4-9f7c-ac3c06d6070c",
+            "16630d70-54bb-445e-9800-98e014900162"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "N02BE01|325밀리그램|연질캡슐|oral",
+      "targetMasters": 2,
+      "authoredRefs": [
+        "07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "90490c36623eca13",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "7bafe499-9c7e-43d1-b800-11aaf727a6b4",
+            "85f7bd25-ffe1-452c-8da5-b769b8293176"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AE01|400밀리그램|연질캡슐|oral",
+      "targetMasters": 2,
+      "authoredRefs": [
+        "01a08a82-92c6-4436-889e-4409bb0e0b47"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "2af6d40cfd20a2cc",
+          "masters": 2,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "8b0b6724-b50b-4122-ac2f-603a6de09931",
+            "c38806cc-bae2-41d7-a36a-c1ea5291b5b7"
+          ]
+        }
+      ]
+    },
+    {
+      "atcKey": "M01AE14|300밀리그램|정|oral",
+      "targetMasters": 1,
+      "authoredRefs": [
+        "002c309a-8576-48ec-938a-19bc1478bacb"
+      ],
+      "authoredRep_hasEasy": false,
+      "authoredRep_contentSigCount": 0,
+      "modelA_viable": false,
+      "fpGroups": [
+        {
+          "fingerprint": "7ec6ad4e02da05ff",
+          "masters": 1,
+          "distinctContentSigs": 1,
+          "existingCanon": 0,
+          "원문완전일치": false,
+          "modelA": false,
+          "masterIds": [
+            "943f2e3e-d5c6-498c-8909-01c2c04c04af"
+          ]
+        }
+      ]
+    }
+  ]
+}
