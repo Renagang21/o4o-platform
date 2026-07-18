@@ -122,4 +122,12 @@ raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 
 
 **재개**: G: 없이 DB 소스로 `마그네슘+비타민D+칼슘`부터 combo-select→generate→dry-run→apply→독립검증 연속 생산 가능.
 
+### 5.5 PART B 재개(DB 소스) — mg+vd+ca(M3) 72 LIVE + 최적화·수정
+
+**첫 DB-소스 조합 생산**(G: 비의존 실증): 마그네슘+비타민D+칼슘(M3) 적격 72 · **작성 72 · BLOCKED 0 · 독립검증 PASS**. write 288.
+- **서버사이드 선필터**(`hff-raw-source` dbCandidateSource baseLike): BASE_STANDARD ILIKE ALL 필요조건 부분문자열(비타민/미네랄=label 확정 substring, 동의어 원료는 제외→누락 0). vd-zn 재확인 동치 유지(38·집합차0·draft차0). 스캔 ~60s(비인덱스 JSON, foreground 가능).
+- **정규화 dedup 수정**(combo-select): 같은 기능성 공백 변이(골다공증"발생위험감소" vs "발생위험 감소")가 ko 중복→en 붕괴로 개수 어긋남 → normFn 기준 ko/en 쌍 정렬 dedup. mg-vd-ca 오탐 9건 해소(63→72).
+- **G-MULTI-BILINGUAL 순서검사 수정**(compose): 원료명 raw indexOf 금지("칼슘"이 비타민D 기능성에 등장) → 기능성 카드 마커 위치로 판정.
+세션 누적 LIVE = 3,001 + 72 = **3,073**.
+
 **PART B 생산 재개 지점**: 다중원료 composer 확장 필요 — ① 2~3 원료 각각 badge/표시량/기능성 렌더 ② 원료별 지표성분·기준량 분리(수치 혼입 0) ③ ko/en 원료별 기능성 대응 전수검사(§10) ④ 조합별 20건 내부 게이트 → BLOCKED 0·기능성 누락/추가 0·수치 혼입 0 시 잔여 전량. 가장 큰 안정 M2(비타민D+아연 등)부터. 기존 단일 composer/registry/apply/verify 재사용, 다중 편익 병합만 신규.

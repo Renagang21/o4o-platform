@@ -9,7 +9,7 @@
 import '../env-loader.js';
 import fs from 'node:fs';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
-import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo } from './hff-nutrient-registry.js';
+import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo, normFn } from './hff-nutrient-registry.js';
 import { resolveSource } from './hff-raw-source.js';
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
@@ -78,7 +78,16 @@ interface RawItem { ENTRPS?: string; PRDUCT?: string; STTEMNT_NO?: string; DISTB
 const counts: Record<string, number> = {}; const bump = (k: string) => { counts[k] = (counts[k] ?? 0) + 1; };
 const eligible: unknown[] = []; const holds: Array<{ statementNo: string; productName: string; holdCode: string; reason: string }> = []; const seen = new Set<string>();
 
-const src = resolveSource(process.argv, process.env);
+// DB 서버사이드 선필터용 **필요조건** 부분문자열(적격 제품 BASE_STANDARD 에 반드시 존재하는 것만).
+// 동의어로 라벨이 갈리는 원료(나이아신/니코틴산, 비오틴/바이오틴, 엽산/폴산 등)는 '' 로 두어 필터에서 제외(누락 방지).
+const NECESSARY: Record<string, string> = {
+  '아연': '아연', '마그네슘': '마그네슘', '칼슘': '칼슘', '철': '철', '셀레늄': '셀', '구리': '구리', '망간': '망간', '요오드': '요오드',
+  '비타민A': '비타민', '비타민C': '비타민', '비타민D': '비타민', '비타민E': '비타민', '비타민K': '비타민', '비타민B1': '비타민', '비타민B2': '비타민', '비타민B6': '비타민', '비타민B12': '비타민',
+  '판토텐산': '판토텐', '루테인': '루테인', '글루코사민': '글루코사민', '옥타코사놀': '옥타코사놀', '테아닌': '테아닌',
+  '나이아신': '', '엽산': '', '비오틴': '', '크롬': '', '몰리브덴': '', 'MSM': '', '밀크씨슬': '', '코엔자임Q10': '', '프로폴리스': '', '가르시니아': '', '녹차': '', '오메가3': '', '은행잎': '', '감마리놀렌산': '', '식이섬유': '',
+};
+const baseLike = [...new Set(TARGET.map((k) => NECESSARY[k] ?? '').filter(Boolean))];
+const src = resolveSource(process.argv, process.env, baseLike.length ? baseLike : undefined);
 for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const base = it.BASE_STANDARD ?? ''; const name = (it.PRDUCT ?? '').trim(); const srv = it.SRV_USE ?? ''; const sungsang = it.SUNGSANG ?? ''; const stmt = (it.STTEMNT_NO ?? '').trim();
   const { byKey, unknown, nonTarget } = extractSpecs(base);
@@ -99,10 +108,12 @@ for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const ingredients: Array<{ key: string; labelKo: string; labelEn: string; declaredAmount: unknown; functionsKo: string[]; functionsEn: string[] }> = [];
   let attrFail = false; const attributed = new Set<string>();
   for (const k of TARGET) {
-    const fk = allFns.filter((f) => fnBelongsTo(f, k)); fk.forEach((f) => attributed.add(f));
-    const fe = fk.map((f) => mapFunctionEn(f));
+    const fkRaw = allFns.filter((f) => fnBelongsTo(f, k)); fkRaw.forEach((f) => attributed.add(f));
+    // 정규화 기준 dedup — ko/en 쌍을 정렬 유지(같은 기능성의 공백 변이가 ko 중복→en 붕괴로 개수 어긋나는 것 방지)
+    const seenN = new Set<string>(); const fk: string[] = []; const fe: string[] = [];
+    for (const f of fkRaw) { const nk = normFn(f); if (seenN.has(nk)) continue; const en = mapFunctionEn(f); if (en == null) { fe.push(null as unknown as string); fk.push(f); continue; } seenN.add(nk); fk.push(f); fe.push(en); }
     if (fk.length === 0 || fe.some((e) => e == null)) { attrFail = true; break; }
-    ingredients.push({ key: k, labelKo: metaOf(k).displayKo, labelEn: metaOf(k).displayEn, declaredAmount: byKey.get(k)!, functionsKo: [...new Set(fk)], functionsEn: [...new Set(fe as string[])] });
+    ingredients.push({ key: k, labelKo: metaOf(k).displayKo, labelEn: metaOf(k).displayEn, declaredAmount: byKey.get(k)!, functionsKo: fk, functionsEn: fe });
   }
   const unattributed = allFns.filter((f) => !attributed.has(f));
   if (attrFail || unattributed.length > 0) { bump('HOLD_GROUNDING'); holds.push({ statementNo: stmt, productName: name, holdCode: 'HOLD_GROUNDING', reason: attrFail ? '원료 기능성 귀속/매핑 실패' : `부원료/미귀속 기능성: ${unattributed.slice(0, 2).join('|').slice(0, 40)}` }); continue; }

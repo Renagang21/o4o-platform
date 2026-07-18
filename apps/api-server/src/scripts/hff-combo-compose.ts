@@ -178,13 +178,14 @@ export function runComboGuard(seed: ComboSeed, ko: string, en: string): MultiFin
   // G-MULTI-DUPLICATE: 원료 키 중복
   const keys = seed.ingredients.map((g) => g.key);
   if (new Set(keys).size !== keys.length) out.push({ rule: 'G-MULTI-DUPLICATE', status: 'BLOCKED', message: `원료 키 중복: ${keys.join(',')}` });
-  // G-MULTI-BILINGUAL 순서: ko/en 원료 순서 동일 (badge 순)
-  const koOrder = seed.ingredients.map((g) => meta(g.key).displayKo);
-  const enOrder = seed.ingredients.map((g) => meta(g.key).displayEn);
-  const koIdx = koOrder.map((x) => koText.indexOf(x));
-  const enIdx = enOrder.map((x) => enText.indexOf(x));
-  const sortedKo = [...koIdx].sort((a, b) => a - b), sortedEn = [...enIdx].sort((a, b) => a - b);
-  if (JSON.stringify(koIdx) !== JSON.stringify(sortedKo) || JSON.stringify(enIdx) !== JSON.stringify(sortedEn)) out.push({ rule: 'G-MULTI-BILINGUAL', status: 'BLOCKED', message: '원료 순서 ko/en 불일치' });
+  // G-MULTI-BILINGUAL 순서: ko/en 원료 **기능성 카드** 순서가 seed 순서와 동일한가.
+  // ⚠️ 원료명 raw indexOf 금지 — "칼슘"이 비타민 D 기능성("칼슘과 인이 흡수…")에 등장해 오탐(실측: mg+vd+ca).
+  //    카드 마커(<li><b>라벨</b><ul class="sd-why">)로 위치를 잡는다.
+  const cardPos = (html: string, label: string) => html.indexOf(`<li><b>${label}</b><ul class="sd-why">`);
+  const koIdx = seed.ingredients.map((g) => cardPos(ko, meta(g.key).displayKo));
+  const enIdx = seed.ingredients.map((g) => cardPos(en, meta(g.key).displayEn));
+  const asc = (a: number[]) => a.every((v, i) => i === 0 || (v > a[i - 1] && v >= 0));
+  if (!asc(koIdx) || !asc(enIdx)) out.push({ rule: 'G-MULTI-BILINGUAL', status: 'BLOCKED', message: `원료 카드 순서 ko/en seed 불일치 (ko ${JSON.stringify(koIdx)} en ${JSON.stringify(enIdx)})` });
   return out;
 }
 
