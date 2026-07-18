@@ -147,3 +147,10 @@ raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 
 - **선정**: mention 148 → ELIGIBLE 49. **생성**: 49/49 · PASS 46 · REVIEW 3 · BLOCKED 0 · G-MULTI HOLD 0. REVIEW 3 = 코팅정제 성상 D-CLAIM-GROUNDED(원문 grounding, known-safe).
 - **적재**: dry-run 예상 196 = 실측 196 → apply COMMIT → 독립검증(새 연결) PASS. master 49 + candidate 49 + SPD 98 = write **196**. tag `batch:single-nutrient-combo-msm-vd`. 복합형 누적 LIVE 238 → **287**.
 - **공통 가드 수정(G-MULTI-AMOUNT-SOURCE 콤마 정규화)**: `srcNorm` 이 천단위 콤마를 제거하지 않아, 콤마 제거 정수 `declaredAmount.value`("1500")가 원문 "1,500"과 substring 불일치 → **값 ≥ 1000 원료(MSM 1500mg)에서 25/49 대량 false-positive HOLD**. 추출값은 전부 원문 정확. `srcNorm` 에 `.replace(/(?<=\d),(?=\d)/g, '')`(숫자 사이 콤마만) 추가로 해소. 회귀: vd-ca 재생성 byte-identical · mg-vd-ca 72/72 무회귀(확대 0) → 기존 PASS 불변, 순수 확대 방향. msm-vd 25 false-positive 전량 해소(작성 24→49).
+
+### 5.8 루테인+비타민A(lut-va) — PAUSED_GROUP_DEFECT (기존 LIVE 오분류)
+
+- 선정 ELIGIBLE 20, 생성 20/20 PASS·BLOCKED 0(품질 정상). 그러나 dry-run **ALREADY_PROMOTED 13** — 20건 중 13이 이미 `batch:single-nutrient-lutein`으로 LIVE.
+- 진단: 13건은 실제 **루테인+비타민A 2원료 제품**인데 단일 루테인 라인이 단일로 오분류 → 비타민A 기능성 누락 게시(표본 2/3 누락 확인). **기존 LIVE 데이터 결함**.
+- 결정 **Option A**: lut-va 를 `PAUSED_GROUP_DEFECT`로 격리(apply 금지·LIVE 수정 금지·7건 부분 apply 금지·산출물 보존). 교정·감사는 별도 트랙 → `WO-O4O-HFF-SINGLE-NUTRIENT-MULTI-INGREDIENT-MISCLASSIFICATION-AUDIT-AND-LUTEIN-CORRECTION-V1`. 공통 결함 여부(다른 단일 라인의 다중원료 흡수) read-only 감사 포함.
+- 복합형 생산은 계속 — 다음 독립 조합(식이섬유+아연 → 오메가3+비타민E → 철+엽산). 기존 복합형 287 무변경.
