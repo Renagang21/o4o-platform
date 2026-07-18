@@ -16,6 +16,8 @@
  */
 import '../env-loader.js';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
@@ -30,8 +32,12 @@ const PROXY_PORT = parseInt(process.env.PROXY_PORT ?? '5460', 10);
 const SOURCE_LABEL = 'MFDS_HEALTH_FUNCTIONAL_FOOD';
 const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
-const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/55e4dd9c-cf70-462e-8114-188f6c53d473/scratchpad';
-const DATA = 'C:/Users/sohae/o4o-platform/docs/checks/data/product-description-guard';
+// 경로 해석: (1) 명시적 env override → (2) 현재 저장소 REPO_ROOT 기준 상대경로 (clone 독립).
+// solid/liq apply 스크립트와 동일 패턴. 특정 클론 하드코딩 제거(대상·write·게이트·트랜잭션 로직 불변).
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(HERE, '../../../..');
+const DATA = process.env.HFF_DATA_DIR ?? path.join(REPO_ROOT, 'docs/checks/data/product-description-guard');
+const SP = process.env.HFF_SCRATCH_DIR ?? path.join(REPO_ROOT, 'scratchpad');
 
 function loadTargets(): GuardProductInput[] {
   const out: GuardProductInput[] = [];
