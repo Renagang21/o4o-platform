@@ -141,3 +141,9 @@ raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 
 - **기존 복합형 193 무변경**(baselineDrift 0). 복합형 누적 LIVE = 193 + 45 = **238**.
 
 **생산 중 수정**: ① `hff-nutrient-store-canonical-apply.ts` rollback manifest 저장 경로가 옛 세션 scratchpad로 하드코딩 → 첫 apply 시 writeFileSync ENOENT → catch가 트랜잭션 ROLLBACK(영구 write 0, 데이터 무변경). `HFF_APPLY_MANIFEST_DIR` env override + `os.tmpdir()` fallback + mkdir 보장으로 수정 후 재실행 COMMIT. ② 신규 read-only 도구: `hff-combo-db-identify.ts`(프로덕션 식별·기준 수량), `hff-combo-verify-committed.ts`(apply 후 독립검증·tag 기준·baseline 무변경).
+
+### 5.7 MSM+비타민D(M2) 49 LIVE + 공통 가드 콤마 정규화 수정
+
+- **선정**: mention 148 → ELIGIBLE 49. **생성**: 49/49 · PASS 46 · REVIEW 3 · BLOCKED 0 · G-MULTI HOLD 0. REVIEW 3 = 코팅정제 성상 D-CLAIM-GROUNDED(원문 grounding, known-safe).
+- **적재**: dry-run 예상 196 = 실측 196 → apply COMMIT → 독립검증(새 연결) PASS. master 49 + candidate 49 + SPD 98 = write **196**. tag `batch:single-nutrient-combo-msm-vd`. 복합형 누적 LIVE 238 → **287**.
+- **공통 가드 수정(G-MULTI-AMOUNT-SOURCE 콤마 정규화)**: `srcNorm` 이 천단위 콤마를 제거하지 않아, 콤마 제거 정수 `declaredAmount.value`("1500")가 원문 "1,500"과 substring 불일치 → **값 ≥ 1000 원료(MSM 1500mg)에서 25/49 대량 false-positive HOLD**. 추출값은 전부 원문 정확. `srcNorm` 에 `.replace(/(?<=\d),(?=\d)/g, '')`(숫자 사이 콤마만) 추가로 해소. 회귀: vd-ca 재생성 byte-identical · mg-vd-ca 72/72 무회귀(확대 0) → 기존 PASS 불변, 순수 확대 방향. msm-vd 25 false-positive 전량 해소(작성 24→49).

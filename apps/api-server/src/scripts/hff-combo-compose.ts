@@ -161,7 +161,9 @@ export function runComboGuard(seed: ComboSeed, ko: string, en: string): MultiFin
     'MSM': /MSM|엠에스엠|메틸설포닐|디메틸설폰/i, '글루코사민': /글루코사민/i, '루테인': /루테인|지아잔틴/i, '밀크씨슬': /실리마린|밀크씨슬/i,
     '코엔자임Q10': /코엔자임|코큐텐|Q10/i, '식이섬유': /식이섬유|차전자|난소화성/i, '옥타코사놀': /옥타코사놀/i,
   };
-  const srcNorm = (seed.source.baseStandard || '').replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0)).replace(/㎎/g, 'mg').replace(/\s+/g, ' ');
+  // 천단위 구분 콤마(숫자 사이 콤마)만 제거 — declaredAmount.value 는 콤마 제거 정수라 "1500" vs 원문 "1,500" 오탐 방지.
+  // list 콤마 등 비수치 콤마는 불변. 수치 이동 탐지 로직은 유지(값이 자기 라벨 구간에 없으면 여전히 BLOCKED).
+  const srcNorm = (seed.source.baseStandard || '').replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0)).replace(/㎎/g, 'mg').replace(/(?<=\d),(?=\d)/g, '').replace(/\s+/g, ' ');
   if (srcNorm) {
     // 모든 원료 라벨 위치 → 각 원료 window = [자기 라벨, 다음 라벨)
     const marks = seed.ingredients.map((g) => { const re = SRC_LABEL[g.key]; const m = re ? re.exec(srcNorm) : null; return { key: g.key, idx: m ? m.index : -1 }; });
