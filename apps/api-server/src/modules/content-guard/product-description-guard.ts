@@ -25,6 +25,7 @@ import type {
 } from './product-description-guard.types.js';
 import { GUARD_VERSION } from './product-description-guard.types.js';
 import { computeBasis, ruleA, ruleB, ruleC, ruleD, ruleE, ruleENameClaim, ruleF, ruleG, ruleH, ruleQ } from './product-description-guard.rules.js';
+import { runLiquidGroundingRules, runLiquidBodyRules, runLiquidBilingualRules } from './product-description-guard.rules.js';
 import { crossCheckNumber, isBulkMaterial, parseBasis, parseCfu } from './source-grounding-parser.js';
 import type { ParseOutcome } from './source-grounding-parser.js';
 
@@ -190,8 +191,41 @@ export function runBilingualGuard(input: GuardProductInput): GuardFinding[] {
   return ruleH(input);
 }
 
+/**
+ * 액상(드롭·병) 전용 실행 — `liquidGrounding` 이 있을 때만.
+ * 고형 PRE-SRC/A~H 는 `grounding.declaredAmount`(mg 기준)를 전제로 하므로 액상엔 부적합·예외.
+ * G-LIQUID 6규칙만 실행한다: grounding 정합(pre) / 본문 주장(post) / ko·en 대조(bilingual).
+ */
+export function runLiquidGuard(input: GuardProductInput, opts: GuardOptions = {}): GuardProductResult {
+  const phase = opts.phase ?? 'all';
+  const want = (p: GuardPhase) => phase === 'all' || phase === p;
+
+  const pre = want('pre') ? runLiquidGroundingRules(input) : [];
+  const post = want('post') ? runLiquidBodyRules(input) : [];
+  const bi = want('bilingual') ? runLiquidBilingualRules(input) : [];
+  const findings = [...pre, ...post, ...bi];
+
+  return {
+    candidateId: input.candidateId,
+    productName: input.productName,
+    guardVersion: GUARD_VERSION,
+    preGuardStatus: pre.length ? mergeStatus(pre) : 'NOT_APPLICABLE',
+    postGuardStatus: post.length ? mergeStatus(post) : 'NOT_APPLICABLE',
+    koEnStatus: bi.length ? mergeStatus(bi) : 'NOT_APPLICABLE',
+    overallStatus: mergeStatus(findings),
+    blockedCount: findings.filter((f) => f.status === 'BLOCKED').length,
+    reviewCount: findings.filter((f) => f.status === 'REVIEW_REQUIRED').length,
+    passCount: findings.filter((f) => f.status === 'PASS' || f.status === 'INFO').length,
+    precheckInfoCount: findings.filter((f) => f.status === 'PRECHECK_INFO').length,
+    findings,
+  };
+}
+
 /** 제품 1건 전체 실행 */
 export function runGuard(input: GuardProductInput, opts: GuardOptions = {}): GuardProductResult {
+  // 액상 grounding 이 있으면 액상 경로로 분리(고형 규칙 미실행 → 고형 판정 불변).
+  if (input.liquidGrounding) return runLiquidGuard(input, opts);
+
   const phase = opts.phase ?? 'all';
   const want = (p: GuardPhase) => phase === 'all' || phase === p;
 

@@ -10,6 +10,7 @@
 import type {
   GuardFinding,
   GuardProductInput,
+  LiquidGrounding,
 } from './product-description-guard.types.js';
 import {
   extractKoCounts,
@@ -1150,6 +1151,217 @@ export function ruleH(input: GuardProductInput): GuardFinding[] {
 
   if (out.length === 0) out.push(ok('H-COUNT-MISMATCH-001', 'drafts', 'ko/en 수치·기능성 대조 통과'));
   return out;
+}
+
+// ═══ G-LIQUID. 액상(드롭·병) 6규칙 ═══════════════════════════════════════════
+//
+// WO-O4O-HFF-PROBIOTICS-LIQUID-MODEL-PILOT-6-V1 승격.
+// 고형 A~H 와 **혼합하지 않는다**. `input.liquidGrounding` 이 있을 때만 실행된다.
+// 판정 SSOT = `liquidGrounding`(원문에서 확정된 grounded fact). 각 규칙 = draft ↔ grounded fact 대조.
+// **원문 연결이 없는 부피·환산·물·냉장·생존율 주장 = BLOCKED.**
+
+const liqBlock = (
+  ruleId: string,
+  language: 'ko' | 'en' | 'both',
+  field: string,
+  matchedText: string | null,
+  sourceEvidence: string,
+  message: string,
+  suggestedAction: string,
+): GuardFinding => ({ ruleId, severity: 'ERROR', status: 'BLOCKED', language, field, matchedText, sourceEvidence, message, suggestedAction });
+
+/** 부피 표기를 정규화(㎖→ml)하고 태그 제거 */
+function liqNorm(html: string): string {
+  return stripHtml(html).replace(/㎖/g, 'ml');
+}
+
+/** draft 텍스트의 모든 mL 수치 토큰(예: "0.295ml", "100 ml") */
+function liqMlTokens(text: string): number[] {
+  const out: number[] = [];
+  const re = /(\d[\d.]*)\s*ml/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    const v = Number(m[1]);
+    if (Number.isFinite(v)) out.push(v);
+  }
+  return out;
+}
+
+/** grounded mL 집합 — cfuBasis·1회부피·1일총량·총용량 중 PARSED + 원문(srvRaw/성상외 baseStandard) mL */
+function liqGroundedMl(lg: LiquidGrounding, source: GuardProductInput['source']): number[] {
+  const s = new Set<number>();
+  const push = (f: { state: string; value: number | null } | undefined) => {
+    if (f && f.state === 'PARSED' && f.value != null) s.add(f.value);
+  };
+  push(lg.cfuBasis);
+  push(lg.serving?.servingVolumeMl);
+  push(lg.dailyTotal);
+  push(lg.totalVolume);
+  // 원문에 직접 등장한 mL 도 grounded (예: baseStandard "100 mL", srvRaw "0.295ml")
+  for (const raw of [source.baseStandard ?? '', source.intake ?? '', lg.srvRaw ?? '']) {
+    for (const v of liqMlTokens(raw)) s.add(v);
+  }
+  return Array.from(s);
+}
+
+const CONTAINER_KO = String.raw`병|포|앰플|스틱`;
+const CONTAINER_EN = String.raw`bottle|sachet|stick|ampoule|ampule`;
+
+/** G-LIQUID-VOLUME-BASIS — 총용량·1회·1일 혼입: draft mL ⊄ grounded mL = BLOCKED */
+export function liquidVolumeBasis(input: GuardProductInput): GuardFinding[] {
+  const lg = input.liquidGrounding!;
+  const grounded = liqGroundedMl(lg, input.source);
+  const out: GuardFinding[] = [];
+  for (const [lang, html] of [['ko', input.drafts.ko], ['en', input.drafts.en]] as const) {
+    const seen = new Set<number>();
+    for (const v of liqMlTokens(liqNorm(html))) {
+      if (grounded.includes(v) || seen.has(v)) { seen.add(v); continue; }
+      seen.add(v);
+      out.push(liqBlock(
+        'G-LIQUID-VOLUME-BASIS-001', lang, 'drafts', `${v}ml`,
+        `grounded mL=[${grounded.join(', ')}] (cfuBasis·1회부피·1일총량·총용량·원문)`,
+        `${lang} 초안의 부피 ${v}ml 이 원문 grounded 부피 집합에 없습니다(총용량/1회/1일 혼입 의심).`,
+        '원문에 없는 부피는 삭제하십시오. 총용량↔1회량↔1일량을 섞지 마십시오.',
+      ));
+    }
+  }
+  if (out.length === 0) out.push(ok('G-LIQUID-VOLUME-BASIS-001', 'drafts', `부피 토큰 전부 grounded [${grounded.join(', ')}]ml`));
+  return out;
+}
+
+/** G-LIQUID-PER-UNIT — 병·포·앰플 mL 미표기인데 근거없이 부피/균수 환산 = BLOCKED */
+export function liquidPerUnit(input: GuardProductInput): GuardFinding[] {
+  const lg = input.liquidGrounding!;
+  const out: GuardFinding[] = [];
+  const containerAbsent = lg.serving?.servingVolumeMl?.state === 'ABSENT';
+  if (containerAbsent) {
+    for (const [lang, html] of [['ko', input.drafts.ko], ['en', input.drafts.en]] as const) {
+      const t = liqNorm(html);
+      // "1병(100ml)" / "1 bottle (100 ml)" — 용기에 근거없는 부피 부기
+      const volRe = new RegExp(String.raw`(?:${CONTAINER_KO}|${CONTAINER_EN})\s*\(\s*\d[\d.]*\s*ml`, 'i');
+      // "1병당 100억" / "per bottle 10 billion" — 용기당 균수 환산
+      const cntRe = new RegExp(String.raw`(?:(?:${CONTAINER_KO})\s*당\s*\d)|(?:per\s+(?:${CONTAINER_EN})\s*[,:]?\s*\d)`, 'i');
+      const mv = t.match(volRe);
+      const mc = t.match(cntRe);
+      if (mv) out.push(liqBlock('G-LIQUID-PER-UNIT-002', lang, 'drafts', mv[0].trim(), `serving.servingVolumeMl=ABSENT (병 용량 원문 미표기)`, `${lang} 초안이 용기(${lg.serving.unit})에 근거없는 부피를 부기했습니다("${mv[0].trim()}").`, '병 용량이 원문에 없으면 mL 을 부기하지 마십시오.'));
+      if (mc) out.push(liqBlock('G-LIQUID-PER-UNIT-002', lang, 'drafts', mc[0].trim(), `serving.servingVolumeMl=ABSENT / cfuBasisType=${lg.cfuBasisType}`, `${lang} 초안이 용기당 균수를 근거없이 환산했습니다("${mc[0].trim()}").`, '병당 균수는 계산하지 마십시오(1병 용량 미지).'));
+    }
+  }
+  if (out.length === 0) out.push(ok('G-LIQUID-PER-UNIT-002', 'drafts', containerAbsent ? '용기 부피·균수 무근거 환산 없음' : '용기 부피 원문 표기(해당 없음)'));
+  return out;
+}
+
+/** G-LIQUID-CFU-BASIS — CFU 기준부피 전이·용기당 전이 = BLOCKED */
+export function liquidCfuBasis(input: GuardProductInput): GuardFinding[] {
+  const lg = input.liquidGrounding!;
+  const out: GuardFinding[] = [];
+  const basis = lg.cfuBasis?.state === 'PARSED' ? lg.cfuBasis.value : null;
+  for (const [lang, html] of [['ko', input.drafts.ko], ['en', input.drafts.en]] as const) {
+    const t = liqNorm(html);
+    // draft 의 "Xml당 …CFU" / "…CFU per Xml" 기준부피가 grounded 기준과 다르면 BLOCKED
+    const koBasis = matchAll(/(\d[\d.]*)\s*ml\s*당/gi, t).map((x) => Number(/(\d[\d.]*)/.exec(x.text)![1]));
+    const enBasis = matchAll(/per\s*(\d[\d.]*)\s*ml/gi, t).map((x) => Number(/(\d[\d.]*)/.exec(x.text)![1]));
+    if (basis != null) {
+      for (const b of [...koBasis, ...enBasis]) {
+        if (b !== basis) out.push(liqBlock('G-LIQUID-CFU-BASIS-003', lang, 'drafts', `${b}ml당 CFU`, `cfuBasis=${basis}ml (${lg.cfuBasisType})`, `${lang} 초안의 CFU 기준부피 ${b}ml 이 원문 기준 ${basis}ml 과 다릅니다.`, 'CFU 표시 기준부피를 원문 그대로 쓰십시오.'));
+      }
+    }
+    // 용기당 CFU 전이(원문이 mL 기준일 때): "1병당 …CFU" / "…CFU per bottle"
+    const contCfu = new RegExp(String.raw`(?:(?:${CONTAINER_KO})\s*당\s*[\d,.]+\s*(?:억|조|만|billion|million)?\s*(?:CFU|cfu))|(?:CFU\s*per\s+(?:${CONTAINER_EN}))`, 'i');
+    const mc = t.match(contCfu);
+    // 원문 CFU 기준이 mL 인데(cfuBasis.unit==='ml') 용기당으로 전이한 경우만 차단
+    if (mc && (lg.cfuBasis?.unit === 'ml')) {
+      out.push(liqBlock('G-LIQUID-CFU-BASIS-003', lang, 'drafts', mc[0].trim(), `cfuBasis=${basis}ml (원문 mL 기준)`, `${lang} 초안이 mL 기준 CFU 를 용기당으로 전이했습니다("${mc[0].trim()}").`, '원문 mL 기준을 용기당으로 바꾸지 마십시오.'));
+    }
+  }
+  if (out.length === 0) out.push(ok('G-LIQUID-CFU-BASIS-003', 'drafts', basis != null ? `CFU 기준부피 ${basis}ml 원문 일치` : 'CFU 기준 전이 없음'));
+  return out;
+}
+
+/** G-LIQUID-VEHICLE — 원문 근거없는 물·희석 = BLOCKED */
+export function liquidVehicle(input: GuardProductInput): GuardFinding[] {
+  const lg = input.liquidGrounding!;
+  const out: GuardFinding[] = [];
+  for (const [lang, html] of [['ko', input.drafts.ko], ['en', input.drafts.en]] as const) {
+    const t = liqNorm(html);
+    if (!lg.vehicle?.water) {
+      const waterRe = lang === 'ko' ? /물\s*(?:과|와)\s*함께|물\s*에\s*(?:타|섞)/ : /\bwith\s+water\b|\bmix(?:ed)?\s+(?:it\s+)?(?:with|in)\s+water\b/i;
+      const mw = t.match(waterRe);
+      if (mw) out.push(liqBlock('G-LIQUID-VEHICLE-004', lang, 'drafts', mw[0].trim(), `vehicle.water=false / SRV_USE: ${truncate(lg.srvRaw, 50)}`, `${lang} 초안이 원문에 없는 "물과 함께" 섭취를 서술했습니다.`, '원문 섭취방법에 없는 물 섭취 지시를 삭제하십시오.'));
+    }
+    if (!lg.vehicle?.dilute) {
+      const dilRe = lang === 'ko' ? /희석/ : /\bdilut/i;
+      const md = t.match(dilRe);
+      if (md) out.push(liqBlock('G-LIQUID-VEHICLE-004', lang, 'drafts', md[0].trim(), `vehicle.dilute=false / SRV_USE: ${truncate(lg.srvRaw, 50)}`, `${lang} 초안이 원문에 없는 희석 섭취를 서술했습니다.`, '원문에 없는 희석 지시를 삭제하십시오.'));
+    }
+  }
+  if (out.length === 0) out.push(ok('G-LIQUID-VEHICLE-004', 'drafts', '원문없는 물·희석 주장 없음'));
+  return out;
+}
+
+/** G-LIQUID-STORAGE — 원문없는 냉장·개봉후·생존율 = BLOCKED */
+export function liquidStorage(input: GuardProductInput): GuardFinding[] {
+  const lg = input.liquidGrounding!;
+  const out: GuardFinding[] = [];
+  const st = lg.storage ?? { refrigerate: false, mode: null, roomTemp: false };
+  for (const [lang, html] of [['ko', input.drafts.ko], ['en', input.drafts.en]] as const) {
+    const t = liqNorm(html);
+    // 냉장 주장인데 원문 냉장 아님
+    const refRe = lang === 'ko' ? /냉장/ : /\brefrigerat/i;
+    const mr = t.match(refRe);
+    if (mr && !st.refrigerate) out.push(liqBlock('G-LIQUID-STORAGE-005', lang, 'drafts', mr[0].trim(), `storage.refrigerate=false / PRSRV: ${truncate(lg.prsrvRaw, 50)}`, `${lang} 초안이 원문에 없는 냉장 보관을 서술했습니다.`, '원문 보관조건에 없는 냉장 서술을 삭제하십시오.'));
+    // 개봉후 주장인데 원문이 개봉후 모드가 아님(상시냉장·실온 등)
+    const openRe = lang === 'ko' ? /개봉\s*후/ : /after\s+open/i;
+    const mo = t.match(openRe);
+    if (mo && st.mode !== 'after-open') out.push(liqBlock('G-LIQUID-STORAGE-005', lang, 'drafts', mo[0].trim(), `storage.mode=${st.mode ?? 'null'} / PRSRV: ${truncate(lg.prsrvRaw, 50)}`, `${lang} 초안이 "개봉 후" 조건을 서술했으나 원문 보관모드는 ${st.mode ?? '해당없음'} 입니다.`, '원문 보관모드와 다른 개봉후 조건을 서술하지 마십시오.'));
+    // 생존율·균수보장 — 원문에 절대 없는 추정
+    const claimRe = lang === 'ko' ? /생존율|균수\s*보장|끝까지\s*살아|장까지\s*살아/ : /\bsurviv(?:al|es?)\b|\bguarantee[ds]?\b.*(?:reach|gut|intestin)|\breach(?:es)?\s+(?:the\s+)?(?:gut|intestines?)\s+alive/i;
+    const mc = t.match(claimRe);
+    if (mc) out.push(liqBlock('G-LIQUID-STORAGE-005', lang, 'drafts', mc[0].trim(), `원문에 생존율/균수보장 근거 없음`, `${lang} 초안이 근거없는 생존율·균수보장을 주장했습니다("${mc[0].trim()}").`, '생존율·균수보장 등 추정 주장을 삭제하십시오.'));
+  }
+  if (out.length === 0) out.push(ok('G-LIQUID-STORAGE-005', 'drafts', '원문없는 냉장·개봉후·생존율 주장 없음'));
+  return out;
+}
+
+/** G-LIQUID-BILINGUAL — ko/en 부피·드롭수·CFU 동치 */
+export function liquidBilingual(input: GuardProductInput): GuardFinding[] {
+  const out: GuardFinding[] = [];
+  const ko = liqNorm(input.drafts.ko);
+  const en = liqNorm(input.drafts.en);
+
+  // 부피 mL 집합
+  const koMl = uniq(liqMlTokens(ko));
+  const enMl = uniq(liqMlTokens(en));
+  if (koMl.join(',') !== enMl.join(',')) {
+    out.push(liqBlock('G-LIQUID-BILINGUAL-006', 'both', 'drafts', `ko=[${koMl.join(', ')}]ml / en=[${enMl.join(', ')}]ml`, 'ko/en 부피 동치', 'ko/en 부피(mL) 집합이 다릅니다.', '언어 간 부피 표기를 일치시키십시오.'));
+  }
+  // 드롭·방울 수 ↔ drops
+  const koDrops = uniq(matchAll(/(\d+)\s*(?:드롭|방울)/g, ko).map((x) => Number(/(\d+)/.exec(x.text)![1])));
+  const enDrops = uniq(matchAll(/(\d+)\s*drops?/gi, en).map((x) => Number(/(\d+)/.exec(x.text)![1])));
+  if (koDrops.join(',') !== enDrops.join(',')) {
+    out.push(liqBlock('G-LIQUID-BILINGUAL-006', 'both', 'drafts', `ko=[${koDrops.join(', ')}] / en=[${enDrops.join(', ')}] drops`, 'ko/en 드롭수 동치', 'ko/en 드롭·방울 수가 다릅니다.', '드롭·방울 수를 언어 간 일치시키십시오.'));
+  }
+  // CFU 절대값 집합
+  const koCfu = uniq(extractKoCounts(ko).map((c) => c.value));
+  const enCfu = uniq(extractEnCounts(en).map((c) => c.value));
+  for (const v of koCfu) if (!enCfu.includes(v)) out.push(liqBlock('G-LIQUID-BILINGUAL-006', 'both', 'drafts', `${v.toLocaleString()} (ko)`, `ko CFU=[${koCfu.map((x) => x.toLocaleString()).join(', ')}] / en=[${enCfu.map((x) => x.toLocaleString()).join(', ')}]`, `한국어 CFU ${v.toLocaleString()} 이 영어(${koCountToEn(v)})에 없습니다.`, 'ko/en CFU 를 일치시키십시오.'));
+  for (const v of enCfu) if (!koCfu.includes(v)) out.push(liqBlock('G-LIQUID-BILINGUAL-006', 'both', 'drafts', `${koCountToEn(v)} (en)`, `ko=[${koCfu.map((x) => x.toLocaleString()).join(', ')}] / en=[${enCfu.map((x) => x.toLocaleString()).join(', ')}]`, `영어 CFU ${koCountToEn(v)} 이 한국어에 없습니다.`, 'ko/en CFU 를 일치시키십시오.'));
+
+  if (out.length === 0) out.push(ok('G-LIQUID-BILINGUAL-006', 'drafts', 'ko/en 부피·드롭수·CFU 동치'));
+  return out;
+}
+
+/** 액상 grounding 정합(pre 상당): 부피·용기·CFU 기준 */
+export function runLiquidGroundingRules(input: GuardProductInput): GuardFinding[] {
+  return [...liquidVolumeBasis(input), ...liquidPerUnit(input), ...liquidCfuBasis(input)];
+}
+/** 액상 본문 주장(post 상당): 물·희석·냉장·개봉후·생존율 */
+export function runLiquidBodyRules(input: GuardProductInput): GuardFinding[] {
+  return [...liquidVehicle(input), ...liquidStorage(input)];
+}
+/** 액상 ko/en 대조(bilingual 상당) */
+export function runLiquidBilingualRules(input: GuardProductInput): GuardFinding[] {
+  return liquidBilingual(input);
 }
 
 // ─── util ────────────────────────────────────────────────────────────────────

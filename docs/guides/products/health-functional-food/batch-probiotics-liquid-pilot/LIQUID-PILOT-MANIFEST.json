@@ -1,10 +1,13 @@
 {
   "wo": "WO-O4O-HFF-PROBIOTICS-LIQUID-MODEL-PILOT-6-V1",
   "generatedAt": "2026-07-18",
-  "status": "PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION",
+  "status": "PILOT_COMPLETE_DB_WRITE_DEFERRED",
+  "statusNote": "WO 범위(EN 한글 잔존 수정·ko/en 재생성·G-LIQUID rules.ts 승격·페어테스트·전체 회귀·반응형 검수) 전부 완료. DB write 는 본 WO 범위 밖(다음 우선순위: 액상 PASS 별도 적재 큐).",
   "model": "액상 별도 모델 — 총용량/1회량/1일량/CFU기준 별개. 원문 연결 없으면 계산 안 함(환산 금지).",
-  "guard": "G-LIQUID 6규칙 워킹스크립트(공통코드 미수정). rules.ts 승격은 오케스트레이터.",
-  "applyPath": "별도(294 b3 큐와 합치지 않음). liquidGrounding 구조라 solid content-guard(grounding.declaredAmount) 비호환 → G-LIQUID 승격 후 별도 apply 필요.",
+  "guard": "G-LIQUID 6규칙을 공통 가드 product-description-guard@1.2.0 에 승격(rules.ts liquidVolumeBasis/liquidPerUnit/liquidCfuBasis/liquidVehicle/liquidStorage/liquidBilingual). liquidGrounding 존재 시에만 액상 경로 — 고형 판정 불변(가법적). 페어테스트+6건 실측 21/21 PASS, content-guard 회귀 162/162 PASS, 타입체크 0.",
+  "enResidual": "EN 표시기준 성상·유통기한·보관 한글 잔존 → 의미 보존 영어 번역(liquidGrounding.formEn/shelfLifeEn/storageEn). 한국어 원문은 source·liquidGrounding.form/prsrvRaw 에 유지. EN 초안 한글 문자 0.",
+  "responsive": "12 드래프트 × 5뷰포트(360·390·768·1024·1440) 실브라우저 측정 — 가로 오버플로 0, 카드 오버플로 0.",
+  "applyPath": "별도(294 b3 큐와 합치지 않음). liquidGrounding 구조라 solid content-guard(grounding.declaredAmount) 비호환 → G-LIQUID 승격 완료. 잔여 선결: 액상 grounding 을 SPD apply 가 수용하도록 apply 경로 확장(후속 WO).",
   "production": {
     "count": 6,
     "items": [

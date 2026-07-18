@@ -2,8 +2,10 @@
 
 - 담당: Agent A (유산균·프로바이오틱스 전용). 비타민·Agent B·의약품·294큐 미접촉.
 - 일자: 2026-07-18
-- status: **PAUSED_EXTERNAL_DEPENDENCY_DB_WRITE_PERMISSION** · **DB write 0**
-- **공통코드(rules.ts·source-grounding-parser.ts) 미수정** — 액상 파서·G-LIQUID 6규칙은 워킹스크립트(scratchpad)로 구현·검증. 승격은 오케스트레이터.
+- status: **PILOT_COMPLETE_DB_WRITE_DEFERRED** · **DB write 0**
+- **G-LIQUID 6규칙 공통 가드 승격 완료** — `product-description-guard@1.2.0` (rules.ts: liquidVolumeBasis/liquidPerUnit/liquidCfuBasis/liquidVehicle/liquidStorage/liquidBilingual). `liquidGrounding` 존재 시에만 액상 경로 진입 → 고형 A~H·PRE-SRC 판정 **불변(가법적 확장)**. 승격 근거: types.ts `LiquidGrounding` + product-description-guard.ts `runLiquidGuard`.
+- **EN 표시기준 한글 잔존 수정 완료** — 성상·유통기한·보관을 의미 보존 영어로 번역(`liquidGrounding.formEn/shelfLifeEn/storageEn`). 한국어 원문은 `source`·`liquidGrounding.form/prsrvRaw` 에 유지. EN 초안 한글 문자 **0**.
+- **회귀·검증**: 페어테스트+6건 실측 **21/21 PASS**, content-guard 전체 **162/162 PASS**(기존 141 불변 + 신규 21), content-guard 타입체크 **0 오류**, CLI end-to-end 6/6 PASS(exit 0).
 
 ---
 
@@ -14,13 +16,15 @@
 | 대상 | **6** (액상 유산균, poolA 잔여 전량; 숫자 확대 없음) |
 | PASS_LIQUID_MODEL | **6** (per-serving 5 + per-volume-unit-unknown 1) |
 | HOLD | **0** |
-| G-LIQUID 실측 | BLOCKED **0/6** (워킹가드) |
-| 페어테스트 | 6규칙 전부 정상=PASS / 오류합성=BLOCKED ✓ |
-| 반응형 5뷰포트 | PASS (6 × ko/en × 360·390·768·1024·1440) |
+| G-LIQUID 실측 | BLOCKED **0/6** (공통 가드 `product-description-guard@1.2.0`) |
+| 페어테스트 | 6규칙 전부 정상=PASS / 오류합성=BLOCKED ✓ (Jest liquid-guard.test.ts) |
+| content-guard 회귀 | **162/162 PASS** (기존 141 불변 + 신규 21) |
+| 반응형 5뷰포트 | PASS (12 드래프트 × 360·390·768·1024·1440, 오버플로 0 실브라우저 측정) |
+| EN 표시기준 한글 잔존 | **0** (성상·유통기한·보관 영어 번역, 원문은 grounding 보존) |
 | ko/en 부피·드롭수·CFU 동치 | 일치 |
 | 원문없는 환산/물/희석/냉장/생존율 주장 | **0** |
 
-> ⚠️ **표준 content-guard(runGuard) 비호환**: 액상은 `liquidGrounding`(별도 구조)라 solid 모델의 `grounding.declaredAmount` 를 참조하는 PRE-SRC 가 예외 발생 → **의도된 분리**. 적재는 **G-LIQUID 승격 후 별도 apply 경로**(294 b3 큐와 합치지 않음).
+> ✅ **공통 가드 승격 완료**: 액상은 `liquidGrounding`(별도 구조)라 solid 모델의 `grounding.declaredAmount` 를 참조하는 PRE-SRC·A~H 와 분리한다. `runGuard` 는 `liquidGrounding` 이 있으면 `runLiquidGuard`(G-LIQUID 6규칙)로 분기하고 고형 규칙을 실행하지 않는다 → 고형 판정 100% 불변. 적재는 **별도 apply 경로**(294 b3 큐와 합치지 않음).
 
 ## 2. 대상 6건 고정 (grounding)
 
@@ -51,7 +55,7 @@
 
 ## 4. G-LIQUID 6규칙 (승격 재료 — 설계 + 페어케이스)
 
-> 워킹스크립트 `liq-guard.mjs`. 각 규칙 = draft ↔ source 대조. 오케스트레이터가 rules.ts 승격 + 페어테스트 + 141 회귀.
+> 공통 가드 `product-description-guard.rules.ts` 에 승격 완료. 각 규칙 = draft ↔ grounded fact(`liquidGrounding`) 대조. 판정 SSOT = `liquidGrounding`(원문에서 확정된 grounded fact). 페어테스트+실측은 `__tests__/liquid-guard.test.ts` 21/21 PASS, 고형 회귀 141 불변.
 
 ### G-LIQUID-VOLUME-BASIS (총용량·1회·1일 혼입)
 - **판정**: draft 의 모든 mL 토큰 ∈ 원문 mL 집합. 원문에 없는 부피 등장 = BLOCKED.
@@ -109,13 +113,20 @@
 ## 7. 적재 후보 / 후속 모델 확장
 
 - **적재후보 6** (별도 production manifest). **294 큐와 미합침.** 별도 dry-run·별도 apply 경로.
-- **선결**: 액상 items 는 `liquidGrounding` 구조라 현 b3/content-guard(solid `grounding.declaredAmount`) 로 적재 불가 → **① G-LIQUID rules.ts 승격 + ② 액상 grounding 을 SPD apply 가 수용하도록 apply 경로 확장** 후 적재. (본 WO 범위 밖 = 오케스트레이터/후속 WO.)
+- **선결**: 액상 items 는 `liquidGrounding` 구조라 현 b3/content-guard(solid `grounding.declaredAmount`) 로 적재 불가 → **① G-LIQUID rules.ts 승격 ✅ 완료(본 WO)** + **② 액상 grounding 을 SPD apply 가 수용하도록 apply 경로 확장(후속 WO)** 후 적재. DB write 는 본 WO 범위 밖.
 - **후속 모델 확장 필요**: 스포이드 눈금·앰플·희석배수·병 총용량+CFU/병 형 → 부피·밀도 모델 확장. 파일풀엔 없음(추가 모집단 DB read 필요).
 
 ## 8. 산출 파일
 
-- 입력 JSON: `docs/checks/data/product-description-guard/hff-probiotics-liq-cp01.json`
-- 초안: `docs/guides/products/health-functional-food/batch-probiotics-liquid-pilot/LIQ-CP01/drafts/*.{ko,en}.html`
+**공통 가드 승격(코드):**
+- `apps/api-server/src/modules/content-guard/product-description-guard.types.ts` — `LiquidGrounding` 타입 + `GuardProductInput.liquidGrounding?` + GUARD_VERSION 1.2.0
+- `apps/api-server/src/modules/content-guard/product-description-guard.rules.ts` — G-LIQUID 6규칙(liquidVolumeBasis/liquidPerUnit/liquidCfuBasis/liquidVehicle/liquidStorage/liquidBilingual) + 3 composer(runLiquidGroundingRules/BodyRules/BilingualRules)
+- `apps/api-server/src/modules/content-guard/product-description-guard.ts` — `runLiquidGuard` + `runGuard` 액상 분기
+- `apps/api-server/src/modules/content-guard/__tests__/liquid-guard.test.ts` — 페어테스트 12 + 6건 실측 + EN 한글잔존 검사 (21 test)
+
+**산출물(콘텐츠):**
+- 입력 JSON: `docs/checks/data/product-description-guard/hff-probiotics-liq-cp01.json` (liquidGrounding.formEn/shelfLifeEn/storageEn + grounding 스텁 추가, drafts.en 한글 3필드 → 영어)
+- 초안: `docs/guides/products/health-functional-food/batch-probiotics-liquid-pilot/LIQ-CP01/drafts/*.{ko,en}.html` (ko 불변, en 표시기준 3필드 영어화)
 - production manifest: `.../batch-probiotics-liquid-pilot/LIQUID-PILOT-MANIFEST.json`
-- 워킹스크립트(scratchpad, 커밋 안 함): `liq-parse.mjs`(파서 4상태) · `liq-write.mjs`(액상 템플릿) · `liq-guard.mjs`(G-LIQUID 6규칙+페어) · `liq-responsive.mjs`.
+- 워킹스크립트(scratchpad, 커밋 안 함): `liq-regen.mjs`(EN 번역·재생성) · `liq-responsive-harness.mjs`(반응형 하네스).
 - 본 CHECK.

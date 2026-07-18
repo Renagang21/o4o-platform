@@ -170,6 +170,76 @@ export interface DeclaredCfu {
   absolute: number;
 }
 
+/**
+ * 액상(드롭·병) 프로바이오틱스 grounding — **고형 모델과 별도 구조**(WO-O4O-HFF-PROBIOTICS-LIQUID-MODEL-PILOT-6-V1).
+ *
+ * 고형 모델(`grounding.declaredAmount`)은 mg/캡슐 기준이라 액상의 mL·드롭·병·CFU/mL 기준을
+ * 표현할 수 없다. 액상은 **총용량 / 1회 부피 / 1일 총량 / CFU 기준부피** 를 전부 별개 필드로 두고,
+ * **원문 연결이 없으면 계산하지 않는다**(환산·역산 금지).
+ *
+ * 파서 4상태: `PARSED`(원문에서 확정) / `ABSENT`(원문에 없음 — 실패가 아님) /
+ *            `PARSE_FAILED`(표현은 있으나 해석불가) / `ABNORMAL`(0·음수). ABSENT ≠ PARSE_FAILED.
+ */
+export type LiquidFieldState = 'PARSED' | 'ABSENT' | 'PARSE_FAILED' | 'ABNORMAL';
+
+export interface LiquidField {
+  state: LiquidFieldState;
+  /** state 가 PARSED 일 때만 의미 있음. 그 외에는 null */
+  value: number | null;
+  /** 부피 단위(mL 등) — cfuBasis 등에서 사용 */
+  unit?: string;
+}
+
+export interface LiquidGrounding {
+  permit: string;
+  product: string;
+  maker: string;
+  /** 성상(한국어 원문). **grounding 원문 보존** — en 초안에는 formEn(의미 보존 번역)을 쓴다 */
+  form: string;
+  /** 성상 영어 번역(의미 보존). 없으면 en 초안이 한국어 form 을 그대로 노출(한글 잔존) */
+  formEn?: string;
+  target: string;
+  /** 표시 CFU 절대값 */
+  cfu: LiquidField;
+  /** CFU 표시 기준 부피(예: 0.295ml 당 / 100ml 당) */
+  cfuBasis: LiquidField;
+  /**
+   * `per-serving`            기준부피 = 1회 부피(드롭류)
+   * `per-volume`             기준부피 = 일반 부피 기준
+   * `per-volume-unit-unknown` 기준 100mL·섭취는 병 단위·병 용량 미지 → **병당 환산 금지**(야쿠르트)
+   */
+  cfuBasisType: 'per-serving' | 'per-volume' | 'per-volume-unit-unknown';
+  serving: {
+    /** 1일 섭취 횟수 */
+    pd: LiquidField;
+    /** 1회 섭취 개수(드롭·방울·병) */
+    count: number;
+    /** 섭취 단위(드롭/방울/병) */
+    unit: string;
+    /** 1회 부피(mL). 병처럼 원문에 mL 없으면 ABSENT — 환산 금지 */
+    servingVolumeMl: LiquidField;
+  };
+  /** 1일 총 섭취 부피(mL). 1회부피·횟수가 **둘 다 PARSED** 일 때만 PARSED */
+  dailyTotal: LiquidField;
+  /** 병·용기 총용량(mL). 원문 미표기면 ABSENT */
+  totalVolume: LiquidField;
+  /** 섭취 매개: 물과 함께 / 희석 — 원문 근거 없으면 draft 에 등장 금지 */
+  vehicle: { water: boolean; dilute: boolean };
+  /** 흔들어 섭취 지시 여부 */
+  shake: boolean;
+  /** 보관: 냉장 여부 / 냉장 모드(개봉후·상시) / 실온 여부 — 원문 grounded */
+  storage: { refrigerate: boolean; mode: 'after-open' | 'always' | null; roomTemp: boolean };
+  /** 보관방법 영어 번역(의미 보존). 한국어 원문은 source.storage / prsrvRaw 에 유지 */
+  storageEn?: string;
+  /** 유통기한 영어 번역(의미 보존). 한국어 원문은 source.shelfLife 에 유지 */
+  shelfLifeEn?: string;
+  /** 섭취방법 원문(SRV_USE) */
+  srvRaw: string;
+  /** 보관방법 원문(PRSRV_PD) */
+  prsrvRaw: string;
+  cautionHasShake: boolean;
+}
+
 export interface GuardProductInput {
   candidateId: string;
   productName: string;
@@ -189,6 +259,12 @@ export interface GuardProductInput {
   statementNo: string;
   source: GuardSourceInput;
   grounding: GroundingInput;
+  /**
+   * 액상 grounding(드롭·병). **존재하면 액상 경로**로 판정한다(G-LIQUID 6규칙).
+   * 이 필드가 있으면 runGuard 는 고형 PRE-SRC/A~H 를 건너뛰고 액상 규칙만 실행한다.
+   * 없으면(대다수 고형 제품) 동작은 이전과 100% 동일 — **가법적 확장**이다.
+   */
+  liquidGrounding?: LiquidGrounding;
   drafts: {
     ko: string;
     en: string;
@@ -207,5 +283,7 @@ export interface GuardOptions {
  * 1.1.0 — REVIEW 튜닝(WO-O4O-PRODUCT-DESCRIPTION-GROUNDING-GUARD-REVIEW-TUNING-V1).
  *   위험 신호(BLOCKED/REVIEW_REQUIRED)와 정보성·형식성 신호(INFO/PRECHECK_INFO)를 분리.
  *   **검출을 약화한 것이 아니라** 사람이 실제 위험에 집중하도록 분류를 바꾼 것이다.
+ * 1.2.0 — 액상(드롭·병) G-LIQUID 6규칙 승격(WO-O4O-HFF-PROBIOTICS-LIQUID-MODEL-PILOT-6-V1).
+ *   `liquidGrounding` 이 있을 때만 액상 경로로 진입한다. 고형 제품 판정은 불변(가법적).
  */
-export const GUARD_VERSION = 'product-description-guard@1.1.0';
+export const GUARD_VERSION = 'product-description-guard@1.2.0';
