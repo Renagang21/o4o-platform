@@ -26,7 +26,8 @@ export async function* fileJsonlSource(path: string): AsyncGenerator<HffRawItem>
  * 반드시 존재하는 **필요조건**이어야 한다(그래야 valid 제품 누락 0 = 동치 보존). 서버사이드 선필터로 스캔 단축.
  */
 export async function* dbCandidateSource(port: number, username?: string, password?: string, database?: string, baseLike?: string[]): AsyncGenerator<HffRawItem> {
-  const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username, password, database, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 120000 } });
+  // statement_timeout: prefilter 없는 조합(식이섬유·오메가3 등 동의어 변이 원료)은 비인덱스 JSON ILIKE 전량 스캔이라 120s 초과 → 5분.
+  const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username, password, database, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 300000 } });
   await ds.initialize();
   const likes = (baseLike ?? []).filter((x) => x && x.trim()).map((x) => `%${x}%`);
   if (likes.length) console.error(`[source] DB 서버사이드 BASE_STANDARD ILIKE ALL: ${JSON.stringify(baseLike)}`);

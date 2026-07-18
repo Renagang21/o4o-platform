@@ -86,7 +86,9 @@ const NECESSARY: Record<string, string> = {
   '판토텐산': '판토텐', '루테인': '루테인', '글루코사민': '글루코사민', '옥타코사놀': '옥타코사놀', '테아닌': '테아닌',
   '나이아신': '', '엽산': '', '비오틴': '', '크롬': '', '몰리브덴': '', 'MSM': '', '밀크씨슬': '', '코엔자임Q10': '', '프로폴리스': '', '가르시니아': '', '녹차': '', '오메가3': '', '은행잎': '', '감마리놀렌산': '', '식이섬유': '',
 };
-const baseLike = [...new Set(TARGET.map((k) => NECESSARY[k] ?? '').filter(Boolean))];
+// --no-prefilter: 저선택도 단일 prefilter(예 '아연')는 비인덱스 JSONB ILIKE 스캔이 느려 timeout →
+// prefilter를 끄고 전량 fetch(id 인덱스 순) 후 JS에서 동일 선별. 선별 결과 동일(prefilter=필요조건 superset).
+const baseLike = process.argv.includes('--no-prefilter') ? [] : [...new Set(TARGET.map((k) => NECESSARY[k] ?? '').filter(Boolean))];
 const src = resolveSource(process.argv, process.env, baseLike.length ? baseLike : undefined);
 for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const base = it.BASE_STANDARD ?? ''; const name = (it.PRDUCT ?? '').trim(); const srv = it.SRV_USE ?? ''; const sungsang = it.SUNGSANG ?? ''; const stmt = (it.STTEMNT_NO ?? '').trim();
