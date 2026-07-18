@@ -1,0 +1,241 @@
+{
+  "wo": "WO-O4O-OTC-GLOBAL-ATC-SAFETY-BRIDGE-RECALC-V1",
+  "dbWrite": 0,
+  "readOnly": true,
+  "groundedExtractOk": 19131,
+  "extractFail": 0,
+  "무성분명경구단일_대상": 7301,
+  "rule": {
+    "후보키": "atc_code|함량|제형|경로",
+    "분리키": "9요소 안전지문(용법수치·연령·기간·최대량·금기·임신수유·상호작용·첨가제·단일복합)",
+    "후보풀": "grounded-named(전역) ∪ authored(전량) — shard 경계 없음"
+  },
+  "buckets": {
+    "ATC후보+안전지문일치": 338,
+    "ATC후보있으나_안전지문불일치": 1435,
+    "ATC후보없음": 5140,
+    "authored후보없음": 388,
+    "별도수동검토": 0
+  },
+  "bucketGroups": {
+    "ATC후보+안전지문일치": 43,
+    "ATC후보있으나_안전지문불일치": 414,
+    "ATC후보없음": 1601,
+    "authored후보없음": 85,
+    "별도수동검토": 0
+  },
+  "atcCodeNone": 0,
+  "최종": {
+    "무성분명_확장추가_제품수": 338,
+    "무성분명_신규작성_그룹수": 2099,
+    "통합_새설명서필요_그룹수": 1071,
+    "통합_새설명서필요_제품수": 2879,
+    "기존확장_통합_제품수": 2732,
+    "최종_재사용가능_제품수": 3070,
+    "무성분명_분리유지_제품수": 1435,
+    "무성분명_연결불가_제품수": 5140,
+    "무성분명_신규작성_제품수": 5528
+  },
+  "applyTop30": [
+    {
+      "atcKey": "B01AC06|100밀리그램|정|oral",
+      "masters": 60,
+      "authoredRefs": [
+        "0052dc6c-639a-400b-b7a3-144d84ae5c14"
+      ],
+      "sample": "삼익아스피린장용정"
+    },
+    {
+      "atcKey": "A03AA05|100밀리그램|정|oral",
+      "masters": 37,
+      "authoredRefs": [
+        "003beef8-82c4-4897-a176-d0ea8a695699"
+      ],
+      "sample": "신일트리메부틴말레산염정"
+    },
+    {
+      "atcKey": "A02AD03|500밀리그램|정|oral",
+      "masters": 33,
+      "authoredRefs": [
+        "01a231cd-b471-4d93-8071-b271f8c4627d"
+      ],
+      "sample": "에이프로젠알마게이트정"
+    },
+    {
+      "atcKey": "R06AE07|10밀리그램|정|oral",
+      "masters": 29,
+      "authoredRefs": [
+        "01f6fa04-c72b-4e3e-b7f7-eb5e8fa26b54"
+      ],
+      "sample": "지엘세티리진염산염정"
+    },
+    {
+      "atcKey": "P02CA03|400밀리그램|정|oral",
+      "masters": 27,
+      "authoredRefs": [
+        "0178f85b-94d7-4ac9-a061-ac4c2d9ad750"
+      ],
+      "sample": "씨트리알벤다졸400정"
+    },
+    {
+      "atcKey": "R05CB06|30밀리그램|정|oral",
+      "masters": 25,
+      "authoredRefs": [
+        "00b4e7ff-ce10-4bc7-a943-039d80c94b5a"
+      ],
+      "sample": "영일염산암브록솔정"
+    },
+    {
+      "atcKey": "R05CB01|200밀리그램|캡슐|oral",
+      "masters": 22,
+      "authoredRefs": [
+        "0112b8e0-cc26-411b-84d7-4a1b66bfbe24"
+      ],
+      "sample": "우리들아세틸시스테인캡슐200mg"
+    },
+    {
+      "atcKey": "M01AX|125밀리그램|정|oral",
+      "masters": 13,
+      "authoredRefs": [
+        "01994863-920a-45ea-97d1-f493416cafa7"
+      ],
+      "sample": "신일클로닉신리시네이트정"
+    },
+    {
+      "atcKey": "V06DD|500밀리그램|연질캡슐|oral",
+      "masters": 12,
+      "authoredRefs": [
+        "1167c6d5-0cfd-4594-b15d-20f51e72521b"
+      ],
+      "sample": "오스틴엘시스틴연질캡슐500밀리그램"
+    },
+    {
+      "atcKey": "A03AA05|200밀리그램|정|oral",
+      "masters": 10,
+      "authoredRefs": [
+        "0175e433-a171-44ec-b601-ad65a805171d"
+      ],
+      "sample": "셀트리온트리메부틴말레산염정"
+    },
+    {
+      "atcKey": "B03BB01|1밀리그램|정|oral",
+      "masters": 10,
+      "authoredRefs": [
+        "068e2176-ee92-4e94-a47d-2dc632bacf53"
+      ],
+      "sample": "일동폴산정1밀리그램"
+    },
+    {
+      "atcKey": "R06AX13|10밀리그램|정|oral",
+      "masters": 10,
+      "authoredRefs": [
+        "0a7dee0b-e578-4015-967a-fad092071eef"
+      ],
+      "sample": "로리딘정(로라티딘)[수출명:LORIDIN-ILJINTAB.)"
+    },
+    {
+      "atcKey": "A07FA01|250밀리그램|캡슐|oral",
+      "masters": 9,
+      "authoredRefs": [
+        "022f4af0-1219-428b-bd69-fa39a5e7fe7f"
+      ],
+      "sample": "라시도필캡슐"
+    },
+    {
+      "atcKey": "C05CA03|300밀리그램|캡슐|oral",
+      "masters": 6,
+      "authoredRefs": [
+        "05be62a5-89dc-4f20-95f9-cb6187f5ab35"
+      ],
+      "sample": "조아디오스민캡슐"
+    },
+    {
+      "atcKey": "M01AE02|275밀리그램|정|oral",
+      "masters": 6,
+      "authoredRefs": [
+        "006f1a2b-f1f7-40a6-ac10-7f0093a150a1"
+      ],
+      "sample": "슈넬나프록센나트륨정"
+    },
+    {
+      "atcKey": "M09AB03|100밀리그램|정|oral",
+      "masters": 5,
+      "authoredRefs": [
+        "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a"
+      ],
+      "sample": "삼성브로멜라인장용정"
+    },
+    {
+      "atcKey": "R05CB07|200밀리그램|캡슐|oral",
+      "masters": 4,
+      "authoredRefs": [
+        "0ff909f4-20dc-49d1-b8c5-91794ab62df6"
+      ],
+      "sample": "소롤200mg캡슐"
+    },
+    {
+      "atcKey": "R05CB15|300밀리그램|캡슐|oral",
+      "masters": 4,
+      "authoredRefs": [
+        "00065e32-c23e-4e84-b818-0b25779dc014"
+      ],
+      "sample": "현대에르도스테인캡슐"
+    },
+    {
+      "atcKey": "A07FA02|282.5밀리그램|캡슐|oral",
+      "masters": 3,
+      "authoredRefs": [
+        "16f0c2ef-44eb-4629-a82c-e7fc69511b94"
+      ],
+      "sample": "바이메드캡슐"
+    },
+    {
+      "atcKey": "M01AE01|200밀리그램|연질캡슐|oral",
+      "masters": 3,
+      "authoredRefs": [
+        "0203e1b4-7237-4641-b2b5-a918867b3514"
+      ],
+      "sample": "한솔이부프로펜연질캡슐"
+    },
+    {
+      "atcKey": "M01AE02|250밀리그램|연질캡슐|oral",
+      "masters": 3,
+      "authoredRefs": [
+        "02355c78-3d6d-4f6b-8120-de9ff7f14673"
+      ],
+      "sample": "경남나프록센연질캡슐"
+    },
+    {
+      "atcKey": "M01AE01|400밀리그램|연질캡슐|oral",
+      "masters": 2,
+      "authoredRefs": [
+        "01a08a82-92c6-4436-889e-4409bb0e0b47"
+      ],
+      "sample": "탁센400이부프로펜연질캡슐"
+    },
+    {
+      "atcKey": "N02BE01|325밀리그램|연질캡슐|oral",
+      "masters": 2,
+      "authoredRefs": [
+        "07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7"
+      ],
+      "sample": "유한아세트아미노펜연질캡슐"
+    },
+    {
+      "atcKey": "N05CM|25밀리그램|정|oral",
+      "masters": 2,
+      "authoredRefs": [
+        "0be1a647-aadf-4b76-9814-5f9a1d60a321"
+      ],
+      "sample": "포린피아정"
+    },
+    {
+      "atcKey": "M01AE14|300밀리그램|정|oral",
+      "masters": 1,
+      "authoredRefs": [
+        "002c309a-8576-48ec-938a-19bc1478bacb"
+      ],
+      "sample": "팍스정"
+    }
+  ]
+}
