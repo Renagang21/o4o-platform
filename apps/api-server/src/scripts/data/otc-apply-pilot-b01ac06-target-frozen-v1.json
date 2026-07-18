@@ -1,0 +1,440 @@
+{
+  "wo": "WO-O4O-OTC-CANONICAL-APPLY-PILOT-B01AC06-V1",
+  "stage": "§1~4 dry-run",
+  "dbWrite": 0,
+  "readOnly": true,
+  "atc": "B01AC06",
+  "authoredRef": "0052dc6c-639a-400b-b7a3-144d84ae5c14",
+  "authoredRep": [
+    {
+      "master_id": "017be207-9371-4d9e-acf9-06df14063705",
+      "name": "린피스에프정(아스피린)",
+      "spec": "100밀리그램 / 500 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "0b82a5f8-391d-4d4a-a6df-3b55398f5779",
+      "name": "아스쿨장용정(아스피린)",
+      "spec": "100밀리그램 / 1000 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "0ddf0ae2-a40f-4ed9-a03b-6bfb4f3cd6eb",
+      "name": "린피스에프정(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "2c3ce468-39e1-4a07-896f-ff174e937513",
+      "name": "아스테릭정(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "36294dca-abf0-482c-ab3a-1c29ce01bf1a",
+      "name": "에스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "3b96a8f9-9cd7-4697-ae7c-9d67c1866d6d",
+      "name": "에스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 500 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "3e727823-0cfe-4578-b989-d82fcea83c77",
+      "name": "와이투아스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 300 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "411e6a69-5a10-4e4f-a01e-b56f77fc40c7",
+      "name": "아이스피린장용정(아스피린)",
+      "spec": "100밀리그램 / 1000 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "47c23e88-4ffc-4fc3-9c54-b44339182e4c",
+      "name": "다나릭스장용정(아스피린)",
+      "spec": "100밀리그램 / 500 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "4e277858-5fee-4744-b4ae-9e3b4baf51e5",
+      "name": "다나릭스장용정(아스피린)",
+      "spec": "100밀리그램 / 100 / 정 / PTP",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "4f3a3e9b-160c-48db-89f4-243c93b71143",
+      "name": "아이스피린장용정(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "5ee9226d-e622-4e47-b99b-8eb33210640f",
+      "name": "다나릭스장용정(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "6c72ee6d-f4e0-47cf-9758-7fb98d305b1f",
+      "name": "아스쿨장용정(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "7eb0952e-b43b-4461-a46d-be3658852ebc",
+      "name": "아스테릭정(아스피린)",
+      "spec": "100밀리그램 / 100 / 정 / PTP",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "94bca3c1-c590-40ab-be1e-f0aa00256d47",
+      "name": "에스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "bcf791c6-7c04-4fac-bee7-aa2c7201cfac",
+      "name": "아이스피린장용정(아스피린)",
+      "spec": "100밀리그램 / 300 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "cf329294-c1dc-47e0-b29d-56201c53197c",
+      "name": "아이스피린장용정(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "cfdb6f01-79ff-4e1f-9fdc-a5ad2314af31",
+      "name": "아스쿨장용정(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "d3a3d8cb-6e12-4ad5-b267-476b57945197",
+      "name": "다나릭스장용정(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "e14d311c-4e4f-4928-80c9-d1ef0a9eb767",
+      "name": "린피스에프정(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "e5bac1c9-cbb2-4cd3-8c7b-49fd603e172e",
+      "name": "와이투아스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 30 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "f3605605-f7b3-4eeb-826d-14c217d0c805",
+      "name": "와이투아스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 0",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    },
+    {
+      "master_id": "feefc3a5-d9a5-4cc8-991f-d4e22bd488b4",
+      "name": "와이투아스피린장용정100밀리그램(아스피린)",
+      "spec": "100밀리그램 / 1000 / 정 / 병",
+      "hasEasy": false,
+      "fp": null,
+      "safety": null
+    }
+  ],
+  "authoredRepHasEasy": false,
+  "authoredRepMasters": 23,
+  "namedReference": {
+    "distinctFps": [
+      "3f45a385d23b8a7a",
+      "3ef05f826f2f2828",
+      "ca0d3dcd7cfe3765",
+      "9840608ed4791455",
+      "25d8ecc0200dcf54",
+      "1a59cfe7eca0011c"
+    ],
+    "distinctSafeties": [
+      "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:1a5f478b109beb45:none:single",
+      "04f18c587ef07b6c:ca7bad0c490c1276:80705e54c403e53e:d41d8cd98f00b204:27e07ed1ef1dfb38:ban:03951a0ec675b4f4:none:single",
+      "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:59868b20bb04ae09:none:single",
+      "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:02792573c936c3dd:ban:59868b20bb04ae09:none:single"
+    ],
+    "samples": [
+      {
+        "name": "아스팜장용정(아스피린)",
+        "fp": "3f45a385d23b8a7a",
+        "safety": "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:1a5f478b109beb45:none:single"
+      },
+      {
+        "name": "오코피린장용정(아스피린)",
+        "fp": "3ef05f826f2f2828",
+        "safety": "04f18c587ef07b6c:ca7bad0c490c1276:80705e54c403e53e:d41d8cd98f00b204:27e07ed1ef1dfb38:ban:03951a0ec675b4f4:none:single"
+      },
+      {
+        "name": "에이에스피장용정100mg(아스피린)",
+        "fp": "3f45a385d23b8a7a",
+        "safety": "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:1a5f478b109beb45:none:single"
+      },
+      {
+        "name": "영일아스피린장용정100mg(아스피린)",
+        "fp": "3f45a385d23b8a7a",
+        "safety": "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:1a5f478b109beb45:none:single"
+      },
+      {
+        "name": "아스텍션장용정100밀리그램(아스피린)",
+        "fp": "ca0d3dcd7cfe3765",
+        "safety": "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:59868b20bb04ae09:none:single"
+      },
+      {
+        "name": "린아스장용정(아스피린)",
+        "fp": "3f45a385d23b8a7a",
+        "safety": "04f18c587ef07b6c:ea86f1da479eb947:80705e54c403e53e:d41d8cd98f00b204:78a9a112660aa5fa:ban:1a5f478b109beb45:none:single"
+      }
+    ]
+  },
+  "totalCandidates": 73,
+  "fpReport": [
+    {
+      "fingerprint": "1c2e38232d471a9e",
+      "masters": 52,
+      "expected": 52,
+      "expectedMatch": true,
+      "distinctSafetySigs": 1,
+      "safetyMatchesNamed": true,
+      "원문일치_named": false,
+      "원문일치_authoredRep": null,
+      "안전일치_authoredRep": null,
+      "determinismStable": true,
+      "include": false,
+      "reason": "grounded-named 과 안전은 일치하나 원문(fingerprint) 부정합 → 별도 검토(제외)",
+      "existingKoCanon": 0,
+      "existingEnCanon": 0,
+      "existingKoReview": 0,
+      "existingEnReview": 0,
+      "sampleNames": [
+        "삼익아스피린장용정",
+        "서울아스피린장용정",
+        "프라임아스피린장용정100밀리그램",
+        "휴비스트아스피린장용정"
+      ],
+      "masterIds": [
+        "0728ee9c-b2e0-493d-9390-b905320bc08d",
+        "07adf08b-dc39-45e0-b6b5-27449d156e51",
+        "0a128a74-5d8e-4fca-8baa-eefc8eba55f6",
+        "0c380954-2ed6-4243-851b-411137e884a0",
+        "11d24580-070d-43c1-8077-5064037a4e0b",
+        "174d046c-8a9f-4a59-a57a-837f35012139",
+        "18753d85-72a0-4151-b53f-3dda13230c34",
+        "1e89b475-441f-41a0-a225-81385b9a156b",
+        "28ceeda2-9b2f-4919-be77-adbb0b0389e3",
+        "2dd51ae2-aa6d-4c90-b6c1-9e060e06cb40",
+        "2f129bfe-fc79-47be-b5aa-bc5f3503dcd7",
+        "2f25b532-52d8-4b87-97b4-2d5cc4aec1d2",
+        "31081a5e-b2b1-4fc5-953d-2b13ba3ed594",
+        "3c7ecb84-28ef-4bfe-b6b2-5b7faaef8821",
+        "3d1fc979-d59b-4357-b6f7-7da143556860",
+        "4567f58d-4886-4611-89eb-db88afda989f",
+        "466e4f70-0272-4bfc-84a7-eb05dc84b39a",
+        "4aa1cb7d-dcde-4d37-bf06-a713c8904d2f",
+        "5299c37e-7add-4615-a3f1-9bddf905536e",
+        "5b523e99-84a1-408a-891c-820ff876d921",
+        "68c0c020-95e9-4443-8c69-dfa6719ea9e6",
+        "69e21ccc-aff8-445d-b57c-8daffa65197a",
+        "6fd42e89-0b35-46c2-a400-8927281c88cd",
+        "712630b5-f6cd-47b1-904c-840d9bf2b3fa",
+        "75070801-95fd-4384-bcbb-b366ac85e2a2",
+        "760a2075-a2f6-4c6b-bb7a-e7eff5fa4b40",
+        "78c1f77b-daa9-418b-8620-b1e4966459d3",
+        "7d9f98fd-5f8f-4d35-bb87-43443a8a929e",
+        "7de6470f-e664-40ff-8167-194b40dde73c",
+        "86385ec0-70ee-4d5e-a052-56884a18585e",
+        "8a9984c8-dab2-42a2-9ba8-b908b10864f0",
+        "9adfe774-f8a7-448f-97d0-e9f2c09cf7e6",
+        "9cfada26-aabd-4f91-a84f-99351c4f2d6b",
+        "a3fde5de-b216-4cb1-bf25-fef96cd1581c",
+        "af88e31a-ab5d-4adf-b446-6ff9b80f3213",
+        "b3821f8f-68a8-4183-8ddc-295bb0b7f0df",
+        "be96dee4-6c13-472b-b201-a15233260a41",
+        "c35eb6a0-47ce-46e2-9f11-9b9bebef3e2c",
+        "c8a19ee3-ff9c-4293-ae4d-ba0313527401",
+        "c97ce1a3-a473-4d53-a1a6-1a195a818e78",
+        "ca55fd9f-a7ea-48d5-8d07-b9ea234f6127",
+        "d2e92a0e-f5ff-404c-9ab3-4b149a6df188",
+        "d5c8df91-5825-497d-9e54-66c36dbcc252",
+        "da19107e-4d60-486b-93e3-452205ff5059",
+        "df5d01fb-0924-430d-8a9f-2c643685cfb9",
+        "e4418664-b66a-4be9-8e62-f048a39574d8",
+        "e8f55275-d078-441e-81f8-83ead06ea584",
+        "eb3b8ef5-2d3f-419e-af86-993d666a54ec",
+        "f0f20a08-7a54-4a20-99d5-d9d3db93148f",
+        "f33b4fca-fc9d-41a2-8cfb-0765e1693426",
+        "f3f26b71-0605-44c9-91fa-736f8ed9a3ac",
+        "f6c6b8e3-6066-4b45-9db0-53c0981a3116"
+      ]
+    },
+    {
+      "fingerprint": "6e2030058d0db10e",
+      "masters": 8,
+      "expected": 8,
+      "expectedMatch": true,
+      "distinctSafetySigs": 1,
+      "safetyMatchesNamed": true,
+      "원문일치_named": false,
+      "원문일치_authoredRep": null,
+      "안전일치_authoredRep": null,
+      "determinismStable": true,
+      "include": false,
+      "reason": "grounded-named 과 안전은 일치하나 원문(fingerprint) 부정합 → 별도 검토(제외)",
+      "existingKoCanon": 0,
+      "existingEnCanon": 0,
+      "existingKoReview": 0,
+      "existingEnReview": 0,
+      "sampleNames": [
+        "한미아스피린장용정100밀리그램",
+        "삼성아스피린장용정100밀리그램"
+      ],
+      "masterIds": [
+        "0d0ea654-6ec4-4015-afd1-65822e1abbd6",
+        "199efdb4-5e74-4aff-a3c4-fa979f232a2c",
+        "38b9a033-96d9-4f23-925b-9ecaa8438554",
+        "3bbc498d-0c90-4a26-b932-f6a35a942751",
+        "a28ec75d-84cb-47bd-ac3e-f2ab0639e8d2",
+        "c91d75e7-5733-4c92-8c9d-72a2fa14cbee",
+        "eb81957e-7ddb-4717-afa9-359c412c0d8b",
+        "ff096052-4a38-4098-b9b5-bbfbe38534af"
+      ]
+    },
+    {
+      "fingerprint": "cf8d0d84ecaa5914",
+      "masters": 6,
+      "expected": null,
+      "expectedMatch": false,
+      "distinctSafetySigs": 1,
+      "safetyMatchesNamed": false,
+      "원문일치_named": false,
+      "원문일치_authoredRep": null,
+      "안전일치_authoredRep": null,
+      "determinismStable": true,
+      "include": false,
+      "reason": "grounded-named 안전지문 불일치 → 제외",
+      "existingKoCanon": 0,
+      "existingEnCanon": 0,
+      "existingKoReview": 0,
+      "existingEnReview": 0,
+      "sampleNames": [
+        "아스피린프로텍트정100밀리그람"
+      ],
+      "masterIds": [
+        "384d1bf3-2d4f-4cab-a49f-4babbd6401a2",
+        "607acfeb-4e98-47e6-ad04-155eba5f25ae",
+        "85d01dbf-24b5-415a-837d-f6a154f78a66",
+        "8fa88b56-dd1e-4421-8ccc-ac11fa73c80e",
+        "9b20ce36-ccca-4c70-98b9-9068090328bd",
+        "fbf4db31-7a07-42e7-9c61-6b3b0de14eee"
+      ]
+    },
+    {
+      "fingerprint": "36639a072dc2ec96",
+      "masters": 4,
+      "expected": null,
+      "expectedMatch": false,
+      "distinctSafetySigs": 1,
+      "safetyMatchesNamed": false,
+      "원문일치_named": false,
+      "원문일치_authoredRep": null,
+      "안전일치_authoredRep": null,
+      "determinismStable": true,
+      "include": false,
+      "reason": "grounded-named 안전지문 불일치 → 제외",
+      "existingKoCanon": 0,
+      "existingEnCanon": 0,
+      "existingKoReview": 0,
+      "existingEnReview": 0,
+      "sampleNames": [
+        "보령바이오아스피린장용정100밀리그램"
+      ],
+      "masterIds": [
+        "4e371b12-c628-467e-9cde-efe292a8e855",
+        "a4344378-eb40-4861-9ba4-542c84eab38f",
+        "a7bb5df1-afa1-426b-aad7-83c9a82d43bd",
+        "d28b9ed8-31a4-4a99-836c-db2722bdeead"
+      ]
+    },
+    {
+      "fingerprint": "ce6e8b3b6370fa9b",
+      "masters": 3,
+      "expected": null,
+      "expectedMatch": false,
+      "distinctSafetySigs": 1,
+      "safetyMatchesNamed": false,
+      "원문일치_named": false,
+      "원문일치_authoredRep": null,
+      "안전일치_authoredRep": null,
+      "determinismStable": true,
+      "include": false,
+      "reason": "grounded-named 안전지문 불일치 → 제외",
+      "existingKoCanon": 0,
+      "existingEnCanon": 0,
+      "existingKoReview": 0,
+      "existingEnReview": 0,
+      "sampleNames": [
+        "영진아스피린장용정"
+      ],
+      "masterIds": [
+        "25fafa46-7df6-44d2-9131-64905ecb6cb1",
+        "3d8b0bcb-ef05-4af4-b1e5-1129d067bfe1",
+        "9cbc6201-726f-4c90-ae95-c8c8b4ee54ae"
+      ]
+    }
+  ],
+  "frozen_include_masterIds": []
+}

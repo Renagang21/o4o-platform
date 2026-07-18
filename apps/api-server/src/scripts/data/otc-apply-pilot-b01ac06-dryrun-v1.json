@@ -1,0 +1,80 @@
+{
+  "wo": "WO-O4O-OTC-CANONICAL-APPLY-PILOT-B01AC06-V1",
+  "dbWrite": 0,
+  "warn_authored대표_e약은요_부재": true,
+  "warn_note": "authored 대표(0052dc6c)는 e약은요 원문 미보유(authored-only 명명 아스피린 doc). 대표 자체와의 원문 대조 불가 → 판정은 grounded-named 아스피린(원문 보유) 원문+안전 완전 일치 기준. 각 대상은 자체 e약은요 원문 보유 → 자기 원문 grounding 으로 authoring 가능(대표 content 복사 아님).",
+  "reenumerationDeterministic": true,
+  "expectedSplit": {
+    "1c2e38232d471a9e": 52,
+    "6e2030058d0db10e": 8
+  },
+  "modelA_설명": "Model A = 대표/named 원문(fingerprint)+안전 완전 일치분만 재사용. authored 대표 원문 부재 + 무성분명 aspirin 원문이 named aspirin 원문과 불일치 → 완전일치 0.",
+  "modelA_최종포함_master수": 0,
+  "modelB": {
+    "설명": "Model B = 각 대상의 자체 e약은요 원문으로 authoring(대표 content 복사 아님). 안전지문 named 일치는 임상 일관성 확인용. 원문은 대상별 자기 grounding.",
+    "포함_fingerprint": [
+      "1c2e38232d471a9e",
+      "6e2030058d0db10e"
+    ],
+    "포함_master수": 60,
+    "제외_안전불일치": [
+      {
+        "fingerprint": "cf8d0d84ecaa5914",
+        "masters": 6
+      },
+      {
+        "fingerprint": "36639a072dc2ec96",
+        "masters": 4
+      },
+      {
+        "fingerprint": "ce6e8b3b6370fa9b",
+        "masters": 3
+      }
+    ]
+  },
+  "최종포함_fingerprint": [],
+  "최종포함_master수": 0,
+  "제외": [
+    {
+      "fingerprint": "1c2e38232d471a9e",
+      "masters": 52,
+      "reason": "grounded-named 과 안전은 일치하나 원문(fingerprint) 부정합 → 별도 검토(제외)"
+    },
+    {
+      "fingerprint": "6e2030058d0db10e",
+      "masters": 8,
+      "reason": "grounded-named 과 안전은 일치하나 원문(fingerprint) 부정합 → 별도 검토(제외)"
+    },
+    {
+      "fingerprint": "cf8d0d84ecaa5914",
+      "masters": 6,
+      "reason": "grounded-named 안전지문 불일치 → 제외"
+    },
+    {
+      "fingerprint": "36639a072dc2ec96",
+      "masters": 4,
+      "reason": "grounded-named 안전지문 불일치 → 제외"
+    },
+    {
+      "fingerprint": "ce6e8b3b6370fa9b",
+      "masters": 3,
+      "reason": "grounded-named 안전지문 불일치 → 제외"
+    }
+  ],
+  "예상": {
+    "ko_needs_review_INSERT": 0,
+    "en_needs_review_INSERT": 0,
+    "en_canonical_flip": 0,
+    "ko_canonical_flip": 0
+  },
+  "기존_canonical_변경": 0,
+  "dryRun_DB_write": 0,
+  "rollback_master_ids": [],
+  "재실행_동일": true,
+  "stopConditions": {
+    "split_52_8_reproduced": true,
+    "authored_mismatch": true,
+    "existing_canonical_conflict": false,
+    "target_count_unstable": false
+  }
+}
