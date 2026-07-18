@@ -1,0 +1,530 @@
+{
+  "wo": "WO-O4O-OTC-FULL-CORPUS-SOURCE-FINGERPRINT-AUDIT-3-AGENT-V1",
+  "agent": "나",
+  "shard": 1,
+  "dbWrite": 0,
+  "shardMasters": 6452,
+  "extractOk": 6452,
+  "extractFail": 0,
+  "distinctItemSeq": 1590,
+  "groups": 2232,
+  "tierCount": {
+    "Tier1": {
+      "masters": 4270,
+      "groups": 1271
+    },
+    "Tier5": {
+      "masters": 2014,
+      "groups": 946
+    },
+    "Tier3": {
+      "masters": 133,
+      "groups": 10
+    },
+    "Tier2": {
+      "masters": 35,
+      "groups": 5
+    }
+  },
+  "sizeDist": {
+    "1": 795,
+    "2-5": 1238,
+    "6-20": 183,
+    "21-50": 15,
+    "51+": 1
+  },
+  "routeDist": {
+    "oral": 4438,
+    "topical": 1296,
+    "ophthalmic": 365,
+    "unknown": 309,
+    "nasal": 21,
+    "rectal": 7,
+    "vaginal": 16
+  },
+  "oralMasters": 4438,
+  "nonOralMasters": 2014,
+  "coverage": {
+    "50%": 456,
+    "70%": 869,
+    "80%": 1190,
+    "90%": 1587
+  },
+  "safetyConsolidation": {
+    "oralMasters": 4438,
+    "safetyGroups": 1224,
+    "coverage": {
+      "50%": 242,
+      "70%": 496,
+      "80%": 660,
+      "90%": 882
+    },
+    "note": "경구·단일제만. 성분·함량·제형·경로+안전지문 동일 → 문구변이 무시하고 대표 1건 공유 가능(통합단계 후보)."
+  },
+  "existingCanonical": {
+    "easyCanonicalKoInPopulation": 6452,
+    "authoredCanonicalInPopulation": 0,
+    "enCanonicalInPopulation": 0,
+    "breakdown": [
+      {
+        "source_type": "mfds_easy_drug",
+        "language": "ko",
+        "status": "canonical",
+        "masters": 6452
+      }
+    ],
+    "note": "모집단=e약은요-grounded 라 전건 e약은요 ko canonical 표시본 보유. authored(mfds_drug_otc/nutrition_combo)는 A_no_spd_only(e약은요 미보유) 대상 승격분이라 이 모집단과 구조적 disjoint → authored 0 은 조인버그 아님. 재사용 수치는 통합단계(3 shard + authored 병합) 확정."
+  },
+  "authoredBridge": {
+    "검토후확장후보": {
+      "groups": 165,
+      "masters": 998
+    },
+    "새설명서필요": {
+      "groups": 397,
+      "masters": 1009
+    },
+    "주성분코드필요(무성분명)": {
+      "groups": 724,
+      "masters": 2431
+    },
+    "비경구-별도트랙": {
+      "groups": 946,
+      "masters": 2014
+    }
+  },
+  "atcBridge": {
+    "buckets": {
+      "ATC 후보 있음": 3014,
+      "ATC 후보 + 안전지문 일치": 2883,
+      "ATC 후보 있으나 안전지문 불일치": 131,
+      "ATC 후보 없음": 127,
+      "ATC 코드 없음": 0
+    },
+    "noIngredientMasters": 3141,
+    "safetyMatch": 2883,
+    "safetyMismatch": 131,
+    "note": "후보 연결 키=atc_code|함량|제형|경로(후보 풀=shard 내 grounded 전체, 명명+무성분명). 안전지문(용법수치·연령·기간·금기·임신·첨가제·상호작용·단일복합)=최종 분리 키. ⚠️shard-local 값 — twin 이 item_seq 해시로 타 shard 산재 가능 → 전량 후보 수는 통합단계 확정."
+  },
+  "noIngredient": {
+    "groups": 1097,
+    "masters": 3141
+  },
+  "splitCases": {
+    "count": 79,
+    "top": [
+      {
+        "key": "에르도스테인|300밀리그램|캡슐",
+        "groups": 15
+      },
+      {
+        "key": "L-아스파르트산-L-아르기닌수화물|20밀리리터|액",
+        "groups": 14
+      },
+      {
+        "key": "세티리진염산염|10밀리그램|정",
+        "groups": 12
+      },
+      {
+        "key": "덱시부프로펜|300밀리그램|연질캡슐",
+        "groups": 12
+      },
+      {
+        "key": "나프록센나트륨|275밀리그램|정",
+        "groups": 11
+      },
+      {
+        "key": "알마게이트|500밀리그램|정",
+        "groups": 10
+      },
+      {
+        "key": "덱시부프로펜|500밀리리터|시럽",
+        "groups": 9
+      },
+      {
+        "key": "덱시부프로펜|없음|시럽",
+        "groups": 9
+      },
+      {
+        "key": "나프록센|250밀리그램|연질캡슐",
+        "groups": 8
+      },
+      {
+        "key": "덱시부프로펜|300밀리그램|정",
+        "groups": 7
+      },
+      {
+        "key": "바실루스리케니포르미스균|300그램|과립/산",
+        "groups": 7
+      },
+      {
+        "key": "바실루스리케니포르미스균|없음|과립/산",
+        "groups": 7
+      },
+      {
+        "key": "아세트아미노펜|500밀리그램|정",
+        "groups": 6
+      },
+      {
+        "key": "아세틸시스테인|200밀리그램|캡슐",
+        "groups": 5
+      },
+      {
+        "key": "트리메부틴말레산염|100밀리그램|정",
+        "groups": 5
+      },
+      {
+        "key": "이부프로펜|200밀리그램|연질캡슐",
+        "groups": 5
+      },
+      {
+        "key": "이부프로펜|400밀리그램|연질캡슐",
+        "groups": 5
+      },
+      {
+        "key": "세티리진염산염|10밀리그램|연질캡슐",
+        "groups": 5
+      },
+      {
+        "key": "시메티콘|없음|액",
+        "groups": 5
+      },
+      {
+        "key": "아스피린|100밀리그램|정",
+        "groups": 4
+      }
+    ]
+  },
+  "top30": [
+    {
+      "fp": "d4482002d924d5da",
+      "tier": "Tier1",
+      "size": 96,
+      "ingredient": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "atc": "R05CB15",
+      "withCanonical": 0,
+      "sample": "에리텐캡슐(에르도스테인)"
+    },
+    {
+      "fp": "f19bf322f89a0ab2",
+      "tier": "Tier5",
+      "size": 49,
+      "ingredient": "수출명:KEFEN",
+      "strength": "30밀리그램",
+      "form": "첩부제",
+      "atc": "M02AA10",
+      "withCanonical": 0,
+      "sample": "케펜텍플라스타(케토프로펜)(수출명:KEFEN)"
+    },
+    {
+      "fp": "ccfa8e92341197b3",
+      "tier": "Tier3",
+      "size": 48,
+      "ingredient": "아세틸시스테인",
+      "strength": "200밀리그램",
+      "form": "캡슐",
+      "atc": "R05CB01",
+      "withCanonical": 0,
+      "sample": "아티란캡슐200밀리그램(아세틸시스테인)"
+    },
+    {
+      "fp": "b8f0b8ec7fc79b50",
+      "tier": "Tier1",
+      "size": 29,
+      "ingredient": "",
+      "strength": "150밀리그램",
+      "form": "캡슐",
+      "atc": "A01AD",
+      "withCanonical": 0,
+      "sample": "덴드리스캡슐"
+    },
+    {
+      "fp": "01a3d3748a9c1f73",
+      "tier": "Tier1",
+      "size": 29,
+      "ingredient": "바실루스리케니포르미스균",
+      "strength": "250밀리그램",
+      "form": "캡슐",
+      "atc": "A07FA01",
+      "withCanonical": 0,
+      "sample": "락토민지캡슐(바실루스리케니포르미스균)"
+    },
+    {
+      "fp": "4c23d6b38ba74922",
+      "tier": "Tier1",
+      "size": 28,
+      "ingredient": "암브록솔염산염",
+      "strength": "30밀리그램",
+      "form": "정",
+      "atc": "R05CB06",
+      "withCanonical": 0,
+      "sample": "로이솔정(암브록솔염산염)"
+    },
+    {
+      "fp": "613223c138319bda",
+      "tier": "Tier1",
+      "size": 27,
+      "ingredient": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "atc": "R05CB15",
+      "withCanonical": 0,
+      "sample": "엘도캡슐(에르도스테인)"
+    },
+    {
+      "fp": "3f45a385d23b8a7a",
+      "tier": "Tier1",
+      "size": 26,
+      "ingredient": "아스피린",
+      "strength": "100밀리그램",
+      "form": "정",
+      "atc": "B01AC06",
+      "withCanonical": 0,
+      "sample": "린아스장용정(아스피린)"
+    },
+    {
+      "fp": "61f741e57e9675c9",
+      "tier": "Tier1",
+      "size": 26,
+      "ingredient": "아세틸시스테인",
+      "strength": "200밀리그램",
+      "form": "캡슐",
+      "atc": "R05CB01",
+      "withCanonical": 0,
+      "sample": "해그린캡슐(아세틸시스테인)"
+    },
+    {
+      "fp": "5c025945deefdefa",
+      "tier": "Tier1",
+      "size": 23,
+      "ingredient": "디오스민",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "atc": "C05CA03",
+      "withCanonical": 0,
+      "sample": "마더스민캡슐(디오스민)"
+    },
+    {
+      "fp": "863b085ec21a2c8e",
+      "tier": "Tier1",
+      "size": 23,
+      "ingredient": "",
+      "strength": "20밀리리터",
+      "form": "액",
+      "atc": "A13A",
+      "withCanonical": 0,
+      "sample": "파워콤프액"
+    },
+    {
+      "fp": "0f41e98a9d3a8953",
+      "tier": "Tier1",
+      "size": 22,
+      "ingredient": "",
+      "strength": "700밀리그램",
+      "form": "과립/산",
+      "atc": "R05F",
+      "withCanonical": 0,
+      "sample": "용각산쿨과립"
+    },
+    {
+      "fp": "124ba9cf3fbbe666",
+      "tier": "Tier1",
+      "size": 22,
+      "ingredient": "",
+      "strength": "400밀리그램",
+      "form": "정",
+      "atc": "M01AE01",
+      "withCanonical": 0,
+      "sample": "오스틴이부프로펜정400밀리그램"
+    },
+    {
+      "fp": "4ce2b6ed0354b2e5",
+      "tier": "Tier1",
+      "size": 21,
+      "ingredient": "로라타딘",
+      "strength": "10밀리그램",
+      "form": "정",
+      "atc": "R06AX13",
+      "withCanonical": 0,
+      "sample": "제이타딘정(로라타딘)"
+    },
+    {
+      "fp": "5b48970fb9c3026a",
+      "tier": "Tier1",
+      "size": 21,
+      "ingredient": "트리메부틴말레산염",
+      "strength": "100밀리그램",
+      "form": "정",
+      "atc": "A03AA05",
+      "withCanonical": 0,
+      "sample": "제이부틴정(트리메부틴말레산염)"
+    },
+    {
+      "fp": "f55debd2caae4fbc",
+      "tier": "Tier1",
+      "size": 21,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "정",
+      "atc": "A03AA05",
+      "withCanonical": 0,
+      "sample": "휴니즈트리메부틴말레산염정"
+    },
+    {
+      "fp": "981488eef906287b",
+      "tier": "Tier1",
+      "size": 19,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "캡슐",
+      "atc": "D11AX",
+      "withCanonical": 0,
+      "sample": "마이녹실에스캡슐"
+    },
+    {
+      "fp": "1c2e38232d471a9e",
+      "tier": "Tier1",
+      "size": 18,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "정",
+      "atc": "B01AC06",
+      "withCanonical": 0,
+      "sample": "삼익아스피린장용정"
+    },
+    {
+      "fp": "903e104ec6ed05ac",
+      "tier": "Tier3",
+      "size": 18,
+      "ingredient": "",
+      "strength": "475밀리그램",
+      "form": "정",
+      "atc": "A12AX",
+      "withCanonical": 0,
+      "sample": "지노칼시움정"
+    },
+    {
+      "fp": "6cb701ae85396482",
+      "tier": "Tier1",
+      "size": 17,
+      "ingredient": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "정",
+      "atc": "R05CB15",
+      "withCanonical": 0,
+      "sample": "엘도브론정(에르도스테인)"
+    },
+    {
+      "fp": "b46ca4a7e9d0c606",
+      "tier": "Tier1",
+      "size": 17,
+      "ingredient": "",
+      "strength": "400밀리그램",
+      "form": "정",
+      "atc": "A09AA02",
+      "withCanonical": 0,
+      "sample": "베스자임정"
+    },
+    {
+      "fp": "4ad1b9b6057e339e",
+      "tier": "Tier1",
+      "size": 17,
+      "ingredient": "",
+      "strength": "69.15밀리그램",
+      "form": "정",
+      "atc": "A11JB",
+      "withCanonical": 0,
+      "sample": "제텐비정"
+    },
+    {
+      "fp": "a699684548af2f2f",
+      "tier": "Tier5",
+      "size": 16,
+      "ingredient": "디클로페낙나트륨",
+      "strength": "15밀리그램",
+      "form": "첩부제",
+      "atc": "M02AA15",
+      "withCanonical": 0,
+      "sample": "디로펜24쿨플라스타(디클로페낙나트륨)"
+    },
+    {
+      "fp": "4d8b0e04280e2def",
+      "tier": "Tier1",
+      "size": 16,
+      "ingredient": "",
+      "strength": "300밀리그램",
+      "form": "정",
+      "atc": "R05X",
+      "withCanonical": 0,
+      "sample": "판피린티정"
+    },
+    {
+      "fp": "116f4e67de788228",
+      "tier": "Tier1",
+      "size": 16,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "연질캡슐",
+      "atc": "A05BA",
+      "withCanonical": 0,
+      "sample": "헤파비트에프연질캡슐"
+    },
+    {
+      "fp": "7bfaaab7c078c2a6",
+      "tier": "Tier5",
+      "size": 15,
+      "ingredient": "1회용",
+      "strength": "0.5밀리리터",
+      "form": "점안액",
+      "atc": "S01XA20",
+      "withCanonical": 0,
+      "sample": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)"
+    },
+    {
+      "fp": "b6beb591bb01607d",
+      "tier": "Tier1",
+      "size": 15,
+      "ingredient": "",
+      "strength": "20밀리리터",
+      "form": "시럽",
+      "atc": "A05BA",
+      "withCanonical": 0,
+      "sample": "헤파토스시럽"
+    },
+    {
+      "fp": "10a023981f808c27",
+      "tier": "Tier1",
+      "size": 15,
+      "ingredient": "",
+      "strength": "100밀리그램",
+      "form": "정",
+      "atc": "V03AB32",
+      "withCanonical": 0,
+      "sample": "더블유녹스정(글루타티온(환원형))"
+    },
+    {
+      "fp": "09a06982f9d47e14",
+      "tier": "Tier1",
+      "size": 15,
+      "ingredient": "니자티딘",
+      "strength": "75밀리그램",
+      "form": "정",
+      "atc": "A02BA04",
+      "withCanonical": 0,
+      "sample": "자니틴정(니자티딘)"
+    },
+    {
+      "fp": "049369deaf8000d4",
+      "tier": "Tier5",
+      "size": 15,
+      "ingredient": "1회용",
+      "strength": "0.5밀리리터",
+      "form": "점안액",
+      "atc": "S01XA20",
+      "withCanonical": 0,
+      "sample": "아이포레점안액(트레할로스수화물)(1회용)"
+    }
+  ]
+}
