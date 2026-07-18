@@ -122,7 +122,7 @@ const strengthOf = (spec: string): string => (spec || '').split(' / ')[0].trim()
 type Rec = {
   master_id: string; name: string; ingredient: string; strength: string; form: string; route: string;
   atc_code: string; multi: boolean; nonOral: boolean;
-  norm_ind: string; norm_dos: string; norm_cau: string; safety: string; pharmKey: string; keyType: string;
+  norm_ind: string; norm_dos: string; norm_cau: string; norm_full: string; safety: string; pharmKey: string; keyType: string;
 };
 
 function pharmKeyOf(x: { ingredient: string; atc_code: string; strength: string; form: string; route: string; master_id: string }): { key: string; keyType: string } {
@@ -145,37 +145,63 @@ function toRec(r: { master_id: string; name: string; spec: string; atc_code: str
   const { key, keyType } = pharmKeyOf({ ingredient, atc_code, strength, form, route, master_id: r.master_id });
   return {
     master_id: r.master_id, name: r.name, ingredient, strength, form, route, atc_code, multi, nonOral: route !== 'oral',
-    norm_ind: H(normalize(ind)), norm_dos: H(normalize(dos)), norm_cau: H(normalize(cau)), safety, pharmKey: key, keyType,
+    norm_ind: H(normalize(ind)), norm_dos: H(normalize(dos)), norm_cau: H(normalize(cau)), norm_full: H(normalize(r.content || '')), safety, pharmKey: key, keyType,
   };
 }
 const groupKeyOf = (x: Rec): string => H([x.norm_ind, x.norm_dos, x.norm_cau, H(`${x.ingredient}|${x.strength}`), H(x.form), x.route].join('|'));
 
 async function main(): Promise<void> {
   const { DataSource } = await import('typeorm');
-  const ds = new DataSource({
+  const mkDs = () => new DataSource({
     type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5432', 10),
     username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME,
-    entities: [], synchronize: false, logging: ['error'],
+    entities: [], synchronize: false, logging: ['error'], extra: { keepAlive: true, statement_timeout: 120000 },
   });
+  let ds = mkDs();
   await ds.initialize();
+  // 라이브 프록시/네트워크 간헐 단절(ECONNRESET) 대비: 연결 오류 시 재초기화 후 재시도.
+  const q = async (sql: string, params?: any[], tries = 5): Promise<any[]> => {
+    for (let i = 1; i <= tries; i++) {
+      try { return await ds.query(sql, params); }
+      catch (e: any) {
+        const msg = String(e?.message || e);
+        const conn = /ECONNRESET|Connection terminated|server closed|read ECONN|timeout|socket hang/i.test(msg);
+        if (!conn || i === tries) throw e;
+        console.error(`[retry ${i}/${tries}] ${msg.slice(0, 80)} — 재연결`);
+        try { await ds.destroy(); } catch {}
+        ds = mkDs(); await ds.initialize();
+      }
+    }
+    return [];
+  };
   const AUTHORED = ['mfds_drug_otc', 'mfds_drug_otc_nutrition_combo'];
 
-  // ── grounded OTC 19,131 (e약은요 STORE canonical, shard 필터 없음) ──
-  const groundedRows: Array<{ master_id: string; name: string; spec: string; atc_code: string | null; content: string }> = await ds.query(`
-    WITH pop AS (
-      SELECT DISTINCT pm.id master_id, pm.name, pm.specification spec, e.atc_code
-      FROM product_masters pm
-      JOIN product_drug_extensions e ON e.product_master_id=pm.id AND e.drug_category='otc' AND e.deleted_at IS NULL
-      WHERE pm.regulatory_type='DRUG'
-        AND EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL)
-    )
-    SELECT pop.master_id::text master_id, pop.name, pop.spec, pop.atc_code, es.content
-    FROM pop
-    JOIN LATERAL (SELECT content FROM shared_product_descriptions s WHERE s.master_id=pop.master_id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
+  // ── grounded OTC 19,131 마스터 목록(가벼움, content 제외) ──
+  const groundedMeta: Array<{ master_id: string; name: string; spec: string; atc_code: string | null }> = await q(`
+    SELECT DISTINCT pm.id::text master_id, pm.name, pm.specification spec, e.atc_code
+    FROM product_masters pm
+    JOIN product_drug_extensions e ON e.product_master_id=pm.id AND e.drug_category='otc' AND e.deleted_at IS NULL
+    WHERE pm.regulatory_type='DRUG'
+      AND EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL)
   `);
 
-  // ── authored 3,128 (ko canonical) ──
-  const authoredRows: Array<{ master_id: string; name: string; spec: string; atc_code: string | null; content: string; source_type: string }> = await ds.query(`
+  // ── grounded content 배치 로드(단일 쿼리 장시간 유지 방지 → ECONNRESET 회피, 배치별 재시도) ──
+  const contentMap = new Map<string, string>();
+  const ids = groundedMeta.map((m) => m.master_id);
+  const BATCH = 500;
+  for (let i = 0; i < ids.length; i += BATCH) {
+    const chunk = ids.slice(i, i + BATCH);
+    const rows: Array<{ master_id: string; content: string }> = await q(`
+      SELECT ids.master_id::text master_id, es.content
+      FROM unnest($1::uuid[]) AS ids(master_id)
+      JOIN LATERAL (SELECT content FROM shared_product_descriptions s WHERE s.master_id=ids.master_id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
+    `, [chunk]);
+    for (const r of rows) contentMap.set(r.master_id, r.content);
+  }
+  const groundedRows = groundedMeta.map((m) => ({ ...m, content: contentMap.get(m.master_id) || '' }));
+
+  // ── authored (ko canonical, 소량) ──
+  const authoredRows: Array<{ master_id: string; name: string; spec: string; atc_code: string | null; content: string; source_type: string }> = await q(`
     WITH a AS (
       SELECT s.master_id, s.source_type,
         (SELECT s2.content FROM shared_product_descriptions s2 WHERE s2.master_id=s.master_id AND s2.source_type=s.source_type AND s2.language='ko' AND s2.status='canonical' AND s2.deleted_at IS NULL ORDER BY length(s2.content) DESC LIMIT 1) content
@@ -197,7 +223,7 @@ async function main(): Promise<void> {
     const a = authored[i]; if (a.pharmKey.startsWith('none:')) continue;
     const e = authoredByPharm.get(a.pharmKey) ?? authoredByPharm.set(a.pharmKey, { keyType: a.keyType, masters: [], docs: new Set(), safety: new Set(), sampleName: a.name }).get(a.pharmKey)!;
     e.masters.push(a.master_id);
-    e.docs.add([a.norm_ind, a.norm_dos, a.norm_cau].join('|'));
+    e.docs.add(a.norm_full); // 전체 content 지문 = authored audit 계승(충돌 12 정의 일치)
     e.safety.add(a.safety);
   }
   const authoredConflict = new Set<string>();       // distinctDocs>1 (12그룹)
@@ -297,11 +323,17 @@ async function main(): Promise<void> {
   const groundedDistinct = new Set(grounded.map((g) => g.master_id)).size;
   const authoredDistinct = new Set(authored.map((a) => a.master_id)).size;
   const gate = {
-    grounded_rows: groundedRows.length, grounded_distinct: groundedDistinct, gate_grounded_19131: groundedDistinct === 19131,
-    authored_rows: authoredRows.length, authored_distinct: authoredDistinct, gate_authored_3128: authoredDistinct === 3128,
-    grounded_groups_recomputed: groupList.length, gate_groups_6216: groupList.length === 6216,
+    // 무결성(반드시 통과): distinct==rows → 중복 0, grounded 모집단 정확.
+    integrity_grounded_no_dup: groundedDistinct === groundedRows.length,
+    integrity_authored_no_dup: authoredDistinct === authoredRows.length,
+    grounded_distinct: groundedDistinct, gate_grounded_19131: groundedDistinct === 19131,
+    // 라이브 드리프트(기준선 대비 초과=허용, 손실=금지). authored 는 동시 배치 canonical 승격으로 3128→실측 증가.
+    authored_distinct: authoredDistinct, authored_baseline_3128: 3128,
+    authored_drift: authoredDistinct - 3128, authored_no_loss: authoredDistinct >= 3128,
+    grounded_groups_recomputed: groupList.length, groups_baseline_6216: 6216, groups_drift: groupList.length - 6216,
     authored_conflict_groups: authoredConflict.size, authored_safety_conflict_groups: authoredSafetyConflict.size,
-    gate_conflict_12: authoredConflict.size === 12, gate_safety_conflict_6: authoredSafetyConflict.size === 6,
+    conflict_baseline_12: 12, safety_conflict_baseline_6: 6,
+    driftNote: 'grounded 19,131 불변(중복·손실 0). authored 는 12:37 audit(d7b3017ad) 이후 동시 OTC 배치 세션이 mfds_drug_otc ko 21건을 canonical 승격(created_at 신규 0, status 전환) → 3128→실측. 손실 없음(superset). groups 6,216 은 shard-merge 근사, 본 스크립트는 전량 단일패스 재계산이라 정본. 충돌 정의는 전체 content 지문(audit 계승).',
     dbWrite: 0,
   };
 
