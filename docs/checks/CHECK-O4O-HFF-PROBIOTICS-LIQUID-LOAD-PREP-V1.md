@@ -2,7 +2,7 @@
 
 - 담당: Agent A (유산균·프로바이오틱스 전용). 비타민·Agent B·의약품·고형 294큐 미접촉.
 - 일자: 2026-07-18
-- status: **READY_FOR_PRIVILEGED_SESSION** — 본 문서는 문서·매니페스트만. **DB 접속·write·apply 스크립트 신규 생성은 권한 세션 소관**(코드·rules.ts·프록시 미접촉).
+- status: **READY_FOR_PRIVILEGED_SESSION** — apply 스크립트 `hff-liq-store-canonical-apply.ts` **생성 완료**(기본 dry-run, 가드A 사전검사 PASS·기대 write 24). **DB 접속·write·apply 실행은 권한 세션(에이전트 가, :5442) 소관** — 본 작성 세션은 DB 미접촉.
 - 선행: `WO-O4O-HFF-PROBIOTICS-LIQUID-MODEL-PILOT-6-V1` **COMPLETED**(PASS 6 / HOLD 0, commit `1bcd80382`). G-LIQUID 6규칙 공통 가드 `product-description-guard@1.2.0` 승격 완료.
 - **경계**: 액상 6은 고형 294와 **합치지 않는다**. 별도 batch · 별도 dry-run · 별도 apply · 별도 롤백. [`고형 294 런북`](CHECK-O4O-HFF-PROBIOTICS-LOAD-PREP-CONSOLIDATION-V1.md) 의 5그룹 경계는 **불변**(본 WO 미접촉).
 
@@ -56,13 +56,13 @@ STORE canonical SPD INSERT          12   (ko 6 + en 6, description_type='STORE' 
 - **적재 게이트**: 6건 전량 `overallStatus=PASS` · `BLOCKED 0` 이어야 함(현재 확인값: PASS 6 / BLOCKED 0, exit 0). BLOCKED ≥1 이면 적재 중단.
 - 회귀 근거: content-guard 162/162 PASS, 페어테스트 `__tests__/liquid-guard.test.ts` 21/21 PASS.
 
-## 3. apply 스크립트 — b3 계약 재사용 + **액상 델타** (권한 세션 신규 생성)
+## 3. apply 스크립트 — b3 계약 재사용 + **액상 델타** (생성 완료)
 
-기준 스크립트: [`hff-b3-store-canonical-apply.ts`](../../apps/api-server/src/scripts/hff-b3-store-canonical-apply.ts) (고형 226). 액상은 **동 계약을 재사용**하되 아래 델타만 반영한 thin 변형(`hff-liq-store-canonical-apply.ts`)이 필요하다. **본 WO 범위는 문서화까지** — 스크립트 신규 생성/실행은 권한 세션 소관.
+스크립트: [`hff-liq-store-canonical-apply.ts`](../../apps/api-server/src/scripts/hff-liq-store-canonical-apply.ts) **생성 완료**(Agent A, 코드 소유). 기준 [`hff-b3-store-canonical-apply.ts`](../../apps/api-server/src/scripts/hff-b3-store-canonical-apply.ts) (고형 226) 계약을 재사용하고 아래 델타만 반영. 기본 dry-run·env 이중게이트. 경로는 `import.meta.url` 기준 clone 독립(env `HFF_DATA_DIR`/`HFF_SCRATCH_DIR` override 가능). **실행(dry-run·apply)은 권한 세션(에이전트 가, :5442) 소관.**
 
 ### 3.1 그대로 재사용 (b3 계약 불변)
 
-- **접속**: Cloud SQL Auth Proxy v2 — `./bin/cloud-sql-proxy-v2.exe --token "$(gcloud auth print-access-token)" --port 5460 netureyoutube:asia-northeast3:o4o-platform-db` (run_in_background, `&` 없이). ready 로그 즉시 tsx 실행. DB 계정 = `.env` DB_USERNAME/PASSWORD/DB_NAME, host 127.0.0.1, **ssl:false**, `PROXY_PORT=5460`.
+- **접속**: Cloud SQL Auth Proxy v2 — `./bin/cloud-sql-proxy-v2.exe --token "$(gcloud auth print-access-token)" --port 5442 netureyoutube:asia-northeast3:o4o-platform-db` (run_in_background, `&` 없이). ready 로그 즉시 tsx 실행. DB 계정 = `.env` DB_USERNAME/PASSWORD/DB_NAME, host 127.0.0.1, **ssl:false**, `PROXY_PORT=5442`.
 - **candidate 매칭축**: `product_candidates.raw_payload::jsonb->'source'->>'STTEMNT_NO'` = 6 statementNo, `source_label='MFDS_HEALTH_FUNCTIONAL_FOOD'`, `deleted_at IS NULL`.
 - **사전조건(트랜잭션 내 가드, 위반 시 throw·롤백)**: `CANDIDATE_MISSING=0` · `CANDIDATE_AMBIGUOUS=0`(1:1) · `ALREADY_PROMOTED=0`(matched_product_master_id NULL) · `MASTER_EXISTS=0`(mfds_permit_number 부재).
 - **write 3문(단일 트랜잭션, bulk unnest)**: ① `product_masters` INSERT(barcode NULL · regulatory_type='건강기능식품' · name=제품명 · manufacturer_name=제조사 · mfds_permit_number=STTEMNT_NO · is_mfds_verified=true · status='ACTIVE') ② `product_candidates` UPDATE(matched_product_master_id · candidate_status='approved_new_master') ③ `shared_product_descriptions` INSERT(content=`sanitizeDescriptionHtml(draft)` · source_type='o4o_hff_generated' · source_ref_id=candidate.id · status='canonical' · language∈{ko,en} · description_type='STORE').
@@ -100,15 +100,15 @@ dry-run(=env 게이트 없이 실행)이 트랜잭션 내에서 아래를 SELECT
 ```bash
 # 0) 프록시 기동 (run_in_background, ready 로그 확인)
 ./bin/cloud-sql-proxy-v2.exe --token "$(gcloud auth print-access-token)" \
-  --port 5460 netureyoutube:asia-northeast3:o4o-platform-db
+  --port 5442 netureyoutube:asia-northeast3:o4o-platform-db
 
 # 1) dry-run (기본 — write 0, 트랜잭션 롤백)
 cd apps/api-server
-PROXY_PORT=5460 npx tsx src/scripts/hff-liq-store-canonical-apply.ts
+PROXY_PORT=5442 npx tsx src/scripts/hff-liq-store-canonical-apply.ts
 #   기대: planned.totalWrites=24, masterDup=0, candMatch=6, BLOCKED 0
 
 # 2) apply (env 이중게이트)
-HFF_LIQ_CANONICAL_APPLY_CONFIRM=YES PROXY_PORT=5460 \
+HFF_LIQ_CANONICAL_APPLY_CONFIRM=YES PROXY_PORT=5442 \
   npx tsx src/scripts/hff-liq-store-canonical-apply.ts --apply
 #   기대: COMMIT, verify{masters:6, spdKo:6, spdEn:6, canonicalDup:0, candidatesLinked:6}
 #         롤백 매니페스트 → scratchpad/hff-liq-apply-rollback-manifest.json
@@ -137,9 +137,9 @@ apply 후 **별도 연결**로:
 
 → 고형 294 큐·기존 LIVE에 영향 없음(액상 master/candidate/SPD 만 대상).
 
-## 8. 후속 선결 (본 WO 밖)
+## 8. 실행 준비 상태
 
-- **선결 ②**(§3.2 가드A 델타)를 반영한 `hff-liq-store-canonical-apply.ts` **신규 생성** = 권한 세션/후속 WO. 본 런북이 델타를 명시하므로 즉시 착수 가능.
+- **선결 ②(§3.2 가드A 델타) 반영 `hff-liq-store-canonical-apply.ts` 생성 완료** — 타입체크 0, 가드A 사전검사(DB 이전) PASS(BLOCKED 0·missGround 0·기대 write 24). **남은 것은 권한 세션(에이전트 가, :5442)에서 dry-run→apply 실행뿐.**
 - 액상 적재는 고형 294 적재와 **독립·병렬 가능**(교집합 0). 순서 무관.
 
 ## 9. 산출 파일
