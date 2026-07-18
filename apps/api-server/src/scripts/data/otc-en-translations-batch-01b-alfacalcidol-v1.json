@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-BATCH-01B-ALFACALCIDOL-KO-EN-COMPLETE-V1",
+  "note": "알파칼시돌 0.5㎍ 연질캡슐 en 번역 1건(그룹당 1). ko 보완 draft(candidate 0436f0d8) content_json 기준. 수치·금기 원문 수준 유지 — 골다공증 0.5–1㎍(1~2캡슐)/부갑상선 등 1–4㎍(2~8캡슐), 혈청 칼슘 조절, 유육종증 상담 유지.",
+  "translations": [
+    {
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "title": "Alfacalcidol 0.5 ㎍ Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for osteoporosis and to improve symptoms — such as low blood calcium and bone pain — that accompany vitamin D metabolism disorders, including chronic kidney failure, hypoparathyroidism, and vitamin D-resistant rickets or osteomalacia.",
+      "usage": "Adults take one to two capsules (0.5–1 ㎍) once a day for osteoporosis or chronic kidney failure, and two to eight capsules (1–4 ㎍) once a day for a vitamin D metabolism disorder such as hypoparathyroidism. The dose is adjusted according to blood calcium levels. While taking it, follow the given instructions on calcium intake, and do not take it together with preparations that contain calcium or vitamin D or with magnesium preparations.",
+      "caution": "Do not take this if you are allergic to it, or if you have high blood calcium, high blood phosphate, or high blood magnesium, or signs of vitamin D toxicity. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, a child, elderly, have had kidney stones, or have sarcoidosis. Take care not to exceed the set dose.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Alfacalcidol 0.5 ㎍",
+        "How it works": "Supplies active vitamin D (improves calcium metabolism)",
+        "Main symptoms": "Osteoporosis, and low blood calcium or bone pain that accompanies a vitamin D metabolism disorder",
+        "Who should be careful": "People with high blood calcium or kidney stones, and women who are pregnant or breastfeeding",
+        "Why this one": "An active vitamin D preparation"
+      },
+      "checkNote": "수치 0.5–1㎍(1~2캡슐)·1–4㎍(2~8캡슐) 정확 대응, 혈청 칼슘 조절 반영, 금기 과민·고칼슘/고인산/고마그네슘혈증·비타민D 독성 유지, 상담 임부·수유부·어린이·고령자·신장결석·유육종증(sarcoidosis) 유지, 칼슘·비타민D·마그네슘 병용 금지 유지."
+    }
+  ]
+}
