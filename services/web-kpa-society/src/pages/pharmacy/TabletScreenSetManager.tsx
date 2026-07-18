@@ -1164,11 +1164,11 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               )
             ) : liveView === 'tablet' ? (
               <div style={{ position: 'relative', overflow: 'hidden', width: '100%', aspectRatio: '16 / 10', background: '#000', borderRadius: 10 }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             ) : (
               <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 240px)', aspectRatio: '9 / 19', background: '#000', borderRadius: 18 }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreenMobile} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreenMobile} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             )}
             {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) — 오류 상태에선 오류 배지가 우선 */}
@@ -1186,8 +1186,11 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
             )}
           </div>
 
+          {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §9: 상품 출처·미리보기 문맥 안내.
+              Screen Set 은 코너와 독립된 원본(§3.1) — 빌더 미리보기는 코너 문맥이 없어 배치 골격만 보여준다.
+              실제 상품은 이 콘텐츠를 코너에 적용했을 때 그 코너의 진열 상품으로 공개 화면에 표시된다. */}
           <div className="px-3 py-1.5 border-t bg-white text-[10px] text-slate-400 leading-relaxed">
-            저장 전 미리보기입니다. 상품·코너 콘텐츠는 매장 데이터로 조회되며 저장 전에는 DB에 반영되지 않습니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            템플릿의 화면 배치를 미리 보여드립니다. 상품은 이 콘텐츠를 적용한 코너의 진열 상품으로 표시됩니다. 저장 전 미리보기이며, 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
         </div>
       </aside>
@@ -1258,11 +1261,11 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
           <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-auto" onClick={(e) => e.stopPropagation()}>
             {preview.view === 'tablet' ? (
               <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 1024px)', aspectRatio: '16 / 10', background: '#000', borderRadius: 12, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             ) : (
               <div style={{ position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={stripIdleForMobilePreview(preview.screen)} embedded showQrBadge={false} />
+                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={stripIdleForMobilePreview(preview.screen)} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             )}
           </div>

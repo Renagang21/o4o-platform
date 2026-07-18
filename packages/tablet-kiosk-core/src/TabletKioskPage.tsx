@@ -325,6 +325,16 @@ export interface TabletKioskPageProps {
    * 부모는 position:relative; overflow:hidden 컨테이너를 제공해야 한다. 미지정=기존 전체화면 kiosk.
    */
   embedded?: boolean;
+  /**
+   * 레이아웃 전용 미리보기(WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1).
+   * true 면 실제 매장 상품을 조회/표시하지 않고, 선택한 템플릿의 배치만 중립적인 골격(상품 영역
+   * placeholder)으로 보여준다. 신규 제작 초기 문맥처럼 아직 적용 코너가 없어 진열 상품 문맥이 없을 때 사용.
+   *  - api.fetchProducts 를 호출하지 않는다(실제 상품 0).
+   *  - 코너 제목/설명·대기 영상 등 사용자가 입력한 block 은 previewScreen sections 로 그대로 반영된다.
+   *  - 상품은 이 콘텐츠를 실제 코너에 적용했을 때 그 코너 진열 상품으로 공개 화면에 표시된다(문맥 캡션은 caller).
+   * 미지정=기존 동작(fetchProducts 로 매장 상품 표시).
+   */
+  previewLayoutOnly?: boolean;
 }
 
 export interface TabletKioskDisplaySettings {
@@ -333,6 +343,17 @@ export interface TabletKioskDisplaySettings {
   showConsultationButton?: boolean;
   autoSlideSeconds?: number;
   idleSlideSeconds?: number;
+}
+
+/**
+ * 상품 썸네일 — 로딩 실패/빈 URL 안전 처리(WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8).
+ * 미리보기·공개 태블릿·QR 공통. onError 1회로 '이미지 없음' 골격(📦)으로 전환 → 깨진 아이콘/긴 alt/무한 재시도 방지.
+ */
+function ProductImage({ src, alt, imgStyle, fallbackSize = 32 }: { src?: string | null; alt: string; imgStyle?: React.CSSProperties; fallbackSize?: number }) {
+  const [failed, setFailed] = useState(false);
+  const usable = typeof src === 'string' && src.trim().length > 0;
+  if (!usable || failed) return <div style={{ fontSize: `${fallbackSize}px`, color: '#cbd5e1' }} aria-label="이미지 없음">📦</div>;
+  return <img src={src as string} alt={alt} style={imgStyle ?? styles.productImg} onError={() => setFailed(true)} />;
 }
 
 export function TabletKioskPage({
@@ -344,6 +365,7 @@ export function TabletKioskPage({
   slug: slugProp,
   previewScreen,
   embedded = false,
+  previewLayoutOnly = false,
 }: TabletKioskPageProps) {
   const { slug: routeSlug } = useParams<{ slug: string }>();
   const slug = slugProp ?? routeSlug;
@@ -408,6 +430,9 @@ export function TabletKioskPage({
   // Load products (supplier + local merged)
   useEffect(() => {
     if (!slug) return;
+    // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
+    //   아직 적용 코너가 없어 진열 상품 문맥이 없다 → 실제 매장 상품을 조회하지 않는다(골격만 표시).
+    if (previewLayoutOnly) { dispatch({ type: 'LOAD_SUCCESS', products: [] }); return; }
     dispatch({ type: 'LOAD_START' });
     api.fetchProducts(slug, { limit: 50 })
       .then((res) => {
@@ -416,7 +441,7 @@ export function TabletKioskPage({
         dispatch({ type: 'LOAD_SUCCESS', products: [...suppliers, ...locals] });
       })
       .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
-  }, [slug, api]);
+  }, [slug, api, previewLayoutOnly]);
 
   // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1:
   //   적용된 Screen Set 을 opt-in 으로 읽는다. api.fetchScreen 미주입이거나 응답 mode='legacy'
@@ -674,11 +699,8 @@ export function TabletKioskPage({
           {/* 왼쪽: 상품 이미지 + 분류 배지 */}
           <div style={styles.detailImageCol}>
             <div style={styles.detailImageBox}>
-              {selectedProduct.imageUrl ? (
-                <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' as const }} />
-              ) : (
-                <div style={{ fontSize: '64px', color: '#cbd5e1' }}>📦</div>
-              )}
+              {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8: 상세 이미지도 로딩 실패 시 '이미지 없음' 골격. */}
+              <ProductImage src={selectedProduct.imageUrl} alt={selectedProduct.name} imgStyle={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' as const }} fallbackSize={64} />
             </div>
             {selectedProduct.category && (
               <span style={styles.categoryBadge}>{selectedProduct.category}</span>
@@ -851,9 +873,11 @@ export function TabletKioskPage({
         <div style={styles.headerMain}>
           <div style={styles.headerTexts}>
             <div style={styles.headerTitleRow}>
-              <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || '매장 상품 안내'}</h1>
+              {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
+                  아직 코너 제목이 확정되지 않았으므로 '매장 상품 안내'(실제 코너처럼 보이는 문구) 대신 중립 placeholder. */}
+              <h1 style={isProductLayout ? styles.cornerTitleCompact : styles.cornerTitle}>{cornerInfo?.title || (previewLayoutOnly ? '코너 제목' : '매장 상품 안내')}</h1>
             </div>
-            {!isProductLayout && !cornerInfo?.body && (
+            {!isProductLayout && !cornerInfo?.body && !previewLayoutOnly && (
               <p style={styles.cornerHint}>궁금한 상품을 터치해 설명을 확인해 보세요</p>
             )}
           </div>
@@ -935,7 +959,21 @@ export function TabletKioskPage({
       {!hideProductsBody && (
       // WO-O4O-KPA-TABLET-TEMPLATE-DESIGN-REFINE-V1: 제품 템플릿은 제품(order 4)이 콘텐츠(order 6)보다 먼저.
       <div style={{ ...styles.body, order: isProductLayout ? 4 : 5 }}>
-        {loading ? (
+        {previewLayoutOnly ? (
+          // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 실제 상품 대신 중립 골격.
+          //   템플릿별 배치(grid/gridFocus)는 유지 → 5 템플릿 배치 차이는 그대로 확인 가능.
+          <div style={isProductFocus ? styles.gridFocus : styles.grid} aria-hidden>
+            {(isProductFocus ? [0, 1, 2] : [0, 1, 2, 3]).map((i) => (
+              <div key={i} style={styles.skeletonCard}>
+                <div style={isProductFocus ? styles.skeletonThumbFocus : styles.skeletonThumb}>상품 영역</div>
+                <div style={styles.skeletonInfo}>
+                  <div style={styles.skeletonLine} />
+                  <div style={{ ...styles.skeletonLine, width: '50%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : loading ? (
           <div style={styles.centerMessage}>
             <p style={{ color: '#94a3b8' }}>상품을 불러오는 중...</p>
           </div>
@@ -964,11 +1002,9 @@ export function TabletKioskPage({
                 style={highlighted ? { ...styles.productCard, outline: '3px solid #14b8a6', outlineOffset: '2px', transform: 'scale(1.02)' } : styles.productCard}
               >
                 <div style={isProductFocus ? styles.productImgAreaFocus : styles.productImgArea}>
-                  {p.imageUrl ? (
-                    <img src={p.imageUrl} alt={p.name} style={styles.productImg} />
-                  ) : (
-                    <div style={{ fontSize: '32px', color: '#cbd5e1' }}>📦</div>
-                  )}
+                  {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8:
+                      로딩 실패/잘못된 URL 은 깨진 이미지 아이콘+긴 alt 대신 '이미지 없음' 골격(📦)으로 대체. */}
+                  <ProductImage src={p.imageUrl} alt={p.name} />
                 </div>
                 <div style={styles.productInfo}>
                   <span style={styles.productName}>{p.name}</span>
@@ -1471,6 +1507,45 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     fontSize: '11px',
     fontWeight: 700,
+  },
+  // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기 골격(중립 회색 블록).
+  skeletonCard: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    border: '2px dashed #e2e8f0',
+    overflow: 'hidden',
+  },
+  skeletonThumb: {
+    height: '140px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f1f5f9',
+    color: '#94a3b8',
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  skeletonThumbFocus: {
+    height: '200px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f1f5f9',
+    color: '#94a3b8',
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  skeletonInfo: {
+    padding: '12px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '8px',
+  },
+  skeletonLine: {
+    height: '10px',
+    width: '80%',
+    borderRadius: '4px',
+    backgroundColor: '#e2e8f0',
   },
   // Detail view
   detailImageArea: {
