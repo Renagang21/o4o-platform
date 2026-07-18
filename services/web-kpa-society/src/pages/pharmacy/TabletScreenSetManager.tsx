@@ -58,7 +58,6 @@ interface Props {
 
 // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 블록 유형 목록/라벨(BLOCK_TYPES·BLOCK_LABEL) 제거 —
 //   사용자에게 블록 유형을 고르게 하지 않으므로 내부 용어 테이블이 필요 없다.
-const STATUS_LABEL: Record<ScreenSetStatus, string> = { draft: '초안', active: '활성', archived: '보관', operator_template: '운영자 템플릿' };
 
 // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1:
 //   Phase 1 선택지는 corner_information_basic_v1 하나뿐이지만, 후속 TEMPLATE-APPLY 에서
@@ -73,7 +72,7 @@ const DEFAULT_TEMPLATE_KEY = 'corner_information_basic_v1';
 //   사용자가 실제로 하는 업무 3항목(대기 화면 / 코너 설명 / 추가 정보)으로 고정한다.
 //   내부 블록(idle_media/corner_description/content_list/product_list/qr_guide)은
 //   템플릿 선택 시 자동 준비되고 사용자에게 용어가 노출되지 않는다.
-type BuilderStepKind = 'basic' | 'idle' | 'corner' | 'extra' | 'save';
+type BuilderStepKind = 'idle' | 'corner' | 'extra' | 'save';
 interface BuilderStepMeta {
   title: string;
   kind: BuilderStepKind;
@@ -87,8 +86,10 @@ interface TemplateMeta {
   /** 이 템플릿이 화면에 쓰는 블록(자동 준비 대상). 사용자에게 노출하지 않는다. */
   requiredBlocks: ScreenBlockType[];
 }
+// WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: '기본 정보' 단계 제거.
+//   상태 선택 제거 후 기본 정보엔 콘텐츠 이름만 남는데, 그 관리 이름은 코너 제목에서 자동 파생 →
+//   독립 단계 불필요. 관리 이름은 마지막 '미리보기·저장' 단계에서 선택적으로만 수정.
 const BUILDER_STEPS: BuilderStepMeta[] = [
-  { title: '기본 정보', kind: 'basic' },
   { title: '대기 화면', kind: 'idle', note: '손님이 화면을 만지지 않을 때 자동으로 재생할 영상·이미지입니다. “화면을 터치하세요” 안내는 자동으로 표시됩니다.' },
   { title: '코너 설명', kind: 'corner', note: '이 코너가 어떤 곳인지 손님에게 보여줄 제목과 짧은 소개입니다.' },
   { title: '추가 정보', kind: 'extra', note: '손님에게 함께 보여줄 설명서·안내 콘텐츠를 골라 목록으로 구성합니다.' },
@@ -700,7 +701,11 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   const isEdit = !!initialDetail;
   const [step, setStep] = useState(0);
   const [name, setName] = useState(initialDetail?.name ?? '');
-  const [status, setStatus] = useState<ScreenSetStatus>(initialDetail?.status ?? 'draft');
+  // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 관리 이름(name)은 코너 제목에서 자동 파생.
+  //   nameEdited=true 면 사용자가 저장 단계에서 직접 수정한 것 → 더 이상 코너 제목을 따라가지 않는다.
+  //   신규=자동 파생(false), 수정=기존 관리 이름 보존(true).
+  const [nameEdited, setNameEdited] = useState(!!initialDetail);
+  // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: status 는 사용자 선택 항목이 아니다(저장 시 서버로 파생 처리).
   const [templateKey, setTemplateKey] = useState(initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY);
   // WO-...-BUSINESS-FIELDS-V1: 진입 즉시 업무 항목이 쓰는 내부 블록을 자동 확보(추가만).
   const [blocks, setBlocks] = useState<ScreenBlock[]>(() => ensureAutoBlocks(seedInitialBlocks(initialDetail)));
@@ -759,7 +764,6 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   // ── dirty guard (baseline = 초기값) ──
   const baseline = useRef({
     name: initialDetail?.name ?? '',
-    status: (initialDetail?.status ?? 'draft') as ScreenSetStatus,
     templateKey: initialDetail?.templateKey ?? DEFAULT_TEMPLATE_KEY,
     // WO-...-BUSINESS-FIELDS-V1: 자동 준비된 블록은 '사용자 변경'이 아니다.
     //   baseline 을 초기 state 와 동일하게(ensureAutoBlocks 적용) 잡아야 열자마자 '변경됨'/이탈 경고가 뜨지 않는다.
@@ -768,7 +772,6 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   });
   const isDirty =
     name.trim() !== baseline.current.name ||
-    status !== baseline.current.status ||
     templateKey !== baseline.current.templateKey ||
     normalizeBlocks(blocks) !== baseline.current.blocks;
   useEffect(() => {
@@ -820,15 +823,20 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
   const totalSteps = 1 + tSteps.length;
 
   const handleSave = async () => {
-    if (!nameValid) { onToast({ type: 'error', message: '콘텐츠 이름을 입력해 주세요.' }); setStep(1); return; }
+    if (!nameValid) { onToast({ type: 'error', message: '코너 제목 또는 콘텐츠 관리 이름을 입력해 주세요.' }); setStep(totalSteps - 1); return; }
     setSaving(true);
     try {
       let id = initialDetail?.id;
       if (isEdit && id) {
-        await updateScreenSet(id, { name: name.trim(), status, templateKey });
+        // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 상태는 사용자가 선택하지 않는다.
+        //   '저장 = 사용할 수 있는 화면 세트'. 코너 적용 게이트(POST current-screen-set)가 active 를 요구하므로
+        //   draft 는 active 로 승격(선택 UI 제거 후 draft 를 적용 가능하게 만들 다른 경로가 없음).
+        //   active/archived/operator_template 등은 그대로 유지(보관·특수 상태는 별도 흐름에서 관리).
+        const nextStatus: ScreenSetStatus = initialDetail!.status === 'draft' ? 'active' : initialDetail!.status;
+        await updateScreenSet(id, { name: name.trim(), status: nextStatus, templateKey });
       } else {
-        // library 재사용 세트(tabletId=null). create 계약은 draft|active 만 허용 → archived 는 draft 로.
-        const created = await createScreenSet({ name: name.trim(), tabletId: null, status: status === 'active' ? 'active' : 'draft', templateKey });
+        // library 재사용 세트(tabletId=null). 신규 저장은 기본 active(코너별 운영에서 바로 적용 가능). draft 는 UI 에서 만들지 않는다.
+        const created = await createScreenSet({ name: name.trim(), tabletId: null, status: 'active', templateKey });
         id = created.id;
       }
       await saveScreenSetBlocks(id!, blocks);
@@ -897,10 +905,16 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
           <label className="text-xs font-semibold text-slate-600">코너 제목</label>
           <input
             value={c.title ?? ''}
-            onChange={(e) => patchConfigOf('corner_description', { title: e.target.value })}
+            onChange={(e) => {
+              const v = e.target.value;
+              patchConfigOf('corner_description', { title: v });
+              // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 관리 이름 미수정 시 코너 제목을 그대로 따라감.
+              if (!nameEdited) setName(v);
+            }}
             placeholder="예: 구강관리 코너"
             className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
+          <p className="text-[11px] text-slate-400 mt-1">고객 태블릿·QR 화면에 표시되는 제목입니다.</p>
         </div>
         <div>
           <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -1037,36 +1051,28 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
               </div>
             );
           }
-          if (sm.kind === 'basic') {
-            return (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-slate-600">콘텐츠 이름</label>
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="예: 입마름·구취 관리 세트"
-                    className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" autoFocus />
-                  {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다.</p>}
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-slate-600">상태</label>
-                  <select value={status} onChange={(e) => setStatus(e.target.value as ScreenSetStatus)}
-                    className="mt-1 px-2 py-2 rounded-lg border border-slate-200 text-sm">
-                    <option value="draft">초안</option>
-                    <option value="active">활성</option>
-                    {isEdit && <option value="archived">보관</option>}
-                  </select>
-                  <p className="text-[11px] text-slate-400 mt-1">저장은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). 코너 적용은 ‘코너별 운영’ 탭에서 합니다.</p>
-                </div>
-              </div>
-            );
-          }
           if (sm.kind === 'save') {
             return (
               <div className="space-y-3">
+                {/* WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 관리 이름은 마지막 단계에서 선택적으로만 수정.
+                    기본값 = 코너 제목 자동 파생. 고객 화면에는 코너 제목이 표시되고, 이 이름은 목록 구분용. */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">콘텐츠 관리 이름</label>
+                  <input value={name}
+                    onChange={(e) => { setName(e.target.value); setNameEdited(true); }}
+                    placeholder="예: 구강관리 코너 - 겨울철 안내형"
+                    className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                  <p className="text-[11px] text-slate-400 mt-1">콘텐츠 목록에서 구분하기 위한 이름입니다. 고객 화면에는 코너 제목이 표시됩니다.</p>
+                  {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다. 코너 제목을 입력하면 자동으로 채워집니다.</p>}
+                </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  저장한 콘텐츠는 코너에 자동 적용되지 않습니다. 실제 태블릿 화면은 ‘코너별 운영’에서 선택합니다.
+                </p>
                 <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
                   <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
                   {/* WO-...-BUSINESS-FIELDS-V1: 블록 수 대신 업무 항목 기준 요약(내부 용어 미노출). */}
                   <div className="text-[11px] text-slate-500">
-                    템플릿 <b>{templateLabel(templateKey)}</b> · 상태 <b>{STATUS_LABEL[status]}</b>
+                    템플릿 <b>{templateLabel(templateKey)}</b>
                   </div>
                   <ul className="text-[11px] text-slate-600 space-y-0.5 pt-0.5">
                     <li>대기 화면: <b>{idleSummary}</b></li>
