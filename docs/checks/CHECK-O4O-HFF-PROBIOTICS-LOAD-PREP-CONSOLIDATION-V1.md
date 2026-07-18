@@ -22,7 +22,9 @@
 
 ## 1. 공통 계약 (전 그룹 동일 — b3 계약)
 
-**기준 스크립트**: `apps/api-server/src/scripts/hff-b3-store-canonical-apply.ts` (오케스트레이터 커밋 f82de45f5). 다른 그룹은 **동 계약 재사용** — `loadTargets()` 를 그룹 데이터 파일로, `TARGET` 를 그룹 건수로 지정한 thin 변형 또는 `loadTargets`/`TARGET` 파라미터화(권장: env `HFF_APPLY_FILES`/`HFF_APPLY_TARGET`). **본 WO 범위는 문서화까지 — 스크립트 신규 생성/수정은 권한 세션 소관.**
+**기준 스크립트**:
+- **G1 (226)** = `apps/api-server/src/scripts/hff-b3-store-canonical-apply.ts` (오케스트레이터 커밋 f82de45f5) 그대로.
+- **G2~G5 (68)** = `apps/api-server/src/scripts/hff-probiotics-solid-store-canonical-apply.ts` **생성 완료**(Agent A). b3 와 **동일 계약**을 env(`HFF_APPLY_FILES`/`HFF_APPLY_TARGET`/`HFF_APPLY_TAG`)로 파라미터화 — 그룹마다 스크립트를 새로 만들지 않는다. 고형 전용(액상 혼입 시 `LIQUID_MIXED` throw). 경로는 `import.meta.url` 기준 clone 독립. 타입체크 0, 가드A 사전검사(DB 이전) 68건 PASS(BLOCKED 0·grounding결손 0). 실행은 권한 세션(에이전트 가, :5442) 소관.
 
 - **접속**: Cloud SQL Auth Proxy v2 — `./bin/cloud-sql-proxy-v2.exe --token "$(gcloud auth print-access-token)" --port 5460 netureyoutube:asia-northeast3:o4o-platform-db` (run_in_background, `&` 없이). ready 로그 즉시 tsx 실행(프록시 수명 짧음). DB 계정 = `.env` DB_USERNAME/PASSWORD/DB_NAME, host 127.0.0.1, **ssl:false**, `PROXY_PORT=5460`.
 - **env 이중게이트**: dry-run 기본. apply = `HFF_B3_CANONICAL_APPLY_CONFIRM=YES ... --apply`.
@@ -45,7 +47,30 @@
 | G4 | kw-cp02,03,04 | 46 | 동 계약 | `batch:probiotics-kids-womens` | `hff-kw-exp-...` |
 | G5 | kw-inf-cp01 | 2 | 동 계약 | `batch:probiotics-kids-womens-infant` | `hff-kwinf-...` |
 
-> PROXY_PORT=5460 공통. G1 은 기존 b3 스크립트 그대로 실행 가능. G2~G5 는 loadTargets/TARGET 만 교체.
+> PROXY_PORT **5442**(에이전트 가 검증 포트). G1 은 기존 b3 스크립트 그대로. G2~G5 는 아래 env 지정 실행.
+
+### 2.1 G2~G5 실행 명령 (파라미터화 solid 스크립트)
+
+각 그룹 **dry-run(기본, write 0)** → 확인 후 **apply**(env 이중게이트). `HFF_SOLID_CANONICAL_APPLY_CONFIRM=YES` 추가 시 apply.
+
+```bash
+cd apps/api-server
+# G2 P1-잔여 (1, write 4)
+HFF_APPLY_FILES=hff-probiotics-prod-d-cp01 HFF_APPLY_TARGET=1 HFF_APPLY_TAG=batch:probiotics-prod-003 \
+  PROXY_PORT=5442 npx tsx src/scripts/hff-probiotics-solid-store-canonical-apply.ts
+# G3 KW-파일럿 (19, write 76)
+HFF_APPLY_FILES=hff-probiotics-kw-cp01 HFF_APPLY_TARGET=19 HFF_APPLY_TAG=batch:probiotics-kids-womens \
+  PROXY_PORT=5442 npx tsx src/scripts/hff-probiotics-solid-store-canonical-apply.ts
+# G4 KW-확대 (46, write 184)
+HFF_APPLY_FILES=hff-probiotics-kw-cp02,hff-probiotics-kw-cp03,hff-probiotics-kw-cp04 HFF_APPLY_TARGET=46 HFF_APPLY_TAG=batch:probiotics-kids-womens \
+  PROXY_PORT=5442 npx tsx src/scripts/hff-probiotics-solid-store-canonical-apply.ts
+# G5 INFANT (2, write 8)
+HFF_APPLY_FILES=hff-probiotics-kw-inf-cp01 HFF_APPLY_TARGET=2 HFF_APPLY_TAG=batch:probiotics-kids-womens-infant \
+  PROXY_PORT=5442 npx tsx src/scripts/hff-probiotics-solid-store-canonical-apply.ts
+```
+
+- apply 는 각 명령 앞에 `HFF_SOLID_CANONICAL_APPLY_CONFIRM=YES` + 뒤에 `--apply`. 롤백 매니페스트는 태그별 자동 분리(`scratchpad/hff-solid-<tag>-apply-rollback-manifest.json`).
+- 68 합계 write = 4+76+184+8 = **272**. G2~G5 는 상호 독립(교집합 0) → 순서 무관·개별 롤백.
 
 ## 3. 순차 처리 순서 · 의존성
 
