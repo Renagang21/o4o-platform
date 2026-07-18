@@ -9,6 +9,8 @@
  */
 import '../env-loader.js';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { runGuard } from '../modules/content-guard/product-description-guard.js';
@@ -25,7 +27,9 @@ const PROXY_PORT = parseInt(process.env.PROXY_PORT ?? '5433', 10);
 const SOURCE_LABEL = 'MFDS_HEALTH_FUNCTIONAL_FOOD';
 const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
-const SP = 'C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/2b5935f9-9c75-483f-8206-e3385235d4d4/scratchpad';
+// rollback manifest 저장 위치: env override 우선, 없으면 OS temp 하위 고정 폴더(세션 무관, 항상 생성 보장).
+const SP = process.env.HFF_APPLY_MANIFEST_DIR ?? path.join(os.tmpdir(), 'hff-apply-manifests');
+fs.mkdirSync(SP, { recursive: true });
 
 async function main(): Promise<void> {
   if (APPLY && !CONFIRM) throw new Error('APPLY_BLOCKED: --apply 는 HFF_NUTRIENT_APPLY_CONFIRM=YES 필요');

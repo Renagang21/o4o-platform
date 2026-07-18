@@ -131,3 +131,13 @@ raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 
 세션 누적 LIVE = 3,001 + 72 = **3,073**.
 
 **PART B 생산 재개 지점**: 다중원료 composer 확장 필요 — ① 2~3 원료 각각 badge/표시량/기능성 렌더 ② 원료별 지표성분·기준량 분리(수치 혼입 0) ③ ko/en 원료별 기능성 대응 전수검사(§10) ④ 조합별 20건 내부 게이트 → BLOCKED 0·기능성 누락/추가 0·수치 혼입 0 시 잔여 전량. 가장 큰 안정 M2(비타민D+아연 등)부터. 기존 단일 composer/registry/apply/verify 재사용, 다중 편익 병합만 신규.
+
+### 5.6 PART B 재개(prompt 모드·사용자 프록시 5442) — 비타민D+칼슘(M2) 45 LIVE
+
+**승인 프로토콜 생산**: 사용자 실행 Cloud SQL Auth Proxy `127.0.0.1:5442` + `apps/api-server/.env` 자격증명, 권한 prompt 모드에서 단계별 승인(read-only → generate/dry-run → apply)으로 진행.
+- **선정**(combo-select --source db): mention 708 → ELIGIBLE **45**. HOLD: HOLD_MULTI 650(추가 기능성 원료) · 액상 1 · grounding 12 · 수출/벌크 0.
+- **생성**: 작성 45 · **PASS 39 · REVIEW 6 · BLOCKED 0 · G-MULTI HOLD 0**. REVIEW = D-CLAIM-GROUNDED 4제품(코팅정제 성상, 원문 근거 grounding) + PRE-SRC-BASIS-UNVERIFIABLE 2제품(가드 mg환산 분모 재파싱 한계, declaredAmount 정상 추출) + Q-TRUNCATED-PARTIAL 1(요약형 인용) — 전부 known-safe.
+- **적재**: dry-run 예상 write 180 = 실측 180 → apply COMMIT → **독립검증(새 연결) PASS**. master 45 + candidate 45 + SPD 90 = write **180**. tag `batch:single-nutrient-combo-vd-ca`. canonicalDup 0 · spdRefLinks 90 · candidateLinks 45.
+- **기존 복합형 193 무변경**(baselineDrift 0). 복합형 누적 LIVE = 193 + 45 = **238**.
+
+**생산 중 수정**: ① `hff-nutrient-store-canonical-apply.ts` rollback manifest 저장 경로가 옛 세션 scratchpad로 하드코딩 → 첫 apply 시 writeFileSync ENOENT → catch가 트랜잭션 ROLLBACK(영구 write 0, 데이터 무변경). `HFF_APPLY_MANIFEST_DIR` env override + `os.tmpdir()` fallback + mkdir 보장으로 수정 후 재실행 COMMIT. ② 신규 read-only 도구: `hff-combo-db-identify.ts`(프로덕션 식별·기준 수량), `hff-combo-verify-committed.ts`(apply 후 독립검증·tag 기준·baseline 무변경).
