@@ -43,11 +43,12 @@
 | audit log (canonical_replaced) | **26** (엔티티 모델 1행/교체) |
 | **총계** | **≤ 104** |
 
-### ⚠️ audit 수 정책 불일치 (STOP 조건 §"audit schema…" 관련 — 정합 필요)
+### audit 수 규약 — 26행 확정 (2026-07-19)
 
-- **엔티티** `SharedProductDescriptionAuditLog`: `event_type='canonical_replaced'` = **1행/교체** (previous_description_id + new_description_id 동시 기록) → **26**.
-- **정책 §2-A / WO 예상**: "audit 2/master = **52**" (demote 1 + flip 1 별도).
-- → **불일치.** 엔티티 설계는 교체 1건=1행. dry-run 은 엔티티 기준 **26**으로 산정. **실제 apply 전 정책-엔티티 audit 카운트 정합(26 vs 52) 확정 필요.** (schema 컬럼 자체는 정책 요구 충족 — previous/new status·id·metadata 존재. 차이는 행 수 규약.)
+- **엔티티** `SharedProductDescriptionAuditLog`: `event_type='canonical_replaced'` = **1행/교체** (previous_description_id[demote된 easy] + new_description_id[승격 authored] + previous/new status + metadata 동시 기록) → **26**.
+- 초판 정책 §2-A "audit 2/master = 52" 는 구현과 불일치 → **1행/master(26) 로 확정·정책 문서 정정 완료.**
+- dry-run 은 엔티티 기준 **26**으로 산정(스크립트 구현 일치). 감사 의미(누가·언제·무엇을→무엇으로·이전 강등처=deprecated)는 metadata 로 보존 — dry-run 실행 시 필드값 확인.
+- schema 컬럼은 정책 요구 충족(previous/new id·status·metadata 존재). **STOP 조건 해소.**
 
 ---
 
@@ -70,20 +71,23 @@
 - **선정 groupKey:** 에르도스테인\|300밀리그램\|정 · **대상 26** (SSOT 그대로확장) · source_ref `03e0af9d`
 - **제외:** 4 (fp `d68b3eec…` 안전지문불일치, SSOT 구분) · 비경구 0 · authored충돌 0(설계 기준)
 - **원문 확보율·안전지문:** candidate 기준 100% · 그대로확장(원문 fp 동일 26)
-- **예상 write:** SPD ≤78 + audit 26 (총 ≤104) — **정책 52 vs 엔티티 26 정합 선결**
+- **예상 write:** SPD ≤78 (nr INSERT 26 + demote 26 + flip 26) + **audit 26** = **총 ≤104** (기존 authored nr 있으면 그만큼 차감)
 - **rollback 범위:** 26 master 슬롯(authored canonical→deprecated + deprecated easy→canonical 역계약, 원문 행 보존)
-- **dry-run:** **실행 대기** — `.env`(`DB_PASSWORD`) 간헐 소실로 미실행. 복구 즉시 2회 byte-identical + 게이트 PASS 확인 → JSON 산출
-- **실제 승격 진행 가능 여부:** **대기** — (a) dry-run 실행·PASS (b) audit 카운트(26/52) 정합 후 승인 봉투
+- **dry-run:** **실행 대기 — 인증 세션 핸드오프**. `apps/api-server/.env`(프로덕션 `DB_PASSWORD`)는 이 세션에서 생성·복구·복사·삭제 금지. `.env` 안정 보유 세션이 커밋 `b22c051b1` pull 후 SELECT-only 로 실행.
+- **audit 규약:** **26행 확정**(정책 §2-A 정정 완료). STOP 조건 해소.
+- **실제 승격 진행 가능 여부:** **대기** — dry-run 실행·PASS 후 승인 봉투 1회.
 - **DB write:** 0
 
 ---
 
-## 6. 재개 선결
+## 6. 재개 절차 (인증 보유 세션)
 
-1. `.env`(프로덕션 `DB_PASSWORD`) 복구 → dry-run 실행 → 게이트 PASS·재실행 결정론 확인 → `otc-erdosteine-300mg-upgrade-dryrun-v1.json` 산출·커밋.
-2. **audit 카운트 규약 확정**(엔티티 1행/교체=26 채택 권고, 정책 §2-A "52" 정정 또는 근거 제시).
-3. 위 완료 후 실제 26 승격 = 승인 봉투 1회.
+1. 커밋 `b22c051b1` pull. `.env`(프로덕션 자격증명)는 **이 세션에서 다루지 않음** — 인증 보유 세션에서만.
+2. `npx tsx src/scripts/drug-otc-erdosteine-300mg-canonical-upgrade-pilot.ts` **2회 실행**(SELECT-only) → `otc-erdosteine-300mg-upgrade-dryrun-v1.json` **byte-identical** + 게이트 anomalies 0 확인.
+3. dry-run report 의 audit metadata 필드값(previous/new id·status·previousDemotedTo)이 감사 의미 보존하는지 확인.
+4. JSON + 본 CHECK(결과 반영)만 path-specific commit·push.
+5. 실제 26 승격 write 는 **별도 승인 봉투 전까지 금지**.
 
 ---
 
-*설계·SSOT 재고정 완료. dry-run 실행만 .env 복구 대기. 실제 write 0.*
+*설계·SSOT 재고정·audit 규약(26) 확정 완료. dry-run 실행은 인증 세션 핸드오프. 실제 write 0.*

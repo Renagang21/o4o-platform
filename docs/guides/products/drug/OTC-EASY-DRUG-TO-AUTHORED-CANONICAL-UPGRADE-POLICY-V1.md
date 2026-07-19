@@ -83,12 +83,13 @@ master당 최소 write (ko 승격):
 - authored needs_review INSERT  : 1  (STEP A-1, 신규 시. 기존 행 재사용 시 0)
 - easy canonical → deprecated   : 1  (STEP B-3)
 - authored needs_review → flip  : 1  (STEP B-4)
-- audit log                     : 2+ (demote 1 + flip 1, 최소)
-= SPD write 3 (또는 2) + audit log 2+ per master
+- audit log                     : 1  (canonical_replaced 1행/교체 — demote·flip을 previous/new로 한 행에 기록)
+= SPD write 3 (또는 2) + audit log 1 per master
 en 단계: 빈 슬롯 INSERT 1 (+ audit 1) per master (별도)
 ```
 
-> **승인 봉투 보고 규칙(정정)**: 예상 write는 **SPD 변경과 audit log를 분리**해 보고한다(예: `SPD 3 × N + audit 2N`). 그룹 전체 = master 수 × 위 계수. no-op(이미 authored) master는 write 0.
+> **감사 로그 규약(정정 2026-07-19)**: 엔티티 `SharedProductDescriptionAuditLog` 는 `event_type='canonical_replaced'` **1행에 previous_description_id(demote된 easy)+new_description_id(승격된 authored)+previous_status/new_status+metadata** 를 함께 기록한다 → **교체 1건 = audit 1행/master**. 초판의 "2행/master"(demote·flip 별도)는 구현과 불일치라 **1행/master 로 정정**. 감사 의미(누가·언제·무엇을→무엇으로·이전 강등처)는 metadata(`previousDemotedTo:'deprecated'` 등)로 보존된다.
+> **승인 봉투 보고 규칙**: 예상 write는 **SPD 변경과 audit log를 분리**해 보고한다(예: `SPD 3 × N + audit N`). 그룹 전체 = master 수 × 위 계수. no-op(이미 authored) master는 write 0.
 
 ---
 
