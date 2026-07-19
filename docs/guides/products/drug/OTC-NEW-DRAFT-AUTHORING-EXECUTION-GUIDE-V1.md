@@ -13,7 +13,7 @@
 | 항목 | 값 |
 |---|---|
 | 작업 대상 | bridge 통합 **`새설명서필요`** 구획 = **2,882 그룹 / 9,101 제품**(정본 `90342ce7d` 검토 확정, 스크립트 `9dc8f3ebf`) — authored 후보 없음 |
-| grounding 원천 | 각 grounded 제품의 **e약은요 STORE canonical 원문**(mfds_easy_drug). 신규 draft는 이 원문에서만 구조화(창작 금지, CR-004/AR-002) |
+| grounding 원천 | 각 대상 master에 연결된 **식약처 e약은요 원천 레코드**(`mfds_easy_drug`). **STORE canonical 보유 여부와 별개**(원천 데이터 ≠ 표시용 canonical). 신규 draft는 이 원천 레코드에서만 구조화(창작 금지, CR-004/AR-002). **기존 STORE canonical(authored 표시본) 보유 master는 신규 authored apply 대상에서 제외**(무충돌 신규만) |
 | 산출 | 그룹당 **ko 구조화 draft 1건** → 연결 master 전개 → en 번역 → canonical |
 | **제외(이 배치와 섞지 않음)** | 검토후확장 1,182 · 안전지문불일치 1,424 · 비경구별도트랙 6,223 · 무성분명 atc_code 없음 · rx · 복합제 |
 | 후보 선정 | **본 문서는 규칙만 정의**. Top20·추천5 등 실제 그룹 선정은 에이전트 가 소관(개입 금지) |
