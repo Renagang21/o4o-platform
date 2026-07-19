@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-FAMOTIDINE-10MG-PILOT-DRYRUN-GA-V1 (펙소페나딘 전환)",
+  "note": "펙소페나딘염산염 60mg 정 en 번역 1건(그룹당 1). ko draft(candidate 049c2a1c) content_json 기준. 수치 원문 유지 — 1정/12시간, 24시간 2정 초과 금지, 12세 이상.",
+  "translations": [
+    {
+      "groupKey": "펙소페나딘염산염|60밀리그램|정",
+      "title": "Fexofenadine Hydrochloride 60 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for the temporary relief of a runny nose, sneezing, itchy and watery eyes, and an itchy nose or throat caused by pollen allergy or other upper-airway allergies.",
+      "usage": "Adults and adolescents aged 12 and over take one tablet with water every 12 hours, not exceeding two tablets in 24 hours. Do not take it with grapefruit, orange, or apple juice or with antacids, and do not drink alcohol while taking it.",
+      "caution": "Do not take this if you are allergic to it or if you are breastfeeding. Talk to a pharmacist before taking it if you are under 12 years old, have kidney problems, are elderly, have cardiovascular disease, or are pregnant. Do not take it together with other antihistamine-containing medicines such as cold remedies or cough-and-cold products.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Fexofenadine hydrochloride 60 mg",
+        "How it works": "Antihistamine (relieves allergy symptoms)",
+        "Main symptoms": "Runny nose, sneezing, watery eyes, and itching from an upper-airway allergy",
+        "Who should be careful": "People with kidney problems and women who are breastfeeding",
+        "Why this one": "A less-drowsy antihistamine"
+      },
+      "checkNote": "수치 1정/12시간·24시간 2정 초과금지·12세 유지, 금기 과민·수유부, 상담 12세미만·신장애·고령자·심혈관·임부, 병용금지 항히스타민·자몽/오렌지/사과주스·제산제·음주 유지."
+    }
+  ]
+}

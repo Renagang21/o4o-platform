@@ -1,6 +1,8 @@
 # CHECK-O4O-OTC-FEXOFENADINE-60MG-PILOT-DRYRUN-V1 — 펙소페나딘 60mg 정 파일럿 dry-run (에이전트 가)
 
-WO: `WO-O4O-OTC-FAMOTIDINE-10MG-PILOT-DRYRUN-GA-V1` (파모티딘 stale → **펙소페나딘 전환**, 사용자 승인) · 일자: 2026-07-18 · 상태: **완료 (isOral 선행 수정 + read-only dry-run) · apply 승인 대기**
+WO: `WO-O4O-OTC-FAMOTIDINE-10MG-PILOT-DRYRUN-GA-V1` (파모티딘 stale → **펙소페나딘 전환**, 사용자 승인) · 일자: 2026-07-18 · 상태: **완료 — ko·en canonical 14건 apply LIVE (승인 봉투)**
+
+> **apply 결과(승인 봉투)**: STEP1 ko canonical INSERT 14 · STEP2 en needs_review INSERT 14 · STEP3 en flip 14(지문 14/14). 독립검증 ko 14·en 14·ko↔en 14·dup 0. 콘텐츠 대조(ko 12시간 간격·24시간 2정 / en every 12 hours·two tablets, en 한글 0). 재실행 no-op(ko/en newInsert 0·flip 0). 기존 canonical UPDATE 0. 단일 조합·단일 TX·이중 게이트. 산출: 그룹 특화 3 스크립트 + en 번역 JSON.
 채널: Cloud SQL Auth Proxy(:5442) → production `o4o_platform`, SELECT only. DB write **0** · 기존 canonical 수정 **0**.
 
 ---
