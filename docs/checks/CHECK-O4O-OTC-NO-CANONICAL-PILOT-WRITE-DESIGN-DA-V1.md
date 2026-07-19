@@ -97,4 +97,47 @@ STORE canonical 미보유(e약은요-미보유) 경구 후보(결정론 확정, 
 
 ---
 
-*read-only 설계·dry-run. 실제 24 master ko canonical write 는 사용자 승인 후.*
+---
+
+## 8. 실제 apply 완료 보고 (사용자 승인 후 실행)
+
+`--apply` + `DRUG_OTC_PILOT_FAMO_KO_CONFIRM=YES` 로 24건 ko canonical 승격 실행 (mode=APPLY, dbWrite=1).
+
+| 항목 | 값 |
+|---|---:|
+| ko needs_review INSERT | 24 |
+| ko canonical flip (본 프로세스) | 2 |
+| koCanonicalAfter (in-TX 사후검증) | 24 (PASS, ROLLBACK 없음) |
+
+**⚠️ 동시 세션 레이스:** INSERT 24 / 본 flip 2 불일치는 STEP1↔STEP2 사이에 **병렬 세션이 22건을 flip** 한 결과. `INSERT ... WHERE NOT EXISTS(canonical|needs_review)` 가드가 이중 INSERT 를 차단해 최종 상태는 정확.
+
+### 독립 검증 (스크립트 사후검증과 별개 재쿼리)
+
+| 검증 | 결과 |
+|---|---|
+| source_ref 0057f50c STORE canonical ko | **24** (needs_review 잔량 **0**) |
+| 24 대상 STORE ko canonical | total 24 · exactly1 **24** · dup **0** · missing **0** |
+| canonical source_type / source_ref | mfds_drug_otc / 0057f50c 공유 · 24 |
+| 대상 외 write(이 source_ref) | **0** |
+| 재실행 no-op | ✅ (promotable 0 → 사후검증 전 ABORT, **DB write 0**, 상태 불변) |
+| 기존 canonical content UPDATE | 0 |
+| 펙소페나딘·글루코사민·비경구 혼입 | 0 |
+
+**최종:** 파모티딘 10mg 정 **24 master ko STORE canonical LIVE** (mfds_drug_otc, source_ref 0057f50c 공유). duplicate 0 · rollback manifest = 산출 JSON `rollback_master_ids` 24. **DB write 범위 초과 0.**
+
+### rollback (필요 시)
+
+```sql
+-- 이 파일럿분만 회수 (승인 필요)
+UPDATE shared_product_descriptions SET status='deprecated', updated_at=now()
+WHERE source_ref_id='0057f50c-e693-4385-b5d8-4f57178db590'::uuid
+  AND source_type='mfds_drug_otc' AND description_type='STORE' AND language='ko' AND status='canonical' AND deleted_at IS NULL;
+```
+
+### 다음
+- en 24건: draft en 번역 → needs_review persist → canonical flip (별도 작업, 이번 승인 범위 외).
+- ko 파일럿 성공 → top-5 확대는 별도 WO.
+
+---
+
+*설계·dry-run PASS → 사용자 승인 → 실제 24 ko canonical apply COMMIT·독립검증·no-op 확인 완료.*

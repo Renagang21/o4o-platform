@@ -1,7 +1,7 @@
 {
   "wo": "WO-O4O-OTC-NO-CANONICAL-PILOT-WRITE-DESIGN-DA-V1",
-  "mode": "dry-run",
-  "dbWrite": 0,
+  "mode": "APPLY",
+  "dbWrite": 1,
   "group": "파모티딘|10밀리그램|정",
   "anomalies": [],
   "candidate": "0057f50c-e693-4385-b5d8-4f57178db590",
@@ -48,5 +48,8 @@
     "en_needs_review_INSERT_after_translation": 24,
     "en_canonical_flip_after_translation": 24,
     "기존_canonical_UPDATE": 0
-  }
+  },
+  "needsReviewInserted": 24,
+  "canonicalFlipped": 2,
+  "koCanonicalAfter": 24
 }
