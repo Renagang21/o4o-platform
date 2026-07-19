@@ -414,7 +414,8 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
     onChange(reindex(next));
   };
   const remove = (i: number) => {
-    if (!window.confirm('이 콘텐츠를 현재 화면 세트에서 제거하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
+    if (!window.confirm('이 추가 정보를 현재 태블릿 콘텐츠에서 삭제하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
+    // WO-...-EDIT-REMOVE-REORDER-USABILITY-V1: 현재 Screen Set 의 content_list 에서만 제거(원본 설명서·콘텐츠·Resource 불변).
     onChange(reindex(items.filter((_, idx) => idx !== i)));
   };
   const add = (added: ContentListItem[], titles: Record<string, string>) => {
@@ -465,7 +466,9 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
                   <button onClick={() => move(i, 'up')} disabled={i === 0} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronUp className="w-4 h-4" /> 위로</button>
                   <button onClick={() => move(i, 'down')} disabled={i === items.length - 1} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronDown className="w-4 h-4" /> 아래로</button>
                   <button onClick={() => upd(i, { visible: !it.visible })} className={`${btn} ${it.visible ? 'text-slate-600 bg-white border border-slate-200 hover:bg-slate-50' : 'text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100'}`}>{it.visible ? '숨기기' : '표시하기'}</button>
-                  <button onClick={() => setExpanded(open ? null : k)} className={`${btn} text-indigo-700 bg-white border border-indigo-200 hover:bg-indigo-50`}>내용 설정</button>
+                  {/* WO-...-EDIT-REMOVE-REORDER-USABILITY-V1: '내용 설정'→'수정'(제목·설명 표시값 편집, 원본 불변), 삭제는 최상위로 노출. */}
+                  <button onClick={() => setExpanded(open ? null : k)} className={`${btn} border ${open ? 'text-indigo-800 bg-indigo-50 border-indigo-400' : 'text-indigo-700 bg-white border-indigo-200 hover:bg-indigo-50'}`}>수정</button>
+                  <button onClick={() => remove(i)} className={`${btn} text-red-600 bg-white border border-red-200 hover:bg-red-50`}><X className="w-4 h-4" /> 삭제</button>
                 </div>
                 {open && (
                   <div className="border-t border-slate-100 pt-2 space-y-2">
@@ -477,12 +480,7 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
                       <label className="text-[11px] font-medium text-slate-600">화면에 표시할 짧은 설명</label>
                       <input value={it.displaySummary ?? ''} onChange={(e) => upd(i, { displaySummary: e.target.value.trim() ? e.target.value : null })} placeholder="비워두면 원래 콘텐츠의 요약을 사용합니다" className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm" />
                     </div>
-                    <div className="pt-1">
-                      <button onClick={() => remove(i)} className="min-h-[44px] px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-xl hover:bg-red-50 inline-flex items-center gap-1">
-                        <X className="w-4 h-4" /> 이 화면 세트에서 제거
-                      </button>
-                      <p className="text-[11px] text-slate-400 mt-1">이 화면 세트의 목록에서만 빠집니다. 원본 콘텐츠는 삭제되지 않습니다.</p>
-                    </div>
+                    <p className="text-[11px] text-slate-400">여기서 바꾼 제목·짧은 설명은 이 화면 세트에만 적용되며, 원본 콘텐츠는 변경되지 않습니다.</p>
                   </div>
                 )}
               </div>
