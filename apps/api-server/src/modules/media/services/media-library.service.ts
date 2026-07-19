@@ -367,11 +367,48 @@ export class MediaLibraryService {
   }
 
   /**
+   * WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: 이 미디어 URL 을 참조하는 Screen Set 블록 수.
+   *   - 대상: **물리적으로 남아 있는 모든 Screen Set**(status 무관, deleted_at 무관). active 만 검사하지 않는다 —
+   *     리스트에서 제거(보관)된 콘텐츠도 복원될 수 있으므로 물리 사본이 참조하면 보호한다.
+   *   - 매칭: 정규화 URL **완전일치**(단순 부분검색 아님). corner/health body(HTML)는 img/video/source src 일치,
+   *     idle_media custom items 는 url 완전일치. 외부 YouTube/Vimeo 는 GCS url 과 매치되지 않아 자연 제외.
+   *   - coarse(config::text ILIKE) 로 후보만 좁힌 뒤 정밀 판정(오탐 방지).
+   */
+  private async screenSetUsageCount(url: string): Promise<number> {
+    if (!url) return 0;
+    const rows: Array<{ config: unknown }> = await this.dataSource.query(
+      `SELECT b.config
+         FROM store_tablet_screen_blocks b
+         JOIN store_tablet_screen_sets s ON s.id = b.screen_set_id
+        WHERE b.config::text ILIKE $1`,
+      [`%${url}%`],
+    );
+    let count = 0;
+    for (const r of rows) {
+      const cfg = (r.config && typeof r.config === 'object' && !Array.isArray(r.config)) ? (r.config as Record<string, unknown>) : {};
+      if (typeof cfg.body === 'string' && htmlReferencesResourceUrl(cfg.body, url)) { count++; continue; }
+      if (Array.isArray(cfg.items) && (cfg.items as unknown[]).some((it) => {
+        const u = (it && typeof it === 'object') ? (it as Record<string, unknown>).url : null;
+        return typeof u === 'string' && u.trim() === url.trim();
+      })) { count++; continue; }
+    }
+    return count;
+  }
+
+  /**
    * 자산 삭제 (DB + GCS).
+   * WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: Screen Set 이 참조 중이면 GCS/DB 삭제 거부(사본 이미지 깨짐 방지).
    */
   async deleteAsset(assetId: string): Promise<void> {
     const asset = await this.repo.findOne({ where: { id: assetId } });
     if (!asset) throw new Error('Asset not found');
+
+    // Screen Set 사용 가드 — GCS/DB 삭제 이전에 확인(사용 중이면 아무것도 지우지 않는다).
+    if (asset.url && (await this.screenSetUsageCount(asset.url)) > 0) {
+      const err = new Error('MEDIA_IN_USE_SCREEN_SET') as Error & { code?: string };
+      err.code = 'MEDIA_IN_USE_SCREEN_SET';
+      throw err;
+    }
 
     // GCS 삭제 (gcsPath가 있는 경우만)
     if (asset.gcsPath) {

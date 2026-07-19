@@ -244,6 +244,15 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
         res.status(404).json({ success: false, error: 'Asset not found' });
         return;
       }
+      // WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: Screen Set 사용 중 → 409 로 삭제 거부.
+      if (error.code === 'MEDIA_IN_USE_SCREEN_SET') {
+        res.status(409).json({
+          success: false,
+          code: 'MEDIA_IN_USE_SCREEN_SET',
+          error: '이 미디어는 타블렛 콘텐츠에서 사용 중이므로 삭제할 수 없습니다. 사용 중인 콘텐츠에서 먼저 제거해 주세요.',
+        });
+        return;
+      }
       res.status(500).json({ success: false, error: 'Failed to delete asset' });
     }
   });
