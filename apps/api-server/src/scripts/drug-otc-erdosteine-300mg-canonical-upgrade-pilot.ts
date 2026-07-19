@@ -33,28 +33,58 @@ const TARGET_FP = '4b4e162690065e8e';   // bridge SSOT authored그대로확장 (
 const EXCLUDE_FP = 'd68b3eec1cb56646';  // bridge SSOT 안전지문불일치 (4)
 const EXPECTED = 26;
 const AUTHORED_SOURCE = 'mfds_drug_otc';
-const NON_ORAL_RE = /질정|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|가글|트로키/;
 
 const stripTags = (s: string): string => s.replace(/<[^>]+>/g, ' ');
 function normalize(s: string): string {
   return stripTags(s || '').normalize('NFKC').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
     .replace(/[·・∙•▪▶►\-–—]/g, ',').replace(/^\s*\d+\)\s*/gm, '').replace(/[，、]/g, ',').replace(/[．。]/g, '.').replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').trim();
 }
-function sections(content: string): Record<string, string> {
+// ── fingerprint = bridge 정본(f2c819451 / drug-otc-full-corpus-authored-bridge-integration.ts) 함수 VERBATIM 채용 ──
+//    (bridge 산식 변경 아님 — 동치 재현. 이전 커스텀 sections/cau(상호작용 포함) 오차가 fp 미재현의 원인이었음.)
+function easySections(content: string): Record<string, string> {
   const out: Record<string, string> = {}; const re = /<p><strong>([^<]+)<\/strong><br\/?>([\s\S]*?)<\/p>/g; let m: RegExpExecArray | null;
   while ((m = re.exec(content))) out[m[1].trim()] = m[2].trim(); return out;
 }
-function deriveForm(name: string): string {
-  return /연질캡슐/.test(name) ? '연질캡슐' : /캡슐/.test(name) ? '캡슐' : /정/.test(name) ? '정' : '기타';
+function freeSections(content: string): Record<string, string> {
+  const out: Record<string, string> = {}; const re = /<(h[1-4]|strong)[^>]*>\s*([^<]{2,40}?)\s*<\/\1>([\s\S]*?)(?=<(?:h[1-4]|strong)[^>]*>|$)/gi; let m: RegExpExecArray | null;
+  while ((m = re.exec(content))) { const title = m[2].replace(/[:：]\s*$/, '').trim(); const body = m[3].trim(); if (title) out[title] = (out[title] ? out[title] + '\n' : '') + body; }
+  return out;
 }
-/** bridge groupKeyOf 와 동일: H([norm_ind, norm_dos, norm_cau, H(성분|함량), H(제형), route]) */
-function fingerprintOf(name: string, spec: string, content: string): string {
-  const sec = sections(content);
-  const ind = sec['효능·효과'] || '', dos = sec['용법·용량'] || '';
-  const cau = [sec['경고'], sec['사용상 주의사항'], sec['상호작용']].filter(Boolean).join('\n');
-  const ingredient = (name.match(/\(([^()]+)\)\s*$/)?.[1] || '').trim();
-  const strength = (spec || '').split(' / ')[0].trim();
-  return H([H(normalize(ind)), H(normalize(dos)), H(normalize(cau)), H(`${ingredient}|${strength}`), H(deriveForm(name)), 'oral'].join('|'));
+function bucketSections(sec: Record<string, string>): { ind: string; dos: string; cau: string; itx: string } {
+  let ind = '', dos = '', cau = '', itx = '';
+  for (const [t, b] of Object.entries(sec)) {
+    if (/효능|효과|적응|용도/.test(t)) ind += (ind ? '\n' : '') + b;
+    else if (/용법|용량|복용|투여\s*방법|사용\s*방법|사용법/.test(t)) dos += (dos ? '\n' : '') + b;
+    else if (/상호\s*작용|병용/.test(t)) itx += (itx ? '\n' : '') + b;
+    else if (/주의|경고|금기|부작용|이상\s*반응|임부|임신|수유/.test(t)) cau += (cau ? '\n' : '') + b;
+  }
+  return { ind, dos, cau, itx };
+}
+function formOf(name: string): string {
+  return /연질캡슐/.test(name) ? '연질캡슐' : /캡슐/.test(name) ? '캡슐' : /연고/.test(name) ? '연고' : /크림/.test(name) ? '크림'
+    : /플라스타|첩부|패치|패취|카타플/.test(name) ? '첩부제' : /점안/.test(name) ? '점안액' : /시럽/.test(name) ? '시럽'
+    : /과립|산\(/.test(name) ? '과립/산' : /정/.test(name) ? '정' : /액/.test(name) ? '액' : '기타';
+}
+function routeSig(name: string): string {
+  if (/질정|질좌|질내정|질\s?삽입/.test(name)) return 'vaginal';
+  if (/좌약|좌제/.test(name)) return 'rectal';
+  if (/점안|안연고/.test(name)) return 'ophthalmic';
+  if (/점이액|귀에/.test(name)) return 'otic';
+  if (/점비|비강/.test(name)) return 'nasal';
+  if (/크림|연고|로션|로숀|겔$|겔\(|겔제|젤$|젤\(|플라스타|플라스터|첩부|카타플|패취|패치|파스|파프|스왑|스틱|거즈|탈지면|솜|네일라카|라카|외용|도포|스프레이|에어로솔|에어졸|소독|폼$|폼\(|워시|카타플라스마/.test(name)) return 'topical';
+  if (/정$|정\d|정\(|정밀리|정\[|캡슐|캅셀|캅셀|시럽|현탁|과립|산제|산\(|트로키|츄어|씹|저작|드링크|내복|환$|환\(|액$|액\(|액\[|물약|시럽제/.test(name)) return 'oral';
+  return 'unknown';
+}
+const ingredientOf = (name: string): string => (name.match(/\(([^()]+)\)\s*$/)?.[1] || '').trim();
+const strengthOf = (spec: string): string => (spec || '').split(' / ')[0].trim();
+/** bridge groupKeyOf VERBATIM: H([norm_ind, norm_dos, norm_cau, H(성분|함량), H(제형), route]) — cau 는 bucketSections(상호작용 제외) */
+function fingerprintOf(name: string, spec: string, content: string): { fp: string; route: string; form: string; ingredient: string } {
+  let sec = easySections(content || '');
+  if (Object.keys(sec).length === 0) sec = freeSections(content || '');
+  const { ind, dos, cau } = bucketSections(sec);
+  const ingredient = ingredientOf(name); const strength = strengthOf(spec); const form = formOf(name); const route = routeSig(name);
+  const fp = H([H(normalize(ind)), H(normalize(dos)), H(normalize(cau)), H(`${ingredient}|${strength}`), H(form), route].join('|'));
+  return { fp, route, form, ingredient };
 }
 
 async function main(): Promise<void> {
@@ -81,21 +111,28 @@ async function main(): Promise<void> {
        JOIN LATERAL (SELECT content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
        WHERE pm.name LIKE '%('||$1||')' AND split_part(pm.specification,' / ',1)=$2 AND pm.name LIKE '%'||$3||'%'
        ORDER BY pm.id`, [GROUP.ingredient, GROUP.dose, GROUP.formKeyword]);
-    const withFp = coarse.map((r) => ({ ...r, fp: fingerprintOf(r.name, r.spec, r.content) }));
+    const withFp = coarse.map((r) => { const f = fingerprintOf(r.name, r.spec, r.content); return { ...r, ...f }; });
     const target = withFp.filter((r) => r.fp === TARGET_FP);
     const excluded = withFp.filter((r) => r.fp === EXCLUDE_FP);
     const other = withFp.filter((r) => r.fp !== TARGET_FP && r.fp !== EXCLUDE_FP);
     const masterIds = target.map((r) => r.id).sort();
+    const excludeIds = new Set(excluded.map((r) => r.id));
     report.coarseTotal = coarse.length;
     report.target26 = target.length; report.excluded4 = excluded.length; report.otherFp = other.length;
     report.excludedDetail = excluded.map((r) => ({ id: r.id, name: r.name, reason: '안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)' }));
-    report.rollback_master_ids = masterIds;
-    report.nonOralNames = target.filter((r) => NON_ORAL_RE.test(r.name)).map((r) => r.name);
+    report.target_master_ids = masterIds; report.rollback_master_ids = masterIds;
+    report.targetExcludeIntersection = masterIds.filter((id) => excludeIds.has(id)).length; // 교집합 0 이어야
+    report.fpDistribution = Object.entries(withFp.reduce((a: Record<string, number>, r) => { a[r.fp] = (a[r.fp] || 0) + 1; return a; }, {})).map(([fp, n]) => ({ fp, n, ssot: fp === TARGET_FP ? '그대로확장' : fp === EXCLUDE_FP ? '안전지문불일치' : '미분류' }));
+    report.nonOralNames = target.filter((r) => r.route !== 'oral').map((r) => r.name);
 
     if (target.length !== EXPECTED) report.anomalies.push(`target ${target.length} !== EXPECTED ${EXPECTED} (bridge SSOT 그대로확장 재고정 불일치)`);
+    if (excluded.length !== 4) report.anomalies.push(`excluded ${excluded.length} !== 4 (안전지문불일치 SSOT 재고정 불일치)`);
     if (new Set(masterIds).size !== masterIds.length) report.anomalies.push('target master 중복');
+    if (report.targetExcludeIntersection !== 0) report.anomalies.push(`target∩exclude ${report.targetExcludeIntersection} !== 0`);
     if (other.length !== 0) report.anomalies.push(`SSOT 미분류 fingerprint ${other.length} (coarse 30=26+4 외)`);
     if (report.nonOralNames.length) report.anomalies.push(`비경구 혼입 ${report.nonOralNames.length}`);
+    // 진단 JSON: ABORT 전에도 남긴다(WO §6). 성공 시 아래에서 최종본으로 덮어씀.
+    fs.writeFileSync(path.join(OUT_DIR, 'otc-erdosteine-300mg-upgrade-dryrun-v1.json'), JSON.stringify({ ...report, stage: 'pre-gate 진단' }, null, 2), 'utf8');
 
     // 슬롯 상태: e약은요 STORE ko canonical 정확히 1 · authored canonical/needs_review 충돌
     const slot: Array<{ easy: string; authored_canon: string; authored_nr: string; anyc: string }> = masterIds.length ? await ds.query(`
