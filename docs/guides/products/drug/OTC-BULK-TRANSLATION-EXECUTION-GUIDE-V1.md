@@ -19,6 +19,23 @@
 
 ---
 
+## 0-A. 동시 쓰기 소유권 (Write Ownership) — 필수
+
+> 근거: 파모티딘 10mg 정 파일럿(ko·en 각 24)에서 STEP1(needs_review INSERT)↔STEP2(canonical flip) 사이에
+> **병렬 세션이 22건을 flip** 한 레이스 관측. `INSERT ... WHERE NOT EXISTS` 가드로 최종 상태는 정확했으나,
+> flip 카운트 불일치·검증 혼선을 유발. (`CHECK-O4O-OTC-NO-CANONICAL-PILOT-WRITE-DESIGN-DA-V1`)
+
+```text
+- 동일 groupKey · master 집합의 production write 는 단일 에이전트(세션)만 소유한다.
+- apply 시작부터 독립 검증 · no-op 확인 완료까지, 다른 세션의 동일 대상 write 를 금지한다.
+- 병렬 세션은 그 구간 동안 read-only 검증만 허용한다.
+```
+
+- 소유 세션은 apply 봉투(persist → flip → 독립검증 → no-op)를 **연속**으로 끝낸 뒤 소유를 해제한다.
+- 안전판: 모든 INSERT 는 `WHERE NOT EXISTS(canonical|needs_review)`, flip 후 `count == EXPECTED` · `dup == 0` 사후검증 → 불일치 ROLLBACK (레이스가 나도 이중 생성·초과 write 는 구조적으로 차단).
+
+---
+
 ## 1. 배치 단위
 
 - **10~20 그룹 단위**로 배치. 그룹 = `성분|함량|제형`(3축, DR-005/DR-019).

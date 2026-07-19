@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-FAMOTIDINE-10MG-EN-COMPLETE-V1",
+  "note": "파모티딘 10mg 정 en 번역 1건(그룹당 1). ko canonical(source_ref 0057f50c, draft content_json) 기준 충실 번역. 수치·연령·기간·금기 원문 수준 유지 — 16세 이상 1정(10mg)/1일 2정(20mg)까지, 14일 이상 복용 금지, 3개월 이상 지속 속쓰림 상담, 알코올 병용 금지.",
+  "translations": [
+    {
+      "groupKey": "파모티딘|10밀리그램|정",
+      "title": "Famotidine 10 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for excess stomach acid, heartburn, and acid reflux (sour belching).",
+      "usage": "People aged 16 and over may take one tablet (10 mg) at a time, up to two tablets (20 mg) a day. Do not take it with drinks that contain alcohol, and do not take it for more than 14 days.",
+      "caution": "Do not take this if you are allergic to it. Talk to a pharmacist before taking it if you have trouble swallowing food, vomit blood or pass bloody stools, have heartburn that lasts more than 3 months, have unexplained weight loss, have kidney or liver disease, are elderly, or are pregnant or breastfeeding. Stop taking it if your symptoms do not improve.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Famotidine 10 mg",
+        "How it works": "Reduces stomach acid secretion (H2 blocker)",
+        "Main symptoms": "Excess stomach acid, heartburn, acid reflux",
+        "Who should be careful": "People on long-term use, or with trouble swallowing or weight loss",
+        "Why this one": "An H2 blocker that reduces stomach acid"
+      },
+      "checkNote": "수치·연령·기간 정확 대응: 16세 이상→aged 16 and over, 1정(10mg)→one tablet (10 mg), 1일 2정(20mg)→up to two tablets (20 mg) a day, 14일 이상 금지→not for more than 14 days, 3개월 이상 속쓰림→more than 3 months. 금기·상담 유지: 과민증 복용금지, 삼킴곤란·토혈/혈변·체중감소·신간질환·고령자·임부수유부 약사 상담, 알코올 병용 금지, 증상 미개선 시 중단."
+    }
+  ]
+}
