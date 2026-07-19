@@ -44,7 +44,14 @@
 | api-server typecheck (내 2파일) | ✅ 오류 0 |
 | deleteAsset 호출부 | 컨트롤러 1곳(:239)만 → 409 매핑 완료, 회귀 없음 |
 | 매처 신뢰도 | 기존 프로덕션 `htmlReferencesResourceUrl` 재사용(검증된 완전일치) |
-| 라이브 스모크 | ⏳ 배포 후(operator 권한 + 미디어·Screen Set 참조 setup 필요) — 미디어 삭제 시 참조 세트 있으면 409, 참조 제거 후 삭제 성공. |
+| 탐지 입력 라이브 확인 | ✅ (2026-07-19 배포 후) 테스트 Screen Set 코너설명 블록에 `<img src="…GUARD-TEST…jpg">` 저장·조회 확인(`savedBodyHasImg:true`) → 가드가 읽는 `store_tablet_screen_blocks` 데이터 형태 실증. 정리(참조 제거+tombstone) 완료. |
+| operator 409 실행 | ⏳ 미수행(정직) — DELETE `/media-library/:id` 는 **operator/admin 권한**(store_owner 세션 불가) + 실 미디어 자산 필요. 가드는 **삭제를 막는 fail-safe**(오작동 시에도 기존 동작=무가드로 회귀할 뿐, 데이터 손실 유발 안 함). 아래 절차로 확정 가능. |
+
+### operator 409 확정 절차 (권장)
+1. operator/admin 계정으로 `GET /media-library` → 실 자산 A(url U) 확보.
+2. store owner 로 Screen Set 코너설명 body 에 `<img src="U">` 저장(위 탐지 입력 방식).
+3. operator 로 `DELETE /media-library/{A}` → **409 `MEDIA_IN_USE_SCREEN_SET`** (실 자산 A 는 가드로 보존됨).
+4. Screen Set 참조 제거 후 재삭제 → 200. (가드는 삭제를 막으므로 실 미디어는 이 과정에서 삭제되지 않음.)
 
 ## 5. 산출물
 - 변경 파일 2 + 본 CHECK. **migration 0, 신규 컬럼·테이블·ref-count 0**. commit=(아래) / 배포 후 스모크.
