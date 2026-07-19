@@ -1,0 +1,223 @@
+/**
+ * WO-O4O-OTC-ERDOSTEINE-300MG-CANONICAL-UPGRADE-PILOT-DRYRUN-DA-V1
+ *
+ * 첫 Track A(e약은요 → authored canonical 교체) 파일럿: 에르도스테인 300mg 정.
+ *   대상 = bridge SSOT `authored그대로확장` fp=4b4e162690065e8e 의 26 master (정본 90342ce7d).
+ *   제외 = fp=d68b3eec1cb56646 `안전지문불일치` 4 master (coarse 30 = 26 + 4).
+ *   authored source_ref_id = 03e0af9d-5236-460a-86d4-1af8b0c00c61.
+ *
+ * 정책: OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1 (커밋 89379627d) Option A.
+ *   STEP A: authored ko needs_review 준비·검증(demote 이전). STEP B 단일 TX: demote easy→deprecated → flip
+ *   authored needs_review→canonical → 사후검증(canonical 1·authored·deprecated easy 1·dup 0) → audit → COMMIT.
+ *
+ * dry-run 기본(read-only·DB write 0). apply 이중게이트: --apply + DRUG_OTC_ERDO_UPGRADE_CONFIRM=YES.
+ * ⚠️ audit 수 정책 불일치 플래그: 엔티티 SharedProductDescriptionAuditLog 는 canonical_replaced **1행/교체**
+ *   (previous+new 동시 기록) → 26. 정책 §2-A "audit 2/master=52" 와 다름 → 실제 apply 전 정합 필요(보고).
+ *
+ * Usage(apps/api-server): npx tsx src/scripts/drug-otc-erdosteine-300mg-canonical-upgrade-pilot.ts [--apply]
+ */
+
+import 'dotenv/config';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc-description-consumer-html.js';
+
+const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
+const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
+const H = (s: string): string => md5(s).slice(0, 16);
+
+const GROUP = { key: '에르도스테인|300밀리그램|정', ingredient: '에르도스테인', dose: '300밀리그램', formKeyword: '정' };
+const CANDIDATE = '03e0af9d-5236-460a-86d4-1af8b0c00c61';
+const TARGET_FP = '4b4e162690065e8e';   // bridge SSOT authored그대로확장 (26)
+const EXCLUDE_FP = 'd68b3eec1cb56646';  // bridge SSOT 안전지문불일치 (4)
+const EXPECTED = 26;
+const AUTHORED_SOURCE = 'mfds_drug_otc';
+const NON_ORAL_RE = /질정|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|가글|트로키/;
+
+const stripTags = (s: string): string => s.replace(/<[^>]+>/g, ' ');
+function normalize(s: string): string {
+  return stripTags(s || '').normalize('NFKC').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+    .replace(/[·・∙•▪▶►\-–—]/g, ',').replace(/^\s*\d+\)\s*/gm, '').replace(/[，、]/g, ',').replace(/[．。]/g, '.').replace(/\s+/g, ' ').replace(/\s*,\s*/g, ',').trim();
+}
+function sections(content: string): Record<string, string> {
+  const out: Record<string, string> = {}; const re = /<p><strong>([^<]+)<\/strong><br\/?>([\s\S]*?)<\/p>/g; let m: RegExpExecArray | null;
+  while ((m = re.exec(content))) out[m[1].trim()] = m[2].trim(); return out;
+}
+function deriveForm(name: string): string {
+  return /연질캡슐/.test(name) ? '연질캡슐' : /캡슐/.test(name) ? '캡슐' : /정/.test(name) ? '정' : '기타';
+}
+/** bridge groupKeyOf 와 동일: H([norm_ind, norm_dos, norm_cau, H(성분|함량), H(제형), route]) */
+function fingerprintOf(name: string, spec: string, content: string): string {
+  const sec = sections(content);
+  const ind = sec['효능·효과'] || '', dos = sec['용법·용량'] || '';
+  const cau = [sec['경고'], sec['사용상 주의사항'], sec['상호작용']].filter(Boolean).join('\n');
+  const ingredient = (name.match(/\(([^()]+)\)\s*$/)?.[1] || '').trim();
+  const strength = (spec || '').split(' / ')[0].trim();
+  return H([H(normalize(ind)), H(normalize(dos)), H(normalize(cau)), H(`${ingredient}|${strength}`), H(deriveForm(name)), 'oral'].join('|'));
+}
+
+async function main(): Promise<void> {
+  const apply = process.argv.slice(2).includes('--apply') && process.env.DRUG_OTC_ERDO_UPGRADE_CONFIRM === 'YES';
+  const mode = apply ? 'APPLY' : 'dry-run';
+
+  const { DataSource } = await import('typeorm');
+  const ds = new DataSource({ type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5442', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 120000 } });
+  await ds.initialize();
+
+  const report: any = { wo: 'WO-O4O-OTC-ERDOSTEINE-300MG-CANONICAL-UPGRADE-PILOT-DRYRUN-DA-V1', mode, dbWrite: 0, group: GROUP.key, candidate: CANDIDATE, policy: '89379627d Option A', anomalies: [] as string[] };
+  try {
+    // draft
+    const draft: Array<{ candidate_id: string; title: string; content_json: Record<string, unknown> }> = await ds.query(
+      `SELECT candidate_id::text, title, content_json FROM product_candidate_description_drafts WHERE candidate_id=$1::uuid AND deleted_at IS NULL LIMIT 1`, [CANDIDATE]);
+    if (draft.length !== 1) throw new Error(`draft(candidate ${CANDIDATE}) ${draft.length} !== 1 → ABORT`);
+    const d = draft[0];
+    report.draftTitle = d.title;
+
+    // coarse 재열거 + fingerprint 재고정
+    const coarse: Array<{ id: string; name: string; spec: string; content: string }> = await ds.query(
+      `SELECT pm.id::text id, pm.name, pm.specification spec, es.content
+       FROM product_masters pm
+       JOIN LATERAL (SELECT content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
+       WHERE pm.name LIKE '%('||$1||')' AND split_part(pm.specification,' / ',1)=$2 AND pm.name LIKE '%'||$3||'%'
+       ORDER BY pm.id`, [GROUP.ingredient, GROUP.dose, GROUP.formKeyword]);
+    const withFp = coarse.map((r) => ({ ...r, fp: fingerprintOf(r.name, r.spec, r.content) }));
+    const target = withFp.filter((r) => r.fp === TARGET_FP);
+    const excluded = withFp.filter((r) => r.fp === EXCLUDE_FP);
+    const other = withFp.filter((r) => r.fp !== TARGET_FP && r.fp !== EXCLUDE_FP);
+    const masterIds = target.map((r) => r.id).sort();
+    report.coarseTotal = coarse.length;
+    report.target26 = target.length; report.excluded4 = excluded.length; report.otherFp = other.length;
+    report.excludedDetail = excluded.map((r) => ({ id: r.id, name: r.name, reason: '안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)' }));
+    report.rollback_master_ids = masterIds;
+    report.nonOralNames = target.filter((r) => NON_ORAL_RE.test(r.name)).map((r) => r.name);
+
+    if (target.length !== EXPECTED) report.anomalies.push(`target ${target.length} !== EXPECTED ${EXPECTED} (bridge SSOT 그대로확장 재고정 불일치)`);
+    if (new Set(masterIds).size !== masterIds.length) report.anomalies.push('target master 중복');
+    if (other.length !== 0) report.anomalies.push(`SSOT 미분류 fingerprint ${other.length} (coarse 30=26+4 외)`);
+    if (report.nonOralNames.length) report.anomalies.push(`비경구 혼입 ${report.nonOralNames.length}`);
+
+    // 슬롯 상태: e약은요 STORE ko canonical 정확히 1 · authored canonical/needs_review 충돌
+    const slot: Array<{ easy: string; authored_canon: string; authored_nr: string; anyc: string }> = masterIds.length ? await ds.query(`
+      SELECT
+        count(*) FILTER (WHERE src='mfds_easy_drug' AND st='canonical')::text easy,
+        count(*) FILTER (WHERE src IN ('mfds_drug_otc','nutrition_combo') AND st='canonical')::text authored_canon,
+        count(*) FILTER (WHERE src IN ('mfds_drug_otc','nutrition_combo') AND st='needs_review')::text authored_nr,
+        count(DISTINCT mid) FILTER (WHERE st='canonical')::text anyc
+      FROM (
+        SELECT s.master_id mid, s.source_type src, s.status st
+        FROM shared_product_descriptions s
+        WHERE s.master_id = ANY($1::uuid[]) AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL
+      ) t`, [masterIds]) : [{ easy: '0', authored_canon: '0', authored_nr: '0', anyc: '0' }];
+    // e약은요 정확 1건/ master
+    const easyPer: Array<{ n: string }> = masterIds.length ? await ds.query(
+      `SELECT count(*)::text n FROM unnest($1::uuid[]) mid WHERE (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.source_type='mfds_easy_drug' AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)=1`, [masterIds]) : [{ n: '0' }];
+    report.easyCanonicalExactly1 = parseInt(easyPer[0].n, 10);
+    report.authoredCanonicalConflict = parseInt(slot[0].authored_canon, 10);
+    report.existingAuthoredNeedsReview = parseInt(slot[0].authored_nr, 10);
+    report.easyCanonicalTotal = parseInt(slot[0].easy, 10);
+
+    if (report.easyCanonicalExactly1 !== EXPECTED) report.anomalies.push(`e약은요 STORE ko canonical 정확히1 아닌 master (${report.easyCanonicalExactly1}/${EXPECTED})`);
+    if (report.authoredCanonicalConflict !== 0) report.anomalies.push(`기존 authored canonical 충돌 ${report.authoredCanonicalConflict}`);
+
+    // draft HTML 빌드·검증
+    const built = buildDrugOtcConsumerHtml(d.content_json as never, { title: d.title });
+    if (built.missing.length) report.anomalies.push(`필수필드 누락 ${built.missing.join(',')}`);
+    if (!built.html) report.anomalies.push('빈 html');
+    if (built.html.includes('<table')) report.anomalies.push('<table>');
+    if (built.html.includes('<!--')) report.anomalies.push('주석');
+    if (built.html.includes('&amp;lt;') || built.html.includes('&amp;gt;')) report.anomalies.push('이중 escape');
+    if (!built.html.includes('sd-warn')) report.anomalies.push('sd-warn 없음');
+    report.htmlLen = built.html.length; report.contentHash = md5(built.html);
+    report.summary = String((d.content_json as any)?.summaryTable?.['성분'] ?? '') || null;
+
+    // 예상 write (정책 §2-A) — dry-run 산정
+    const authoredNrInsert = EXPECTED - report.existingAuthoredNeedsReview; // 신규 needs_review INSERT
+    report.예상write = {
+      STEP_A_authored_needs_review_INSERT: authoredNrInsert,
+      STEP_B_easy_canonical_demote: EXPECTED,
+      STEP_B_authored_canonical_flip: EXPECTED,
+      audit_log_canonical_replaced: EXPECTED, // 엔티티 모델: 1행/교체(previous+new)
+      SPD_write_total: authoredNrInsert + EXPECTED + EXPECTED,
+      audit_write_total: EXPECTED,
+      grand_total: authoredNrInsert + EXPECTED + EXPECTED + EXPECTED,
+    };
+    report.auditCountFlag = {
+      entity_model: `SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → ${EXPECTED}`,
+      policy_2A: 'audit 2/master = 52 (demote 1 + flip 1)',
+      status: '불일치 — 실제 apply 전 정합 필요(엔티티는 1행/교체 설계). dry-run 은 엔티티 기준 26으로 산정.',
+    };
+
+    if (report.anomalies.length) throw new Error(`이상 ${report.anomalies.length}건 → ABORT\n  ${report.anomalies.join('\n  ')}`);
+
+    // === APPLY (이중게이트 통과 시만) — 정책 §2 STEP A + STEP B ===
+    if (apply) {
+      report.dbWrite = 1;
+      const qr = ds.createQueryRunner(); await qr.connect();
+      // STEP A: authored ko needs_review 준비 (멱등)
+      await qr.startTransaction();
+      try {
+        const insA = await qr.query(
+          `INSERT INTO shared_product_descriptions (master_id, content, summary, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+           SELECT mid, $3, $5, $2, $4::uuid, 'needs_review', 'ko', 'STORE', now(), now()
+           FROM unnest($1::uuid[]) mid
+           WHERE NOT EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.status IN ('canonical','needs_review'))
+           RETURNING id`, [masterIds, AUTHORED_SOURCE, built.html, CANDIDATE, report.summary]);
+        report.stepA_inserted = Array.isArray(insA) ? insA.length : 0;
+        await qr.commitTransaction();
+      } catch (e) { await qr.rollbackTransaction(); await qr.release(); throw e; }
+      // STEP B: 단일 TX 슬롯 교체 (master 루프 — 각 master 슬롯 원자성은 TX 전체로 보장)
+      await qr.startTransaction();
+      try {
+        let demoted = 0, flipped = 0, audited = 0;
+        for (const mid of masterIds) {
+          const cur: Array<{ id: string; source_type: string }> = await qr.query(
+            `SELECT id::text id, source_type FROM shared_product_descriptions WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL`, [mid]);
+          if (cur.length === 0) throw new Error(`master ${mid} canonical 0건 → ABORT`);
+          if (cur.length > 1) throw new Error(`master ${mid} canonical ${cur.length}건 → ABORT`);
+          if (['mfds_drug_otc', 'nutrition_combo'].includes(cur[0].source_type)) continue; // 이미 authored → no-op
+          if (cur[0].source_type !== 'mfds_easy_drug') throw new Error(`master ${mid} canonical source ${cur[0].source_type} 예상밖 → ABORT`);
+          const easyId = cur[0].id;
+          await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical'`, [easyId]);
+          demoted += 1;
+          const flip = await qr.query(
+            `UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND status='needs_review' AND deleted_at IS NULL RETURNING id`, [mid]);
+          const newId = Array.isArray(flip) && flip[0] ? flip[0].id : null;
+          if (!newId) throw new Error(`master ${mid} authored needs_review flip 실패 → ABORT`);
+          flipped += 1;
+          await qr.query(
+            `INSERT INTO shared_product_description_audit_logs (event_type, description_type, master_id, language, previous_description_id, new_description_id, previous_status, new_status, metadata, performed_at)
+             VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb, now())`,
+            [mid, easyId, newId, JSON.stringify({ previousDemotedTo: 'deprecated', previousSource: 'mfds_easy_drug', newSource: AUTHORED_SOURCE, source_ref_id: CANDIDATE, wo: report.wo })]);
+          audited += 1;
+        }
+        report.stepB_demoted = demoted; report.stepB_flipped = flipped; report.stepB_audited = audited;
+        // 사후검증
+        const post: Array<{ canon1: string; authored: string; dep: string; dup: string }> = await qr.query(`
+          SELECT
+            count(*) FILTER (WHERE canoncnt=1)::text canon1,
+            count(*) FILTER (WHERE authored_canon)::text authored,
+            count(*) FILTER (WHERE dep_easy)::text dep,
+            count(*) FILTER (WHERE canoncnt>1)::text dup
+          FROM (
+            SELECT mid,
+              (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL) canoncnt,
+              EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.deleted_at IS NULL) authored_canon,
+              EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL) dep_easy
+            FROM unnest($1::uuid[]) mid
+          ) t`, [masterIds]);
+        report.post = { canonical1: parseInt(post[0].canon1, 10), authored: parseInt(post[0].authored, 10), deprecatedEasy: parseInt(post[0].dep, 10), dup: parseInt(post[0].dup, 10) };
+        if (report.post.canonical1 !== EXPECTED || report.post.authored !== EXPECTED || report.post.deprecatedEasy !== EXPECTED || report.post.dup !== 0)
+          throw new Error(`사후검증 실패 canon1=${report.post.canonical1} authored=${report.post.authored} dep=${report.post.deprecatedEasy} dup=${report.post.dup} → ROLLBACK`);
+        await qr.commitTransaction();
+      } catch (e) { await qr.rollbackTransaction(); await qr.release(); throw e; }
+      await qr.release();
+    }
+  } finally { await ds.destroy(); }
+
+  fs.writeFileSync(path.join(OUT_DIR, 'otc-erdosteine-300mg-upgrade-dryrun-v1.json'), JSON.stringify(report, null, 2), 'utf8');
+  console.log(JSON.stringify(report, null, 2));
+  console.log(`\n[${mode}] target ${report.target26}/${EXPECTED} · 제외 ${report.excluded4} · authored충돌 ${report.authoredCanonicalConflict} · 기존nr ${report.existingAuthoredNeedsReview} · 이상 ${report.anomalies.length}`);
+  if (!apply) console.log('  (dry-run — write 0. apply: --apply + DRUG_OTC_ERDO_UPGRADE_CONFIRM=YES, 별도 승인)');
+}
+main().catch((e) => { console.error('FATAL', e instanceof Error ? e.message : e); process.exit(1); });
