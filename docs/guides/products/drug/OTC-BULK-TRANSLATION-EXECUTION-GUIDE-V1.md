@@ -3,6 +3,7 @@
 > **목적**: 검토 완료된 한국어 OTC 설명서 그룹을 **여러 컴퓨터에서 동일한 절차**로 영문 번역·전개·검수·공개 전환하는 배치 실행 표준.
 > **원칙**: 이 문서에는 **이미 검증된 절차만** 담는다(은행엽·포도엽 299 트랙 실증 — CHECK 6종). 신규 실험 절차는 포함하지 않는다.
 > **상태**: Active · 일자 2026-07-17 · 근거 트랙 = [HERBAL 6 CHECK](#부록-근거-check)
+> **선행 단계(신규 draft)**: 번역 소스인 ko canonical이 아직 없는 `새설명서필요` 그룹은 먼저 [OTC-NEW-DRAFT-AUTHORING-EXECUTION-GUIDE-V1](OTC-NEW-DRAFT-AUTHORING-EXECUTION-GUIDE-V1.md)로 e약은요 원문 grounding 구조화 draft → ko canonical을 만든 뒤 본 지침의 en 단계로 진입한다.
 
 ---
 
