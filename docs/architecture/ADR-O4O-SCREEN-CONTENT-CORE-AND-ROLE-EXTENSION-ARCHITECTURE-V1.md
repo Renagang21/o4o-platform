@@ -21,6 +21,28 @@
 
 ---
 
+## H1·H2 확정 결정 (2026-07-19, 사용자 승인)
+
+두 정책 공백이 아래로 확정됐다. HOLD ②③④ 해소 → 잔여는 **구현 gap**(별도 P1 gap 분석 WO 참조).
+
+### H1 — 미디어 복사 정책: **영구 Media Resource 참조 (바이너리 중복복사 금지)**
+- Screen Set 텍스트·설정·배치 = **값 복사**. O4O 관리 이미지/영상 = **영구 media resource ID 참조**(가져오기마다 파일 물리복제 안 함).
+- **원본 콘텐츠 삭제 ≠ 미디어 파일 삭제**(분리). 원본 수정 시 기존 파일 덮어쓰지 않고 **새 Resource 생성**. **사용 중(참조>0) 미디어 하드삭제 금지**, **참조 0일 때만 정리**. → 매장 사본은 원본 콘텐츠 삭제 후에도 동일 미디어 계속 표시.
+- **외부 미디어(YouTube/Vimeo)는 예외**: URL 참조 유지(가져오기 시 유효성 검사, 재생 실패 시 기본 대기화면). "독립 사본"은 **구성·설정에 한정**, 외부 영상 자체는 복제 안 함.
+- 공유되는 것은 **운영자 콘텐츠가 아니라 불변 Media Resource** → 운영자 원본 수정·삭제는 매장 사본에 무영향.
+
+### H2 — Screen Set QR: **Screen Set 종속 채널(생명주기 자동 추종, slug 불변·재사용 금지)**
+| Screen Set 상태 | QR 처리 |
+|---|---|
+| 정상 사용 | 같은 slug로 활성 |
+| archived(리스트에서 제거) | 연결 QR `is_active=false` |
+| 복원 | **기존 QR·기존 slug 재활성**(`is_active=true`) |
+| 영구 삭제 | QR **tombstone 보존**(slug 재사용 금지) |
+| 새 Screen Set | 새 QR·새 slug 발급 |
+- 생성 QR `ensure` = 현행 멱등 유지. 비활성 QR 접속 시 **명확한 종료 화면**. slug는 다른 콘텐츠에 **재사용 금지**. Screen Set 편집·코너 적용/해제는 QR 활성 여부에 **무영향**. 일반 QR 수동 활성/비활성 계약과는 **별도**. → **"QR 해제" 버튼 불필요**(Screen Set 생명주기 자동 추종).
+
+---
+
 ## 1. 현재 구조도 (as-is)
 
 ```text
@@ -164,16 +186,16 @@
 
 | HOLD 조건 | 판정 | 조치 |
 |-----------|------|------|
-| ① HUB와 신규 Screen Content Package 책임 중복 | **HOLD 발동** | 신규 테이블 반려. 복사=asset-snapshot, 복합=screen_sets 재사용 |
-| ② 매장 사본 원본 삭제 후 독립 렌더 불가 | **부분 HOLD(미디어)** | 텍스트 OK / 미디어 정책 H1 결정 전 미구현 |
-| ③ 미디어 복사·참조 정책 근거 없음 | **HOLD(정책 공백)** | 현행=참조복사(문서화됨)이나 완전독립 미보장 → H1 결정 필요 |
-| ④ 일반 QR/ScreenSet QR 생명주기 분리 불가 | **HOLD 미발동(경고)** | 분리 가능하나 teardown 비대칭 → H2 정의 |
+| ① HUB와 신규 Screen Content Package 책임 중복 | **HOLD 발동(유지)** | 신규 테이블 반려. 복사=asset-snapshot, 복합=screen_sets 재사용 |
+| ② 매장 사본 원본 삭제 후 독립 렌더 불가 | **RESOLVED(H1)** | 영구 media resource 참조 + in-use 하드삭제 금지로 미디어까지 독립 확정 → 구현 gap은 P1 |
+| ③ 미디어 복사·참조 정책 근거 없음 | **RESOLVED(H1)** | O4O 미디어=영구 Resource 참조 / 외부=URL 참조로 확정 |
+| ④ 일반 QR/ScreenSet QR 생명주기 분리 불가 | **RESOLVED(H2)** | Screen Set 종속 채널(archive=비활성/restore=동일slug/삭제=tombstone, slug 재사용 금지) 확정 |
 | ⑤ 공급자 정책 충돌 | **HOLD 미발동** | 충돌 없음(D 조사) |
 | ⑥ 공통화가 KPA 공개 화면 계약 변경 | **HOLD 미발동** | 추출은 공개 계약 무변경으로 가능(D) |
 
-**회귀 위험**: (1) resolver seam 파라미터화 시 KPA content_list 회귀 — 브라우저 스모크 필수. (2) 블록 상수 추출 시 3서비스(kiosk-core 소비) 회귀. (3) H2 teardown 구현 시 기존 활성 Screen Set QR 접근 영향 — 반드시 archived-only 대상.
+**회귀 위험**: (1) resolver seam 파라미터화 시 KPA content_list 회귀 — 브라우저 스모크 필수. (2) 블록 상수 추출 시 3서비스(kiosk-core 소비) 회귀. (3) H2 archive→QR 비활성 구현 시 기존 활성 Screen Set QR 접근 영향 — 반드시 archived-only 대상.
 
-**미결정(요결정)**: H1(미디어 독립성), H2(QR teardown). 이 둘 확정 전 P2~P5 구현 착수 금지.
+**미결정 해소**: H1·H2 확정(2026-07-19). ①(신규 테이블)만 유지 HOLD. 잔여는 **구현 gap** → 별도 [P1 gap 분석 CHECK](../checks/CHECK-O4O-SCREEN-CONTENT-H1-H2-GAP-ANALYSIS-V1.md) 참조. 신규 테이블 신설은 계속 금지.
 
 ## 10. 코드·DB 변경 0 확인
 
