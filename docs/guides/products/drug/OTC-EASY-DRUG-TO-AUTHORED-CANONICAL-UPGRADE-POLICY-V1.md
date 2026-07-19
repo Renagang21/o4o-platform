@@ -37,45 +37,58 @@
 
 대상 단위 = **(master_id, description_type='STORE', language='ko')** 슬롯. 그룹의 연결 master 각각에 적용.
 
+> **안전 순서 원칙(확정)**: **authored 콘텐츠를 먼저 준비·검증한 뒤에만** 기존 e약은요 canonical을 내린다. authored가 준비되지 않은 상태에서 기존 canonical부터 demote하는 것을 금지한다. `authored canonical 직접 INSERT`는 needs_review 행을 만들 수 없는 예외에서만 사용한다(기본 경로는 needs_review→flip).
+
 ```text
-BEGIN;  -- 단일 TX, 단일 write-owner
+STEP A — authored 콘텐츠 준비·검증 (demote 이전)
+1) authored ko needs_review 확보:
+   INSERT authored (source_type='mfds_drug_otc'|..._nutrition_combo, description_type='STORE',
+     language='ko', status='needs_review', content=<§2 구조화 draft>, source_ref_id=<candidate/원천>)
+   WHERE NOT EXISTS(authored canonical|needs_review for 슬롯);   -- 재실행 no-op
+   또는 기존 authored needs_review 행 확인(멱등).
+2) 검증: 내용(구조화·grounding 완비)·source_ref_id·대상 master 수 확인.
+   미충족 → 중단(demote 미실행, 슬롯 무변경).
 
-0) 사전 조회(TX 내):
-   cur := SELECT id, source_type, status FROM shared_product_descriptions
-          WHERE master_id=$m AND description_type='STORE' AND COALESCE(language,'ko')='ko'
-            AND status='canonical' AND deleted_at IS NULL;
-   - cur 0건        → ABORT(예상 위반: grounded는 e약은요 canonical 보유 전제) → 보고
-   - cur.source_type ∈ authored(mfds_drug_otc|..._nutrition_combo) → **NO-OP**(이미 승격) → COMMIT(무변경)
-   - cur.source_type = 'mfds_easy_drug' → 진행
-
-1) demote(원문 보존): 
+STEP B — 슬롯 교체 (단일 TX, 단일 write-owner)
+BEGIN;
+   cur := 현재 canonical(슬롯). 
+   - cur 0건                    → ABORT(grounded는 e약은요 canonical 보유 전제) → 보고
+   - cur.source_type ∈ authored → NO-OP(이미 승격) → COMMIT(무변경)
+   - cur.source_type='mfds_easy_drug' → 진행
+3) e약은요 canonical → deprecated:
    UPDATE ... SET status='deprecated', updated_at=NOW(), updated_by=$owner
    WHERE id=cur.id AND status='canonical';   -- content·source_ref_id·행 보존, deleted_at NULL 유지
-   → 슬롯 predicate(canonical&not-deleted) 밖으로 이탈 = 슬롯 비움
-
-2) authored canonical 확보(둘 중 하나):
-   2a) authored needs_review 선존재 → flip:
-       UPDATE ... SET status='canonical', curated_at=NOW(), curated_by=$owner
-       WHERE master_id=$m AND description_type='STORE' AND COALESCE(language,'ko')='ko'
-         AND source_type IN (authored) AND status='needs_review' AND deleted_at IS NULL;
-   2b) 미존재 → INSERT authored canonical:
-       INSERT (... source_type='mfds_drug_otc'|..., description_type='STORE', language='ko', status='canonical', content=<구조화>, source_ref_id=<candidate/원천>)
-       WHERE NOT EXISTS(현재 canonical for 슬롯);   -- 1)로 이미 비었으므로 성공
-
-3) 사후검증(TX 내, 실패 시 ROLLBACK):
-   - canonical_count(슬롯) == 1                          (0·2 방지)
-   - 그 1건.source_type ∈ authored                       (교체 성공)
-   - deprecated e약은요 행 1건 존재(원문 보존 확인)
+4) authored needs_review → canonical flip:
+   UPDATE ... SET status='canonical', curated_at=NOW(), curated_by=$owner
+   WHERE master_id=$m AND description_type='STORE' AND COALESCE(language,'ko')='ko'
+     AND source_type IN (authored) AND status='needs_review' AND deleted_at IS NULL;
+5) 사후검증(실패 시 ROLLBACK):
+   - canonical_count(슬롯) == 1      (0·2 방지)
+   - 그 1건.source_type ∈ authored   (교체 성공)
+   - deprecated e약은요 행 1건 존재    (원문 보존)
    - dup == 0
    불일치 → ROLLBACK;
-
-4) 감사 로그: SharedProductDescriptionAuditLog에 demote(easy→deprecated)+create/flip(→authored canonical) 기록.
-
-COMMIT;
+6) 감사 로그: SharedProductDescriptionAuditLog에 demote(easy→deprecated) + flip(→authored canonical) 기록.
+7) COMMIT;
 ```
 
-- **순서 고정**: **demote(1) → authored canonical(2)**. 역순은 partial unique 위반. 단일 TX라 외부에는 0·2 canonical 상태가 **절대 커밋되지 않음**(원자성 + 인덱스 이중 방어).
-- **0/2 방지**: 2 canonical은 partial unique index가 구조적으로 차단, 0 canonical은 demote+create를 같은 TX에 묶어 방지(demote만 단독 커밋 금지).
+- **순서 고정**: STEP A(authored 준비·검증) → STEP B에서 **demote(3) → flip(4)**. demote·flip 역순은 partial unique 위반. authored 미준비 시 STEP B 진입 금지.
+- **0/2 방지**: 2 canonical은 partial unique index가 구조적으로 차단, 0 canonical은 demote+flip을 같은 TX에 묶어 방지(demote만 단독 커밋 금지).
+- **예외(2b, 비권장)**: needs_review 행을 만들 수 없는 상황에서만 STEP B-4를 `INSERT authored canonical`로 대체. 기본 경로 아님.
+
+### 2-A. 예상 write (master당 · 감사 로그 분리)
+
+```text
+master당 최소 write (ko 승격):
+- authored needs_review INSERT  : 1  (STEP A-1, 신규 시. 기존 행 재사용 시 0)
+- easy canonical → deprecated   : 1  (STEP B-3)
+- authored needs_review → flip  : 1  (STEP B-4)
+- audit log                     : 2+ (demote 1 + flip 1, 최소)
+= SPD write 3 (또는 2) + audit log 2+ per master
+en 단계: 빈 슬롯 INSERT 1 (+ audit 1) per master (별도)
+```
+
+> **승인 봉투 보고 규칙(정정)**: 예상 write는 **SPD 변경과 audit log를 분리**해 보고한다(예: `SPD 3 × N + audit 2N`). 그룹 전체 = master 수 × 위 계수. no-op(이미 authored) master는 write 0.
 
 ---
 

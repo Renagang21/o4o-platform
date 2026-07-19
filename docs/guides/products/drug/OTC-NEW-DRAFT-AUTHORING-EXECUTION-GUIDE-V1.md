@@ -106,7 +106,8 @@
 단계   : STEP 1(ko draft INSERT) → STEP 2(ko canonical flip) → STEP 3(en) → STEP 4(검증)
 방식   : dry-run → 이중 게이트 apply → 사후검증(count==EXPECTED·dup==0) → no-op 확인
 연속   : clean 그룹은 그룹 간 중간 승인 없이 순차 수행
-로그   : 그룹별 group_key·master수·INSERT수·flip수·en수·검증결과 기록
+예상write: SPD 변경과 audit log 분리 보고(승격 정책 §2-A: master당 SPD 3(또는 2)+audit 2+). no-op master=0
+로그   : 그룹별 group_key·master수·SPD write수·flip수·audit수·en수·검증결과 기록
 소유   : 소유 세션 단독 write, 봉투 완료까지 유지
 중단   : §7 stop gate 중 하나라도 → 즉시 중단·보고, 승인 대기
 금지   : DB write 외 구조/정책 변경, conflict 기준 변경, 타 구획(검토후/불일치/비경구) 편입
