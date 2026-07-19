@@ -552,7 +552,8 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
     onAdd(out, titles);
   };
   const selectedCount = Object.values(selO4o).filter(Boolean).length + Object.values(selStore).filter(Boolean).length;
-  const tabBtn = (active: boolean) => `flex-1 min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+  // 3-컬럼 등폭 탭: 한글 단어가 중간에서 깨지지 않도록 break-keep, 좁은 폭 대응 leading-tight + px 축소.
+  const tabBtn = (active: boolean) => `flex-1 min-h-[44px] px-2 py-2 text-sm font-medium rounded-xl leading-tight break-keep ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
 
   return (
     <div className="fixed inset-0 z-[950] bg-slate-900/50 flex items-stretch sm:items-center justify-center p-0 sm:p-4" onClick={onClose} role="presentation">
@@ -563,7 +564,7 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
         </div>
         {/* 출처 기준 3분류(성격 기준 아님) — WO-...-BUSINESS-FIELDS-V1 */}
         <div className="px-4 pt-3 grid grid-cols-3 gap-1.5 flex-shrink-0">
-          <button onClick={() => setTab('spd')} className={tabBtn(tab === 'spd')}>상품 매장용<br className="sm:hidden" /> 상세설명서</button>
+          <button onClick={() => setTab('spd')} className={tabBtn(tab === 'spd')}>매장용 상세설명서</button>
           <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 제공<br className="sm:hidden" /> 콘텐츠</button>
           <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작<br className="sm:hidden" /> 콘텐츠</button>
         </div>
