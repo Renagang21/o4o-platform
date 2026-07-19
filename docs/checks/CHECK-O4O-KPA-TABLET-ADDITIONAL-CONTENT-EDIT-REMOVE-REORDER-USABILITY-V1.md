@@ -40,7 +40,8 @@
 |------|------|
 | web typecheck | ✅ `tsc --noEmit` EXIT 0 |
 | web production build | ✅ EXIT 0 (14.43s) |
-| 버튼 정비(수정/삭제/순서) 라이브 스모크 | ⏳ 배포 후 — 테스트 세트에 ≥3 항목 추가 → 위로/아래로 순서변경·제약, 수정(제목·설명), 숨김/표시, 삭제+확인, 미리보기 순서 일치, 저장·재진입 유지. 테스트 데이터는 코너 미적용 [TEST] 세트로 검증 후 정리. |
+| 버튼 정비(수정/삭제/순서) 라이브 스모크 | ✅ **PASS** (2026-07-19, 배포 후 kpa-society.co.kr). 제작기 4단계에 코푸시럽에스 3개 추가 후: 버튼 순서 **위로\|아래로\|숨기기\|수정\|삭제** 확인, 첫 위로·마지막 아래로 disabled·중간 양쪽 활성. `아래로`로 순서변경(번호 재정렬). `수정` → 제목 입력 패널 열림(버튼 active), "테스트제목-A" 입력 시 카드 제목 즉시 반영. `숨기기` → "○ 현재 숨김"+`표시하기` 토글, **미리보기에서 숨긴 항목 제외**(3개 중 2개만 코너 콘텐츠에 표시). `삭제` → 확인 다이얼로그(정확한 문안) → accept → 개수 3→2. console error 0. |
+| 저장/재진입/공개 순서·visible | ✅ 계약 재사용(무변경) — `sortOrder`/`visible`/`displayTitle`/`displaySummary` 는 이 WO 이전부터 content_list 로 저장되고 [resolveContentListItems](../../apps/api-server/src/routes/platform/store-public/store-public-tablet-content-resolve.ts)가 정렬·필터·오버라이드 적용(미리보기=서버 resolve 로 이미 반영 확인). 본 WO 는 버튼 표현/배치만 변경 → persistence 회귀 위험 없음. (prod 테스트 세트 생성은 불필요 write 회피 위해 미실행.) |
 
 ---
 
