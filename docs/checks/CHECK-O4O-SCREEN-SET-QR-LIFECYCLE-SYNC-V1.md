@@ -41,9 +41,17 @@
 
 | 항목 | 결과 |
 |------|------|
-| api-server typecheck (내 3파일) | ✅ 오류 0 (전체 10 error는 타 세션 미커밋 스크립트, 내 파일 무관) |
-| web typecheck / build | ✅ EXIT 0 / EXIT 0 (14.05s) |
-| API/브라우저 스모크 | ⏳ 배포 후 — 테스트 세트 생성(자동 QR)→/qr/{slug} 정상→archive→410 종료→restore→복구, slug·QR id 불변, 일반 QR 불변, 편집/적용 무영향 확인. 테스트 세트 정리. |
+| api-server typecheck (내 파일) | ✅ 오류 0 (전체 error는 타 세션 미커밋 스크립트, 내 파일 무관) |
+| web typecheck / build | ✅ EXIT 0 / EXIT 0 |
+| **API 스모크 (배포 후 라이브)** | ✅ **PASS** (2026-07-19). 테스트 세트(자동 QR slug=`test-qr-lifecycle-smoke`): active→공개 **200** / archive(PATCH·DELETE)→**410 SCREEN_SET_INACTIVE** / restore(PATCH)→**200 동일 slug** / rename(편집)→**200(무영향)** / DELETE→**410 tombstone**. **slug·QR id 불변**(`fa27ef7f…`), 반복 archive/restore 멱등, `isActive` DB 토글 확인. |
+
+### 스모크 중 발견 & 하드닝 (no-store)
+- 상태의존 공개 GET(200/410)이 브라우저/edge에 캐시되어 restore 후에도 plain-GET이 410 지연 노출됨(테스트 브라우저 캐시 오염). QR `isActive` 토글 자체는 정상(cache-bypass GET·DB row 확인).
+- → 공개 `/qr/public/:slug` 응답에 **`Cache-Control: no-store, must-revalidate`** 추가(commit 별도). fresh-scan(실제 QR 스캔=매번 새 브라우저) 검증에서 200/410 라이브 즉시 반영 확인.
+
+### 일반 QR·다른 set·보호 샘플 (구조적 무영향)
+- `setScreenSetQrActive`·public 410 분기 모두 **`landing_type='screen_set'` + 특정 `landing_target_id`** 한정 → 일반 QR(product/page/link/video)·다른 Screen Set QR **구조적으로 무영향**. 코너 적용/해제·블록 편집은 QR is_active 미접촉(status 전이에서만 변경).
+- 스모크는 테스트 세트(id `7658f0c1…`)만 대상 → 보호 샘플(구강관리/피부관리) 무접촉.
 
 ## 5. 중지 조건 점검 (해당 없음)
 - Screen Set QR/일반 QR 구분 = `landing_type='screen_set'`로 안전 구분 ✅
