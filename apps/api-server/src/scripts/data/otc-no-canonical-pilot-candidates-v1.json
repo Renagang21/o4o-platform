@@ -2,45 +2,12 @@
   "wo": "apply 재정의 → e약은요-미보유(STORE canonical 無) 첫 파일럿 후보 집계",
   "dbWrite": 0,
   "readOnly": true,
-  "universe_OTC_STOREcanonical_無": 35268,
+  "universe_OTC_STOREcanonical_無": 35254,
   "otc_total": 57572,
   "총_draft": 95,
-  "사용가능_draft_경구": 2,
+  "사용가능_draft_경구": 1,
   "사용가능_draft_비경구별도트랙": 1,
   "추천_top3_경구": [
-    {
-      "candidate_id": "049c2a1c-d834-401a-bc6a-3321fcc3c104",
-      "title": "펙소페나딘염산염 60mg 정",
-      "groupKey": "펙소페나딘염산염|60밀리그램|정",
-      "promotable": 14,
-      "groupTotal": 50,
-      "rx": 0,
-      "koNeedsReview": 0,
-      "enCanonical": 0,
-      "pharmHomogeneous": true,
-      "예상": {
-        "ko_INSERT": 14,
-        "en_INSERT_after_translation": 14,
-        "ko_flip": 14,
-        "en_flip": 14
-      },
-      "rollback_master_ids": [
-        "0477b1e5-ec65-426d-a964-065003f635c8",
-        "1ba2c0da-5d2e-4678-87d8-68f82c20b304",
-        "20576123-8ed4-463e-a641-4d5830f50092",
-        "3c12b756-5391-4767-8a9b-254961533c36",
-        "41ac38b2-db8d-4cc9-bd15-370a45cfba70",
-        "549744a5-27a1-42b8-9bc4-6c7218b3ebe1",
-        "57426ed6-f364-4757-8329-3374b7c3e192",
-        "7d8c17a5-641c-4cf7-9eec-f9427171e0f2",
-        "89dd3ad3-e486-481c-86dd-432cdefb0519",
-        "8ca5aa8f-847f-4fa6-8d4b-39b02010aaa7",
-        "9d31053d-dfa1-4aef-ba06-fa0a0dfeafb2",
-        "af115a11-7a61-443a-b9da-ffcde5aba349",
-        "bfb8d095-afeb-4da9-855b-00f9f2123de3",
-        "ce881ddc-24e0-4247-a89d-747056bd8c84"
-      ]
-    },
     {
       "candidate_id": "00e0ca81-076d-4b12-82ff-0855d05a124b",
       "title": "결정글루코사민황산염 250mg 캡슐",
@@ -77,12 +44,6 @@
     }
   ],
   "사용가능_경구_전체": [
-    {
-      "title": "펙소페나딘염산염 60mg 정",
-      "promotable": 14,
-      "groupTotal": 50,
-      "rx": 0
-    },
     {
       "title": "결정글루코사민황산염 250mg 캡슐",
       "promotable": 8,
@@ -278,6 +239,11 @@
     },
     {
       "title": "니자티딘 75mg 정",
+      "promotable": 0,
+      "reason": "promotable 0(그룹 이미 canonical 보유)"
+    },
+    {
+      "title": "펙소페나딘염산염 60mg 정",
       "promotable": 0,
       "reason": "promotable 0(그룹 이미 canonical 보유)"
     },
@@ -678,7 +644,7 @@
       "alreadyPromoted": 128,
       "promotable": 0,
       "koNeedsReview": 0,
-      "enCanonical": 0,
+      "enCanonical": 24,
       "err": null,
       "pharmHomogeneous": true,
       "예상": {
@@ -1537,17 +1503,17 @@
       "oral": true,
       "groupTotal": 50,
       "rx": 0,
-      "alreadyPromoted": 36,
-      "promotable": 14,
+      "alreadyPromoted": 50,
+      "promotable": 0,
       "koNeedsReview": 0,
       "enCanonical": 0,
       "err": null,
       "pharmHomogeneous": true,
       "예상": {
-        "ko_INSERT": 14,
-        "en_INSERT_after_translation": 14,
-        "ko_flip": 14,
-        "en_flip": 14
+        "ko_INSERT": 0,
+        "en_INSERT_after_translation": 0,
+        "ko_flip": 0,
+        "en_flip": 0
       }
     },
     {
