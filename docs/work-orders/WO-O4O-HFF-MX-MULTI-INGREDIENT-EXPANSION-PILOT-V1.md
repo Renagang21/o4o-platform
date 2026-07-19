@@ -52,4 +52,10 @@
   - 마그네슘+비타민D+비타민K+칼슘 26 · 마그네슘+망간+비타민D+칼슘 12 · 비타민C+비타민D+셀레늄+아연 9.
   - 각 generate PASS·BLOCKED 0·G-MULTI HOLD 0. REVIEW 6(코팅정제·basis known-safe). dry-run 188=188 → apply COMMIT → 독립검증 3조합 PASS(canonicalDup 0·links 47·SPD sourceRef 94).
   - tag `batch:single-nutrient-combo-{mg-vd-vk-ca,mg-mn-vd-ca,vc-vd-se-zn}`. 복합형 누적 365→**412**. 기존 무변경.
-- (다음) 미생산 MX 4-원료 조합 인벤토리 산출 → 후보 select→generate→dry-run 자동, **DB COMMIT은 배치별 재승인**.
+- **MX 4-원료 추가 배치**: 밀크씨슬+비타민B1+B2+B6(간건강+B군) 9건 LIVE. generate PASS 7·REVIEW 2(코팅정제 known-safe)·BLOCKED 0·G-MULTI HOLD 0. dry-run 36=36 → apply COMMIT → 독립검증 PASS(canonicalDup 0·links 9·SPD sourceRef 18). tag `batch:single-nutrient-combo-ms-b126`. 복합형 누적 412→**421**.
+
+## 6. 라인 정리 및 다음 단계 (결정: b)
+
+- **MX 4-원료 클린 조합 종료**: 대형 미네랄 조합(mg+zn+ca+vd 69·mg+vd+vk+ca 26·mg+mn+vd+ca 12·vc+vd+se+zn 9·밀크씨슬+B 9)은 완료(복합형 421 LIVE). 남은 4-원료는 전부 단자릿수 B군(제품이 대개 5+종 종합비타민이라 "정확히 4"가 드묾) → **반복 스윕 종료**(수확체감).
+- **다음(별도 준비)**: ① ADC 기반 durable proxy 안정화(WO-...-PROXY-SERVICE-AND-ENV-PRESERVATION-V1) ② higher-N 5~8종 종합비타민 후보군 정확 인벤토리(select 엄격추출 기준 실제 full-set) → 그룹화 → 신규 배치. `--token` 프록시 상태에서는 대량 probe 미진행.
+- composeCombo/G-MULTI는 N-원료 무변경 처리 확인(4원료 실증) → higher-N도 구조 변경 없이 가능 전망(단, 카드 5+ 렌더·selection full-set 확정 필요).

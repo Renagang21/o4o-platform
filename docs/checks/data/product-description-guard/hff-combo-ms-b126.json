@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "ms-b126-001",
+  "productName": "밀크씨슬&비타민B",
+  "productNameEn": "밀크씨슬&비타민B",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001371",
+  "category": "hff",
+  "source": {
+   "mainFunction": "간 건강에 도움을 줄 수 있음\n탄수화물과 에너지 대사에 필요\n체내 에너지 생성에 필요\n단백질 및 아미노산 이용에 필요\n혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 장방형의 장용성 제피정제\n2. 실리마린(mg): 표시량(130mg/700mg)의 80~120%\n3. 비타민B1(mg): 표시량(12mg/700mg)의 80~180%\n4. 비타민B2(mg): 표시량(14mg/700mg)의 80~180%\n5. 비타민B6(mg): 표시량(15mg/700mg)의 80~150%\n6. 납(mg/kg): 1.0 이하\n7. 비소(mg/kg): 1.0 이하\n8. 카드뮴(mg/kg): 0.5 이하\n9. 수은(mg/kg): 0.5 이하\n10. 대장균군: 음성\n11. 붕해시험: 적합 (1액에서 120분이내 내용물이 붕해안됨, 2액에서 60분이내 붕해)",
+   "intake": "1일 1회, 1회 2정씩 충분한 물과 함께 섭취하십시오",
+   "caution": "알레르기 반응이 나타나는 경우에는 섭취 중단\n설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n어린이, 임산부 및 수유부는 섭취를 피할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 장방형의 장용성 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 12mg</span><span class=\"sd-badge is-solid\">비타민 B2 14mg</span><span class=\"sd-badge is-solid\">비타민 B6 15mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>밀크씨슬&amp;비타민B<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>12mg</b>, 비타민 B2 <b>14mg</b>, 비타민 B6 <b>15mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>12mg</b>, 비타민 B2 <b>14mg</b>, 비타민 B6 <b>15mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 장방형의 장용성 제피정제 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/700mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(12mg/700mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(14mg/700mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(15mg/700mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 장방형의 장용성 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 12mg</span><span class=\"sd-badge is-solid\">Vitamin B2 14mg</span><span class=\"sd-badge is-solid\">Vitamin B6 15mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>밀크씨슬&amp;비타민B<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>12mg</b> of Vitamin B1, <b>14mg</b> of Vitamin B2, <b>15mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>130mg</b> Milk thistle, <b>12mg</b> Vitamin B1, <b>14mg</b> Vitamin B2, <b>15mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 700mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (12mg / 700mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (14mg / 700mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (15mg / 700mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 장방형의 장용성 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-002",
+  "productName": "슈퍼밀크씨슬칸",
+  "productNameEn": "슈퍼밀크씨슬칸",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021705",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[밀크씨슬(카르두스 마리아누스)추출물 제품] ① 간 건강에 도움을 줄 수 있음\n\n[비타민B1] ①탄수화물과 에너지 대사에 필요\n\n[비타민B2] ①체내 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미∙이취가 없으며 흐린 노랑색의 점박이가 있는 흰 노란색의 장방형 제피정제\n②실리마린 : 표시량(130mg/650mg)의 80 ~ 120% \n③비타민B1 : 표시량(6mg/650mg)의 80 ~ 180%\n④비타민B2 : 표시량(7mg/650mg)의 80 ~ 180%\n⑤비타민B6 : 표시량(7.5mg/650mg)의 80 ~ 150%\n⑥납(mg/kg) : 1.0이하\n⑦카드뮴(mg/kg) : 0.5이하\n⑧총수은(mg/kg) : 0.5이하\n⑨총비소(mg/kg) : 1.0이하\n⑩대장균군 : 음성\n⑪붕해시험 : 60분 이내\n⑫잔류용매(헥산(mg/kg)) : 5.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 반응이 나타나는 경우에는 섭취 중단 \n② 설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의\n③ 알레르기 체질이신 경우 성분을 확인 하신 후 섭취하십시오.\n④ 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n⑥ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n⑦ 어린이, 임산부 및 수유부는 섭취를 피할 것\n⑧손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없으며 흐린 노랑색의 점박이가 있는 흰 노란색의 장방형 제피정제",
+   "storage": "① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 650,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 6mg</span><span class=\"sd-badge is-solid\">비타민 B2 7mg</span><span class=\"sd-badge is-solid\">비타민 B6 7.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼밀크씨슬칸<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>6mg</b>, 비타민 B2 <b>7mg</b>, 비타민 B6 <b>7.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>6mg</b>, 비타민 B2 <b>7mg</b>, 비타민 B6 <b>7.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미∙이취가 없으며 흐린 노랑색의 점박이가 있는 흰 노란색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/650mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(6mg/650mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(7mg/650mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(7.5mg/650mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미∙이취가 없으며 흐린 노랑색의 점박이가 있는 흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 7mg</span><span class=\"sd-badge is-solid\">Vitamin B6 7.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>슈퍼밀크씨슬칸<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>6mg</b> of Vitamin B1, <b>7mg</b> of Vitamin B2, <b>7.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>130mg</b> Milk thistle, <b>6mg</b> Vitamin B1, <b>7mg</b> Vitamin B2, <b>7.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 650mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (6mg / 650mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (7mg / 650mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (7.5mg / 650mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미∙이취가 없으며 흐린 노랑색의 점박이가 있는 흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습 및 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-003",
+  "productName": "간:비",
+  "productNameEn": "간:비",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106410",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[밀크씨슬 추출물] ① 간 건강에 도움을 줄 수 있음\n\n[비타민 B1] ①탄수화물과 에너지 대사에 필요\n\n[비타민 B2] ①체내 에너지 생성에 필요\n\n[비타민 B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "① 성상 : 이미,이취가 없고 고유의 향미가 있는 황색의 코팅정제\n② 실리마린 : 표시량(130mg/3,200㎎)의 80 ~120%\n③ 비타민B1 : 표시량(1.2mg/3,200mg)의 80~180%\n④ 비타민B2 : 표시량(1.4mg/3,200mg)의 80~180%\n⑤ 비타민B6 : 표시량(1.5mg/3,200mg)의 80~150%\n⑥ 헥산(mg/kg) : 5.0 이하\n⑦ 초산에틸(mg/kg) : 50.0 이하\n⑧ 납(mg/kg) : 1.0 이하\n⑨ 카드뮴(mg/kg) : 0.5 이하\n⑩ 총수은(mg/kg) : 0.5 이하\n⑪ 총비소(mg/kg) : 1.0 이하\n⑫ 대장균군 : 음성\n⑬ 붕해도 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.\n③ 설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의하십시오.\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n⑤ 동봉된 흡습제(실리카겔)는 섭취하지 마십시오.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 황색의 코팅정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 3200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>간:비<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 황색의 코팅정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/3200mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/3200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/3200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/3200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 황색의 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>간:비<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>130mg</b> Milk thistle, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 3200mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 3200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 3200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 3200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 황색의 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-004",
+  "productName": "밀크씨슬 간건강케어",
+  "productNameEn": "밀크씨슬 간건강케어",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352675",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1]\n탄수화물과 에너지 대사에 필요\n\n[비타민B2]\n체내 에너지 생성에 필요\n\n[비타민B6]\n단백질 및 아미노산 이용에 필요\n혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[밀크씨슬 추출물]\n간 건강에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 보라색 또는 흐린 보라색의 장방형 제피 정제\n2. 실리마린 : 표시량(130mg/320mg)의 80~120%\n3. 비타민B6 : 표시량(1.5mg/320mg)의 80~150%\n4. 비타민B1 : 표시량(1.2mg/320mg)의 80~180%\n5. 비타민B2 : 표시량(1.4mg/320mg)의 80~180%\n6. 납(mg/kg) : 1.0 이하\n7. 카드뮴(mg/kg) : 0.5 이하\n8. 수은(mg/kg) : 0.5 이하\n9. 비소(mg/kg) : 1.0 이하\n10. 붕해도 : 60분 이내\n11. 대장균군 : 음성\n12. 헥산 (mg/kg) : 5.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[비타민B1]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B2]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[밀크씨슬 추출물]\n어린이, 임산부 및 수유부는 섭취를 피할 것\n알레르기 반응이 나타나는 경우에는 섭취 중단\n설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 보라색 또는 흐린 보라색의 장방형 제피 정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 320,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>밀크씨슬 간건강케어<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 보라색 또는 흐린 보라색의 장방형 제피 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/320mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/320mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/320mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/320mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 보라색 또는 흐린 보라색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>밀크씨슬 간건강케어<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>130mg</b> Milk thistle, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 320mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 320mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 320mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 320mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 보라색 또는 흐린 보라색의 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-005",
+  "productName": "간 건강엔 밀크씨슬",
+  "productNameEn": "간 건강엔 밀크씨슬",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001325",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 간 건강에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요 ②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상: 이미, 이취가 없고 고유의 향미가 있는 연한회색 ~ 회녹색의 제피정제\n2. 실리마린: 표시량(130mg/1200mg)의 80~120%\n3. 비타민B1: 8.42mg/1200mg의 80~180%\n4. 비타민B2: 9.80mg/1200mg의 80~180%\n5. 비타민B6: 10.50mg/1200mg의 80~150%\n6. 대장균군: 음성\n7. 납(mg/kg): 1.0 이하\n8. 총비소(mg/kg): 1.0 이하\n9. 카드뮴(mg/kg): 0.5 이하\n10. 총수은(mg/kg): 0.5 이하\n11. 헥산(mg/kg): 5.0 이하\n12. 초산에틸(mg/kg): 50.0 이하\n13. 붕해도: 60분 이내",
+   "intake": "1일 2회, 1회 1정씩 충분한 물과 함께 섭취하십시오",
+   "caution": "① 알레르기 반응이 나타나는 경우에는 섭취 중단 ② 설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한회색 ~ 회녹색의 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 8.42mg</span><span class=\"sd-badge is-solid\">비타민 B2 9.8mg</span><span class=\"sd-badge is-solid\">비타민 B6 10.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>간 건강엔 밀크씨슬<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>8.42mg</b>, 비타민 B2 <b>9.8mg</b>, 비타민 B6 <b>10.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>8.42mg</b>, 비타민 B2 <b>9.8mg</b>, 비타민 B6 <b>10.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한회색 ~ 회녹색의 제피정제 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/1200mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(8.42mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(9.8mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(10.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한회색 ~ 회녹색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 8.42mg</span><span class=\"sd-badge is-solid\">Vitamin B2 9.8mg</span><span class=\"sd-badge is-solid\">Vitamin B6 10.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>간 건강엔 밀크씨슬<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>8.42mg</b> of Vitamin B1, <b>9.8mg</b> of Vitamin B2, <b>10.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>130mg</b> Milk thistle, <b>8.42mg</b> Vitamin B1, <b>9.8mg</b> Vitamin B2, <b>10.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 1200mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (8.42mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (9.8mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (10.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한회색 ~ 회녹색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-006",
+  "productName": "진정주 밀크씨슬",
+  "productNameEn": "진정주 밀크씨슬",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061409",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[밀크씨슬추출물] 간 건강에 도움을 줄 수 있음\n\n[비타민B1] 탄수화물과 에너지 대사에 필요\n\n[비타민B2] 체내 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 밝은 갈색의 내용물을 함유한 진한 초록색의 장방형 연질캡슐\n2) 실리마린: 표시량(130 mg / 700 mg)의 80~120%\n3) 비타민B1: 표시량(3.6 mg/ 700 mg)의 80~180%\n4) 비타민B2: 표시량(4.2 mg/ 700 mg)의 80~180%\n5) 비타민B6: 표시량(4.5 mg/ 700 mg)의 80~150%\n6) 납(mg/kg): 1.0 이하\n7) 카드뮴(mg/kg): 0.5 이하\n8) 수은(mg/kg): 0.5 이하\n9) 비소(mg/kg): 1.0 이하\n10) 헥산(mg/kg): 5.0 이하\n11) 붕해시험 : 20분이내\n12) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[밀크씨슬추출물]\n 어린이 임산부 및 수유부는 섭취를 피할 것\n 알레르기 반응이 나타나는 경우에는 섭취 중단\n설사 위통 복부팽만 등의 위장관계 장애가 나타나는 경우에는 , , 섭취에 주의\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 갈색의 내용물을 함유한 진한 초록색의 장방형 연질캡슐",
+   "storage": "실온/ 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 3.6mg</span><span class=\"sd-badge is-solid\">비타민 B2 4.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 4.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>진정주 밀크씨슬<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 갈색의 내용물을 함유한 진한 초록색의 장방형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/700mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(3.6mg/700mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(4.2mg/700mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(4.5mg/700mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 갈색의 내용물을 함유한 진한 초록색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 3.6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 4.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 4.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>진정주 밀크씨슬<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>3.6mg</b> of Vitamin B1, <b>4.2mg</b> of Vitamin B2, <b>4.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>130mg</b> Milk thistle, <b>3.6mg</b> Vitamin B1, <b>4.2mg</b> Vitamin B2, <b>4.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 700mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (3.6mg / 700mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (4.2mg / 700mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (4.5mg / 700mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 갈색의 내용물을 함유한 진한 초록색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-007",
+  "productName": "케어간(Care Liver)",
+  "productNameEn": "케어간(Care Liver)",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110767",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 간 건강에 도움을 줄 수 있음\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 진한노랑~황갈색의 타원형 제피정제\n2. 실리마린 : 표시량(130㎎/1600㎎)의 80~120%\n3. 비타민B1 : 표시량(0.85㎎/1600㎎)의 80~180%\n4. 비타민B2 : 표시량(0.95㎎/1600㎎)의 80~180%\n5. 비타민B6 : 표시량(1.06㎎/1600㎎)의 80~150%\n6. 납(㎎/㎏) : 1.0 이하\n7. 카드뮴(㎎/㎏) : 0.5 이하\n8. 수은(㎎/㎏) : 0.5 이하\n9. 비소(㎎/㎏) : 1.0 이하\n10. 대장균군 : 음성\n11. 붕해 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 반응이 나타나는 경우에는 섭취 중단 ② 설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 진한노랑~황갈색의 타원형 제피정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 0.85mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.95mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.06mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케어간(Care Liver)<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>0.85mg</b>, 비타민 B2 <b>0.95mg</b>, 비타민 B6 <b>1.06mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>0.85mg</b>, 비타민 B2 <b>0.95mg</b>, 비타민 B6 <b>1.06mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 진한노랑~황갈색의 타원형 제피정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/1600mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.85mg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.95mg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.06mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 진한노랑~황갈색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 0.85mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.95mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.06mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케어간(Care Liver)<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>0.85mg</b> of Vitamin B1, <b>0.95mg</b> of Vitamin B2, <b>1.06mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>130mg</b> Milk thistle, <b>0.85mg</b> Vitamin B1, <b>0.95mg</b> Vitamin B2, <b>1.06mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 1600mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.85mg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.95mg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.06mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 진한노랑~황갈색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-008",
+  "productName": "장대원 간건강",
+  "productNameEn": "장대원 간건강",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110950",
+  "category": "hff",
+  "source": {
+   "mainFunction": "① 간 건강에 도움을 줄 수 있음\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 황갈색의 타원형 정제.\n2. 실리마린 : 표시량(130 ㎎/2,000 ㎎)의 80~120%\n3. 비타민B1 : 표시량(1.2㎎/2000㎎)의 80~180%\n4. 비타민B2 : 표시량(1.4㎎/2000㎎)의 80~180%\n5. 비타민B6 : 표시량(1.5㎎/2000㎎)의 80~150%\n6. 납(㎎/㎏) : 1.0 이하\n7. 카드뮴(㎎/㎏) : 0.5 이하\n8. 수은(㎎/㎏) : 0.5 이하\n9. 비소(㎎/㎏) : 1.0 이하\n10. 대장균군 : 음성.\n11. 붕해 : 적합(30분 이내)",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "알레르기 반응이 나타나는 경우에는 섭취 중단\n설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 황갈색의 타원형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>장대원 간건강<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 황갈색의 타원형 정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 황갈색의 타원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>장대원 간건강<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>130mg</b> Milk thistle, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 황갈색의 타원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "ms-b126-009",
+  "productName": "헤파쿠스플러스",
+  "productNameEn": "헤파쿠스플러스",
+  "manufacturer": "일양약품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017068179",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[밀크씨슬추출물]①간 건강에 도움을 줄 수 있음\n\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B1]①탄수화물과 에너지 대사에 필요\n\n[비타민B2]①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흐린빨간색의 장방형 코팅정제\n2. 실리마린 : 표시량(130 mg/500 mg)의 80~120%\n3. 비타민B6 : 표시량(1.5 mg/500 mg)의 80~150%\n4. 비타민B1 : 표시량(1.2 mg/500 mg)의 80~180%\n5. 비타민B2 : 표시량(1.4 mg/500 mg)의 80~180%\n6. 납(mg/kg) : 1.0 이하\n7. 카드뮴(mg/kg) : 0.5 이하\n8. 총수은(mg/kg) : 0.5 이하\n9. 총비소(mg/kg) : 1.0 이하\n10. 대장균군 : 음성\n11. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.\n2) 설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의하십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것.\n4) 특이체질, 알레르기 체질이신 경우 원료를 확인하신 후 섭취하여 주시기 바랍니다.\n5) 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n6) 섭취 시 목에 걸릴 우려가 있으니 충분한 물과 함께 섭취하십시오.\n7) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흐린빨간색의 장방형 코팅정제",
+   "storage": "- 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 130,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">밀크씨슬 130mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>헤파쿠스플러스<small>밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6</small></h1><p class=\"sd-meta\">일양약품(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 밀크씨슬 <b>130mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흐린빨간색의 장방형 코팅정제 · 일양약품(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>밀크씨슬</b> 표시량(130mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흐린빨간색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 밀크씨슬 · 비타민 B1 · 비타민 B2 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Milk thistle 130mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>헤파쿠스플러스<small>Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 일양약품(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>130mg</b> of Milk thistle, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>130mg</b> Milk thistle, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 일양약품(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Milk thistle</b><ul class=\"sd-why\"><li>May help with liver health</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Milk thistle</b> labelled (130mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흐린빨간색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Milk thistle · Vitamin B1 · Vitamin B2 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
