@@ -233,10 +233,9 @@ export default function TabletContentLibraryList({
           <div className="w-7 h-7 rounded flex items-center justify-center bg-indigo-50 shrink-0 text-indigo-500">
             <Layers className="w-3.5 h-3.5" />
           </div>
+          {/* WO-...-REMOVE-REUSE-BADGE-V1: 모든 Screen Set 이 코너와 독립돼 원래 재사용 가능 → '재사용' 배지는 구분정보 아님(제거).
+              현재 사용처는 '현재 적용 코너' 열로만 표현. 재사용 기능·데이터·코너 적용 API 무변경. */}
           <span className="font-medium text-slate-800 text-sm truncate">{s.name}</span>
-          {s.tabletId === null && (
-            <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded flex-shrink-0">재사용</span>
-          )}
         </div>
       ),
     },
