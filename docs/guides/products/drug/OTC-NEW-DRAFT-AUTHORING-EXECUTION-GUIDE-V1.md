@@ -13,7 +13,7 @@
 | 항목 | 값 |
 |---|---|
 | 작업 대상 | bridge 통합 **`새설명서필요`** 구획 = **2,882 그룹 / 9,101 제품**(정본 `90342ce7d` 검토 확정, 스크립트 `9dc8f3ebf`) — authored 후보 없음 |
-| grounding 원천 | 각 대상 master에 연결된 **식약처 e약은요 원천 레코드**(`mfds_easy_drug`). **STORE canonical 보유 여부와 별개**(원천 데이터 ≠ 표시용 canonical). 신규 draft는 이 원천 레코드에서만 구조화(창작 금지, CR-004/AR-002). **기존 STORE canonical(authored 표시본) 보유 master는 신규 authored apply 대상에서 제외**(무충돌 신규만) |
+| grounding 원천 | 각 대상 master에 연결된 **식약처 e약은요 원천 레코드**(`mfds_easy_drug`). **STORE canonical 보유 여부와 별개**(원천 데이터 ≠ 표시용 canonical). 신규 draft는 이 원천 레코드에서만 구조화(창작 금지, CR-004/AR-002). **제외 = authored 표시본(mfds_drug_otc/nutrition_combo) canonical 보유 master**(이미 승격됨). **e약은요 canonical 보유는 제외가 아니라 [승격(교체) 대상](OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1.md)** — 슬롯 점유이므로 단순 INSERT 불가, demote→replace 계약 적용 |
 | 산출 | 그룹당 **ko 구조화 draft 1건** → 연결 master 전개 → en 번역 → canonical |
 | **제외(이 배치와 섞지 않음)** | 검토후확장 1,182 · 안전지문불일치 1,424 · 비경구별도트랙 6,223 · 무성분명 atc_code 없음 · rx · 복합제 |
 | 후보 선정 | **본 문서는 규칙만 정의**. Top20·추천5 등 실제 그룹 선정은 에이전트 가 소관(개입 금지) |
@@ -85,9 +85,9 @@
 
 각 단계 **dry-run 먼저**, write는 **단일 TX + 이중 게이트**, INSERT/상태전환만:
 
-1. **STEP 0 — read-only 조사**: 그룹의 e약은요 원문·안전지문·기존 canonical 상태 확인. clean 판정(§1) / 제외 태깅(§4).
-2. **STEP 1 — ko draft 작성**(needs_review INSERT): §2 기준 구조화. `INSERT ... WHERE NOT EXISTS(canonical|needs_review)`.
-3. **STEP 2 — ko canonical flip**: needs_review → canonical(이중 게이트 GATE_ENV=YES). flip 후 `count==EXPECTED · dup==0` 사후검증, 불일치 ROLLBACK.
+1. **STEP 0 — read-only 조사**: 그룹의 e약은요 원문·안전지문·현재 canonical 상태 확인. clean 판정(§1) / 제외 태깅(§4).
+2. **STEP 1 — ko draft 작성**(needs_review INSERT): §2 기준 구조화. `INSERT ... WHERE NOT EXISTS(authored canonical|needs_review)`.
+3. **STEP 2 — ko canonical 승격(슬롯 교체)**: ⚠️ grounded는 **e약은요 canonical이 (master,STORE,ko) 슬롯을 점유** → 단순 flip 불가. **[승격(교체) 정책](OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1.md) §2를 따른다**: 동일 TX에서 e약은요 canonical→`deprecated` demote(원문 보존) → authored canonical flip/INSERT → 사후검증(canonical==1·authored·dup==0·deprecated 보존), 불일치 ROLLBACK. 이중 게이트 GATE_ENV=YES.
 4. **STEP 3 — en 번역·전개·검수·공개**: [OTC-BULK-TRANSLATION-EXECUTION-GUIDE-V1](OTC-BULK-TRANSLATION-EXECUTION-GUIDE-V1.md) 절차 그대로(그룹당 en 1건 → 연결 master 전개 → 검수 → canonical).
 5. **STEP 4 — 독립 검증**: 재조회로 ko/en canonical 정합·연결 master 전개 수·no-op 확인.
 
