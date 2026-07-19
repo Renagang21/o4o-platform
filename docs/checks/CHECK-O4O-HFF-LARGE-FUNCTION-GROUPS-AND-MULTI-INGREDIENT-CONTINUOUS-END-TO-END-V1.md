@@ -154,3 +154,10 @@ raw(`G:\내 드라이브\...\mfds-...jsonl`, Google Drive)가 세션 중 일시 
 - 진단: 13건은 실제 **루테인+비타민A 2원료 제품**인데 단일 루테인 라인이 단일로 오분류 → 비타민A 기능성 누락 게시(표본 2/3 누락 확인). **기존 LIVE 데이터 결함**.
 - 결정 **Option A**: lut-va 를 `PAUSED_GROUP_DEFECT`로 격리(apply 금지·LIVE 수정 금지·7건 부분 apply 금지·산출물 보존). 교정·감사는 별도 트랙 → `WO-O4O-HFF-SINGLE-NUTRIENT-MULTI-INGREDIENT-MISCLASSIFICATION-AUDIT-AND-LUTEIN-CORRECTION-V1`. 공통 결함 여부(다른 단일 라인의 다중원료 흡수) read-only 감사 포함.
 - 복합형 생산은 계속 — 다음 독립 조합(식이섬유+아연 → 오메가3+비타민E → 철+엽산). 기존 복합형 287 무변경.
+
+### 5.9 M2/M3 순수 조합 라인 종결 — mg-zn-ca 2 LIVE + 소진 판정
+
+- **마그네슘+아연+칼슘(M3)**: ELIGIBLE 2 (mention 546·grounding-held 60·HOLD_MULTI 479). dry-run 8=8 → apply COMMIT → 독립검증 PASS. tag `batch:single-nutrient-combo-mg-zn-ca`. 복합형 누적 294→**296**.
+- **grounding-held 60 원인 규명(정당 HOLD)**: 47 = "부원료/미귀속 기능성"(예 "칼슘과 인이 흡수…"·"뼈의 형성과 유지…" = 비타민D 기능성) → 실제 mg+zn+ca+**비타민D** 4원료 제품인데 3원료로 게시 시 비타민D 누락(=lutein형 결함) → 정확한 방어. 13 = 귀속/매핑 실패. **공통 버그 아님, registry 정상**.
+- **소진 판정**: 다음 3조합 신규 0 (오메가3+비타민E=registry gap[오메가3 INGREDIENT_FN 부재, 별도 공통코드 WO] · 철+엽산=순수 2-조합 부재 · 식이섬유+아연≈0). 순수 2~3원료 적격 제품 사실상 소진. 대형 조합 완료·나머지 한 자릿수.
+- **결정**: M2/M3 순수 조합 라인 **종결(296 LIVE 확정)**. 실질 규모 확대는 MX(4+원료) 별도 파일럿 WO `WO-O4O-HFF-MX-MULTI-INGREDIENT-EXPANSION-PILOT-V1`로 분리(현 M2/M3 composer/G-MULTI 억지 확장 금지).
