@@ -27,11 +27,16 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { execSync } from 'node:child_process';
 
 const WRITE = process.env.WRITE !== '0';
 const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const H = (s: string): string => md5(s).slice(0, 16);
+// 실행 스크립트 commit 추적(산출물 자기증명). env 우선, 없으면 git HEAD, 실패 시 unknown.
+const SCRIPT_COMMIT = process.env.SCRIPT_COMMIT || (() => {
+  try { return execSync('git rev-parse HEAD', { cwd: process.cwd(), encoding: 'utf8' }).trim(); } catch { return 'unknown'; }
+})();
 
 // ── fingerprint 헬퍼 (shard-1 / authored audit 계승) ────────────────────────────
 function easySections(content: string): Record<string, string> {
@@ -183,6 +188,7 @@ async function main(): Promise<void> {
     JOIN product_drug_extensions e ON e.product_master_id=pm.id AND e.drug_category='otc' AND e.deleted_at IS NULL
     WHERE pm.regulatory_type='DRUG'
       AND EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL)
+    ORDER BY 1
   `);
 
   // ── grounded content 배치 로드(단일 쿼리 장시간 유지 방지 → ECONNRESET 회피, 배치별 재시도) ──
@@ -212,6 +218,7 @@ async function main(): Promise<void> {
     SELECT a.master_id::text master_id, a.source_type, a.content, pm.name, pm.specification spec, e.atc_code
     FROM a JOIN product_masters pm ON pm.id=a.master_id
     LEFT JOIN product_drug_extensions e ON e.product_master_id=pm.id AND e.deleted_at IS NULL
+    ORDER BY a.master_id, a.source_type
   `, [AUTHORED]);
 
   const grounded = groundedRows.map(toRec);
@@ -241,7 +248,8 @@ async function main(): Promise<void> {
   }
   const dominantSafetyOf = (pharmKey: string): string | null => {
     const m = groundedSafeByPharm.get(pharmKey); if (!m) return null;
-    return [...m.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    // count desc, 동률 시 safety 문자열 오름차순으로 고정(결정론) — 동률의 그대로/불일치 카운트 합은 불변, 선택만 안정화.
+    return [...m.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))[0][0];
   };
 
   // ── grounded master 분류 ──
@@ -281,13 +289,13 @@ async function main(): Promise<void> {
   const groupList = [...gGroups.entries()].map(([fp, members]) => {
     const counts: Record<string, number> = {};
     for (const m of members) { const b = masterBucket.get(m.master_id)!; counts[b] = (counts[b] || 0) + 1; }
-    // 그룹 대표 판정: 비경구 우선, 그다음 우세 버킷
+    // 그룹 대표 판정: 비경구 우선, 그다음 우세 버킷. 동률 시 BUCKETS 고정 우선순위로 결정론화(카운트 무영향 — 동률 없음 실증: summary 4회 byte-identical).
     let bucket: Bucket;
     if (members.some((m) => m.nonOral || m.multi)) bucket = '비경구별도트랙';
-    else bucket = (Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]) as Bucket;
+    else bucket = (Object.entries(counts).sort((a, b) => b[1] - a[1] || BUCKETS.indexOf(a[0] as Bucket) - BUCKETS.indexOf(b[0] as Bucket))[0][0]) as Bucket;
     const rep = members[0];
     return { fingerprint: fp, size: members.length, bucket, counts, pharmKey: rep.pharmKey, keyType: rep.keyType, ingredient: rep.ingredient, strength: rep.strength, form: rep.form, route: rep.route, atc_code: rep.atc_code, sampleName: rep.name };
-  }).sort((a, b) => b.size - a.size);
+  }).sort((a, b) => b.size - a.size || (a.fingerprint < b.fingerprint ? -1 : a.fingerprint > b.fingerprint ? 1 : 0));
   const groupBucket: Record<string, { groups: number; masters: number }> = {};
   for (const g of groupList) { (groupBucket[g.bucket] ??= { groups: 0, masters: 0 }); groupBucket[g.bucket].groups += 1; groupBucket[g.bucket].masters += g.size; }
 
@@ -311,7 +319,7 @@ async function main(): Promise<void> {
   }
 
   // ── 커버리지: authored 대표설명서 상위 N 누적 grounded apply 커버 ──
-  const applyList = [...applyCover.values()].sort((a, b) => (b.groundedApply + b.groundedReview) - (a.groundedApply + a.groundedReview));
+  const applyList = [...applyCover.values()].sort((a, b) => (b.groundedApply + b.groundedReview) - (a.groundedApply + a.groundedReview) || (a.pharmKey < b.pharmKey ? -1 : a.pharmKey > b.pharmKey ? 1 : 0));
   const totalApplyMasters = bucketMasters['authored그대로확장'] + bucketMasters['검토후확장'];
   const cumCoverage = (n: number): { reps: number; grounded: number; pct: number } => {
     let acc = 0; const slice = applyList.slice(0, n);
@@ -339,7 +347,7 @@ async function main(): Promise<void> {
 
   const summary = {
     wo: 'WO-O4O-OTC-FULL-CORPUS-AUTHORED-BRIDGE-INTEGRATION-V1', dbWrite: 0, readOnly: true,
-    inputs: { grounded_commit: '0aa64a0ef', authored_commit: 'd7b3017ad', unifiedRule: 'shard-1/authored-audit 계승, 단일 규칙 글로벌 재계산' },
+    inputs: { grounded_commit: '0aa64a0ef', authored_commit: 'd7b3017ad', scriptCommit: SCRIPT_COMMIT, unifiedRule: 'shard-1/authored-audit 계승, 단일 규칙 글로벌 재계산' },
     gate,
     masterPartition: bucketMasters,
     groupPartition: groupBucket,
@@ -361,12 +369,14 @@ async function main(): Promise<void> {
   };
 
   const groupsOut = { wo: summary.wo, groundedGroups: groupList.length, groups: groupList };
+  // 저장 전 안정 정렬(결정론): 키 배열은 문자열 오름차순, 샘플 배열은 master_id 오름차순.
+  const byMasterId = (a: { master_id: string }, b: { master_id: string }) => (a.master_id < b.master_id ? -1 : a.master_id > b.master_id ? 1 : 0);
   const exceptionsOut = {
     wo: summary.wo,
-    authoredConflictKeys: [...authoredConflict],
-    authoredSafetyConflictKeys: [...authoredSafetyConflict],
-    grounded_none_pharmKey: grounded.filter((g) => g.pharmKey.startsWith('none:') && !g.nonOral && !g.multi).map((g) => ({ master_id: g.master_id, name: g.name, atc_code: g.atc_code })),
-    안전지문불일치_샘플: grounded.filter((g) => masterBucket.get(g.master_id) === '안전지문불일치').slice(0, 100).map((g) => ({ master_id: g.master_id, name: g.name, pharmKey: g.pharmKey })),
+    authoredConflictKeys: [...authoredConflict].sort(),
+    authoredSafetyConflictKeys: [...authoredSafetyConflict].sort(),
+    grounded_none_pharmKey: grounded.filter((g) => g.pharmKey.startsWith('none:') && !g.nonOral && !g.multi).map((g) => ({ master_id: g.master_id, name: g.name, atc_code: g.atc_code })).sort(byMasterId),
+    안전지문불일치_샘플: grounded.filter((g) => masterBucket.get(g.master_id) === '안전지문불일치').map((g) => ({ master_id: g.master_id, name: g.name, pharmKey: g.pharmKey })).sort(byMasterId).slice(0, 100),
   };
 
   if (WRITE) {
