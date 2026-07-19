@@ -30,26 +30,27 @@ import { archiveScreenSet, fetchScreenSet, previewScreenSet, type ScreenSet, typ
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
-// WO-...-REMOVE-LABEL-V1: 사용자 화면에서 archived = '리스트에서 제거됨'(내부 status 는 archived 그대로).
+// WO-O4O-KPA-TABLET-REMOVE-DRAFT-CONCEPT-V1: 사용자 화면 status 를 2분류로 통일 —
+//   '사용 가능'(코너에 선택·적용 가능: active·draft) / '보관'(archived). 실제 적용 여부는 '현재 적용 코너'가 담당.
+//   내부 status/API/enum(draft/active/archived) 는 그대로. '초안'·'활성' 표현은 사용자에게 노출하지 않는다.
 const STATUS_LABEL: Record<ScreenSetStatus, string> = {
-  draft: '초안',
-  active: '활성',
-  archived: '리스트에서 제거됨',
+  draft: '사용 가능',
+  active: '사용 가능',
+  archived: '보관',
   operator_template: '운영자 템플릿',
 };
 const STATUS_BADGE_CLASS: Record<ScreenSetStatus, string> = {
-  draft: 'bg-slate-100 text-slate-600',
+  draft: 'bg-emerald-50 text-emerald-700',
   active: 'bg-emerald-50 text-emerald-700',
   archived: 'bg-amber-50 text-amber-700',
   operator_template: 'bg-indigo-50 text-indigo-700',
 };
 
-type StatusFilter = '' | 'draft' | 'active' | 'archived';
+type StatusFilter = 'all' | 'available' | 'archived';
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: '', label: '전체' },
-  { value: 'draft', label: '초안' },
-  { value: 'active', label: '활성' },
-  { value: 'archived', label: '리스트에서 제거됨' },
+  { value: 'all', label: '전체' },
+  { value: 'available', label: '사용 가능' },
+  { value: 'archived', label: '보관' },
 ];
 
 const PAGE_SIZES = [10, 20, 50];
@@ -63,8 +64,8 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
   rules: [
     { key: 'preview', label: '미리보기' },
     { key: 'edit', label: '수정' },
-    // 리스트에서 제거(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지).
-    { key: 'archive', label: '리스트에서 제거', variant: 'warning', visible: (s) => s.status !== 'archived' },
+    // 보관(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지). 내부 status 는 archived 그대로.
+    { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
   ],
 });
 const ACTION_ICONS: Record<string, ReactNode> = {
@@ -114,7 +115,7 @@ export default function TabletContentLibraryList({
   onPreviewContext,
 }: Props) {
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('available');
   const [templateFilter, setTemplateFilter] = useState<string>('');
   const [cornerFilter, setCornerFilter] = useState<string>(''); // '' 전체 / '__none__' 미사용 / 코너명
   const [pageSize, setPageSize] = useState<number>(20);
@@ -156,7 +157,7 @@ export default function TabletContentLibraryList({
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return sets
-      .filter((s) => (statusFilter === '' ? s.status !== 'archived' : s.status === statusFilter))
+      .filter((s) => (statusFilter === 'all' ? true : statusFilter === 'archived' ? s.status === 'archived' : s.status !== 'archived'))
       .filter((s) => !templateFilter || s.templateKey === templateFilter)
       .filter((s) => {
         if (!cornerFilter) return true;
@@ -181,7 +182,7 @@ export default function TabletContentLibraryList({
   useEffect(() => { setPage(1); }, [search, statusFilter, templateFilter, cornerFilter, pageSize]);
   useEffect(() => { setSelectedKeys(new Set()); }, [page, search, statusFilter, templateFilter, cornerFilter, pageSize, sets]);
 
-  // ── 일괄 리스트에서 제거 ──
+  // ── 일괄 보관 ──
   const batchArchiveOp = useCallback(
     async (
       ids: string[],
@@ -192,8 +193,8 @@ export default function TabletContentLibraryList({
         if (r.status === 'fulfilled') return { id, status: 'success' as const };
         const err = r.reason as { code?: string; message?: string } | null;
         const error = (err?.code === 'SCREEN_SET_IN_USE' || err?.code === 'ARCHIVE_BLOCKED_CONNECTED')
-          ? '코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제하세요'
-          : err?.message || '리스트에서 제거하지 못했습니다';
+          ? '코너에 연결되어 있어 보관할 수 없습니다. 먼저 코너 연결을 해제하세요'
+          : err?.message || '보관하지 못했습니다';
         return { id, status: 'failed' as const, error };
       });
       return { data: { results } };
@@ -204,10 +205,10 @@ export default function TabletContentLibraryList({
   const handleBulkArchive = useCallback(async () => {
     const ids = pageRows.filter((s) => selectedKeys.has(s.id) && s.status !== 'archived').map((s) => s.id);
     if (ids.length === 0) {
-      toast.error('제거할 수 있는 항목이 없습니다. (이미 제거된 항목은 제외됩니다)');
+      toast.error('보관할 수 있는 항목이 없습니다. (이미 보관된 항목은 제외됩니다)');
       return;
     }
-    if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 리스트에서 제거하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다.\n(코너에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
+    if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 보관하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘보관’ 필터에서 다시 확인할 수 있습니다.\n(코너에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
     const result = await batch.executeBatch(batchArchiveOp, ids);
     if (result.successCount > 0) {
       setSelectedKeys(new Set());
@@ -337,7 +338,7 @@ export default function TabletContentLibraryList({
           <div className="flex gap-1.5 flex-wrap">
             {STATUS_FILTERS.map((f) => (
               <button
-                key={f.value || 'all'}
+                key={f.value}
                 onClick={() => setStatusFilter(f.value)}
                 className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
                   statusFilter === f.value
@@ -365,14 +366,14 @@ export default function TabletContentLibraryList({
         actions={[
           {
             key: 'bulk-archive',
-            label: `선택한 콘텐츠를 리스트에서 제거 (${archivableSelectedCount})`,
+            label: `선택한 콘텐츠 보관 (${archivableSelectedCount})`,
             onClick: handleBulkArchive,
             variant: 'default' as const,
             icon: <Trash2 className="w-3.5 h-3.5" />,
             loading: batch.loading,
             group: 'actions',
             visible: selectedKeys.size > 0,
-            tooltip: '선택한 콘텐츠를 리스트에서 제거합니다(콘텐츠는 삭제되지 않음). 코너에 연결된 콘텐츠는 먼저 연결 해제 필요.',
+            tooltip: '선택한 콘텐츠를 보관합니다(콘텐츠는 삭제되지 않음). 코너에 연결된 콘텐츠는 먼저 연결 해제 필요.',
           },
         ]}
       />
@@ -391,7 +392,7 @@ export default function TabletContentLibraryList({
         rowKey="id"
         loading={loading}
         emptyMessage={
-          search || statusFilter || templateFilter || cornerFilter
+          search || statusFilter !== 'available' || templateFilter || cornerFilter
             ? '조건에 맞는 태블릿 콘텐츠가 없습니다.'
             : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
         }

@@ -433,16 +433,14 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
           <p className="text-[11px] text-slate-500 leading-relaxed">고객에게 보여줄 제품 설명·매장 안내 콘텐츠입니다. 여기서 바꾼 제목·설명은 현재 화면 세트에만 적용되며, 원본 콘텐츠는 변경되지 않습니다.</p>
         </div>
         <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700 flex-shrink-0`}>
-          <Plus className="w-4 h-4" /> 추가 정보 고르기
+          <Plus className="w-4 h-4" /> 추가 정보
         </button>
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-8 px-4 space-y-3">
-          <p className="text-sm text-slate-500 leading-relaxed">아직 고른 추가 정보가 없습니다.<br />이 코너에서 손님에게 함께 보여줄 상세설명서·안내 콘텐츠를 골라 주세요.</p>
-          <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
-            <Plus className="w-4 h-4" /> 추가 정보 고르기
-          </button>
+        /* WO-O4O-KPA-TABLET-EXTRA-INFO-BUTTON-DEDUP-V1: 빈 상태 안내만 표시(중복 버튼 제거 — 추가는 상단 '추가 정보' 하나로). */
+        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-6 px-4">
+          <p className="text-sm text-slate-500 leading-relaxed">아직 추가한 정보가 없습니다.<br />손님에게 함께 보여줄 상세설명서·안내 콘텐츠를 추가해 주세요.</p>
         </div>
       ) : (
         <div className="space-y-2">
