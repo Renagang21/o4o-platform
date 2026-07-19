@@ -25,6 +25,8 @@ import TabletContentLibraryList from './TabletContentLibraryList';
 import { TabletKioskPage, detectIdleMediaType, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명 본문 = O4O 표준 편집기(별도 HTML 입력창 없음)
 import { RichTextEditor } from '@o4o/content-editor';
+// WO-O4O-TABLET-ADDITIONAL-CONTENT-SKU-DISTINGUISHABILITY-V1: 동일 상품명 SKU 구분정보(handled-products 와 공통 함수 재사용).
+import { buildProductVariantLabel } from '../../utils/productVariantLabel';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
@@ -589,6 +591,11 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
                     <span className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 ${sel ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300'}`}>{sel ? '✓' : ''}</span>
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-slate-800 truncate">{r.name}</div>
+                      {/* WO-O4O-TABLET-ADDITIONAL-CONTENT-SKU-DISTINGUISHABILITY-V1: 동일 상품명 구분정보(규격·제형·포장). 있을 때만. */}
+                      {(() => {
+                        const variant = buildProductVariantLabel(r);
+                        return variant ? <div className="text-[11px] text-slate-600 break-keep leading-tight" title={r.specification ?? undefined}>{variant}</div> : null;
+                      })()}
                       <div className="text-[11px] text-slate-400 truncate">O4O 표준 설명서{r.barcode ? ` · ${r.barcode}` : ''}{r.summary ? ` · ${r.summary.slice(0, 30)}` : ''}</div>
                     </div>
                     {added && <span className="text-[10px] font-semibold text-slate-500 bg-slate-200 px-1.5 py-0.5 rounded flex-shrink-0">이미 추가됨</span>}

@@ -1526,7 +1526,8 @@ export function createStoreTabletRoutes(
       const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
       if (q.length < 2) { res.json({ success: true, data: [] }); return; }
       const rows = await dataSource.query(
-        `SELECT pm.id AS "masterId", pm.name, pm.barcode,
+        // WO-O4O-TABLET-ADDITIONAL-CONTENT-SKU-DISTINGUISHABILITY-V1: 동일 상품명 SKU 구분용 specification 추가(직접 컬럼, migration 무관).
+        `SELECT pm.id AS "masterId", pm.name, pm.barcode, pm.specification,
                 (SELECT d.summary FROM shared_product_descriptions d
                   WHERE d.master_id = pm.id AND d.description_type = 'STORE' AND d.status = 'canonical' AND d.deleted_at IS NULL
                   ORDER BY (d.language = 'ko') DESC, d.updated_at DESC LIMIT 1) AS summary,

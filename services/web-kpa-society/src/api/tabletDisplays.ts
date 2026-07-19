@@ -199,6 +199,8 @@ export interface O4oDescriptionSearchResult {
   masterId: string;
   name: string;
   barcode: string | null;
+  // WO-O4O-TABLET-ADDITIONAL-CONTENT-SKU-DISTINGUISHABILITY-V1: 동일 상품명 SKU 구분용(규격/제형/포장 결합 원문). 서버 pm.specification.
+  specification: string | null;
   summary: string | null;
   languages: string[];
 }
