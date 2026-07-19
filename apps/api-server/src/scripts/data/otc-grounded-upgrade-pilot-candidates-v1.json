@@ -1,0 +1,306 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-PILOT-CANDIDATE-AUDIT-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "track": "A (grounded upgrade: e약은요 canonical → authored canonical 교체)",
+  "authored그대로확장_그룹수": 158,
+  "authored그대로확장_master합": 1201,
+  "top10": [
+    {
+      "pharmKey": "ing:아스피린|100밀리그램|정|oral",
+      "groupKey": "아스피린|100밀리그램|정",
+      "sample": "린아스장용정(아스피린)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "B01AC06",
+      "bridge_확장": 67,
+      "e약은요_canonical_master": 105,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 2,
+      "안전동질_master": 96,
+      "원문확보율": 1,
+      "authored_source_ref_id": "0052dc6c-639a-400b-b7a3-144d84ae5c14",
+      "authored_충돌": 0,
+      "민감약효군": true,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "민감 약효군",
+        "안전지문 분리 필요(distinct 2)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 96,
+        "audit_log": 96
+      }
+    },
+    {
+      "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "sample": "트리엠정100밀리그램(트리메부틴말레산염)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "A03AA05",
+      "bridge_확장": 66,
+      "e약은요_canonical_master": 127,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 3,
+      "안전동질_master": 113,
+      "원문확보율": 1,
+      "authored_source_ref_id": "003beef8-82c4-4897-a176-d0ea8a695699",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 3)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 113,
+        "audit_log": 113
+      }
+    },
+    {
+      "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "sample": "비스칸엔캡슐(바실루스리케니포르미스균)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "A07FA01",
+      "bridge_확장": 56,
+      "e약은요_canonical_master": 88,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 5,
+      "안전동질_master": 68,
+      "원문확보율": 1,
+      "authored_source_ref_id": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 5)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 68,
+        "audit_log": 68
+      }
+    },
+    {
+      "pharmKey": "ing:디오스민|300밀리그램|캡슐|oral",
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "sample": "마더스민캡슐(디오스민)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "C05CA03",
+      "bridge_확장": 38,
+      "e약은요_canonical_master": 45,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 2,
+      "안전동질_master": 42,
+      "원문확보율": 1,
+      "authored_source_ref_id": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 2)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 42,
+        "audit_log": 42
+      }
+    },
+    {
+      "pharmKey": "ing:로라타딘|10밀리그램|정|oral",
+      "groupKey": "로라타딘|10밀리그램|정",
+      "sample": "클라리틴정(로라타딘)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "R06AX13",
+      "bridge_확장": 38,
+      "e약은요_canonical_master": 41,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 2,
+      "안전동질_master": 38,
+      "원문확보율": 1,
+      "authored_source_ref_id": "0a7dee0b-e578-4015-967a-fad092071eef",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 2)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 38,
+        "audit_log": 38
+      }
+    },
+    {
+      "pharmKey": "ing:알벤다졸|400밀리그램|정|oral",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "sample": "젠타졸정(알벤다졸)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "P02CA03",
+      "bridge_확장": 38,
+      "e약은요_canonical_master": 92,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 2,
+      "안전동질_master": 88,
+      "원문확보율": 1,
+      "authored_source_ref_id": "0178f85b-94d7-4ac9-a061-ac4c2d9ad750",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 2)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 88,
+        "audit_log": 88
+      }
+    },
+    {
+      "pharmKey": "ing:알마게이트|500밀리그램|정|oral",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "sample": "한미알마게이트정500밀리그램(알마게이트)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "A02AD03",
+      "bridge_확장": 37,
+      "e약은요_canonical_master": 124,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 4,
+      "안전동질_master": 93,
+      "원문확보율": 1,
+      "authored_source_ref_id": "01a231cd-b471-4d93-8071-b271f8c4627d",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 4)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 93,
+        "audit_log": 93
+      }
+    },
+    {
+      "pharmKey": "ing:트리메부틴말레산염|150밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "sample": "트리멘정(트리메부틴말레산염)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "A03AA05",
+      "bridge_확장": 28,
+      "e약은요_canonical_master": 49,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 3,
+      "안전동질_master": 40,
+      "원문확보율": 1,
+      "authored_source_ref_id": "00f0325a-c5a4-4d3c-b900-1774a24509f5",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 3)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 40,
+        "audit_log": 40
+      }
+    },
+    {
+      "pharmKey": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "sample": "파인싹연질캡슐(클로닉신리시네이트)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "M01AX",
+      "bridge_확장": 27,
+      "e약은요_canonical_master": 29,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 2,
+      "안전동질_master": 27,
+      "원문확보율": 1,
+      "authored_source_ref_id": "03de1849-7d18-4ea4-8896-63a3658540c4",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "안전지문 분리 필요(distinct 2)"
+      ],
+      "예상write": {
+        "SPD_upgrade": 27,
+        "audit_log": 27
+      }
+    },
+    {
+      "pharmKey": "ing:에르도스테인|300밀리그램|정|oral",
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "sample": "동화엘텐정(에르도스테인)",
+      "keyType": "ingredient",
+      "route": "oral",
+      "atc": "R05CB15",
+      "bridge_확장": 26,
+      "e약은요_canonical_master": 30,
+      "e약은요_canonical_중복": 0,
+      "안전지문_distinct": 1,
+      "안전동질_master": 30,
+      "원문확보율": 1,
+      "authored_source_ref_id": "03e0af9d-5236-460a-86d4-1af8b0c00c61",
+      "authored_충돌": 0,
+      "민감약효군": false,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "SPD_upgrade": 30,
+        "audit_log": 30
+      }
+    }
+  ],
+  "추천_첫파일럿": {
+    "groupKey": "에르도스테인|300밀리그램|정",
+    "sample": "동화엘텐정(에르도스테인)",
+    "승격대상_master": 30,
+    "e약은요_canonical_master": 30,
+    "authored_source_ref_id": "03e0af9d-5236-460a-86d4-1af8b0c00c61",
+    "예상write": {
+      "SPD_upgrade": 30,
+      "audit_log": 30
+    },
+    "rollback_master_ids": [
+      "05c4fd55-cf09-4a10-9bb3-14545ce2e002",
+      "075974a7-e6c7-4e79-91ed-257a60060fee",
+      "0d70af50-118e-448f-8a2a-34a2717981c0",
+      "21f18379-d1e8-4ae7-b278-47c0013ccada",
+      "232f7c5e-0b9a-4e44-843a-e085a47ecf1f",
+      "28a97589-04d8-4ab5-abe1-d65ce2d2bf0f",
+      "29d35352-9533-4145-b737-a0caf1244c9a",
+      "2f96569a-5867-4f22-9368-55d93de3e372",
+      "301b45c7-b58f-497d-ba23-baca432dfd69",
+      "352f9bf7-0481-4a76-a266-d990ef627360",
+      "3b868d95-9639-454a-9ecd-000e032a9338",
+      "4ab62390-d0db-4493-a36f-e6ab3589c234",
+      "51967ab7-7c2d-45cb-b0ff-7914a8893fba",
+      "794d5f76-0fed-43ee-aca0-19be3254ecb0",
+      "7aea1af7-f950-4687-b00e-feebcb710fce",
+      "7b2bfa02-0cb3-44a3-aa1b-51f656e6d0a6",
+      "801beb6a-842f-493c-bbcc-a14c9b061505",
+      "85074a2c-1cef-489a-b8f9-5082674148ef",
+      "90a45f70-6ef6-4819-9c12-f6dcd10bbc94",
+      "ab03e167-4df9-4ca5-bb6b-0550a6cce9ee",
+      "bc3c2317-996f-4ce3-8e2b-7e2394ece587",
+      "c8e53ad1-b798-4c31-936a-9645f1b77030",
+      "da1e0627-971f-495d-8e65-4b5d5ebe473e",
+      "df028d04-a5ea-4fac-b1ef-8436a8eaa18d",
+      "eb8ea3b4-36b7-4a6e-9623-4a2a406d93c9",
+      "f74e3829-21fb-401c-9374-091e2b14e581",
+      "f8dd6200-d53f-48e0-b6d4-c18c2d8d7fe4",
+      "f9e66854-790f-45ec-aee2-f5c1e499535d",
+      "fbd54826-7c3f-42ff-ba12-f3f93f43e223",
+      "fcc21bd0-3865-456a-a111-f456d9fd272e"
+    ]
+  },
+  "summary": {
+    "READY": 1,
+    "EXCLUDED": 9
+  }
+}
