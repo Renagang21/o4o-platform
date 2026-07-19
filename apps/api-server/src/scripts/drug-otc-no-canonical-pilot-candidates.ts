@@ -32,8 +32,9 @@ function draftComplete(cj: any): { complete: boolean; missing: string[] } {
   }
   return { complete: missing.length === 0, missing };
 }
-// 경구 여부(draft doseForm) — 경구·단일 파일럿 조건. 질정/좌제/점안 등 비경구 제외.
-const isOral = (form?: string): boolean => !!form && !/질정|질좌|좌제|좌약|점안|점이|점비|질내|외용|크림|연고|패치|첩부/.test(form);
+// 경구 여부 — 경구·단일 파일럿 조건. ⚠️ draft doseForm 은 비신뢰(클로트리마졸 질정도 doseForm='정')라 title 까지 검사.
+const NON_ORAL_RE = /질정|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|에어로솔|가글|함수|트로키|질캡슐/;
+const isOral = (form?: string, title?: string): boolean => !!form && !NON_ORAL_RE.test(`${form} ${title || ''}`);
 
 async function main(): Promise<void> {
   const { DataSource } = await import('typeorm');
@@ -83,7 +84,7 @@ async function main(): Promise<void> {
     rows.push({
       candidate_id: d.candidate_id, title: d.title, groupKey: seed.groupKey,
       ingredient, dose, formKeyword, draftComplete: comp.complete, missing: comp.missing, contentPending,
-      oral: isOral(formKeyword), groupTotal, rx, alreadyPromoted, promotable, koNeedsReview: koNR, enCanonical: enC, err,
+      oral: isOral(formKeyword, d.title), groupTotal, rx, alreadyPromoted, promotable, koNeedsReview: koNR, enCanonical: enC, err,
       pharmHomogeneous: !!(ingredient && dose && formKeyword),
       예상: { ko_INSERT: promotable, en_INSERT_after_translation: promotable, ko_flip: promotable, en_flip: promotable },
       promotableIds,
