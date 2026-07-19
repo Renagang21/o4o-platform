@@ -1,0 +1,127 @@
+{
+  "wo": "WO-O4O-OTC-ERDOSTEINE-300MG-CANONICAL-UPGRADE-PILOT-DRYRUN-DA-V1",
+  "mode": "dry-run",
+  "dbWrite": 0,
+  "group": "에르도스테인|300밀리그램|정",
+  "candidate": "03e0af9d-5236-460a-86d4-1af8b0c00c61",
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "에르도스테인 300mg 정",
+  "coarseTotal": 30,
+  "target26": 26,
+  "excluded4": 4,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "05c4fd55-cf09-4a10-9bb3-14545ce2e002",
+      "name": "엘도테인정(에르도스테인)",
+      "reason": "안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)"
+    },
+    {
+      "id": "29d35352-9533-4145-b737-a0caf1244c9a",
+      "name": "엘도테인정(에르도스테인)",
+      "reason": "안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)"
+    },
+    {
+      "id": "51967ab7-7c2d-45cb-b0ff-7914a8893fba",
+      "name": "엘도테인정(에르도스테인)",
+      "reason": "안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)"
+    },
+    {
+      "id": "ab03e167-4df9-4ca5-bb6b-0550a6cce9ee",
+      "name": "엘도테인정(에르도스테인)",
+      "reason": "안전지문불일치(fp d68b3eec1cb56646, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "075974a7-e6c7-4e79-91ed-257a60060fee",
+    "0d70af50-118e-448f-8a2a-34a2717981c0",
+    "21f18379-d1e8-4ae7-b278-47c0013ccada",
+    "232f7c5e-0b9a-4e44-843a-e085a47ecf1f",
+    "28a97589-04d8-4ab5-abe1-d65ce2d2bf0f",
+    "2f96569a-5867-4f22-9368-55d93de3e372",
+    "301b45c7-b58f-497d-ba23-baca432dfd69",
+    "352f9bf7-0481-4a76-a266-d990ef627360",
+    "3b868d95-9639-454a-9ecd-000e032a9338",
+    "4ab62390-d0db-4493-a36f-e6ab3589c234",
+    "794d5f76-0fed-43ee-aca0-19be3254ecb0",
+    "7aea1af7-f950-4687-b00e-feebcb710fce",
+    "7b2bfa02-0cb3-44a3-aa1b-51f656e6d0a6",
+    "801beb6a-842f-493c-bbcc-a14c9b061505",
+    "85074a2c-1cef-489a-b8f9-5082674148ef",
+    "90a45f70-6ef6-4819-9c12-f6dcd10bbc94",
+    "bc3c2317-996f-4ce3-8e2b-7e2394ece587",
+    "c8e53ad1-b798-4c31-936a-9645f1b77030",
+    "da1e0627-971f-495d-8e65-4b5d5ebe473e",
+    "df028d04-a5ea-4fac-b1ef-8436a8eaa18d",
+    "eb8ea3b4-36b7-4a6e-9623-4a2a406d93c9",
+    "f74e3829-21fb-401c-9374-091e2b14e581",
+    "f8dd6200-d53f-48e0-b6d4-c18c2d8d7fe4",
+    "f9e66854-790f-45ec-aee2-f5c1e499535d",
+    "fbd54826-7c3f-42ff-ba12-f3f93f43e223",
+    "fcc21bd0-3865-456a-a111-f456d9fd272e"
+  ],
+  "rollback_master_ids": [
+    "075974a7-e6c7-4e79-91ed-257a60060fee",
+    "0d70af50-118e-448f-8a2a-34a2717981c0",
+    "21f18379-d1e8-4ae7-b278-47c0013ccada",
+    "232f7c5e-0b9a-4e44-843a-e085a47ecf1f",
+    "28a97589-04d8-4ab5-abe1-d65ce2d2bf0f",
+    "2f96569a-5867-4f22-9368-55d93de3e372",
+    "301b45c7-b58f-497d-ba23-baca432dfd69",
+    "352f9bf7-0481-4a76-a266-d990ef627360",
+    "3b868d95-9639-454a-9ecd-000e032a9338",
+    "4ab62390-d0db-4493-a36f-e6ab3589c234",
+    "794d5f76-0fed-43ee-aca0-19be3254ecb0",
+    "7aea1af7-f950-4687-b00e-feebcb710fce",
+    "7b2bfa02-0cb3-44a3-aa1b-51f656e6d0a6",
+    "801beb6a-842f-493c-bbcc-a14c9b061505",
+    "85074a2c-1cef-489a-b8f9-5082674148ef",
+    "90a45f70-6ef6-4819-9c12-f6dcd10bbc94",
+    "bc3c2317-996f-4ce3-8e2b-7e2394ece587",
+    "c8e53ad1-b798-4c31-936a-9645f1b77030",
+    "da1e0627-971f-495d-8e65-4b5d5ebe473e",
+    "df028d04-a5ea-4fac-b1ef-8436a8eaa18d",
+    "eb8ea3b4-36b7-4a6e-9623-4a2a406d93c9",
+    "f74e3829-21fb-401c-9374-091e2b14e581",
+    "f8dd6200-d53f-48e0-b6d4-c18c2d8d7fe4",
+    "f9e66854-790f-45ec-aee2-f5c1e499535d",
+    "fbd54826-7c3f-42ff-ba12-f3f93f43e223",
+    "fcc21bd0-3865-456a-a111-f456d9fd272e"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "d68b3eec1cb56646",
+      "n": 4,
+      "ssot": "안전지문불일치"
+    },
+    {
+      "fp": "4b4e162690065e8e",
+      "n": 26,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "easyCanonicalExactly1": 26,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 26,
+  "htmlLen": 1550,
+  "contentHash": "459f20efdf5c52b550d2806c5acbe7ac",
+  "summary": "에르도스테인 300mg",
+  "예상write": {
+    "STEP_A_authored_needs_review_INSERT": 26,
+    "STEP_B_easy_canonical_demote": 26,
+    "STEP_B_authored_canonical_flip": 26,
+    "audit_log_canonical_replaced": 26,
+    "SPD_write_total": 78,
+    "audit_write_total": 26,
+    "grand_total": 104
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 26",
+    "policy_2A": "audit 2/master = 52 (demote 1 + flip 1)",
+    "status": "불일치 — 실제 apply 전 정합 필요(엔티티는 1행/교체 설계). dry-run 은 엔티티 기준 26으로 산정."
+  }
+}
