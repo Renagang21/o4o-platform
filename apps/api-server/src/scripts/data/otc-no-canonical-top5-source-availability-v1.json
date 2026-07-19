@@ -1,0 +1,81 @@
+{
+  "wo": "WO-O4O-OTC-NO-CANONICAL-TOP5-OFFICIAL-SOURCE-AVAILABILITY-AUDIT-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "대상_master_총": 829,
+  "핵심발견": "첫5그룹 유일 candidate 소스 = mfds-drug-master-standard-code(메타만·원문 텍스트 0). e약은요 disjoint(0). → 관제 효능·용법·주의·첨가제 원문 DB 미보유.",
+  "groups": [
+    {
+      "groupKey": "은행엽건조엑스|240밀리그램|정",
+      "masters": 395,
+      "mfdsCodeRate": 1,
+      "e약은요_보유": 0,
+      "원문보유_master": 0,
+      "원문확보율": 0,
+      "취소": 0,
+      "rx혼입": 0,
+      "authoringPossible": 0,
+      "HOLD": 395,
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "groupKey": "은행엽건조엑스|120밀리그램|정",
+      "masters": 179,
+      "mfdsCodeRate": 1,
+      "e약은요_보유": 0,
+      "원문보유_master": 0,
+      "원문확보율": 0,
+      "취소": 0,
+      "rx혼입": 0,
+      "authoringPossible": 0,
+      "HOLD": 179,
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "groupKey": "은행엽건조엑스|40밀리그램|정",
+      "masters": 104,
+      "mfdsCodeRate": 1,
+      "e약은요_보유": 0,
+      "원문보유_master": 0,
+      "원문확보율": 0,
+      "취소": 0,
+      "rx혼입": 0,
+      "authoringPossible": 0,
+      "HOLD": 104,
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "groupKey": "은행엽엑스|120밀리그램|정",
+      "masters": 77,
+      "mfdsCodeRate": 1,
+      "e약은요_보유": 0,
+      "원문보유_master": 0,
+      "원문확보율": 0,
+      "취소": 0,
+      "rx혼입": 0,
+      "authoringPossible": 0,
+      "HOLD": 77,
+      "verdict": "SOURCE_MISSING"
+    },
+    {
+      "groupKey": "라니티딘염산염|75밀리그램|정",
+      "masters": 74,
+      "mfdsCodeRate": 1,
+      "e약은요_보유": 0,
+      "원문보유_master": 0,
+      "원문확보율": 0,
+      "취소": 0,
+      "rx혼입": 0,
+      "authoringPossible": 0,
+      "HOLD": 74,
+      "verdict": "SOURCE_MISSING"
+    }
+  ],
+  "AUTHORING_READY_그룹": [],
+  "summary": {
+    "AUTHORING_READY": 0,
+    "PARTIAL_HOLD": 0,
+    "SAFETY_SPLIT": 0,
+    "SOURCE_MISSING": 5
+  }
+}
