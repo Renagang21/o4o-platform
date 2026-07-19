@@ -33,7 +33,7 @@ function draftComplete(cj: any): { complete: boolean; missing: string[] } {
   return { complete: missing.length === 0, missing };
 }
 // 경구 여부 — 경구·단일 파일럿 조건. ⚠️ draft doseForm 은 비신뢰(클로트리마졸 질정도 doseForm='정')라 title 까지 검사.
-const NON_ORAL_RE = /질정|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|에어로솔|가글|함수|트로키|질캡슐/;
+const NON_ORAL_RE = /질정|질용|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|에어로솔|가글|함수|트로키|질캡슐|vaginal/i;
 const isOral = (form?: string, title?: string): boolean => !!form && !NON_ORAL_RE.test(`${form} ${title || ''}`);
 
 async function main(): Promise<void> {

@@ -2,55 +2,12 @@
   "wo": "apply 재정의 → e약은요-미보유(STORE canonical 無) 첫 파일럿 후보 집계",
   "dbWrite": 0,
   "readOnly": true,
-  "universe_OTC_STOREcanonical_無": 35292,
+  "universe_OTC_STOREcanonical_無": 35268,
   "otc_total": 57572,
   "총_draft": 95,
-  "사용가능_draft_경구": 3,
+  "사용가능_draft_경구": 2,
   "사용가능_draft_비경구별도트랙": 1,
   "추천_top3_경구": [
-    {
-      "candidate_id": "0057f50c-e693-4385-b5d8-4f57178db590",
-      "title": "파모티딘 10mg 정",
-      "groupKey": "파모티딘|10밀리그램|정",
-      "promotable": 24,
-      "groupTotal": 128,
-      "rx": 0,
-      "koNeedsReview": 0,
-      "enCanonical": 0,
-      "pharmHomogeneous": true,
-      "예상": {
-        "ko_INSERT": 24,
-        "en_INSERT_after_translation": 24,
-        "ko_flip": 24,
-        "en_flip": 24
-      },
-      "rollback_master_ids": [
-        "047248a4-b32b-466e-a9d5-bedb41aa7e9b",
-        "04e03f2e-91d1-4ef2-b9c1-88c8b2559a2b",
-        "23f39ac4-7ee0-464b-82af-93570f38ea74",
-        "35579c98-6c09-4c5f-9886-bfee0ef5bbce",
-        "3b2b9ea1-8e30-4357-b835-c4b6805e9af4",
-        "3e46483f-8ffc-4b25-ac01-9eb3eba92491",
-        "44801684-b7e5-4d35-8396-90b929e545d9",
-        "45193cdd-14fd-4b54-b205-1087f11bf4cc",
-        "4ad4d83e-683a-4f29-989e-eeb4fff0893a",
-        "4ca8e3b1-188e-4c4a-9a99-93f24c30c379",
-        "7265b98f-5b58-4943-9419-f30907ab6d6c",
-        "771d256c-c118-4cfb-9b5a-8550bdff6b26",
-        "7f20f5fd-87da-4640-9d5f-a6dd9f17e1a7",
-        "88f442b2-f5c1-4468-9c70-4dff28e8d700",
-        "98dd57b9-d99e-4849-b9b6-07fe1d28c146",
-        "a7aa4045-2c1f-499b-b2d2-3b202acce061",
-        "a9e50c4c-6731-4912-bbe3-1079677f75c6",
-        "b2e69269-82c2-4178-bf57-ac20da5fd77b",
-        "b975c4b2-b024-4fde-9a67-9ddb8f353690",
-        "c24f2ae8-a682-466b-bfec-2a3263039ad4",
-        "d5c7e877-43ec-4c48-82ed-001500bede35",
-        "e93dd7b0-4f8c-4e0f-9388-61a089b40080",
-        "ed79381d-ff11-4bc0-ae5d-ef5e0e1054b0",
-        "f4c5f729-3885-485b-a78d-54caa1289d0b"
-      ]
-    },
     {
       "candidate_id": "049c2a1c-d834-401a-bc6a-3321fcc3c104",
       "title": "펙소페나딘염산염 60mg 정",
@@ -121,12 +78,6 @@
   ],
   "사용가능_경구_전체": [
     {
-      "title": "파모티딘 10mg 정",
-      "promotable": 24,
-      "groupTotal": 128,
-      "rx": 0
-    },
-    {
       "title": "펙소페나딘염산염 60mg 정",
       "promotable": 14,
       "groupTotal": 50,
@@ -162,6 +113,11 @@
     },
     {
       "title": "아스피린 100mg 정",
+      "promotable": 0,
+      "reason": "promotable 0(그룹 이미 canonical 보유)"
+    },
+    {
+      "title": "파모티딘 10mg 정",
       "promotable": 0,
       "reason": "promotable 0(그룹 이미 canonical 보유)"
     },
@@ -719,17 +675,17 @@
       "oral": true,
       "groupTotal": 128,
       "rx": 0,
-      "alreadyPromoted": 104,
-      "promotable": 24,
+      "alreadyPromoted": 128,
+      "promotable": 0,
       "koNeedsReview": 0,
       "enCanonical": 0,
       "err": null,
       "pharmHomogeneous": true,
       "예상": {
-        "ko_INSERT": 24,
-        "en_INSERT_after_translation": 24,
-        "ko_flip": 24,
-        "en_flip": 24
+        "ko_INSERT": 0,
+        "en_INSERT_after_translation": 0,
+        "ko_flip": 0,
+        "en_flip": 0
       }
     },
     {
