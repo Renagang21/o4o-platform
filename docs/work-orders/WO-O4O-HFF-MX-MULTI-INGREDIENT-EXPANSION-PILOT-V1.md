@@ -47,4 +47,9 @@
   - **composer 무변경 검증**: composeCombo/runComboGuard N-루프가 4-원료 카드(마그네슘·아연·칼슘·비타민D) 독립 렌더(표시량 혼입 0)·ko/en 정합. G-MULTI(AMOUNT-SOURCE·BILINGUAL 등) 4-원료 정상.
   - 반응형 PASS(CSS 구조): sd-badges flex-wrap + sd-card max-width 860/overflow-hidden → 360~1440 가로스크롤 0. 동일 구조 후속 MX 재확인 불필요.
   - dry-run 276=276 → apply COMMIT → 독립검증(새 연결) PASS. tag `batch:single-nutrient-combo-mg-zn-ca-vd`. 복합형 누적 296→**365**. 기존 무변경.
-- (다음) MX 규모순 연속: select→generate→guard→dry-run 자동, COMMIT만 승인.
+- **MX 인벤토리(DB-source, read-only)**: `hff-combo-mx-inventory.ts` 신설. scanned 41,261 · MX(≥4) 조합 1,384종 · byN 4:724·5:545·6:454·7:301·8:239…. **주의**: 고-N 조합의 인벤토리 카운트는 과대(인벤토리 SPEC이 일부 스펙 누락 → select의 엄격 추출에서 추가원료 검출로 HOLD_MULTI). 예: 8원료 후보 45건 → select ELIGIBLE 0. **4원료 조합이 가장 신뢰성 높음**.
+- **MX 4-원료 3조합 LIVE (규모순, 47건)**:
+  - 마그네슘+비타민D+비타민K+칼슘 26 · 마그네슘+망간+비타민D+칼슘 12 · 비타민C+비타민D+셀레늄+아연 9.
+  - 각 generate PASS·BLOCKED 0·G-MULTI HOLD 0. REVIEW 6(코팅정제·basis known-safe). dry-run 188=188 → apply COMMIT → 독립검증 3조합 PASS(canonicalDup 0·links 47·SPD sourceRef 94).
+  - tag `batch:single-nutrient-combo-{mg-vd-vk-ca,mg-mn-vd-ca,vc-vd-se-zn}`. 복합형 누적 365→**412**. 기존 무변경.
+- (다음) 미생산 MX 4-원료 조합 인벤토리 산출 → 후보 select→generate→dry-run 자동, **DB COMMIT은 배치별 재승인**.
