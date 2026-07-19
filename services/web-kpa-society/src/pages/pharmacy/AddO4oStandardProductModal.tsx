@@ -15,6 +15,7 @@ import { Pagination } from '@o4o/operator-ux-core';
 import {
   searchO4oStandardProducts,
   registerStandardProductToStore,
+  buildProductVariantLabel,
   type O4oStandardProduct,
 } from '../../api/o4oStandardProducts';
 import { colors } from '../../styles/theme';
@@ -211,6 +212,13 @@ export function AddO4oStandardProductModal({ open, onClose, onRegistered }: Prop
                           )}
                           <div style={{ minWidth: 0 }}>
                             <div style={styles.productName} title={p.name}>{p.name}</div>
+                            {/* WO-...-SKU-DISTINGUISHABILITY-V1: 동일 상품명 구분용 보조정보(규격·제형·포장). 있을 때만. */}
+                            {(() => {
+                              const variant = buildProductVariantLabel(p);
+                              return variant ? (
+                                <div style={styles.productVariant} title={p.specification ?? undefined}>{variant}</div>
+                              ) : null;
+                            })()}
                             {p.regulatoryName && p.regulatoryName !== p.name && (
                               <div style={styles.productSub} title={p.regulatoryName}>{p.regulatoryName}</div>
                             )}
@@ -296,7 +304,10 @@ const styles: Record<string, CSSProperties> = {
   thumb: { width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${colors.neutral200}`, flexShrink: 0 },
   thumbPlaceholder: { width: '36px', height: '36px', borderRadius: '6px', background: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '340px' },
-  productSub: { fontSize: '12px', color: colors.neutral400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '340px' },
+  // WO-...-SKU-DISTINGUISHABILITY-V1: 상품명 아래 SKU 구분정보(규격·제형·포장). 상품명보다 작고 보조적이되 너무 흐리지 않게(neutral600).
+  //   작은 화면에서 전체가 보이도록 말줄임 대신 자연 줄바꿈(spec 문자열이 짧아 데스크톱은 사실상 1줄).
+  productVariant: { fontSize: '12px', color: colors.neutral600, maxWidth: '340px', marginTop: '1px', lineHeight: 1.35, wordBreak: 'keep-all' },
+  productSub: { fontSize: '11px', color: colors.neutral400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '340px' },
   addBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '12px', fontWeight: 500, color: colors.white, cursor: 'pointer' },
   addBtnBusy: { opacity: 0.6, cursor: 'default' },
   doneBadge: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px', fontSize: '12px', fontWeight: 500, color: '#16A34A', background: '#DCFCE7', borderRadius: '6px' },
