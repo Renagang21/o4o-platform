@@ -39,6 +39,8 @@ export default function QrLandingPage() {
   const [data, setData] = useState<QrLandingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: archive 로 종료된 Screen Set QR(410) → 전용 종료 안내.
+  const [terminated, setTerminated] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -49,6 +51,7 @@ export default function QrLandingPage() {
 
     setLoading(true);
     setError(null);
+    setTerminated(false);
 
     getQrLandingData(slug)
       .then((res) => {
@@ -59,8 +62,12 @@ export default function QrLandingPage() {
           setError('QR 정보를 찾을 수 없습니다');
         }
       })
-      .catch(() => {
-        setError('QR 정보를 찾을 수 없습니다');
+      .catch((e: unknown) => {
+        // 410 SCREEN_SET_INACTIVE = archive 로 종료된 Screen Set QR → 종료 안내(일반 404 는 기존 처리).
+        const status = (e as { status?: number })?.status;
+        const code = (e as { code?: string })?.code;
+        if (status === 410 || code === 'SCREEN_SET_INACTIVE') setTerminated(true);
+        else setError('QR 정보를 찾을 수 없습니다');
       })
       .finally(() => setLoading(false));
   }, [slug]);
@@ -107,6 +114,23 @@ export default function QrLandingPage() {
             <QrCode size={48} style={{ color: colors.neutral300 }} />
           </div>
           <p style={styles.loadingText}>불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Terminated (WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1): archive 로 종료된 Screen Set QR ──
+  if (terminated) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.card}>
+          <div style={styles.errorIcon}>
+            <AlertCircle size={48} style={{ color: colors.neutral400 }} />
+          </div>
+          <h1 style={styles.errorTitle}>현재 사용할 수 없는 화면입니다</h1>
+          <p style={styles.errorDesc}>
+            매장에서 새로 안내받은 QR을 이용해 주세요.
+          </p>
         </div>
       </div>
     );

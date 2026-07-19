@@ -51,7 +51,7 @@ import { parseContentListConfig } from './store-tablet-content-list-block.js';
 import { resolveContentListItems } from './store-public/store-public-tablet-content-resolve.js';
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
-import { ensureScreenSetQr, buildScreenSetQrUrl } from './store-screen-set-qr.service.js';
+import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -1324,22 +1324,33 @@ export function createStoreTabletRoutes(
       if (sets.length === 0) { res.status(400).json({ success: false, error: 'no fields to update', code: 'VALIDATION_ERROR' }); return; }
       sets.push(`updated_at = NOW()`);
       params.push(id); params.push(organizationId);
-      const upd = await dataSource.query(
-        `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
-         WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND deleted_at IS NULL
-         RETURNING ${setCols('')}`,
-        params,
-      );
-      if (!upd?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
-      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §7: 이름 변경 시 QR title 갱신(가능) — slug 는 불변.
-      if (req.body?.name !== undefined && upd[0].publicQrSlug) {
-        await dataSource.query(
-          `UPDATE store_qr_codes SET title = $1, updated_at = NOW()
-           WHERE organization_id = $2 AND landing_type = 'screen_set' AND landing_target_id = $3`,
-          [String(upd[0].name || 'Tablet Corner').slice(0, 300), organizationId, id],
-        ).catch((e: unknown) => console.error('[StoreTablet] QR title sync failed (non-fatal):', (e as any)?.message));
-      }
-      res.json({ success: true, data: await withQrLink(dataSource, organizationId, id, upd[0]) });
+      // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: status 전이(archive/restore)와 종속 QR is_active 를 원자적으로.
+      const statusChange: string | null = req.body?.status !== undefined ? String(req.body.status) : null;
+      let updated: any = null;
+      await dataSource.transaction(async (m) => {
+        const upd = await m.query(
+          `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
+           WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND deleted_at IS NULL
+           RETURNING ${setCols('')}`,
+          params,
+        );
+        if (!upd?.[0]) return;
+        updated = upd[0];
+        // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §7: 이름 변경 시 QR title 갱신 — slug 는 불변.
+        if (req.body?.name !== undefined && updated.publicQrSlug) {
+          await m.query(
+            `UPDATE store_qr_codes SET title = $1, updated_at = NOW()
+             WHERE organization_id = $2 AND landing_type = 'screen_set' AND landing_target_id = $3`,
+            [String(updated.name || 'Tablet Corner').slice(0, 300), organizationId, id],
+          );
+        }
+        // archived → QR 비활성, active/draft(=restore) → QR 재활성. slug·row 불변, 일반 QR 무영향.
+        if (statusChange !== null) {
+          await setScreenSetQrActive(m, organizationId, id, statusChange !== 'archived');
+        }
+      });
+      if (!updated) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      res.json({ success: true, data: await withQrLink(dataSource, organizationId, id, updated) });
     } catch (error: any) {
       console.error('[StoreTablet] PATCH /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
@@ -1371,12 +1382,20 @@ export function createStoreTabletRoutes(
         });
         return;
       }
-      const del = await dataSource.query(
-        `UPDATE store_tablet_screen_sets SET deleted_at = NOW(), status = 'archived', updated_at = NOW()
-         WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL RETURNING id`,
-        [id, organizationId],
-      );
-      if (!del?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: soft-delete(=archive) + 종속 QR 비활성을 원자적으로.
+      let deleted = false;
+      await dataSource.transaction(async (m) => {
+        const del = await m.query(
+          `UPDATE store_tablet_screen_sets SET deleted_at = NOW(), status = 'archived', updated_at = NOW()
+           WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL RETURNING id`,
+          [id, organizationId],
+        );
+        if (!del?.[0]) return;
+        // Screen Set QR 만 비활성(slug·row 불변). 일반 QR·다른 set QR 무영향.
+        await setScreenSetQrActive(m, organizationId, id, false);
+        deleted = true;
+      });
+      if (!deleted) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       res.json({ success: true, data: { id, deleted: true } });
     } catch (error: any) {
       console.error('[StoreTablet] DELETE /screen-sets/:id error:', error);

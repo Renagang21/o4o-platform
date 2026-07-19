@@ -50,6 +50,29 @@ export interface EnsureScreenSetQrResult {
   reused: boolean;
 }
 
+/** query 가능한 실행자(DataSource 또는 트랜잭션 EntityManager). */
+type QueryExecutor = { query: (sql: string, params?: unknown[]) => Promise<unknown> };
+
+/**
+ * WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1
+ * Screen Set 종속 QR(store_qr_codes, landing_type='screen_set')의 is_active 만 동기화한다.
+ *  - archive → false, restore → true. **slug·QR row·landing_target_id 불변**(재사용/재생성/삭제 없음).
+ *  - landing_type='screen_set' + 해당 set 만 대상 → 일반 QR(product/page/link/video)·다른 Screen Set QR 무영향.
+ *  - 트랜잭션 원자성을 위해 executor(EntityManager)를 주입받는다.
+ */
+export async function setScreenSetQrActive(
+  executor: QueryExecutor,
+  organizationId: string,
+  screenSetId: string,
+  active: boolean,
+): Promise<void> {
+  await executor.query(
+    `UPDATE store_qr_codes SET is_active = $1, updated_at = NOW()
+      WHERE organization_id = $2 AND landing_type = 'screen_set' AND landing_target_id = $3`,
+    [active, organizationId, screenSetId],
+  );
+}
+
 /**
  * Screen Set 에 screen_set QR 을 멱등 확보 + public_qr_slug 동기화.
  * @returns 확보된 QR(slug/url/reused). 게이트 미충족(미소유/삭제/보관) 시 null.
