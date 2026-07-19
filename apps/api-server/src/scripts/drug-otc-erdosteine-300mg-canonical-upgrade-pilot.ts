@@ -26,6 +26,9 @@ import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc
 const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const H = (s: string): string => md5(s).slice(0, 16);
+// TypeORM query() 의 UPDATE/INSERT ... RETURNING 결과는 드라이버에 따라 `[rows, affected]` 또는 `rows` 로 온다.
+// (guide Gotcha #3) rows 만 정규화 반환. SELECT(res[0]=행 객체)는 그대로.
+const retRows = (res: unknown): Array<{ id?: string }> => (Array.isArray(res) && Array.isArray(res[0]) ? res[0] : (res as unknown[])) as Array<{ id?: string }>;
 
 const GROUP = { key: '에르도스테인|300밀리그램|정', ingredient: '에르도스테인', dose: '300밀리그램', formKeyword: '정' };
 const CANDIDATE = '03e0af9d-5236-460a-86d4-1af8b0c00c61';
@@ -200,7 +203,7 @@ async function main(): Promise<void> {
            FROM unnest($1::uuid[]) mid
            WHERE NOT EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.status IN ('canonical','needs_review'))
            RETURNING id`, [masterIds, AUTHORED_SOURCE, built.html, CANDIDATE, report.summary]);
-        report.stepA_inserted = Array.isArray(insA) ? insA.length : 0;
+        report.stepA_inserted = retRows(insA).length; // 재실행 시 기존 26 needs_review → 0 (no-op)
         await qr.commitTransaction();
       } catch (e) { await qr.rollbackTransaction(); await qr.release(); throw e; }
       // STEP B: 단일 TX 슬롯 교체 (master 루프 — 각 master 슬롯 원자성은 TX 전체로 보장)
@@ -215,12 +218,14 @@ async function main(): Promise<void> {
           if (['mfds_drug_otc', 'nutrition_combo'].includes(cur[0].source_type)) continue; // 이미 authored → no-op
           if (cur[0].source_type !== 'mfds_easy_drug') throw new Error(`master ${mid} canonical source ${cur[0].source_type} 예상밖 → ABORT`);
           const easyId = cur[0].id;
-          await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical'`, [easyId]);
+          const demote = await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical' RETURNING id`, [easyId]);
+          if (retRows(demote).length !== 1) throw new Error(`master ${mid} easy demote ${retRows(demote).length}건 !== 1 → ABORT`);
           demoted += 1;
           const flip = await qr.query(
             `UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND status='needs_review' AND deleted_at IS NULL RETURNING id`, [mid]);
-          const newId = Array.isArray(flip) && flip[0] ? flip[0].id : null;
-          if (!newId) throw new Error(`master ${mid} authored needs_review flip 실패 → ABORT`);
+          const flipRows = retRows(flip);
+          const newId = flipRows[0]?.id ?? null;
+          if (flipRows.length !== 1 || !newId) throw new Error(`master ${mid} authored needs_review flip ${flipRows.length}건 → ABORT`);
           flipped += 1;
           await qr.query(
             `INSERT INTO shared_product_description_audit_logs (event_type, description_type, master_id, language, previous_description_id, new_description_id, previous_status, new_status, metadata, performed_at)
@@ -243,7 +248,8 @@ async function main(): Promise<void> {
               EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL) dep_easy
             FROM unnest($1::uuid[]) mid
           ) t`, [masterIds]);
-        report.post = { canonical1: parseInt(post[0].canon1, 10), authored: parseInt(post[0].authored, 10), deprecatedEasy: parseInt(post[0].dep, 10), dup: parseInt(post[0].dup, 10) };
+        const postRow = (retRows(post)[0] as unknown as { canon1: string; authored: string; dep: string; dup: string }); // SELECT 은 그대로, 방어적 정규화
+        report.post = { canonical1: parseInt(postRow.canon1, 10), authored: parseInt(postRow.authored, 10), deprecatedEasy: parseInt(postRow.dep, 10), dup: parseInt(postRow.dup, 10) };
         if (report.post.canonical1 !== EXPECTED || report.post.authored !== EXPECTED || report.post.deprecatedEasy !== EXPECTED || report.post.dup !== 0)
           throw new Error(`사후검증 실패 canon1=${report.post.canonical1} authored=${report.post.authored} dep=${report.post.deprecatedEasy} dup=${report.post.dup} → ROLLBACK`);
         await qr.commitTransaction();
