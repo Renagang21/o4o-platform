@@ -42,4 +42,9 @@
 
 ## 5. 진행 기록
 
-- (착수) mg+zn+ca+비타민D 4-원료 read-only sizing 예정.
+- **파일럿 PASS + 첫 MX 배치 LIVE**: mg+zn+ca+비타민D(4원료) ELIGIBLE 69.
+  - 20-파일럿 → 전량 69 generate PASS 58·REVIEW 11(코팅정제·basis 재파싱 known-safe)·BLOCKED 0·G-MULTI HOLD 0.
+  - **composer 무변경 검증**: composeCombo/runComboGuard N-루프가 4-원료 카드(마그네슘·아연·칼슘·비타민D) 독립 렌더(표시량 혼입 0)·ko/en 정합. G-MULTI(AMOUNT-SOURCE·BILINGUAL 등) 4-원료 정상.
+  - 반응형 PASS(CSS 구조): sd-badges flex-wrap + sd-card max-width 860/overflow-hidden → 360~1440 가로스크롤 0. 동일 구조 후속 MX 재확인 불필요.
+  - dry-run 276=276 → apply COMMIT → 독립검증(새 연결) PASS. tag `batch:single-nutrient-combo-mg-zn-ca-vd`. 복합형 누적 296→**365**. 기존 무변경.
+- (다음) MX 규모순 연속: select→generate→guard→dry-run 자동, COMMIT만 승인.
