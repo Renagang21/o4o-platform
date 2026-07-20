@@ -82,4 +82,9 @@
 
 - `hff-combo-select --combo "마그네슘,망간,비타민D,아연,칼슘"` 로 첫 배치 ELIGIBLE 확정 → compose → G-MULTI guard → generate → dry-run(ROLLBACK). **COMMIT 직전에만 승인 요청**.
 
-*read-only · DB write 0 · generate/dry-run/apply 미실행.*
+## 실행 결과 (Agent B) — 첫 배치 LIVE
+
+- **mg+mn+vd+zn+ca(N5) 20건 LIVE**(2026-07-20). select 실측 ELIGIBLE **20**(인벤토리 예측 22의 상한 대비 grounding HOLD 2건 정제 = 본 문서 §basis "상한 추정" 예측 정확). generate PASS 18·REVIEW 2(코팅정제 known-safe)·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 write 80 → apply COMMIT → 독립검증 PASS(canonicalDup 0·기존 421 무변경). **복합형 421 → 441**. 상세: 상위 WO §6 "higher-N 첫 배치 LIVE".
+- 다음: 헤드라인 B-complex 완전형 N8(49) — Agent A 확정 후 Agent B 착수.
+
+*인벤토리 자체는 read-only · DB write 0. 위 실행 결과는 별도 Agent B apply(승인 기반).*

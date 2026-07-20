@@ -67,3 +67,12 @@
 - 최다 그룹: **비타민B 컴플렉스 완전형(N8) 49** · 나이아신+밀크씨슬 B군(N6) 42 · **미네랄 멀티 mg+mn+vd+zn+ca(N5) 22**(LIVE 4원료 확장). 기존 LIVE(전량 N≤4)와 제품 중복 0.
 - compose N-제너릭·G-MULTI(카드수/순서) 강제 → 5~8 카드 구조 변경 불요, 최고 N 시각 스모크 1회만 권장.
 - **권장 첫 배치 = mg+mn+vd+zn+ca(N5, 22)**(전 원료 attribution/basis 기 실증, 신규표면 0) → 이후 헤드라인 B-complex N8 49. generate/dry-run/apply 미실행 · COMMIT 직전 승인.
+
+### higher-N 첫 배치 LIVE (Agent B) — mg+mn+vd+zn+ca(N5) 20건
+
+- **대상 정제**: Agent A 인벤토리 예측 22(상한) → `hff-combo-select` 실측 mention 142 · **ELIGIBLE 20** · HOLD 제외 122(HOLD_MULTI 119 · 벌크 1 · grounding 2). 그룹 일치, 예측-실측 차 2 = 문서화된 grounding HOLD 정제분. 신규 원료 0 · 제형 tablet 18·chewable 2(→'정' 카운터, 구조 신규 0).
+- **generate**: 작성 20 · PASS 18 · REVIEW 2(`D-CLAIM-GROUNDED-002` 코팅정제 known-safe, 미차단) · BLOCKED 0 · **G-MULTI HOLD 0**. composeCombo/G-MULTI N=5 무변경 처리(5-카드 렌더·ko/en 정합).
+- **dry-run(exec+ROLLBACK, DB write 0)**: preload 전 PASS(candidate missing/ambiguous 0 · 사전승격 0 · masterDup 0 · canonicalSpdDup 0 · sanitizeEmpty 0 · 연결 20/20). 예상 write 80 = postVerify 80(masters 20·candidate UPDATE 20·SPD ko20+en20) · canonicalDup 0 · postVerifyPass true.
+- **apply(COMMIT, 사용자 승인)** → **독립검증(새 연결)** PASS: appliedProducts 20 · totalWrites 80 · canonicalDup 0 · candidateLinks 20 · spdSourceRefLinks 40. 기존 복합형 baseline **421 무변경**(lu-va 7 PAUSED 포함) → **복합형 누적 421 → 441**.
+- tag `batch:single-nutrient-mg-mn-vd-zn-ca`. rollback manifest 저장(20 master + 40 SPD + 20 candidate snapshot). 산출: `docs/checks/data/product-description-guard/hff-combo-mg-mn-vd-zn-ca.json` + drafts `docs/guides/products/health-functional-food/production-combo/mg-mn-vd-zn-ca/drafts/`.
+- **다음**: 헤드라인 B-complex 완전형 N8(49) — Agent A 확정 후 착수(8-카드 세로 스택 시각 스모크 동반). lut-va(lu-va) `PAUSED_GROUP_DEFECT` 유지.
