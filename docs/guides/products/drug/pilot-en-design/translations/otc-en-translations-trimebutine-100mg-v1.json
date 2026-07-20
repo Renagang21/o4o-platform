@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRIMEBUTINE-100MG-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "동일 약물(source_ref_id 003beef8) out66 38건이 이미 en canonical(md5 bd0595e5e454ad05687a335305cb379e)로 LIVE. 본 번역은 그 검토완료 en 을 재구성해 66 target 에 확장한다(새 medical fact 0, 약물 전체 en 일관성). 빌드 결과가 live 38 en 과 byte-identical 임을 스크립트가 게이트로 증명한다.",
+  "translations": [
+    {
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "title": "Trimebutine Maleate 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take one to two tablets (100–200 mg) three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Talk to a pharmacist before taking it if you are pregnant, may be pregnant, or are breastfeeding. Talk to a pharmacist or doctor if your symptoms last a long time or get worse.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 100 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited conditions affecting lactose; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    }
+  ],
+  "summary": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms"
+}
