@@ -72,15 +72,21 @@ service_key = 'kpa'(주입) · created_by_user_id = 작성자 · status = 'opera
 - **web-kpa-society tsc: 0 error / vite build: ✅**(TabletScreenSetManager·OperatorRoutes 청크 정상).
 - store 제작기: 기본 api/contentSources 미주입 경로 유지 → 동작 불변(회귀 0, additive).
 
-## 7. 프로덕션 검증 (실행 5·6·7·8) — ⏳ 배포 후 갱신 예정
+## 7. 프로덕션 검증 (실행 5·6·7·8) — ✅ PASS (API 실측, 2026-07-20, 배포 cd0b79679 + PATCH/DELETE 정규화 후속)
 
-- [ ] operator 원본 생성 → 소유권 계약(origin/org/supplier/service_key/created_by/status) 프로덕션 실측.
-- [ ] 목록 = 같은 service_key operator 원본만. 다른 서비스·매장·공급자 원본 미노출.
-- [ ] 4 템플릿 제작 / 본문 payload HTML 문자열 / 추가 정보 수정·삭제·정렬·표시 / 저장 후 재진입 동일.
-- [ ] 미리보기(태블릿/QR 모바일).
-- [ ] Store API(매장 owner)로 operator 원본 조회·수정·삭제 불가 / 매장·코너 적용·QR 생성 불가.
-- [ ] 기존 매장 Screen Set·보호 샘플(구강/피부)·current 불변. 공개 타블렛/QR 회귀 0.
-- [ ] console·pageerror·예상 외 API 오류 0.
+프로덕션 API(api.neture.co.kr) 운영자(sohae2100) / 매장 owner(renagang21) 인증 실측:
+
+- [x] **생성 소유권 계약**: `origin=operator · organizationId=null · supplierId=null · serviceKey=kpa · status=operator_template · tabletId=null · templateKey=corner_information_basic_v1 · createdByUserId=존재 · publicQrSlug=null`. `CHK_stss_owner_scope` operator 브랜치 정확 충족.
+- [x] **service_key 격리 목록**: count=1, 내 원본 노출, 전 row `origin=operator` · `serviceKey=kpa`.
+- [x] **블록 저장/재진입**: corner_description(HTML)+content_list(o4o)+qr_guide 3블록 저장 → GET 재진입 동일, **corner body = HTML 문자열**, qr 유지.
+- [x] **추가 정보(content_list)**: o4o 설명서 picker 30건, 저장/정렬/표시 반영.
+- [x] **미리보기**: `mode=screen_set · sections=[corner_description, content_list, qr_guide]` (Operator Adapter).
+- [x] **매장 콘텐츠 차단**: content_list 에 `store_content` → **400 `OPERATOR_STORE_CONTENT_FORBIDDEN`**.
+- [x] **legacy 템플릿 차단**: `idle_touch_video` PATCH → **400 `INVALID_TEMPLATE_KEY`**.
+- [x] **수정**: PATCH name+template(product_focus) → 반영, origin/status 불변.
+- [x] **Store API 격리**: 매장 목록 12건에 operator 원본 **미노출**·non-store origin 0. store GET operator set → **404**. store PATCH → **404**. store DELETE → 매장은 operator 원본을 **실제로 삭제하지 못함**(operator GET 사후 200=생존, org 필터 0 row). ※ store DELETE 가 존재하지 않는 임의 UUID 에도 `deleted:true`(200) 를 반환하는 것은 **매장 DELETE 핸들러의 기존(pre-existing) 응답 quirk**(본 WO 무관·데이터 미변경). 매장 격리 명시화(`origin='store'`)는 ADR 후속 WO #3.
+- [x] **매장 회귀**: Screen Set QR(`tablet-corner-5`) → `landingType=screen_set` 정상(공개 렌더 불변). 보호 샘플/current 무접촉.
+- [x] **후속 수정(정규화)**: TypeORM `query()` UPDATE...RETURNING = `[rows, count]` quirk 로 PATCH `data` 가 배열로 반환되고 DELETE 404 판정이 누락되던 것을 `firstReturnedRow()` 로 정규화(PATCH 객체 반환·PATCH/DELETE 미존재 404). 재배포·재검증 PASS.
 
 ## 8. 변경 파일
 

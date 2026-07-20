@@ -68,6 +68,15 @@ const blockCols = (p: string) =>
   `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
   `${p}is_visible AS "isEnabled", ${p}config, ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
 
+// TypeORM dataSource.query() 결과 정규화: INSERT ... RETURNING → rows 배열([{...}]) 직접 반환하지만
+//   UPDATE ... RETURNING → [rows, affectedCount] 형태로 반환한다(pg 드라이버 quirk). 두 형태 모두에서
+//   첫 반환 row(객체)를 안전하게 꺼낸다. 미존재(0 row) → null(호출부가 404 처리).
+function firstReturnedRow(result: unknown): any | null {
+  if (!Array.isArray(result)) return null;
+  const rows = Array.isArray(result[0]) ? (result[0] as unknown[]) : (result as unknown[]);
+  return (rows[0] as any) ?? null;
+}
+
 function buildAllowedRoles(serviceKey: string): PrefixedRole[] {
   return [
     `${serviceKey}:admin` as PrefixedRole,
@@ -231,7 +240,9 @@ export function createOperatorScreenSetController(
          RETURNING ${setCols('')}`,
         [serviceKey, name, templateKey, userId],
       );
-      res.status(201).json({ success: true, data: ins[0] });
+      const row = firstReturnedRow(ins);
+      if (!row) { res.status(500).json({ success: false, error: 'Insert returned no row', code: 'INTERNAL_ERROR' }); return; }
+      res.status(201).json({ success: true, data: row });
     } catch (error: any) {
       console.error('[OperatorScreenSet] POST / error:', error);
       res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
@@ -290,8 +301,9 @@ export function createOperatorScreenSetController(
          RETURNING ${setCols('')}`,
         params,
       );
-      if (!upd?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
-      res.json({ success: true, data: upd[0] });
+      const row = firstReturnedRow(upd);
+      if (!row) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      res.json({ success: true, data: row });
     } catch (error: any) {
       console.error('[OperatorScreenSet] PATCH /:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
@@ -358,7 +370,7 @@ export function createOperatorScreenSetController(
          WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL RETURNING id`,
         [id, serviceKey],
       );
-      if (!del?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      if (!firstReturnedRow(del)) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       res.json({ success: true, data: { id, deleted: true } });
     } catch (error: any) {
       console.error('[OperatorScreenSet] DELETE /:id error:', error);
