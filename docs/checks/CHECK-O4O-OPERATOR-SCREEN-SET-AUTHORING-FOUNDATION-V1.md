@@ -4,7 +4,7 @@
 > 설계: `ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1`
 > 선행 스키마: `WO-O4O-SCREEN-SET-OWNER-SCOPE-SCHEMA-MIGRATION-V1` (organization_id nullable + supplier_id + `CHK_stss_owner_scope`, 프로덕션 LIVE·post-verify PASS 배포 e52aedba1 / b45211239)
 > Date: 2026-07-20
-> **상태: 구현 완료(재개)** — HOLD(2026-07-20, organization_id NOT NULL 중지) → 소유권 migration 완료 기준으로 재개.
+> **상태: ✅ 완료·LIVE** — HOLD(2026-07-20, organization_id NOT NULL 중지) → 소유권 migration 완료 기준으로 재개·구현·프로덕션 검증(API + 브라우저 스모크) PASS. 배포 cd0b79679 + 정규화 6f3585a11.
 
 ---
 
@@ -86,7 +86,31 @@ service_key = 'kpa'(주입) · created_by_user_id = 작성자 · status = 'opera
 - [x] **수정**: PATCH name+template(product_focus) → 반영, origin/status 불변.
 - [x] **Store API 격리**: 매장 목록 12건에 operator 원본 **미노출**·non-store origin 0. store GET operator set → **404**. store PATCH → **404**. store DELETE → 매장은 operator 원본을 **실제로 삭제하지 못함**(operator GET 사후 200=생존, org 필터 0 row). ※ store DELETE 가 존재하지 않는 임의 UUID 에도 `deleted:true`(200) 를 반환하는 것은 **매장 DELETE 핸들러의 기존(pre-existing) 응답 quirk**(본 WO 무관·데이터 미변경). 매장 격리 명시화(`origin='store'`)는 ADR 후속 WO #3.
 - [x] **매장 회귀**: Screen Set QR(`tablet-corner-5`) → `landingType=screen_set` 정상(공개 렌더 불변). 보호 샘플/current 무접촉.
-- [x] **후속 수정(정규화)**: TypeORM `query()` UPDATE...RETURNING = `[rows, count]` quirk 로 PATCH `data` 가 배열로 반환되고 DELETE 404 판정이 누락되던 것을 `firstReturnedRow()` 로 정규화(PATCH 객체 반환·PATCH/DELETE 미존재 404). 재배포·재검증 PASS.
+- [x] **후속 수정(정규화)**: TypeORM `query()` UPDATE...RETURNING = `[rows, count]` quirk 로 PATCH `data` 가 배열로 반환되고 DELETE 404 판정이 누락되던 것을 `firstReturnedRow()` 로 정규화(PATCH 객체 반환·PATCH/DELETE 미존재 404). 재배포(6f3585a11)·재검증 PASS(PATCH data=dict / PATCH·DELETE 미존재 404 / 실 set delete 200).
+
+### 7-1. 브라우저 스모크 (kpa-society.co.kr, 운영자 sohae2100, Playwright, 2026-07-20) — ✅ PASS
+
+- [x] 로그인 → `/operator/tablet/screen-sets` 페이지 로드(사이드바 `매장 지원 › 매장 HUB 태블릿 화면` 경로).
+- [x] `원본 만들기` → 제작 셸 진입, **템플릿 4종 정확 노출**(기본 코너 안내형 / 상품 집중형 / 코너 소개형 / 제품 진열형), **legacy 대기 영상형 미노출**.
+- [x] 코너 설명 입력 → 미리보기·저장. **오른쪽 실시간 미리보기 패널 present**(operator preview endpoint + kiosk renderer 재사용).
+- [x] **실제 UI 저장 성공** → 리스트 복귀 + 새 원본 목록 노출(`[SMOKE] 운영자 원본 UI`). 저장 후 삭제로 정리(잔여 0).
+- [x] **page error 0**. console/API 4xx = **기존 legal/policy(terms·privacy) 404 4건뿐**(본 기능 무관, 예상 외 아님). 제작·저장·미리보기 흐름에서 기능 관련 오류 0.
+
+## 완료 보고
+
+```
+WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1 완료
+1. 운영자 원본 소유권 계약 (origin=operator·org NULL·supplier NULL·service_key·created_by·operator_template) — PASS
+2. 운영자 API·service key 격리 (/api/v1/kpa/operator/screen-sets, origin+service_key) — PASS
+3. Operator ContentSourceAdapter (o4o canonical 허용·store 차단·비-canonical 자연 제외) — PASS
+4. 제작기·4개 템플릿 (제작 셸 재사용, idle_touch_video 제외) — PASS
+5. 저장 payload·재진입 (HTML 문자열 body, 블록 영속) — PASS
+6. 미리보기 (operator adapter + previewLayoutOnly kiosk) — PASS
+7. 매장·코너·QR 직접 사용 차단 (store GET/PATCH 404, store_content 거부, QR slug null) — PASS
+8. 기존 매장·보호 샘플 불변 (Screen Set QR 렌더 정상, public/store 무접촉) — PASS
+9. migration 0 — PASS
+10. commit·배포 (cd0b79679 + 정규화 6f3585a11, API+web LIVE) — PASS
+```
 
 ## 8. 변경 파일
 
