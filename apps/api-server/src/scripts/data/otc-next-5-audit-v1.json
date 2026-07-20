@@ -1,0 +1,930 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-NEXT-5-FINAL-AUDIT-NA-V1",
+  "agent": "나",
+  "readOnly": true,
+  "dbWrite": 0,
+  "track": "A (grounded upgrade: e약은요 STORE ko canonical → authored canonical 교체 + EN 동반)",
+  "basis": "bridge full-content fingerprint (fingerprintOf 정본 VERBATIM) — coarse 를 fp 별 분리, bridge target fp/bridge_n 대조",
+  "generatedAt_note": "deterministic — no timestamps embedded (byte-stable across runs)",
+  "candidates": [
+    {
+      "verdict": "READY",
+      "groupKey": "니자티딘|75밀리그램|정",
+      "pharmKey": "ing:니자티딘|75밀리그램|정|oral",
+      "sample": "니자드정(니자티딘)",
+      "atc": "A02BA04",
+      "bridgeFp": "db6e1f0bb7d9763f",
+      "bridge_n": 18,
+      "coarseTotal": 21,
+      "target_master": 18,
+      "target_reproduced": true,
+      "exclude_nonTarget": 3,
+      "excludeFormBreak": {
+        "정": 3
+      },
+      "fpDistribution": [
+        {
+          "fp": "db6e1f0bb7d9763f",
+          "n": 18,
+          "form": "정",
+          "route": "oral",
+          "sample": "자니틴정(니자티딘)",
+          "target": true
+        },
+        {
+          "fp": "7f88215cfd2455ef",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "니타딘정(니자티딘)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 18,
+      "easyCanonicalTotal": 18,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "75밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "048ba86f-f85e-42f8-97fd-7bc4e46cc092",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 33,
+        "out_of_target_total": 33,
+        "out_same_group_already_applied": 33,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_by_source_ref": [],
+        "reusable_reviewed_en_from_ref": 33,
+        "reusable_en_distinct_md5": 1
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 18,
+        "STEP_B_easy_canonical_demote": 18,
+        "STEP_B_authored_canonical_flip": 18,
+        "audit_canonical_replaced": 18,
+        "ko_total": 72
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 18
+      },
+      "total_write": 90,
+      "stop_reason": [],
+      "target_master_ids": [
+        "130a196b-8602-4f1c-be6b-cb70c8314cb9",
+        "321798ee-d07e-49d5-9b4d-803c4b699f2f",
+        "34277b69-12f0-47a7-baa9-f4dd2d6aa47f",
+        "3df34e77-906c-423c-a5ef-25f8bbe61ccb",
+        "4741371a-887e-4875-8eb4-a53dd72eca2f",
+        "49fa340e-702c-46e6-84c4-683c4724736b",
+        "4a3f8637-3d9b-40ba-b1f8-a6482f9cd688",
+        "5fe92b8d-0f76-413b-9170-205b9920c945",
+        "653878b5-ba04-4cb4-b075-fc4126a2c969",
+        "678393c1-b52f-4448-bde7-3137f75efdb5",
+        "6d8a0b1b-1dc6-4dae-8b8c-7c93d91a067b",
+        "8c14e229-8f4b-480d-8731-b907cb7a091f",
+        "932559f9-492d-4f03-bec1-693976fb7d13",
+        "9d8f237b-66bf-44ae-a0cb-45bab8507a8b",
+        "b0020732-24aa-4746-ae4d-86976c6edcf8",
+        "b333b642-d064-4a83-bd51-05a1bafc2276",
+        "b8a28d4e-0aca-4ffb-a6c6-e442eb1fdbce",
+        "f5664005-8493-4f61-a5d4-17fe1bc16d7b"
+      ],
+      "rollback_master_ids": [
+        "130a196b-8602-4f1c-be6b-cb70c8314cb9",
+        "321798ee-d07e-49d5-9b4d-803c4b699f2f",
+        "34277b69-12f0-47a7-baa9-f4dd2d6aa47f",
+        "3df34e77-906c-423c-a5ef-25f8bbe61ccb",
+        "4741371a-887e-4875-8eb4-a53dd72eca2f",
+        "49fa340e-702c-46e6-84c4-683c4724736b",
+        "4a3f8637-3d9b-40ba-b1f8-a6482f9cd688",
+        "5fe92b8d-0f76-413b-9170-205b9920c945",
+        "653878b5-ba04-4cb4-b075-fc4126a2c969",
+        "678393c1-b52f-4448-bde7-3137f75efdb5",
+        "6d8a0b1b-1dc6-4dae-8b8c-7c93d91a067b",
+        "8c14e229-8f4b-480d-8731-b907cb7a091f",
+        "932559f9-492d-4f03-bec1-693976fb7d13",
+        "9d8f237b-66bf-44ae-a0cb-45bab8507a8b",
+        "b0020732-24aa-4746-ae4d-86976c6edcf8",
+        "b333b642-d064-4a83-bd51-05a1bafc2276",
+        "b8a28d4e-0aca-4ffb-a6c6-e442eb1fdbce",
+        "f5664005-8493-4f61-a5d4-17fe1bc16d7b"
+      ],
+      "recommended_run_order": 1
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "pharmKey": "ing:아세트아미노펜|325밀리그램|연질캡슐|oral",
+      "sample": "타이맥스연질캡슐(아세트아미노펜)",
+      "atc": "N02BE01",
+      "bridgeFp": "26587fd5ff28e6b3",
+      "bridge_n": 18,
+      "coarseTotal": 24,
+      "target_master": 18,
+      "target_reproduced": true,
+      "exclude_nonTarget": 6,
+      "excludeFormBreak": {
+        "연질캡슐": 6
+      },
+      "fpDistribution": [
+        {
+          "fp": "26587fd5ff28e6b3",
+          "n": 18,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나스펜연질캡슐(아세트아미노펜)",
+          "target": true
+        },
+        {
+          "fp": "2b1fa0e4500237ef",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "타이렌연질캡슐(아세트아미노펜)",
+          "target": false
+        },
+        {
+          "fp": "3cbae9047a4c082a",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "타이로펜연질캡슐(아세트아미노펜)",
+          "target": false
+        },
+        {
+          "fp": "8ace0cbcdcee953a",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "이두패프연질캡슐(아세트아미노펜)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 18,
+      "easyCanonicalTotal": 18,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "연질캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "325밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 2,
+        "out_of_target_total": 2,
+        "out_same_group_already_applied": 2,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_by_source_ref": [],
+        "reusable_reviewed_en_from_ref": 2,
+        "reusable_en_distinct_md5": 1
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 18,
+        "STEP_B_easy_canonical_demote": 18,
+        "STEP_B_authored_canonical_flip": 18,
+        "audit_canonical_replaced": 18,
+        "ko_total": 72
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 18
+      },
+      "total_write": 90,
+      "stop_reason": [],
+      "target_master_ids": [
+        "10868b75-a5f9-4d5d-82d6-a3a5c56e1cf0",
+        "25cef701-1196-48c6-84b2-12ab3eef6568",
+        "2c672cc1-989b-4477-92fe-8b14db079fa3",
+        "4c90f3db-78e7-4e00-b481-f0a6ef2d539c",
+        "4d9737d0-ed25-4736-9a93-a5f5f38029f1",
+        "591f0234-355e-410a-b273-f6131296e486",
+        "5fc3f903-086a-4767-acfb-93493e899208",
+        "6bada577-2648-4544-8b19-b44681d9eeb3",
+        "971c7dfe-ae52-49d4-b2c6-f57f0ec2db6f",
+        "a280f96a-887e-42f4-8189-6034b0c61490",
+        "aa65864c-27ed-420d-9619-d15df2dd8490",
+        "c66fd225-7909-4bba-9b59-526efdda5a32",
+        "c7c61e35-8b8d-47df-bce8-8ef2edd49b88",
+        "c8984d56-1a3f-4e9e-82d4-29fd1ed469d7",
+        "c8f34bb9-3182-440e-ad66-104e0cbeeb5d",
+        "ca24f6d2-59b4-49d5-b32a-7afdb7abadd3",
+        "dfc832a0-3b6c-4217-89d7-450274e40da9",
+        "eb72b34b-6ee9-4fbe-83fb-9dd063dde3c8"
+      ],
+      "rollback_master_ids": [
+        "10868b75-a5f9-4d5d-82d6-a3a5c56e1cf0",
+        "25cef701-1196-48c6-84b2-12ab3eef6568",
+        "2c672cc1-989b-4477-92fe-8b14db079fa3",
+        "4c90f3db-78e7-4e00-b481-f0a6ef2d539c",
+        "4d9737d0-ed25-4736-9a93-a5f5f38029f1",
+        "591f0234-355e-410a-b273-f6131296e486",
+        "5fc3f903-086a-4767-acfb-93493e899208",
+        "6bada577-2648-4544-8b19-b44681d9eeb3",
+        "971c7dfe-ae52-49d4-b2c6-f57f0ec2db6f",
+        "a280f96a-887e-42f4-8189-6034b0c61490",
+        "aa65864c-27ed-420d-9619-d15df2dd8490",
+        "c66fd225-7909-4bba-9b59-526efdda5a32",
+        "c7c61e35-8b8d-47df-bce8-8ef2edd49b88",
+        "c8984d56-1a3f-4e9e-82d4-29fd1ed469d7",
+        "c8f34bb9-3182-440e-ad66-104e0cbeeb5d",
+        "ca24f6d2-59b4-49d5-b32a-7afdb7abadd3",
+        "dfc832a0-3b6c-4217-89d7-450274e40da9",
+        "eb72b34b-6ee9-4fbe-83fb-9dd063dde3c8"
+      ],
+      "recommended_run_order": 2
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "pharmKey": "ing:엘카르니틴|330밀리그램|정|oral",
+      "sample": "카르틴엘정(엘카르니틴)",
+      "atc": "A16AA01",
+      "bridgeFp": "a75d4ff900dbe2a9",
+      "bridge_n": 16,
+      "coarseTotal": 42,
+      "target_master": 16,
+      "target_reproduced": true,
+      "exclude_nonTarget": 26,
+      "excludeFormBreak": {
+        "정": 26
+      },
+      "fpDistribution": [
+        {
+          "fp": "a75d4ff900dbe2a9",
+          "n": 16,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘카리나정(엘카르니틴)",
+          "target": true
+        },
+        {
+          "fp": "9017e0024031ff4c",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘카닐정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "ac7ba3027cafce45",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "에르틴정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "900a8110303e8f41",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘카렌정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "ce70c85c245f0056",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘리스정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "3b9730d3fc8d9ab1",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘카탄정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "6599085d5e3901c9",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘큐정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "845d1bdeddd113fa",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘패스정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "89cb14c846be1601",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘론드정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "a727d2db1e059599",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엘카렉정(엘카르니틴)",
+          "target": false
+        },
+        {
+          "fp": "d6a08d37d9648c25",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "에레스정(엘카르니틴)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 16,
+      "easyCanonicalTotal": 16,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "330밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "035efa8f-cc53-4e64-a111-c4528689f457",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 12,
+        "out_of_target_total": 12,
+        "out_same_group_already_applied": 12,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_by_source_ref": [],
+        "reusable_reviewed_en_from_ref": 12,
+        "reusable_en_distinct_md5": 1
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 16,
+        "STEP_B_easy_canonical_demote": 16,
+        "STEP_B_authored_canonical_flip": 16,
+        "audit_canonical_replaced": 16,
+        "ko_total": 64
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 16
+      },
+      "total_write": 80,
+      "stop_reason": [],
+      "target_master_ids": [
+        "00271542-66ca-42e7-8d73-216c0ce247ee",
+        "09524fe0-ae94-4a9d-92a8-4b70e482d03b",
+        "0db2ea54-c0d2-471e-afd1-a06d4a3be9c9",
+        "2273e1fc-a205-45ec-8b19-6aa82643bed5",
+        "2515aae4-94be-47d5-a05c-4e54bbea0a2f",
+        "481d2189-6b8e-49e8-a941-2a00ab863b58",
+        "5126a652-c406-4a27-9ecc-37f65ecce0d8",
+        "5dff6127-bd29-41aa-9a17-ff1f37de10ed",
+        "6b1d53f8-1275-4aba-8564-440bc9cfa413",
+        "882725ce-3412-429f-a8df-28c752088c03",
+        "a1e6c2d4-aea0-4dcf-b432-74724b53e0c2",
+        "a5eaa8c7-d926-4df8-bc52-64facf5449ca",
+        "ace96b6d-1730-4327-84c2-a78f177a8723",
+        "c4da1a84-344b-4331-babc-d7e9388661a5",
+        "ebd42a1e-762e-463f-b97b-3f0948cc1881",
+        "ee69e1ac-b181-4d0c-944a-d70e25b9e2a5"
+      ],
+      "rollback_master_ids": [
+        "00271542-66ca-42e7-8d73-216c0ce247ee",
+        "09524fe0-ae94-4a9d-92a8-4b70e482d03b",
+        "0db2ea54-c0d2-471e-afd1-a06d4a3be9c9",
+        "2273e1fc-a205-45ec-8b19-6aa82643bed5",
+        "2515aae4-94be-47d5-a05c-4e54bbea0a2f",
+        "481d2189-6b8e-49e8-a941-2a00ab863b58",
+        "5126a652-c406-4a27-9ecc-37f65ecce0d8",
+        "5dff6127-bd29-41aa-9a17-ff1f37de10ed",
+        "6b1d53f8-1275-4aba-8564-440bc9cfa413",
+        "882725ce-3412-429f-a8df-28c752088c03",
+        "a1e6c2d4-aea0-4dcf-b432-74724b53e0c2",
+        "a5eaa8c7-d926-4df8-bc52-64facf5449ca",
+        "ace96b6d-1730-4327-84c2-a78f177a8723",
+        "c4da1a84-344b-4331-babc-d7e9388661a5",
+        "ebd42a1e-762e-463f-b97b-3f0948cc1881",
+        "ee69e1ac-b181-4d0c-944a-d70e25b9e2a5"
+      ],
+      "recommended_run_order": 3
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "pharmKey": "ing:나프록센|250밀리그램|연질캡슐|oral",
+      "sample": "큐센연질캡슐(나프록센)",
+      "atc": "M01AE02",
+      "bridgeFp": "b2b5edea34cff218",
+      "bridge_n": 15,
+      "coarseTotal": 87,
+      "target_master": 15,
+      "target_reproduced": true,
+      "exclude_nonTarget": 72,
+      "excludeFormBreak": {
+        "연질캡슐": 72
+      },
+      "fpDistribution": [
+        {
+          "fp": "b2b5edea34cff218",
+          "n": 15,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "큐센연질캡슐(나프록센)",
+          "target": true
+        },
+        {
+          "fp": "ee90cf6ba0af24a4",
+          "n": 7,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "맥쎈연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "cb132b3a2745d6a2",
+          "n": 6,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "팜페인파워연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "dd14d9adc0efc046",
+          "n": 6,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "다나센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "62f2793e94a4634b",
+          "n": 5,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "탁센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "c212a513bb88ad42",
+          "n": 4,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "스피록센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "b0003aa124371a86",
+          "n": 3,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "푸로싹연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "b3cf231c8b428307",
+          "n": 3,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "이지페인록센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "17d1b5ce69315997",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "에이프록센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "2f8fd6f7b1291bac",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나에겐연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "35b8a8663a09f577",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "낙센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "36d8be60125a30df",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "테라록센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "392ae079dac0eae0",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "엔프렌드연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "4b2067404240d899",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나쎈연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "7b9b5a51ae40608b",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "미가펜에스연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "900d084412ec40a6",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나리센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "9762f129b2446a16",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나콕스펜연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "987702c5d20f0375",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "여우엔연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "9e939e7f075b39bc",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "프리엔에프연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "aa4e75d6bcbeea99",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "이지엔6스트롱연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "ac6ef16c192a7fb3",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "에이스펜연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "b67d53ab4af2c4c8",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "프리센연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "c853b9559a335c12",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "프로센골드연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "ef0901301763d56b",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "확펜연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "fc44f386b2adb46a",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "로젠연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "fcd522aeba64d746",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "나프원큐에스연질캡슐(나프록센)",
+          "target": false
+        },
+        {
+          "fp": "fd6f53fbe4e1015d",
+          "n": 2,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "자이날큐연질캡슐(나프록센)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 15,
+      "easyCanonicalTotal": 15,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "연질캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "250밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "02355c78-3d6d-4f6b-8120-de9ff7f14673",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 14,
+        "out_of_target_total": 14,
+        "out_same_group_already_applied": 14,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_by_source_ref": [],
+        "reusable_reviewed_en_from_ref": 14,
+        "reusable_en_distinct_md5": 1
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 15,
+        "STEP_B_easy_canonical_demote": 15,
+        "STEP_B_authored_canonical_flip": 15,
+        "audit_canonical_replaced": 15,
+        "ko_total": 60
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 15
+      },
+      "total_write": 75,
+      "stop_reason": [],
+      "target_master_ids": [
+        "1aae3820-d57c-4287-8774-f49288dba601",
+        "26cf9d31-1eac-40d1-8fb7-cbf1e9182609",
+        "2892c9c9-f4e9-4b7f-a1e9-da8b28555c5a",
+        "2ed181b6-1b18-44bb-bd29-c827b547fbea",
+        "38b5777b-7875-4a61-8866-ae44283a9c73",
+        "3dcfd122-b3e5-43ff-8dcb-6360fecdebbd",
+        "63f4a224-0a4d-48ae-a250-cfcda022d671",
+        "65fc189f-f8a1-41a7-9f4e-830382aecbce",
+        "6668c630-213d-474d-96c8-2a21babe251a",
+        "77e08a85-1bb7-4456-98d5-763550a44eec",
+        "7ce42de7-3b55-48a4-b69e-7676a08d126f",
+        "932f4d26-b55a-4124-9b30-aeb19eb2d762",
+        "9608e469-e2b7-4741-8000-84c5087b71e2",
+        "bf1c25ec-10b0-4a06-a58d-f27eeaeaf8be",
+        "e5ff2706-c022-4599-b7b9-999e2f6aeb1c"
+      ],
+      "rollback_master_ids": [
+        "1aae3820-d57c-4287-8774-f49288dba601",
+        "26cf9d31-1eac-40d1-8fb7-cbf1e9182609",
+        "2892c9c9-f4e9-4b7f-a1e9-da8b28555c5a",
+        "2ed181b6-1b18-44bb-bd29-c827b547fbea",
+        "38b5777b-7875-4a61-8866-ae44283a9c73",
+        "3dcfd122-b3e5-43ff-8dcb-6360fecdebbd",
+        "63f4a224-0a4d-48ae-a250-cfcda022d671",
+        "65fc189f-f8a1-41a7-9f4e-830382aecbce",
+        "6668c630-213d-474d-96c8-2a21babe251a",
+        "77e08a85-1bb7-4456-98d5-763550a44eec",
+        "7ce42de7-3b55-48a4-b69e-7676a08d126f",
+        "932f4d26-b55a-4124-9b30-aeb19eb2d762",
+        "9608e469-e2b7-4741-8000-84c5087b71e2",
+        "bf1c25ec-10b0-4a06-a58d-f27eeaeaf8be",
+        "e5ff2706-c022-4599-b7b9-999e2f6aeb1c"
+      ],
+      "recommended_run_order": 4
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "소브레롤|200밀리그램|캡슐",
+      "pharmKey": "ing:소브레롤|200밀리그램|캡슐|oral",
+      "sample": "소부날캡슐200mg(소브레롤)",
+      "atc": "R05CB07",
+      "bridgeFp": "2e37307573cfb189",
+      "bridge_n": 15,
+      "coarseTotal": 15,
+      "target_master": 15,
+      "target_reproduced": true,
+      "exclude_nonTarget": 0,
+      "excludeFormBreak": {},
+      "fpDistribution": [
+        {
+          "fp": "2e37307573cfb189",
+          "n": 15,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "소부날캡슐200mg(소브레롤)",
+          "target": true
+        }
+      ],
+      "easyCanonicalExactly1": 15,
+      "easyCanonicalTotal": 15,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "200밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "0ff909f4-20dc-49d1-b8c5-91794ab62df6",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 3,
+        "out_of_target_total": 3,
+        "out_same_group_already_applied": 3,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_by_source_ref": [],
+        "reusable_reviewed_en_from_ref": 3,
+        "reusable_en_distinct_md5": 1
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 15,
+        "STEP_B_easy_canonical_demote": 15,
+        "STEP_B_authored_canonical_flip": 15,
+        "audit_canonical_replaced": 15,
+        "ko_total": 60
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 15
+      },
+      "total_write": 75,
+      "stop_reason": [],
+      "target_master_ids": [
+        "03ba235e-17f8-4f27-b19a-a317abf87a29",
+        "317eb88c-6ef4-4434-9950-14b28cbd7562",
+        "359f288a-b878-4d82-96ef-6e29864376d5",
+        "35dfb72e-12ae-4962-9957-fec39d7102f5",
+        "4d8f4efd-709e-46e1-9166-db4e0083f00f",
+        "8133ebb3-5110-4d1c-910c-1bfe25cbf596",
+        "8424849d-0bc2-4415-993d-9892071d994d",
+        "93f4b962-518e-4758-94e8-c96de640aa6d",
+        "992c90e4-e9d8-45f2-be50-55fbac023af6",
+        "a408ce6f-0e91-4da6-be63-ea31e99a6b68",
+        "a8530c77-3b0a-4093-8b23-83c59b743757",
+        "b0dbe667-71d4-4bb2-9b2a-145f21597f01",
+        "bf8cfdc5-7ba3-4dc9-91d6-ffcac340d18a",
+        "ec37233b-de07-437a-a235-fa7972517c69",
+        "f01416b6-2aac-4dc5-b534-06a4d4228548"
+      ],
+      "rollback_master_ids": [
+        "03ba235e-17f8-4f27-b19a-a317abf87a29",
+        "317eb88c-6ef4-4434-9950-14b28cbd7562",
+        "359f288a-b878-4d82-96ef-6e29864376d5",
+        "35dfb72e-12ae-4962-9957-fec39d7102f5",
+        "4d8f4efd-709e-46e1-9166-db4e0083f00f",
+        "8133ebb3-5110-4d1c-910c-1bfe25cbf596",
+        "8424849d-0bc2-4415-993d-9892071d994d",
+        "93f4b962-518e-4758-94e8-c96de640aa6d",
+        "992c90e4-e9d8-45f2-be50-55fbac023af6",
+        "a408ce6f-0e91-4da6-be63-ea31e99a6b68",
+        "a8530c77-3b0a-4093-8b23-83c59b743757",
+        "b0dbe667-71d4-4bb2-9b2a-145f21597f01",
+        "bf8cfdc5-7ba3-4dc9-91d6-ffcac340d18a",
+        "ec37233b-de07-437a-a235-fa7972517c69",
+        "f01416b6-2aac-4dc5-b534-06a4d4228548"
+      ],
+      "recommended_run_order": 5
+    }
+  ],
+  "ready_order": [
+    {
+      "order": 1,
+      "groupKey": "니자티딘|75밀리그램|정",
+      "target": 18,
+      "ko": 72,
+      "en": 18
+    },
+    {
+      "order": 2,
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "target": 18,
+      "ko": 72,
+      "en": 18
+    },
+    {
+      "order": 3,
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "target": 16,
+      "ko": 64,
+      "en": 16
+    },
+    {
+      "order": 4,
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "target": 15,
+      "ko": 60,
+      "en": 15
+    },
+    {
+      "order": 5,
+      "groupKey": "소브레롤|200밀리그램|캡슐",
+      "target": 15,
+      "ko": 60,
+      "en": 15
+    }
+  ],
+  "summary": {
+    "READY": 5,
+    "HOLD": 0,
+    "EXCLUDED": 0
+  }
+}
