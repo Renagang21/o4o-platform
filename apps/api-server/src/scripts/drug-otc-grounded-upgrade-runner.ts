@@ -153,6 +153,24 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-trimebutine-100mg-jeong',
   },
+  // 바실루스리케니포르미스균 250mg 캡슐 — Track A 3번째(WO-...-BACILLUS-LICHENIFORMIS-250MG-KO-...-DA-V1).
+  //   감사 커밋 c15c6bbb4(에이전트 가) 기준. target 단일 fp 56 · 비대상 7 fp 32(coarse 88).
+  'bacillus-liche-250mg-capsule': {
+    key: '바실루스리케니포르미스균|250밀리그램|캡슐',
+    ingredient: '바실루스리케니포르미스균',
+    dose: '250밀리그램',
+    formKeyword: '캡슐',
+    candidate: '022f4af0-1219-428b-bd69-fa39a5e7fe7f',
+    targetFp: '13208b062a9c8c79',
+    excludeFp: [
+      '085e66182ccb8459', '14860d74206f81f7', '7ed92e6bd2891a28', 'a024d7fa8eaabc06',
+      'b97a4eb486a66e60', '273d81582c3dcd4e', '8f001c52affcd167',
+    ], // 비대상 7 fp = 6+6+5+5+4+3+3 = 32
+    expected: 56,
+    excludedExpected: 32,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-bacillus-liche-250mg-capsule',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

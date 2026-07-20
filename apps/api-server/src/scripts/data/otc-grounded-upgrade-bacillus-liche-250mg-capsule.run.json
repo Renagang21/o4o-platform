@@ -1,0 +1,349 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "바실루스리케니포르미스균 250mg 캡슐",
+  "coarseTotal": 88,
+  "target": 56,
+  "excluded": 32,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "1430d894-ff80-45f2-a331-4ef2649d53b0",
+      "name": "정장생캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp a024d7fa8eaabc06, bridge SSOT)"
+    },
+    {
+      "id": "16c7a383-96e2-47ab-aaae-ab7161131f97",
+      "name": "정장생캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp a024d7fa8eaabc06, bridge SSOT)"
+    },
+    {
+      "id": "1838f202-3e65-4011-9019-3d22f52c5d62",
+      "name": "바시판포르미캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp b97a4eb486a66e60, bridge SSOT)"
+    },
+    {
+      "id": "33f98e6a-8926-47fc-ad31-9d44b0952e46",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "34b677e4-882d-4444-8d76-5e2476c2cb06",
+      "name": "정장생캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp a024d7fa8eaabc06, bridge SSOT)"
+    },
+    {
+      "id": "3b614244-1ae5-4d44-b8e5-2a7db928bf9b",
+      "name": "두배락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 7ed92e6bd2891a28, bridge SSOT)"
+    },
+    {
+      "id": "3c13059f-2440-4aaf-ae39-75f75d76c3ac",
+      "name": "장이락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 8f001c52affcd167, bridge SSOT)"
+    },
+    {
+      "id": "417fa0af-39b4-4b52-ad1b-f97f9c66c14f",
+      "name": "정장생캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp a024d7fa8eaabc06, bridge SSOT)"
+    },
+    {
+      "id": "50d0991f-b688-4e4e-b99b-9d5ff95bc560",
+      "name": "바시판포르미캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp b97a4eb486a66e60, bridge SSOT)"
+    },
+    {
+      "id": "5ff9e543-96f6-4cae-953d-e67efade06cf",
+      "name": "두배락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 7ed92e6bd2891a28, bridge SSOT)"
+    },
+    {
+      "id": "6ac29462-50b5-4953-bbf3-226321cc4291",
+      "name": "락시러스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "7847270f-ed4f-4572-bb31-62bf265ff85a",
+      "name": "바시판포르미캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp b97a4eb486a66e60, bridge SSOT)"
+    },
+    {
+      "id": "7d6e555e-3d94-47b8-b9a2-a63e0f215102",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "7f7688cb-1780-4fa1-9f27-8afcf00963cf",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "897dfcf6-6cbf-4165-a70b-64adb37ceafe",
+      "name": "두배락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 7ed92e6bd2891a28, bridge SSOT)"
+    },
+    {
+      "id": "8b4d2a22-ed7d-43d6-a295-cbe0b77ef7ca",
+      "name": "바토루스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "a49d92df-059e-4f0a-ade8-fa030fdff7ab",
+      "name": "락시러스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "a4a3a0e7-4f8e-43ed-afea-53a4987ea618",
+      "name": "장이락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 8f001c52affcd167, bridge SSOT)"
+    },
+    {
+      "id": "ab82ce0a-cc76-43d8-b47d-5ffec20a9490",
+      "name": "바토루스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "b0776c99-ec5b-49e3-acd3-052c71503939",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "bb872ae1-0eab-41bb-9a8b-2c74181c3177",
+      "name": "두배락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 7ed92e6bd2891a28, bridge SSOT)"
+    },
+    {
+      "id": "c1d89517-4b6a-442e-9bdf-feadaead11b2",
+      "name": "정장생캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp a024d7fa8eaabc06, bridge SSOT)"
+    },
+    {
+      "id": "d23fe1e8-55f1-4c09-a455-246281da862d",
+      "name": "락시러스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "d30c6631-8bb5-40e9-a69e-37346a7582a0",
+      "name": "바토루스캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 14860d74206f81f7, bridge SSOT)"
+    },
+    {
+      "id": "d725db35-c4d1-485c-a11f-2d45677f713b",
+      "name": "리케락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 273d81582c3dcd4e, bridge SSOT)"
+    },
+    {
+      "id": "d910c24b-7c40-48a2-b7cf-745679657e8d",
+      "name": "바시판포르미캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp b97a4eb486a66e60, bridge SSOT)"
+    },
+    {
+      "id": "dd6175f0-5abf-497e-b79d-18ef7c547050",
+      "name": "리케락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 273d81582c3dcd4e, bridge SSOT)"
+    },
+    {
+      "id": "e3d759c3-2f3d-402b-9a51-66de9b49d17b",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "eaf14ae7-8d82-49ed-a9ad-9a89fce1b196",
+      "name": "장이락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 8f001c52affcd167, bridge SSOT)"
+    },
+    {
+      "id": "ee721406-96cf-47c0-bb3e-144d245e32b9",
+      "name": "리케락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 273d81582c3dcd4e, bridge SSOT)"
+    },
+    {
+      "id": "f5d45327-aa7a-40f7-bd24-8e43b4bce6ba",
+      "name": "락토셀캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 085e66182ccb8459, bridge SSOT)"
+    },
+    {
+      "id": "fef17305-f1c0-46bb-9a54-abe5ae2d3b18",
+      "name": "두배락캡슐(바실루스리케니포르미스균)",
+      "reason": "비대상(fp 7ed92e6bd2891a28, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "026e60f9-572e-4b76-9995-182a7151d21e",
+    "0ac1c319-1362-4bb2-9199-a93d497bd30d",
+    "0e91ba2a-6476-4e42-881f-3adf3ddd2749",
+    "115596f0-c682-4e32-b319-94cd0d043a40",
+    "129c9fda-d2cc-4a11-9a2c-96388c569f83",
+    "145ef11a-2a1a-492d-9145-ee5185f71b89",
+    "1cdf9847-f6ae-4c72-a427-644d82fb5d50",
+    "1e9a24f2-71d9-4dbc-9729-6d9d7d7a4590",
+    "3496a8a7-6129-463b-9474-b09cad4e702e",
+    "39a84dcd-ee18-450c-a9d7-1b771088e774",
+    "405834e4-5628-44e0-9453-51aa84a5c17b",
+    "40bc28e7-3e06-4e98-b544-0d25f2e251e2",
+    "41ec0260-60c9-4d1e-901e-5833cb26ed5e",
+    "45990be8-e0f8-42bf-b39a-ec2b1c3990ae",
+    "45dc8f16-859c-47b2-bb5a-aef89867b6e9",
+    "5162f01a-e9b0-44cc-b6e5-668816f28cb0",
+    "5633358f-d566-4ea5-b937-8132c174be38",
+    "56d6d7ca-6078-44cc-8f8a-ceda9add1115",
+    "5779e0ba-2009-4ef7-ac9d-454bd8609751",
+    "59c183e9-3d82-4870-aa38-e04cdc37b679",
+    "5bb447f7-3039-422b-adb8-83a3e9ed444d",
+    "5fb4ee8e-fbfd-4689-ac6c-d43e045432e1",
+    "693536c4-3842-4b6c-9fd0-cf6a044e6738",
+    "73636c27-5e70-41f5-abb1-f15a229586ba",
+    "7c9cc632-98ef-4042-a296-b6a97ef5715a",
+    "7f0de5a0-f826-4f37-a5c3-46b51559d89b",
+    "7f760403-ec72-4f99-88b1-2136c54e43ee",
+    "8136e232-169e-4cb1-9c3a-4a2239f41944",
+    "828b13d9-80c8-41a7-9282-3402846337fe",
+    "82e71d7f-865e-4b7e-b2b9-c67d77f12863",
+    "840017c6-6aa7-4166-9ed7-30c3ab6c04cd",
+    "88e2198a-a568-4a3d-b123-004d8c584efc",
+    "8c63e8a3-4ab2-45e0-905e-cdcfe45c83ee",
+    "90b400cc-e7f9-47bf-9348-c1d745e94764",
+    "981f762e-2e53-4ac2-bd86-bdf73b03c0dc",
+    "9a3a3aab-d738-42c8-b605-0a966d301cfb",
+    "a0551f89-2cf8-487c-9cb5-e9e30c71a36e",
+    "b6c51f9e-cd65-4f8d-87c0-70e556f9f80a",
+    "c2adf58f-f80f-4f1b-a41f-fa04d0e5e952",
+    "cbfa6c94-3ec6-4b6d-85f3-1daac06119b9",
+    "cceed165-5ad7-4c6f-8cfc-f53847507061",
+    "d6af979e-3d8b-4fae-bbd5-ce0b2f215ddc",
+    "d8c00c88-3122-4095-9ef6-12d8701c7e8b",
+    "d9bdf3b9-abf3-46cb-82ef-c7f31957455b",
+    "e06133c1-e82b-48e4-b31a-fa9258d9f695",
+    "e28b9105-f474-4bd0-8148-1f0c93ffb8c1",
+    "e367be4b-d233-4570-b625-f1e9467dcfa7",
+    "e6140d7d-c504-42da-8b8e-6bbd511eb870",
+    "e6b46056-07ea-47c4-9327-63142c435e07",
+    "e6d1f5e7-0e4a-4fbb-9bfc-07c870bb4eeb",
+    "e962839b-0ae6-4a3a-95e9-98c0c0d80b27",
+    "ec4e60b8-0c26-4d3a-8f2c-a95c65816f62",
+    "f2c536ca-5315-4c4a-a29d-ee8ac8066dd9",
+    "f515c443-c572-494e-b0be-8b05767cd548",
+    "f8c47a36-6f30-492d-ad3f-2f3a4dc23b06",
+    "fbc4113f-a9e0-4ff6-97b6-0e980a4a1cda"
+  ],
+  "rollback_master_ids": [
+    "026e60f9-572e-4b76-9995-182a7151d21e",
+    "0ac1c319-1362-4bb2-9199-a93d497bd30d",
+    "0e91ba2a-6476-4e42-881f-3adf3ddd2749",
+    "115596f0-c682-4e32-b319-94cd0d043a40",
+    "129c9fda-d2cc-4a11-9a2c-96388c569f83",
+    "145ef11a-2a1a-492d-9145-ee5185f71b89",
+    "1cdf9847-f6ae-4c72-a427-644d82fb5d50",
+    "1e9a24f2-71d9-4dbc-9729-6d9d7d7a4590",
+    "3496a8a7-6129-463b-9474-b09cad4e702e",
+    "39a84dcd-ee18-450c-a9d7-1b771088e774",
+    "405834e4-5628-44e0-9453-51aa84a5c17b",
+    "40bc28e7-3e06-4e98-b544-0d25f2e251e2",
+    "41ec0260-60c9-4d1e-901e-5833cb26ed5e",
+    "45990be8-e0f8-42bf-b39a-ec2b1c3990ae",
+    "45dc8f16-859c-47b2-bb5a-aef89867b6e9",
+    "5162f01a-e9b0-44cc-b6e5-668816f28cb0",
+    "5633358f-d566-4ea5-b937-8132c174be38",
+    "56d6d7ca-6078-44cc-8f8a-ceda9add1115",
+    "5779e0ba-2009-4ef7-ac9d-454bd8609751",
+    "59c183e9-3d82-4870-aa38-e04cdc37b679",
+    "5bb447f7-3039-422b-adb8-83a3e9ed444d",
+    "5fb4ee8e-fbfd-4689-ac6c-d43e045432e1",
+    "693536c4-3842-4b6c-9fd0-cf6a044e6738",
+    "73636c27-5e70-41f5-abb1-f15a229586ba",
+    "7c9cc632-98ef-4042-a296-b6a97ef5715a",
+    "7f0de5a0-f826-4f37-a5c3-46b51559d89b",
+    "7f760403-ec72-4f99-88b1-2136c54e43ee",
+    "8136e232-169e-4cb1-9c3a-4a2239f41944",
+    "828b13d9-80c8-41a7-9282-3402846337fe",
+    "82e71d7f-865e-4b7e-b2b9-c67d77f12863",
+    "840017c6-6aa7-4166-9ed7-30c3ab6c04cd",
+    "88e2198a-a568-4a3d-b123-004d8c584efc",
+    "8c63e8a3-4ab2-45e0-905e-cdcfe45c83ee",
+    "90b400cc-e7f9-47bf-9348-c1d745e94764",
+    "981f762e-2e53-4ac2-bd86-bdf73b03c0dc",
+    "9a3a3aab-d738-42c8-b605-0a966d301cfb",
+    "a0551f89-2cf8-487c-9cb5-e9e30c71a36e",
+    "b6c51f9e-cd65-4f8d-87c0-70e556f9f80a",
+    "c2adf58f-f80f-4f1b-a41f-fa04d0e5e952",
+    "cbfa6c94-3ec6-4b6d-85f3-1daac06119b9",
+    "cceed165-5ad7-4c6f-8cfc-f53847507061",
+    "d6af979e-3d8b-4fae-bbd5-ce0b2f215ddc",
+    "d8c00c88-3122-4095-9ef6-12d8701c7e8b",
+    "d9bdf3b9-abf3-46cb-82ef-c7f31957455b",
+    "e06133c1-e82b-48e4-b31a-fa9258d9f695",
+    "e28b9105-f474-4bd0-8148-1f0c93ffb8c1",
+    "e367be4b-d233-4570-b625-f1e9467dcfa7",
+    "e6140d7d-c504-42da-8b8e-6bbd511eb870",
+    "e6b46056-07ea-47c4-9327-63142c435e07",
+    "e6d1f5e7-0e4a-4fbb-9bfc-07c870bb4eeb",
+    "e962839b-0ae6-4a3a-95e9-98c0c0d80b27",
+    "ec4e60b8-0c26-4d3a-8f2c-a95c65816f62",
+    "f2c536ca-5315-4c4a-a29d-ee8ac8066dd9",
+    "f515c443-c572-494e-b0be-8b05767cd548",
+    "f8c47a36-6f30-492d-ad3f-2f3a4dc23b06",
+    "fbc4113f-a9e0-4ff6-97b6-0e980a4a1cda"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "13208b062a9c8c79",
+      "n": 56,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "a024d7fa8eaabc06",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b97a4eb486a66e60",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "085e66182ccb8459",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7ed92e6bd2891a28",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8f001c52affcd167",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "14860d74206f81f7",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "273d81582c3dcd4e",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 56,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 56 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}
