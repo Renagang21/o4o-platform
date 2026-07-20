@@ -37,6 +37,54 @@
 
 ---
 
+## 0-B. 번역 vs 외부 LLM 자동초안 구분 (정책 확정)
+
+> 근거: WO-O4O-OTC-KO-TO-EN-TRANSLATION-POLICY-CLARIFY-NA-V1 (2026-07-20, 문서 정비·DB write 0). CLAUDE.md 콘텐츠 작성 불변 원칙 · [CONTENT-AUTHORING-PRINCIPLES CR-002/004/007](../../content-authoring/CONTENT-AUTHORING-PRINCIPLES.md) · [AI-GROUNDING AR-002](../../ai/AI-GROUNDING.md) 와 본 지침 §3~§6 을 대조해 확정한다.
+
+### 0-B-1. grounded ko canonical 기준 영어 충실 번역 = **허용**
+
+- **검토 완료된 ko canonical 을 소스로 한 영어 충실 번역은 허용된 작업이다.** ko canonical 은 이미 공식 원문(e약은요·허가사항)에 grounding 되고 검토·승격까지 끝난 자산이므로, 그 의미·수치·강도를 보존해 영어로 옮기는 것은 **형식 변환(번역)** 이지 근거 없는 사실 생성이 아니다. (본 지침 §3-1 "번역 소스 = 수정 완료 ko canonical" · 은행엽·포도엽 299 실증)
+
+### 0-B-2. 금지되는 "외부 LLM 자동초안" 과 승인된 번역의 구분
+
+| 구분 | 금지 — 외부 LLM 자동초안 | 허용 — 승인된 번역 |
+|---|---|---|
+| 무엇을 만드나 | **새 medical fact**(성분·효능·수치·용법·주의)를 원문 grounding 없이 생성·보강 | 이미 grounded·검토완료된 ko canonical 4필드(`efficacy·usage·caution·summaryTable`)를 영어로 변환 |
+| 새 사실 | 있음 (창작·일반지식 유입) | **0** (원문에 없는 사실 추가 금지) |
+| 근거 | 없음 → 위반 | ko canonical = 원문 grounding 승계 |
+| Rule | CR-004·AR-002 위반 | CR-002 원문 우선 준수 |
+
+- **판별 기준 = "이 산출물이 ko canonical 에 없는 새 medical fact 를 만드는가?"** → YES 면 금지(초안 창작), NO(의미 보존 형식 변환)면 허용(번역).
+- 번역은 GUIDE/GLOSSARY(§3-3) + TEST-LOG 수치·금기 대조 검수(§3-6) + 이중 게이트(§6)를 거친다. `translatorNote`·`bodyMarkdown` 주석은 소비자 비노출이되 **번역자는 반드시 열람**(오역·안전정보 소실 방지, [TRANSLATION-DRAFTS-V1 §6](pilot-en-design/TRANSLATION-DRAFTS-V1.md)).
+
+### 0-B-3. 수치·금기·주의·첨가제 보존 게이트 (요약)
+
+번역이 "충실"함을 보장하는 보존 게이트 — 상세는 §3~§6, 여기서는 확정 목록만:
+
+| 축 | 보존 규칙 | 위치 |
+|---|---|---|
+| 수치 | 값 불변, 표기만 변환(`40~80mg`→`40–80 mg`, `1일 3회`→`three times a day`) | §3-3 |
+| 금기 | `Do not take this if …` — 강도 보존 | §3-3 |
+| 주의 | 문장 단위 `<li>` 분리 · 강도 보존 | §3-3·§7-6 |
+| 첨가제(per-master) | 공유 소스 수정 불가 → **caution 복사본 재생성**으로 master 별 canonical 만 갱신 | §7-5 |
+| 검수 | TEST-LOG 로 그룹당 **수치·용량·기간·금기 대조** | §3-6 |
+| persist 게이트 | **한글 0 · `<table>` 0 · 주석 0 · 필수필드 누락 0 · ko↔en 정합** | §4 |
+
+### 0-B-4. 영어 원문이 별도로 필요한 경우 vs 필요 없는 경우
+
+- **별도 EN 원문 불필요(원칙·대부분)**: STORE en 슬롯이 비어 있으면(grounded 제품은 e약은요 en 미보유가 일반) ko canonical 을 번역해 **authored en canonical 을 직접 INSERT** 한다. **ko canonical 자체가 grounding 소스** 이므로 별도 e약은요 EN 원문은 필요 없다. ([UPGRADE-POLICY §3-2](OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1.md))
+- **별도 원문/작업이 필요(예외·드묾)**: ① en canonical 이 이미 존재하면 §5 계약을 en 슬롯에 적용(demote→replace, [UPGRADE-POLICY §3-3](OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1.md)). ② 번역이 아니라 **영어권 소비자 톤으로 재작성**(예: HFF)하는 경우는 번역이 아닌 **authoring** 이므로 별도 grounding 필요 — OTC 의약품 en 은 이 경로를 쓰지 않는다(충실 번역 원칙).
+- **확정**: OTC 의약품 en 은 **ko canonical 번역이 원칙** → "별도 grounded EN 원문 부재" 는 en 진행의 정합적 blocker 가 아니다.
+
+### 0-B-5. 트리메부틴말레산염 100mg 정 66건 en 진행 가능 여부 = **진행 가능 (본 지침 경로)**
+
+- ko 66건 authored canonical **LIVE·검토완료**([TRIMEBUTINE-100MG-RUNNER §7](../../../checks/CHECK-O4O-OTC-TRIMEBUTINE-100MG-UPGRADE-RUNNER-PILOT-DA-V1.md)) → **번역 소스 충족**.
+- 66 master 의 non-ko STORE = 0 → en 슬롯 비어 있음 → **authored en canonical 직접 INSERT 경로**(demote 불필요, §0-B-4).
+- 위 CHECK §8 의 EN HOLD("grounded EN 원문 부재")는 **grounded-upgrade runner(ko 전용, en 경로 없음) 기준**의 안전 보류였다. 본 **BULK-TRANSLATION 경로**는 ko canonical 을 번역 소스로 쓰므로 별도 EN 원문이 필요 없어 **정책상 진행 가능**하다(모순 아님 — 경로가 다름).
+- **단, 실제 en 실행은 별도 apply WO** 로 본 지침 §3(그룹당 en 번역 1건 + GUIDE/GLOSSARY + TEST-LOG) → §4(needs_review 전개) → §5(canonical 전환)를 dry-run→이중게이트로 수행한다. **본 WO 는 정책 확정만(DB write 0)** 이며 en 자동 실행·번역 초안 생성을 지시하지 않는다.
+
+---
+
 ## 1. 배치 단위
 
 - **10~20 그룹 단위**로 배치. 그룹 = `성분|함량|제형`(3축, DR-005/DR-019).
