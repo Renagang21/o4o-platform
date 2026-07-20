@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-ALBENDAZOLE-400MG-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "알벤다졸 400mg 정 EN 번역 1건. grounded ko canonical(source_ref 0178f85b) 충실 번역. 동일 약물 out-of-scope 33 master 의 live en canonical(md5 11800175070e91f771fd414cdf040d22) 을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "400 mg once(회충·구충·편충·아메리카구충) · 요충 1정 후 7일 뒤 1정 재투여 · 분선충+촌충 중증 400 mg 1일1회 3일 — ko 용량·투여횟수·간격 보존(값 불변)",
+    "연령": "24 months or older / under 2 금지 — ko 연령 경계 보존",
+    "금기": "Do not take this if …(과민·임부/임신가능/수유·2세 미만) — 강도 보존",
+    "주의": "병용금기(theophylline·cimetidine·praziquantel·dexamethasone·ritonavir·phenytoin·carbamazepine·phenobarbital) · 간/신 상담 · 가족 동시 치료 — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 11800175 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "title": "Albendazole 400 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to treat infection with roundworm, pinworm, hookworm, whipworm, American hookworm and threadworm, including mixed infections.",
+      "usage": "For roundworm, hookworm, whipworm and hookworm infection, adults and children 24 months or older take one tablet (400 mg) once. For pinworm, take one tablet and then one more tablet 7 days later to prevent reinfection. If threadworm occurs together with another parasite (tapeworm) as a severe infection, take one tablet (400 mg) once a day for 3 days. If the tablet is hard to swallow, you may chew it or take it with a small amount of water.",
+      "caution": "Do not take this if you have ever reacted to it, if you are pregnant, may be pregnant or are breastfeeding, or for children under 2. Do not take it together with theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine or phenobarbital. Talk to a pharmacist before taking it if you have liver or kidney problems. Pinworm often spreads again within a family, so it is best to treat everyone together.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Albendazole 400 mg",
+        "How it works": "Treats worm infection",
+        "Main symptoms": "Roundworm, pinworm, hookworm, whipworm infection",
+        "Who should be careful": "Pregnancy and breastfeeding; do not give to children under 2",
+        "Why this one": "A worm treatment taken as a single dose"
+      }
+    }
+  ],
+  "summary": "Roundworm, pinworm, hookworm, whipworm infection"
+}

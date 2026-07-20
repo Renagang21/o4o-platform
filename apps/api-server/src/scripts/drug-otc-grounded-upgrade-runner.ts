@@ -186,6 +186,25 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-loratadine-10mg-jeong',
   },
+  // 알벤다졸 400mg 정 — Track A(WO-O4O-OTC-ALBENDAZOLE-400MG-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 커밋 fc66ec00f 기준. target 단일 fp 38 · 비대상 7 fp 54(coarse 92, other 0).
+  //   비대상 = 안전지문불일치 47(160f299c19·10384de117·28d292014·7da304f94·4bc58b993) + 비대상 authored 7(44ef883e4·12dd978c3).
+  'albendazole-400mg-jeong': {
+    key: '알벤다졸|400밀리그램|정',
+    ingredient: '알벤다졸',
+    dose: '400밀리그램',
+    formKeyword: '정',
+    candidate: '0178f85b-94d7-4ac9-a061-ac4c2d9ad750',
+    targetFp: '879d80e7afe2d0f4',
+    excludeFp: [
+      '10384de1b4730be8', '12dd978c6a15f077', '160f299c7741cdfa', '28d29201cd57742b',
+      '44ef883e752951ce', '4bc58b995fe73f97', '7da304f9b51043b3',
+    ], // 비대상 7 fp = 17+3+19+4+4+3+4 = 54
+    expected: 38,
+    excludedExpected: 54,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-albendazole-400mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

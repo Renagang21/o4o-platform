@@ -77,6 +77,17 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-loratadine-10mg-v1.json',
     outBase: 'otc-en-complete-loratadine-10mg',
   },
+  // 알벤다졸 400mg 정 (WO-O4O-OTC-ALBENDAZOLE-400MG-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 0178f85b = 71 ko 공유(38 target + 33 out). out33 이미 en canonical LIVE(md5 11800175).
+  //   38 ko == 33 ko(동일 약물) → out33 en 재구성. 38 master_id 스코프(source_ref 스코프 금지).
+  'albendazole-400mg-jeong': {
+    key: '알벤다졸|400밀리그램|정',
+    candidate: '0178f85b-94d7-4ac9-a061-ac4c2d9ad750',
+    sourceType: 'mfds_drug_otc', expected: 38,
+    koRunBase: 'otc-grounded-upgrade-albendazole-400mg-jeong',
+    translationFile: 'otc-en-translations-albendazole-400mg-v1.json',
+    outBase: 'otc-en-complete-albendazole-400mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {
