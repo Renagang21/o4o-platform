@@ -205,6 +205,42 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-albendazole-400mg-jeong',
   },
+  // 알마게이트 500mg 정 — Track A(WO-O4O-OTC-ALMAGATE-500MG-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 커밋 fc66ec00f 기준. target 단일 fp 37 · 비대상 18 fp 87(coarse 124, other 0).
+  'almagate-500mg-jeong': {
+    key: '알마게이트|500밀리그램|정',
+    ingredient: '알마게이트',
+    dose: '500밀리그램',
+    formKeyword: '정',
+    candidate: '01a231cd-b471-4d93-8071-b271f8c4627d',
+    targetFp: 'b08e3e7b13e8836f',
+    excludeFp: [
+      '0165936088bfcaa7', '081db4afdf104715', '28b6c02e9e086790', '56efd9c169329676',
+      '5815a604cf518c6a', '5b53bf6a3de859dd', '6efc5656c935af21', '6f4a3a2de951b186',
+      '73c83c801de51129', '83468fcb10c930aa', '8756eb34abe2d6d2', '8a5c24ed7ab7bb90',
+      'aa11b369fdd7268c', 'd7e0734264663065', 'da3a46edb73780c3', 'dc552be816d2403a',
+      'eb4fa0d16182826f', 'fc5e9901df83108d',
+    ], // 비대상 18 fp = 5+14+4+2+3+3+7+2+3+4+4+7+2+3+18+2+2+2 = 87
+    expected: 37,
+    excludedExpected: 87,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-almagate-500mg-jeong',
+  },
+  // 디오스민 300mg 캡슐 — Track A(WO-O4O-OTC-DIOSMIN-300MG-... · 에이전트 다).
+  //   감사 커밋 c15c6bbb4(에이전트 가) 기준. target 단일 fp 38 · 비대상 2 fp 7(coarse 45, other 0).
+  'diosmin-300mg-capsule': {
+    key: '디오스민|300밀리그램|캡슐',
+    ingredient: '디오스민',
+    dose: '300밀리그램',
+    formKeyword: '캡슐',
+    candidate: '05be62a5-89dc-4f20-95f9-cb6187f5ab35',
+    targetFp: 'e0a551d8020daa5c',
+    excludeFp: ['21bd2e89cb9d1b1b', '2c027163aef221c8'], // 비대상 2 fp = 4+3 = 7
+    expected: 38,
+    excludedExpected: 7,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-diosmin-300mg-capsule',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

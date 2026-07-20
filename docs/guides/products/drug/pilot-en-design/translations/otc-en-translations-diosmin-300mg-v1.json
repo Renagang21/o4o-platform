@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-DIOSMIN-300MG-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "동일 약물(source_ref_id 05be62a5) out 12건이 이미 en canonical(md5 5e22fbf8bb041d8bd482f767e0f278c6)로 LIVE. 본 번역은 그 검토완료 en 을 재구성해 38 target 에 확장한다(새 medical fact 0, 약물 전체 en 일관성). 빌드 결과가 live 12 en 과 byte-identical 임을 스크립트가 게이트로 증명한다.",
+  "translations": [
+    {
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "title": "Diosmin 300 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease heaviness and pain in the legs caused by poor vein circulation, as a supportive treatment for problems caused by fragile capillaries, and to treat the signs of haemorrhoids.",
+      "usage": "Adults take one capsule twice a day. If haemorrhoids come back or get worse, up to 1,200–1,800 mg a day may be taken. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are breastfeeding. Talk to a pharmacist before taking it if you are pregnant. Do not take it for a long period. If your symptoms do not improve quickly, an examination of the anus and a review of your treatment are needed.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diosmin 300 mg",
+        "How it works": "Improves vein circulation",
+        "Main symptoms": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "Who should be careful": "Breastfeeding; long-term use",
+        "Why this one": "A vein circulation treatment for heavy legs and haemorrhoid symptoms (capsule)"
+      }
+    }
+  ],
+  "summary": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids"
+}

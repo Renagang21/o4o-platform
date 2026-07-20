@@ -88,6 +88,28 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-albendazole-400mg-v1.json',
     outBase: 'otc-en-complete-albendazole-400mg',
   },
+  // 알마게이트 500mg 정 (WO-O4O-OTC-ALMAGATE-500MG-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 01a231cd = 63 ko 공유(37 target + 26 out). out26 이미 en canonical LIVE(md5 8e5a52ff).
+  //   37 ko == 26 ko(동일 약물) → out26 en 재구성. 37 master_id 스코프(source_ref 스코프 금지).
+  'almagate-500mg-jeong': {
+    key: '알마게이트|500밀리그램|정',
+    candidate: '01a231cd-b471-4d93-8071-b271f8c4627d',
+    sourceType: 'mfds_drug_otc', expected: 37,
+    koRunBase: 'otc-grounded-upgrade-almagate-500mg-jeong',
+    translationFile: 'otc-en-translations-almagate-500mg-v1.json',
+    outBase: 'otc-en-complete-almagate-500mg',
+  },
+  // 디오스민 300mg 캡슐 (WO-O4O-OTC-DIOSMIN-300MG-EN-COMPLETE-DA-V1 · 에이전트 다)
+  //   source_ref 05be62a5 = 50 ko 공유(38 target + 12 out). out12 이미 en canonical LIVE(md5 5e22fbf8).
+  //   38 ko == 12 ko(동일 약물) → out12 en 재구성. 38 master_id 스코프(source_ref 스코프 금지).
+  'diosmin-300mg-capsule': {
+    key: '디오스민|300밀리그램|캡슐',
+    candidate: '05be62a5-89dc-4f20-95f9-cb6187f5ab35',
+    sourceType: 'mfds_drug_otc', expected: 38,
+    koRunBase: 'otc-grounded-upgrade-diosmin-300mg-capsule',
+    translationFile: 'otc-en-translations-diosmin-300mg-v1.json',
+    outBase: 'otc-en-complete-diosmin-300mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

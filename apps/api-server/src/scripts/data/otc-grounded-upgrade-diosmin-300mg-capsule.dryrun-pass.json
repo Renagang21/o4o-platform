@@ -1,0 +1,187 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "디오스민|300밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "디오스민 300mg 캡슐",
+  "coarseTotal": 45,
+  "target": 38,
+  "excluded": 7,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "1451cfe1-ace5-4937-adc5-c54c2e341535",
+      "name": "케이스민캡슐(디오스민)",
+      "reason": "비대상(fp 2c027163aef221c8, bridge SSOT)"
+    },
+    {
+      "id": "207e8e3d-56b5-4890-b82b-5c2fda0efe75",
+      "name": "케이스민캡슐(디오스민)",
+      "reason": "비대상(fp 2c027163aef221c8, bridge SSOT)"
+    },
+    {
+      "id": "292cb136-fa8c-400c-990c-ab445f847ee4",
+      "name": "베노론캡슐(디오스민)",
+      "reason": "비대상(fp 21bd2e89cb9d1b1b, bridge SSOT)"
+    },
+    {
+      "id": "3ec08c2e-b5b6-412a-9a88-7c68d73c70f6",
+      "name": "베노론캡슐(디오스민)",
+      "reason": "비대상(fp 21bd2e89cb9d1b1b, bridge SSOT)"
+    },
+    {
+      "id": "53145f7c-db7c-4245-871a-ad83e4d67990",
+      "name": "케이스민캡슐(디오스민)",
+      "reason": "비대상(fp 2c027163aef221c8, bridge SSOT)"
+    },
+    {
+      "id": "bdafd74d-4618-4067-aa27-b60524e6ad1c",
+      "name": "베노론캡슐(디오스민)",
+      "reason": "비대상(fp 21bd2e89cb9d1b1b, bridge SSOT)"
+    },
+    {
+      "id": "e4718326-c1c1-400f-8ce6-52a4e28c5490",
+      "name": "베노론캡슐(디오스민)",
+      "reason": "비대상(fp 21bd2e89cb9d1b1b, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "00b6fcde-f11f-49d3-888e-686b36dde384",
+    "0b11d6ba-0e3b-4f91-bf2c-b68845823e2d",
+    "1736ebe1-d2e2-4d8e-9af3-48e0fe90cf2c",
+    "18badbae-c9c5-41c3-a604-e814d0398f2a",
+    "1a9fdbce-510a-414c-9b7b-99d6d8e52d5f",
+    "20c5281a-8ff5-4ce6-b541-b994d5258129",
+    "22512377-b44c-4eff-ba83-5246b9ab3e0f",
+    "354cb53c-4dd2-4b9d-9229-230c68f2e618",
+    "47e100f7-69b6-4047-b15b-05c3f6b7da97",
+    "4b91914d-9afa-47cb-9dbf-63babf14ddd6",
+    "508b6096-cea5-4552-a645-a9409b51a5d1",
+    "535ef743-3afa-44ae-ab17-df3c13bbe265",
+    "5b2c4f12-6b89-4714-ae56-d3038a1eefcb",
+    "5b63226a-0483-4391-b9c9-b78d16df7657",
+    "6043112c-7335-47d5-be5b-4b9333ddad02",
+    "73e2dd53-d971-4fef-babe-32d223744adc",
+    "7ad8658c-8941-4666-99bf-8fac5e34ad3b",
+    "7d5c7b95-1ac5-4506-82d2-1602e792ad10",
+    "8019c63c-b2d7-485d-9e83-ca59fbe42090",
+    "853f770a-6825-4814-a487-46276d1e964f",
+    "86d29bd8-1268-4eeb-a63e-ca9e6bd0328e",
+    "928277a7-ffac-4b28-a7a6-4b0e72fbb558",
+    "9880fee9-66d5-4bbb-90fe-45046497b982",
+    "a53a65c8-f9bb-4dcd-8a09-74d45bdc9434",
+    "a55774ce-01ea-47ff-93cd-0210b98319c7",
+    "aaa9053d-763a-4d34-80c9-11ffae245594",
+    "adfff8c5-369b-48b7-9f71-f3cc69edf8cf",
+    "c1341008-3c55-4114-a993-45eba6814ab6",
+    "c45c8cd3-251b-4b2f-a1c9-bd5b7188e352",
+    "d445b491-170a-41f1-a0a7-636b2d623508",
+    "db547dcc-c612-464e-a55e-0c9ddb08ef78",
+    "dc9670f4-7546-4c80-9c05-a1361e909713",
+    "df3ebfc4-bbdc-411c-be46-5eb7a9474a04",
+    "e7acf94a-686e-4cab-a2cb-65e6c3a3b964",
+    "e8abd41d-f8bd-4fc8-a205-ceb61f13e678",
+    "f50539f2-e8a3-429c-9b97-6ae1d8909be7",
+    "fa0cd6f0-8cff-46f6-b366-7a51b31fa51b",
+    "fa204843-23d8-4650-84fd-f66a05d91748"
+  ],
+  "rollback_master_ids": [
+    "00b6fcde-f11f-49d3-888e-686b36dde384",
+    "0b11d6ba-0e3b-4f91-bf2c-b68845823e2d",
+    "1736ebe1-d2e2-4d8e-9af3-48e0fe90cf2c",
+    "18badbae-c9c5-41c3-a604-e814d0398f2a",
+    "1a9fdbce-510a-414c-9b7b-99d6d8e52d5f",
+    "20c5281a-8ff5-4ce6-b541-b994d5258129",
+    "22512377-b44c-4eff-ba83-5246b9ab3e0f",
+    "354cb53c-4dd2-4b9d-9229-230c68f2e618",
+    "47e100f7-69b6-4047-b15b-05c3f6b7da97",
+    "4b91914d-9afa-47cb-9dbf-63babf14ddd6",
+    "508b6096-cea5-4552-a645-a9409b51a5d1",
+    "535ef743-3afa-44ae-ab17-df3c13bbe265",
+    "5b2c4f12-6b89-4714-ae56-d3038a1eefcb",
+    "5b63226a-0483-4391-b9c9-b78d16df7657",
+    "6043112c-7335-47d5-be5b-4b9333ddad02",
+    "73e2dd53-d971-4fef-babe-32d223744adc",
+    "7ad8658c-8941-4666-99bf-8fac5e34ad3b",
+    "7d5c7b95-1ac5-4506-82d2-1602e792ad10",
+    "8019c63c-b2d7-485d-9e83-ca59fbe42090",
+    "853f770a-6825-4814-a487-46276d1e964f",
+    "86d29bd8-1268-4eeb-a63e-ca9e6bd0328e",
+    "928277a7-ffac-4b28-a7a6-4b0e72fbb558",
+    "9880fee9-66d5-4bbb-90fe-45046497b982",
+    "a53a65c8-f9bb-4dcd-8a09-74d45bdc9434",
+    "a55774ce-01ea-47ff-93cd-0210b98319c7",
+    "aaa9053d-763a-4d34-80c9-11ffae245594",
+    "adfff8c5-369b-48b7-9f71-f3cc69edf8cf",
+    "c1341008-3c55-4114-a993-45eba6814ab6",
+    "c45c8cd3-251b-4b2f-a1c9-bd5b7188e352",
+    "d445b491-170a-41f1-a0a7-636b2d623508",
+    "db547dcc-c612-464e-a55e-0c9ddb08ef78",
+    "dc9670f4-7546-4c80-9c05-a1361e909713",
+    "df3ebfc4-bbdc-411c-be46-5eb7a9474a04",
+    "e7acf94a-686e-4cab-a2cb-65e6c3a3b964",
+    "e8abd41d-f8bd-4fc8-a205-ceb61f13e678",
+    "f50539f2-e8a3-429c-9b97-6ae1d8909be7",
+    "fa0cd6f0-8cff-46f6-b366-7a51b31fa51b",
+    "fa204843-23d8-4650-84fd-f66a05d91748"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "e0a551d8020daa5c",
+      "n": 38,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "2c027163aef221c8",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "21bd2e89cb9d1b1b",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 38,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 38,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 38,
+  "htmlLen": 1587,
+  "contentHash": "2b02938535dd46788ded39bb5746c742",
+  "summary": "디오스민 300mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 38,
+      "STEP_B_easy_canonical_demote": 38,
+      "STEP_B_authored_canonical_flip": 38,
+      "total": 114
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 38,
+      "total": 38
+    },
+    "grand_total": 152
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 38",
+    "policy_2A": "audit 2/master = 76 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
