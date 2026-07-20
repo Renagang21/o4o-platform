@@ -122,4 +122,30 @@ basis/원료/제형/Guard 재사용: YES / 신규 0
 
 ---
 
-*read-only · DB write 0 · generate/dry-run/apply 미실행. select 실측(`--source file`).*
+## 8. 실행 기록 — #1 비타민D+비타민E 24 LIVE (Agent B · 2026-07-20 · COMMIT)
+
+§6 1순위 생산 실행 완료. **DB write 96 · COMMIT.**
+
+| 단계 | 실측 |
+|------|------|
+| select (`--source db`, proxy 5433) | ELIGIBLE **27** · 제형 softgel 22·chewable 2·tablet 2·powder 1 (§2 file-source와 정확 일치) |
+| 오메가3 은닉 3건 제외(§4) | `200400200142058`·`20120019007573`·`20120019007579` 모두 pool 존재 확인 후 제외 → **clean 24** (softgel 22→19) |
+| generate·Guard | PASS **24** · REVIEW 0 · BLOCKED 0 · G-MULTI HOLD 0 · 자동HOLD 0. 전건 원료 카드 2(D+E)·EPA/DHA/오메가 누출 0 |
+| dry-run(exec+rollback) | postVerifyPass ✓ · 예상=실측 96 · canonicalDup 0 → ROLLBACK(DB write 0) |
+| COMMIT (`--apply`, 이중게이트) | **완료** — ProductMaster 24 · candidate UPDATE 24 · STORE SPD ko 24 · en 24 = **96** |
+
+### 독립 사후검증 (새 DB 연결 · 2종)
+- `hff-vd-ve-postverify.ts`: masters 24 · spdKo 24 · spdEn 24 · **canonicalDup 0** · candidateLinks 24 · spdRefLinks 48 · **badCards(EPA/DHA/오메가) 0** · **omega3Contam(제외 3건 혼입) 0** · 건강기능식품/ACTIVE
+- `hff-combo-verify-committed.ts --slug vd-ve --expect 24`: independentVerifyPass **true** · **existingTotal(baseline) 573 → totalComboLive 597**
+
+### 결과
+- **복합형 LIVE 573 → 597** (baseline 573 + vd-ve 24). 기존 LIVE drift 0.
+- tag `batch:single-nutrient-vd-ve` · rollback manifest `hff-vd-ve-apply-rollback-manifest.json`.
+- 아티팩트: `docs/checks/data/product-description-guard/hff-combo-vd-ve.json` (target 24, drafts 포함).
+- verifier allowlist 에 `batch:single-nutrient-vd-ve` 추가(비-`combo-` 접두 복합형 slug 집계 정합).
+
+> #2 비타민D+셀레늄+아연(8, clean) 은 후속 배치. 별도 트랙 single-Zn 흡수 1건(§3-3)·lut-va(기능성 단일형 흡수 교정 프로그램 하위, PAUSED 유지) 은 본 배치와 분리.
+
+---
+
+*§1~7 read-only 조사(select 실측). §8 생산은 승인·이중게이트 후 COMMIT 실행 완료.*
