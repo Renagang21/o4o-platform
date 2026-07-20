@@ -44,13 +44,13 @@ TEMP replica(세션 로컬, prod 무변경, ROLLBACK)에 target 제약 적용 + 
 - **무효 7 reject**: store w/o org · operator w/ org · operator w/o service_key · operator w/o created_by · supplier w/o supplier_id · supplier w/o service_key · **supplier w/ org(매장 org 사용 불가)**.
 - 결과: **10 pass / 0 fail**. (operator w/ org·supplier w/ org = "operator·supplier 에 매장 organization 사용 불가" 검증.)
 
-## 5. 프로덕션 migration 및 사후검증 (실행 8·9) — DEFERRED(배포 후)
+## 5. 프로덕션 migration 및 사후검증 (실행 8·9) — ✅ PASS (배포 e52aedba1, 2026-07-20)
 
-- [ ] CI/CD(main deploy) migration 자동 실행 성공(로그).
-- [ ] `organization_id` is_nullable=YES, `supplier_id` 컬럼 존재, `CHK_stss_owner_scope`·origin CHECK(supplier 포함) 존재, 2 인덱스 존재.
-- [ ] 기존 store row 수=22·값 불변(id/organization_id/origin/status).
-- [ ] 매장 목록/상세/수정 API 정상, 공개 타블렛·Screen Set QR 정상(회귀 0).
-- [ ] 무효 조합 INSERT 거부(prod 라이브, 즉시 ROLLBACK 확인).
+- [x] CI/CD(main deploy "Deploy API Server") **success** → migration 자동 실행.
+- [x] `organization_id` is_nullable=**YES**, `supplier_id` uuid nullable 존재, `CHK_store_tablet_screen_sets_origin` = `('store','operator','supplier')`, `CHK_stss_owner_scope` 정의 정확(store/operator/supplier 3-way), 인덱스 `idx_stss_operator_scope`·`idx_stss_supplier_scope` 존재.
+- [x] 기존 store row **22건 불변**, 전량 `origin='store' AND organization_id NOT NULL AND supplier_id NULL`(valid_store=22). backfill 0.
+- [x] 공개 타블렛 `GET /stores/{slug}/tablet/screen` → mode=screen_set·**content_list 5 카드**, Screen Set QR `GET /kpa/qr/public/tablet-corner-5` → landingType=screen_set·**content_list 5 카드**. **회귀 0**.
+- [x] **prod 라이브 무효 조합 거부**: `INSERT origin='operator' + organization_id` → `check_violation`(CHK_stss_owner_scope) 거부. BEGIN/**ROLLBACK**(데이터 write 0).
 
 ## 6. 인덱스 (실행 6-표기)
 
