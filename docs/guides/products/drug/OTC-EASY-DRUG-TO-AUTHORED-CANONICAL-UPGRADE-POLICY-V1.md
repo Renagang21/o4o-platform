@@ -3,6 +3,7 @@
 > **목적**: grounded OTC 제품은 이미 `mfds_easy_drug / STORE / ko / canonical` **슬롯을 점유**하므로, 신규 authored 구조화 설명서를 단순 INSERT하면 canonical unique 제약을 위반한다. 기존 표시본을 authored 표시본으로 **안전하게 교체(in-place upgrade)**하는 계약을 정의한다.
 > **상태**: Active · 일자 2026-07-18 · WO-O4O-OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-NA-V1 · **read-only 설계(DB write 0)**
 > **소비처**: [OTC-NEW-DRAFT-AUTHORING-EXECUTION-GUIDE-V1](OTC-NEW-DRAFT-AUTHORING-EXECUTION-GUIDE-V1.md) STEP 1~2 계약을 본 문서로 대체.
+> **파일럿 검증(2026-07-18)**: §2 계약이 **에르도스테인 300mg 정 첫 Track A 승격**으로 실측 검증됨 — 26 master LIVE(easy demote 26·authored flip 26·audit 26). §1~§8 설계는 이 실측으로 확정되었으며 **실행에서 얻은 lessons·정정 원칙은 §9 참조**(본 반영 = WO-O4O-OTC-GROUNDED-UPGRADE-PILOT-LESSONS-GUIDE-NA-V1, 문서 전용·DB write 0).
 
 ---
 
@@ -142,3 +143,65 @@ en 단계: 빈 슬롯 INSERT 1 (+ audit 1) per master (별도)
 - ko 승격·검증 완료 후 en 진행. 감사 로그 기록.
 - 실패 시 TX ROLLBACK로 e약은요 canonical 원복. 재실행 no-op.
 - DB write = status 전환 + authored INSERT/flip만(구조 변경 0). 자기 산출물만 path-specific commit.
+
+---
+
+## 9. 파일럿 검증 lessons — 에르도스테인 300mg 정 첫 Track A (2026-07-18)
+
+> 본 절은 §1~§8 설계를 **실행으로 검증**하며 얻은 확정 원칙이다. 정책 방향·산식·감사 규약은 §2/§2-A/§5 그대로이며, 본 절은 그 실측 확인과 실행 세부 원칙을 추가한다. 근거 CHECK: [DRYRUN](../../../checks/CHECK-O4O-OTC-ERDOSTEINE-300MG-UPGRADE-DRYRUN-EXECUTE-V1.md) · [SSOT-TARGET-FIX](../../../checks/CHECK-O4O-OTC-ERDOSTEINE-300MG-SSOT-TARGET-FIX-DA-V1.md) · [INCIDENT](../../../checks/CHECK-O4O-OTC-ERDOSTEINE-300MG-UPGRADE-APPLY-INCIDENT-V1.md) · [FLIP-PARSE-FIX](../../../checks/CHECK-O4O-OTC-ERDOSTEINE-300MG-FLIP-RESULT-PARSE-FIX-DA-V1.md) · [APPLY-RETRY(완료)](../../../checks/CHECK-O4O-OTC-ERDOSTEINE-300MG-UPGRADE-APPLY-RETRY-V1.md).
+
+### 9-1. 검증된 표준 흐름 (확정)
+
+**needs_review 준비 → easy demote → authored flip → audit → 검증** 이 실측으로 성립한 표준 승격 순서다.
+
+| 단계 | 연산 | 에르도스테인 실측 | 대응 계약 |
+|---|---|---:|---|
+| ① needs_review 준비 | authored `needs_review` INSERT (멱등) | 최초 26 / 재사용 시 0 | §2 STEP A |
+| ② easy demote | easy canonical → `deprecated` | 26 | §2 STEP B-3 |
+| ③ authored flip | authored needs_review → `canonical` | 26 | §2 STEP B-4 |
+| ④ audit | `canonical_replaced` INSERT | 26 | §2-A |
+| ⑤ 검증 | canonical1·authored·deprecatedEasy·dup0 | PASS → COMMIT | §2 STEP B-5 |
+
+- **audit = `canonical_replaced` 1행/master** (previous=demote된 easy · new=승격된 authored를 한 행에 기록). §2-A 규약이 실측과 일치함이 확인됨. **"2행/master" 로 되돌리지 말 것.**
+- 실측 총 write = **78** (demote 26 + flip 26 + audit 26), needs_review 재사용으로 STEP A INSERT 0. 제외 4건(안전지문 불일치)은 미접촉·불변.
+
+### 9-2. STEP A ↔ STEP B 분리 시 중간 상태 처리 원칙
+
+STEP A(needs_review 준비)와 STEP B(슬롯 교체)는 **별도 TX** 로 커밋될 수 있다. 인시던트에서 STEP A는 커밋되고 STEP B는 ABORT/ROLLBACK 된 중간 상태가 실제로 발생했다. 이때의 원칙:
+
+- **STEP A 커밋 + STEP B 미커밋 = 안전한 중간 상태**다. authored `needs_review` 26은 조회 슬롯 밖(표시 안 됨), live STORE ko canonical은 e약은요 그대로 → **소비자 화면 영향 0**.
+- STEP A는 **멱등**(`INSERT … WHERE NOT EXISTS(authored canonical|needs_review)`) → 정정 후 STEP B 재실행이 기존 needs_review 26을 **그대로 이어받아 flip**한다. **재삽입·중복 0**(52 아님).
+- 중간 상태에서 needs_review 를 성급히 DELETE 하지 말 것. cleanup 이 필요하면 별도 승인 DELETE 로만 수행. 기본은 정정본 STEP B 가 이어받음.
+- **demote 단독 커밋 금지**(§2 유지): demote(③ 이전 단계)는 flip 과 반드시 같은 TX. 0 canonical 잔존 방지.
+
+### 9-3. 동일 대상 단일 write-owner (실측 확인)
+
+- 동일 `(master, STORE, ko)` 슬롯의 production write 는 **단일 세션만 소유**(§5 write-owner 상속). 에르도스테인에서 코드 수정(에이전트 다)과 apply 실행(에이전트 가)을 분리하되, **실제 DB write 소유는 실행 세션 1개**로 고정됐다.
+- 승격 시작 ~ 사후검증/no-op 확인까지 타 세션은 **read-only 만**. 봉투 완료 후 소유 해제. 코드 수정 세션은 write 0(코드만).
+
+### 9-4. 재실행 = ALREADY_UPGRADED (표준 계약)
+
+이미 승격 완료된 대상에 승격을 재실행하면 **다음이 표준**이다:
+
+- **판정 = `ALREADY_UPGRADED`** (cur.source_type ∈ authored → 대상 이미 교체됨)
+- **DB write = 0** (demote·flip·audit·insert 전부 0)
+- **verification = PASS** (canonical1 = authored · deprecated easy 보존 · dup 0 이 이미 성립)
+- **exit code = 0** (정상 종료)
+
+> 실측 주의: 에르도스테인 스크립트는 재실행 시 pre-gate(“easy canonical 정확히 26” 전제)가 승격 후 상태(easy=deprecated)와 반대라 **ABORT** 로 안전 거부했다(write 0·상태 불변으로 손상은 없음). 그러나 **표준 계약은 pre-gate ABORT 가 아니라 ALREADY_UPGRADED PASS/exit 0** 이다 — 향후 승격 스크립트는 “이미 authored canonical” 을 **성공(no-op)** 으로 인식해 exit 0 반환하도록 작성한다(에러 아님). 이미-승격을 실패로 보고하지 말 것.
+
+### 9-5. fingerprint = bridge full-content SSOT (coarse 재계산 금지)
+
+- 승격 대상 분할(그대로확장 vs 안전지문 불일치)의 fingerprint 는 **bridge 정본**([FULL-CORPUS-AUTHORED-BRIDGE-INTEGRATION](../../../checks/CHECK-O4O-OTC-FULL-CORPUS-AUTHORED-BRIDGE-INTEGRATION-V1.md), 함수 `easySections`/`freeSections`/`bucketSections`/`formOf`/`routeSig`/`ingredientOf`/`strengthOf`/`groupKeyOf`) 를 **verbatim 재현**해 계산한다.
+- **coarse 재계산 금지**: 초기 파일럿이 독자 `sections`(상호작용을 `cau` 에 포함)로 coarse 재계산 → bridge 의 `bucketSections`(상호작용을 **`itx`** 로 cau 와 분리)와 불일치 → target 0 FAIL 이 발생했다. 원인 = full-content 기반 bridge 산식을 재현하지 않고 자체 재계산한 것.
+- 확정: 대상 fingerprint `4b4e162690065e8e` = **26**(그대로확장), 제외 `d68b3eec1cb56646` = **4**(안전지문 불일치). 승격 스크립트는 bridge 함수를 그대로 채용하고 `target∩exclude==0`·`excluded==4` 게이트를 둔다.
+- bridge 산출 JSON 은 fingerprint·size·bucket·sampleName 만 담고 **master ID 를 영속화하지 않는다** → 결정론적 분할의 유일한 방법은 **bridge 알고리즘 재현**(임의 ID 하드코딩·독자 재계산 아님).
+
+### 9-6. 인시던트 시 live canonical 유지 여부 우선 확인
+
+승격 중 스크립트 오류/ABORT/ROLLBACK 등 인시던트 발생 시 **가장 먼저 확인할 것 = live STORE ko canonical 이 유지되는가**:
+
+- 최우선 점검: `WHERE status='canonical' AND description_type='STORE' AND lang='ko'` 슬롯이 **여전히 존재(0건 아님)** 하고 소비자 조회가 무중단인지. 에르도스테인 인시던트에서 live canonical 은 e약은요 그대로 유지 → **화면 영향 0** 이 먼저 확인됐고, 그 위에서 원인 진단·재개를 진행했다.
+- §2 STEP B 는 demote+flip 을 단일 TX 로 묶어 **0 canonical 잔존을 구조적으로 차단**하므로, ROLLBACK 시 easy canonical 이 자동 원복된다. 인시던트 보고는 이 “live 안전” 확인을 결론 최상단에 둔다.
+- live 안전이 확인되면 스크립트/파싱 버그는 **WO 금지 범위 밖에서 미수정 중단·핸드오프**(에르도스테인: 실행 세션은 미수정 중단, 코드 수정은 별도 owning 세션). live 가 위험할 때만 즉시 역계약(§4 수동 원복)을 검토한다.
+- 실행 함정(참고): TypeORM `UPDATE … RETURNING` 결과는 드라이버에 따라 `[rows, affected]` 또는 `rows` 로 온다 → `retRows(res)=Array.isArray(res)&&Array.isArray(res[0])?res[0]:res` 가드 없이 `flip[0].id` 로 읽으면 `newId=null` 거짓 실패 → ABORT. 승격 스크립트의 모든 RETURNING 파싱에 이 가드를 둔다.
