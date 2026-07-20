@@ -48,6 +48,11 @@ basis 재사용: YES (신규 0)
 새 원료/제형: 0 / 0
 판정: G13 READY · G10 READY_WITH_HOLD · G7 HOLD
 Agent B 권장 순서(통합): #9(17) → #11(16) → G13(10) → #4(9,선택) → G10(9,선택)
+
+## 실행 결과 (Agent B)
+
+- **#9 mg+mn+vd+vk+ca(N5) 17건 LIVE**(2026-07-20). select 실측 ELIGIBLE **17**·grounding HOLD **0**(clean READY, 검수 정확 일치). generate PASS 15·REVIEW 2(코팅정제)·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 68 → apply COMMIT → 독립검증 PASS(canonicalDup 0·기존 512 무변경). **복합형 512 → 529**(직접 카운트). tag `batch:single-nutrient-mg-mn-vd-vk-ca`. 상세: 상위 WO §6 "higher-N V2 큐 1순위 LIVE".
+- 다음: #11(16) → G13(10) 순. #4·G10은 저수율 선택.
 중지 사유: 없음
 ```
 

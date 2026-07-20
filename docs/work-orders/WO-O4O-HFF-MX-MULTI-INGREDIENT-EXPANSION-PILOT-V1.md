@@ -96,3 +96,12 @@
 - **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 28 · totalWrites 112(masters 28·candidate UPDATE 28·SPD ko28+en28) · canonicalDup 0 · candidateLinks 28 · spdRefLinks 56. tag `batch:single-nutrient-ms-niacin-b126-panto`. rollback manifest 저장.
 - **복합형 누적 484 → 512** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28). verify 도구 totalComboLive 는 여전히 비-`combo-` slug 누락 과소표시 → 실계는 직접 카운트 SSOT.
 - **다음**: Agent A 인벤토리 상위 후속(B-complex 계열 top40 잔여 · 미네랄 확장 등) 또는 신규 higher-N 그룹 검수 확정분 대기. lut-va(lu-va) `PAUSED_GROUP_DEFECT` 유지.
+
+### higher-N V2 큐 1순위 LIVE (Agent B) — #9 mg+mn+vd+vk+ca N5 17건
+
+- 기준·검수: Agent A V1(`7abfb2419`) #9 검수, V2(`9d417651e`) 권장순서 1순위. READY 17/0.
+- **대상 정제**: select 실측 mention 113 · **ELIGIBLE 17**(Agent A와 정확 일치) · **grounding HOLD 0**(clean READY) · HOLD_MULTI 96. 신규 원료/basis/제형 0(tablet 16·chewable 1). B 비타민 무포함 → Guard 무이슈.
+- **generate**: 작성 17 · PASS 15 · REVIEW 2(코팅정제 known-safe) · BLOCKED 0 · **G-MULTI HOLD 0**.
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 17 · totalWrites 68(masters 17·candidate UPDATE 17·SPD ko17+en17) · canonicalDup 0 · candidateLinks 17 · spdRefLinks 34. tag `batch:single-nutrient-mg-mn-vd-vk-ca`. rollback manifest 저장.
+- **복합형 누적 512 → 529** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17).
+- **다음(Agent A 권장순서)**: #11 mg+vd+vk+zn+ca(N5, READY 16) → G13 6미네랄(N6, READY 10) → 이후 #4·G10(선택, 저수율). lut-va `PAUSED_GROUP_DEFECT` 유지.
