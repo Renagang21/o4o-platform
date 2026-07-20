@@ -87,3 +87,12 @@
 - **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 43 · totalWrites 172(masters 43·candidate UPDATE 43·SPD ko43+en43) · canonicalDup 0 · candidateLinks 43 · spdRefLinks 86. tag `batch:single-nutrient-b-complex-n8`. rollback manifest 저장.
 - **복합형 누적 441 → 484** (직접 카운트 검증: combo14 원본 421 + N5 20 + N8 43). ⚠️ `hff-combo-verify-committed` 의 `totalComboLive` 는 baseline 패턴 `batch:single-nutrient-combo-%` 만 집계 → N5/N8(비-`combo-` slug 태그) 누락으로 464 로 과소표시. 실제 총계는 484(직접 태그 카운트 SSOT). 후속 검증 시 실제 총계 = 직접 카운트 기준.
 - **다음**: 2순위 N6 간건강+B군(밀크씨슬+나이아신+B1+B2+B6+판토텐산, READY_WITH_HOLD 28/14) — Agent A 확정분, Agent B 착수 대기.
+
+### higher-N 2순위 LIVE (Agent B) — 간건강+B군 N6 28건
+
+- 기준·검수: Agent A `CHECK-O4O-HFF-HIGHER-N-TOP3-REVIEW-A-V1` ②, READY_WITH_HOLD 28/14.
+- **대상 정제**: select 실측 mention 242 · **ELIGIBLE 28**(Agent A와 정확 일치) · grounding HOLD 14 + HOLD_MULTI 200. HOLD∩target overlap 0. 신규 원료/basis/제형 0(tablet 21·capsule 4·softgel 3). B12 부재 → Guard(B1 `\b`) 무충돌.
+- **generate**: 작성 28 · PASS 26 · REVIEW 2(코팅정제 known-safe) · BLOCKED 0 · **G-MULTI HOLD 0**. (N6=6카드 ⊂ 검증완료 N8=8카드 범위 → 시각 스모크 생략)
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 28 · totalWrites 112(masters 28·candidate UPDATE 28·SPD ko28+en28) · canonicalDup 0 · candidateLinks 28 · spdRefLinks 56. tag `batch:single-nutrient-ms-niacin-b126-panto`. rollback manifest 저장.
+- **복합형 누적 484 → 512** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28). verify 도구 totalComboLive 는 여전히 비-`combo-` slug 누락 과소표시 → 실계는 직접 카운트 SSOT.
+- **다음**: Agent A 인벤토리 상위 후속(B-complex 계열 top40 잔여 · 미네랄 확장 등) 또는 신규 higher-N 그룹 검수 확정분 대기. lut-va(lu-va) `PAUSED_GROUP_DEFECT` 유지.

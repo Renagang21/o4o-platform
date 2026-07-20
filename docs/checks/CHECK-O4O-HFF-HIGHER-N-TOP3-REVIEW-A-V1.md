@@ -90,6 +90,7 @@ Agent B 권장 대상: ① N8 B컴플렉스(43), ② N6 간건강+B군(28)
 
 - **비타민B 컴플렉스 N8 43건 LIVE**(2026-07-20). select 실측 ELIGIBLE **43**(본 검수와 정확 일치)·grounding HOLD 6·HOLD∩target 0. generate PASS 37·REVIEW 6(코팅정제 known-safe)·BLOCKED 0·G-MULTI HOLD 0. 8-카드 시각 스모크 360/768/1440 가로 오버플로 0. dry-run 예상=실측 write 172 → apply COMMIT → 독립검증 PASS(canonicalDup 0·기존 421 무변경). **복합형 441 → 484**(직접 카운트).
 - **공통 Guard 버그수정 동반**: 최초 generate 3건이 `G-MULTI-AMOUNT-SOURCE` 오탐(라벨 정규식 `비타민B1`이 `비타민B12` 오매칭, 단어경계 부재). B1+B12 최초 공존 배치라 표면화 → `\b` 추가(select CLS 정합)로 43/43. 커밋 `8b100389a`, 회귀(ms-b126) 불변. 상세: 상위 WO §6 "higher-N 헤드라인 LIVE".
-- ② N6 간건강+B군(28/14)은 Agent A 확정분, Agent B 착수 대기.
+- **② N6 간건강+B군 28건 LIVE**(2026-07-20). select 실측 ELIGIBLE **28**(검수 일치)·grounding HOLD 14·HOLD∩target 0. generate PASS 26·REVIEW 2(코팅정제)·BLOCKED 0·G-MULTI HOLD 0(B12 부재, Guard 무충돌). dry-run 예상=실측 112 → apply COMMIT → 독립검증 PASS(canonicalDup 0·기존 484 무변경). **복합형 484 → 512**(직접 카운트). tag `batch:single-nutrient-ms-niacin-b126-panto`. 상세: 상위 WO §6 "higher-N 2순위 LIVE".
+- ③ N6 비타민C(3건)는 그룹 자체 HOLD(attribution 불명확 지배) — Agent B 대상 제외 유지.
 
 *본 검수 자체는 read-only · DB write 0. 위 실행 결과는 별도 Agent B apply(승인 기반).*
