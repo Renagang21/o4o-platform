@@ -32,6 +32,8 @@ import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 //   /tablet/screen 의 blocks→sections 는 공용 resolveScreenSetSections 로 통일(QR landing 과 동일 소스).
 //   기존의 resolveTemplateKey/shapeStaticBlock/resolveContentListItems 직접 호출은 resolver 내부로 이동.
 import { resolveScreenSetSections } from './store-public-screen-set-resolve.js';
+// WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회 기본 Store Adapter 명시 주입.
+import { createStoreContentSourceAdapter } from './store-public-tablet-content-source.js';
 
 export function createStorePublicTabletRoutes(deps: {
   dataSource: DataSource;
@@ -517,7 +519,7 @@ export function createStorePublicTabletRoutes(deps: {
         storeId: resolved.storeId,
         storeSlug: req.params.slug,
         tabletContext: { tabletId, configured: displaySource.configured },
-      });
+      }, createStoreContentSourceAdapter(dataSource));
       if (!resolvedSet) {
         res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source, note: 'applied screen set unavailable → legacy fallback' } });
         return;

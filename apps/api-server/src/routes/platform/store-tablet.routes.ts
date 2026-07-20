@@ -49,6 +49,8 @@ import { parseContentListConfig } from './store-tablet-content-list-block.js';
 // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft blocks → sections resolve(read-only) 재사용.
 //   공개 /tablet/screen 핸들러와 동일한 resolve 함수(SELECT only)를 관리 라우터에서 재사용한다.
 import { resolveContentListItems } from './store-public/store-public-tablet-content-resolve.js';
+// WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: draft preview content_list 원본 조회 기본 Store Adapter 명시 주입.
+import { createStoreContentSourceAdapter } from './store-public/store-public-tablet-content-source.js';
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
 import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
@@ -1473,12 +1475,14 @@ export function createStoreTabletRoutes(
 
       const sections: Array<{ blockType: string; sortOrder: number; data: Record<string, unknown> }> = [];
       let order = 0;
+      // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회 기본 Store Adapter 명시 주입.
+      const contentSource = createStoreContentSourceAdapter(dataSource);
       for (const { b } of visible) {
         const bt = b.blockType as string;
         const config = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
         try {
           if (bt === 'content_list') {
-            const items = await resolveContentListItems(dataSource, organizationId, config);
+            const items = await resolveContentListItems(contentSource, organizationId, config);
             if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
           } else if (bt === 'idle_media') {
             const parsed = parseIdleMediaConfig(config);

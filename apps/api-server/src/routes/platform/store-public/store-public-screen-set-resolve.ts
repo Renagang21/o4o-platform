@@ -21,6 +21,8 @@ import { queryTabletVisibleProducts, resolveServiceKeys } from './store-public-u
 import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
 import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
+// WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회는 주입된 adapter 로 위임.
+import type { ContentSourceAdapter } from './store-public-tablet-content-source.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
 import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
 
@@ -115,6 +117,9 @@ async function resolveScreenSetLocalProducts(
 export async function resolveScreenSetSections(
   dataSource: DataSource,
   input: ResolveScreenSetInput,
+  // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회 adapter(호출부가 명시 주입).
+  //   화면 구성(블록 정렬·상품·idle·QR)은 이 resolver 가 유지. 원본 조회만 adapter 경계로 분리.
+  contentSource: ContentSourceAdapter,
 ): Promise<ResolvedScreenSet | null> {
   const setRows = await dataSource.query(
     `SELECT id, name, status, template_key AS "templateKey", public_qr_slug AS "publicQrSlug"
@@ -200,7 +205,7 @@ export async function resolveScreenSetSections(
         const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
         sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
       } else if (b.blockType === 'content_list') {
-        const cards = await resolveContentListItems(dataSource, input.storeId, b.config);
+        const cards = await resolveContentListItems(contentSource, input.storeId, b.config);
         sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });
       } else if (b.blockType === 'qr_guide') {
         // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §5:

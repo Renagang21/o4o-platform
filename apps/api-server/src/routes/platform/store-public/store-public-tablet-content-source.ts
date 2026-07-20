@@ -1,0 +1,116 @@
+/**
+ * content_list Content Source Adapter — 원본 조회 경계
+ *
+ * WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1
+ *   resolveContentListItems 의 **원본 조회**(store_content / o4o_product_description) 만 명시적
+ *   adapter 경계로 분리한다. 화면 구성·정렬·표시 여부·override 적용은 resolver(resolveContentListItems)에
+ *   남는다. adapter 는 참조ID → 공통 resolved content(ResolvedSourceContent) 정규화 + 미존재/접근불가 처리만 담당.
+ *
+ *   기본 Store Adapter(createStoreContentSourceAdapter)는 기존 DB 조회 구현을 **그대로 이동**
+ *   (byte-equivalent). 신규 테이블·컬럼·migration 없음. 응답 필드 불변.
+ *
+ *   호출부(공개 태블릿 Screen Set / Screen Set QR / draft preview / 관리자·매장 미리보기)는
+ *   이 기본 adapter 를 **명시적으로 주입**한다. adapter 없는 묵시적 DB 조회 fallback 은 하지 않는다.
+ */
+
+import type { DataSource } from 'typeorm';
+
+/** 원본에서 도출한 공통 resolved content. displayTitle/displaySummary override·visible·순서는 resolver 가 적용. */
+export interface ResolvedSourceContent {
+  /** stable 카드 id (o4o:{masterId}:{language} / store:{contentId}). */
+  itemId: string;
+  /** 출처 배지('O4O 표준' | '매장 제작'). */
+  sourceBadge: string;
+  /** override 전 원본 기본 제목. */
+  baseTitle: string;
+  /** override 전 원본 요약. */
+  baseSummary: string;
+  thumbnailUrl: string | null;
+  hasDetail: boolean;
+  relatedProductName: string | null;
+  detail: { html: string };
+}
+
+/**
+ * content_list 원본 조회 계약. resolver 는 이 계약에만 의존하고 DB 를 직접 조회하지 않는다.
+ *  - 반환 null = 미존재 / 접근 불가(타 org, archived, 설명 없음) → resolver 가 해당 item skip.
+ */
+export interface ContentSourceAdapter {
+  /** o4o_product_description(SPD STORE canonical) 원본 조회. ProductMaster/설명 없으면 null. */
+  fetchProductDescription(masterId: string, language: string): Promise<ResolvedSourceContent | null>;
+  /** store_content(kpa_store_contents) 원본 조회. 미존재/타 org/archived 면 null. */
+  fetchStoreContent(organizationId: string, contentId: string): Promise<ResolvedSourceContent | null>;
+}
+
+function asString(v: unknown): string {
+  return typeof v === 'string' ? v : '';
+}
+
+/**
+ * 기본 Store Adapter — 기존 resolveO4oItem/resolveStoreItem 의 DB 조회를 그대로 이동(byte-equivalent).
+ */
+export function createStoreContentSourceAdapter(dataSource: DataSource): ContentSourceAdapter {
+  return {
+    async fetchProductDescription(masterId, language) {
+      const rows = await dataSource.query(
+        `SELECT pm.name AS "masterName", spd.content AS "content", spd.summary AS "summary"
+           FROM product_masters pm
+           LEFT JOIN LATERAL (
+             SELECT d.content, d.summary
+               FROM shared_product_descriptions d
+              WHERE d.master_id = pm.id
+                AND d.description_type = 'STORE'
+                AND d.status = 'canonical'
+                AND d.deleted_at IS NULL
+              ORDER BY (d.language = $2) DESC, (d.language = 'ko') DESC, d.updated_at DESC
+              LIMIT 1
+           ) spd ON true
+          WHERE pm.id = $1
+          LIMIT 1`,
+        [masterId, language],
+      );
+      const row = rows?.[0];
+      if (!row) return null; // ProductMaster 없음
+      const html = asString(row.content);
+      if (!html.trim()) return null; // STORE canonical 없음 → 설명 없는 카드는 skip
+      const masterName = asString(row.masterName);
+      return {
+        itemId: `o4o:${masterId}:${language}`,
+        sourceBadge: 'O4O 표준',
+        baseTitle: masterName,
+        baseSummary: asString(row.summary),
+        thumbnailUrl: null,
+        hasDetail: true,
+        relatedProductName: masterName || null,
+        detail: { html },
+      };
+    },
+
+    async fetchStoreContent(organizationId, contentId) {
+      const rows = await dataSource.query(
+        `SELECT title, content_json AS "contentJson", workspace_status AS "workspaceStatus"
+           FROM kpa_store_contents
+          WHERE id = $1 AND organization_id = $2
+          LIMIT 1`,
+        [contentId, organizationId],
+      );
+      const row = rows?.[0];
+      if (!row) return null; // 없음 / 타 org(=조회 안 됨)
+      if (row.workspaceStatus === 'archived') return null; // archived 제외
+      const cj = (row.contentJson && typeof row.contentJson === 'object' && !Array.isArray(row.contentJson)
+        ? row.contentJson
+        : {}) as Record<string, unknown>;
+      const html = asString(cj.html) || asString(cj.body);
+      return {
+        itemId: `store:${contentId}`,
+        sourceBadge: '매장 제작',
+        baseTitle: asString(row.title),
+        baseSummary: asString(cj.summary),
+        thumbnailUrl: null,
+        hasDetail: !!html.trim(),
+        relatedProductName: null,
+        detail: { html },
+      };
+    },
+  };
+}

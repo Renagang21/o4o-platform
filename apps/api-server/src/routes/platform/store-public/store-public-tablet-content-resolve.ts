@@ -6,19 +6,23 @@
  *   viewer 가 SPD/kpa_store_contents 를 직접 몰라도 되게 서버에서 resolve(참조ID만 통과하는
  *   product_content 의 dormant 실패를 반복하지 않음).
  *
- *   sourceType:
+ * WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1
+ *   원본 조회(store_content / o4o_product_description)는 ContentSourceAdapter 로 분리했다.
+ *   이 함수는 **화면 구성**만 담당한다: config 파싱 · visible 필터 · sortOrder 정렬 · resolve 상한 ·
+ *   사용자 지정 displayTitle/displaySummary override 적용 · 카드 조립. DB 는 직접 조회하지 않는다.
+ *
+ *   sourceType(원본 조회는 adapter 가 수행):
  *     - o4o_product_description : masterId+language → shared_product_descriptions
- *         (description_type='STORE', status='canonical') 를 language 우선 → ko fallback 조회.
- *         ProductMaster 없거나 STORE canonical 없으면 item skip.
- *     - store_content : kpa_store_contents.id → org 일치 + workspace_status≠'archived' 조회.
- *         없거나 타 org 이면 skip.
+ *         (description_type='STORE', status='canonical') language 우선 → ko fallback.
+ *     - store_content : kpa_store_contents.id → org 일치 + workspace_status≠'archived'.
+ *     미존재/접근 불가(adapter 가 null 반환) → 해당 item skip.
  *
  *   HTML 안전(§6): 서버는 원문 html 을 전달하되, viewer 는 ContentRenderer(DOMPurify)로만
  *   렌더한다는 계약. 서버가 dangerously 렌더하지 않는다(문자열 전달만).
  */
 
-import type { DataSource } from 'typeorm';
-import { parseContentListConfig, type ContentListItem } from '../store-tablet-content-list-block.js';
+import { parseContentListConfig } from '../store-tablet-content-list-block.js';
+import type { ContentSourceAdapter } from './store-public-tablet-content-source.js';
 
 /** resolve 상한(과도한 카드 방지). config 자체는 100까지 허용하나 공개 렌더는 50 로 제한. */
 const RESOLVE_LIMIT = 50;
@@ -35,18 +39,17 @@ export interface ContentListCard {
   detail: { html: string };
 }
 
-function asString(v: unknown): string {
-  return typeof v === 'string' ? v : '';
-}
-
 /**
  * content_list block config → 카드 배열.
  * - 잘못된 config → [] (섹션은 caller 가 items=[] 로 반환).
- * - visible=false / resolve 실패 item → skip.
- * - sortOrder 오름차순.
+ * - visible=false / resolve 실패(원본 미존재·접근불가) item → skip.
+ * - sortOrder 오름차순. displayTitle/displaySummary override 적용.
+ *
+ * @param source content_list 원본 조회 adapter(호출부가 명시 주입 — 묵시적 DB fallback 없음).
+ * @param organizationId store_content 경계 org.
  */
 export async function resolveContentListItems(
-  dataSource: DataSource,
+  source: ContentSourceAdapter,
   organizationId: string,
   config: unknown,
 ): Promise<ContentListCard[]> {
@@ -61,86 +64,26 @@ export async function resolveContentListItems(
   const cards: ContentListCard[] = [];
   for (const item of items) {
     try {
-      const card =
+      const src =
         item.sourceType === 'o4o_product_description'
-          ? await resolveO4oItem(dataSource, item)
-          : await resolveStoreItem(dataSource, organizationId, item);
-      if (card) cards.push(card);
+          ? await source.fetchProductDescription(item.masterId, item.language)
+          : await source.fetchStoreContent(organizationId, item.contentId);
+      if (!src) continue; // 원본 미존재 / 접근 불가 → skip
+      cards.push({
+        itemId: src.itemId,
+        sourceType: item.sourceType,
+        sourceBadge: src.sourceBadge,
+        // 사용자 지정 override(displayTitle/displaySummary) 우선, 없으면 원본 기본값.
+        title: item.displayTitle ?? src.baseTitle,
+        summary: item.displaySummary ?? src.baseSummary,
+        thumbnailUrl: src.thumbnailUrl,
+        hasDetail: src.hasDetail,
+        relatedProductName: src.relatedProductName,
+        detail: src.detail,
+      });
     } catch {
       // 개별 item resolve 실패는 전체 /screen 을 깨지 않는다 → skip.
     }
   }
   return cards;
-}
-
-async function resolveO4oItem(
-  dataSource: DataSource,
-  item: Extract<ContentListItem, { sourceType: 'o4o_product_description' }>,
-): Promise<ContentListCard | null> {
-  const rows = await dataSource.query(
-    `SELECT pm.name AS "masterName", spd.content AS "content", spd.summary AS "summary"
-       FROM product_masters pm
-       LEFT JOIN LATERAL (
-         SELECT d.content, d.summary
-           FROM shared_product_descriptions d
-          WHERE d.master_id = pm.id
-            AND d.description_type = 'STORE'
-            AND d.status = 'canonical'
-            AND d.deleted_at IS NULL
-          ORDER BY (d.language = $2) DESC, (d.language = 'ko') DESC, d.updated_at DESC
-          LIMIT 1
-       ) spd ON true
-      WHERE pm.id = $1
-      LIMIT 1`,
-    [item.masterId, item.language],
-  );
-  const row = rows?.[0];
-  if (!row) return null; // ProductMaster 없음
-  const html = asString(row.content);
-  if (!html.trim()) return null; // STORE canonical 없음 → 설명 없는 카드는 skip
-  const masterName = asString(row.masterName);
-  return {
-    itemId: `o4o:${item.masterId}:${item.language}`,
-    sourceType: 'o4o_product_description',
-    sourceBadge: 'O4O 표준',
-    title: item.displayTitle ?? masterName,
-    summary: item.displaySummary ?? asString(row.summary),
-    thumbnailUrl: null,
-    hasDetail: true,
-    relatedProductName: masterName || null,
-    detail: { html },
-  };
-}
-
-async function resolveStoreItem(
-  dataSource: DataSource,
-  organizationId: string,
-  item: Extract<ContentListItem, { sourceType: 'store_content' }>,
-): Promise<ContentListCard | null> {
-  const rows = await dataSource.query(
-    `SELECT title, content_json AS "contentJson", workspace_status AS "workspaceStatus"
-       FROM kpa_store_contents
-      WHERE id = $1 AND organization_id = $2
-      LIMIT 1`,
-    [item.contentId, organizationId],
-  );
-  const row = rows?.[0];
-  if (!row) return null; // 없음 / 타 org(=조회 안 됨)
-  if (row.workspaceStatus === 'archived') return null; // archived 제외
-  const cj = (row.contentJson && typeof row.contentJson === 'object' && !Array.isArray(row.contentJson)
-    ? row.contentJson
-    : {}) as Record<string, unknown>;
-  const html = asString(cj.html) || asString(cj.body);
-  const title = item.displayTitle ?? asString(row.title);
-  return {
-    itemId: `store:${item.contentId}`,
-    sourceType: 'store_content',
-    sourceBadge: '매장 제작',
-    title,
-    summary: item.displaySummary ?? asString(cj.summary),
-    thumbnailUrl: null,
-    hasDetail: !!html.trim(),
-    relatedProductName: null,
-    detail: { html },
-  };
 }
