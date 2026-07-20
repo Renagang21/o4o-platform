@@ -1,7 +1,7 @@
 {
   "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
   "mode": "dry-run",
-  "status": "PASS",
+  "status": "ALREADY_UPGRADED",
   "dbWrite": 0,
   "groupKey": "트리메부틴말레산염|100밀리그램|정",
   "writeOwner": {
@@ -526,33 +526,9 @@
   ],
   "nonOralNames": [],
   "upgradeState": {
-    "authoredCanonMasters": 0,
-    "easyCanonMasters": 66,
+    "authoredCanonMasters": 66,
+    "easyCanonMasters": 0,
     "noneCanonMasters": 0
   },
-  "easyCanonicalExactly1": 66,
-  "authoredCanonicalConflict": 0,
-  "existingAuthoredNeedsReview": 0,
-  "easyCanonicalTotal": 66,
-  "htmlLen": 1636,
-  "contentHash": "4076161888b3da9dde7d05bef9b44cc3",
-  "summary": "트리메부틴말레산염 100mg",
-  "writePlan": {
-    "spd": {
-      "STEP_A_authored_needs_review_INSERT": 66,
-      "STEP_B_easy_canonical_demote": 66,
-      "STEP_B_authored_canonical_flip": 66,
-      "total": 198
-    },
-    "audit": {
-      "canonical_replaced_INSERT": 66,
-      "total": 66
-    },
-    "grand_total": 264
-  },
-  "auditCountFlag": {
-    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 66",
-    "policy_2A": "audit 2/master = 132 (demote 1 + flip 1)",
-    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
-  }
+  "note": "target 66 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
 }

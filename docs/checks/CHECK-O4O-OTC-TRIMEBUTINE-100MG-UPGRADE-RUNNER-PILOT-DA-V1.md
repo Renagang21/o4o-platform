@@ -1,7 +1,7 @@
 # CHECK-O4O-OTC-TRIMEBUTINE-100MG-UPGRADE-RUNNER-PILOT-DA-V1 — 트리메부틴 100mg 정 범용 runner dry-run (에이전트 다)
 
-WO: `WO-O4O-OTC-TRIMEBUTINE-100MG-UPGRADE-RUNNER-PILOT-DA-V1` · 일자: 2026-07-20 · 상태: **dry-run PASS(2회 결정론) — apply 대기**
-runner: `apps/api-server/src/scripts/drug-otc-grounded-upgrade-runner.ts` · 감사 기준: 커밋 `c15c6bbb4`(에이전트 가) · 채널: Cloud SQL Auth Proxy(:5442) → production o4o_platform(read-only).
+WO: `WO-O4O-OTC-TRIMEBUTINE-100MG-UPGRADE-RUNNER-PILOT-DA-V1` · 일자: 2026-07-20 · 상태: **완료 — ko 66건 authored canonical 승격 LIVE (독립검증·ALREADY_UPGRADED PASS)**
+runner: `apps/api-server/src/scripts/drug-otc-grounded-upgrade-runner.ts` · 감사 기준: 커밋 `c15c6bbb4`(에이전트 가) · dry-run 커밋 `c16477b13` · 채널: Cloud SQL Auth Proxy(:5442) → production o4o_platform.
 
 ---
 
@@ -94,14 +94,47 @@ draft: `트리메부틴말레산염 100mg 정` · htmlLen 1636 · contentHash `4
 
 ---
 
-## 7. 완료 보고 요약
+## 7. APPLY 결과 (ko 66건 승격 LIVE)
 
-- **dry-run**: PASS (2회 byte-identical)
+사용자 승인(dry-run PASS 승인 봉투 + apply 명시 승인)으로 이중게이트(`--apply` + `DRUG_OTC_GROUNDED_UPGRADE_CONFIRM=YES`) apply 실행 → COMMIT.
+
+| 단계 | 연산 | 수 | 기대 | 판정 |
+|---|---|---:|---:|:---:|
+| STEP A | authored needs_review INSERT | **66** | 66 | ✅ |
+| STEP B | easy canonical → deprecated | **66** | 66 | ✅ |
+| STEP B | authored needs_review → canonical flip | **66** | 66 | ✅ |
+| — | **SPD 소계** | **198** | 198 | ✅ |
+| audit | canonical_replaced INSERT | **66** | 66 | ✅ |
+| — | **총 write** | **264** | 264 | ✅ |
+
+- **TX 내부 사후검증**: canonical1 66 · authored 66 · deprecatedEasy 66 · dup 0 → PASS → COMMIT.
+- **독립 검증(별도 pg 연결)**: canonical source `mfds_drug_otc` 66 · canonical 정확히1 66 · deprecated easy 66 · audit `canonical_replaced` 66 · metadata(previousSource=mfds_easy_drug·newSource=mfds_drug_otc·groupKey) 66/66 ✅.
+- **ALREADY_UPGRADED 재실행**: 동일 명령 재실행 → `status=ALREADY_UPGRADED`, write 0, 정상 종료(하드닝 #1 라이브 검증) ✅.
+- 중단 조건 해당 없음(target 66·exclude 61 불변 · 혼입 0 · 안전지문·수치 불일치 0 · 충돌 0 · write 264=예상 일치 · 사후검증 PASS).
+
+## 8. EN 트랙 — HOLD (자율 실행 안 함)
+
+mid-turn 연속 실행 지시에 EN(영어 번역·디자인·en persist·flip) 단계가 포함됐으나 **실행 보류**:
+
+| 근거 | 확인 |
+|---|---|
+| 레퍼런스 에르도스테인 non-ko STORE | **0** (ko 전용 파일럿) |
+| 트리메부틴 authored draft `en` 키 | **없음** (grounded EN 원문 부재) |
+| 트리메부틴 66 master 기존 non-ko STORE | **0** |
+| runner EN 경로 | 없음 (ko 전용, `COALESCE(language,'ko')='ko'`) |
+
+> 약품 소비자 콘텐츠는 grounding 없이 외부 LLM 초안 자동생성 금지(CLAUDE.md 콘텐츠 작성 불변 원칙). grounded EN 원문이 없어 EN 승격은 **별도 WO(원문 확보 후)** 로 넘긴다. ko 트랙은 완료.
+
+## 9. 완료 보고 요약
+
+- **dry-run**: PASS (2회 byte-identical, md5 `0fc3c17f4321ab1d8a232f265af2aad9`)
+- **apply**: ko 66건 승격 LIVE (SPD 198 · audit 66 · 총 264) · TX 사후검증 PASS
 - **target / exclude / other**: 66 / 61 / 0 (교집합 0)
 - **기존 needs_review**: 0
-- **예상 write**: SPD 198 · audit 66 · 총 264
-- **rollback IDs**: 66
-- **재실행 결정론**: md5 `0fc3c17f4321ab1d8a232f265af2aad9`
-- **commit SHA**: (본 커밋 — 아래 완료보고 참조)
+- **독립 검증**: PASS (canonical `mfds_drug_otc` 66 · deprecated easy 66 · audit 66/metadata 66)
+- **ALREADY_UPGRADED 재실행**: PASS (write 0)
+- **rollback IDs**: 66 (`src/scripts/data/otc-grounded-upgrade-trimebutine-100mg-jeong.run.json`)
+- **EN 트랙**: HOLD (grounded 원문 부재)
+- **commit SHA**: dry-run `c16477b13` · apply 결과 CHECK (본 커밋)
 
-> **다음**: dry-run PASS → 같은 승인 봉투로 apply → 독립검증 → `ALREADY_UPGRADED` no-op 확인. ⚠️ runner 계약 변경(excludeFp 배열) 이 apply 코드에 포함되므로, apply 착수 전 본 변경을 명시 확인.
+> **rollback** = master 66 + audit `canonical_replaced` 66(previous=deprecated easy, new=authored). 다음 clean 후보(바실루스·디오스민)는 별도 WO 지시 대기.
