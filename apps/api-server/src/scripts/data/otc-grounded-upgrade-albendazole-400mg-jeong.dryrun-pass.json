@@ -1,0 +1,447 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "알벤다졸|400밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0178f85b-94d7-4ac9-a061-ac4c2d9ad750",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "알벤다졸 400mg 정",
+  "coarseTotal": 92,
+  "target": 38,
+  "excluded": 54,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "01bd3247-64dd-4918-9d2a-8d52c2dd24e5",
+      "name": "젠텔정400밀리그람(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "0c8544b5-b241-478e-b68e-841823bc7ec0",
+      "name": "알젠다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "0eb241d9-9bd0-4441-9e45-b0f70fe521c9",
+      "name": "젠텔정400밀리그람(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "12150f2b-07af-4035-a996-58a436ec89d8",
+      "name": "알나졸정400밀리그램(알벤다졸)",
+      "reason": "비대상(fp 44ef883e752951ce, bridge SSOT)"
+    },
+    {
+      "id": "16eca874-47ce-49d0-8762-9a85c350686e",
+      "name": "알비정400mg(알벤다졸)",
+      "reason": "비대상(fp 4bc58b995fe73f97, bridge SSOT)"
+    },
+    {
+      "id": "17698352-1a66-4564-988b-730d0e851833",
+      "name": "알벤프리졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "1a1affa1-4011-463e-a837-a541abb956c8",
+      "name": "알졸타정400mg(알벤다졸)",
+      "reason": "비대상(fp 28d29201cd57742b, bridge SSOT)"
+    },
+    {
+      "id": "1c04373d-2247-4adb-ab96-8b06f8c4b35e",
+      "name": "올싹정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "237dfaf8-2cb4-46ca-9727-467c9c7fa3b3",
+      "name": "알나졸정400밀리그램(알벤다졸)",
+      "reason": "비대상(fp 44ef883e752951ce, bridge SSOT)"
+    },
+    {
+      "id": "284f3168-a2eb-4840-973a-5e1964164a9d",
+      "name": "다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "2a1c8aad-dedb-4a25-87a3-f4e75008a704",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "3620fdf6-00ea-402f-b423-e7896836200e",
+      "name": "올싹정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "36611204-1ce2-4e59-8b33-5b0e36cdcd58",
+      "name": "알바콤정(알벤다졸)",
+      "reason": "비대상(fp 12dd978c6a15f077, bridge SSOT)"
+    },
+    {
+      "id": "3a764859-3ba6-4c32-ac65-3f55f25a59a5",
+      "name": "알벤졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "3e89f854-6db9-4a37-8e77-b7817cd677da",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "4e777e50-1d6d-41b4-aa0a-9533722a3b99",
+      "name": "인콤정(알벤다졸)",
+      "reason": "비대상(fp 7da304f9b51043b3, bridge SSOT)"
+    },
+    {
+      "id": "4f52db38-5453-4165-bbd5-7fe682f6990d",
+      "name": "알나졸정400밀리그램(알벤다졸)",
+      "reason": "비대상(fp 44ef883e752951ce, bridge SSOT)"
+    },
+    {
+      "id": "5353b2f7-b6a0-44a9-884d-35de7a9a8d06",
+      "name": "알젠다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "5eaa193e-585d-42f7-94b9-1f1938905186",
+      "name": "알킬정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "5eac72e9-f814-4b27-a67e-2b2126424d5a",
+      "name": "알비정400mg(알벤다졸)",
+      "reason": "비대상(fp 4bc58b995fe73f97, bridge SSOT)"
+    },
+    {
+      "id": "613db3d5-1a11-48b3-addb-22bded54fbbc",
+      "name": "알벤프리졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "61ec194c-0091-4248-831b-29e1ed3c2c63",
+      "name": "다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "64b407fb-f2fb-4b10-8cba-21aa0c6deca8",
+      "name": "알킬정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "68690690-621d-4629-a607-d0ef8b006694",
+      "name": "알바콤정(알벤다졸)",
+      "reason": "비대상(fp 12dd978c6a15f077, bridge SSOT)"
+    },
+    {
+      "id": "6c371139-1397-4713-9f94-0de9bba1eb92",
+      "name": "알킬정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "6ce47601-f66b-4b35-9d43-7c02b7868157",
+      "name": "모아졸정(알벤다졸)",
+      "reason": "비대상(fp 28d29201cd57742b, bridge SSOT)"
+    },
+    {
+      "id": "76e45140-2e9a-4e16-8b0e-4365dec31c43",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "7abba1cf-f57e-4232-9f28-ca5e1189966f",
+      "name": "알나졸정400밀리그램(알벤다졸)",
+      "reason": "비대상(fp 44ef883e752951ce, bridge SSOT)"
+    },
+    {
+      "id": "835546bf-4536-4518-98be-1258845a5fb8",
+      "name": "제나콤정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "8ed0dcbe-2156-4342-b2de-bba047e8f7d9",
+      "name": "다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "9adc322f-bba6-4465-a3eb-2a545e6d5142",
+      "name": "젠텔정400밀리그람(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "9dc06d76-68bd-4877-a43d-907a93938b21",
+      "name": "알젠다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "a03f0298-7252-453c-9741-3f15edb215d4",
+      "name": "올싹정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "a4469022-2375-4e06-857b-088e28491b94",
+      "name": "젠텔정400밀리그람(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "a9b8145b-c84d-481e-a0f3-2adf321458e6",
+      "name": "알벤졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "ac44aff6-5325-4d4f-8ae5-338709684f93",
+      "name": "다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "b35fceff-fe62-472c-a314-664ef0a7d011",
+      "name": "제나콤정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "b8330d79-3f85-4e0a-9633-67cde42b2652",
+      "name": "올싹정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "b924f783-cf4d-4350-83bc-324673cae7bf",
+      "name": "올싹정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "bc77f4f8-cabe-47a1-897e-936a6d393ab2",
+      "name": "알젠다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "bd2b9d8c-f077-4729-bcce-5816e16946a6",
+      "name": "젠텔정400밀리그람(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "be68383e-a9f7-4bab-8565-f059f71c966c",
+      "name": "알졸타정400mg(알벤다졸)",
+      "reason": "비대상(fp 28d29201cd57742b, bridge SSOT)"
+    },
+    {
+      "id": "c0c73c7b-2d70-4385-acc2-29f7f2f97467",
+      "name": "알바콤정(알벤다졸)",
+      "reason": "비대상(fp 12dd978c6a15f077, bridge SSOT)"
+    },
+    {
+      "id": "c1a010cc-b4a2-4116-b6f6-49bd4e39b9e4",
+      "name": "인콤정(알벤다졸)",
+      "reason": "비대상(fp 7da304f9b51043b3, bridge SSOT)"
+    },
+    {
+      "id": "d71f6e10-19d0-46c9-b7f8-77b30be44464",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "da41a053-1a94-48d4-bf06-bd380ade7823",
+      "name": "인콤정(알벤다졸)",
+      "reason": "비대상(fp 7da304f9b51043b3, bridge SSOT)"
+    },
+    {
+      "id": "dc8320c0-8bb3-4e37-b8fe-0c9ae964a727",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "e74de2a6-ef01-48c8-98cb-af96f70b8c11",
+      "name": "모아졸정(알벤다졸)",
+      "reason": "비대상(fp 28d29201cd57742b, bridge SSOT)"
+    },
+    {
+      "id": "e8cdb184-ada5-4e6c-aa1b-e11539eb140c",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "ecbdf81a-a163-4072-b4cc-da0ae51e03b3",
+      "name": "알비정400mg(알벤다졸)",
+      "reason": "비대상(fp 4bc58b995fe73f97, bridge SSOT)"
+    },
+    {
+      "id": "f4d9ded4-54eb-4091-bdf8-2f3852effb07",
+      "name": "인콤정(알벤다졸)",
+      "reason": "비대상(fp 7da304f9b51043b3, bridge SSOT)"
+    },
+    {
+      "id": "f6e6a4b2-4e25-4c93-9bfc-562b92894ccf",
+      "name": "알젠다졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    },
+    {
+      "id": "f877843c-6d09-44b2-a102-bca33da455a6",
+      "name": "벤다졸정(알벤다졸)",
+      "reason": "비대상(fp 10384de1b4730be8, bridge SSOT)"
+    },
+    {
+      "id": "fcab04f9-cb6f-4a46-b244-8808336ee7c5",
+      "name": "알벤졸정(알벤다졸)",
+      "reason": "비대상(fp 160f299c7741cdfa, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "002c20de-63de-449b-af6d-beb7d9dceac5",
+    "06141bb7-e70f-402d-8179-81d17881adca",
+    "110ff94e-ebb3-4aa7-a798-c850a196e6c3",
+    "114459ff-2f92-4854-9dc2-aad375e17e19",
+    "11dc5bcc-29d9-4ff7-b4f5-ef9a6856e00b",
+    "2432af33-7234-4820-9b94-49e1437b9f5d",
+    "2a422f2d-231f-4f2c-8908-a577951baafd",
+    "2cc1e50c-5a10-4f95-9ef8-8c2eeb7eca06",
+    "2da59723-bd8c-4fbe-94fa-a57f8a9aecf0",
+    "2f7e9969-ed44-48ae-b841-a8d1b69b1a08",
+    "304639ef-96f8-404c-8928-388ee146614c",
+    "358e1f07-1a5b-40dd-84cc-d3413dbce11c",
+    "3c5cbafe-c1ae-4989-846f-345f51428a71",
+    "3f38948f-aec4-4437-ab1b-b46223e9476f",
+    "50d56650-835c-469b-ada1-12cc0f2d92ae",
+    "56ad6161-78a5-4640-bdd2-3627b88d18f5",
+    "586682fc-6c01-471e-a196-4ca514fa9ca4",
+    "59a30903-0c3e-48dd-aeff-e6b5bced571c",
+    "5f460837-93da-4706-835e-aa6529d4c258",
+    "6146b95c-3bac-4124-a946-1cd68ecf849e",
+    "6bdbec00-434c-4bf1-99d0-e1bb7bba2c3a",
+    "77d0c571-e223-41be-9adf-a2cc34072ae1",
+    "84b18a16-7039-421d-ba33-ba00bbe65af3",
+    "88dedcb4-9294-4879-be60-6e49549c4d94",
+    "9019c8ae-384e-454f-b29d-f6fe2c890f7e",
+    "93a5fe4a-d15f-430f-a654-6ce3dc0ff7ad",
+    "a2840996-4081-4919-8c62-22425c3953cd",
+    "ad7cdd79-e3ba-40a3-b5e5-7ba8b228ae95",
+    "b97d3b50-935c-48a4-96d3-a5b445c0c351",
+    "c4cb0ca5-c77b-4ffa-9675-f4ea5e21d140",
+    "ca667702-7c34-4121-977b-9302eb73d206",
+    "cbbe8ac5-5873-491a-8009-452771b1b1a9",
+    "ea8b155c-6259-4c1e-b1af-fc4e029c0477",
+    "ea93095e-d094-49ee-8849-6f3b69b63f71",
+    "f2d1720a-497a-498a-9340-aad029e5fe9b",
+    "f6ae9854-e2e0-4280-a356-3e7584d3849b",
+    "fc623fa7-77b6-4f3f-b13d-dcb12f02439a",
+    "ff450362-c7a9-41ee-9510-44aef0eac27b"
+  ],
+  "rollback_master_ids": [
+    "002c20de-63de-449b-af6d-beb7d9dceac5",
+    "06141bb7-e70f-402d-8179-81d17881adca",
+    "110ff94e-ebb3-4aa7-a798-c850a196e6c3",
+    "114459ff-2f92-4854-9dc2-aad375e17e19",
+    "11dc5bcc-29d9-4ff7-b4f5-ef9a6856e00b",
+    "2432af33-7234-4820-9b94-49e1437b9f5d",
+    "2a422f2d-231f-4f2c-8908-a577951baafd",
+    "2cc1e50c-5a10-4f95-9ef8-8c2eeb7eca06",
+    "2da59723-bd8c-4fbe-94fa-a57f8a9aecf0",
+    "2f7e9969-ed44-48ae-b841-a8d1b69b1a08",
+    "304639ef-96f8-404c-8928-388ee146614c",
+    "358e1f07-1a5b-40dd-84cc-d3413dbce11c",
+    "3c5cbafe-c1ae-4989-846f-345f51428a71",
+    "3f38948f-aec4-4437-ab1b-b46223e9476f",
+    "50d56650-835c-469b-ada1-12cc0f2d92ae",
+    "56ad6161-78a5-4640-bdd2-3627b88d18f5",
+    "586682fc-6c01-471e-a196-4ca514fa9ca4",
+    "59a30903-0c3e-48dd-aeff-e6b5bced571c",
+    "5f460837-93da-4706-835e-aa6529d4c258",
+    "6146b95c-3bac-4124-a946-1cd68ecf849e",
+    "6bdbec00-434c-4bf1-99d0-e1bb7bba2c3a",
+    "77d0c571-e223-41be-9adf-a2cc34072ae1",
+    "84b18a16-7039-421d-ba33-ba00bbe65af3",
+    "88dedcb4-9294-4879-be60-6e49549c4d94",
+    "9019c8ae-384e-454f-b29d-f6fe2c890f7e",
+    "93a5fe4a-d15f-430f-a654-6ce3dc0ff7ad",
+    "a2840996-4081-4919-8c62-22425c3953cd",
+    "ad7cdd79-e3ba-40a3-b5e5-7ba8b228ae95",
+    "b97d3b50-935c-48a4-96d3-a5b445c0c351",
+    "c4cb0ca5-c77b-4ffa-9675-f4ea5e21d140",
+    "ca667702-7c34-4121-977b-9302eb73d206",
+    "cbbe8ac5-5873-491a-8009-452771b1b1a9",
+    "ea8b155c-6259-4c1e-b1af-fc4e029c0477",
+    "ea93095e-d094-49ee-8849-6f3b69b63f71",
+    "f2d1720a-497a-498a-9340-aad029e5fe9b",
+    "f6ae9854-e2e0-4280-a356-3e7584d3849b",
+    "fc623fa7-77b6-4f3f-b13d-dcb12f02439a",
+    "ff450362-c7a9-41ee-9510-44aef0eac27b"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "879d80e7afe2d0f4",
+      "n": 38,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "10384de1b4730be8",
+      "n": 17,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "160f299c7741cdfa",
+      "n": 19,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "44ef883e752951ce",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4bc58b995fe73f97",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "28d29201cd57742b",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "12dd978c6a15f077",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7da304f9b51043b3",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 38,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 38,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 38,
+  "htmlLen": 1769,
+  "contentHash": "b4b1f613d9807b5ab7e4ea0539ea46c0",
+  "summary": "알벤다졸 400mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 38,
+      "STEP_B_easy_canonical_demote": 38,
+      "STEP_B_authored_canonical_flip": 38,
+      "total": 114
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 38,
+      "total": 38
+    },
+    "grand_total": 152
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 38",
+    "policy_2A": "audit 2/master = 76 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
