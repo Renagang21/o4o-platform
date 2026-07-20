@@ -105,3 +105,13 @@
 - **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 17 · totalWrites 68(masters 17·candidate UPDATE 17·SPD ko17+en17) · canonicalDup 0 · candidateLinks 17 · spdRefLinks 34. tag `batch:single-nutrient-mg-mn-vd-vk-ca`. rollback manifest 저장.
 - **복합형 누적 512 → 529** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17).
 - **다음(Agent A 권장순서)**: #11 mg+vd+vk+zn+ca(N5, READY 16) → G13 6미네랄(N6, READY 10) → 이후 #4·G10(선택, 저수율). lut-va `PAUSED_GROUP_DEFECT` 유지.
+
+### higher-N V2 큐 2순위 LIVE (Agent B) — #11 mg+vd+vk+zn+ca N5 15건 (+1 정당 HOLD)
+
+- 기준·검수: Agent A V1 #11 검수, V2 권장 2순위. READY 16/0(select 상한).
+- **대상 정제**: select 실측 mention 120 · ELIGIBLE 16 · grounding HOLD 0. **generate 표준 Guard에서 1건 정당 HOLD** → 최종 target **15**. 신규 원료/basis/제형 0(tablet 15·chewable 1).
+  - **HOLD 1건**: stmt `2020000997275`(트러스펙트 칼슘마그네슘아연비타민D K2) — 원문 basis 오기(`칼슘 : 표시량(300mg /1,1500mg)`, 타 4원료는 `/1,500mg`). 표준 Guard `PRE-SRC-BASIS-MISMATCH-002`가 basis 불일치 정확 탐지·BLOCKED. **원문 데이터 결함(오탐 아님)** — 숫자 임의보정 금지. 후속: 공식 표시사항으로 정확 함량 확인 후 별도 교정. HOLD 레지스트리 `hff-combo-mg-vd-vk-zn-ca.blocked-hold.json`.
+- **generate**: 작성 15 · PASS 15 · REVIEW 0 · BLOCKED 0 · **G-MULTI HOLD 0**.
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 15 · totalWrites 60(masters 15·candidate UPDATE 15·SPD ko15+en15) · canonicalDup 0 · candidateLinks 15 · spdRefLinks 30. tag `batch:single-nutrient-mg-vd-vk-zn-ca`. rollback manifest 저장.
+- **복합형 누적 529 → 544** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17 + #11 15).
+- **다음(Agent A 권장순서)**: G13 6미네랄(N6, READY 10) → 이후 #4·G10(선택, 저수율). lut-va `PAUSED_GROUP_DEFECT` 유지.
