@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-CLONIXIN-125MG-SOFTCAP-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "클로닉신리시네이트 125mg 연질캡슐 EN 번역 1건. grounded ko canonical(source_ref 03de1849) 충실 번역. 동일 약물 out-of-scope 7 master 의 live en canonical(md5 d359211f77019739e5f0ec8d5b46931d)을 재현하는 검증본. 표준 번역 파일에 entry 부재 → live out en HTML 에서 DrugOtcEnTranslation 필드를 역구성해 buildDrugOtcEnConsumerHtml 산출 md5 가 live out en 과 byte-identical(diff 0) 임을 확인, 검토완료 EN 재사용으로 새 medical fact 0 증명. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "one to two capsules (125–250 mg) three times a day · 다른 소염진통제 병용금지 — ko 용량·횟수 보존(값 불변)",
+    "금기": "Do not take this if …(소화성궤양·천식/두드러기/아스피린 등 소염진통제 알레르기·CABG 수술 통증·임부·중증 간/신장애·심부전·염증성 장질환) — 강도 보존",
+    "주의": "Talk to a pharmacist(고혈압·기관지천식·간/신장애) — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 d359211f byte-identical 재현(diff 0)"
+  },
+  "translations": [
+    {
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "title": "Clonixin Lysinate 125 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve mild to moderate pain such as muscle pain, neuralgia, pain after injury or surgery, headache, toothache and earache.",
+      "usage": "Adults take one to two capsules (125–250 mg) three times a day. Do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have a peptic ulcer; if you have ever had asthma, hives or an allergy to this medicine, aspirin or other anti-inflammatory painkillers; for pain around CABG surgery; if you are pregnant; or if you have severe liver or kidney impairment, heart failure or inflammatory bowel disease. If you have had high blood pressure, bronchial asthma, or liver or kidney impairment, talk to a pharmacist before taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Clonixin lysinate 125 mg",
+        "How it works": "Relieves pain and inflammation",
+        "Main symptoms": "Muscle pain, neuralgia, headache, toothache, earache, pain after injury or surgery",
+        "Who should be careful": "Peptic ulcer, severe liver or kidney impairment, pregnancy",
+        "Why this one": "An anti-inflammatory painkiller for mild to moderate pain (soft capsule)"
+      }
+    }
+  ],
+  "summary": null
+}

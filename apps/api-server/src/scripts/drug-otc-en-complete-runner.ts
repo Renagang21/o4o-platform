@@ -110,6 +110,17 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-diosmin-300mg-v1.json',
     outBase: 'otc-en-complete-diosmin-300mg',
   },
+  // 클로닉신리시네이트 125mg 연질캡슐 (WO-O4O-OTC-CLONIXIN-125MG-SOFTCAP-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 03de1849 = 34 ko 공유(27 target + 7 out). out7 이미 en canonical LIVE(md5 d359211f, summary null).
+  //   27 ko == 7 ko(동일 약물) → out7 en 재구성. 27 master_id 스코프(source_ref 스코프 금지).
+  'clonixin-125mg-softcap': {
+    key: '클로닉신리시네이트|125밀리그램|연질캡슐',
+    candidate: '03de1849-7d18-4ea4-8896-63a3658540c4',
+    sourceType: 'mfds_drug_otc', expected: 27,
+    koRunBase: 'otc-grounded-upgrade-clonixin-125mg-softcap',
+    translationFile: 'otc-en-translations-clonixin-125mg-softcap-v1.json',
+    outBase: 'otc-en-complete-clonixin-125mg-softcap',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

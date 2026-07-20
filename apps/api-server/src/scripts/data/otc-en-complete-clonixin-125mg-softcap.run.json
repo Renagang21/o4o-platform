@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "03de1849-7d18-4ea4-8896-63a3658540c4",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 27,
+  "targetMasters": 27,
+  "anomalies": [],
+  "koCanonical": 27,
+  "existingEnAny": 27,
+  "existingEnCanonical": 27,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "d359211f77019739e5f0ec8d5b46931d",
+      "n": 7
+    }
+  ],
+  "builtLen": 2621,
+  "builtMd5": "d359211f77019739e5f0ec8d5b46931d",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 27,
+    "STEP2_en_canonical_flip": 27,
+    "en_write_total": 54
+  },
+  "enTargetMd5": "d359211f77019739e5f0ec8d5b46931d",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(d359211f77019739e5f0ec8d5b46931d) — write 0, 정상 종료"
+}

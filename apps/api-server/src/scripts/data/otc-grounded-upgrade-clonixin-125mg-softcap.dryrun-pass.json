@@ -1,0 +1,135 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "03de1849-7d18-4ea4-8896-63a3658540c4",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "클로닉신리시네이트 125mg 연질캡슐",
+  "coarseTotal": 29,
+  "target": 27,
+  "excluded": 2,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "4085b2b3-0394-4a61-8993-9866b7b56993",
+      "name": "이지페인클린연질캡슐(클로닉신리시네이트)",
+      "reason": "비대상(fp 4fa9e63b65c211ad, bridge SSOT)"
+    },
+    {
+      "id": "cc7b9f5d-4419-4b20-aa0f-3441f4a5747b",
+      "name": "이지페인클린연질캡슐(클로닉신리시네이트)",
+      "reason": "비대상(fp 4fa9e63b65c211ad, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "087828da-9cd2-421c-af65-ad4941d33c4a",
+    "1422425d-bcf2-4160-affe-77e1d441ec66",
+    "14af324a-7172-4f2e-9462-f4472729da2c",
+    "183eb739-ceda-41b2-9513-437b8fcf9e93",
+    "21ae8a74-b028-4370-8e34-dcde323bac3a",
+    "23353bc6-8bb9-4934-bc32-72fede4f14fd",
+    "278e2337-7961-424b-8455-02b52c73e698",
+    "358c68bc-ce72-4ea5-b89a-04e37eaa2a77",
+    "38eb3c73-2579-40e9-8c2b-e84aa08a6a40",
+    "3c5c660c-dfe1-4f94-821c-f122b1426d4e",
+    "4fc66abe-6765-4196-b8c5-f275c11e8d1f",
+    "647a8472-c5e1-4d74-ac9b-355cc0ab6461",
+    "740ce080-b60a-4f17-9f0c-292a5a6ec920",
+    "77e2a756-123b-4da6-8459-8eacf74e451a",
+    "7eddd884-35ad-43f8-8808-12f70975b29c",
+    "831ec826-3c57-4c4e-a258-d009c76859b9",
+    "835cfcb7-1ef6-4cd4-8ca0-636a3a2ad806",
+    "86cab057-d0da-448c-9093-d2e9d3c12b77",
+    "9549fc3f-e24b-4283-9e79-96a0f989dd88",
+    "9626692f-3385-4b6d-bc80-88f4b56fd5e0",
+    "9b5a2d02-775b-4ec9-a890-becdddad26f6",
+    "bfe553a8-7ac6-4e5e-b75f-4e0f2d943dd2",
+    "c1062efd-a1d3-40e2-a351-a45aa40dc841",
+    "c9217d0e-b99b-446c-a590-4fee70ee8e88",
+    "db62ca2f-f606-46b1-9936-74ee350f70ad",
+    "f5b4c264-1c6a-44bc-bdb6-8d7e45e8c282",
+    "fcc8d513-84b8-4bad-9e42-19799ede41f7"
+  ],
+  "rollback_master_ids": [
+    "087828da-9cd2-421c-af65-ad4941d33c4a",
+    "1422425d-bcf2-4160-affe-77e1d441ec66",
+    "14af324a-7172-4f2e-9462-f4472729da2c",
+    "183eb739-ceda-41b2-9513-437b8fcf9e93",
+    "21ae8a74-b028-4370-8e34-dcde323bac3a",
+    "23353bc6-8bb9-4934-bc32-72fede4f14fd",
+    "278e2337-7961-424b-8455-02b52c73e698",
+    "358c68bc-ce72-4ea5-b89a-04e37eaa2a77",
+    "38eb3c73-2579-40e9-8c2b-e84aa08a6a40",
+    "3c5c660c-dfe1-4f94-821c-f122b1426d4e",
+    "4fc66abe-6765-4196-b8c5-f275c11e8d1f",
+    "647a8472-c5e1-4d74-ac9b-355cc0ab6461",
+    "740ce080-b60a-4f17-9f0c-292a5a6ec920",
+    "77e2a756-123b-4da6-8459-8eacf74e451a",
+    "7eddd884-35ad-43f8-8808-12f70975b29c",
+    "831ec826-3c57-4c4e-a258-d009c76859b9",
+    "835cfcb7-1ef6-4cd4-8ca0-636a3a2ad806",
+    "86cab057-d0da-448c-9093-d2e9d3c12b77",
+    "9549fc3f-e24b-4283-9e79-96a0f989dd88",
+    "9626692f-3385-4b6d-bc80-88f4b56fd5e0",
+    "9b5a2d02-775b-4ec9-a890-becdddad26f6",
+    "bfe553a8-7ac6-4e5e-b75f-4e0f2d943dd2",
+    "c1062efd-a1d3-40e2-a351-a45aa40dc841",
+    "c9217d0e-b99b-446c-a590-4fee70ee8e88",
+    "db62ca2f-f606-46b1-9936-74ee350f70ad",
+    "f5b4c264-1c6a-44bc-bdb6-8d7e45e8c282",
+    "fcc8d513-84b8-4bad-9e42-19799ede41f7"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "5f1cb691ae1d06e8",
+      "n": 27,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "4fa9e63b65c211ad",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 27,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 27,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 27,
+  "htmlLen": 1613,
+  "contentHash": "4fc15744198ac1de878264c18443ab53",
+  "summary": "클로닉신리시네이트 125mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 27,
+      "STEP_B_easy_canonical_demote": 27,
+      "STEP_B_authored_canonical_flip": 27,
+      "total": 81
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 27,
+      "total": 27
+    },
+    "grand_total": 108
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 27",
+    "policy_2A": "audit 2/master = 54 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

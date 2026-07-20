@@ -241,6 +241,21 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-diosmin-300mg-capsule',
   },
+  // 클로닉신리시네이트 125mg 연질캡슐 — Track A(WO-O4O-OTC-CLONIXIN-125MG-SOFTCAP-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 커밋 fc66ec00f 기준. target 단일 fp 27 · 비대상 단일 fp 2(coarse 29, other 0).
+  'clonixin-125mg-softcap': {
+    key: '클로닉신리시네이트|125밀리그램|연질캡슐',
+    ingredient: '클로닉신리시네이트',
+    dose: '125밀리그램',
+    formKeyword: '연질캡슐',
+    candidate: '03de1849-7d18-4ea4-8896-63a3658540c4',
+    targetFp: '5f1cb691ae1d06e8',
+    excludeFp: '4fa9e63b65c211ad',
+    expected: 27,
+    excludedExpected: 2,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-clonixin-125mg-softcap',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────
