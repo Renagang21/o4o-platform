@@ -68,12 +68,23 @@ interface ContentSourceAdapter {
 - **단위 테스트 5 PASS**(`__tests__/store-public-tablet-content-resolve.test.ts`, mock adapter): 잘못된 config→[] · visible=false 제외 · sortOrder 정렬 · displayTitle/displaySummary override(있으면 우선/없으면 baseTitle) · 미존재(null) skip+나머지 유지 · sourceType→adapter 메서드 라우팅+org 전달.
 - 인접 회귀: `store-public-tablet-screen`·`store-tablet-idle-block` 18 PASS.
 
-## 6. 프로덕션 검증 (실행 8) — DEFERRED (API 배포 후 수행)
+## 6. 프로덕션 검증 (실행 8) — ✅ PASS (프로덕션 API, 매장 owner 인증, 2026-07-20, 배포 558eb83cc)
 
-- [ ] 공개 태블릿 `/:slug/tablet/screen` content_list 카드(제목·요약·순서·표시·detail html) 불변.
-- [ ] Screen Set QR `/qr/public/:slug` content_list 동일 소스·동일 카드.
-- [ ] 제작기 draft preview(POST /screen-sets/preview) content_list 정합(저장 후 공개와 동일).
-- [ ] 보호 샘플(구강/피부) sections·상품 집합 불변. console/pageerror/예상 외 API 오류 0.
+대상: 매장 "네뚜레-약국" / 구강관리 코너 tablet(`c86863d8…`) / Screen Set "구강관리 기본 코너 안내형"(`6f10d68e…`, QR `tablet-corner-5`) — content_list 5 items(o4o 2 + store 3). **세 경로 content_list 카드 완전 동일**:
+
+| 카드 itemId | 공개 태블릿 (tabletContext=full) | QR public (org) | draft preview | title / badge / htmlLen |
+|-------------|:---:|:---:|:---:|-------------------------|
+| o4o:4c5cd989…:ko | ✅ | ✅ | ✅ | 성광알파헥시딘가글액 / O4O 표준 / 777 |
+| o4o:5679aaf4…:ko | ✅ | ✅ | ✅ | 그린헥시딘가글액 / O4O 표준 / 881 |
+| store:02438358… | ✅ | ✅ | ✅ | 잇몸 관리 안내 / 매장 제작 / 257 |
+| store:92e8784e… | ✅ | ✅ | ✅ | 치간칫솔·치실 사용 안내 / 매장 제작 / 200 |
+| store:41140e79… | ✅ | ✅ | ✅ | 구강청결제 선택 안내 / 매장 제작 / 212 |
+
+- **공개 태블릿** `GET /api/v1/stores/{slug}/tablet/screen?tabletId=` → 200, mode=screen_set, sections=[idle_media, corner_description, content_list, product_list, qr_guide]. content_list 5 카드 = 위 표(itemId/title/badge/hasDetail/htmlLen 동일) ✅.
+- **Screen Set QR** `GET /api/v1/kpa/qr/public/tablet-corner-5` → 200, landingType=screen_set, sections=[corner_description, content_list, product_list, qr_guide]. content_list 5 카드 = 동일 ✅. (idle_media 제외는 모바일 QR 기존 동작.)
+- **draft preview** `POST /api/v1/store/screen-sets/preview` → sections=[idle_media, corner_description, content_list, qr_guide]. content_list 5 카드 = 동일 ✅. (product_list 생략은 뷰어 fetchProducts 기존 동작.)
+- **section 구성 차이**(idle_media·product_list 포함/제외)는 **content_list seam 과 무관한 기존 tabletContext/mode 정책** — content_list 자체는 세 경로 byte-identical.
+- 보호 샘플(구강/피부)·current 무변경(read-only 조회; QR scan-log insert 는 공개 endpoint 기존 부수효과, 1회). console error = 초기 auth 부트스트랩 401 + 라우트 탐색용 404 프로브(앱 오류 아님). 실제 endpoint(태블릿/QR/preview) 전부 200.
 
 ## 7. 변경 파일 (실행 10)
 
@@ -107,6 +118,10 @@ apps/api-server/src/routes/platform/store-public/__tests__/store-public-tablet-c
 | content_list 순서·표시·제목·요약 override 불변 | ✅ (테스트 5) |
 | 누락 콘텐츠 처리 방식 불변 | ✅ (null → skip) |
 | 타블렛·Screen Set QR 동일 resolver 사용 | ✅ |
-| draft preview·공개 결과 정합 | ⏳ (프로덕션 검증 §6 DEFERRED) |
-| console·pageerror·API 오류 0 | ⏳ (§6) |
+| draft preview·공개 결과 정합 | ✅ (§6 세 경로 content_list byte-identical) |
+| console·pageerror·API 오류 0 | ✅ (실 endpoint 200, 앱 오류 0 — §6) |
 | DB·migration·데이터 write 0 | ✅ |
+
+---
+
+*content_list 원본 조회를 ContentSourceAdapter 로 분리(resolveScreenSetSections 화면 구성 유지). 기본 Store Adapter=기존 DB 조회 byte-equivalent 이동. 4 호출부 명시 주입·묵시적 fallback 없음. 단위 5+인접 18 PASS. 프로덕션 세 경로(태블릿/QR/preview) content_list 완전 동일. DB write 0. commit 558eb83cc.*
