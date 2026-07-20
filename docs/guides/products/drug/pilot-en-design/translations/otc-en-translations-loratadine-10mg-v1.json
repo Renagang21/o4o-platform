@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-LORATADINE-10MG-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "로라타딘 10mg 정 EN 번역 1건. grounded ko canonical(source_ref 0a7dee0b) 충실 번역. 동일 약물 out-of-scope 13 master 의 live en canonical(md5 056512e15b671e487ee7c33793e32125) 을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치": "10 mg / once a day / 6 to under 12 · 30 kg 경계 / half a tablet — ko 수치·용량·연령 경계 보존(값 불변, 표기만 en 변환)",
+    "금기": "Do not take this if …(과민·6세 미만·임부/수유·유전질환 galactose/Lapp lactase/glucose-galactose) — 강도 보존",
+    "주의": "Talk to a pharmacist before …(간장애·신부전) · 병용금기(cimetidine·erythromycin·ketoconazole) — 강도·대상 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 056512e1 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "로라타딘|10밀리그램|정",
+      "title": "Loratadine 10 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for allergic rhinitis (sneezing, a blocked nose, itching and burning eyes) and for long-lasting hives with no known cause.",
+      "usage": "Adults and children 12 or older take one tablet (10 mg) once a day. Children aged 6 to under 12 take one tablet once a day if they weigh 30 kg or more, or half a tablet once a day if they weigh under 30 kg.",
+      "caution": "Do not take this if you have ever reacted to it, if you are a child under 6, if you are pregnant or breastfeeding, or if you have an inherited condition such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Talk to a pharmacist before taking it if you have liver problems or kidney failure. Do not take it together with medicines that slow down liver metabolism, such as cimetidine, erythromycin or ketoconazole.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Loratadine 10 mg",
+        "How it works": "Antihistamine (eases allergy symptoms)",
+        "Main symptoms": "Allergic rhinitis (sneezing, blocked nose, itching), long-lasting hives",
+        "Who should be careful": "Under 6; pregnancy and breastfeeding; liver problems",
+        "Why this one": "An antihistamine taken once a day"
+      }
+    }
+  ],
+  "summary": "Allergic rhinitis (sneezing, blocked nose, itching), long-lasting hives"
+}

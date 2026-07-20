@@ -66,6 +66,17 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-bacillus-liche-250mg-v1.json',
     outBase: 'otc-en-complete-bacillus-liche-250mg',
   },
+  // 로라타딘 10mg 정 (WO-O4O-OTC-LORATADINE-10MG-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 0a7dee0b = 51 ko 공유(38 target + 13 out). out13 이미 en canonical LIVE(md5 056512e1).
+  //   38 ko == 13 ko(동일 약물) → out13 en 재구성. 38 master_id 스코프(source_ref 스코프 금지).
+  'loratadine-10mg-jeong': {
+    key: '로라타딘|10밀리그램|정',
+    candidate: '0a7dee0b-e578-4015-967a-fad092071eef',
+    sourceType: 'mfds_drug_otc', expected: 38,
+    koRunBase: 'otc-grounded-upgrade-loratadine-10mg-jeong',
+    translationFile: 'otc-en-translations-loratadine-10mg-v1.json',
+    outBase: 'otc-en-complete-loratadine-10mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {
