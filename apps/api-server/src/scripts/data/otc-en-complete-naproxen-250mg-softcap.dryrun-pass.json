@@ -1,0 +1,35 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "나프록센|250밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "02355c78-3d6d-4f6b-8120-de9ff7f14673",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 15,
+  "targetMasters": 15,
+  "anomalies": [],
+  "koCanonical": 15,
+  "existingEnAny": 0,
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "b117c20017de1a74ddbb0ea3f3dca33f",
+      "n": 14
+    }
+  ],
+  "builtLen": 2957,
+  "builtMd5": "b117c20017de1a74ddbb0ea3f3dca33f",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 15,
+    "STEP2_en_canonical_flip": 15,
+    "en_write_total": 30
+  },
+  "enTargetMd5": null
+}

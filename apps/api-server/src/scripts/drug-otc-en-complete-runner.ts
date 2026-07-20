@@ -157,6 +157,61 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-bromelain-100mg-v1.json',
     outBase: 'otc-en-complete-bromelain-100mg',
   },
+  // 아세트아미노펜 325mg 연질캡슐 (WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1 · 에이전트 다)
+  //   source_ref 07fd7b8f 공유 ko == 대상 ko(동일 약물) → out en 재구성(otc-en-translations-v1.json 동일 groupKey 발췌).
+  //   build == live out en byte-identical 게이트로 새 medical fact 0 증명. 18 master_id 스코프.
+  'acetaminophen-325mg-softcap': {
+    key: '아세트아미노펜|325밀리그램|연질캡슐',
+    candidate: '07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7',
+    sourceType: 'mfds_drug_otc', expected: 18,
+    koRunBase: 'otc-grounded-upgrade-acetaminophen-325mg-softcap',
+    translationFile: 'otc-en-translations-acetaminophen-325mg-softcap-v1.json',
+    outBase: 'otc-en-complete-acetaminophen-325mg-softcap',
+  },
+  // 나프록센 250mg 연질캡슐 (WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1 · 에이전트 다)
+  //   source_ref 02355c78 공유 ko == 대상 ko(동일 약물) → out en 재구성(otc-en-translations-v1.json 동일 groupKey 발췌).
+  //   build == live out en byte-identical 게이트로 새 medical fact 0 증명. 15 master_id 스코프.
+  'naproxen-250mg-softcap': {
+    key: '나프록센|250밀리그램|연질캡슐',
+    candidate: '02355c78-3d6d-4f6b-8120-de9ff7f14673',
+    sourceType: 'mfds_drug_otc', expected: 15,
+    koRunBase: 'otc-grounded-upgrade-naproxen-250mg-softcap',
+    translationFile: 'otc-en-translations-naproxen-250mg-softcap-v1.json',
+    outBase: 'otc-en-complete-naproxen-250mg-softcap',
+  },
+  // 니자티딘 75mg 정 (WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 048ba86f = 51 ko 공유(18 target + 33 out). out33 이미 en canonical LIVE(md5 e18e8f84, summary "Excess stomach acid…").
+  //   18 ko == 33 ko(동일 약물, md5 570e1e97) → out33 en 재사용. struct=마스터 번역 발췌. 18 master_id 스코프.
+  'nizatidine-75mg-jeong': {
+    key: '니자티딘|75밀리그램|정',
+    candidate: '048ba86f-f85e-42f8-97fd-7bc4e46cc092',
+    sourceType: 'mfds_drug_otc', expected: 18,
+    koRunBase: 'otc-grounded-upgrade-nizatidine-75mg-jeong',
+    translationFile: 'otc-en-translations-nizatidine-75mg-jeong-v1.json',
+    outBase: 'otc-en-complete-nizatidine-75mg-jeong',
+  },
+  // 엘카르니틴 330mg 정 (WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 035efa8f = 28 ko 공유(16 target + 12 out). out12 이미 en canonical LIVE(md5 4319e705, summary "Carnitine deficiency…").
+  //   16 ko == 12 ko(동일 약물, md5 94749597) → out12 en 재사용. struct=마스터 번역 발췌. 16 master_id 스코프.
+  'levocarnitine-330mg-jeong': {
+    key: '엘카르니틴|330밀리그램|정',
+    candidate: '035efa8f-cc53-4e64-a111-c4528689f457',
+    sourceType: 'mfds_drug_otc', expected: 16,
+    koRunBase: 'otc-grounded-upgrade-levocarnitine-330mg-jeong',
+    translationFile: 'otc-en-translations-levocarnitine-330mg-jeong-v1.json',
+    outBase: 'otc-en-complete-levocarnitine-330mg-jeong',
+  },
+  // 소브레롤 200mg 캡슐 (WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   source_ref 0ff909f4 = 18 ko 공유(15 target + 3 out). out3 이미 en canonical LIVE(md5 e987fc7c, summary "Sudden and long-lasting bronchitis…").
+  //   15 ko == 3 ko(동일 약물, md5 c05847a8) → out3 en 재사용. struct=마스터 번역 발췌. 15 master_id 스코프.
+  'sobrerol-200mg-capsule': {
+    key: '소브레롤|200밀리그램|캡슐',
+    candidate: '0ff909f4-20dc-49d1-b8c5-91794ab62df6',
+    sourceType: 'mfds_drug_otc', expected: 15,
+    koRunBase: 'otc-grounded-upgrade-sobrerol-200mg-capsule',
+    translationFile: 'otc-en-translations-sobrerol-200mg-capsule-v1.json',
+    outBase: 'otc-en-complete-sobrerol-200mg-capsule',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

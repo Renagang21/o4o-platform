@@ -1,0 +1,586 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "나프록센|250밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "02355c78-3d6d-4f6b-8120-de9ff7f14673",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "나프록센 250mg 연질캡슐",
+  "coarseTotal": 87,
+  "target": 15,
+  "excluded": 72,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "04c49d9c-8231-4a6f-9738-207418cbf50b",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "054f2f9e-b056-4ceb-8ce0-d8cf6b47814f",
+      "name": "프리엔에프연질캡슐(나프록센)",
+      "reason": "비대상(fp 9e939e7f075b39bc, bridge SSOT)"
+    },
+    {
+      "id": "0677183b-5c29-4001-9473-3ea02b0e1b23",
+      "name": "스피록센연질캡슐(나프록센)",
+      "reason": "비대상(fp c212a513bb88ad42, bridge SSOT)"
+    },
+    {
+      "id": "0a88fb94-63fa-47f7-b8ff-7cf57de43c0c",
+      "name": "맥쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "0a9e19ca-f8f4-4062-975b-0be4fd82e601",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "10127a6b-693a-4a6b-ae61-3a3816bc22ce",
+      "name": "다나센연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "106c6747-0074-4fdc-b36d-b9f8d48dd7b4",
+      "name": "에이스펜연질캡슐(나프록센)",
+      "reason": "비대상(fp ac6ef16c192a7fb3, bridge SSOT)"
+    },
+    {
+      "id": "114a77dd-f0c4-456f-b2ba-89b0b6a58cee",
+      "name": "스피록센연질캡슐(나프록센)",
+      "reason": "비대상(fp c212a513bb88ad42, bridge SSOT)"
+    },
+    {
+      "id": "1253b972-00bd-47e5-ad5f-1edf1a82635f",
+      "name": "엔프렌드연질캡슐(나프록센)",
+      "reason": "비대상(fp 392ae079dac0eae0, bridge SSOT)"
+    },
+    {
+      "id": "19820a7f-235e-47a1-acfe-54ca9754de42",
+      "name": "자이날큐연질캡슐(나프록센)",
+      "reason": "비대상(fp fd6f53fbe4e1015d, bridge SSOT)"
+    },
+    {
+      "id": "1b1042f2-8d71-49bf-b8d5-67600fd39db9",
+      "name": "푸로싹연질캡슐(나프록센)",
+      "reason": "비대상(fp b0003aa124371a86, bridge SSOT)"
+    },
+    {
+      "id": "1c660b1e-96e3-436a-ac81-c8b40ad4014b",
+      "name": "나에겐연질캡슐(나프록센)",
+      "reason": "비대상(fp 2f8fd6f7b1291bac, bridge SSOT)"
+    },
+    {
+      "id": "22001c58-8b8b-4d43-97d5-42f1b159b970",
+      "name": "페인엔젤센연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "23ec278d-1aff-472d-be96-552e2978836d",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "280d7a10-db49-4fad-9c37-d2de0d7642be",
+      "name": "프리센연질캡슐(나프록센)",
+      "reason": "비대상(fp b67d53ab4af2c4c8, bridge SSOT)"
+    },
+    {
+      "id": "28cde90a-f00a-444d-9331-c45692ef1dd4",
+      "name": "나쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp 4b2067404240d899, bridge SSOT)"
+    },
+    {
+      "id": "28e89237-2deb-4641-9eaa-31d725286a4f",
+      "name": "나프원큐에스연질캡슐(나프록센)",
+      "reason": "비대상(fp fcd522aeba64d746, bridge SSOT)"
+    },
+    {
+      "id": "2b4e74e2-8161-4474-9811-5b63b3a58ff4",
+      "name": "탁센연질캡슐(나프록센)",
+      "reason": "비대상(fp 62f2793e94a4634b, bridge SSOT)"
+    },
+    {
+      "id": "2c6e0ee2-f244-409c-b2f4-0874a1017e4d",
+      "name": "에이프록센연질캡슐(나프록센)",
+      "reason": "비대상(fp 17d1b5ce69315997, bridge SSOT)"
+    },
+    {
+      "id": "2efea108-6afd-45c8-ab12-f2c443dbcb28",
+      "name": "프로센골드연질캡슐(나프록센)",
+      "reason": "비대상(fp c853b9559a335c12, bridge SSOT)"
+    },
+    {
+      "id": "34b095dd-c7e1-441b-a987-59f3a24fc276",
+      "name": "나프로센연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "3b396ab7-7c36-443e-85ee-5ef6ba3d828a",
+      "name": "페인엔젤센연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "3be0fc9d-db5d-44ea-a1bd-52cf79735996",
+      "name": "이지페인록센연질캡슐(나프록센)",
+      "reason": "비대상(fp b3cf231c8b428307, bridge SSOT)"
+    },
+    {
+      "id": "3e3f980f-387e-43e7-ad6f-1c4b72a8088a",
+      "name": "프리센연질캡슐(나프록센)",
+      "reason": "비대상(fp b67d53ab4af2c4c8, bridge SSOT)"
+    },
+    {
+      "id": "3ec25984-b0f5-4c86-973b-50681771a5d3",
+      "name": "이지엔6스트롱연질캡슐(나프록센)",
+      "reason": "비대상(fp aa4e75d6bcbeea99, bridge SSOT)"
+    },
+    {
+      "id": "46c5ac8b-f432-46e9-a7f5-3667853ebbbc",
+      "name": "낙센연질캡슐(나프록센)",
+      "reason": "비대상(fp 35b8a8663a09f577, bridge SSOT)"
+    },
+    {
+      "id": "4a22bbd3-f290-4421-856e-b789e87801bd",
+      "name": "미가펜에스연질캡슐(나프록센)",
+      "reason": "비대상(fp 7b9b5a51ae40608b, bridge SSOT)"
+    },
+    {
+      "id": "4d836c4a-5c92-40b0-a1d9-ad6e33c371a3",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "51a01e14-cdf0-4191-ad1b-f3b7c956e45d",
+      "name": "자이날큐연질캡슐(나프록센)",
+      "reason": "비대상(fp fd6f53fbe4e1015d, bridge SSOT)"
+    },
+    {
+      "id": "59a87c03-cedb-456c-969b-e67ede937a69",
+      "name": "에이프록센연질캡슐(나프록센)",
+      "reason": "비대상(fp 17d1b5ce69315997, bridge SSOT)"
+    },
+    {
+      "id": "5a652f7c-5c14-4d77-87c5-0948eb3ab065",
+      "name": "올나펜연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "5b4621bb-1fd6-4e51-be3d-162ef5fa0e4e",
+      "name": "맥쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "6152f92d-2f27-4a41-bfd7-69ade1a4c4de",
+      "name": "에이스펜연질캡슐(나프록센)",
+      "reason": "비대상(fp ac6ef16c192a7fb3, bridge SSOT)"
+    },
+    {
+      "id": "6342bf2d-7030-41b6-9b79-dd6bc0100a05",
+      "name": "확펜연질캡슐(나프록센)",
+      "reason": "비대상(fp ef0901301763d56b, bridge SSOT)"
+    },
+    {
+      "id": "6e0cc1f2-791a-441c-84d0-899f264c0742",
+      "name": "프로센골드연질캡슐(나프록센)",
+      "reason": "비대상(fp c853b9559a335c12, bridge SSOT)"
+    },
+    {
+      "id": "6e1febef-abe8-4bc4-9340-122d9cd645c8",
+      "name": "이지페인록센연질캡슐(나프록센)",
+      "reason": "비대상(fp b3cf231c8b428307, bridge SSOT)"
+    },
+    {
+      "id": "75097470-9941-495b-8bd3-fb547ab0ca9d",
+      "name": "로젠연질캡슐(나프록센)",
+      "reason": "비대상(fp fc44f386b2adb46a, bridge SSOT)"
+    },
+    {
+      "id": "7bb6012a-ac71-446a-9aa0-f44a8f6c3b1b",
+      "name": "나프원큐에스연질캡슐(나프록센)",
+      "reason": "비대상(fp fcd522aeba64d746, bridge SSOT)"
+    },
+    {
+      "id": "7c578e32-743e-4970-b445-f57b56cbe1d9",
+      "name": "나리센연질캡슐(나프록센)",
+      "reason": "비대상(fp 900d084412ec40a6, bridge SSOT)"
+    },
+    {
+      "id": "85dc56cf-e8cb-44aa-b758-a3e3c9a30b5f",
+      "name": "이지페인록센연질캡슐(나프록센)",
+      "reason": "비대상(fp b3cf231c8b428307, bridge SSOT)"
+    },
+    {
+      "id": "8fd232c1-700c-4e27-bf96-fdc39990117c",
+      "name": "나쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp 4b2067404240d899, bridge SSOT)"
+    },
+    {
+      "id": "95e50fb7-2eca-4180-9b55-b1a4383e8fc6",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "95f6808b-ed72-4c22-bb31-7fc350f7a138",
+      "name": "미가펜에스연질캡슐(나프록센)",
+      "reason": "비대상(fp 7b9b5a51ae40608b, bridge SSOT)"
+    },
+    {
+      "id": "968689f6-694b-4736-b22a-0bb60874a750",
+      "name": "여우엔연질캡슐(나프록센)",
+      "reason": "비대상(fp 987702c5d20f0375, bridge SSOT)"
+    },
+    {
+      "id": "99944216-6f26-4830-b388-12d19e0255a9",
+      "name": "나프로센연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "9c474b52-72c2-41f5-8ac6-524490ffd7a9",
+      "name": "팜페인파워연질캡슐(나프록센)",
+      "reason": "비대상(fp cb132b3a2745d6a2, bridge SSOT)"
+    },
+    {
+      "id": "a254bc69-f78f-4e7c-8008-7a540a50da31",
+      "name": "푸로싹연질캡슐(나프록센)",
+      "reason": "비대상(fp b0003aa124371a86, bridge SSOT)"
+    },
+    {
+      "id": "a3464519-73ff-46ee-a4a4-db3cc3d19826",
+      "name": "이지엔6스트롱연질캡슐(나프록센)",
+      "reason": "비대상(fp aa4e75d6bcbeea99, bridge SSOT)"
+    },
+    {
+      "id": "ab5ce96f-e897-4474-b83f-f5b5f8fe0483",
+      "name": "탁센연질캡슐(나프록센)",
+      "reason": "비대상(fp 62f2793e94a4634b, bridge SSOT)"
+    },
+    {
+      "id": "ab9f6ebc-52ad-4218-a710-6b7f32ddc507",
+      "name": "여우엔연질캡슐(나프록센)",
+      "reason": "비대상(fp 987702c5d20f0375, bridge SSOT)"
+    },
+    {
+      "id": "b6ca9d13-086b-4a11-b398-4c1a6c2d4ac7",
+      "name": "맥쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "b79efca9-d055-45d4-bea9-605d92ba2462",
+      "name": "테라록센연질캡슐(나프록센)",
+      "reason": "비대상(fp 36d8be60125a30df, bridge SSOT)"
+    },
+    {
+      "id": "bae6090e-bbdc-44c5-be88-e6d75a266e67",
+      "name": "엔프렌드연질캡슐(나프록센)",
+      "reason": "비대상(fp 392ae079dac0eae0, bridge SSOT)"
+    },
+    {
+      "id": "bb3455b1-82a6-468a-b343-3394cf32298a",
+      "name": "다나센연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "c60aaa0f-bff6-40c8-bdf0-58fc8a87db62",
+      "name": "캐롤엔연질캡슐(나프록센)",
+      "reason": "비대상(fp c212a513bb88ad42, bridge SSOT)"
+    },
+    {
+      "id": "c69350f2-5152-473f-8760-069161b041cb",
+      "name": "나에겐연질캡슐(나프록센)",
+      "reason": "비대상(fp 2f8fd6f7b1291bac, bridge SSOT)"
+    },
+    {
+      "id": "cb2a6b81-cb09-4e42-9bed-2c077994f4ce",
+      "name": "맥쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "cbac8206-8582-4176-9e3e-ac544e48055d",
+      "name": "탁센연질캡슐(나프록센)",
+      "reason": "비대상(fp 62f2793e94a4634b, bridge SSOT)"
+    },
+    {
+      "id": "cc0ce30f-ede1-49ab-b037-626179e12ece",
+      "name": "푸로싹연질캡슐(나프록센)",
+      "reason": "비대상(fp b0003aa124371a86, bridge SSOT)"
+    },
+    {
+      "id": "da8f0d65-f15a-471f-b50a-b93d5622e271",
+      "name": "탁센연질캡슐(나프록센)",
+      "reason": "비대상(fp 62f2793e94a4634b, bridge SSOT)"
+    },
+    {
+      "id": "dccb41d8-bc4e-4ae9-878c-40aac1ff39cb",
+      "name": "올나펜연질캡슐(나프록센)",
+      "reason": "비대상(fp dd14d9adc0efc046, bridge SSOT)"
+    },
+    {
+      "id": "dcd968ae-9839-4ad6-87af-dd462e50d892",
+      "name": "캐롤엔연질캡슐(나프록센)",
+      "reason": "비대상(fp c212a513bb88ad42, bridge SSOT)"
+    },
+    {
+      "id": "dff90729-8713-49ee-a52f-4a356fb7017d",
+      "name": "나콕스펜연질캡슐(나프록센)",
+      "reason": "비대상(fp 9762f129b2446a16, bridge SSOT)"
+    },
+    {
+      "id": "e3b1ba13-1bde-4f03-9d64-edba851f520c",
+      "name": "로젠연질캡슐(나프록센)",
+      "reason": "비대상(fp fc44f386b2adb46a, bridge SSOT)"
+    },
+    {
+      "id": "ebb8c753-f741-4e52-b9b5-d7d659d4b556",
+      "name": "테라록센연질캡슐(나프록센)",
+      "reason": "비대상(fp 36d8be60125a30df, bridge SSOT)"
+    },
+    {
+      "id": "ed086fc8-3c6d-4d9d-87c8-d0157db5a1a3",
+      "name": "프리엔에프연질캡슐(나프록센)",
+      "reason": "비대상(fp 9e939e7f075b39bc, bridge SSOT)"
+    },
+    {
+      "id": "eeafc3c9-ab33-485a-b14b-f836480f0dd5",
+      "name": "나콕스펜연질캡슐(나프록센)",
+      "reason": "비대상(fp 9762f129b2446a16, bridge SSOT)"
+    },
+    {
+      "id": "eed5d942-964a-4d53-abcc-33c227d93649",
+      "name": "탁센연질캡슐(나프록센)",
+      "reason": "비대상(fp 62f2793e94a4634b, bridge SSOT)"
+    },
+    {
+      "id": "ef0ab361-0b76-4fee-820f-b446e32c7a39",
+      "name": "낙센연질캡슐(나프록센)",
+      "reason": "비대상(fp 35b8a8663a09f577, bridge SSOT)"
+    },
+    {
+      "id": "faba6457-a24c-4da5-81b1-0634af7424b5",
+      "name": "맥쎈연질캡슐(나프록센)",
+      "reason": "비대상(fp ee90cf6ba0af24a4, bridge SSOT)"
+    },
+    {
+      "id": "fc273b0a-9b47-4597-8d8a-bd057f010790",
+      "name": "나리센연질캡슐(나프록센)",
+      "reason": "비대상(fp 900d084412ec40a6, bridge SSOT)"
+    },
+    {
+      "id": "fe29d98b-24bf-4445-8ac9-965e034378ee",
+      "name": "확펜연질캡슐(나프록센)",
+      "reason": "비대상(fp ef0901301763d56b, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "1aae3820-d57c-4287-8774-f49288dba601",
+    "26cf9d31-1eac-40d1-8fb7-cbf1e9182609",
+    "2892c9c9-f4e9-4b7f-a1e9-da8b28555c5a",
+    "2ed181b6-1b18-44bb-bd29-c827b547fbea",
+    "38b5777b-7875-4a61-8866-ae44283a9c73",
+    "3dcfd122-b3e5-43ff-8dcb-6360fecdebbd",
+    "63f4a224-0a4d-48ae-a250-cfcda022d671",
+    "65fc189f-f8a1-41a7-9f4e-830382aecbce",
+    "6668c630-213d-474d-96c8-2a21babe251a",
+    "77e08a85-1bb7-4456-98d5-763550a44eec",
+    "7ce42de7-3b55-48a4-b69e-7676a08d126f",
+    "932f4d26-b55a-4124-9b30-aeb19eb2d762",
+    "9608e469-e2b7-4741-8000-84c5087b71e2",
+    "bf1c25ec-10b0-4a06-a58d-f27eeaeaf8be",
+    "e5ff2706-c022-4599-b7b9-999e2f6aeb1c"
+  ],
+  "rollback_master_ids": [
+    "1aae3820-d57c-4287-8774-f49288dba601",
+    "26cf9d31-1eac-40d1-8fb7-cbf1e9182609",
+    "2892c9c9-f4e9-4b7f-a1e9-da8b28555c5a",
+    "2ed181b6-1b18-44bb-bd29-c827b547fbea",
+    "38b5777b-7875-4a61-8866-ae44283a9c73",
+    "3dcfd122-b3e5-43ff-8dcb-6360fecdebbd",
+    "63f4a224-0a4d-48ae-a250-cfcda022d671",
+    "65fc189f-f8a1-41a7-9f4e-830382aecbce",
+    "6668c630-213d-474d-96c8-2a21babe251a",
+    "77e08a85-1bb7-4456-98d5-763550a44eec",
+    "7ce42de7-3b55-48a4-b69e-7676a08d126f",
+    "932f4d26-b55a-4124-9b30-aeb19eb2d762",
+    "9608e469-e2b7-4741-8000-84c5087b71e2",
+    "bf1c25ec-10b0-4a06-a58d-f27eeaeaf8be",
+    "e5ff2706-c022-4599-b7b9-999e2f6aeb1c"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "cb132b3a2745d6a2",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9e939e7f075b39bc",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c212a513bb88ad42",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ee90cf6ba0af24a4",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "dd14d9adc0efc046",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ac6ef16c192a7fb3",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "392ae079dac0eae0",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "fd6f53fbe4e1015d",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b2b5edea34cff218",
+      "n": 15,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "b0003aa124371a86",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "2f8fd6f7b1291bac",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b67d53ab4af2c4c8",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4b2067404240d899",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "fcd522aeba64d746",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "62f2793e94a4634b",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "17d1b5ce69315997",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c853b9559a335c12",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b3cf231c8b428307",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "aa4e75d6bcbeea99",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "35b8a8663a09f577",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7b9b5a51ae40608b",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ef0901301763d56b",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "fc44f386b2adb46a",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "900d084412ec40a6",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "987702c5d20f0375",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "36d8be60125a30df",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9762f129b2446a16",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 15,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 15,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 15,
+  "htmlLen": 1730,
+  "contentHash": "c5d906859536256d3d45fec647e592b7",
+  "summary": "나프록센 250mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 15,
+      "STEP_B_easy_canonical_demote": 15,
+      "STEP_B_authored_canonical_flip": 15,
+      "total": 45
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 15,
+      "total": 15
+    },
+    "grand_total": 60
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 15",
+    "policy_2A": "audit 2/master = 30 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

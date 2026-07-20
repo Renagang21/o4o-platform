@@ -1,0 +1,107 @@
+{
+  "wo": "WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+  "targetFp": "26587fd5ff28e6b3",
+  "coarseTotal": 24,
+  "targetCount": 18,
+  "excludeCount": 6,
+  "excludeFpCount": 3,
+  "excludeFps": [
+    "3cbae9047a4c082a",
+    "2b1fa0e4500237ef",
+    "8ace0cbcdcee953a"
+  ],
+  "targetForms": [
+    "연질캡슐"
+  ],
+  "targetRoutes": [
+    "oral"
+  ],
+  "allForms": [
+    "연질캡슐"
+  ],
+  "distribution": [
+    {
+      "fp": "26587fd5ff28e6b3",
+      "n": 18,
+      "isTarget": true,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나스펜연질캡슐(아세트아미노펜)",
+        "이지엔6에이스연질캡슐(아세트아미노펜)"
+      ]
+    },
+    {
+      "fp": "3cbae9047a4c082a",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "타이로펜연질캡슐(아세트아미노펜)",
+        "타이로펜연질캡슐(아세트아미노펜)"
+      ]
+    },
+    {
+      "fp": "2b1fa0e4500237ef",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "타이렌연질캡슐(아세트아미노펜)",
+        "타이렌연질캡슐(아세트아미노펜)"
+      ]
+    },
+    {
+      "fp": "8ace0cbcdcee953a",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "이두패프연질캡슐(아세트아미노펜)",
+        "이두패프연질캡슐(아세트아미노펜)"
+      ]
+    }
+  ],
+  "target_master_ids": [
+    "10868b75-a5f9-4d5d-82d6-a3a5c56e1cf0",
+    "25cef701-1196-48c6-84b2-12ab3eef6568",
+    "2c672cc1-989b-4477-92fe-8b14db079fa3",
+    "4c90f3db-78e7-4e00-b481-f0a6ef2d539c",
+    "4d9737d0-ed25-4736-9a93-a5f5f38029f1",
+    "591f0234-355e-410a-b273-f6131296e486",
+    "5fc3f903-086a-4767-acfb-93493e899208",
+    "6bada577-2648-4544-8b19-b44681d9eeb3",
+    "971c7dfe-ae52-49d4-b2c6-f57f0ec2db6f",
+    "a280f96a-887e-42f4-8189-6034b0c61490",
+    "aa65864c-27ed-420d-9619-d15df2dd8490",
+    "c66fd225-7909-4bba-9b59-526efdda5a32",
+    "c7c61e35-8b8d-47df-bce8-8ef2edd49b88",
+    "c8984d56-1a3f-4e9e-82d4-29fd1ed469d7",
+    "c8f34bb9-3182-440e-ad66-104e0cbeeb5d",
+    "ca24f6d2-59b4-49d5-b32a-7afdb7abadd3",
+    "dfc832a0-3b6c-4217-89d7-450274e40da9",
+    "eb72b34b-6ee9-4fbe-83fb-9dd063dde3c8"
+  ]
+}

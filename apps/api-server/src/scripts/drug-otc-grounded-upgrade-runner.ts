@@ -313,6 +313,95 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-clonixin-125mg-jeong',
   },
+  // 아세트아미노펜 325mg 연질캡슐 — Track A(WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1 · 에이전트 다).
+  //   next-batch 감사(GA): targetFp 26587fd5ff28e6b3 · READY · target 18 · bridge 18.
+  //   coarse 24(연질캡슐 only) = target 18 + 비대상 3 fp 6(2+2+2, 전부 oral·연질캡슐). fp-harvest 확정.
+  'acetaminophen-325mg-softcap': {
+    key: '아세트아미노펜|325밀리그램|연질캡슐',
+    ingredient: '아세트아미노펜',
+    dose: '325밀리그램',
+    formKeyword: '연질캡슐',
+    candidate: '07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7',
+    targetFp: '26587fd5ff28e6b3',
+    excludeFp: ['3cbae9047a4c082a', '2b1fa0e4500237ef', '8ace0cbcdcee953a'], // 비대상 3 fp = 2+2+2 = 6
+    expected: 18,
+    excludedExpected: 6,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-acetaminophen-325mg-softcap',
+  },
+  // 나프록센 250mg 연질캡슐 — Track A(WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1 · 에이전트 다).
+  //   next-batch 감사(GA): targetFp b2b5edea34cff218 · READY · target 15 · bridge 15.
+  //   coarse 87(연질캡슐 only) = target 15 + 비대상 26 fp 72(7+6+6+5+4+3+3+2×20, 전부 oral·연질캡슐). fp-harvest 확정.
+  'naproxen-250mg-softcap': {
+    key: '나프록센|250밀리그램|연질캡슐',
+    ingredient: '나프록센',
+    dose: '250밀리그램',
+    formKeyword: '연질캡슐',
+    candidate: '02355c78-3d6d-4f6b-8120-de9ff7f14673',
+    targetFp: 'b2b5edea34cff218',
+    excludeFp: [
+      'ee90cf6ba0af24a4', 'cb132b3a2745d6a2', 'dd14d9adc0efc046', '62f2793e94a4634b',
+      'c212a513bb88ad42', 'b0003aa124371a86', 'b3cf231c8b428307', '9e939e7f075b39bc',
+      'ac6ef16c192a7fb3', '392ae079dac0eae0', 'fd6f53fbe4e1015d', '2f8fd6f7b1291bac',
+      'b67d53ab4af2c4c8', '4b2067404240d899', 'fcd522aeba64d746', '17d1b5ce69315997',
+      'c853b9559a335c12', 'aa4e75d6bcbeea99', '35b8a8663a09f577', '7b9b5a51ae40608b',
+      'ef0901301763d56b', 'fc44f386b2adb46a', '900d084412ec40a6', '987702c5d20f0375',
+      '36d8be60125a30df', '9762f129b2446a16',
+    ], // 비대상 26 fp = 7+6+6+5+4+3+3+2×20 = 72
+    expected: 15,
+    excludedExpected: 72,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-naproxen-250mg-softcap',
+  },
+  // 니자티딘 75mg 정 — Track A(WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 fp-probe(2026-07-20) 기준. coarse(easy SPD) 21 = target 단일 fp 18 + 비대상 단일 fp 3(other 0). authored 충돌 0.
+  'nizatidine-75mg-jeong': {
+    key: '니자티딘|75밀리그램|정',
+    ingredient: '니자티딘',
+    dose: '75밀리그램',
+    formKeyword: '정',
+    candidate: '048ba86f-f85e-42f8-97fd-7bc4e46cc092',
+    targetFp: 'db6e1f0bb7d9763f',
+    excludeFp: '7f88215cfd2455ef', // 비대상 단일 fp 3
+    expected: 18,
+    excludedExpected: 3,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-nizatidine-75mg-jeong',
+  },
+  // 엘카르니틴 330mg 정 — Track A(WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 fp-probe(2026-07-20) 기준. coarse(easy SPD) 42 = target 단일 fp 16 + 비대상 10 fp 26(other 0). authored 충돌 0.
+  'levocarnitine-330mg-jeong': {
+    key: '엘카르니틴|330밀리그램|정',
+    ingredient: '엘카르니틴',
+    dose: '330밀리그램',
+    formKeyword: '정',
+    candidate: '035efa8f-cc53-4e64-a111-c4528689f457',
+    targetFp: 'a75d4ff900dbe2a9',
+    excludeFp: [
+      'ac7ba3027cafce45', '9017e0024031ff4c', '900a8110303e8f41', 'ce70c85c245f0056',
+      'a727d2db1e059599', 'd6a08d37d9648c25', '6599085d5e3901c9', '3b9730d3fc8d9ab1',
+      '89cb14c846be1601', '845d1bdeddd113fa',
+    ], // 비대상 10 fp = 4+4+3+3+2+2+2+2+2+2 = 26
+    expected: 16,
+    excludedExpected: 26,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-levocarnitine-330mg-jeong',
+  },
+  // 소브레롤 200mg 캡슐 — Track A(WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   감사 fp-probe(2026-07-20) 기준. coarse(easy SPD) 15 = target 단일 fp 15 + 비대상 0(other 0, 단일 fp 그룹). authored 충돌 0.
+  'sobrerol-200mg-capsule': {
+    key: '소브레롤|200밀리그램|캡슐',
+    ingredient: '소브레롤',
+    dose: '200밀리그램',
+    formKeyword: '캡슐',
+    candidate: '0ff909f4-20dc-49d1-b8c5-91794ab62df6',
+    targetFp: '2e37307573cfb189',
+    excludeFp: [], // 비대상 0 (coarse 전량 단일 fp)
+    expected: 15,
+    excludedExpected: 0,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-sobrerol-200mg-capsule',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

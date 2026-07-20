@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "07fd7b8f-fa67-41d8-8afe-37cf3bcd78f7",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 18,
+  "targetMasters": 18,
+  "anomalies": [],
+  "koCanonical": 18,
+  "existingEnAny": 18,
+  "existingEnCanonical": 18,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "daf4d06d14103bd01493202b1beb8b88",
+      "n": 2
+    }
+  ],
+  "builtLen": 2813,
+  "builtMd5": "daf4d06d14103bd01493202b1beb8b88",
+  "consistencyMatch": true,
+  "summaryField": "Fever, headache, nerve pain, muscle pain, period pain, toothache, joint pain",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 18,
+    "STEP2_en_canonical_flip": 18,
+    "en_write_total": 36
+  },
+  "enTargetMd5": "daf4d06d14103bd01493202b1beb8b88",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(daf4d06d14103bd01493202b1beb8b88) — write 0, 정상 종료"
+}

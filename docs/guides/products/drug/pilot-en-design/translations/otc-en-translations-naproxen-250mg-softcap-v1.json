@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1",
+  "guide": "v1",
+  "note": "나프록센 250mg 연질캡슐 en 완결 — out14 en canonical(md5 b117c200) HTML 에서 결정적 역재구성(builder VERBATIM). summary null. 15 master_id 스코프.",
+  "translations": [
+    {
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "title": "Naproxen 250 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for osteoarthritis, rheumatoid arthritis and ankylosing spondylitis; tendinitis and bursitis; acute gout; painful menstruation; musculoskeletal disorders such as sprains, bruises and low back pain; pain after surgery or tooth extraction; and migraine.",
+      "usage": "For pain, adults first take two capsules (500 mg), then one capsule (250 mg) every 6 to 8 hours, without exceeding 1,250 mg a day. If your stomach is sensitive, take it after food, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have a peptic ulcer, severe liver or kidney impairment, heart failure or bronchial asthma; for pain around coronary artery bypass graft (CABG) surgery; if you are pregnant or breastfeeding; or if you are a child aged 2 or under. Because there is a risk of cardiovascular clots such as heart attack and stroke and of gastrointestinal bleeding or ulcers, stop taking it and seek advice if you have stomach pain, black stools, a rash or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Naproxen 250 mg",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Menstrual pain, headache, toothache, muscle pain, joint pain, low back pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "A long-acting anti-inflammatory painkiller (soft capsule)"
+      }
+    }
+  ],
+  "summary": null
+}

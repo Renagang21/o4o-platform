@@ -1,0 +1,472 @@
+{
+  "wo": "WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groupKey": "나프록센|250밀리그램|연질캡슐",
+  "targetFp": "b2b5edea34cff218",
+  "coarseTotal": 87,
+  "targetCount": 15,
+  "excludeCount": 72,
+  "excludeFpCount": 26,
+  "excludeFps": [
+    "ee90cf6ba0af24a4",
+    "cb132b3a2745d6a2",
+    "dd14d9adc0efc046",
+    "62f2793e94a4634b",
+    "c212a513bb88ad42",
+    "b0003aa124371a86",
+    "b3cf231c8b428307",
+    "9e939e7f075b39bc",
+    "ac6ef16c192a7fb3",
+    "392ae079dac0eae0",
+    "fd6f53fbe4e1015d",
+    "2f8fd6f7b1291bac",
+    "b67d53ab4af2c4c8",
+    "4b2067404240d899",
+    "fcd522aeba64d746",
+    "17d1b5ce69315997",
+    "c853b9559a335c12",
+    "aa4e75d6bcbeea99",
+    "35b8a8663a09f577",
+    "7b9b5a51ae40608b",
+    "ef0901301763d56b",
+    "fc44f386b2adb46a",
+    "900d084412ec40a6",
+    "987702c5d20f0375",
+    "36d8be60125a30df",
+    "9762f129b2446a16"
+  ],
+  "targetForms": [
+    "연질캡슐"
+  ],
+  "targetRoutes": [
+    "oral"
+  ],
+  "allForms": [
+    "연질캡슐"
+  ],
+  "distribution": [
+    {
+      "fp": "b2b5edea34cff218",
+      "n": 15,
+      "isTarget": true,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "큐센연질캡슐(나프록센)",
+        "큐센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "ee90cf6ba0af24a4",
+      "n": 7,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "맥쎈연질캡슐(나프록센)",
+        "나프로센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "cb132b3a2745d6a2",
+      "n": 6,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "팜페인파워연질캡슐(나프록센)",
+        "팜페인파워연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "dd14d9adc0efc046",
+      "n": 6,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "다나센연질캡슐(나프록센)",
+        "페인엔젤센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "62f2793e94a4634b",
+      "n": 5,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "탁센연질캡슐(나프록센)",
+        "탁센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "c212a513bb88ad42",
+      "n": 4,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "스피록센연질캡슐(나프록센)",
+        "스피록센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "b0003aa124371a86",
+      "n": 3,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "푸로싹연질캡슐(나프록센)",
+        "푸로싹연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "b3cf231c8b428307",
+      "n": 3,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "이지페인록센연질캡슐(나프록센)",
+        "이지페인록센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "9e939e7f075b39bc",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "프리엔에프연질캡슐(나프록센)",
+        "프리엔에프연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "ac6ef16c192a7fb3",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "에이스펜연질캡슐(나프록센)",
+        "에이스펜연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "392ae079dac0eae0",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "엔프렌드연질캡슐(나프록센)",
+        "엔프렌드연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "fd6f53fbe4e1015d",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "자이날큐연질캡슐(나프록센)",
+        "자이날큐연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "2f8fd6f7b1291bac",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나에겐연질캡슐(나프록센)",
+        "나에겐연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "b67d53ab4af2c4c8",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "프리센연질캡슐(나프록센)",
+        "프리센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "4b2067404240d899",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나쎈연질캡슐(나프록센)",
+        "나쎈연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "fcd522aeba64d746",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나프원큐에스연질캡슐(나프록센)",
+        "나프원큐에스연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "17d1b5ce69315997",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "에이프록센연질캡슐(나프록센)",
+        "에이프록센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "c853b9559a335c12",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "프로센골드연질캡슐(나프록센)",
+        "프로센골드연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "aa4e75d6bcbeea99",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "이지엔6스트롱연질캡슐(나프록센)",
+        "이지엔6스트롱연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "35b8a8663a09f577",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "낙센연질캡슐(나프록센)",
+        "낙센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "7b9b5a51ae40608b",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "미가펜에스연질캡슐(나프록센)",
+        "미가펜에스연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "ef0901301763d56b",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "확펜연질캡슐(나프록센)",
+        "확펜연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "fc44f386b2adb46a",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "로젠연질캡슐(나프록센)",
+        "로젠연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "900d084412ec40a6",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나리센연질캡슐(나프록센)",
+        "나리센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "987702c5d20f0375",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "여우엔연질캡슐(나프록센)",
+        "여우엔연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "36d8be60125a30df",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "테라록센연질캡슐(나프록센)",
+        "테라록센연질캡슐(나프록센)"
+      ]
+    },
+    {
+      "fp": "9762f129b2446a16",
+      "n": 2,
+      "isTarget": false,
+      "forms": [
+        "연질캡슐"
+      ],
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "나콕스펜연질캡슐(나프록센)",
+        "나콕스펜연질캡슐(나프록센)"
+      ]
+    }
+  ],
+  "target_master_ids": [
+    "1aae3820-d57c-4287-8774-f49288dba601",
+    "26cf9d31-1eac-40d1-8fb7-cbf1e9182609",
+    "2892c9c9-f4e9-4b7f-a1e9-da8b28555c5a",
+    "2ed181b6-1b18-44bb-bd29-c827b547fbea",
+    "38b5777b-7875-4a61-8866-ae44283a9c73",
+    "3dcfd122-b3e5-43ff-8dcb-6360fecdebbd",
+    "63f4a224-0a4d-48ae-a250-cfcda022d671",
+    "65fc189f-f8a1-41a7-9f4e-830382aecbce",
+    "6668c630-213d-474d-96c8-2a21babe251a",
+    "77e08a85-1bb7-4456-98d5-763550a44eec",
+    "7ce42de7-3b55-48a4-b69e-7676a08d126f",
+    "932f4d26-b55a-4124-9b30-aeb19eb2d762",
+    "9608e469-e2b7-4741-8000-84c5087b71e2",
+    "bf1c25ec-10b0-4a06-a58d-f27eeaeaf8be",
+    "e5ff2706-c022-4599-b7b9-999e2f6aeb1c"
+  ]
+}

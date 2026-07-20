@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-ACETAMINOPHEN-NAPROXEN-KO-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5",
+  "note": "아세트아미노펜 325mg 연질캡슐 en 완결 — otc-en-translations-v1.json 동일 groupKey 발췌(out2 en canonical md5 daf4d06d 빌드 원본). 18 master_id 스코프.",
+  "translations": [
+    {
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "title": "Acetaminophen 325 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, headache, nerve pain, muscle pain, period pain, sprain pain, toothache and joint pain.",
+      "usage": "Adults and children 12 or older take two capsules three to four times a day, every 4 to 6 hours as needed. Do not take more than 12 capsules (4 g) in one day. Take the lowest dose for the shortest possible time.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a peptic ulcer, a severe blood disorder, severe liver or kidney problems, severe heart failure, aspirin-induced asthma, or if you drink alcohol. If you are pregnant or breastfeeding, talk to a pharmacist before taking it. If you drink alcohol regularly there is a risk of liver damage, so get advice. Do not take it together with other products that contain acetaminophen, barbiturates or tricyclic antidepressants. Get advice if a fever lasts more than 3 days or pain more than 10 days.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetaminophen 325 mg",
+        "How it works": "Reduces fever and pain",
+        "Main symptoms": "Fever, headache, nerve pain, muscle pain, period pain, toothache, joint pain",
+        "Who should be careful": "Liver disease; alcohol; do not exceed 4,000 mg a day",
+        "Why this one": "A fever and pain reliever that is gentle on the stomach (soft capsule)"
+      }
+    }
+  ],
+  "summary": "Fever, headache, nerve pain, muscle pain, period pain, toothache, joint pain"
+}
