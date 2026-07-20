@@ -111,6 +111,13 @@ EN persist(§4) 이전에 다음을 확정한다:
 - **기존 herbal 방식의 `source_ref_id`(candidate) 단독 master 열거를 Grounded Upgrade 그룹에 재사용하지 않는다.** herbal(299)은 그룹 전체가 단일 승격 대상이라 `source_ref_id=candidate` 열거가 곧 target 이었으나, Grounded Upgrade 는 fingerprint 분할로 candidate 공유 집합 ≠ target 이다.
 - 따라서 §4 의 "master 집합 = 그룹 ko canonical(`source_ref_id=candidate`)" 은 **herbal 계열 그룹에 한정**하며, **Grounded Upgrade 그룹은 §0-C-1 의 runner 확정 target master_id 집합으로 대상을 고정**한다(§4 주석 참조).
 
+### 0-C-4. 실증·범용 runner·`ALREADY_COMPLETE` (2026-07-20)
+
+- **live 실증**: 바실루스리케니포르미스균 250mg 캡슐 en 56건 완결로 §0-C 스코프 가드가 실증됨 — `source_ref_id`(`022f4af0…`) **공유 64**(target 56 + out-of-scope 8) 중 **56 을 master_id 리스트로만 스코프**, **out-of-scope 8 의 기존 en canonical 미접촉(불변)**. ([BACILLUS-250MG-EN-COMPLETE](../../../checks/CHECK-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1.md))
+- **범용 실행 도구**: Grounded Upgrade EN 완결은 **`apps/api-server/src/scripts/drug-otc-en-complete-runner.ts`**(트리메부틴 검증본을 일반화)로 수행한다. §4·§5 의 herbal 스크립트(`drug-otc-herbal-en-persist/-canonical-promotion.ts`)는 **herbal 계열 그룹 한정**이며, Grounded Upgrade 그룹은 이 범용 en-complete runner 를 쓴다(정본 target master_id 스코프 내장).
+- **`ALREADY_COMPLETE` 재실행 = write 0 (EN 멱등 종결)**: en 이 이미 canonical 완결된 대상에 재실행하면 `status=ALREADY_COMPLETE` · **DB write 0** · 정상 종료(exit 0). ko 측 [`ALREADY_UPGRADED`](OTC-EASY-DRUG-TO-AUTHORED-CANONICAL-UPGRADE-POLICY-V1.md) 표준의 EN 대응 — 이미-완결을 **성공(no-op)** 으로 인식하고 실패로 보고하지 않는다.
+- **(선택 게이트) 동일 약물 build byte-identical**: out-of-scope 에 검토완료 en canonical 이 이미 있고 target ko 가 그와 byte-identical(동일 약물)이면, 번역 `build == live out-of-scope en`(md5 동일)을 게이트로 두어 **새 medical fact 0** 을 구조적으로 증명할 수 있다(바실루스: build md5 `377e7f4ca23fc4846b7cd401bbf31f7b` == live). 이는 §0-B-2 판별의 강한 실증형이며, out-of-scope en 부재 시엔 §3-6 TEST-LOG 대조로 대체한다.
+
 ---
 
 ## 1. 배치 단위
@@ -155,7 +162,7 @@ EN persist(§4) 이전에 다음을 확정한다:
 
 ## 4. 전개 저장 (needs_review)
 
-> 스크립트 패턴: `drug-otc-herbal-en-persist.ts`
+> 스크립트 패턴: herbal 계열 = `drug-otc-herbal-en-persist.ts` · **Grounded Upgrade 계열 = `drug-otc-en-complete-runner.ts`(범용, persist+flip 통합, §0-C-4)**.
 
 - **master 집합**:
   - **herbal 계열 그룹**: 그룹 ko canonical(`source_ref_id=candidate`) → **ko↔en `master_id`·`source_ref_id` 정합**.
