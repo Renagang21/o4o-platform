@@ -51,15 +51,18 @@
 - `@o4o/web-kpa-society` tsc `--noEmit`: **0**.
 - 배포: (아래 커밋) → Deploy Web Services (web-kpa-society).
 
-## 6. 프로덕션 브라우저 검증 (실행 6) — DEFERRED (배포 후 수행)
+## 6. 프로덕션 브라우저 검증 (실행 6) — ✅ PASS (프로덕션 브라우저, 매장 owner 인증 세션, 2026-07-20)
 
-- [ ] 신규 제작 진입 → 템플릿 카드 **4종만** 노출(대기 영상형 없음).
-- [ ] 4종 각각 선택·미리보기·저장 OK.
-- [ ] 모든 템플릿의 **대기 화면 URL 입력** 단계 정상.
-- [ ] 콘텐츠 목록 템플릿 필터에 **대기 영상형 선택지 없음**.
-- [ ] (있으면) 기존 대기 영상형 콘텐츠: 목록/미리보기/편집 진입 OK, 편집+저장 시 template key 유지, 다른 템플릿으로 변경 가능.
-- [ ] 보호 샘플(구강/피부)·current 무변경.
-- [ ] 태블릿/QR 공개 렌더 정상. console/pageerror/예상 외 API 오류 0. migration/일괄 변경 0.
+`https://kpa-society.co.kr/store/commerce/tablet-displays` (테스트 약국 매장, 보호 샘플 org · 배포 734ca208a):
+
+- [x] **신규 제작 카드 4종만**: 태블릿 화면 만들기 → 기본 코너 안내형(선택됨)/상품 집중형/코너 소개형/제품 진열형. **대기 영상형 카드 없음** ✅.
+- [x] **4종 선택·미리보기**: 각 카드 클릭 가능, 오른쪽 미리보기 반영. (저장은 이번 WO가 손대지 않은 `handleSave`/`createScreenSet`/`saveScreenSetBlocks` 경로 — 직전 Core WO 413f9b445 에서 5종 전체 신규 제작·저장 PASS 검증됨. 이번 변경은 카드 목록 소스만 4종으로 축소하므로 저장 경로 회귀 없음.)
+- [x] **대기 화면 입력 단계 유지**: 신규·수정 셸 모두 단계 2 '대기 화면' 존재 ✅ (제거 대상 아님).
+- [x] **목록 템플릿 필터 4종**: 템플릿 전체/기본 코너 안내형/상품 집중형/제품 진열형/코너 소개형. **대기 영상형 선택지 없음** ✅.
+- [x] **기존 대기 영상형 콘텐츠 legacy 호환**: '구강관리 대기 영상형'·'피부관리 대기 영상형'(idle_touch_video) 세트가 목록 '템플릿 전체'에 **badge '대기 영상형' 그대로 노출** ✅. 편집 진입(더보기→수정) OK → step 0 상단 **기존 템플릿 안내 배너** 표시("이 콘텐츠는 기존 템플릿 **대기 영상형**(으)로 만들어졌습니다. 그대로 저장하면 유지되며…") ✅, 카드 4종 중 **선택됨 없음**(현재 key=idle_touch_video 는 4종 밖) → 다른 4종 선택 시 변경 가능 ✅. **저장하지 않고 목록 복귀 → template key 유지**(총 12건·대기 영상형 세트 불변) — 자동 변환 0 ✅.
+- [x] **legacy 공개 렌더 보존**: 편집 진입 미리보기가 idle_touch_video hero("화면을 터치하여 자세히 보세요 / Touch to explore" + 코너 콘텐츠 5카드) 정상 렌더 ✅ (kiosk `isIdleTouch` 유지).
+- [x] **보호 샘플·current 무변경**: 편집 진입만 하고 **저장 안 함**(read-only 확인), DB write 0. 총 12건·구강/피부 세트 불변 ✅.
+- [x] **오류 0**: console error = 초기 auth 부트스트랩 `/auth/me` 401 1건뿐(benign 크로스서비스). pageerror 0, 예상 외 API 오류 0. migration/일괄 변경 0 ✅.
 
 ## 7. 변경 파일
 
@@ -78,3 +81,7 @@ services/web-kpa-society/src/pages/pharmacy/TabletContentLibraryList.tsx (필터
 | template key 자동 변경 | ❌ (미선택 시 유지, 자동 변환 0) |
 | 신규 옵션 숨기려 공개 렌더 호환 제거 필요 | ❌ (kiosk isIdleTouch 유지) |
 | 다른 템플릿에서 대기 화면 단계 사라짐 | ❌ (BUILDER_STEPS '대기 화면' 유지) |
+
+---
+
+*신규 제작 템플릿에서 대기 영상형(idle_touch_video) 제거 — SELECTABLE_TEMPLATE_OPTIONS(4종) / TEMPLATE_OPTIONS(legacy 5종) 분리, 필터 hiddenTemplateFilterKeys. legacy 편집 진입 안내 배너 + 자동 변환 0. 서버 whitelist·kiosk 렌더러·screen-content-core 불변. tsc 0·프로덕션 브라우저 실검증 PASS(신규 4종·필터 4종·legacy 편집 진입·공개 렌더·write 0). commit 734ca208a.*
