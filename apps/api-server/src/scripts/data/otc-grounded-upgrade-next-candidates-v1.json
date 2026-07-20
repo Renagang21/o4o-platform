@@ -1,0 +1,960 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-NEXT-CANDIDATES-AUDIT-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "track": "A (grounded upgrade: e약은요 canonical → authored canonical 교체)",
+  "basis": "bridge full-content fingerprint (fingerprintOf 정본 verbatim) — coarse 그룹을 fp 별로 분리, authored그대로확장 fp-group 만 추출",
+  "excludedPilot": {
+    "groupKey": "에르도스테인|300밀리그램|정",
+    "fp": "4b4e162690065e8e",
+    "note": "이미 26건 LIVE 승격"
+  },
+  "poolSize": 9,
+  "top10Fps": [
+    {
+      "fp": "ffde8a6e2c347eb3",
+      "pharmKey": "ing:아스피린|100밀리그램|정|oral",
+      "bridge_n": 67
+    },
+    {
+      "fp": "7a4aab0b31b1ed19",
+      "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral",
+      "bridge_n": 66
+    },
+    {
+      "fp": "13208b062a9c8c79",
+      "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+      "bridge_n": 56
+    },
+    {
+      "fp": "e0a551d8020daa5c",
+      "pharmKey": "ing:디오스민|300밀리그램|캡슐|oral",
+      "bridge_n": 38
+    },
+    {
+      "fp": "83bcf192525baa16",
+      "pharmKey": "ing:로라타딘|10밀리그램|정|oral",
+      "bridge_n": 38
+    },
+    {
+      "fp": "879d80e7afe2d0f4",
+      "pharmKey": "ing:알벤다졸|400밀리그램|정|oral",
+      "bridge_n": 38
+    },
+    {
+      "fp": "b08e3e7b13e8836f",
+      "pharmKey": "ing:알마게이트|500밀리그램|정|oral",
+      "bridge_n": 37
+    },
+    {
+      "fp": "f4c610df21cf32ef",
+      "pharmKey": "ing:트리메부틴말레산염|150밀리그램|정|oral",
+      "bridge_n": 28
+    },
+    {
+      "fp": "5f1cb691ae1d06e8",
+      "pharmKey": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+      "bridge_n": 27
+    },
+    {
+      "fp": "4b4e162690065e8e",
+      "pharmKey": "ing:에르도스테인|300밀리그램|정|oral",
+      "bridge_n": 26
+    }
+  ],
+  "candidates": [
+    {
+      "pharmKey": "ing:아스피린|100밀리그램|정|oral",
+      "groupKey": "아스피린|100밀리그램|정",
+      "targetFp": "ffde8a6e2c347eb3",
+      "sample": "린아스장용정(아스피린)",
+      "route": "oral",
+      "atc": "B01AC06",
+      "bridge_n": 67,
+      "coarseTotal": 105,
+      "target_master": 67,
+      "target_reproduced": true,
+      "nonTarget_excluded": 38,
+      "fpDistribution": [
+        {
+          "fp": "ffde8a6e2c347eb3",
+          "n": 67,
+          "target": true
+        },
+        {
+          "fp": "b71fa082dd59b46e",
+          "n": 9,
+          "target": false
+        },
+        {
+          "fp": "907e7f34c63bad46",
+          "n": 8,
+          "target": false
+        },
+        {
+          "fp": "c661050c883ab11d",
+          "n": 8,
+          "target": false
+        },
+        {
+          "fp": "d5104ef91945e9b1",
+          "n": 6,
+          "target": false
+        },
+        {
+          "fp": "e2256a43b635e15a",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "25545ae248fbf970",
+          "n": 3,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 67,
+      "easyCanonicalTotal": 67,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": true,
+      "authored_source_ref_id": "0052dc6c-639a-400b-b7a3-144d84ae5c14",
+      "authored_draft_count": 1,
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "민감 약효군"
+      ],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 67,
+        "STEP_B_easy_canonical_demote": 67,
+        "STEP_B_authored_canonical_flip": 67,
+        "audit_log_canonical_replaced": 67,
+        "SPD_write_total": 201,
+        "audit_write_total": 67,
+        "grand_total": 268
+      },
+      "rollback_master_ids": "[67 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:트리메부틴말레산염|100밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "targetFp": "7a4aab0b31b1ed19",
+      "sample": "트리엠정100밀리그램(트리메부틴말레산염)",
+      "route": "oral",
+      "atc": "A03AA05",
+      "bridge_n": 66,
+      "coarseTotal": 127,
+      "target_master": 66,
+      "target_reproduced": true,
+      "nonTarget_excluded": 61,
+      "fpDistribution": [
+        {
+          "fp": "7a4aab0b31b1ed19",
+          "n": 66,
+          "target": true
+        },
+        {
+          "fp": "1ca482b8150f601b",
+          "n": 12,
+          "target": false
+        },
+        {
+          "fp": "388fc082fcc5203c",
+          "n": 11,
+          "target": false
+        },
+        {
+          "fp": "306ce8c4a6793871",
+          "n": 9,
+          "target": false
+        },
+        {
+          "fp": "c9c0d242a5e4a273",
+          "n": 7,
+          "target": false
+        },
+        {
+          "fp": "0e81c56580ba2501",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "4b629892ee85ba89",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "ab9bf22ae1e54918",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "4d59ddd48b0e1102",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "890ef511d4d823e8",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "8567020910ac8454",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "f276b94cff37e58f",
+          "n": 2,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 66,
+      "easyCanonicalTotal": 66,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "003beef8-82c4-4897-a176-d0ea8a695699",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 66,
+        "STEP_B_easy_canonical_demote": 66,
+        "STEP_B_authored_canonical_flip": 66,
+        "audit_log_canonical_replaced": 66,
+        "SPD_write_total": 198,
+        "audit_write_total": 66,
+        "grand_total": 264
+      },
+      "rollback_master_ids": "[66 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "targetFp": "13208b062a9c8c79",
+      "sample": "비스칸엔캡슐(바실루스리케니포르미스균)",
+      "route": "oral",
+      "atc": "A07FA01",
+      "bridge_n": 56,
+      "coarseTotal": 88,
+      "target_master": 56,
+      "target_reproduced": true,
+      "nonTarget_excluded": 32,
+      "fpDistribution": [
+        {
+          "fp": "13208b062a9c8c79",
+          "n": 56,
+          "target": true
+        },
+        {
+          "fp": "085e66182ccb8459",
+          "n": 6,
+          "target": false
+        },
+        {
+          "fp": "14860d74206f81f7",
+          "n": 6,
+          "target": false
+        },
+        {
+          "fp": "7ed92e6bd2891a28",
+          "n": 5,
+          "target": false
+        },
+        {
+          "fp": "a024d7fa8eaabc06",
+          "n": 5,
+          "target": false
+        },
+        {
+          "fp": "b97a4eb486a66e60",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "273d81582c3dcd4e",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "8f001c52affcd167",
+          "n": 3,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 56,
+      "easyCanonicalTotal": 56,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 56,
+        "STEP_B_easy_canonical_demote": 56,
+        "STEP_B_authored_canonical_flip": 56,
+        "audit_log_canonical_replaced": 56,
+        "SPD_write_total": 168,
+        "audit_write_total": 56,
+        "grand_total": 224
+      },
+      "rollback_master_ids": "[56 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:디오스민|300밀리그램|캡슐|oral",
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "targetFp": "e0a551d8020daa5c",
+      "sample": "마더스민캡슐(디오스민)",
+      "route": "oral",
+      "atc": "C05CA03",
+      "bridge_n": 38,
+      "coarseTotal": 45,
+      "target_master": 38,
+      "target_reproduced": true,
+      "nonTarget_excluded": 7,
+      "fpDistribution": [
+        {
+          "fp": "e0a551d8020daa5c",
+          "n": 38,
+          "target": true
+        },
+        {
+          "fp": "21bd2e89cb9d1b1b",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "2c027163aef221c8",
+          "n": 3,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 38,
+      "easyCanonicalTotal": 38,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 38,
+        "STEP_B_easy_canonical_demote": 38,
+        "STEP_B_authored_canonical_flip": 38,
+        "audit_log_canonical_replaced": 38,
+        "SPD_write_total": 114,
+        "audit_write_total": 38,
+        "grand_total": 152
+      },
+      "rollback_master_ids": "[38 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:로라타딘|10밀리그램|정|oral",
+      "groupKey": "로라타딘|10밀리그램|정",
+      "targetFp": "83bcf192525baa16",
+      "sample": "클라리틴정(로라타딘)",
+      "route": "oral",
+      "atc": "R06AX13",
+      "bridge_n": 38,
+      "coarseTotal": 41,
+      "target_master": 38,
+      "target_reproduced": true,
+      "nonTarget_excluded": 3,
+      "fpDistribution": [
+        {
+          "fp": "83bcf192525baa16",
+          "n": 38,
+          "target": true
+        },
+        {
+          "fp": "168c9fc2508b87da",
+          "n": 3,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 38,
+      "easyCanonicalTotal": 38,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "0a7dee0b-e578-4015-967a-fad092071eef",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 38,
+        "STEP_B_easy_canonical_demote": 38,
+        "STEP_B_authored_canonical_flip": 38,
+        "audit_log_canonical_replaced": 38,
+        "SPD_write_total": 114,
+        "audit_write_total": 38,
+        "grand_total": 152
+      },
+      "rollback_master_ids": "[38 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:알벤다졸|400밀리그램|정|oral",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "targetFp": "879d80e7afe2d0f4",
+      "sample": "젠타졸정(알벤다졸)",
+      "route": "oral",
+      "atc": "P02CA03",
+      "bridge_n": 38,
+      "coarseTotal": 92,
+      "target_master": 38,
+      "target_reproduced": true,
+      "nonTarget_excluded": 54,
+      "fpDistribution": [
+        {
+          "fp": "879d80e7afe2d0f4",
+          "n": 38,
+          "target": true
+        },
+        {
+          "fp": "160f299c7741cdfa",
+          "n": 19,
+          "target": false
+        },
+        {
+          "fp": "10384de1b4730be8",
+          "n": 17,
+          "target": false
+        },
+        {
+          "fp": "28d29201cd57742b",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "44ef883e752951ce",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "7da304f9b51043b3",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "12dd978c6a15f077",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "4bc58b995fe73f97",
+          "n": 3,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 38,
+      "easyCanonicalTotal": 38,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "0178f85b-94d7-4ac9-a061-ac4c2d9ad750",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 38,
+        "STEP_B_easy_canonical_demote": 38,
+        "STEP_B_authored_canonical_flip": 38,
+        "audit_log_canonical_replaced": 38,
+        "SPD_write_total": 114,
+        "audit_write_total": 38,
+        "grand_total": 152
+      },
+      "rollback_master_ids": "[38 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:알마게이트|500밀리그램|정|oral",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "targetFp": "b08e3e7b13e8836f",
+      "sample": "한미알마게이트정500밀리그램(알마게이트)",
+      "route": "oral",
+      "atc": "A02AD03",
+      "bridge_n": 37,
+      "coarseTotal": 124,
+      "target_master": 37,
+      "target_reproduced": true,
+      "nonTarget_excluded": 87,
+      "fpDistribution": [
+        {
+          "fp": "b08e3e7b13e8836f",
+          "n": 37,
+          "target": true
+        },
+        {
+          "fp": "da3a46edb73780c3",
+          "n": 18,
+          "target": false
+        },
+        {
+          "fp": "081db4afdf104715",
+          "n": 14,
+          "target": false
+        },
+        {
+          "fp": "6efc5656c935af21",
+          "n": 7,
+          "target": false
+        },
+        {
+          "fp": "8a5c24ed7ab7bb90",
+          "n": 7,
+          "target": false
+        },
+        {
+          "fp": "0165936088bfcaa7",
+          "n": 5,
+          "target": false
+        },
+        {
+          "fp": "28b6c02e9e086790",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "83468fcb10c930aa",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "8756eb34abe2d6d2",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "5815a604cf518c6a",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "5b53bf6a3de859dd",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "73c83c801de51129",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "d7e0734264663065",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "56efd9c169329676",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "6f4a3a2de951b186",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "aa11b369fdd7268c",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "dc552be816d2403a",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "eb4fa0d16182826f",
+          "n": 2,
+          "target": false
+        },
+        {
+          "fp": "fc5e9901df83108d",
+          "n": 2,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 37,
+      "easyCanonicalTotal": 37,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "01a231cd-b471-4d93-8071-b271f8c4627d",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 37,
+        "STEP_B_easy_canonical_demote": 37,
+        "STEP_B_authored_canonical_flip": 37,
+        "audit_log_canonical_replaced": 37,
+        "SPD_write_total": 111,
+        "audit_write_total": 37,
+        "grand_total": 148
+      },
+      "rollback_master_ids": "[37 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:트리메부틴말레산염|150밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "targetFp": "f4c610df21cf32ef",
+      "sample": "트리멘정(트리메부틴말레산염)",
+      "route": "oral",
+      "atc": "A03AA05",
+      "bridge_n": 28,
+      "coarseTotal": 49,
+      "target_master": 28,
+      "target_reproduced": true,
+      "nonTarget_excluded": 21,
+      "fpDistribution": [
+        {
+          "fp": "f4c610df21cf32ef",
+          "n": 28,
+          "target": true
+        },
+        {
+          "fp": "f38569d82d11e1e3",
+          "n": 6,
+          "target": false
+        },
+        {
+          "fp": "5d0f4525dc4e59a4",
+          "n": 4,
+          "target": false
+        },
+        {
+          "fp": "9e942b7fc499581a",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "afd4c9b27d3e2543",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "be9514b40da07abf",
+          "n": 3,
+          "target": false
+        },
+        {
+          "fp": "ed411d6f9dda8b53",
+          "n": 2,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 28,
+      "easyCanonicalTotal": 28,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "00f0325a-c5a4-4d3c-b900-1774a24509f5",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 28,
+        "STEP_B_easy_canonical_demote": 28,
+        "STEP_B_authored_canonical_flip": 28,
+        "audit_log_canonical_replaced": 28,
+        "SPD_write_total": 84,
+        "audit_write_total": 28,
+        "grand_total": 112
+      },
+      "rollback_master_ids": "[28 ids — top3 에만 전개]"
+    },
+    {
+      "pharmKey": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "targetFp": "5f1cb691ae1d06e8",
+      "sample": "파인싹연질캡슐(클로닉신리시네이트)",
+      "route": "oral",
+      "atc": "M01AX",
+      "bridge_n": 27,
+      "coarseTotal": 29,
+      "target_master": 27,
+      "target_reproduced": true,
+      "nonTarget_excluded": 2,
+      "fpDistribution": [
+        {
+          "fp": "5f1cb691ae1d06e8",
+          "n": 27,
+          "target": true
+        },
+        {
+          "fp": "4fa9e63b65c211ad",
+          "n": 2,
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 27,
+      "easyCanonicalTotal": 27,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "nonOralInTarget": [],
+      "sensitive": false,
+      "authored_source_ref_id": "03de1849-7d18-4ea4-8896-63a3658540c4",
+      "authored_draft_count": 1,
+      "verdict": "READY",
+      "excludeReasons": [],
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 27,
+        "STEP_B_easy_canonical_demote": 27,
+        "STEP_B_authored_canonical_flip": 27,
+        "audit_log_canonical_replaced": 27,
+        "SPD_write_total": 81,
+        "audit_write_total": 27,
+        "grand_total": 108
+      },
+      "rollback_master_ids": "[27 ids — top3 에만 전개]"
+    }
+  ],
+  "top3": [
+    {
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "targetFp": "7a4aab0b31b1ed19",
+      "sample": "트리엠정100밀리그램(트리메부틴말레산염)",
+      "atc": "A03AA05",
+      "승격대상_master": 66,
+      "coarseTotal": 127,
+      "편입제외_nonTarget": 61,
+      "authored_source_ref_id": "003beef8-82c4-4897-a176-d0ea8a695699",
+      "easyCanonicalExactly1": 66,
+      "authoredConflict": 0,
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 66,
+        "STEP_B_easy_canonical_demote": 66,
+        "STEP_B_authored_canonical_flip": 66,
+        "audit_log_canonical_replaced": 66,
+        "SPD_write_total": 198,
+        "audit_write_total": 66,
+        "grand_total": 264
+      },
+      "rollback_master_ids": [
+        "07827403-4bba-49f1-a400-6308da821e64",
+        "0a9120e5-6b1a-4242-a9f9-91a7ff921678",
+        "0c2d1668-e41a-4ed3-857b-a8e61d36aef5",
+        "0d3ab47f-8141-4d4a-b14c-391e4dcbcab4",
+        "0f935d73-cd44-4c63-9260-a610de0cb26c",
+        "1622a12b-c0e5-496b-b708-10f6f73c8778",
+        "1ac6f7b5-700f-4d49-aacf-03e3a9168736",
+        "1f080814-6c79-444c-9f37-f337bc5a9510",
+        "21de552e-8b50-4d5d-8051-7a6ed18f9239",
+        "21e770d9-af29-439c-a276-6aabab9c0759",
+        "2319ca7e-f89f-4e06-be7f-36b7f6f4354c",
+        "313a17d4-ab9b-474d-becd-29722ebef55a",
+        "3630e1a8-2e52-41ad-8f68-f8ad35a0f9fb",
+        "37b40523-d8f6-4257-8908-1fc9f7e706ac",
+        "3f1f844f-cc55-4914-8623-f3ede8f8e27d",
+        "3fc0c40c-2402-4c2f-9ee2-07523d311cf4",
+        "408954bc-19af-45bb-bd19-0b445320e0cd",
+        "434bf57f-80d1-4d92-85ff-f6f8fc5d462f",
+        "480fe4cf-1c1e-4398-8709-29fcd6400a37",
+        "481d3c7c-9845-4934-8179-4bdf65ca0921",
+        "4a58cc0c-5a7f-4180-a64a-cd2874cfe3dc",
+        "4f9108f4-fb9b-4f15-825a-58e543f0c16a",
+        "5407f8e5-6ae2-4bfa-a630-fac9304cb41c",
+        "5528c178-2e20-4590-92f6-5bd0c31eda7d",
+        "5b08b273-1616-4705-aa22-6ed1e094329f",
+        "5cfdc16d-b5d7-4ea3-bfbb-1844d69eb963",
+        "63c6d2b8-e03b-477e-b898-8a788cd73e09",
+        "67da3f5b-6c62-4e25-9951-d03e605194ad",
+        "6bd04385-75a5-4b61-baa7-3f6e15b2ae37",
+        "6d82ed75-4bd0-48ee-8454-ab1ee897226a",
+        "7363eeed-6860-4954-9176-39e12ba21291",
+        "76c3be0e-1bc1-4cfc-ae6d-ea8e0af17e84",
+        "774a22d3-3b51-473e-84ee-737915a6fffd",
+        "7b1eee83-64b1-46fe-8d9a-796ae41f5d9f",
+        "7e0b7cd6-86fb-4ebc-befd-e14759cff91d",
+        "8276a916-4abe-4715-b215-45d7d827a329",
+        "83d3a052-dd8b-4204-a264-b03f20fd599e",
+        "880c3c58-e80f-4915-a3d0-e3d7539f8c84",
+        "8c10d340-761b-44b4-8aba-deb28c7d3fe3",
+        "8c8e20c0-dd75-43f3-a148-6520df0fd0e1",
+        "8cd6d662-2167-4169-8de8-8f22fd3d47d8",
+        "8e200452-4cb5-4a72-a919-610f3970f735",
+        "90dbe19d-5d57-46c0-aff0-ee03f32b4d64",
+        "938b3b7c-3a70-40ae-9e8c-0be0c4ee4564",
+        "9690aaef-ba7f-487f-a020-a8e9ae804386",
+        "970226e5-9fc3-45c6-8da2-895657b961b3",
+        "9b004d9e-fba2-4f72-a8b1-0078a17b1638",
+        "9dc0aa7f-64e0-4e75-b42a-5e160a69cb27",
+        "9ea6ab4b-2161-4f22-bbb2-522f662272f5",
+        "b4482c8a-b597-4a24-95d1-666b46fb5e24",
+        "ba4a4a74-69be-4483-874d-bb9b69c6a13e",
+        "bc207587-de81-4e02-859f-90a820e26048",
+        "bdaad5d4-9aa0-4693-b1ce-3ee89b495392",
+        "bf7b7ace-a1c8-4c6b-8d9f-3636dc1d633c",
+        "c05da0bc-25c5-4de3-8070-4766d9e34dd2",
+        "c066dbda-3de0-402d-a534-6f505f74584c",
+        "c746989c-d106-43b5-84d9-e7eae7d81083",
+        "c9194544-8be8-4002-a395-2a4a59e997a7",
+        "d11b5d02-26c0-4569-8fcd-abf819296cba",
+        "d3438bb1-a9b2-4884-8fe7-bbd7bf9396c5",
+        "dbc3075d-186d-410b-9bd7-f4e34ccbfd4e",
+        "df10721a-7df9-4bb5-b755-b22b92d44458",
+        "e634ea75-53e9-4387-8d91-55ff02c3ea57",
+        "e63d4cc5-13b9-404d-b90f-9fca55e24f29",
+        "f582d260-45ec-4508-93ca-35ce77352973",
+        "fa9dfe35-6004-4645-a401-6acc52ebdb69"
+      ]
+    },
+    {
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "targetFp": "13208b062a9c8c79",
+      "sample": "비스칸엔캡슐(바실루스리케니포르미스균)",
+      "atc": "A07FA01",
+      "승격대상_master": 56,
+      "coarseTotal": 88,
+      "편입제외_nonTarget": 32,
+      "authored_source_ref_id": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+      "easyCanonicalExactly1": 56,
+      "authoredConflict": 0,
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 56,
+        "STEP_B_easy_canonical_demote": 56,
+        "STEP_B_authored_canonical_flip": 56,
+        "audit_log_canonical_replaced": 56,
+        "SPD_write_total": 168,
+        "audit_write_total": 56,
+        "grand_total": 224
+      },
+      "rollback_master_ids": [
+        "026e60f9-572e-4b76-9995-182a7151d21e",
+        "0ac1c319-1362-4bb2-9199-a93d497bd30d",
+        "0e91ba2a-6476-4e42-881f-3adf3ddd2749",
+        "115596f0-c682-4e32-b319-94cd0d043a40",
+        "129c9fda-d2cc-4a11-9a2c-96388c569f83",
+        "145ef11a-2a1a-492d-9145-ee5185f71b89",
+        "1cdf9847-f6ae-4c72-a427-644d82fb5d50",
+        "1e9a24f2-71d9-4dbc-9729-6d9d7d7a4590",
+        "3496a8a7-6129-463b-9474-b09cad4e702e",
+        "39a84dcd-ee18-450c-a9d7-1b771088e774",
+        "405834e4-5628-44e0-9453-51aa84a5c17b",
+        "40bc28e7-3e06-4e98-b544-0d25f2e251e2",
+        "41ec0260-60c9-4d1e-901e-5833cb26ed5e",
+        "45990be8-e0f8-42bf-b39a-ec2b1c3990ae",
+        "45dc8f16-859c-47b2-bb5a-aef89867b6e9",
+        "5162f01a-e9b0-44cc-b6e5-668816f28cb0",
+        "5633358f-d566-4ea5-b937-8132c174be38",
+        "56d6d7ca-6078-44cc-8f8a-ceda9add1115",
+        "5779e0ba-2009-4ef7-ac9d-454bd8609751",
+        "59c183e9-3d82-4870-aa38-e04cdc37b679",
+        "5bb447f7-3039-422b-adb8-83a3e9ed444d",
+        "5fb4ee8e-fbfd-4689-ac6c-d43e045432e1",
+        "693536c4-3842-4b6c-9fd0-cf6a044e6738",
+        "73636c27-5e70-41f5-abb1-f15a229586ba",
+        "7c9cc632-98ef-4042-a296-b6a97ef5715a",
+        "7f0de5a0-f826-4f37-a5c3-46b51559d89b",
+        "7f760403-ec72-4f99-88b1-2136c54e43ee",
+        "8136e232-169e-4cb1-9c3a-4a2239f41944",
+        "828b13d9-80c8-41a7-9282-3402846337fe",
+        "82e71d7f-865e-4b7e-b2b9-c67d77f12863",
+        "840017c6-6aa7-4166-9ed7-30c3ab6c04cd",
+        "88e2198a-a568-4a3d-b123-004d8c584efc",
+        "8c63e8a3-4ab2-45e0-905e-cdcfe45c83ee",
+        "90b400cc-e7f9-47bf-9348-c1d745e94764",
+        "981f762e-2e53-4ac2-bd86-bdf73b03c0dc",
+        "9a3a3aab-d738-42c8-b605-0a966d301cfb",
+        "a0551f89-2cf8-487c-9cb5-e9e30c71a36e",
+        "b6c51f9e-cd65-4f8d-87c0-70e556f9f80a",
+        "c2adf58f-f80f-4f1b-a41f-fa04d0e5e952",
+        "cbfa6c94-3ec6-4b6d-85f3-1daac06119b9",
+        "cceed165-5ad7-4c6f-8cfc-f53847507061",
+        "d6af979e-3d8b-4fae-bbd5-ce0b2f215ddc",
+        "d8c00c88-3122-4095-9ef6-12d8701c7e8b",
+        "d9bdf3b9-abf3-46cb-82ef-c7f31957455b",
+        "e06133c1-e82b-48e4-b31a-fa9258d9f695",
+        "e28b9105-f474-4bd0-8148-1f0c93ffb8c1",
+        "e367be4b-d233-4570-b625-f1e9467dcfa7",
+        "e6140d7d-c504-42da-8b8e-6bbd511eb870",
+        "e6b46056-07ea-47c4-9327-63142c435e07",
+        "e6d1f5e7-0e4a-4fbb-9bfc-07c870bb4eeb",
+        "e962839b-0ae6-4a3a-95e9-98c0c0d80b27",
+        "ec4e60b8-0c26-4d3a-8f2c-a95c65816f62",
+        "f2c536ca-5315-4c4a-a29d-ee8ac8066dd9",
+        "f515c443-c572-494e-b0be-8b05767cd548",
+        "f8c47a36-6f30-492d-ad3f-2f3a4dc23b06",
+        "fbc4113f-a9e0-4ff6-97b6-0e980a4a1cda"
+      ]
+    },
+    {
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "targetFp": "e0a551d8020daa5c",
+      "sample": "마더스민캡슐(디오스민)",
+      "atc": "C05CA03",
+      "승격대상_master": 38,
+      "coarseTotal": 45,
+      "편입제외_nonTarget": 7,
+      "authored_source_ref_id": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+      "easyCanonicalExactly1": 38,
+      "authoredConflict": 0,
+      "예상write": {
+        "STEP_A_authored_needs_review_INSERT": 38,
+        "STEP_B_easy_canonical_demote": 38,
+        "STEP_B_authored_canonical_flip": 38,
+        "audit_log_canonical_replaced": 38,
+        "SPD_write_total": 114,
+        "audit_write_total": 38,
+        "grand_total": 152
+      },
+      "rollback_master_ids": [
+        "00b6fcde-f11f-49d3-888e-686b36dde384",
+        "0b11d6ba-0e3b-4f91-bf2c-b68845823e2d",
+        "1736ebe1-d2e2-4d8e-9af3-48e0fe90cf2c",
+        "18badbae-c9c5-41c3-a604-e814d0398f2a",
+        "1a9fdbce-510a-414c-9b7b-99d6d8e52d5f",
+        "20c5281a-8ff5-4ce6-b541-b994d5258129",
+        "22512377-b44c-4eff-ba83-5246b9ab3e0f",
+        "354cb53c-4dd2-4b9d-9229-230c68f2e618",
+        "47e100f7-69b6-4047-b15b-05c3f6b7da97",
+        "4b91914d-9afa-47cb-9dbf-63babf14ddd6",
+        "508b6096-cea5-4552-a645-a9409b51a5d1",
+        "535ef743-3afa-44ae-ab17-df3c13bbe265",
+        "5b2c4f12-6b89-4714-ae56-d3038a1eefcb",
+        "5b63226a-0483-4391-b9c9-b78d16df7657",
+        "6043112c-7335-47d5-be5b-4b9333ddad02",
+        "73e2dd53-d971-4fef-babe-32d223744adc",
+        "7ad8658c-8941-4666-99bf-8fac5e34ad3b",
+        "7d5c7b95-1ac5-4506-82d2-1602e792ad10",
+        "8019c63c-b2d7-485d-9e83-ca59fbe42090",
+        "853f770a-6825-4814-a487-46276d1e964f",
+        "86d29bd8-1268-4eeb-a63e-ca9e6bd0328e",
+        "928277a7-ffac-4b28-a7a6-4b0e72fbb558",
+        "9880fee9-66d5-4bbb-90fe-45046497b982",
+        "a53a65c8-f9bb-4dcd-8a09-74d45bdc9434",
+        "a55774ce-01ea-47ff-93cd-0210b98319c7",
+        "aaa9053d-763a-4d34-80c9-11ffae245594",
+        "adfff8c5-369b-48b7-9f71-f3cc69edf8cf",
+        "c1341008-3c55-4114-a993-45eba6814ab6",
+        "c45c8cd3-251b-4b2f-a1c9-bd5b7188e352",
+        "d445b491-170a-41f1-a0a7-636b2d623508",
+        "db547dcc-c612-464e-a55e-0c9ddb08ef78",
+        "dc9670f4-7546-4c80-9c05-a1361e909713",
+        "df3ebfc4-bbdc-411c-be46-5eb7a9474a04",
+        "e7acf94a-686e-4cab-a2cb-65e6c3a3b964",
+        "e8abd41d-f8bd-4fc8-a205-ceb61f13e678",
+        "f50539f2-e8a3-429c-9b97-6ae1d8909be7",
+        "fa0cd6f0-8cff-46f6-b366-7a51b31fa51b",
+        "fa204843-23d8-4650-84fd-f66a05d91748"
+      ]
+    }
+  ],
+  "summary": {
+    "READY": 8,
+    "EXCLUDED": 1,
+    "selected": 3
+  }
+}
