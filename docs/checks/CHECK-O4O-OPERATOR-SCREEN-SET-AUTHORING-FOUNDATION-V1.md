@@ -84,6 +84,8 @@ ALTER TABLE store_tablet_screen_sets ADD CONSTRAINT "CHK_stss_owner_by_origin" C
 ```
 - 장기적으로는 `organization_id nullable + owner_role/owner_id 또는 origin 기반 CHECK` 가 더 정합적 — **별도 설계 WO 에서 확정**(공급자 원본 확장 대비 포함).
 
+> **후속 설계 확정**: [`ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1`](../architecture/ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1.md) — 소유 주체(store/operator/supplier)별 유효 조합·주체별 컬럼·organization_id nullable·`CHK_stss_owner_scope`·주체별 API 격리·backfill 0 확정. 구현은 그 하위 migration/operator/supplier WO.
+
 ## 6. 조사 채널·안전
 
 - 프로덕션 DB **read-only SELECT/카탈로그 조회만**(cloud-sql-proxy:5442, o4o_api, o4o_platform). **write 0**.
