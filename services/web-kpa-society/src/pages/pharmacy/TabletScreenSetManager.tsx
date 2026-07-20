@@ -19,6 +19,12 @@ import {
   type ScreenSet, type ScreenSetDetail, type ScreenBlock, type ScreenBlockType, type ScreenSetStatus,
   type ContentListItem, type StoreContentSearchResult, type O4oDescriptionSearchResult,
 } from '../../api/tabletDisplays';
+// WO-O4O-SCREEN-CONTENT-CORE-PURE-CONTRACT-EXTRACTION-V1: 검증된 순수 콘텐츠 로직을 Core 에서 소비(로컬 중복 제거).
+//   타입은 tabletDisplays(API DTO) 를 그대로 쓰고, 순수 함수만 Core 로 대체(구조적 호환).
+import {
+  normalizeCornerBody, normalizeBlocks, ensureAutoBlocks, seedInitialBlocks,
+  contentItemKey, moveContentItem, removeContentItem, addContentItems, updateContentItem, isValidScreenSetName,
+} from '@o4o/screen-content-core';
 // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비(추출).
 import TabletContentLibraryList from './TabletContentLibraryList';
 // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 제작 셸 미리보기 = kiosk-core 뷰어 재사용(sections 주입 + embedded).
@@ -100,7 +106,7 @@ const BUILDER_STEPS: BuilderStepMeta[] = [
 
 // 업무 3항목이 사용하는 내부 블록 — 템플릿 선택 시 자동 확보(추가만. 기존 블록 삭제·재정렬 없음).
 //   product_list = 코너 진열 제품(코너별 운영에서 관리) · qr_guide = 모든 템플릿 메인 QR 원칙.
-const AUTO_BLOCK_TYPES: ScreenBlockType[] = ['idle_media', 'corner_description', 'content_list', 'product_list', 'qr_guide'];
+// AUTO_BLOCK_TYPES: @o4o/screen-content-core 에서 소비(로컬 정의 제거).
 
 // 코너 설명 예제 요청문.
 //   WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 코너 설명이 표준 편집기(HTML) + ContentRenderer 렌더로
@@ -167,22 +173,7 @@ export const templateLabel = (key: string | null | undefined) => templateMeta(ke
 
 // WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
 const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';
-// 블록 dirty 비교: 타입/표시여부/config + 순서만(서버 sort_order 는 위치 기반 재정규화 → 값 무시).
-const normalizeBlocks = (bs: ScreenBlock[]) =>
-  JSON.stringify(bs.map((b) => ({ t: b.blockType, e: b.isEnabled, c: b.config ?? {} })));
-
-function defaultConfig(type: ScreenBlockType): Record<string, unknown> {
-  switch (type) {
-    case 'idle_media': return { source: 'legacy_idle_playlist' };
-    case 'corner_description': return { title: '', body: '' };
-    case 'health_info': return { title: '', body: '' };
-    case 'staff_inquiry': return { message: '' };
-    case 'qr_guide': return { label: '', url: '' };
-    case 'product_list': return { source: 'legacy_tablet_displays' };
-    case 'content_list': return { items: [] };
-    default: return {};
-  }
-}
+// normalizeBlocks / defaultConfig: @o4o/screen-content-core 에서 소비(로컬 정의 제거).
 
 // WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 대기 화면 소스 선택 UI 제거 → IDLE_SOURCES 불필요.
 //   (콘텐츠마다 YouTube/Vimeo URL 1개만 사용. 저장은 custom_media.items[] 계약 그대로.)
@@ -403,29 +394,20 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
   //   저장 계약은 sourceType 2종뿐이라, store_content 가 'O4O 제공'인지 '매장 제작'인지는 저장값만으로 구분되지 않는다
   //   (구분은 kpa_store_contents.source_type — 목록은 그 값을 갖지 않는다). → 출처 중립 라벨을 쓴다.
   const sourceLabel = (t: string) => (t === 'o4o_product_description' ? '상품 매장용 상세설명서' : '가져온 콘텐츠');
-  const reindex = (arr: ContentListItem[]) => arr.map((it, idx) => ({ ...it, sortOrder: idx * 10 } as ContentListItem));
-  const upd = (i: number, patch: Partial<ContentListItem>) =>
-    onChange(items.map((it, idx) => (idx === i ? ({ ...it, ...patch } as ContentListItem) : it)));
-  const move = (i: number, dir: 'up' | 'down') => {
-    const t = dir === 'up' ? i - 1 : i + 1;
-    if (t < 0 || t >= items.length) return;
-    const next = [...items];
-    [next[i], next[t]] = [next[t], next[i]];
-    onChange(reindex(next));
-  };
+  // WO-O4O-SCREEN-CONTENT-CORE-PURE-CONTRACT-EXTRACTION-V1: content_list 순수 연산은 Core 소비(UI 부수효과만 로컬).
+  const upd = (i: number, patch: Partial<ContentListItem>) => onChange(updateContentItem(items, i, patch));
+  const move = (i: number, dir: 'up' | 'down') => onChange(moveContentItem(items, i, dir));
   const remove = (i: number) => {
     if (!window.confirm('이 추가 정보를 현재 태블릿 콘텐츠에서 삭제하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
-    // WO-...-EDIT-REMOVE-REORDER-USABILITY-V1: 현재 Screen Set 의 content_list 에서만 제거(원본 설명서·콘텐츠·Resource 불변).
-    onChange(reindex(items.filter((_, idx) => idx !== i)));
+    // 현재 Screen Set 의 content_list 에서만 제거(원본 설명서·콘텐츠·Resource 불변).
+    onChange(removeContentItem(items, i));
   };
   const add = (added: ContentListItem[], titles: Record<string, string>) => {
-    const seen = new Set(items.map(key2));
-    const fresh = added.filter((it) => !seen.has(key2(it)));
     setTitleHints((h) => ({ ...h, ...titles }));
-    onChange(reindex([...items, ...fresh]));
+    onChange(addContentItems(items, added));
     setPicking(false);
   };
-  const cardTitle = (it: ContentListItem) => it.displayTitle || titleHints[key2(it)] || sourceLabel(it.sourceType);
+  const cardTitle = (it: ContentListItem) => it.displayTitle || titleHints[contentItemKey(it)] || sourceLabel(it.sourceType);
   const btn = 'min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl inline-flex items-center justify-center gap-1';
 
   return (
@@ -448,7 +430,7 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
       ) : (
         <div className="space-y-2">
           {items.map((it, i) => {
-            const k = key2(it);
+            const k = contentItemKey(it);
             const open = expanded === k;
             return (
               <div key={k} className="rounded-xl border border-slate-200 bg-white p-3 space-y-2">
@@ -490,7 +472,7 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
       )}
       {picking && (
         <ContentPickerModal
-          existingKeys={new Set(items.map(key2))}
+          existingKeys={new Set(items.map(contentItemKey))}
           onClose={() => setPicking(false)}
           onAdd={add}
           baseSort={items.length * 10}
@@ -499,7 +481,7 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
     </div>
   );
 }
-const key2 = (it: ContentListItem) => (it.sourceType === 'o4o_product_description' ? `o4o:${it.masterId}:${it.language}` : `store:${it.contentId}`);
+// key2: @o4o/screen-content-core 의 contentItemKey 로 대체(로컬 정의 제거).
 
 // content 선택 모달 — 출처 탭(O4O 표준 / 매장 제작) + 검색 + 결과 추가.
 // WO-O4O-KPA-TABLET-TOUCH-FIRST-CONTENT-LIST-EDITOR-V1: 콘텐츠 선택 모달 터치 정비.
@@ -649,13 +631,7 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
 //   RichTextEditor.onChange 는 { html, json } 객체를 준다. corner_description.config.body 는 항상 HTML 문자열이어야
 //   한다(공개 렌더 str()·태블릿 ContentRenderer 계약). 과거 잘못된 연결로 body 에 { html, json } 객체가 들어왔을
 //   가능성을 읽기 경계에서 방어. 정규화는 여기(hydrate) 한 곳 + onChange(쓰기) 한 곳으로 끝낸다.
-export function normalizeCornerBody(body: unknown): string {
-  if (typeof body === 'string') return body;
-  if (body && typeof body === 'object' && 'html' in body && typeof (body as { html?: unknown }).html === 'string') {
-    return (body as { html: string }).html;
-  }
-  return '';
-}
+// normalizeCornerBody: @o4o/screen-content-core 에서 소비(로컬 정의 제거, 외부 소비처 없음).
 
 // WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.6:
 //   실제 공개 QR(PublicScreenSetViewer)은 대기 영상(idle_media)을 제외한다. draft 미리보기 endpoint 는
@@ -667,32 +643,7 @@ function stripIdleForMobilePreview(screen: TabletScreenResponse | null): TabletS
   return { ...screen, sections: secs.filter((s) => s?.blockType !== 'idle_media') } as TabletScreenResponse;
 }
 
-const seedInitialBlocks = (detail: ScreenSetDetail | null): ScreenBlock[] =>
-  detail
-    ? detail.blocks.map((b) =>
-        b.blockType === 'corner_description'
-          ? { ...b, config: { ...(b.config ?? {}), body: normalizeCornerBody((b.config ?? {}).body) } }
-          : { ...b, config: b.config ?? {} },
-      )
-    : [];
-
-/**
- * 업무 항목이 쓰는 내부 블록을 자동 확보한다(WO-...-BUSINESS-FIELDS-V1 "내부 블록은 템플릿 선택 시 자동 준비").
- *  - **추가만** 한다. 기존 블록의 순서·설정·표시여부를 바꾸거나 삭제하지 않는다(보호 샘플 안전).
- *  - qr_guide 는 사용자에게 노출되지 않으므로 신규 생성 시 기본 라벨을 넣는다(빈 라벨이면 공개 화면에서 QR 섹션이 사라짐).
- */
-const ensureAutoBlocks = (blocks: ScreenBlock[]): ScreenBlock[] => {
-  const missing = AUTO_BLOCK_TYPES.filter((t) => !blocks.some((b) => b.blockType === t));
-  if (missing.length === 0) return blocks;
-  const added = missing.map((t, i) => ({
-    blockType: t,
-    sortOrder: blocks.length + i,
-    isEnabled: true,
-    config: t === 'qr_guide' ? { label: '모바일로 더 보기', url: '' } : defaultConfig(t),
-  }));
-  return [...blocks, ...added];
-};
-
+// seedInitialBlocks / ensureAutoBlocks: @o4o/screen-content-core 에서 소비(로컬 정의 제거).
 
 function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
   initialDetail: ScreenSetDetail | null;
@@ -795,7 +746,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     setBlocks((prev) => prev.map((b) => (b.blockType === t ? { ...b, config: cfg } : b)));
   const configOf = (t: ScreenBlockType): any => (blocks[blockIndex(t)]?.config ?? {});
 
-  const nameValid = name.trim().length > 0;
+  const nameValid = isValidScreenSetName(name);
 
   // ── 코너 설명 작성 보조 (WO-...-BUSINESS-FIELDS-V1) ──
   //   공개 뷰어가 본문을 평문 렌더 → HTML 생성 프롬프트(ContentCreationGuideModal 의 store/operator 모드)는 부적합.
