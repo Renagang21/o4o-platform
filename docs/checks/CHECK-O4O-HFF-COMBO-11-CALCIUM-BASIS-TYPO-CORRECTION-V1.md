@@ -81,4 +81,28 @@
 
 ---
 
-*read-only · DB write 0 · generate/dry-run/apply 미실행. 교정은 승인·이중게이트 후.*
+## 7. 교정 실행 기록 (Agent B · 2026-07-20 · COMMIT LIVE)
+
+§6 교정안을 승인·이중게이트 후 실행 완료. **DB write 4 · COMMIT.**
+
+| 단계 | 스크립트 | 실측 |
+|------|----------|------|
+| 1. normalization | `hff-11-ca-basis-normalize.ts` (source-level, DB write 0) | 칼슘 라인 `1,1500mg→1,500mg` 단일 치환. 가드: `1,1500` 전체 1회·칼슘 라인 한정 / 교정후 `1,500mg` 5회 / BASE_STANDARD 외 필드 불변 |
+| 2. select 재실행 | `hff-combo-select` (`--source file`, corrected 단일 stmt) | ELIGIBLE **1** · HOLD 0. 5원료 basis 전부 1500(칼슘 300/1500mg) |
+| 3. target 고정 | — | **1건** (stmt 2020000997275) |
+| 4. generate·Guard | `hff-combo-generate` | PASS **1** · REVIEW 0 · BLOCKED 0 · G-MULTI 0. `PRE-SRC-BASIS-MISMATCH-002` 해소. 초안 오기 문자열 0 |
+| 5. dry-run | `hff-nutrient-store-canonical-apply` (slug `mg-vd-vk-zn-ca`) | postVerifyPass ✓ · 예상=실측 4 · canonicalDup 0 |
+| 6. ROLLBACK | — | dry-run DB write 0 |
+| 7. COMMIT | `--apply` (이중게이트 `HFF_NUTRIENT_APPLY_CONFIRM=YES`) | **완료** — ProductMaster 1 · candidate UPDATE 1 · STORE SPD ko 1 · en 1 = **4** |
+
+### 독립 사후검증 (`hff-11-ca-postverify.ts` · fresh read)
+- ProductMaster `6c0e9b59-b7a7-4ebf-8a62-5e3a41d084a3` · ACTIVE · `건강기능식품` · mfds_permit `2020000997275` · tag `batch:single-nutrient-mg-vd-vk-zn-ca`
+- STORE SPD ko/en 둘 다 `canonical`·`o4o_hff_generated` · **has_typo=false** · **칼슘 basis 300mg/1500mg OK**
+- candidate `pending → approved_new_master` (matched)
+- **#11 그룹 masters 15 → 16 · 복합형 LIVE 572 → 573 · 기존 LIVE 무영향**
+
+리스크 판정(§6 "낮음") 그대로 실현 — 신규 basis/원료/제형/Guard 0, 단건.
+
+---
+
+*조사(§1~6) read-only. §7 교정은 승인·이중게이트(dry-run→독립검증) 후 COMMIT 실행 완료.*
