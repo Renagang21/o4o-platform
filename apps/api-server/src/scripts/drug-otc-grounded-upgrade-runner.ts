@@ -275,6 +275,44 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-trimebutine-150mg-jeong',
   },
+  // 브로멜라인 100mg 정 — Track A(WO-O4O-OTC-BROMELAIN-100MG-KO-EN-COMPLETE-DA-V1 · 에이전트 다).
+  //   next-batch 감사(GA) evaluatedSummary: targetFp f79d8c596f934095 · READY · target 22 · bridge 22.
+  //   coarse 115(name LIKE %(브로멜라인), dose=100밀리그램, name LIKE %정%) → target 22 + 비대상 93.
+  //   excludeFp 는 dry-run fpDistribution 하베스트로 확정(아래 배열). 45mg 그룹(candidate 11b41481…)과 별개 함량 — 미접촉.
+  'bromelain-100mg-jeong': {
+    key: '브로멜라인|100밀리그램|정',
+    ingredient: '브로멜라인',
+    dose: '100밀리그램',
+    formKeyword: '정',
+    candidate: '0308eaa4-7c2d-4ca1-95b7-aae82d767f0a',
+    targetFp: 'f79d8c596f934095',
+    excludeFp: [
+      'a997a1bd77c64270', '4ffd591092293d99', 'bbbe8ddddb8e96fe', 'f9bdc85b3da537f8',
+      'b196c68bba8f3eea', 'ad96bdaf17dd292b', 'ef7094954139bcca', '5c6160b5bc6fc5bb',
+      '9b1526fc3dd4b79f', '51043688afc1b422', '53ae867c6036e430',
+    ], // 비대상 11 fp = 16+9+6+6+6+5+4+4+3+3+2 = 64 (전부 oral, 안전지문불일치). fp-harvest 확정.
+    expected: 22,
+    excludedExpected: 64,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-bromelain-100mg-jeong',
+  },
+  // 클로닉신리시네이트 125mg 정 — Track A(WO-O4O-OTC-CLONIXIN-125MG-TABLET-KO-EN-COMPLETE-GA-V1 · 에이전트 가).
+  //   125mg 연질캡슐 그룹(clonixin-125mg-softcap)과 별개 groupKey(제형 축 상이). 감사 fp-probe(2026-07-20) 기준.
+  //   coarse(easy SPD 보유) 51 = target 단일 fp 26 + 비대상 2 fp 25(other 0). 이미 authored 29 는 easy SPD 부재로 coarse 밖(충돌 0).
+  //   비대상 2 fp = 20(84b185d4) + 5(4374e598) = 25.
+  'clonixin-125mg-jeong': {
+    key: '클로닉신리시네이트|125밀리그램|정',
+    ingredient: '클로닉신리시네이트',
+    dose: '125밀리그램',
+    formKeyword: '정',
+    candidate: '01994863-920a-45ea-97d1-f493416cafa7',
+    targetFp: '30552579b0a3088e',
+    excludeFp: ['84b185d46ada5a83', '4374e59805caee92'], // 비대상 2 fp = 20 + 5 = 25
+    expected: 26,
+    excludedExpected: 25,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-clonixin-125mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

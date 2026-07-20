@@ -132,6 +132,31 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-trimebutine-150mg-v1.json',
     outBase: 'otc-en-complete-trimebutine-150mg',
   },
+  // 클로닉신리시네이트 125mg 정 (WO-O4O-OTC-CLONIXIN-125MG-TABLET-KO-EN-COMPLETE-GA-V1 · 에이전트 가)
+  //   125mg 연질캡슐(source_ref 03de1849, md5 d359211f)과 별개 제형. source_ref 01994863 = 55 ko 공유(26 target + 29 out).
+  //   out29 이미 en canonical LIVE(md5 67144df2, summary null). 26 ko == 29 ko(동일 약물, md5 c1c0bede) → out29 en 재사용.
+  //   struct 는 bulk batch-01 번역에서 채택(build md5 == live out en byte-identical). 26 master_id 스코프(source_ref 스코프 금지).
+  'clonixin-125mg-jeong': {
+    key: '클로닉신리시네이트|125밀리그램|정',
+    candidate: '01994863-920a-45ea-97d1-f493416cafa7',
+    sourceType: 'mfds_drug_otc', expected: 26,
+    koRunBase: 'otc-grounded-upgrade-clonixin-125mg-jeong',
+    translationFile: 'otc-en-translations-clonixin-125mg-jeong-v1.json',
+    outBase: 'otc-en-complete-clonixin-125mg-jeong',
+  },
+  // 브로멜라인 100mg 정 (WO-O4O-OTC-BROMELAIN-100MG-KO-EN-COMPLETE-DA-V1 · 에이전트 다)
+  //   source_ref 0308eaa4 = 51 ko 공유(22 target + 29 out). out29 이미 en canonical LIVE(md5 4d4f202f).
+  //   22 ko == 29 ko(동일 약물, ko md5 ad63397c) → out29 en 재구성(otc-en-translations-v1.json 동일 groupKey 발췌).
+  //   build == live out29 en byte-identical 게이트로 새 medical fact 0 증명. 22 master_id 스코프(source_ref 스코프 금지).
+  //   45mg 그룹(source_ref 11b41481)과 별개 함량 — 미접촉.
+  'bromelain-100mg-jeong': {
+    key: '브로멜라인|100밀리그램|정',
+    candidate: '0308eaa4-7c2d-4ca1-95b7-aae82d767f0a',
+    sourceType: 'mfds_drug_otc', expected: 22,
+    koRunBase: 'otc-grounded-upgrade-bromelain-100mg-jeong',
+    translationFile: 'otc-en-translations-bromelain-100mg-v1.json',
+    outBase: 'otc-en-complete-bromelain-100mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {
