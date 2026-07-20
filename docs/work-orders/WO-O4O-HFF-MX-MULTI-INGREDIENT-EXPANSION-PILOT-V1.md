@@ -76,3 +76,14 @@
 - **apply(COMMIT, 사용자 승인)** → **독립검증(새 연결)** PASS: appliedProducts 20 · totalWrites 80 · canonicalDup 0 · candidateLinks 20 · spdSourceRefLinks 40. 기존 복합형 baseline **421 무변경**(lu-va 7 PAUSED 포함) → **복합형 누적 421 → 441**.
 - tag `batch:single-nutrient-mg-mn-vd-zn-ca`. rollback manifest 저장(20 master + 40 SPD + 20 candidate snapshot). 산출: `docs/checks/data/product-description-guard/hff-combo-mg-mn-vd-zn-ca.json` + drafts `docs/guides/products/health-functional-food/production-combo/mg-mn-vd-zn-ca/drafts/`.
 - **다음**: 헤드라인 B-complex 완전형 N8(49) — Agent A 확정 후 착수(8-카드 세로 스택 시각 스모크 동반). lut-va(lu-va) `PAUSED_GROUP_DEFECT` 유지.
+
+### higher-N 헤드라인 LIVE (Agent B) — 비타민B 컴플렉스 N8 43건 + Guard 버그수정
+
+- 기준·검수: Agent A `CHECK-O4O-HFF-HIGHER-N-TOP3-REVIEW-A-V1`(`ecd484c31`), READY_WITH_HOLD 43/6.
+- **대상 정제**: select 실측 mention 558 · **ELIGIBLE 43**(Agent A와 정확 일치) · grounding HOLD 6 + HOLD_MULTI 509. HOLD∩target 교차검증 overlap 0. 신규 원료/basis/제형 0(tablet 34·capsule 6·powder 2·softgel 1).
+- **공통 Guard 버그수정(승인)**: generate 초회 3건이 `G-MULTI-AMOUNT-SOURCE` 오탐 HOLD → 원인 = 라벨 정규식 `비타민B1`(`/비타민\s?B\s?1/`)이 `비타민B12`에 오매칭(단어경계 부재). B1+B12 **최초 공존 배치**라 잠복버그 표면화. `\b` 추가(`/비타민\s?B\s?1\b/`, select CLS와 정합)로 **43/43 통과**. 회귀: B 함유 유일 기존배치 ms-b126(B12無) 재generate 불변(PASS 7·G-MULTI HOLD 0). 커밋 `8b100389a`. B1 단독·타 로직 무변경(CLAUDE.md Freeze 예외=정규식 오탐 한정).
+- **generate(수정 후)**: 작성 43 · PASS 37 · REVIEW 6(코팅정제 known-safe) · BLOCKED 0 · **G-MULTI HOLD 0**.
+- **8-카드 시각 스모크**: self-contained(store-desc-content CSS) 렌더, 360/768/1440 **가로 오버플로 0**, 8원료 세로 스택·표시량 자기귀속 정확(B1 24mg / B12 96μg 분리).
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 43 · totalWrites 172(masters 43·candidate UPDATE 43·SPD ko43+en43) · canonicalDup 0 · candidateLinks 43 · spdRefLinks 86. tag `batch:single-nutrient-b-complex-n8`. rollback manifest 저장.
+- **복합형 누적 441 → 484** (직접 카운트 검증: combo14 원본 421 + N5 20 + N8 43). ⚠️ `hff-combo-verify-committed` 의 `totalComboLive` 는 baseline 패턴 `batch:single-nutrient-combo-%` 만 집계 → N5/N8(비-`combo-` slug 태그) 누락으로 464 로 과소표시. 실제 총계는 484(직접 태그 카운트 SSOT). 후속 검증 시 실제 총계 = 직접 카운트 기준.
+- **다음**: 2순위 N6 간건강+B군(밀크씨슬+나이아신+B1+B2+B6+판토텐산, READY_WITH_HOLD 28/14) — Agent A 확정분, Agent B 착수 대기.
