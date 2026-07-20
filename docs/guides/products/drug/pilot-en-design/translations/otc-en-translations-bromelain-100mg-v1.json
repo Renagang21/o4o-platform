@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-BROMELAIN-100MG-KO-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5",
+  "note": "브로멜라인 100mg 정 en 완결 — otc-en-translations-v1.json 의 동일 groupKey 항목 그대로 발췌(29 out-of-scope 형제 en canonical md5 4d4f202f 를 빌드한 원본). 22 target master_id 스코프. summary = 형제 en canonical summary 컬럼.",
+  "translations": [
+    {
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "title": "Bromelain 100 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease inflammation that comes with swelling, and swelling after injury or surgery.",
+      "usage": "Adults and children 12 or older take 100 mg twice a day, with water, 30 minutes before meals.",
+      "caution": "Do not take this if you have a severe blood clotting disorder (such as haemophilia), severe liver or kidney disease, if you are taking anticoagulants or antiplatelet medicines, if you are pregnant or breastfeeding, or if you are under 12. Talk to a pharmacist before taking it if you are taking antibiotics such as tetracycline, or have had an allergic reaction before.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bromelain 100 mg",
+        "How it works": "Anti-inflammatory enzyme (eases swelling)",
+        "Main symptoms": "Inflammation with swelling; swelling after injury or surgery",
+        "Who should be careful": "Blood clotting disorders; taking anticoagulants; pregnancy",
+        "Why this one": "An enzyme treatment that eases inflammatory swelling"
+      }
+    }
+  ],
+  "summary": "Inflammation with swelling; swelling after injury or surgery"
+}
