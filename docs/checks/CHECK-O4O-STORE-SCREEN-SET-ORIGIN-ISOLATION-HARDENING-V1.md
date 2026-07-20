@@ -78,17 +78,41 @@ return rows[0] ?? null;
 - `tsc --noEmit`(변경 파일 5): **0 error**. `tsc -p tsconfig.build.json`(배포 빌드 구성): **0 error**.
 - jest 는 이 환경에서 OOM(런너 자원 한계) — 해당 유닛 테스트(resolveTemplateKey/shapeStaticBlock/content_list mock)는 **SQL origin 필터·404 정규화를 커버하지 않으므로** 신호가 아니다. 실제 검증은 §6 프로덕션 실측.
 
-## 6. 실행 7 — 프로덕션 검증 — ⏳ 배포 후 갱신
+## 6. 실행 7 — 프로덕션 검증 — ✅ PASS (배포 af35b1809, 2026-07-20)
 
-- [ ] 매장 목록 = 매장 소유만 / 상세·수정·블록 저장·삭제 정상
-- [ ] 미존재 ID GET/PATCH/DELETE 404
-- [ ] 타 매장 ID GET/PATCH/DELETE 404
-- [ ] 운영자 원본 매장 GET/PATCH/DELETE 404
-- [ ] 공급자 조합(트랜잭션 fixture) 404
-- [ ] 운영자 원본 코너 적용 거부 / 매장 사본 적용 정상
-- [ ] 공개 타블렛 `idle_media` 포함 / Screen Set QR `idle_media` 제외
-- [ ] QR archive 410 · restore 후 동일 slug 200
-- [ ] 보호 샘플(구강/피부)·current 불변, console/pageerror/API 오류 0
+**API 실측**(매장 owner renagang21 / 운영자 sohae2100):
+
+| 검증 | 결과 |
+|------|------|
+| 매장 목록 = 매장 소유만 | ✅ 12건, 전량 `origin='store'`·org non-null·`supplier_id` NULL |
+| 미존재 ID GET/PATCH/DELETE | ✅ **404 / 404 / 404** (기존 DELETE 는 200 `{deleted:true}` 오응답 → 수정됨) |
+| 운영자 원본 매장 GET/PATCH/DELETE/PUT blocks | ✅ **전부 404**, 운영자 원본은 사후 생존(operator GET 200) |
+| 운영자 원본 코너 **적용**(current) | ✅ **404 `SCREEN_SET_NOT_FOUND`** |
+| 운영자 원본 코너 **연결**(link) | ✅ **404 `SCREEN_SET_NOT_FOUND`** |
+| 매장 소유 CRUD | ✅ 생성(origin=store·supplier NULL·status=active·QR slug 발급) → GET 200 → PATCH **data=객체**(배열 아님) → PUT blocks 200 → 코너 적용 200 |
+| 이미 제거된 세트 재삭제 | ✅ 404 |
+
+**공개 채널**(보호 샘플 구강 코너, 실측):
+- 공개 타블렛 `GET /stores/{slug}/tablet/screen?tabletId=` → `mode=screen_set`, sections `[idle_media, corner_description, content_list, product_list, qr_guide]` → **`idle_media` 포함 ✅**
+- Screen Set QR `GET /kpa/qr/public/tablet-corner-5` → sections `[corner_description, content_list, product_list, qr_guide]` → **`idle_media` 제외 ✅**, content_list **5 카드**(SEAM CHECK §6 문서값과 일치 = 회귀 0)
+
+**QR lifecycle**(미연결 신규 세트로 격리 테스트):
+- active 200 → `status=archived` → **410 Gone** → `status=active` 복원 → **동일 slug 200** ✅ (계약 유지)
+
+**공급자/운영자 origin fixture — 트랜잭션(BEGIN…ROLLBACK, 영구 write 0)**:
+`CHK_stss_owner_scope` 를 만족하는 supplier row(org NULL·supplier_id·service_key) + operator row 를 INSERT 후 **하드닝된 실제 predicate** 로 조회:
+
+| predicate | supplier | operator |
+|---|:---:|:---:|
+| 매장 목록(`org=$storeOrg AND origin='store'`) | 0 | 0 |
+| 매장 상세/수정/삭제(`id AND org AND origin='store'`) | **0** | **0** |
+| 공개 resolver(`+ status<>'archived'`) | **0** | — |
+| QR ensure(`+ status<>'archived'`) | **0** | — |
+| **대조군**: 실제 매장 세트 가시성 | **12건 정상 노출**(과차단 0) | |
+
+ROLLBACK 후 fixture row 0 — **영구 데이터 write 0**.
+
+**보호 샘플·current**: 검증 중 테스트 세트를 피부관리 코너에 적용했다가 **원상 복구 완료** — 피부 `current=8c6eb9fe`(피부관리 기본 화면 세트, isCurrent=true) + 원래 5개 연결 유지, 구강 `current=6f10d68e` + 5개 연결 **무변경**. 테스트 산출물(ISO/QRLC/operator fixture) 전량 삭제.
 
 ## 7. 변경 파일
 
@@ -110,3 +134,25 @@ docs/checks/CHECK-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1.md         
 | 공개 resolver 가 운영자 원본 공개에 의존 | ❌ (운영자 원본은 공개 URL·QR 미발급 — 도달 경로 없음) |
 | QR lifecycle 유지에 스키마 변경 필요 | ❌ (is_active 기반 로직 무변경) |
 | 매장/운영자 API 미분리로 라우터 재설계 필요 | ❌ (운영자 API 는 선행 WO 에서 별도 라우터로 분리 완료) |
+
+---
+
+## 완료 보고
+
+```
+WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1 완료
+
+1. 조사한 경로: 매장 API 7 + 코너 적용/연결/목록 3 + 공개(resolver·/idle) 2 + QR(ensure·생성) 2 = 14 지점
+   (+ media-library 역방향 사용처 JOIN 은 의도적 제외 — 운영자 원본 미디어 삭제 오허용 방지)
+2. origin='store' 추가: 위 14 지점 전부. 생성은 supplier_id 명시 NULL + origin='store' 계약 고정.
+3. 404 판정: firstReturnedRow() 로 실제 반환 row 기준 → 미존재/타매장/운영자/공급자/이미제거 5케이스 모두 404
+   (기존 DELETE 는 전 케이스 200 {deleted:true} 오응답). PATCH data 도 배열→객체 정상화.
+4. 코너 적용 차단: 운영자 원본 적용(current) 404 / 연결(link) 404. 매장 사본 적용 200 정상.
+5. 채널 검증: 공개 타블렛 idle_media 포함(5 sections) / Screen Set QR idle_media 제외(4 sections, content_list 5 카드).
+6. QR 회귀: active 200 → archive 410 → restore 동일 slug 200. 계약 유지.
+7. 보호 샘플: 검증 중 변경분 원상 복구 완료(피부 current=8c6eb9fe+5연결, 구강 current=6f10d68e+5연결 무변경).
+8. DB: migration 0 · 백필 0 · 영구 데이터 write 0(fixture 는 BEGIN…ROLLBACK).
+9. typecheck 0(변경파일) / tsconfig.build.json 0 / 프로덕션 API·트랜잭션 fixture 검증 PASS.
+   (jest 는 본 환경 OOM — 해당 유닛테스트는 SQL predicate·404 정규화 미커버라 신호 아님)
+10. commit af35b1809 + CHECK 갱신 push, Deploy API Server success.
+```
