@@ -171,6 +171,21 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-bacillus-liche-250mg-capsule',
   },
+  // 로라타딘 10mg 정 — Track A(WO-O4O-OTC-LORATADINE-10MG-KO-UPGRADE-GA-V1, 준비 감사 270e3f8a6 · 에이전트 가).
+  //   target 단일 fp 38 · 비대상 단일 fp 3(coarse 41, other 0). exclude 단일 fp → excludeFp 문자열.
+  'loratadine-10mg-jeong': {
+    key: '로라타딘|10밀리그램|정',
+    ingredient: '로라타딘',
+    dose: '10밀리그램',
+    formKeyword: '정',
+    candidate: '0a7dee0b-e578-4015-967a-fad092071eef',
+    targetFp: '83bcf192525baa16',
+    excludeFp: '168c9fc2508b87da',
+    expected: 38,
+    excludedExpected: 3,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-loratadine-10mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────
