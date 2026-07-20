@@ -1,0 +1,593 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "나프록센나트륨|275밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "006f1a2b-f1f7-40a6-ac10-7f0093a150a1",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "나프록센나트륨 275mg 정",
+  "coarseTotal": 96,
+  "target": 8,
+  "excluded": 88,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "011f0cbc-56e3-467a-931a-e2ed0cd1ddec",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "018ccd24-b01e-45a2-b9e8-d556fc7585dd",
+      "name": "아나프록스정(나프록센나트륨)",
+      "reason": "비대상(fp 3b15ee57c0203f23, bridge SSOT)"
+    },
+    {
+      "id": "04ec701d-150a-45be-ac48-704b63a064be",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "056462c4-5325-4a2a-89f6-4afa2bc5bb8d",
+      "name": "제이프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e71bb077affe3ed4, bridge SSOT)"
+    },
+    {
+      "id": "11c05de2-61b8-43e7-93e6-a05ee3fe22b1",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "14b83174-05f6-4cfa-b119-bb2ed99f1418",
+      "name": "프로트린정(나프록센나트륨)",
+      "reason": "비대상(fp 77f2de3486d5fad2, bridge SSOT)"
+    },
+    {
+      "id": "153e9cb7-66f6-42ac-8100-4c35ed35430c",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "17e646e8-61f8-4424-bbe4-e7e4a35b7234",
+      "name": "나프록소정(나프록센나트륨)",
+      "reason": "비대상(fp 10e86c53aee132d0, bridge SSOT)"
+    },
+    {
+      "id": "1a5edd7c-0f33-4d94-aba3-ca846ee6d45b",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "239ba6da-bbcd-4b17-b23d-e1d10f1a286e",
+      "name": "제이프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e71bb077affe3ed4, bridge SSOT)"
+    },
+    {
+      "id": "25241d56-0e25-4782-8ef5-17f385a7127c",
+      "name": "아낙스정(나프록센나트륨)",
+      "reason": "비대상(fp 4d06f3b60f675882, bridge SSOT)"
+    },
+    {
+      "id": "25727b3a-f4fd-40a9-aeb4-ccfd910273ba",
+      "name": "스노핀정275밀리그람(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "2b525fdb-6f8c-47e4-8e24-bdd467bbf2af",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "2e2642ba-e31f-4d01-b99e-456d2f6cc1e2",
+      "name": "자이날정(나프록센나트륨)",
+      "reason": "비대상(fp f3dc34b75d99b68b, bridge SSOT)"
+    },
+    {
+      "id": "2f9c47ec-b46b-42ab-b680-390a125fcf34",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "30b54d7b-f4dc-4742-9f02-c2f0968e21ca",
+      "name": "플라낙스정(나프록센나트륨)",
+      "reason": "비대상(fp ef09f520f59e5fed, bridge SSOT)"
+    },
+    {
+      "id": "36f43fc1-faa5-44d8-a5da-42c882952030",
+      "name": "나프록소정(나프록센나트륨)",
+      "reason": "비대상(fp 10e86c53aee132d0, bridge SSOT)"
+    },
+    {
+      "id": "376906c7-c330-4705-b4c7-15bb3081a5f8",
+      "name": "노바프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e64971bbc936ec4e, bridge SSOT)"
+    },
+    {
+      "id": "3aa2c07d-3820-42df-acf5-44c5e1749fae",
+      "name": "폭센정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp 6a1826e241940b79, bridge SSOT)"
+    },
+    {
+      "id": "3aad3162-95fd-4ca4-bb6a-c6e9d5063360",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "3da426bc-2ebd-4590-b583-d0026dee0553",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "4c7f6332-d761-4182-8600-84094a9267e7",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "52924eb9-52c2-492d-b2fd-882a49c430c6",
+      "name": "아나프록스정(나프록센나트륨)",
+      "reason": "비대상(fp 3b15ee57c0203f23, bridge SSOT)"
+    },
+    {
+      "id": "54c1d6cb-bbe2-45bc-aff7-ebeb043092d2",
+      "name": "아나탁심정(나프록센나트륨)",
+      "reason": "비대상(fp 7133d6c4ab036b16, bridge SSOT)"
+    },
+    {
+      "id": "55ec7755-15dd-42ef-adcb-9fcb48fa0d5d",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "58b1b578-29f1-4e17-815b-72c569fd3842",
+      "name": "아낙스정(나프록센나트륨)",
+      "reason": "비대상(fp 4d06f3b60f675882, bridge SSOT)"
+    },
+    {
+      "id": "5bb651f6-9b13-4d20-bfcb-2310c1b5e599",
+      "name": "프리나정(나프록센나트륨)",
+      "reason": "비대상(fp 68605f78af44cbe7, bridge SSOT)"
+    },
+    {
+      "id": "67e10529-e432-4bc6-b351-d3d5389aeb55",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "6a5c148c-0927-4501-a5eb-879d69dfa818",
+      "name": "프리나정(나프록센나트륨)",
+      "reason": "비대상(fp 68605f78af44cbe7, bridge SSOT)"
+    },
+    {
+      "id": "73e01a3c-4f62-4c9a-b00f-00c884cd2d61",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "78387d0b-9199-44e1-88f4-d1949fc8195c",
+      "name": "스노핀정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "7918117f-920e-4909-a167-ad2119a18fbe",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "7a467f49-5772-4205-830b-bdd4b4dd0673",
+      "name": "다나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e2304999f9eda137, bridge SSOT)"
+    },
+    {
+      "id": "7bd7b2ea-4076-49d8-9174-9fb6c3e24f94",
+      "name": "엔에이피정(나프록센나트륨)",
+      "reason": "비대상(fp 232c3531147b2ab7, bridge SSOT)"
+    },
+    {
+      "id": "803075e4-249b-4d46-88f1-56263a6319fc",
+      "name": "폭센정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp 6a1826e241940b79, bridge SSOT)"
+    },
+    {
+      "id": "820c6481-3126-451f-8be4-1ff15aa3423b",
+      "name": "자이날정(나프록센나트륨)",
+      "reason": "비대상(fp f3dc34b75d99b68b, bridge SSOT)"
+    },
+    {
+      "id": "84b16613-5556-43ad-9af4-1004e02ecc38",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "86765bc7-1878-41ac-809f-5f6dea35d093",
+      "name": "플라낙스정(나프록센나트륨)",
+      "reason": "비대상(fp ef09f520f59e5fed, bridge SSOT)"
+    },
+    {
+      "id": "86d96afd-cad4-4bb5-88e9-fd66cfd965ed",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "885db02c-0804-460b-9dff-cf0b4bdff271",
+      "name": "다나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e2304999f9eda137, bridge SSOT)"
+    },
+    {
+      "id": "8ae9698f-d91a-4405-9d7b-cf2cf98dc638",
+      "name": "나프노펜정(나프록센나트륨)",
+      "reason": "비대상(fp 43bdb6112340036e, bridge SSOT)"
+    },
+    {
+      "id": "8e0dc187-81d3-4654-9642-2e3a1b311700",
+      "name": "노바프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e64971bbc936ec4e, bridge SSOT)"
+    },
+    {
+      "id": "992d1ca0-fe4f-48fd-9dbf-bd507b56890b",
+      "name": "스노핀정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "99ff442a-445c-4ed6-a008-85247e76aced",
+      "name": "제이프록센정(나프록센나트륨)",
+      "reason": "비대상(fp e71bb077affe3ed4, bridge SSOT)"
+    },
+    {
+      "id": "9b0078c0-1d67-4050-9358-c5761673d10e",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "9edb2d04-e962-4c01-9c32-ab10015dbacd",
+      "name": "프리나정(나프록센나트륨)",
+      "reason": "비대상(fp 68605f78af44cbe7, bridge SSOT)"
+    },
+    {
+      "id": "9f431049-a952-45a1-9850-5be4cc7d5f9d",
+      "name": "엔에이피정(나프록센나트륨)",
+      "reason": "비대상(fp 232c3531147b2ab7, bridge SSOT)"
+    },
+    {
+      "id": "a7015b0f-d83e-426f-9ae0-2fd33b1cdd64",
+      "name": "아나탁심정(나프록센나트륨)",
+      "reason": "비대상(fp 7133d6c4ab036b16, bridge SSOT)"
+    },
+    {
+      "id": "af160606-102e-4aa8-82fc-9ed86eadfdc5",
+      "name": "아나탁심정(나프록센나트륨)",
+      "reason": "비대상(fp 7133d6c4ab036b16, bridge SSOT)"
+    },
+    {
+      "id": "b0d09e6e-0f06-4fea-9ec7-3cd31bbb9bd7",
+      "name": "나프록소정(나프록센나트륨)",
+      "reason": "비대상(fp 10e86c53aee132d0, bridge SSOT)"
+    },
+    {
+      "id": "b0dea2f4-e0c5-43fe-986d-c51498a56305",
+      "name": "아나탁심정(나프록센나트륨)",
+      "reason": "비대상(fp 7133d6c4ab036b16, bridge SSOT)"
+    },
+    {
+      "id": "b1a6a705-423e-428d-804a-9aba4a851fd0",
+      "name": "아낙스정(나프록센나트륨)",
+      "reason": "비대상(fp 4d06f3b60f675882, bridge SSOT)"
+    },
+    {
+      "id": "b2f9d98a-c85f-4491-bbbb-a5553566ad5e",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "b521f931-855d-4352-8990-2032891f2f4f",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "b529dfc7-7725-4f5f-9205-06bef49a7a82",
+      "name": "프리나정(나프록센나트륨)",
+      "reason": "비대상(fp 68605f78af44cbe7, bridge SSOT)"
+    },
+    {
+      "id": "b6828d7f-da89-4128-ad08-e42dc6bc60df",
+      "name": "아나프록스정(나프록센나트륨)",
+      "reason": "비대상(fp 3b15ee57c0203f23, bridge SSOT)"
+    },
+    {
+      "id": "b69dc6bb-8823-4d32-9854-20cac0abf41c",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "b82d750c-35cd-4b6a-b12a-3de8b865edd5",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "b869353d-4893-4ae0-b7dd-dec06f4a7ad7",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "b8b7131c-6b90-4a6a-bb0e-497d470633da",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "ba7c5526-953a-4c20-9daf-23aef16fdd1a",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "bdd3d89a-2194-4173-be3e-395a42f8a30e",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "c1446413-a7d0-4b8b-b6b3-9ff3605ce17b",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "c5fd5722-a7be-47be-bb7c-cfa64c128bf2",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "c70b7e3b-f498-4451-81e6-1fa25a05c1f5",
+      "name": "자이날정(나프록센나트륨)",
+      "reason": "비대상(fp f3dc34b75d99b68b, bridge SSOT)"
+    },
+    {
+      "id": "cad420aa-2273-4ae0-bc65-01222bbfcc13",
+      "name": "아나탁심정(나프록센나트륨)",
+      "reason": "비대상(fp 7133d6c4ab036b16, bridge SSOT)"
+    },
+    {
+      "id": "ce54d522-19d5-4155-9410-0d5c254e0785",
+      "name": "나프록신정(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    },
+    {
+      "id": "d1d166c7-54f3-4d7d-84b4-e959e5ea449a",
+      "name": "나프노펜정(나프록센나트륨)",
+      "reason": "비대상(fp 43bdb6112340036e, bridge SSOT)"
+    },
+    {
+      "id": "d2d43324-fc08-4656-a872-00c7f33653b4",
+      "name": "플라낙스정(나프록센나트륨)",
+      "reason": "비대상(fp ef09f520f59e5fed, bridge SSOT)"
+    },
+    {
+      "id": "d3b683fe-4d32-41a6-9417-174e5b1e5f8e",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "d56f58d2-fe2c-4db9-8015-fe04830c13fb",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "d75028d3-c7b3-4e6c-ba54-8f156d913596",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "d972d4ab-a125-44ab-8836-b725595af261",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "da2c7643-c6a1-46b0-b0f0-6072cde0fb23",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "df1da249-e43a-4f18-ba3c-a94db7589180",
+      "name": "자이날정(나프록센나트륨)",
+      "reason": "비대상(fp f3dc34b75d99b68b, bridge SSOT)"
+    },
+    {
+      "id": "e37c8406-bd2d-478d-817d-b35eb224dd85",
+      "name": "아나프록스정(나프록센나트륨)",
+      "reason": "비대상(fp 3b15ee57c0203f23, bridge SSOT)"
+    },
+    {
+      "id": "e5d2be19-f6ce-489f-8c3d-2ddacdee15ce",
+      "name": "아낙스정(나프록센나트륨)",
+      "reason": "비대상(fp 4d06f3b60f675882, bridge SSOT)"
+    },
+    {
+      "id": "e9d799cd-33c0-41c2-92ae-fbaa082ee0dd",
+      "name": "폭센정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp 6a1826e241940b79, bridge SSOT)"
+    },
+    {
+      "id": "eaaf81c9-7f56-4681-812b-1ba0c725a54c",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "ebe2cbe7-f2dd-423e-b6d9-a2f7b6bd63e1",
+      "name": "아나프록스정(나프록센나트륨)",
+      "reason": "비대상(fp 3b15ee57c0203f23, bridge SSOT)"
+    },
+    {
+      "id": "f0ef535a-4e65-4f72-af85-e7c268dffb1b",
+      "name": "나프롱정(나프록센나트륨)",
+      "reason": "비대상(fp 0b7e1039e851f2b3, bridge SSOT)"
+    },
+    {
+      "id": "f3141f14-fec1-4c8f-beb9-97043a620d5b",
+      "name": "세록센정(나프록센나트륨)",
+      "reason": "비대상(fp 45cf6d1c6ee40d1e, bridge SSOT)"
+    },
+    {
+      "id": "f48b680d-144e-4d9a-8716-53c6300dab38",
+      "name": "동인당나프록센정(나프록센나트륨)",
+      "reason": "비대상(fp 02cd3e1f93a68b10, bridge SSOT)"
+    },
+    {
+      "id": "f7766835-5bb1-4cc1-b427-d7e9b385c89c",
+      "name": "프로트린정(나프록센나트륨)",
+      "reason": "비대상(fp 77f2de3486d5fad2, bridge SSOT)"
+    },
+    {
+      "id": "fb5bcd14-fe46-4a04-8100-c9058d682458",
+      "name": "프로트린정(나프록센나트륨)",
+      "reason": "비대상(fp 77f2de3486d5fad2, bridge SSOT)"
+    },
+    {
+      "id": "fc732f82-88e6-49a4-bedb-eddb8158da2e",
+      "name": "알삭센정(나프록센나트륨)",
+      "reason": "비대상(fp b6ce175875836460, bridge SSOT)"
+    },
+    {
+      "id": "fe93511c-27c7-406f-85c9-278d8d1be30a",
+      "name": "프리나정(나프록센나트륨)",
+      "reason": "비대상(fp 68605f78af44cbe7, bridge SSOT)"
+    },
+    {
+      "id": "ff26f029-967b-4003-98bf-b1593b089c9b",
+      "name": "스노핀정275밀리그램(나프록센나트륨)",
+      "reason": "비대상(fp a41e78e8f3b1b2da, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
+    "25c77066-dc75-413e-9183-704c6e77d3e6",
+    "2e7714a3-cbac-4fb2-8c87-b25515225d51",
+    "77d68cee-0d00-4244-8a41-889a7aeeca23",
+    "c4a026e1-307c-4cf9-b52c-52d72955b6d8",
+    "d2e2c08d-6e70-4731-9481-4cdc3b350590",
+    "da2acd60-4f53-4232-a645-27a9e392a945",
+    "eb4d88be-e89d-46a3-ab46-d7ac1cb54d8f"
+  ],
+  "rollback_master_ids": [
+    "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
+    "25c77066-dc75-413e-9183-704c6e77d3e6",
+    "2e7714a3-cbac-4fb2-8c87-b25515225d51",
+    "77d68cee-0d00-4244-8a41-889a7aeeca23",
+    "c4a026e1-307c-4cf9-b52c-52d72955b6d8",
+    "d2e2c08d-6e70-4731-9481-4cdc3b350590",
+    "da2acd60-4f53-4232-a645-27a9e392a945",
+    "eb4d88be-e89d-46a3-ab46-d7ac1cb54d8f"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "45cf6d1c6ee40d1e",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "3b15ee57c0203f23",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b6ce175875836460",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e71bb077affe3ed4",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "124cccc95fde01af",
+      "n": 8,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "77f2de3486d5fad2",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0b7e1039e851f2b3",
+      "n": 9,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "10e86c53aee132d0",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a41e78e8f3b1b2da",
+      "n": 12,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4d06f3b60f675882",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f3dc34b75d99b68b",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ef09f520f59e5fed",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e64971bbc936ec4e",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6a1826e241940b79",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "02cd3e1f93a68b10",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7133d6c4ab036b16",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "68605f78af44cbe7",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e2304999f9eda137",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "232c3531147b2ab7",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "43bdb6112340036e",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 8,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 8 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

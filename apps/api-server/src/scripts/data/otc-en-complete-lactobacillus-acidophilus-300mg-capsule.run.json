@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "177466cf-a57b-4381-b1ff-44bc87c12673",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 13,
+  "targetMasters": 13,
+  "anomalies": [],
+  "koCanonical": 13,
+  "existingEnAny": 13,
+  "existingEnCanonical": 13,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "81c45380008e67058c2fd3fdcee1c5ee",
+      "n": 13
+    }
+  ],
+  "builtLen": 2447,
+  "builtMd5": "81c45380008e67058c2fd3fdcee1c5ee",
+  "consistencyMatch": true,
+  "summaryField": "Constipation, loose stools, bloating, abnormal fermentation in the bowel",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 13,
+    "STEP2_en_canonical_flip": 13,
+    "en_write_total": 26
+  },
+  "enTargetMd5": "81c45380008e67058c2fd3fdcee1c5ee",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(81c45380008e67058c2fd3fdcee1c5ee) — write 0, 정상 종료"
+}

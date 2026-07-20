@@ -1,0 +1,139 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "아세틸시스테인 100mg 캡슐",
+  "coarseTotal": 18,
+  "target": 9,
+  "excluded": 9,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "01df112b-8750-490e-af48-51f1da3d16aa",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    },
+    {
+      "id": "031c86a4-4207-44e1-8591-1985ca00b773",
+      "name": "뮤라텐캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp 88c905bf4f255ccd, bridge SSOT)"
+    },
+    {
+      "id": "0be0a70e-5fce-41cb-af18-c524611d1aba",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    },
+    {
+      "id": "13d6d63f-7518-4185-af12-2e037627710e",
+      "name": "뮤라텐캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp 88c905bf4f255ccd, bridge SSOT)"
+    },
+    {
+      "id": "34da6c08-c1c6-4171-bab8-b5c75083f7d8",
+      "name": "뮤라텐캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp 88c905bf4f255ccd, bridge SSOT)"
+    },
+    {
+      "id": "3b43f7cb-1400-47f7-8371-f8190ff699ee",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    },
+    {
+      "id": "401fd732-beb3-400d-8463-9a860680da6d",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    },
+    {
+      "id": "a8f4acaa-8010-4abe-9c58-35ef5099e2e5",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    },
+    {
+      "id": "b3476fb2-6e71-45f5-90c3-3b20579731f3",
+      "name": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+      "reason": "비대상(fp f868ae4a8e341fba, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
+    "24cc1e70-feeb-4cb0-9c15-90eeef521301",
+    "4490855b-6fb0-4fe1-8402-7872be5775fd",
+    "5a46babe-a1aa-4edc-ad61-ebb52a20211c",
+    "812690a4-15ef-4798-9e8a-56d4aec8738a",
+    "aa4a5182-0f6b-4295-b64a-9d9fc0591c81",
+    "c52ee592-9df9-4b69-a040-e1f1437c09d1",
+    "d5bced50-d301-4386-b71e-15a805963eea",
+    "dde775af-35ee-48a7-80d3-ecf1f9abf801"
+  ],
+  "rollback_master_ids": [
+    "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
+    "24cc1e70-feeb-4cb0-9c15-90eeef521301",
+    "4490855b-6fb0-4fe1-8402-7872be5775fd",
+    "5a46babe-a1aa-4edc-ad61-ebb52a20211c",
+    "812690a4-15ef-4798-9e8a-56d4aec8738a",
+    "aa4a5182-0f6b-4295-b64a-9d9fc0591c81",
+    "c52ee592-9df9-4b69-a040-e1f1437c09d1",
+    "d5bced50-d301-4386-b71e-15a805963eea",
+    "dde775af-35ee-48a7-80d3-ecf1f9abf801"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "f868ae4a8e341fba",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "88c905bf4f255ccd",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "41701ec292bc3fa6",
+      "n": 9,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 9,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 9,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 9,
+  "htmlLen": 1592,
+  "contentHash": "e1f5ecc025a629f849775575fedc38c1",
+  "summary": "아세틸시스테인 100mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 9,
+      "STEP_B_easy_canonical_demote": 9,
+      "STEP_B_authored_canonical_flip": 9,
+      "total": 27
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 9,
+      "total": 9
+    },
+    "grand_total": 36
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 9",
+    "policy_2A": "audit 2/master = 18 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

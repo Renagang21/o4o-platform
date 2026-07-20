@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1",
+  "agent": "에이전트 가",
+  "note": "batch-8 번들 A EN 재사용 — data/otc-en-translations-batch-01-v1.json 의 동일 groupKey 항목 **발췌(verbatim)**. 새 medical fact 0. summary 는 동일 source_ref 공유 out en canonical 의 LIVE 값과 동일.",
+  "groupKey": "나프록센나트륨|275밀리그램|정",
+  "summary": null,
+  "translations": [
+    {
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "title": "Naproxen Sodium 275 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for osteoarthritis, rheumatoid arthritis and ankylosing spondylitis, tendinitis and bursitis, acute gout, period pain, musculoskeletal disorders (sprains, bruises, back pain), pain after surgery or tooth extraction, and migraine.",
+      "usage": "For pain, take two tablets (550 mg) first, then one tablet (275 mg) every 6–8 hours, not exceeding 1,350 mg a day. It may cause stomach discomfort, so take it after food if your stomach is sensitive, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a peptic ulcer, severe liver or kidney disease, or heart failure; for pain around coronary artery bypass graft (CABG) surgery; if you are pregnant or breastfeeding; or for a child under 2. Because of the risk of cardiovascular clots (heart attack, stroke) and gastrointestinal bleeding, ulcers or perforation, stop taking it and seek advice if you have stomach pain, black stools, a rash or difficulty breathing. If you regularly drink alcohol, there is a risk of stomach bleeding, so check with a pharmacist before taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Naproxen sodium 275 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Period pain, headache, toothache, muscle pain, joint pain, back pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "A long-acting anti-inflammatory painkiller"
+      },
+      "checkNote": "수치 275mg/550mg(2정)/275mg(1정)/6–8h/1,350mg·연령 under 2·금기 CABG·임부수유부·NSAID 심혈관/위장 경고·음주 상담 전건 유지"
+    }
+  ]
+}

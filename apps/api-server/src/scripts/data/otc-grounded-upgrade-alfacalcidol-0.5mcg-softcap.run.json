@@ -1,0 +1,166 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0436f0d8-3dbe-4939-b511-de3bcd69593c",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "알파칼시돌 0.5㎍ 연질캡슐",
+  "coarseTotal": 29,
+  "target": 12,
+  "excluded": 17,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "name": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp d981726c2fe54e53, bridge SSOT)"
+    },
+    {
+      "id": "2197ee37-b87c-49e9-8e27-bbbffddf6d1b",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "2a80c422-6f9c-4ef7-9ca5-e0ff79ac264a",
+      "name": "알파디연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp e083a096a082c0c1, bridge SSOT)"
+    },
+    {
+      "id": "2e9d75d3-001a-4205-9fcb-c7ca2aeaca75",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "31e0969d-0ca9-433b-add8-a02d1d78c3c3",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "3d68b624-d3da-4cb3-9571-0f6d12ea6315",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "3ddafa2c-8fab-4679-801a-08e17655d9ac",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "4dd50cbf-6bde-4a4a-97b5-6d7548fe1d96",
+      "name": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp d981726c2fe54e53, bridge SSOT)"
+    },
+    {
+      "id": "613621e8-81b5-433a-8a8b-2ee33fc89f81",
+      "name": "알파디연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp e083a096a082c0c1, bridge SSOT)"
+    },
+    {
+      "id": "6c059fc7-2d4a-44a3-ad93-03c71b67730d",
+      "name": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp d981726c2fe54e53, bridge SSOT)"
+    },
+    {
+      "id": "7e077db4-8d6a-4ba3-851d-b4c6a86526f1",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "7fea47c8-93dd-4dbb-b986-bf670090ad84",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "8e32ad9c-7a15-47a3-88c3-ee6afd8ac6d0",
+      "name": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp d981726c2fe54e53, bridge SSOT)"
+    },
+    {
+      "id": "99afb09f-0b32-4dd4-8aa9-8e9c39146597",
+      "name": "알파디연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp e083a096a082c0c1, bridge SSOT)"
+    },
+    {
+      "id": "bdcee2f3-44c6-4499-b886-1a6a464666ab",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "ca82a4ac-c922-4fab-8601-aa5345bc313a",
+      "name": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp 8822d57a6053186c, bridge SSOT)"
+    },
+    {
+      "id": "f7aa7240-462f-4bc1-afd7-a5b805f55e74",
+      "name": "알파디연질캡슐(알파칼시돌)",
+      "reason": "비대상(fp e083a096a082c0c1, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "0b00f16b-ed31-42ac-a627-8b0def9d4194",
+    "250d5967-3dbd-49c3-b1f1-6b7919511ad3",
+    "260edf3f-0366-4e62-b344-8a231e2c410d",
+    "44e8ef9d-1661-441c-bb00-b3333153d37e",
+    "5374abc4-6a7b-4c2f-8040-3b33ce1e8194",
+    "54db584b-93dd-4c2e-9552-8359b32c6336",
+    "67e5dcba-79c2-4893-979a-1545a4600450",
+    "6b99ef51-b72f-4fc1-9fc0-c6c54def00a3",
+    "887b6b1c-61e5-44bc-a80d-791894a695fe",
+    "c4f79d90-6e55-4e6d-9d4b-9dc028739960",
+    "c76c16a4-9031-4fc8-b852-d18f82cca963",
+    "cc445659-1465-4229-aae7-eefcad435227"
+  ],
+  "rollback_master_ids": [
+    "0b00f16b-ed31-42ac-a627-8b0def9d4194",
+    "250d5967-3dbd-49c3-b1f1-6b7919511ad3",
+    "260edf3f-0366-4e62-b344-8a231e2c410d",
+    "44e8ef9d-1661-441c-bb00-b3333153d37e",
+    "5374abc4-6a7b-4c2f-8040-3b33ce1e8194",
+    "54db584b-93dd-4c2e-9552-8359b32c6336",
+    "67e5dcba-79c2-4893-979a-1545a4600450",
+    "6b99ef51-b72f-4fc1-9fc0-c6c54def00a3",
+    "887b6b1c-61e5-44bc-a80d-791894a695fe",
+    "c4f79d90-6e55-4e6d-9d4b-9dc028739960",
+    "c76c16a4-9031-4fc8-b852-d18f82cca963",
+    "cc445659-1465-4229-aae7-eefcad435227"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "d981726c2fe54e53",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8ac89c4550d02b6d",
+      "n": 12,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "8822d57a6053186c",
+      "n": 9,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e083a096a082c0c1",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 12,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 12 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

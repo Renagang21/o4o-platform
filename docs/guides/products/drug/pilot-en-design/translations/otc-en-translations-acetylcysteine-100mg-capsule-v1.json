@@ -1,0 +1,25 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1",
+  "agent": "에이전트 가",
+  "note": "batch-8 번들 A EN 재사용 — otc-en-translations-v1.json (마스터 번역) 의 동일 groupKey 항목 **발췌(verbatim)**. 새 medical fact 0. summary 는 동일 source_ref 공유 out en canonical 의 LIVE 값과 동일.",
+  "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+  "summary": "Thick phlegm in bronchitis, inflammation of the voice box or sinuses",
+  "translations": [
+    {
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "title": "Acetylcysteine 100 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used when phlegm is hard to cough up in sudden or long-lasting bronchitis, asthma, inflammation of the voice box, or sinus inflammation.",
+      "usage": "For sudden illness, adults take 200 mg three times a day. For long-lasting illness, twice a day, before meals, with a small amount of water. Children aged 6 to 14 with a long-lasting illness take 100 mg three times a day. Leave at least 2 hours between this medicine and an antibiotic.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a stomach or duodenal ulcer, or for a baby under 2. Talk to a pharmacist before taking it if you are pregnant or breastfeeding.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetylcysteine 100 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in bronchitis, inflammation of the voice box or sinuses",
+        "Who should be careful": "Stomach or duodenal ulcer; under 2",
+        "Why this one": "A mucus-thinning treatment at a lower strength that can be divided for children"
+      }
+    }
+  ]
+}

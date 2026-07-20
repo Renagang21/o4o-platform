@@ -1,0 +1,173 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1",
+  "agent": "에이전트 가",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groups": [
+    {
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "T": 13,
+      "ko": {
+        "canon1": 13,
+        "dup": 0,
+        "authored": 13,
+        "right_ref": 13,
+        "dep_easy": 13,
+        "easy_still_canon": 0
+      },
+      "auditRows": 13,
+      "siblings": {
+        "coarse_out": 0,
+        "still_easy": 0,
+        "authored": 0
+      },
+      "en": {
+        "en_canon": 13,
+        "en_nr": 0,
+        "distinct_md5": 1,
+        "sample_md5": "81c45380008e67058c2fd3fdcee1c5ee"
+      },
+      "enDup": 0,
+      "checks": {
+        "target_ids_match_audit": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonicalDup_0": true,
+        "ko_authored": true,
+        "ko_source_ref_correct": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "audit_rows_eq_T": true,
+        "siblings_untouched_all_easy": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_single_md5_reused": true,
+        "en_canonicalDup_0": true
+      },
+      "verdict": "PASS"
+    },
+    {
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "T": 12,
+      "ko": {
+        "canon1": 12,
+        "dup": 0,
+        "authored": 12,
+        "right_ref": 12,
+        "dep_easy": 12,
+        "easy_still_canon": 0
+      },
+      "auditRows": 12,
+      "siblings": {
+        "coarse_out": 17,
+        "still_easy": 17,
+        "authored": 0
+      },
+      "en": {
+        "en_canon": 12,
+        "en_nr": 0,
+        "distinct_md5": 1,
+        "sample_md5": "d0e8523587e6cb11df9ddd423cc7366b"
+      },
+      "enDup": 0,
+      "checks": {
+        "target_ids_match_audit": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonicalDup_0": true,
+        "ko_authored": true,
+        "ko_source_ref_correct": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "audit_rows_eq_T": true,
+        "siblings_untouched_all_easy": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_single_md5_reused": true,
+        "en_canonicalDup_0": true
+      },
+      "verdict": "PASS"
+    },
+    {
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "T": 9,
+      "ko": {
+        "canon1": 9,
+        "dup": 0,
+        "authored": 9,
+        "right_ref": 9,
+        "dep_easy": 9,
+        "easy_still_canon": 0
+      },
+      "auditRows": 9,
+      "siblings": {
+        "coarse_out": 9,
+        "still_easy": 9,
+        "authored": 0
+      },
+      "en": {
+        "en_canon": 9,
+        "en_nr": 0,
+        "distinct_md5": 1,
+        "sample_md5": "c167e18fc0f042778b0935797b944508"
+      },
+      "enDup": 0,
+      "checks": {
+        "target_ids_match_audit": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonicalDup_0": true,
+        "ko_authored": true,
+        "ko_source_ref_correct": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "audit_rows_eq_T": true,
+        "siblings_untouched_all_easy": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_single_md5_reused": true,
+        "en_canonicalDup_0": true
+      },
+      "verdict": "PASS"
+    },
+    {
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "T": 8,
+      "ko": {
+        "canon1": 8,
+        "dup": 0,
+        "authored": 8,
+        "right_ref": 8,
+        "dep_easy": 8,
+        "easy_still_canon": 0
+      },
+      "auditRows": 8,
+      "siblings": {
+        "coarse_out": 88,
+        "still_easy": 88,
+        "authored": 0
+      },
+      "en": {
+        "en_canon": 8,
+        "en_nr": 0,
+        "distinct_md5": 1,
+        "sample_md5": "744aecaaac09a35b96e59b8c0d3bea3b"
+      },
+      "enDup": 0,
+      "checks": {
+        "target_ids_match_audit": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonicalDup_0": true,
+        "ko_authored": true,
+        "ko_source_ref_correct": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "audit_rows_eq_T": true,
+        "siblings_untouched_all_easy": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_single_md5_reused": true,
+        "en_canonicalDup_0": true
+      },
+      "verdict": "PASS"
+    }
+  ],
+  "allPass": true
+}

@@ -212,6 +212,91 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-sobrerol-200mg-capsule-v1.json',
     outBase: 'otc-en-complete-sobrerol-200mg-capsule',
   },
+  // ── batch-8 번들 A (WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1 · 에이전트 가) ──
+  //   4그룹 모두 source_ref 공유 out en canonical 단일 md5 · 대상 기존 en 0.
+  //   translationFile = 마스터 번역 발췌(otc-batch8-bundleA-en-probe.ts 로 build == live out en byte-identical 선증명).
+  //   대상 스코프는 ko run.json rollback_master_ids (source_ref 스코프 금지).
+
+  // 락토바실루스아시도필루스균 300mg 캡슐 — out13 en canonical LIVE(md5 81c45380). 13 master_id 스코프.
+  'lactobacillus-acidophilus-300mg-capsule': {
+    key: '락토바실루스아시도필루스균|300밀리그램|캡슐',
+    candidate: '177466cf-a57b-4381-b1ff-44bc87c12673',
+    sourceType: 'mfds_drug_otc', expected: 13,
+    koRunBase: 'otc-grounded-upgrade-lactobacillus-acidophilus-300mg-capsule',
+    translationFile: 'otc-en-translations-lactobacillus-acidophilus-300mg-v1.json',
+    outBase: 'otc-en-complete-lactobacillus-acidophilus-300mg-capsule',
+  },
+  // 알파칼시돌 0.5μg 연질캡슐 — out21 en canonical LIVE(md5 d0e85235, summary null). 12 master_id 스코프.
+  //   1μg 그룹(batch-02 번역)과 별개 함량 — 미접촉.
+  'alfacalcidol-0.5mcg-softcap': {
+    key: '알파칼시돌|0.5마이크로그램|연질캡슐',
+    candidate: '0436f0d8-3dbe-4939-b511-de3bcd69593c',
+    sourceType: 'mfds_drug_otc', expected: 12,
+    koRunBase: 'otc-grounded-upgrade-alfacalcidol-0.5mcg-softcap',
+    translationFile: 'otc-en-translations-alfacalcidol-0.5mcg-softcap-v1.json',
+    outBase: 'otc-en-complete-alfacalcidol-0.5mcg-softcap',
+  },
+  // 아세틸시스테인 100mg 캡슐 — out3 en canonical LIVE(md5 c167e18f). 9 master_id 스코프.
+  'acetylcysteine-100mg-capsule': {
+    key: '아세틸시스테인|100밀리그램|캡슐',
+    candidate: '240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4',
+    sourceType: 'mfds_drug_otc', expected: 9,
+    koRunBase: 'otc-grounded-upgrade-acetylcysteine-100mg-capsule',
+    translationFile: 'otc-en-translations-acetylcysteine-100mg-capsule-v1.json',
+    outBase: 'otc-en-complete-acetylcysteine-100mg-capsule',
+  },
+  // 나프록센나트륨 275mg 정 — out40 en canonical LIVE(md5 744aecaa, summary null). 8 master_id 스코프.
+  //   나프록센 250mg 연질캡슐 그룹(source_ref 02355c78)과 별개 — 미접촉.
+  'naproxen-sodium-275mg-jeong': {
+    key: '나프록센나트륨|275밀리그램|정',
+    candidate: '006f1a2b-f1f7-40a6-ac10-7f0093a150a1',
+    sourceType: 'mfds_drug_otc', expected: 8,
+    koRunBase: 'otc-grounded-upgrade-naproxen-sodium-275mg-jeong',
+    translationFile: 'otc-en-translations-naproxen-sodium-275mg-jeong-v1.json',
+    outBase: 'otc-en-complete-naproxen-sodium-275mg-jeong',
+  },
+  // ── batch-8 번들 B (WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1 · 에이전트 다) ──
+  //   4그룹 모두 source_ref 공유 out en canonical 단일 md5 · 대상 기존 en 0.
+  //   struct 출처·byte-identical 선증명 = src/scripts/otc-batch8-da-en-struct.ts / data/otc-batch8-da-en-struct.json.
+  //   대상 스코프는 ko run.json rollback_master_ids (source_ref 스코프 금지).
+  // 트리메부틴말레산염 200mg 정 — out3 en canonical LIVE(md5 b8021ac0). struct=마스터 번역 발췌. 13 master_id 스코프.
+  //   100mg/150mg 그룹과 별개 함량 — 미접촉.
+  'trimebutine-200mg-jeong': {
+    key: '트리메부틴말레산염|200밀리그램|정',
+    candidate: '0175e433-a171-44ec-b601-ad65a805171d',
+    sourceType: 'mfds_drug_otc', expected: 13,
+    koRunBase: 'otc-grounded-upgrade-trimebutine-200mg-jeong',
+    translationFile: 'otc-en-translations-trimebutine-200mg-jeong-v1.json',
+    outBase: 'otc-en-complete-trimebutine-200mg-jeong',
+  },
+  // 메코발라민 500μg 캡슐 — out10 en canonical LIVE(md5 9e31eba0). 마스터 번역 부재 →
+  //   live en canonical 을 빌더 계약 역파싱으로 복원(창작 0·새 medical fact 0, md5 일치가 게이트). 10 master_id 스코프.
+  'mecobalamin-500ug-capsule': {
+    key: '메코발라민|500마이크로그램|캡슐',
+    candidate: '0908968f-30c8-4c9b-95ed-5631212adbc9',
+    sourceType: 'mfds_drug_otc', expected: 10,
+    koRunBase: 'otc-grounded-upgrade-mecobalamin-500ug-capsule',
+    translationFile: 'otc-en-translations-mecobalamin-500ug-capsule-v1.json',
+    outBase: 'otc-en-complete-mecobalamin-500ug-capsule',
+  },
+  // 덱스판테놀 100mg 정 — out4 en canonical LIVE(md5 2bbeab23). struct=마스터 번역 발췌. 9 master_id 스코프.
+  'dexpanthenol-100mg-jeong': {
+    key: '덱스판테놀|100밀리그램|정',
+    candidate: '0d2b2ef8-cce5-4771-9ed7-159fd10c1715',
+    sourceType: 'mfds_drug_otc', expected: 9,
+    koRunBase: 'otc-grounded-upgrade-dexpanthenol-100mg-jeong',
+    translationFile: 'otc-en-translations-dexpanthenol-100mg-jeong-v1.json',
+    outBase: 'otc-en-complete-dexpanthenol-100mg-jeong',
+  },
+  // 폴산 1mg 정 — out8 en canonical LIVE(md5 5c41a406). struct=마스터 번역 발췌. 9 master_id 스코프.
+  'folic-acid-1mg-jeong': {
+    key: '폴산|1밀리그램|정',
+    candidate: '068e2176-ee92-4e94-a47d-2dc632bacf53',
+    sourceType: 'mfds_drug_otc', expected: 9,
+    koRunBase: 'otc-grounded-upgrade-folic-acid-1mg-jeong',
+    translationFile: 'otc-en-translations-folic-acid-1mg-jeong-v1.json',
+    outBase: 'otc-en-complete-folic-acid-1mg-jeong',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

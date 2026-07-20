@@ -1,0 +1,618 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1",
+  "agent": "에이전트 가",
+  "readOnly": true,
+  "dbWrite": 0,
+  "basis": "otc-next-batch-8-audit-v1.json (commit 52fbdd9a7)",
+  "groups": [
+    {
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "targetFp": "4ec78870b3318967",
+      "auditT": 13,
+      "auditExclude": 0,
+      "coarseTotal": 13,
+      "targetCount": 13,
+      "excludeCount": 0,
+      "excludeFpCount": 0,
+      "excludeFps": [],
+      "excludeBreakdown": [],
+      "targetRoutes": [
+        "oral"
+      ],
+      "checks": {
+        "target_matches_audit_T": true,
+        "target_master_ids_identical": true,
+        "exclude_matches_audit": true,
+        "target_all_oral": true
+      },
+      "verdict": "PASS",
+      "target_master_ids": [
+        "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+        "1131564e-2600-4385-9c29-57d38148324b",
+        "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+        "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+        "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+        "416d87fa-0847-460e-982d-f12386710bdc",
+        "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+        "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+        "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+        "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+        "bf138001-0f2b-4814-bd2e-df1827108516",
+        "cea084b4-06fd-467f-af9a-182dc47d7a64",
+        "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d"
+      ],
+      "distribution": [
+        {
+          "fp": "4ec78870b3318967",
+          "n": 13,
+          "isTarget": true,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+            "락토필캡슐300밀리그램(락토바실루스아시도필루스균)"
+          ]
+        }
+      ]
+    },
+    {
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "targetFp": "8ac89c4550d02b6d",
+      "auditT": 12,
+      "auditExclude": 17,
+      "coarseTotal": 29,
+      "targetCount": 12,
+      "excludeCount": 17,
+      "excludeFpCount": 3,
+      "excludeFps": [
+        "8822d57a6053186c",
+        "d981726c2fe54e53",
+        "e083a096a082c0c1"
+      ],
+      "excludeBreakdown": [
+        {
+          "fp": "8822d57a6053186c",
+          "n": 9
+        },
+        {
+          "fp": "d981726c2fe54e53",
+          "n": 4
+        },
+        {
+          "fp": "e083a096a082c0c1",
+          "n": 4
+        }
+      ],
+      "targetRoutes": [
+        "oral"
+      ],
+      "checks": {
+        "target_matches_audit_T": true,
+        "target_master_ids_identical": true,
+        "exclude_matches_audit": true,
+        "target_all_oral": true
+      },
+      "verdict": "PASS",
+      "target_master_ids": [
+        "0b00f16b-ed31-42ac-a627-8b0def9d4194",
+        "250d5967-3dbd-49c3-b1f1-6b7919511ad3",
+        "260edf3f-0366-4e62-b344-8a231e2c410d",
+        "44e8ef9d-1661-441c-bb00-b3333153d37e",
+        "5374abc4-6a7b-4c2f-8040-3b33ce1e8194",
+        "54db584b-93dd-4c2e-9552-8359b32c6336",
+        "67e5dcba-79c2-4893-979a-1545a4600450",
+        "6b99ef51-b72f-4fc1-9fc0-c6c54def00a3",
+        "887b6b1c-61e5-44bc-a80d-791894a695fe",
+        "c4f79d90-6e55-4e6d-9d4b-9dc028739960",
+        "c76c16a4-9031-4fc8-b852-d18f82cca963",
+        "cc445659-1465-4229-aae7-eefcad435227"
+      ],
+      "distribution": [
+        {
+          "fp": "8ac89c4550d02b6d",
+          "n": 12,
+          "isTarget": true,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "알파칼연질캡슐(알파칼시돌)",
+            "알파칼연질캡슐(알파칼시돌)"
+          ]
+        },
+        {
+          "fp": "8822d57a6053186c",
+          "n": 9,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+            "화니돌0.5마이크로그램연질캡슐(알파칼시돌)"
+          ]
+        },
+        {
+          "fp": "d981726c2fe54e53",
+          "n": 4,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+            "알파키연질캡슐0.5마이크로그램(알파칼시돌)"
+          ]
+        },
+        {
+          "fp": "e083a096a082c0c1",
+          "n": 4,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "알파디연질캡슐(알파칼시돌)",
+            "알파디연질캡슐(알파칼시돌)"
+          ]
+        }
+      ]
+    },
+    {
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "targetFp": "41701ec292bc3fa6",
+      "auditT": 9,
+      "auditExclude": 9,
+      "coarseTotal": 18,
+      "targetCount": 9,
+      "excludeCount": 9,
+      "excludeFpCount": 2,
+      "excludeFps": [
+        "f868ae4a8e341fba",
+        "88c905bf4f255ccd"
+      ],
+      "excludeBreakdown": [
+        {
+          "fp": "f868ae4a8e341fba",
+          "n": 6
+        },
+        {
+          "fp": "88c905bf4f255ccd",
+          "n": 3
+        }
+      ],
+      "targetRoutes": [
+        "oral"
+      ],
+      "checks": {
+        "target_matches_audit_T": true,
+        "target_master_ids_identical": true,
+        "exclude_matches_audit": true,
+        "target_all_oral": true
+      },
+      "verdict": "PASS",
+      "target_master_ids": [
+        "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
+        "24cc1e70-feeb-4cb0-9c15-90eeef521301",
+        "4490855b-6fb0-4fe1-8402-7872be5775fd",
+        "5a46babe-a1aa-4edc-ad61-ebb52a20211c",
+        "812690a4-15ef-4798-9e8a-56d4aec8738a",
+        "aa4a5182-0f6b-4295-b64a-9d9fc0591c81",
+        "c52ee592-9df9-4b69-a040-e1f1437c09d1",
+        "d5bced50-d301-4386-b71e-15a805963eea",
+        "dde775af-35ee-48a7-80d3-ecf1f9abf801"
+      ],
+      "distribution": [
+        {
+          "fp": "41701ec292bc3fa6",
+          "n": 9,
+          "isTarget": true,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "뮤코스텐캡슐100밀리그램(아세틸시스테인)",
+            "튜란트캡슐100밀리그램(아세틸시스테인)"
+          ]
+        },
+        {
+          "fp": "f868ae4a8e341fba",
+          "n": 6,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "뮤테란캡슐100밀리그램(아세틸시스테인)",
+            "뮤테란캡슐100밀리그램(아세틸시스테인)"
+          ]
+        },
+        {
+          "fp": "88c905bf4f255ccd",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "뮤라텐캡슐100밀리그램(아세틸시스테인)",
+            "뮤라텐캡슐100밀리그램(아세틸시스테인)"
+          ]
+        }
+      ]
+    },
+    {
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "targetFp": "124cccc95fde01af",
+      "auditT": 8,
+      "auditExclude": 88,
+      "coarseTotal": 96,
+      "targetCount": 8,
+      "excludeCount": 88,
+      "excludeFpCount": 19,
+      "excludeFps": [
+        "a41e78e8f3b1b2da",
+        "0b7e1039e851f2b3",
+        "45cf6d1c6ee40d1e",
+        "b6ce175875836460",
+        "02cd3e1f93a68b10",
+        "3b15ee57c0203f23",
+        "7133d6c4ab036b16",
+        "68605f78af44cbe7",
+        "4d06f3b60f675882",
+        "f3dc34b75d99b68b",
+        "e71bb077affe3ed4",
+        "77f2de3486d5fad2",
+        "10e86c53aee132d0",
+        "ef09f520f59e5fed",
+        "6a1826e241940b79",
+        "e64971bbc936ec4e",
+        "e2304999f9eda137",
+        "232c3531147b2ab7",
+        "43bdb6112340036e"
+      ],
+      "excludeBreakdown": [
+        {
+          "fp": "a41e78e8f3b1b2da",
+          "n": 12
+        },
+        {
+          "fp": "0b7e1039e851f2b3",
+          "n": 9
+        },
+        {
+          "fp": "45cf6d1c6ee40d1e",
+          "n": 7
+        },
+        {
+          "fp": "b6ce175875836460",
+          "n": 7
+        },
+        {
+          "fp": "02cd3e1f93a68b10",
+          "n": 7
+        },
+        {
+          "fp": "3b15ee57c0203f23",
+          "n": 5
+        },
+        {
+          "fp": "7133d6c4ab036b16",
+          "n": 5
+        },
+        {
+          "fp": "68605f78af44cbe7",
+          "n": 5
+        },
+        {
+          "fp": "4d06f3b60f675882",
+          "n": 4
+        },
+        {
+          "fp": "f3dc34b75d99b68b",
+          "n": 4
+        },
+        {
+          "fp": "e71bb077affe3ed4",
+          "n": 3
+        },
+        {
+          "fp": "77f2de3486d5fad2",
+          "n": 3
+        },
+        {
+          "fp": "10e86c53aee132d0",
+          "n": 3
+        },
+        {
+          "fp": "ef09f520f59e5fed",
+          "n": 3
+        },
+        {
+          "fp": "6a1826e241940b79",
+          "n": 3
+        },
+        {
+          "fp": "e64971bbc936ec4e",
+          "n": 2
+        },
+        {
+          "fp": "e2304999f9eda137",
+          "n": 2
+        },
+        {
+          "fp": "232c3531147b2ab7",
+          "n": 2
+        },
+        {
+          "fp": "43bdb6112340036e",
+          "n": 2
+        }
+      ],
+      "targetRoutes": [
+        "oral"
+      ],
+      "checks": {
+        "target_matches_audit_T": true,
+        "target_master_ids_identical": true,
+        "exclude_matches_audit": true,
+        "target_all_oral": true
+      },
+      "verdict": "PASS",
+      "target_master_ids": [
+        "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
+        "25c77066-dc75-413e-9183-704c6e77d3e6",
+        "2e7714a3-cbac-4fb2-8c87-b25515225d51",
+        "77d68cee-0d00-4244-8a41-889a7aeeca23",
+        "c4a026e1-307c-4cf9-b52c-52d72955b6d8",
+        "d2e2c08d-6e70-4731-9481-4cdc3b350590",
+        "da2acd60-4f53-4232-a645-27a9e392a945",
+        "eb4d88be-e89d-46a3-ab46-d7ac1cb54d8f"
+      ],
+      "distribution": [
+        {
+          "fp": "124cccc95fde01af",
+          "n": 8,
+          "isTarget": true,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "나로펜정(나프록센나트륨)",
+            "나로펜정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "a41e78e8f3b1b2da",
+          "n": 12,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "나프록신정(나프록센나트륨)",
+            "스노핀정275밀리그람(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "0b7e1039e851f2b3",
+          "n": 9,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "나프롱정(나프록센나트륨)",
+            "나프롱정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "45cf6d1c6ee40d1e",
+          "n": 7,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "세록센정(나프록센나트륨)",
+            "세록센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "b6ce175875836460",
+          "n": 7,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "알삭센정(나프록센나트륨)",
+            "알삭센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "02cd3e1f93a68b10",
+          "n": 7,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "동인당나프록센정(나프록센나트륨)",
+            "동인당나프록센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "3b15ee57c0203f23",
+          "n": 5,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "아나프록스정(나프록센나트륨)",
+            "아나프록스정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "7133d6c4ab036b16",
+          "n": 5,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "아나탁심정(나프록센나트륨)",
+            "아나탁심정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "68605f78af44cbe7",
+          "n": 5,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "프리나정(나프록센나트륨)",
+            "프리나정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "4d06f3b60f675882",
+          "n": 4,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "아낙스정(나프록센나트륨)",
+            "아낙스정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "f3dc34b75d99b68b",
+          "n": 4,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "자이날정(나프록센나트륨)",
+            "자이날정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "e71bb077affe3ed4",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "제이프록센정(나프록센나트륨)",
+            "제이프록센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "77f2de3486d5fad2",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "프로트린정(나프록센나트륨)",
+            "프로트린정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "10e86c53aee132d0",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "나프록소정(나프록센나트륨)",
+            "나프록소정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "ef09f520f59e5fed",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "플라낙스정(나프록센나트륨)",
+            "플라낙스정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "6a1826e241940b79",
+          "n": 3,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "폭센정275밀리그램(나프록센나트륨)",
+            "폭센정275밀리그램(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "e64971bbc936ec4e",
+          "n": 2,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "노바프록센정(나프록센나트륨)",
+            "노바프록센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "e2304999f9eda137",
+          "n": 2,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "다나프록센정(나프록센나트륨)",
+            "다나프록센정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "232c3531147b2ab7",
+          "n": 2,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "엔에이피정(나프록센나트륨)",
+            "엔에이피정(나프록센나트륨)"
+          ]
+        },
+        {
+          "fp": "43bdb6112340036e",
+          "n": 2,
+          "isTarget": false,
+          "routes": [
+            "oral"
+          ],
+          "sampleNames": [
+            "나프노펜정(나프록센나트륨)",
+            "나프노펜정(나프록센나트륨)"
+          ]
+        }
+      ]
+    }
+  ],
+  "allPass": true
+}

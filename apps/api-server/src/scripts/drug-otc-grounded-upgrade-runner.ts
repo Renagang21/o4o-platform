@@ -402,6 +402,136 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-sobrerol-200mg-capsule',
   },
+  // ── batch-8 번들 A (WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1 · 에이전트 가) ──
+  //   SSOT: src/scripts/data/otc-next-batch-8-audit-v1.json (commit 52fbdd9a7) target_master_ids.
+  //   excludeFp 는 otc-batch8-bundleA-fp-harvest.ts(read-only) 하베스트로 확정 — target ID 세트는 audit 와 byte-identical.
+
+  // 락토바실루스아시도필루스균 300mg 캡슐 — coarse 13 = target 단일 fp 13 + 비대상 0(zero-exclude).
+  'lactobacillus-acidophilus-300mg-capsule': {
+    key: '락토바실루스아시도필루스균|300밀리그램|캡슐',
+    ingredient: '락토바실루스아시도필루스균',
+    dose: '300밀리그램',
+    formKeyword: '캡슐',
+    candidate: '177466cf-a57b-4381-b1ff-44bc87c12673',
+    targetFp: '4ec78870b3318967',
+    excludeFp: [], // 비대상 0 (coarse 전량 단일 fp)
+    expected: 13,
+    excludedExpected: 0,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-lactobacillus-acidophilus-300mg-capsule',
+  },
+  // 알파칼시돌 0.5μg 연질캡슐 — coarse 29 = target 단일 fp 12 + 비대상 3 fp 17(9+4+4, 전부 oral).
+  'alfacalcidol-0.5mcg-softcap': {
+    key: '알파칼시돌|0.5마이크로그램|연질캡슐',
+    ingredient: '알파칼시돌',
+    dose: '0.5마이크로그램',
+    formKeyword: '연질캡슐',
+    candidate: '0436f0d8-3dbe-4939-b511-de3bcd69593c',
+    targetFp: '8ac89c4550d02b6d',
+    excludeFp: ['8822d57a6053186c', 'd981726c2fe54e53', 'e083a096a082c0c1'], // 비대상 3 fp = 9+4+4 = 17
+    expected: 12,
+    excludedExpected: 17,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-alfacalcidol-0.5mcg-softcap',
+  },
+  // 아세틸시스테인 100mg 캡슐 — coarse 18 = target 단일 fp 9 + 비대상 2 fp 9(6+3, 전부 oral).
+  'acetylcysteine-100mg-capsule': {
+    key: '아세틸시스테인|100밀리그램|캡슐',
+    ingredient: '아세틸시스테인',
+    dose: '100밀리그램',
+    formKeyword: '캡슐',
+    candidate: '240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4',
+    targetFp: '41701ec292bc3fa6',
+    excludeFp: ['f868ae4a8e341fba', '88c905bf4f255ccd'], // 비대상 2 fp = 6+3 = 9
+    expected: 9,
+    excludedExpected: 9,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-acetylcysteine-100mg-capsule',
+  },
+  // 나프록센나트륨 275mg 정 — coarse 96 = target 단일 fp 8 + 비대상 19 fp 88(전부 oral).
+  //   나프록센(염 없음) 250mg 연질캡슐 그룹과 별개 성분·함량·제형 — 미접촉.
+  'naproxen-sodium-275mg-jeong': {
+    key: '나프록센나트륨|275밀리그램|정',
+    ingredient: '나프록센나트륨',
+    dose: '275밀리그램',
+    formKeyword: '정',
+    candidate: '006f1a2b-f1f7-40a6-ac10-7f0093a150a1',
+    targetFp: '124cccc95fde01af',
+    excludeFp: [
+      'a41e78e8f3b1b2da', '0b7e1039e851f2b3', '45cf6d1c6ee40d1e', 'b6ce175875836460',
+      '02cd3e1f93a68b10', '3b15ee57c0203f23', '7133d6c4ab036b16', '68605f78af44cbe7',
+      '4d06f3b60f675882', 'f3dc34b75d99b68b', 'e71bb077affe3ed4', '77f2de3486d5fad2',
+      '10e86c53aee132d0', 'ef09f520f59e5fed', '6a1826e241940b79', 'e64971bbc936ec4e',
+      'e2304999f9eda137', '232c3531147b2ab7', '43bdb6112340036e',
+    ], // 비대상 19 fp = 12+9+7+7+7+5+5+5+4+4+3+3+3+3+3+2+2+2+2 = 88
+    expected: 8,
+    excludedExpected: 88,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-naproxen-sodium-275mg-jeong',
+  },
+  // ── NEXT batch-8 번들 B (WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1 · 에이전트 다) ──
+  //   감사 SSOT = src/scripts/data/otc-next-batch-8-audit-v1.json (commit 52fbdd9a7 · 에이전트 나).
+  //   target/exclude fp 는 감사 fpDistribution 전사(재도출 금지).
+  // 트리메부틴말레산염 200mg 정 — 100mg/150mg 그룹과 **별개 함량**(미접촉).
+  //   coarse 39 = target 단일 fp 13 + 비대상 7 fp 26(9+7+2+2+2+2+2). other 0.
+  'trimebutine-200mg-jeong': {
+    key: '트리메부틴말레산염|200밀리그램|정',
+    ingredient: '트리메부틴말레산염',
+    dose: '200밀리그램',
+    formKeyword: '정',
+    candidate: '0175e433-a171-44ec-b601-ad65a805171d',
+    targetFp: '559c4ffae3658ec7',
+    excludeFp: [
+      'f17325f333c26450', 'c9fa109aceee2ef9', '082b8090363bd2bd', '2015f1b8688204bf',
+      '4b2fc042e06b43ce', '55cc4180bcad2033', 'ad3da743a3eef800',
+    ], // 비대상 7 fp = 9+7+2+2+2+2+2 = 26
+    expected: 13,
+    excludedExpected: 26,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-trimebutine-200mg-jeong',
+  },
+  // 메코발라민 500μg 캡슐 — zero-exclude(coarse 10 전량 단일 fp). other 0.
+  'mecobalamin-500ug-capsule': {
+    key: '메코발라민|500마이크로그램|캡슐',
+    ingredient: '메코발라민',
+    dose: '500마이크로그램',
+    formKeyword: '캡슐',
+    candidate: '0908968f-30c8-4c9b-95ed-5631212adbc9',
+    targetFp: 'c6c4dcfbf46d229c',
+    excludeFp: [], // 비대상 0
+    expected: 10,
+    excludedExpected: 0,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-mecobalamin-500ug-capsule',
+  },
+  // 덱스판테놀 100mg 정 — coarse 21 = target 단일 fp 9 + 비대상 4 fp 12(4+4+2+2). other 0.
+  'dexpanthenol-100mg-jeong': {
+    key: '덱스판테놀|100밀리그램|정',
+    ingredient: '덱스판테놀',
+    dose: '100밀리그램',
+    formKeyword: '정',
+    candidate: '0d2b2ef8-cce5-4771-9ed7-159fd10c1715',
+    targetFp: '37d1268f8f721dda',
+    excludeFp: ['6e082e14e7ab4380', 'ed9a02f0aeed741d', 'b021fd203c757c36', 'bd458ff8b113d9d1'], // 4+4+2+2 = 12
+    expected: 9,
+    excludedExpected: 12,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-dexpanthenol-100mg-jeong',
+  },
+  // 폴산 1mg 정 — coarse 18 = target 단일 fp 9 + 비대상 2 fp 9(7+2). other 0.
+  'folic-acid-1mg-jeong': {
+    key: '폴산|1밀리그램|정',
+    ingredient: '폴산',
+    dose: '1밀리그램',
+    formKeyword: '정',
+    candidate: '068e2176-ee92-4e94-a47d-2dc632bacf53',
+    targetFp: 'cb05e790cbe3b054',
+    excludeFp: ['2e23851a06e1b65e', '404be54966089625'], // 7+2 = 9
+    expected: 9,
+    excludedExpected: 9,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-folic-acid-1mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

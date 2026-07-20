@@ -1,0 +1,35 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 9,
+  "targetMasters": 9,
+  "anomalies": [],
+  "koCanonical": 9,
+  "existingEnAny": 0,
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "c167e18fc0f042778b0935797b944508",
+      "n": 3
+    }
+  ],
+  "builtLen": 2515,
+  "builtMd5": "c167e18fc0f042778b0935797b944508",
+  "consistencyMatch": true,
+  "summaryField": "Thick phlegm in bronchitis, inflammation of the voice box or sinuses",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 9,
+    "STEP2_en_canonical_flip": 9,
+    "en_write_total": 18
+  },
+  "enTargetMd5": null
+}

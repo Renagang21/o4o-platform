@@ -1,0 +1,25 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-A-KO-EN-GA-V1",
+  "agent": "에이전트 가",
+  "note": "batch-8 번들 A EN 재사용 — otc-en-translations-v1.json (마스터 번역) 의 동일 groupKey 항목 **발췌(verbatim)**. 새 medical fact 0. summary 는 동일 source_ref 공유 out en canonical 의 LIVE 값과 동일.",
+  "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+  "summary": "Constipation, loose stools, bloating, abnormal fermentation in the bowel",
+  "translations": [
+    {
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "title": "Lactobacillus acidophilus 300 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to settle the gut and to help with constipation, loose stools, bloating and abnormal fermentation in the bowel.",
+      "usage": "Adults and children 12 or older take one capsule (300 mg) one to three times a day. Children aged 8 to under 12 take it once or twice a day.",
+      "caution": "Do not take this if your immune system is weakened (for example by AIDS, leukaemia, an organ transplant or high-dose steroids), or for a child under 1 who has a high fever or blood in the stool. Talk to a pharmacist before taking it if you have ever reacted to Yellow No. 5.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Lactobacillus acidophilus 300 mg",
+        "How it works": "Settles the gut (improves the balance of gut bacteria)",
+        "Main symptoms": "Constipation, loose stools, bloating, abnormal fermentation in the bowel",
+        "Who should be careful": "Weakened immune system; babies",
+        "Why this one": "A live-culture treatment that helps balance the gut"
+      }
+    }
+  ]
+}

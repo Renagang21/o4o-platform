@@ -1,0 +1,91 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "177466cf-a57b-4381-b1ff-44bc87c12673",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "락토바실루스아시도필루스균 300mg 캡슐",
+  "coarseTotal": 13,
+  "target": 13,
+  "excluded": 0,
+  "otherFp": 0,
+  "excludedDetail": [],
+  "target_master_ids": [
+    "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+    "1131564e-2600-4385-9c29-57d38148324b",
+    "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+    "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+    "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+    "416d87fa-0847-460e-982d-f12386710bdc",
+    "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+    "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+    "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+    "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+    "bf138001-0f2b-4814-bd2e-df1827108516",
+    "cea084b4-06fd-467f-af9a-182dc47d7a64",
+    "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d"
+  ],
+  "rollback_master_ids": [
+    "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+    "1131564e-2600-4385-9c29-57d38148324b",
+    "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+    "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+    "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+    "416d87fa-0847-460e-982d-f12386710bdc",
+    "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+    "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+    "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+    "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+    "bf138001-0f2b-4814-bd2e-df1827108516",
+    "cea084b4-06fd-467f-af9a-182dc47d7a64",
+    "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "4ec78870b3318967",
+      "n": 13,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 13,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 13,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 13,
+  "htmlLen": 1543,
+  "contentHash": "8d0afba959fb4a1a11bac50b4e6abb76",
+  "summary": "락토바실루스아시도필루스균 300mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 13,
+      "STEP_B_easy_canonical_demote": 13,
+      "STEP_B_authored_canonical_flip": 13,
+      "total": 39
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 13,
+      "total": 13
+    },
+    "grand_total": 52
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 13",
+    "policy_2A": "audit 2/master = 26 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

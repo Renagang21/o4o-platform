@@ -1,0 +1,35 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0436f0d8-3dbe-4939-b511-de3bcd69593c",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 12,
+  "targetMasters": 12,
+  "anomalies": [],
+  "koCanonical": 12,
+  "existingEnAny": 0,
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "d0e8523587e6cb11df9ddd423cc7366b",
+      "n": 21
+    }
+  ],
+  "builtLen": 2956,
+  "builtMd5": "d0e8523587e6cb11df9ddd423cc7366b",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 12,
+    "STEP2_en_canonical_flip": 12,
+    "en_write_total": 24
+  },
+  "enTargetMd5": null
+}
