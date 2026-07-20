@@ -45,13 +45,15 @@
 | deleteAsset 호출부 | 컨트롤러 1곳(:239)만 → 409 매핑 완료, 회귀 없음 |
 | 매처 신뢰도 | 기존 프로덕션 `htmlReferencesResourceUrl` 재사용(검증된 완전일치) |
 | 탐지 입력 라이브 확인 | ✅ (2026-07-19 배포 후) 테스트 Screen Set 코너설명 블록에 `<img src="…GUARD-TEST…jpg">` 저장·조회 확인(`savedBodyHasImg:true`) → 가드가 읽는 `store_tablet_screen_blocks` 데이터 형태 실증. 정리(참조 제거+tombstone) 완료. |
-| operator 409 실행 | ⏳ 미수행(정직) — DELETE `/media-library/:id` 는 **operator/admin 권한**(store_owner 세션 불가) + 실 미디어 자산 필요. 가드는 **삭제를 막는 fail-safe**(오작동 시에도 기존 동작=무가드로 회귀할 뿐, 데이터 손실 유발 안 함). 아래 절차로 확정 가능. |
+| operator 409 실행 | ✅ **PASS** (프로덕션 브라우저, operator 인증, 2026-07-20) — 아래 §operator 409 실검증. |
 
-### operator 409 확정 절차 (권장)
-1. operator/admin 계정으로 `GET /media-library` → 실 자산 A(url U) 확보.
-2. store owner 로 Screen Set 코너설명 body 에 `<img src="U">` 저장(위 탐지 입력 방식).
-3. operator 로 `DELETE /media-library/{A}` → **409 `MEDIA_IN_USE_SCREEN_SET`** (실 자산 A 는 가드로 보존됨).
-4. Screen Set 참조 제거 후 재삭제 → 200. (가드는 삭제를 막으므로 실 미디어는 이 과정에서 삭제되지 않음.)
+### operator 409 실검증 (2026-07-20, 프로덕션 브라우저) — ✅ PASS
+경로: `/api/v1/platform/media-library/*` (register-routes `app.use('/api/v1/platform', createMediaLibraryRouter)`).
+1. **operator**(sohae2100) 로 `GET /platform/media-library` → 실 자산 A(id `32d635b5…`, url = `…/o4o-media-library/media/2026/06/8407543a-…webp`) 확보.
+2. **store owner**(renagang21) 로 테스트 Screen Set `b221bd4d…` 생성 + `PUT /store/screen-sets/{id}/blocks` idle_media items[].url = A_URL 저장(참조 생성).
+3. **operator** 로 `DELETE /platform/media-library/32d635b5…` → **409 `deleteStatus:409, code:MEDIA_IN_USE_SCREEN_SET`** ✅. 직후 `GET` → **200(자산 A 보존)** ✅ — 가드가 삭제를 막아 데이터 손실 0.
+4. **정리**: store owner 로 테스트 Screen Set `b221bd4d` 삭제(200) → 참조 제거. **실 자산 A 는 삭제하지 않음**(보호 원칙 "실 운영 미디어 삭제 테스트 금지"). "참조 제거 후 삭제 200" 단계는 실 A 삭제를 수반하므로 미실행 — 가드 해제는 참조 제거로 논리 확인.
+- **부수 관찰(정직)**: 참조 상태에서도 `GET …/{A}/usage` 는 `usages:[]`(0) 반환. 즉 **삭제 가드(fail-safe, deleteAsset)는 참조를 감지해 409를 정확히 반환**하나, 정보용 `/usage` 엔드포인트는 이 참조(idle_media URL)를 표면화하지 못함 → usage 탐지와 삭제 가드의 판정 경로가 다름. 안전 가드(핵심)는 정상. usage 표면화는 후속 개선 후보(데이터 손실과 무관).
 
 ## 5. 산출물
 - 변경 파일 2 + 본 CHECK. **migration 0, 신규 컬럼·테이블·ref-count 0**. commit=(아래) / 배포 후 스모크.

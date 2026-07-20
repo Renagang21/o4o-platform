@@ -16,8 +16,8 @@ KPA 태블릿 제작기(`TabletScreenSetManager`)의 **검증된 순수 콘텐�
 
 ---
 
-## 1. P1b operator 409 검증 상태 (§1)
-- `MEDIA_IN_USE_SCREEN_SET`(미디어 삭제 가드) 검증은 **operator 테스트 계정 필요** → 자동 로그인/권한 환경 없음 → **미검증(Deferred)** 유지. P1b CHECK 상태 그대로. Core 작업은 계속 진행(§1 지침).
+## 1. P1b operator 409 검증 상태 (§1) — ✅ PASS (프로덕션 브라우저, operator 인증, 2026-07-20)
+- operator 계정으로 `DELETE /api/v1/platform/media-library/{referenced}` → **409 `MEDIA_IN_USE_SCREEN_SET`** + 자산 보존(GET 200) 실검증. 상세는 `CHECK-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1.md` §operator 409 갱신 참조. (Core 작업과 별개 WO — §1 지침대로 병행 완료.)
 
 ## 2. Core로 추출한 타입·함수 (§2)
 `packages/screen-content-core/src/index.ts`:
@@ -44,12 +44,16 @@ KPA 태블릿 제작기(`TabletScreenSetManager`)의 **검증된 순수 콘텐�
 - `@o4o/screen-content-core` tsc: **0**. `@o4o/web-kpa-society` tsc: **0**.
 - web build/deploy: **success** (806188ef2). **Docker 빌드 수정**: web-kpa-society Dockerfile 이 각 워크스페이스 package.json/소스를 선별 COPY → 신규 `screen-content-core` COPY 2줄 추가(누락 시 `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND` 로 빌드 실패, 첫 배포 99d554424 실패 → Dockerfile fix 후 재배포 success). Core 가 Vite 빌드에 정상 번들됨.
 
-## 7. 신규·수정·재진입 검증 (§7)
-- 실제 신규 제작/수정/저장/재진입은 **매장 owner 인증 관리 화면 필요** → 자동 로그인 금지 → **DEFERRED**. 인증 세션 확인 항목:
-  1. 신규 제작 저장 → 재진입 시 블록/추가 정보/표시상태 유지.
-  2. content_list 추가/수정/삭제/순서/표시·숨김 동작.
-  3. 5개 템플릿 동작.
-  4. dirty guard(normalizeBlocks 서명) 이동 경고.
+## 7. 신규·수정·재진입 검증 (§7) — ✅ PASS (프로덕션 브라우저, 매장 owner 인증 세션, 2026-07-20)
+`https://kpa-society.co.kr/store/commerce/tablet-displays` (테스트 약국 매장, 보호 샘플 org):
+- **신규 제작·저장**: "[검증] Core추출 테스트 코너" 생성 → 저장 성공(POST /store/screen-sets 201 + PUT /blocks 200, 토스트 "생성됨"), **블록 수 5**(ensureAutoBlocks).
+- **5개 템플릿 전환**: 기본 코너 안내형/대기 영상형/제품 진열형/코너 소개형/상품 집중형 — 각 선택 시 미리보기 반영 + dirty("변경됨"), 기본형 복귀 시 dirty 해제(normalizeBlocks 서명 baseline 일치).
+- **추가 정보(content_list)**: 3건 추가(addContentItems dedup) → **숨기기**(updateContentItem visible=false, 미리보기 2카드로 반영) → **순서 아래로**(moveContentItem swap+reindex) → **삭제**(window.confirm "…원본 콘텐츠는 삭제되지 않습니다" → removeContentItem, 2건으로 재정렬).
+- **저장 payload(API 직접 조회)**: **`corner_description.config.body` = string**("<p>이것은 Core 추출 검증용…") — normalizeCornerBody(RichTextEditor {html,json}→HTML) 정상. content_list 2건 **visible=[true,false]** 유지. blockTypes 5개.
+- **재진입(더보기→수정)**: 편집기 하이드레이트(seedInitialBlocks) — 제목·본문·템플릿·추가 정보 2건·표시상태([표시,숨김]) 동일 유지, dirty 없음(baseline 일치).
+- **미리보기**: 태블릿 화면 / QR 모바일 화면 토글 정상.
+- **테스트 데이터 정리**: 테스트 콘텐츠 삭제(soft-delete 200). 보호 샘플 구강/피부·current 무변경.
+- **오류**: console error = 초기 auth 부트스트랩 401(→refresh→200, benign 크로스서비스) 1건뿐. pageerror 0, 예상 외 API 오류 0(모든 tablet API 200/201).
 
 ## 8. 타블렛·QR 공개 렌더 회귀 (§8)
 - 이번 변경은 **제작기(프론트) 순수 로직 소비 전환뿐** — 공개 runtime(API `/tablet/screen`·`/qr/public`)·kiosk 뷰어·resolver 를 **접촉하지 않음** → 공개 렌더는 구조적으로 무영향.
@@ -85,11 +89,11 @@ pnpm-lock.yaml                                                            (works
 | 신규·수정 payload 완전 동일 | ✅ (fixture 30) |
 | 객체형 corner_description.body 방어 | ✅ (normalizeCornerBody) |
 | 추가정보 수정·삭제·순서·표시 유지 | ✅ (content ops) |
-| 5개 템플릿 동작 | ✅ (template 로직 무변경) / 실화면 ⏸ 인증 |
-| 저장 후 재진입 유지 | ⏸ DEFERRED(인증) |
-| 타블렛·Screen Set QR 결과 불변 | ✅ (공개 경로 무접촉) |
-| 보호 샘플·current 불변 | ✅ (write 0) |
-| console·pageerror·API 오류 0 | ⏸ 실화면 인증 후 |
+| 5개 템플릿 동작 | ✅ (실화면 5종 전환 PASS §7) |
+| 저장 후 재진입 유지 | ✅ (실화면 재진입 동일 유지 §7) |
+| 타블렛·Screen Set QR 결과 불변 | ✅ (공개 경로 무접촉·태블릿 sections 불변) |
+| 보호 샘플·current 불변 | ✅ (테스트 세트만 사용·삭제, write 0 on 보호샘플) |
+| console·pageerror·API 오류 0 | ✅ (auth 부트스트랩 401만·pageerror0·API 오류0 §7) |
 | DB·migration 0 | ✅ |
 | commit/push·배포 | ✅ (99d554424 + Dockerfile fix 806188ef2 · web deploy success) |
 
