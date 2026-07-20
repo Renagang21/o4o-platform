@@ -1,0 +1,139 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "폴산|1밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "068e2176-ee92-4e94-a47d-2dc632bacf53",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "폴산 1mg 정",
+  "coarseTotal": 18,
+  "target": 9,
+  "excluded": 9,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "3e053caa-aae4-4430-a0b6-77e54b73a195",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "50c9fee1-ebcf-4936-9949-dc86990df01f",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "51315054-1837-4a74-9eda-0f83387cd303",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "6783227f-5e45-48b4-a27e-4d6dc8b872e9",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "68632d74-da12-4bc3-93be-b7daae5d913d",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "6af72220-e55c-462d-ae16-3b11073646fc",
+      "name": "폴스원정(폴산)",
+      "reason": "비대상(fp 404be54966089625, bridge SSOT)"
+    },
+    {
+      "id": "893d3163-f7bc-4f3b-8ee1-27c38f37ae27",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "c37aed9f-8922-425a-93b9-5734be050a10",
+      "name": "폴시드정(폴산)",
+      "reason": "비대상(fp 2e23851a06e1b65e, bridge SSOT)"
+    },
+    {
+      "id": "dce3bdef-fda4-4224-9f06-77019db10ac5",
+      "name": "폴스원정(폴산)",
+      "reason": "비대상(fp 404be54966089625, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "11b3d1f7-83de-455e-9b87-193f3a6a7eed",
+    "200d81fa-9075-4aec-99b5-a6ea3009b65f",
+    "39be241e-a132-4e7d-8664-87c8525fbcc9",
+    "71ff03ef-719e-4bc2-b66f-fd172d0e6931",
+    "7b06b043-0d7f-4c76-9ca5-8e46622a7486",
+    "c278e379-3e66-4028-822a-9cb4592e0f98",
+    "c5e1a39d-e1e0-4590-aaae-383633f0bfb7",
+    "de306f3b-63bf-4152-a2f7-d55b795a9c3a",
+    "f5f56a62-f29b-4801-8d97-083a5cf66365"
+  ],
+  "rollback_master_ids": [
+    "11b3d1f7-83de-455e-9b87-193f3a6a7eed",
+    "200d81fa-9075-4aec-99b5-a6ea3009b65f",
+    "39be241e-a132-4e7d-8664-87c8525fbcc9",
+    "71ff03ef-719e-4bc2-b66f-fd172d0e6931",
+    "7b06b043-0d7f-4c76-9ca5-8e46622a7486",
+    "c278e379-3e66-4028-822a-9cb4592e0f98",
+    "c5e1a39d-e1e0-4590-aaae-383633f0bfb7",
+    "de306f3b-63bf-4152-a2f7-d55b795a9c3a",
+    "f5f56a62-f29b-4801-8d97-083a5cf66365"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "cb05e790cbe3b054",
+      "n": 9,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "2e23851a06e1b65e",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "404be54966089625",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 9,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 9,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 9,
+  "htmlLen": 1707,
+  "contentHash": "ac650e61aa5e2574a46eff99b2d98e2c",
+  "summary": "폴산 1mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 9,
+      "STEP_B_easy_canonical_demote": 9,
+      "STEP_B_authored_canonical_flip": 9,
+      "total": 27
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 9,
+      "total": 9
+    },
+    "grand_total": 36
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 9",
+    "policy_2A": "audit 2/master = 18 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "readOnly": false,
+  "groups": {
+    "trimebutine-200mg-jeong": {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "liveEnMd5": "b8021ac013e795904e4924ee2f5d3a8c",
+      "liveEnCount": 3,
+      "summary": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+      "masterStruct": {
+        "present": true,
+        "builtMd5": "b8021ac013e795904e4924ee2f5d3a8c",
+        "match": true
+      },
+      "structSource": "master-translation-file",
+      "byteIdentical": true,
+      "verdict": "PASS",
+      "written": "otc-en-translations-trimebutine-200mg-jeong-v1.json"
+    },
+    "mecobalamin-500ug-capsule": {
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "liveEnMd5": "9e31eba07f3029816d9007109623ce97",
+      "liveEnCount": 10,
+      "summary": null,
+      "masterStruct": {
+        "present": false
+      },
+      "reverseParse": {
+        "builtMd5": "9e31eba07f3029816d9007109623ce97",
+        "match": true,
+        "missing": []
+      },
+      "structSource": "reverse-parse-of-live-en",
+      "byteIdentical": true,
+      "verdict": "PASS",
+      "written": "otc-en-translations-mecobalamin-500ug-capsule-v1.json"
+    },
+    "dexpanthenol-100mg-jeong": {
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "liveEnMd5": "2bbeab235a2cb9818dd5cbae9437c547",
+      "liveEnCount": 4,
+      "summary": "Hair loss",
+      "masterStruct": {
+        "present": true,
+        "builtMd5": "2bbeab235a2cb9818dd5cbae9437c547",
+        "match": true
+      },
+      "structSource": "master-translation-file",
+      "byteIdentical": true,
+      "verdict": "PASS",
+      "written": "otc-en-translations-dexpanthenol-100mg-jeong-v1.json"
+    },
+    "folic-acid-1mg-jeong": {
+      "groupKey": "폴산|1밀리그램|정",
+      "liveEnMd5": "5c41a406b1fbed993dcfeca356baf373",
+      "liveEnCount": 8,
+      "summary": "Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition",
+      "masterStruct": {
+        "present": true,
+        "builtMd5": "5c41a406b1fbed993dcfeca356baf373",
+        "match": true
+      },
+      "structSource": "master-translation-file",
+      "byteIdentical": true,
+      "verdict": "PASS",
+      "written": "otc-en-translations-folic-acid-1mg-jeong-v1.json"
+    }
+  },
+  "status": "PASS",
+  "failCount": 0
+}

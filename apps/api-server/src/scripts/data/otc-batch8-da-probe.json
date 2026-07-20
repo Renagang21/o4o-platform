@@ -1,0 +1,95 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groups": {
+    "trimebutine-200mg-jeong": {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "source_ref_id": "0175e433-a171-44ec-b601-ad65a805171d",
+      "expectedT": 13,
+      "draftCount": 1,
+      "draftTitle": "트리메부틴말레산염 200mg 정",
+      "refKoCanonical": [
+        {
+          "md5": "aa237534f66e28293e6767b1a1322962",
+          "n": 3
+        }
+      ],
+      "refEnCanonical": [
+        {
+          "md5": "b8021ac013e795904e4924ee2f5d3a8c",
+          "n": 3,
+          "summary": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+          "len": 2417
+        }
+      ],
+      "refEnHtml": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">Over-the-counter</span><span class=\"sd-badge\">Regulates gut movement</span></div>\n    <h1>Trimebutine Maleate 200 mg Tablet<small>A digestive aid that regulates gut movement</small></h1>\n    <p class=\"sd-meta\">Trimebutine maleate 200 mg</p>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.</p>\n    <h2>At a glance</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Category</span>\n        <p>Over-the-counter</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Ingredient</span>\n        <p>Trimebutine maleate 200 mg</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">How it works</span>\n        <p>Regulates gut movement</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Main symptoms</span>\n        <p>Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Who should be careful</span>\n        <p>Inherited lactose metabolism disorders; pregnancy and breastfeeding</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Why this one</span>\n        <p>A digestive aid that regulates gut movement</p>\n      </div>\n    </div>\n    <h2>How to take it</h2>\n    <p class=\"sd-intake\">Adults take 100–200 mg three times a day, before meals. The dose may be adjusted to suit your age and symptoms.</p>\n    <h2>Before you take this</h2>\n    <ul class=\"sd-warn\">\n      <li>Do not take this if you have an inherited problem with lactose metabolism, such as galactose intolerance.</li>\n      <li>Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or if you have ever reacted to Yellow No. 4 (tartrazine).</li>\n    </ul>\n    <p class=\"sd-foot\">Medicines are managed to GMP standards through sourcing, manufacturing and quality control. Products with the same ingredient, strength and form are managed to the same standard for quality and effect. Check with a pharmacist by ingredient and strength rather than by product name.</p>\n  </div>\n</div>"
+    },
+    "mecobalamin-500ug-capsule": {
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "source_ref_id": "0908968f-30c8-4c9b-95ed-5631212adbc9",
+      "expectedT": 10,
+      "draftCount": 1,
+      "draftTitle": "메코발라민 500㎍ 캡슐",
+      "refKoCanonical": [
+        {
+          "md5": "6876cef5b37c44f4afa568d0b6101bcb",
+          "n": 10
+        }
+      ],
+      "refEnCanonical": [
+        {
+          "md5": "9e31eba07f3029816d9007109623ce97",
+          "n": 10,
+          "summary": null,
+          "len": 2230
+        }
+      ],
+      "refEnHtml": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">Over-the-counter</span><span class=\"sd-badge\">Supplies vitamin B12 (for nerves)</span></div>\n    <h1>Mecobalamin 500 ㎍ Capsule<small>A vitamin B12 preparation that acts on peripheral nerves</small></h1>\n    <p class=\"sd-meta\">Mecobalamin 500 ㎍</p>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">This medicine is used for peripheral neuropathy.</p>\n    <h2>At a glance</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Category</span>\n        <p>Over-the-counter</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Ingredient</span>\n        <p>Mecobalamin 500 ㎍</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">How it works</span>\n        <p>Supplies vitamin B12 (for nerves)</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Main symptoms</span>\n        <p>Peripheral neuropathy such as tingling in the hands and feet</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Who should be careful</span>\n        <p>Seek advice if there is no improvement after one month</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Why this one</span>\n        <p>A vitamin B12 preparation that acts on peripheral nerves</p>\n      </div>\n    </div>\n    <h2>How to take it</h2>\n    <p class=\"sd-intake\">Adults take three capsules (1,500 ㎍) a day, divided into three doses.</p>\n    <h2>Before you take this</h2>\n    <ul class=\"sd-warn\">\n      <li>Do not take this if you have ever reacted to this medicine or if you have an inherited problem with lactose metabolism.</li>\n      <li>Talk to a pharmacist before taking it if you are pregnant or breastfeeding, and seek advice if there is no improvement or it gets worse after about one month.</li>\n    </ul>\n    <p class=\"sd-foot\">Medicines are managed to GMP standards through sourcing, manufacturing and quality control. Products with the same ingredient, strength and form are managed to the same standard for quality and effect. Check with a pharmacist by ingredient and strength rather than by product name.</p>\n  </div>\n</div>"
+    },
+    "dexpanthenol-100mg-jeong": {
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "source_ref_id": "0d2b2ef8-cce5-4771-9ed7-159fd10c1715",
+      "expectedT": 9,
+      "draftCount": 1,
+      "draftTitle": "덱스판테놀 100mg 정",
+      "refKoCanonical": [
+        {
+          "md5": "d4db06d8798296c0bd4919db22d4dc83",
+          "n": 4
+        }
+      ],
+      "refEnCanonical": [
+        {
+          "md5": "2bbeab235a2cb9818dd5cbae9437c547",
+          "n": 4,
+          "summary": "Hair loss",
+          "len": 2347
+        }
+      ],
+      "refEnHtml": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">Over-the-counter</span><span class=\"sd-badge\">Supports treatment for hair loss</span></div>\n    <h1>Dexpanthenol 100 mg Tablet<small>A preparation used as a supportive treatment for hair loss</small></h1>\n    <p class=\"sd-meta\">Dexpanthenol 100 mg</p>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">This medicine is used as a supportive treatment for hair loss.</p>\n    <h2>At a glance</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Category</span>\n        <p>Over-the-counter</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Ingredient</span>\n        <p>Dexpanthenol 100 mg</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">How it works</span>\n        <p>Supports treatment for hair loss</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Main symptoms</span>\n        <p>Hair loss</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Who should be careful</span>\n        <p>Under 19; not for any purpose other than hair loss</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Why this one</span>\n        <p>A preparation used as a supportive treatment for hair loss</p>\n      </div>\n    </div>\n    <h2>How to take it</h2>\n    <p class=\"sd-intake\">Adults take one tablet three times a day. The treatment period is 6 weeks.</p>\n    <h2>Before you take this</h2>\n    <ul class=\"sd-warn\">\n      <li>Do not take this if you have ever reacted to it, if you are under 19, for any purpose other than hair loss, or if you have an inherited condition such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.</li>\n      <li>Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or have ever had a drug allergy.</li>\n      <li>If there is no improvement after about 6 weeks, stop taking it.</li>\n    </ul>\n    <p class=\"sd-foot\">Medicines are managed to GMP standards through sourcing, manufacturing and quality control. Products with the same ingredient, strength and form are managed to the same standard for quality and effect. Check with a pharmacist by ingredient and strength rather than by product name.</p>\n  </div>\n</div>"
+    },
+    "folic-acid-1mg-jeong": {
+      "groupKey": "폴산|1밀리그램|정",
+      "source_ref_id": "068e2176-ee92-4e94-a47d-2dc632bacf53",
+      "expectedT": 9,
+      "draftCount": 1,
+      "draftTitle": "폴산 1mg 정",
+      "refKoCanonical": [
+        {
+          "md5": "ac650e61aa5e2574a46eff99b2d98e2c",
+          "n": 8
+        }
+      ],
+      "refEnCanonical": [
+        {
+          "md5": "5c41a406b1fbed993dcfeca356baf373",
+          "n": 8,
+          "summary": "Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition",
+          "len": 2857
+        }
+      ],
+      "refEnHtml": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">Over-the-counter</span><span class=\"sd-badge\">Supplies folic acid (folate)</span></div>\n    <h1>Folic Acid 1 mg Tablet<small>A vitamin preparation that replaces folate</small></h1>\n    <p class=\"sd-meta\">Folic acid 1 mg</p>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">This medicine is used to prevent and treat folic acid deficiency, to supply folic acid during pregnancy and breastfeeding, and for anaemia linked to folic acid deficiency — such as anaemia from poor nutrition, anaemia in pregnancy, and anaemia in children.</p>\n    <h2>At a glance</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Category</span>\n        <p>Over-the-counter</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Ingredient</span>\n        <p>Folic acid 1 mg</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">How it works</span>\n        <p>Supplies folic acid (folate)</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Main symptoms</span>\n        <p>Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Who should be careful</span>\n        <p>Pernicious anaemia from vitamin B12 deficiency</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">Why this one</span>\n        <p>A vitamin preparation that replaces folate</p>\n      </div>\n    </div>\n    <h2>How to take it</h2>\n    <p class=\"sd-intake\">To treat folic acid deficiency, adults and children 24 months or older take 0.25–1 mg a day. To prevent it, or when the body needs more, take 0.1–0.25 mg a day.</p>\n    <h2>Before you take this</h2>\n    <ul class=\"sd-warn\">\n      <li>Do not take this if you have ever reacted to it, or if you have pernicious anaemia or megaloblastic anaemia caused by vitamin B12 deficiency (it can mask the cause of the anaemia), or if you have an inherited condition such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.</li>\n      <li>Talk to a pharmacist before taking it if you are taking a folate-metabolism inhibitor such as methotrexate or trimethoprim, an anti-epileptic such as phenytoin, sulfasalazine or cholestyramine, or if you are under a doctor's care.</li>\n      <li>If there is no improvement after about a month, stop taking it.</li>\n    </ul>\n    <p class=\"sd-foot\">Medicines are managed to GMP standards through sourcing, manufacturing and quality control. Products with the same ingredient, strength and form are managed to the same standard for quality and effect. Check with a pharmacist by ingredient and strength rather than by product name.</p>\n  </div>\n</div>"
+    }
+  }
+}

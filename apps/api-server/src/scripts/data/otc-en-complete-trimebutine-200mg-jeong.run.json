@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "트리메부틴말레산염|200밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0175e433-a171-44ec-b601-ad65a805171d",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 13,
+  "targetMasters": 13,
+  "anomalies": [],
+  "koCanonical": 13,
+  "existingEnAny": 13,
+  "existingEnCanonical": 13,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "b8021ac013e795904e4924ee2f5d3a8c",
+      "n": 3
+    }
+  ],
+  "builtLen": 2417,
+  "builtMd5": "b8021ac013e795904e4924ee2f5d3a8c",
+  "consistencyMatch": true,
+  "summaryField": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 13,
+    "STEP2_en_canonical_flip": 13,
+    "en_write_total": 26
+  },
+  "enTargetMd5": "b8021ac013e795904e4924ee2f5d3a8c",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(b8021ac013e795904e4924ee2f5d3a8c) — write 0, 정상 종료"
+}

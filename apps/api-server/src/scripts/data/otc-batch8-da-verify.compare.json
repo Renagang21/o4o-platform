@@ -1,0 +1,113 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groups": {
+    "trimebutine-200mg-jeong": {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "T": 13,
+      "checks": {
+        "target_count": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonical_authored": true,
+        "ko_right_source_ref": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "canonicalDup_0": true,
+        "audit_rows_eq_T": true,
+        "ko_md5_uniform": true,
+        "ko_md5_matches_out_sibling": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_md5_uniform": true,
+        "en_md5_byte_identical_to_out": true,
+        "exclude_set_unchanged": true,
+        "exclude_easy_ones_still_easy": true,
+        "out_sibling_unchanged": true,
+        "before_was_clean_easy": true
+      },
+      "failed": [],
+      "verdict": "PASS"
+    },
+    "mecobalamin-500ug-capsule": {
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "T": 10,
+      "checks": {
+        "target_count": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonical_authored": true,
+        "ko_right_source_ref": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "canonicalDup_0": true,
+        "audit_rows_eq_T": true,
+        "ko_md5_uniform": true,
+        "ko_md5_matches_out_sibling": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_md5_uniform": true,
+        "en_md5_byte_identical_to_out": true,
+        "exclude_set_unchanged": true,
+        "exclude_easy_ones_still_easy": true,
+        "out_sibling_unchanged": true,
+        "before_was_clean_easy": true
+      },
+      "failed": [],
+      "verdict": "PASS"
+    },
+    "dexpanthenol-100mg-jeong": {
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "T": 9,
+      "checks": {
+        "target_count": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonical_authored": true,
+        "ko_right_source_ref": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "canonicalDup_0": true,
+        "audit_rows_eq_T": true,
+        "ko_md5_uniform": true,
+        "ko_md5_matches_out_sibling": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_md5_uniform": true,
+        "en_md5_byte_identical_to_out": true,
+        "exclude_set_unchanged": true,
+        "exclude_easy_ones_still_easy": true,
+        "out_sibling_unchanged": true,
+        "before_was_clean_easy": true
+      },
+      "failed": [],
+      "verdict": "PASS"
+    },
+    "folic-acid-1mg-jeong": {
+      "groupKey": "폴산|1밀리그램|정",
+      "T": 9,
+      "checks": {
+        "target_count": true,
+        "ko_canonical_exactly_1": true,
+        "ko_canonical_authored": true,
+        "ko_right_source_ref": true,
+        "ko_easy_deprecated": true,
+        "ko_no_easy_canonical_left": true,
+        "canonicalDup_0": true,
+        "audit_rows_eq_T": true,
+        "ko_md5_uniform": true,
+        "ko_md5_matches_out_sibling": true,
+        "en_canonical_eq_T": true,
+        "en_needs_review_0": true,
+        "en_md5_uniform": true,
+        "en_md5_byte_identical_to_out": true,
+        "exclude_set_unchanged": true,
+        "exclude_easy_ones_still_easy": true,
+        "out_sibling_unchanged": true,
+        "before_was_clean_easy": true
+      },
+      "failed": [],
+      "verdict": "PASS"
+    }
+  },
+  "status": "PASS",
+  "failGroups": 0
+}

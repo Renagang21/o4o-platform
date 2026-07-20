@@ -1,0 +1,164 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "덱스판테놀|100밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0d2b2ef8-cce5-4771-9ed7-159fd10c1715",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "덱스판테놀 100mg 정",
+  "coarseTotal": 21,
+  "target": 9,
+  "excluded": 12,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "02e5dd5f-75c1-4598-a088-8269b988b020",
+      "name": "다모판텐정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp 6e082e14e7ab4380, bridge SSOT)"
+    },
+    {
+      "id": "12cbb97d-8675-4d51-9974-c78955201556",
+      "name": "케어모닉정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp b021fd203c757c36, bridge SSOT)"
+    },
+    {
+      "id": "38fd4385-275d-46d0-902d-2236de80af65",
+      "name": "알로판텐정100mg(덱스판테놀)",
+      "reason": "비대상(fp ed9a02f0aeed741d, bridge SSOT)"
+    },
+    {
+      "id": "5952600a-9ddb-41c9-87da-48d3dc62ed8d",
+      "name": "판덱스정(덱스판테놀)",
+      "reason": "비대상(fp bd458ff8b113d9d1, bridge SSOT)"
+    },
+    {
+      "id": "6d34d5c0-c1b4-4e04-960b-c5894bc95f35",
+      "name": "다모판텐정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp 6e082e14e7ab4380, bridge SSOT)"
+    },
+    {
+      "id": "78c7f7b1-e2f7-47cd-8499-19513107d5af",
+      "name": "케어모닉정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp b021fd203c757c36, bridge SSOT)"
+    },
+    {
+      "id": "7a8f8561-f155-4dd4-ae69-0b7eccd86f48",
+      "name": "다모판텐정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp 6e082e14e7ab4380, bridge SSOT)"
+    },
+    {
+      "id": "9471a93b-67a3-4135-a99e-4ad83860e075",
+      "name": "알로판텐정100mg(덱스판테놀)",
+      "reason": "비대상(fp ed9a02f0aeed741d, bridge SSOT)"
+    },
+    {
+      "id": "c2939c1b-eda5-4ce0-8792-182250eeb39a",
+      "name": "다모판텐정100밀리그램(덱스판테놀)",
+      "reason": "비대상(fp 6e082e14e7ab4380, bridge SSOT)"
+    },
+    {
+      "id": "d8ea554a-bf0d-4c11-99ce-20bf9dd7afe0",
+      "name": "판덱스정(덱스판테놀)",
+      "reason": "비대상(fp bd458ff8b113d9d1, bridge SSOT)"
+    },
+    {
+      "id": "f6a6bf58-8b9e-42d3-ad45-4cc76b40e32e",
+      "name": "알로판텐정100mg(덱스판테놀)",
+      "reason": "비대상(fp ed9a02f0aeed741d, bridge SSOT)"
+    },
+    {
+      "id": "f717d67a-5162-4f8b-a3db-544f0cafc112",
+      "name": "알로판텐정100mg(덱스판테놀)",
+      "reason": "비대상(fp ed9a02f0aeed741d, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "063ab12e-a4a2-4cb8-acab-fedc30262096",
+    "0f740402-eca7-43b9-b95d-95c8bab346bc",
+    "646a78c0-b758-479b-95a7-b226644ddfb5",
+    "7b8903c0-a572-4c42-99fb-311f6dccac14",
+    "95f7bc4d-7f0d-4a00-a7d5-972efd48686e",
+    "b09ddb9e-73ff-4438-9a1c-a024b75eaaab",
+    "c773e96f-0b6c-430b-ac16-9bc877a0de13",
+    "cc226d8a-dd53-43a4-9ea6-2b9de3fb258f",
+    "f5802f4d-bb68-43e6-a9c8-ed58107454e0"
+  ],
+  "rollback_master_ids": [
+    "063ab12e-a4a2-4cb8-acab-fedc30262096",
+    "0f740402-eca7-43b9-b95d-95c8bab346bc",
+    "646a78c0-b758-479b-95a7-b226644ddfb5",
+    "7b8903c0-a572-4c42-99fb-311f6dccac14",
+    "95f7bc4d-7f0d-4a00-a7d5-972efd48686e",
+    "b09ddb9e-73ff-4438-9a1c-a024b75eaaab",
+    "c773e96f-0b6c-430b-ac16-9bc877a0de13",
+    "cc226d8a-dd53-43a4-9ea6-2b9de3fb258f",
+    "f5802f4d-bb68-43e6-a9c8-ed58107454e0"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "6e082e14e7ab4380",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "37d1268f8f721dda",
+      "n": 9,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "b021fd203c757c36",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ed9a02f0aeed741d",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "bd458ff8b113d9d1",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 9,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 9,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 9,
+  "htmlLen": 1513,
+  "contentHash": "d4db06d8798296c0bd4919db22d4dc83",
+  "summary": "덱스판테놀 100mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 9,
+      "STEP_B_easy_canonical_demote": 9,
+      "STEP_B_authored_canonical_flip": 9,
+      "total": 27
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 9,
+      "total": 9
+    },
+    "grand_total": 36
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 9",
+    "policy_2A": "audit 2/master = 18 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

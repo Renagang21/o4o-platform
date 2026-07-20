@@ -1,0 +1,796 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "phase": "before",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groups": {
+    "trimebutine-200mg-jeong": {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "T": 13,
+      "targetN": 13,
+      "koState": {
+        "canon1": 13,
+        "authored": 0,
+        "right_ref": 0,
+        "dep_easy": 0,
+        "easy_canon": 13,
+        "dup": 0
+      },
+      "audit_n": 0,
+      "excludeN": 29,
+      "exclude": [
+        {
+          "mid": "0f633053-4a91-42cb-ae69-08e80371730d",
+          "spd_id": "7b218ef4-ff63-49f5-96f4-c132bd96dd9d",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "12852913-84b7-434b-a2a3-36ca7468674a",
+          "spd_id": "816999d2-b3d9-4a0b-9d46-f0ec5a3e16e0",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "12e22feb-0982-4c0b-bd33-c7687ff2a770",
+          "spd_id": "97fdd34e-a880-46e7-9c7f-468135a9559c",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "174a15fb-3232-4f6c-8d22-200b09c1db4e",
+          "spd_id": "de2883bc-126e-463c-8f3c-8b70271604fc",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "215c60a1-e32c-4908-a444-085cc21ce299",
+          "spd_id": "95b84257-4e42-4bff-8a50-14a7f8038de5",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "2c92b683-c1aa-474a-a614-6f2164b20b04",
+          "spd_id": "01f6b94f-dc7c-4dd1-ad5a-7df92c9f68f2",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "359e01c0-ae8c-475c-8b2f-1a337d5eb6c4",
+          "spd_id": "364aa48a-9738-4cfb-852b-bd183976a5b5",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "461f4601-5394-460c-9d9f-c3ad368a68f0",
+          "spd_id": "6bf20d0e-7ce7-49e3-849a-3b40a31f1a59",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "717899db-0961-4c3a-85e3-40eb356deac8",
+          "spd_id": "8cbe48eb-529c-4705-9bb9-2247395c7e9c",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "7187c31b-1b8d-45ea-a1eb-49ef4679fd68",
+          "spd_id": "c0c49c03-ade6-4bb1-8422-6d008de54ad3",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "7310a52c-b78a-4c6b-a87f-085928829431",
+          "spd_id": "b47b1e28-3172-43aa-a7cf-456008e001f5",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "9de7ea85-51a1-4f03-90dc-bb46ffd13ceb",
+          "spd_id": "3de33a79-4e9c-485e-9d80-9d03463775d3",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "a5b7d5c0-4766-4480-abd0-53a83eec400a",
+          "spd_id": "9971a84a-dced-4cf6-a89c-d7f9e15ad654",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "a6090b09-a057-4d0e-8057-594bbe0745ed",
+          "spd_id": "dbe1ae33-471f-4dd1-baef-044059ba2274",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "a689f5ca-5525-47ff-9f77-44d1a477a805",
+          "spd_id": "57627fdf-6d41-479c-93d1-be43856b101a",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "b1dfdf64-b5ff-401c-8037-e0ca1bb06276",
+          "spd_id": "9e839b65-db12-420d-b78a-1cb4e42f4de5",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "b323139c-5569-443b-b2ca-f43cd8a8e31c",
+          "spd_id": "223d056f-20f7-4ada-b631-2e5a32f8a036",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "b486cee9-a93d-4e96-98df-5f0be6d5d403",
+          "spd_id": "a33a33a8-dc67-4c13-a556-b7946e579713",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "b6e04bb3-3bd0-4e3f-9b15-aa8dcfb9adc9",
+          "spd_id": "fc9d060e-ac52-44b4-95cb-3bde97806960",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "d8491157-16bb-4c1e-854e-ed1dc3b2063d",
+          "spd_id": "f8772b97-3a50-4839-a40b-77ba5512c122",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "d99073db-e76f-4299-9127-6c76b25c8036",
+          "spd_id": "58b9d8d0-1d25-4ddf-b99e-4cb5bab04aed",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "e0d3a844-187f-4dbb-931f-85be971b42a4",
+          "spd_id": "be265fc3-8b9b-4de2-8ef6-63f52444f5ae",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "e4e2ec56-5b47-4f24-9ae1-12bc4ac261d0",
+          "spd_id": "7c81f0c6-15d3-43cc-90be-e20ae4d68c22",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "ec6f3f9c-5688-49f9-9421-80a0aa572223",
+          "spd_id": "96243507-bc40-4dd4-a1a7-7d7677dc4e55",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "f222c3c0-6270-402b-962d-e5267a811e9d",
+          "spd_id": "5226b7f6-37e3-439b-a93c-26f2aefa8ffb",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "f23b381b-4913-46f7-965b-14e12f8b718e",
+          "spd_id": "a460d178-6fb1-414f-9242-1a5245dd9356",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "f2b60053-537e-4da6-8060-9ecc822d9c2d",
+          "spd_id": "dc66b6dc-a1df-493b-8c49-7d0e9b8ea519",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "f5c1434f-b61d-49e9-89b8-259fee2699b5",
+          "spd_id": "cc2279fc-8da9-46a4-b68b-8285afb6555b",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "f7866ddc-0a47-4921-adba-d98bbd2d1996",
+          "spd_id": "cd8b92d1-48a1-45c0-9023-5b1608963017",
+          "ko_src": "mfds_easy_drug"
+        }
+      ],
+      "outSibN": 6,
+      "outSib": [
+        {
+          "mid": "7310a52c-b78a-4c6b-a87f-085928829431",
+          "lang": "en",
+          "status": "canonical",
+          "h": "b8021ac013e795904e4924ee2f5d3a8c"
+        },
+        {
+          "mid": "7310a52c-b78a-4c6b-a87f-085928829431",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "aa237534f66e28293e6767b1a1322962"
+        },
+        {
+          "mid": "ec6f3f9c-5688-49f9-9421-80a0aa572223",
+          "lang": "en",
+          "status": "canonical",
+          "h": "b8021ac013e795904e4924ee2f5d3a8c"
+        },
+        {
+          "mid": "ec6f3f9c-5688-49f9-9421-80a0aa572223",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "aa237534f66e28293e6767b1a1322962"
+        },
+        {
+          "mid": "f5c1434f-b61d-49e9-89b8-259fee2699b5",
+          "lang": "en",
+          "status": "canonical",
+          "h": "b8021ac013e795904e4924ee2f5d3a8c"
+        },
+        {
+          "mid": "f5c1434f-b61d-49e9-89b8-259fee2699b5",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "aa237534f66e28293e6767b1a1322962"
+        }
+      ],
+      "enState": {
+        "masters_with_en": 0,
+        "en_canon": 0,
+        "en_nr": 0
+      },
+      "enMd5": [],
+      "koMd5": [
+        {
+          "h": "ad0ad305bbeb2e6fdfea1d4d25797b04",
+          "n": 13
+        }
+      ]
+    },
+    "mecobalamin-500ug-capsule": {
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "T": 10,
+      "targetN": 10,
+      "koState": {
+        "canon1": 10,
+        "authored": 0,
+        "right_ref": 0,
+        "dep_easy": 0,
+        "easy_canon": 10,
+        "dup": 0
+      },
+      "audit_n": 0,
+      "excludeN": 10,
+      "exclude": [
+        {
+          "mid": "2e07d2a2-fd57-4c2b-8e41-70a6e1f52dcf",
+          "spd_id": "fbdb06ed-f4fe-4b74-a62a-cc252afcfbbe",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "4cf120df-84e0-4730-94ff-bdc3b913c0b9",
+          "spd_id": "2853a96e-2b55-4f35-9767-6ba8198a5576",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "85cb28ff-adce-4405-8219-81282a3fdde9",
+          "spd_id": "ec46036a-351d-4ca1-a0fa-30825d3d0e09",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "aa258f20-4f7d-4396-8b2d-cef815331e0a",
+          "spd_id": "4d811b3d-c1ed-48b8-acbc-316d14de0307",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "aca0e689-dbcb-4dd6-936c-33d826dd9fee",
+          "spd_id": "5f3203ee-773b-45a7-a2d7-78baa6fcf5e4",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "b1f5ac74-d660-4f43-8f96-4677e5f45968",
+          "spd_id": "deb264f4-676b-4730-ac3a-b9bbd843c284",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "c42c91dc-19a1-4caf-abe2-d5d73fe7a028",
+          "spd_id": "36b9822e-6b8c-43fc-9086-b3ce9d508f2b",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "cd7abfdf-97e3-4ee2-9214-9d85c3c07cfe",
+          "spd_id": "c79b68ad-98f9-4ba3-9f1a-a8db6bc89935",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "d09bacf5-5c4f-4637-be1e-1a2dbdc2514c",
+          "spd_id": "57046dab-4915-4e1f-b3ce-ac77af6a6418",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "fc1420a7-5c9d-4dda-b622-1adfe851ab53",
+          "spd_id": "77570e5e-036a-4193-9dcc-477f32118d45",
+          "ko_src": "mfds_drug_otc"
+        }
+      ],
+      "outSibN": 20,
+      "outSib": [
+        {
+          "mid": "2e07d2a2-fd57-4c2b-8e41-70a6e1f52dcf",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "2e07d2a2-fd57-4c2b-8e41-70a6e1f52dcf",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "4cf120df-84e0-4730-94ff-bdc3b913c0b9",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "4cf120df-84e0-4730-94ff-bdc3b913c0b9",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "85cb28ff-adce-4405-8219-81282a3fdde9",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "85cb28ff-adce-4405-8219-81282a3fdde9",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "aa258f20-4f7d-4396-8b2d-cef815331e0a",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "aa258f20-4f7d-4396-8b2d-cef815331e0a",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "aca0e689-dbcb-4dd6-936c-33d826dd9fee",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "aca0e689-dbcb-4dd6-936c-33d826dd9fee",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "b1f5ac74-d660-4f43-8f96-4677e5f45968",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "b1f5ac74-d660-4f43-8f96-4677e5f45968",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "c42c91dc-19a1-4caf-abe2-d5d73fe7a028",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "c42c91dc-19a1-4caf-abe2-d5d73fe7a028",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "cd7abfdf-97e3-4ee2-9214-9d85c3c07cfe",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "cd7abfdf-97e3-4ee2-9214-9d85c3c07cfe",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "d09bacf5-5c4f-4637-be1e-1a2dbdc2514c",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "d09bacf5-5c4f-4637-be1e-1a2dbdc2514c",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        },
+        {
+          "mid": "fc1420a7-5c9d-4dda-b622-1adfe851ab53",
+          "lang": "en",
+          "status": "canonical",
+          "h": "9e31eba07f3029816d9007109623ce97"
+        },
+        {
+          "mid": "fc1420a7-5c9d-4dda-b622-1adfe851ab53",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "6876cef5b37c44f4afa568d0b6101bcb"
+        }
+      ],
+      "enState": {
+        "masters_with_en": 0,
+        "en_canon": 0,
+        "en_nr": 0
+      },
+      "enMd5": [],
+      "koMd5": [
+        {
+          "h": "d06c275c0b91e8065723d6ca0786ae9f",
+          "n": 10
+        }
+      ]
+    },
+    "dexpanthenol-100mg-jeong": {
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "T": 9,
+      "targetN": 9,
+      "koState": {
+        "canon1": 9,
+        "authored": 0,
+        "right_ref": 0,
+        "dep_easy": 0,
+        "easy_canon": 9,
+        "dup": 0
+      },
+      "audit_n": 0,
+      "excludeN": 16,
+      "exclude": [
+        {
+          "mid": "02e5dd5f-75c1-4598-a088-8269b988b020",
+          "spd_id": "2cac4968-2eee-4a5d-8760-92d54ebe858e",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "12cbb97d-8675-4d51-9974-c78955201556",
+          "spd_id": "ab8ee325-82a8-4dc1-8ca8-9b69b15cda8f",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "380c4ad5-fcaf-4ee7-b58b-a05747752a8a",
+          "spd_id": "a399fc9d-b30a-4fd7-9285-e5ac310ad050",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "38fd4385-275d-46d0-902d-2236de80af65",
+          "spd_id": "aae3ddf5-910b-4cff-927a-c63328b83b8c",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "4e694b0f-dc3b-46c1-a714-0ebc7ba10ad1",
+          "spd_id": "5e02474f-758c-4c1a-86bf-429c48f213b5",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "5952600a-9ddb-41c9-87da-48d3dc62ed8d",
+          "spd_id": "e22ee94b-8458-4663-926b-40fddfa469ec",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "6d34d5c0-c1b4-4e04-960b-c5894bc95f35",
+          "spd_id": "f2e1e769-9528-4fc3-81d5-ac17fe5493f4",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "78c7f7b1-e2f7-47cd-8499-19513107d5af",
+          "spd_id": "ea372624-caa3-49db-9634-d2bf8b608cd7",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "7a8f8561-f155-4dd4-ae69-0b7eccd86f48",
+          "spd_id": "7440b234-5926-43de-9a91-adb736356672",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "9471a93b-67a3-4135-a99e-4ad83860e075",
+          "spd_id": "aaaee430-17e4-4aed-95e0-7f4030fd7b33",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "ba9e9ba9-7df2-46d1-ab89-6e365e93e597",
+          "spd_id": "817a9941-b72e-44b7-ae8a-cca99c788dbc",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "c2939c1b-eda5-4ce0-8792-182250eeb39a",
+          "spd_id": "c05e197b-aa77-4bda-b617-cc2f7249e978",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "c88c0b50-6802-4bbd-960d-b0f52c703a58",
+          "spd_id": "569d3fd5-b5e9-4c95-9bb5-7a9fcdc5b4d5",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "d8ea554a-bf0d-4c11-99ce-20bf9dd7afe0",
+          "spd_id": "e9acad5b-e63d-4c0a-96c7-2c7fc233d845",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "f6a6bf58-8b9e-42d3-ad45-4cc76b40e32e",
+          "spd_id": "bbfc66f3-1ae7-459f-96e1-e70bedcc9e92",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "f717d67a-5162-4f8b-a3db-544f0cafc112",
+          "spd_id": "3477c7ac-6c46-4cb7-8d6a-ea59a81b2654",
+          "ko_src": "mfds_easy_drug"
+        }
+      ],
+      "outSibN": 8,
+      "outSib": [
+        {
+          "mid": "380c4ad5-fcaf-4ee7-b58b-a05747752a8a",
+          "lang": "en",
+          "status": "canonical",
+          "h": "2bbeab235a2cb9818dd5cbae9437c547"
+        },
+        {
+          "mid": "380c4ad5-fcaf-4ee7-b58b-a05747752a8a",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "d4db06d8798296c0bd4919db22d4dc83"
+        },
+        {
+          "mid": "4e694b0f-dc3b-46c1-a714-0ebc7ba10ad1",
+          "lang": "en",
+          "status": "canonical",
+          "h": "2bbeab235a2cb9818dd5cbae9437c547"
+        },
+        {
+          "mid": "4e694b0f-dc3b-46c1-a714-0ebc7ba10ad1",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "d4db06d8798296c0bd4919db22d4dc83"
+        },
+        {
+          "mid": "ba9e9ba9-7df2-46d1-ab89-6e365e93e597",
+          "lang": "en",
+          "status": "canonical",
+          "h": "2bbeab235a2cb9818dd5cbae9437c547"
+        },
+        {
+          "mid": "ba9e9ba9-7df2-46d1-ab89-6e365e93e597",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "d4db06d8798296c0bd4919db22d4dc83"
+        },
+        {
+          "mid": "c88c0b50-6802-4bbd-960d-b0f52c703a58",
+          "lang": "en",
+          "status": "canonical",
+          "h": "2bbeab235a2cb9818dd5cbae9437c547"
+        },
+        {
+          "mid": "c88c0b50-6802-4bbd-960d-b0f52c703a58",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "d4db06d8798296c0bd4919db22d4dc83"
+        }
+      ],
+      "enState": {
+        "masters_with_en": 0,
+        "en_canon": 0,
+        "en_nr": 0
+      },
+      "enMd5": [],
+      "koMd5": [
+        {
+          "h": "07c7c14612a8834afb6e031a16ea7a66",
+          "n": 9
+        }
+      ]
+    },
+    "folic-acid-1mg-jeong": {
+      "groupKey": "폴산|1밀리그램|정",
+      "T": 9,
+      "targetN": 9,
+      "koState": {
+        "canon1": 9,
+        "authored": 0,
+        "right_ref": 0,
+        "dep_easy": 0,
+        "easy_canon": 9,
+        "dup": 0
+      },
+      "audit_n": 0,
+      "excludeN": 17,
+      "exclude": [
+        {
+          "mid": "23f2fc4d-aa3f-41a2-87f3-3509367b160c",
+          "spd_id": "1feade5b-8b12-40a5-ab17-0e825db2289f",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "3314780a-0ef3-4a95-8613-31892ad7925d",
+          "spd_id": "9446e295-1b36-4650-a6f0-4e18d8982ab2",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "3e053caa-aae4-4430-a0b6-77e54b73a195",
+          "spd_id": "16146704-5c39-4bba-8581-88c2100c26db",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "437d9857-b3ef-48e3-8a29-0b625585df4d",
+          "spd_id": "a0462dad-40f9-4518-9b96-aa04e1529ab7",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "47c11f4c-e58e-4db6-9a0e-c592c74537bf",
+          "spd_id": "104c068e-76ec-4c64-9240-63e6549e5941",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "50c9fee1-ebcf-4936-9949-dc86990df01f",
+          "spd_id": "61eaee1c-643f-4a94-beda-e840a50d3f49",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "51315054-1837-4a74-9eda-0f83387cd303",
+          "spd_id": "61e7da10-6f3a-454c-bc18-7f4e285340f2",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "6783227f-5e45-48b4-a27e-4d6dc8b872e9",
+          "spd_id": "25a86fe7-89c3-4704-b54e-238be6101953",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "68632d74-da12-4bc3-93be-b7daae5d913d",
+          "spd_id": "f0acf7e5-2033-4d43-beed-aee5169e1cd4",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "6af72220-e55c-462d-ae16-3b11073646fc",
+          "spd_id": "9bf1be76-fb3a-45fd-9f8b-14dd93c5d842",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "6de79090-dcf1-4a85-928c-321bf77e976c",
+          "spd_id": "74957564-2ac6-4a21-8783-f6dd4ff90cd2",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "893d3163-f7bc-4f3b-8ee1-27c38f37ae27",
+          "spd_id": "851b1775-fa02-4e04-823c-fdf1c3c7b677",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "962bd920-e702-45e0-b20a-ebb82240ebc0",
+          "spd_id": "81a45b73-b7b6-452f-8853-9ac05a1f230e",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "c37aed9f-8922-425a-93b9-5734be050a10",
+          "spd_id": "8c773ca9-6c3f-40c6-b54c-1d61cd99dca4",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "dce3bdef-fda4-4224-9f06-77019db10ac5",
+          "spd_id": "16bfaec4-4c3a-488f-ac36-37f61649717e",
+          "ko_src": "mfds_easy_drug"
+        },
+        {
+          "mid": "ddf3447e-21ad-4fc3-8d60-cc9945323260",
+          "spd_id": "d355a3d9-9020-4b20-8adb-54a5f711c767",
+          "ko_src": "mfds_drug_otc"
+        },
+        {
+          "mid": "e48c6ffd-db70-4d59-8913-0efc8ae73299",
+          "spd_id": "05d033c7-3ed6-4e4c-b2cc-bc75fa1f1126",
+          "ko_src": "mfds_drug_otc"
+        }
+      ],
+      "outSibN": 16,
+      "outSib": [
+        {
+          "mid": "23f2fc4d-aa3f-41a2-87f3-3509367b160c",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "23f2fc4d-aa3f-41a2-87f3-3509367b160c",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "3314780a-0ef3-4a95-8613-31892ad7925d",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "3314780a-0ef3-4a95-8613-31892ad7925d",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "437d9857-b3ef-48e3-8a29-0b625585df4d",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "437d9857-b3ef-48e3-8a29-0b625585df4d",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "47c11f4c-e58e-4db6-9a0e-c592c74537bf",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "47c11f4c-e58e-4db6-9a0e-c592c74537bf",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "6de79090-dcf1-4a85-928c-321bf77e976c",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "6de79090-dcf1-4a85-928c-321bf77e976c",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "962bd920-e702-45e0-b20a-ebb82240ebc0",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "962bd920-e702-45e0-b20a-ebb82240ebc0",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "ddf3447e-21ad-4fc3-8d60-cc9945323260",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "ddf3447e-21ad-4fc3-8d60-cc9945323260",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        },
+        {
+          "mid": "e48c6ffd-db70-4d59-8913-0efc8ae73299",
+          "lang": "en",
+          "status": "canonical",
+          "h": "5c41a406b1fbed993dcfeca356baf373"
+        },
+        {
+          "mid": "e48c6ffd-db70-4d59-8913-0efc8ae73299",
+          "lang": "ko",
+          "status": "canonical",
+          "h": "ac650e61aa5e2574a46eff99b2d98e2c"
+        }
+      ],
+      "enState": {
+        "masters_with_en": 0,
+        "en_canon": 0,
+        "en_nr": 0
+      },
+      "enMd5": [],
+      "koMd5": [
+        {
+          "h": "608fab449614d4fdea1b525c0f7a5d68",
+          "n": 9
+        }
+      ]
+    }
+  }
+}

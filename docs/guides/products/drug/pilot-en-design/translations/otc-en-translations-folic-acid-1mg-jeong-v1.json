@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "폴산|1밀리그램|정 EN 번역 1건. grounded ko canonical(source_ref 공유) 충실 번역. struct 출처=master-translation-file. buildDrugOtcEnConsumerHtml 산출 md5 5c41a406b1fbed993dcfeca356baf373 = 동일 약물 out 8 master live en canonical 과 byte-identical(diff 0) → 새 medical fact 0. 배치 전용 파일.",
+  "testLog": {
+    "판정": "build md5 == live out en md5 5c41a406b1fbed993dcfeca356baf373 byte-identical(diff 0) · 새 medical fact 0 · 한글 0"
+  },
+  "translations": [
+    {
+      "groupKey": "폴산|1밀리그램|정",
+      "title": "Folic Acid 1 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to prevent and treat folic acid deficiency, to supply folic acid during pregnancy and breastfeeding, and for anaemia linked to folic acid deficiency — such as anaemia from poor nutrition, anaemia in pregnancy, and anaemia in children.",
+      "usage": "To treat folic acid deficiency, adults and children 24 months or older take 0.25–1 mg a day. To prevent it, or when the body needs more, take 0.1–0.25 mg a day.",
+      "caution": "Do not take this if you have ever reacted to it, or if you have pernicious anaemia or megaloblastic anaemia caused by vitamin B12 deficiency (it can mask the cause of the anaemia), or if you have an inherited condition such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Talk to a pharmacist before taking it if you are taking a folate-metabolism inhibitor such as methotrexate or trimethoprim, an anti-epileptic such as phenytoin, sulfasalazine or cholestyramine, or if you are under a doctor's care. If there is no improvement after about a month, stop taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Folic acid 1 mg",
+        "How it works": "Supplies folic acid (folate)",
+        "Main symptoms": "Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition",
+        "Who should be careful": "Pernicious anaemia from vitamin B12 deficiency",
+        "Why this one": "A vitamin preparation that replaces folate"
+      }
+    }
+  ],
+  "summary": "Folic acid deficiency; folic acid supply in pregnancy and breastfeeding; anaemia from poor nutrition"
+}

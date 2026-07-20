@@ -1,0 +1,85 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "메코발라민|500마이크로그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0908968f-30c8-4c9b-95ed-5631212adbc9",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "메코발라민 500㎍ 캡슐",
+  "coarseTotal": 10,
+  "target": 10,
+  "excluded": 0,
+  "otherFp": 0,
+  "excludedDetail": [],
+  "target_master_ids": [
+    "00ea8449-b6a4-4fde-bd12-1c15bbe020a0",
+    "06fcb4a6-f4f4-4fb4-9cbf-0d543c46d4db",
+    "0a19707d-feb9-48a6-837b-0368b66bc6e0",
+    "29ce8ee3-6a06-4450-8291-26930e26944a",
+    "3e373437-5d17-4742-b783-69bb54a1bfdd",
+    "7b2601a2-9aa9-434b-bc8d-d3c895d856c5",
+    "9be6330a-fd75-4083-9d8e-39f04061e558",
+    "a6ea9799-8362-4891-9f15-353a62e1a806",
+    "afdfedd5-59de-473c-bb41-bea2ed68b722",
+    "d3af16ff-1b48-4731-932c-54713f423b40"
+  ],
+  "rollback_master_ids": [
+    "00ea8449-b6a4-4fde-bd12-1c15bbe020a0",
+    "06fcb4a6-f4f4-4fb4-9cbf-0d543c46d4db",
+    "0a19707d-feb9-48a6-837b-0368b66bc6e0",
+    "29ce8ee3-6a06-4450-8291-26930e26944a",
+    "3e373437-5d17-4742-b783-69bb54a1bfdd",
+    "7b2601a2-9aa9-434b-bc8d-d3c895d856c5",
+    "9be6330a-fd75-4083-9d8e-39f04061e558",
+    "a6ea9799-8362-4891-9f15-353a62e1a806",
+    "afdfedd5-59de-473c-bb41-bea2ed68b722",
+    "d3af16ff-1b48-4731-932c-54713f423b40"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "c6c4dcfbf46d229c",
+      "n": 10,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 10,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 10,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 10,
+  "htmlLen": 1470,
+  "contentHash": "6876cef5b37c44f4afa568d0b6101bcb",
+  "summary": "메코발라민 500㎍",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 10,
+      "STEP_B_easy_canonical_demote": 10,
+      "STEP_B_authored_canonical_flip": 10,
+      "total": 30
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 10,
+      "total": 10
+    },
+    "grand_total": 40
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 10",
+    "policy_2A": "audit 2/master = 20 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "트리메부틴말레산염|200밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0175e433-a171-44ec-b601-ad65a805171d",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "트리메부틴말레산염 200mg 정",
+  "coarseTotal": 39,
+  "target": 13,
+  "excluded": 26,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0f633053-4a91-42cb-ae69-08e80371730d",
+      "name": "트라부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 2015f1b8688204bf, bridge SSOT)"
+    },
+    {
+      "id": "12852913-84b7-434b-a2a3-36ca7468674a",
+      "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "12e22feb-0982-4c0b-bd33-c7687ff2a770",
+      "name": "쓰담정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 55cc4180bcad2033, bridge SSOT)"
+    },
+    {
+      "id": "174a15fb-3232-4f6c-8d22-200b09c1db4e",
+      "name": "탐부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "215c60a1-e32c-4908-a444-085cc21ce299",
+      "name": "쓰담정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 55cc4180bcad2033, bridge SSOT)"
+    },
+    {
+      "id": "2c92b683-c1aa-474a-a614-6f2164b20b04",
+      "name": "트리싹정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp ad3da743a3eef800, bridge SSOT)"
+    },
+    {
+      "id": "359e01c0-ae8c-475c-8b2f-1a337d5eb6c4",
+      "name": "탐부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "461f4601-5394-460c-9d9f-c3ad368a68f0",
+      "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "717899db-0961-4c3a-85e3-40eb356deac8",
+      "name": "바로부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 082b8090363bd2bd, bridge SSOT)"
+    },
+    {
+      "id": "7187c31b-1b8d-45ea-a1eb-49ef4679fd68",
+      "name": "리부트정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "9de7ea85-51a1-4f03-90dc-bb46ffd13ceb",
+      "name": "탈리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "a5b7d5c0-4766-4480-abd0-53a83eec400a",
+      "name": "탈리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "a6090b09-a057-4d0e-8057-594bbe0745ed",
+      "name": "트라부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 2015f1b8688204bf, bridge SSOT)"
+    },
+    {
+      "id": "a689f5ca-5525-47ff-9f77-44d1a477a805",
+      "name": "제이부틴더블정(트리메부틴말레산염)",
+      "reason": "비대상(fp 4b2fc042e06b43ce, bridge SSOT)"
+    },
+    {
+      "id": "b1dfdf64-b5ff-401c-8037-e0ca1bb06276",
+      "name": "탐부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "b323139c-5569-443b-b2ca-f43cd8a8e31c",
+      "name": "트리싹정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp ad3da743a3eef800, bridge SSOT)"
+    },
+    {
+      "id": "b486cee9-a93d-4e96-98df-5f0be6d5d403",
+      "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "b6e04bb3-3bd0-4e3f-9b15-aa8dcfb9adc9",
+      "name": "리부트정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "d8491157-16bb-4c1e-854e-ed1dc3b2063d",
+      "name": "바로부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp 082b8090363bd2bd, bridge SSOT)"
+    },
+    {
+      "id": "d99073db-e76f-4299-9127-6c76b25c8036",
+      "name": "탈리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "e0d3a844-187f-4dbb-931f-85be971b42a4",
+      "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "e4e2ec56-5b47-4f24-9ae1-12bc4ac261d0",
+      "name": "탐부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "f222c3c0-6270-402b-962d-e5267a811e9d",
+      "name": "리부트정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "f23b381b-4913-46f7-965b-14e12f8b718e",
+      "name": "트리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp f17325f333c26450, bridge SSOT)"
+    },
+    {
+      "id": "f2b60053-537e-4da6-8060-9ecc822d9c2d",
+      "name": "탈리부틴정200밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp c9fa109aceee2ef9, bridge SSOT)"
+    },
+    {
+      "id": "f7866ddc-0a47-4921-adba-d98bbd2d1996",
+      "name": "제이부틴더블정(트리메부틴말레산염)",
+      "reason": "비대상(fp 4b2fc042e06b43ce, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "00e091f9-792c-419e-9397-9355d616aff4",
+    "100fb0f4-278f-4238-b74e-62858560acd0",
+    "2529fdd4-1780-482a-a2c2-dbf45ce274c9",
+    "37a0fa73-6b5b-4e1b-b10f-fb361e959b34",
+    "37d703a6-b068-4d0c-ba2b-4b14ae7b1ef7",
+    "4b9e6c8d-d9e7-4949-881a-5f6448963bf9",
+    "5e399f90-ad85-4277-b927-0708cae4b4f7",
+    "76737d0a-a0e1-435c-842d-f33fd0512bf7",
+    "83e6b6cb-6986-4772-bdca-5ba05e1ae192",
+    "cc180d7c-00dc-48ec-8a54-a5334a847470",
+    "dcc8629d-5db1-402a-9150-325747a3e0d8",
+    "e96bf36e-85f4-4b51-9914-221c184290d3",
+    "ef7a781e-1314-477a-b36f-f769766138d1"
+  ],
+  "rollback_master_ids": [
+    "00e091f9-792c-419e-9397-9355d616aff4",
+    "100fb0f4-278f-4238-b74e-62858560acd0",
+    "2529fdd4-1780-482a-a2c2-dbf45ce274c9",
+    "37a0fa73-6b5b-4e1b-b10f-fb361e959b34",
+    "37d703a6-b068-4d0c-ba2b-4b14ae7b1ef7",
+    "4b9e6c8d-d9e7-4949-881a-5f6448963bf9",
+    "5e399f90-ad85-4277-b927-0708cae4b4f7",
+    "76737d0a-a0e1-435c-842d-f33fd0512bf7",
+    "83e6b6cb-6986-4772-bdca-5ba05e1ae192",
+    "cc180d7c-00dc-48ec-8a54-a5334a847470",
+    "dcc8629d-5db1-402a-9150-325747a3e0d8",
+    "e96bf36e-85f4-4b51-9914-221c184290d3",
+    "ef7a781e-1314-477a-b36f-f769766138d1"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "559c4ffae3658ec7",
+      "n": 13,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "2015f1b8688204bf",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f17325f333c26450",
+      "n": 9,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "55cc4180bcad2033",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ad3da743a3eef800",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "082b8090363bd2bd",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c9fa109aceee2ef9",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4b2fc042e06b43ce",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 13,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 13,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 13,
+  "htmlLen": 1548,
+  "contentHash": "aa237534f66e28293e6767b1a1322962",
+  "summary": "트리메부틴말레산염 200mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 13,
+      "STEP_B_easy_canonical_demote": 13,
+      "STEP_B_authored_canonical_flip": 13,
+      "total": 39
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 13,
+      "total": 13
+    },
+    "grand_total": 52
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 13",
+    "policy_2A": "audit 2/master = 26 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

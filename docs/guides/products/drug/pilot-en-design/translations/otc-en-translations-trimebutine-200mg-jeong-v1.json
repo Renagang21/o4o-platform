@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-BATCH8-BUNDLE-B-KO-EN-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "트리메부틴말레산염|200밀리그램|정 EN 번역 1건. grounded ko canonical(source_ref 공유) 충실 번역. struct 출처=master-translation-file. buildDrugOtcEnConsumerHtml 산출 md5 b8021ac013e795904e4924ee2f5d3a8c = 동일 약물 out 3 master live en canonical 과 byte-identical(diff 0) → 새 medical fact 0. 배치 전용 파일.",
+  "testLog": {
+    "판정": "build md5 == live out en md5 b8021ac013e795904e4924ee2f5d3a8c byte-identical(diff 0) · 새 medical fact 0 · 한글 0"
+  },
+  "translations": [
+    {
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "title": "Trimebutine Maleate 200 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take 100–200 mg three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem with lactose metabolism, such as galactose intolerance. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or if you have ever reacted to Yellow No. 4 (tartrazine).",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 200 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited lactose metabolism disorders; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    }
+  ],
+  "summary": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms"
+}
