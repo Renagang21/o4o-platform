@@ -115,3 +115,12 @@
 - **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 15 · totalWrites 60(masters 15·candidate UPDATE 15·SPD ko15+en15) · canonicalDup 0 · candidateLinks 15 · spdRefLinks 30. tag `batch:single-nutrient-mg-vd-vk-zn-ca`. rollback manifest 저장.
 - **복합형 누적 529 → 544** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17 + #11 15).
 - **다음(Agent A 권장순서)**: G13 6미네랄(N6, READY 10) → 이후 #4·G10(선택, 저수율). lut-va `PAUSED_GROUP_DEFECT` 유지.
+
+### higher-N V2 큐 3순위 LIVE (Agent B) — G13 6미네랄 N6 10건
+
+- 기준·검수: Agent A V2(`9d417651e`) G13, READY 10/2(near-clean, #9∪#11 합집합 6미네랄).
+- **대상 정제**: select 실측 mention 91 · **ELIGIBLE 10**(Agent A와 정확 일치) · grounding HOLD 2 + HOLD_MULTI 79. HOLD∩target overlap 0. 신규 원료/basis/제형 0(tablet 10).
+- **generate**: 작성 10 · PASS 9 · REVIEW 1(코팅정제 known-safe) · BLOCKED 0 · **G-MULTI HOLD 0**(#11과 달리 basis 오기 0).
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 10 · totalWrites 40(masters 10·candidate UPDATE 10·SPD ko10+en10) · canonicalDup 0 · candidateLinks 10 · spdRefLinks 20. tag `batch:single-nutrient-g13-6mineral`. rollback manifest 저장.
+- **복합형 누적 544 → 554** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17 + #11 15 + G13 10).
+- **다음(선택·저수율)**: #4 N7 밀크씨슬+B군+아연(READY_WITH_HOLD 9/22) · G10 N5 B군+비타민C+아연(READY_WITH_HOLD 9/7). deferred 교정 1건: #11 stmt 2020000997275 칼슘 basis. lut-va `PAUSED_GROUP_DEFECT` 유지.

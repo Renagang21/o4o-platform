@@ -53,7 +53,8 @@ Agent B 권장 순서(통합): #9(17) → #11(16) → G13(10) → #4(9,선택) �
 
 - **#9 mg+mn+vd+vk+ca(N5) 17건 LIVE**(2026-07-20). select 실측 ELIGIBLE **17**·grounding HOLD **0**(clean READY, 검수 정확 일치). generate PASS 15·REVIEW 2(코팅정제)·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 68 → apply COMMIT → 독립검증 PASS(canonicalDup 0·기존 512 무변경). **복합형 512 → 529**(직접 카운트). tag `batch:single-nutrient-mg-mn-vd-vk-ca`. 상세: 상위 WO §6 "higher-N V2 큐 1순위 LIVE".
 - **#11 mg+vd+vk+zn+ca(N5) 15건 LIVE**(2026-07-20). select ELIGIBLE 16 → generate 표준 Guard에서 **1건 정당 HOLD**(stmt 2020000997275, 원문 basis 오기 `칼슘 1,1500mg`, `PRE-SRC-BASIS-MISMATCH-002` — 데이터 결함, 오탐 아님, 후속 원문 교정 대기) → target 15. generate PASS 15·REVIEW 0·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 60 → apply COMMIT → 독립검증 PASS(기존 529 무변경). **복합형 529 → 544**(직접 카운트). tag `batch:single-nutrient-mg-vd-vk-zn-ca`. 상세: 상위 WO §6 "higher-N V2 큐 2순위 LIVE".
-- 다음: G13(10) → 이후 #4·G10 저수율 선택.
+- **G13 6미네랄(N6) 10건 LIVE**(2026-07-20). select ELIGIBLE **10**·grounding HOLD 2(검수 정확 일치, near-clean). generate PASS 9·REVIEW 1(코팅정제)·BLOCKED 0·G-MULTI HOLD 0(basis 오기 0). dry-run 예상=실측 40 → apply COMMIT → 독립검증 PASS(기존 544 무변경). **복합형 544 → 554**(직접 카운트). tag `batch:single-nutrient-g13-6mineral`. 상세: 상위 WO §6 "higher-N V2 큐 3순위 LIVE".
+- 다음: 저수율 선택 #4(N7, 9/22)·G10(N5, 9/7). higher-N 주요 그룹 소진 단계.
 중지 사유: 없음
 ```
 
