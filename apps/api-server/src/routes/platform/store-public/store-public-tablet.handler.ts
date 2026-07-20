@@ -402,7 +402,7 @@ export function createStorePublicTabletRoutes(deps: {
           const blk = await dataSource.query(
             `SELECT b.config
              FROM store_tablet_screen_blocks b
-             JOIN store_tablet_screen_sets s ON s.id = b.screen_set_id AND s.deleted_at IS NULL
+             JOIN store_tablet_screen_sets s ON s.id = b.screen_set_id AND s.origin = 'store' AND s.deleted_at IS NULL
              WHERE b.screen_set_id = $1 AND b.block_type = 'idle_media' AND b.is_visible = true
              ORDER BY b.sort_order ASC LIMIT 1`,
             [setId],

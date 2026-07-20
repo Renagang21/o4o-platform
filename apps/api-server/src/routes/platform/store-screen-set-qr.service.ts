@@ -84,9 +84,11 @@ export async function ensureScreenSetQr(
   const { organizationId, screenSetId } = opts;
   const serviceKey = opts.serviceKey ?? 'kpa';
 
+  // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: QR 발급/조회 대상은 매장 소유(origin='store') 원본만.
+  //   운영자·공급자 원본에는 Screen Set QR 을 발급하지 않는다(set 미존재 → null → 호출부가 QR 미부여).
   const [set] = await dataSource.query(
     `SELECT id, name, public_qr_slug AS "publicQrSlug" FROM store_tablet_screen_sets
-     WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
+     WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
     [screenSetId, organizationId],
   );
   if (!set) return null;

@@ -1203,10 +1203,21 @@ export function createStoreTabletRoutes(
     `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
     `${p}is_visible AS "isEnabled", ${p}config, ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
 
+  // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1 §2·§4:
+  //   TypeORM dataSource.query()/manager.query() 의 UPDATE ... RETURNING 은 [rows, affectedCount] 를 반환
+  //   (INSERT ... RETURNING 은 rows 배열 직접). 빈 배열도 truthy 라 `!res?.[0]` 로는 0-row(미존재) 판정이
+  //   누락되어 없는 ID 에도 200 을 반환하던 버그가 있었다. 첫 반환 row(객체)만 안전하게 꺼내 404 판정에 쓴다.
+  const firstReturnedRow = (result: unknown): any | null => {
+    if (!Array.isArray(result)) return null;
+    const rows = Array.isArray(result[0]) ? (result[0] as unknown[]) : (result as unknown[]);
+    return (rows[0] as any) ?? null;
+  };
+
   // GET /screen-sets — 목록 (org 스코프). filter: tabletId / status / includeArchived
   router.get('/screen-sets', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const where: string[] = ['s.organization_id = $1', 's.deleted_at IS NULL'];
+      // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 목록은 매장 소유(origin='store') 원본만.
+      const where: string[] = ['s.organization_id = $1', "s.origin = 'store'", 's.deleted_at IS NULL'];
       const params: any[] = [organizationId];
       const { tabletId, status, includeArchived } = req.query;
       if (tabletId && typeof tabletId === 'string') { params.push(tabletId); where.push(`s.tablet_id = $${params.length}`); }
@@ -1233,7 +1244,7 @@ export function createStoreTabletRoutes(
     try {
       const rows = await dataSource.query(
         `SELECT ${setCols('s.')} FROM store_tablet_screen_sets s
-         WHERE s.id = $1 AND s.organization_id = $2 AND s.deleted_at IS NULL LIMIT 1`,
+         WHERE s.id = $1 AND s.organization_id = $2 AND s.origin = 'store' AND s.deleted_at IS NULL LIMIT 1`,
         [req.params.id, organizationId],
       );
       if (!rows?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
@@ -1271,8 +1282,10 @@ export function createStoreTabletRoutes(
         if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
       }
       const ins = await dataSource.query(
-        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, tablet_id, name, origin, status, template_key, created_by_user_id)
-         VALUES ($1, NULL, $2, $3, 'store', $4, $5, $6)
+        // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 생성 계약 명시 — origin='store'·supplier_id=NULL.
+        //   (organization_id=현재 매장, status=draft|active[UI 기본 active], supplier_id 는 매장 원본에 항상 NULL.)
+        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
+         VALUES ($1, NULL, NULL, $2, $3, 'store', $4, $5, $6)
          RETURNING ${setCols('')}`,
         [organizationId, tabletId, name, status, templateKey, userId],
       );
@@ -1288,7 +1301,7 @@ export function createStoreTabletRoutes(
   router.patch('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
       const id = req.params.id;
-      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
       if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       const sets: string[] = [];
       const params: any[] = [];
@@ -1334,12 +1347,14 @@ export function createStoreTabletRoutes(
       await dataSource.transaction(async (m) => {
         const upd = await m.query(
           `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
-           WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND deleted_at IS NULL
+           WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND origin = 'store' AND deleted_at IS NULL
            RETURNING ${setCols('')}`,
           params,
         );
-        if (!upd?.[0]) return;
-        updated = upd[0];
+        // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1 §4: 실제 반환 row 기준(빈 배열≠성공) → 미존재는 null → 404.
+        const updRow = firstReturnedRow(upd);
+        if (!updRow) return;
+        updated = updRow;
         // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §7: 이름 변경 시 QR title 갱신 — slug 는 불변.
         if (req.body?.name !== undefined && updated.publicQrSlug) {
           await m.query(
@@ -1391,10 +1406,11 @@ export function createStoreTabletRoutes(
       await dataSource.transaction(async (m) => {
         const del = await m.query(
           `UPDATE store_tablet_screen_sets SET deleted_at = NOW(), status = 'archived', updated_at = NOW()
-           WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL RETURNING id`,
+           WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL RETURNING id`,
           [id, organizationId],
         );
-        if (!del?.[0]) return;
+        // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1 §2: 실제 삭제 row 없으면(미존재/타매장/운영자·공급자/이미제거) 404.
+        if (!firstReturnedRow(del)) return;
         // Screen Set QR 만 비활성(slug·row 불변). 일반 QR·다른 set QR 무영향.
         await setScreenSetQrActive(m, organizationId, id, false);
         deleted = true;
@@ -1411,7 +1427,7 @@ export function createStoreTabletRoutes(
   router.put('/screen-sets/:id/blocks', withStoreAuth(async (req, res, organizationId) => {
     try {
       const id = req.params.id;
-      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
       if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       const blocks = req.body?.blocks;
       if (!Array.isArray(blocks)) { res.status(400).json({ success: false, error: 'blocks must be an array', code: 'VALIDATION_ERROR' }); return; }
@@ -1581,7 +1597,7 @@ export function createStoreTabletRoutes(
       if (!screenSetId || typeof screenSetId !== 'string') { res.status(400).json({ success: false, error: 'screenSetId is required', code: 'VALIDATION_ERROR' }); return; }
       const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
       if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
-      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
+      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
       if (!s?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       if (s[0].status !== 'active') { res.status(409).json({ success: false, error: 'Screen set must be active to apply', code: 'SCREEN_SET_NOT_ACTIVE' }); return; }
       // WO-O4O-KPA-TABLET-CORNER-CONTENT-ASSIGNMENT-MODEL-V1 §2:
@@ -1635,7 +1651,7 @@ export function createStoreTabletRoutes(
                 s.public_qr_slug AS "publicQrSlug",
                 (SELECT count(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
            FROM store_tablet_corner_contents cc
-           JOIN store_tablet_screen_sets s ON s.id = cc.screen_set_id AND s.deleted_at IS NULL
+           JOIN store_tablet_screen_sets s ON s.id = cc.screen_set_id AND s.origin = 'store' AND s.deleted_at IS NULL
           WHERE cc.tablet_id = $1 AND cc.organization_id = $2
           ORDER BY cc.sort_order ASC, s.updated_at DESC`,
         [tabletId, organizationId],
@@ -1655,7 +1671,7 @@ export function createStoreTabletRoutes(
       const screenSetId = req.params.screenSetId;
       const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
       if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
-      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
+      const s = await dataSource.query(`SELECT id, status FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL LIMIT 1`, [screenSetId, organizationId]);
       if (!s?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       if (s[0].status === 'archived') { res.status(409).json({ success: false, error: 'Archived screen set cannot be linked', code: 'SCREEN_SET_ARCHIVED' }); return; }
       // 중복은 UNIQUE(tablet, set) 로 방지 — 이미 있으면 그대로 성공(멱등).

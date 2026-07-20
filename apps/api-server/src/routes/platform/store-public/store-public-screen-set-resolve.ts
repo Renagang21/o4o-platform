@@ -122,9 +122,11 @@ export async function resolveScreenSetSections(
   contentSource: ContentSourceAdapter,
 ): Promise<ResolvedScreenSet | null> {
   const setRows = await dataSource.query(
+    // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 공개 타블렛·Screen Set QR 모두 이 resolver 를 공유 →
+    //   origin='store' 로 매장 소유 원본만 공개 resolve(운영자·공급자 원본은 공개 URL·QR 미발급이라 미도달이나 명시 격리).
     `SELECT id, name, status, template_key AS "templateKey", public_qr_slug AS "publicQrSlug"
      FROM store_tablet_screen_sets
-     WHERE id = $1 AND organization_id = $2 AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
+     WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL AND status <> 'archived' LIMIT 1`,
     [input.screenSetId, input.organizationId],
   );
   const set = setRows?.[0];
