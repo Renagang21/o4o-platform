@@ -3,7 +3,7 @@ import '../env-loader.js';
 import { DataSource } from 'typeorm';
 import { normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 
-const STMTS = ["200400200022869","200400200023677","200400170061351"];
+const STMTS = ['20040020028661', '20120019007515'];
 
 async function main(): Promise<void> {
   const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5433', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, ssl: false, extra: { max: 1 } });

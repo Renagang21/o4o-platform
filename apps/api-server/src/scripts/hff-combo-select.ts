@@ -11,6 +11,10 @@ import fs from 'node:fs';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo, normFn } from './hff-nutrient-registry.js';
 import { resolveSource } from './hff-raw-source.js';
+// 파서 단일화 — 생산(본 select) · 감사 스크립트가 **동일 spec 정규화/분류 모듈**을 사용한다.
+// (단위 수식어 `ug`/`㎍`/`mga-TE`·라벨 공백·표시량 접두 누락 과소추출 해소. CHECK-...-PILOT-BLOCKER-B-V1 §3)
+// 기능성 **귀속 정책**은 생산=TARGET 스코프 registry(기존 계약), 감사=명시 구조 우선으로 의도적으로 다르다(아래 주석 참조).
+import { parseSpecs, splitFunctions } from './hff-source-parse.js';
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const COMBO = arg('combo'); const OUT = arg('out');
@@ -20,42 +24,17 @@ const metaOf = (k: string) => NUTRIENT_META[k] ?? FUNCTIONAL_META[k];
 for (const k of TARGET) if (!metaOf(k)) throw new Error(`미지원 원료: ${k}`);
 const TARGET_SET = [...TARGET].sort().join('|');
 
-const NONFUNC = /성상|대장균군|대장균|붕해|납|카드뮴|비소|수은|아플라톡신|세균수|산가|과산화물|타르색소|보존료|수분|회분|중금속|미생물|이산화황|벤조피렌|엽록소/;
-const CLS: Array<{ k: string; re: RegExp }> = [
-  { k: '비타민C', re: /비타민\s?C\b/i }, { k: '비타민D', re: /비타민\s?D\b/i }, { k: '비타민B12', re: /비타민\s?B\s?12|코발라민/i },
-  { k: '비타민B6', re: /비타민\s?B\s?6|피리독/i }, { k: '비타민B2', re: /비타민\s?B\s?2|리보플라빈/i }, { k: '비타민B1', re: /비타민\s?B\s?1\b|티아민/i },
-  { k: '비타민A', re: /비타민\s?A\b|레티놀|베타카로/i }, { k: '비타민E', re: /비타민\s?E\b|토코페롤/i }, { k: '비타민K', re: /비타민\s?K\b|메나퀴논/i },
-  { k: '엽산', re: /엽산|폴[레리]?산/i }, { k: '나이아신', re: /나이아신|니아신|니코틴산|니코틴아미드/i }, { k: '판토텐산', re: /판토텐/i }, { k: '비오틴', re: /비오틴|바이오틴/i },
-  { k: '아연', re: /아연/i }, { k: '마그네슘', re: /마그네슘/i }, { k: '철', re: /철분|헴철|철\s*[:：(]|피로인산철|푸마르산철/i }, { k: '칼슘', re: /칼슘/i },
-  { k: '셀레늄', re: /셀레늄|셀렌/i }, { k: '구리', re: /구리/i }, { k: '망간', re: /망간/i }, { k: '크롬', re: /크[로롬]/i }, { k: '몰리브덴', re: /몰리브/i }, { k: '요오드', re: /요오드|아이오딘/i },
-  { k: '오메가3', re: /EPA|DHA|정제어유/i }, { k: '루테인', re: /루테인|지아잔틴|황반/i }, { k: '밀크씨슬', re: /밀크씨슬|실리마린|카르두스/i },
-  { k: 'MSM', re: /MSM|엠에스엠|메틸설포닐|디메틸설폰/i }, { k: '코엔자임Q10', re: /코엔자임|코큐텐|Q10|유비퀴논/i }, { k: '가르시니아', re: /가르시니아|hydroxycitric|HCA/i },
-  { k: '글루코사민', re: /글루코사민/i }, { k: '식이섬유', re: /식이섬유|차전자|난소화성말토덱스트린|귀리|이눌린|프락토올리고/i }, { k: '옥타코사놀', re: /옥타코사놀/i }, { k: '프로폴리스', re: /프로폴리스|총\s*플라보노이드/i },
-];
-function classify(label: string): string | null { for (const c of CLS) if (c.re.test(label)) return c.k; return null; }
-
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상)/gi;
+// NONFUNC / CLS / classify / SPEC 정규식 / 기능성 분리 → 전부 `hff-source-parse.ts` 로 이관(생산·감사 공용).
+/** 공용 파서 결과를 기존 select 계약(TARGET 한정 byKey + unknown + nonTarget)으로 투영 */
 function extractSpecs(base: string): { byKey: Map<string, { value: number; unit: string; basisAmount: number; basisUnit: string; ratio: string }>; unknown: number; nonTarget: boolean } {
-  const b = normalizeSource(base); const byKey = new Map<string, { value: number; unit: string; basisAmount: number; basisUnit: string; ratio: string }>(); let unknown = 0; let nonTarget = false;
-  const uNorm = (u: string): string => { const x = u.replace(/\s/g, ''); if (/^(㎍|mcg|ug|μg)$/i.test(x)) return 'μg'; if (/^iu$/i.test(x)) return 'IU'; return x.toLowerCase() === 'g' ? 'g' : 'mg'; };
-  const numOf = (s: string) => parseFloat(s.replace(/,/g, ''));
-  let m: RegExpExecArray | null; SPEC.lastIndex = 0;
-  while ((m = SPEC.exec(b)) !== null) {
-    const label = m[1].trim(); if (NONFUNC.test(label)) continue;
-    const k = classify(label); if (!k) { unknown++; continue; }
+  const sp = parseSpecs(base);
+  const byKey = new Map<string, { value: number; unit: string; basisAmount: number; basisUnit: string; ratio: string }>();
+  let nonTarget = false;
+  for (const [k, v] of sp.byKey) {
     if (!TARGET.includes(k)) { nonTarget = true; continue; }
-    if (byKey.has(k)) continue;
-    const ratioM = m[0].match(/([\d.]+\s*[~∼\-]\s*[\d.]+)\s*%/);
-    byKey.set(k, { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio: ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : '표시량 이상' });
+    byKey.set(k, { value: v.value, unit: v.unit, basisAmount: v.basisAmount, basisUnit: v.basisUnit, ratio: v.ratio });
   }
-  return { byKey, unknown, nonTarget };
-}
-
-function extractFunctions(mainFn: string): string[] {
-  let t = normalizeSource(mainFn); t = t.replace(/\[[^\]]*\]/g, ' ');
-  return [...new Set(t.split(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\((?:가|나|다|라|마|바|사|\d+)\)|(?:^|\s)\d+[).]|(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\s*[.,。、/]?\s+(?=[가-힣])/)
-    .map((x) => x.trim().replace(/^[-•*\s:：·]+/, '').replace(/[.。]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
-    .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x)))];
+  return { byKey, unknown: sp.unknownLabels.length, nonTarget };
 }
 const SERVE_UNIT = '(?:연질캡슐|경질캡슐|캡슐|캅셀|정|포|스틱|병|필름|매|개|젤리|구미|스푼|스쿱|알|봉|편|환|팩)';
 function parseServingUnit(srv: string): { count: number | null; unit: string | null } {
@@ -105,8 +84,11 @@ for await (const it of src.gen as AsyncGenerator<RawItem>) {
   // 원료별 declaredAmount 검증 (ratio 확정)
   let badAmt = false; for (const k of TARGET) { const a = byKey.get(k)!; if (!a || a.ratio === '표시량 이상' || !(a.value > 0) || !(a.basisAmount > 0)) badAmt = true; }
   if (badAmt) { bump('HOLD_GROUNDING'); holds.push({ statementNo: stmt, productName: name, holdCode: 'HOLD_GROUNDING', reason: '원료 표시량/비율 추출 실패' }); continue; }
-  // 기능성 귀속
-  const allFns = extractFunctions(it.MAIN_FNCTN ?? '');
+  // 기능성 귀속 — **TARGET 스코프 registry 귀속(기존 계약 유지)**.
+  // ⚠️ 전역 명시-구조 귀속으로 바꾸지 말 것: 라벨 없는 MAIN_FNCTN(인라인)에서 비타민D 기능성
+  //    "칼슘과 인이 흡수되고 이용되는데 필요" 가 **칼슘** 으로 오귀속되어 정상 제품이 오HOLD 된다
+  //    (실측 회귀: D+E LIVE 24 중 14 오탈락). 스펙 파싱만 공용 모듈로 일원화한다.
+  const allFns = splitFunctions(it.MAIN_FNCTN ?? '');
   const ingredients: Array<{ key: string; labelKo: string; labelEn: string; declaredAmount: unknown; functionsKo: string[]; functionsEn: string[] }> = [];
   let attrFail = false; const attributed = new Set<string>();
   for (const k of TARGET) {
