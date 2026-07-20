@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "브로멜라인|100밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 22,
+  "targetMasters": 22,
+  "anomalies": [],
+  "koCanonical": 22,
+  "existingEnAny": 22,
+  "existingEnCanonical": 22,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "4d4f202fef6f945aced03adb9477be1a",
+      "n": 29
+    }
+  ],
+  "builtLen": 2411,
+  "builtMd5": "4d4f202fef6f945aced03adb9477be1a",
+  "consistencyMatch": true,
+  "summaryField": "Inflammation with swelling; swelling after injury or surgery",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 22,
+    "STEP2_en_canonical_flip": 22,
+    "en_write_total": 44
+  },
+  "enTargetMd5": "4d4f202fef6f945aced03adb9477be1a",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(4d4f202fef6f945aced03adb9477be1a) — write 0, 정상 종료"
+}

@@ -1,0 +1,197 @@
+{
+  "wo": "WO-O4O-OTC-BROMELAIN-100MG-KO-EN-COMPLETE-DA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groupKey": "브로멜라인|100밀리그램|정",
+  "targetFp": "f79d8c596f934095",
+  "coarseTotal": 86,
+  "targetCount": 22,
+  "excludeCount": 64,
+  "excludeFpCount": 11,
+  "excludeFps": [
+    "a997a1bd77c64270",
+    "4ffd591092293d99",
+    "bbbe8ddddb8e96fe",
+    "f9bdc85b3da537f8",
+    "b196c68bba8f3eea",
+    "ad96bdaf17dd292b",
+    "ef7094954139bcca",
+    "5c6160b5bc6fc5bb",
+    "9b1526fc3dd4b79f",
+    "51043688afc1b422",
+    "53ae867c6036e430"
+  ],
+  "targetRoutes": [
+    "oral"
+  ],
+  "distribution": [
+    {
+      "fp": "f79d8c596f934095",
+      "n": 22,
+      "isTarget": true,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로엘장용정(브로멜라인)",
+        "브로멜자임장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "a997a1bd77c64270",
+      "n": 16,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브멜라인장용정(브로멜라인)",
+        "키도멜라인장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "4ffd591092293d99",
+      "n": 9,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "로메라제장용정(브로멜라인)",
+        "아이멜라인장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "bbbe8ddddb8e96fe",
+      "n": 6,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로자임정(브로멜라인)",
+        "브로자임정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "f9bdc85b3da537f8",
+      "n": 6,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "노바멜라인장용정100밀리그램(브로멜라인)",
+        "노바멜라인장용정100밀리그램(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "b196c68bba8f3eea",
+      "n": 6,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로다제장용정(브로멜라인)",
+        "브로다제장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "ad96bdaf17dd292b",
+      "n": 5,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로나인장용정(브로멜라인)",
+        "브로나인장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "ef7094954139bcca",
+      "n": 4,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "부로멜장용정(브로멜라인)",
+        "부로멜장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "5c6160b5bc6fc5bb",
+      "n": 4,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로멜라장용정(브로멜라인)",
+        "브로멜라장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "9b1526fc3dd4b79f",
+      "n": 3,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로멜란장용정(브로멜라인)",
+        "브로멜란장용정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "51043688afc1b422",
+      "n": 3,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "벨라제정(브로멜라인)",
+        "벨라제정(브로멜라인)"
+      ]
+    },
+    {
+      "fp": "53ae867c6036e430",
+      "n": 2,
+      "isTarget": false,
+      "routes": [
+        "oral"
+      ],
+      "sampleNames": [
+        "브로라제장용정(브로멜라인)",
+        "브로라제장용정(브로멜라인)"
+      ]
+    }
+  ],
+  "target_master_ids": [
+    "0e3ec914-0ded-4a66-b150-7e716218427c",
+    "1201508c-67d9-4926-bf33-264bfd3866e8",
+    "14464597-90d2-4eab-8dae-1fc741738466",
+    "1a30da3e-2c60-4dcf-b78c-0016bd6e103a",
+    "278d58a9-c186-435d-ae4d-11e6b92ef64a",
+    "45c5a1ec-76b7-4ab5-8c7f-cd9ff18ed5e0",
+    "492d9c54-a49d-4123-8a87-6ae6e798c731",
+    "591260a3-8af3-4ffd-9135-6e27a5331f77",
+    "66f332dc-0ccf-4536-af9d-fd3188d05800",
+    "6e435b0e-6fd7-4108-8f80-d1ffcb064a8f",
+    "77fc3c73-d5d3-410f-8fbf-9c5dcb9c453f",
+    "9148a97e-324c-4600-a8ec-2016b7e27fbd",
+    "b0f2a66a-c80f-48c2-ad8e-55f677f7e2b3",
+    "c2c3e0f1-ade9-4168-8205-b5b67b0d6400",
+    "c7fee65b-a8d4-44e0-8480-a9f8640f9c73",
+    "cf19a2ce-e5fa-4841-8a1a-ab39bd3dc963",
+    "d1b8946d-dbdb-4a16-b697-cef9f961297d",
+    "d5acb352-db12-46dc-bc6d-002d572e6990",
+    "e9da295a-1305-42c7-b48e-ee2cdada0908",
+    "f2b4195a-2f02-4bd5-9cd6-08ce3cee5411",
+    "f5944ee2-46fd-4f9d-8c5e-66eee209e48a",
+    "fae25dff-3e16-4f59-86e5-f2e68897439b"
+  ]
+}

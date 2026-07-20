@@ -1,0 +1,485 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "브로멜라인|100밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0308eaa4-7c2d-4ca1-95b7-aae82d767f0a",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "브로멜라인 100mg 정",
+  "coarseTotal": 86,
+  "target": 22,
+  "excluded": 64,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "05dc04e7-08ab-4404-9a1e-54955a2940f6",
+      "name": "부로멜장용정(브로멜라인)",
+      "reason": "비대상(fp ef7094954139bcca, bridge SSOT)"
+    },
+    {
+      "id": "0d570406-cad4-459e-bf51-0247da80d731",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "1039feb9-db39-4d1a-b16f-ff79fabdb5bb",
+      "name": "브로멜란장용정(브로멜라인)",
+      "reason": "비대상(fp 9b1526fc3dd4b79f, bridge SSOT)"
+    },
+    {
+      "id": "1255f78b-fdfe-4280-86c9-9accfd7df786",
+      "name": "부로멜장용정(브로멜라인)",
+      "reason": "비대상(fp ef7094954139bcca, bridge SSOT)"
+    },
+    {
+      "id": "14aa966d-ea51-4f05-bc7d-1162b7aff0e9",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "152160ec-85e1-43c8-81c6-9a28afcc622c",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "1b293daf-a1e0-47d6-bea1-efa5fdf01824",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "1ce9c07c-3c35-411c-8714-5ec8ea601319",
+      "name": "브멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "203cb044-e614-43d3-a0a8-e2b8894633a7",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "21b4deb6-073c-4a0b-845d-c24bf6d8380a",
+      "name": "키도멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "222ac1ee-47e4-4e8a-bf3e-138f4c9036a2",
+      "name": "부로멜장용정(브로멜라인)",
+      "reason": "비대상(fp ef7094954139bcca, bridge SSOT)"
+    },
+    {
+      "id": "24e9ed86-66f9-4b00-8f81-9c58675e56f4",
+      "name": "브로나인장용정(브로멜라인)",
+      "reason": "비대상(fp ad96bdaf17dd292b, bridge SSOT)"
+    },
+    {
+      "id": "2fb2985b-1fc8-4670-82df-a38ebea7394e",
+      "name": "브로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp 5c6160b5bc6fc5bb, bridge SSOT)"
+    },
+    {
+      "id": "308ff485-717a-472b-8241-f7862d95c129",
+      "name": "브멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "31aee434-3e0f-4e18-9de6-531ccff0f40f",
+      "name": "메로타제장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "34c5b763-f820-412a-92c8-0b0cb128e8f2",
+      "name": "브로라제장용정(브로멜라인)",
+      "reason": "비대상(fp 53ae867c6036e430, bridge SSOT)"
+    },
+    {
+      "id": "364b3c4f-6ac1-4935-8cde-76b8c45dd557",
+      "name": "로메라제장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "3ddc316d-ba6a-4b88-b3f6-795d82005f01",
+      "name": "브롤라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "3de7a180-8c2e-4cbf-8faa-f6ff8391fcab",
+      "name": "아이멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "4c45d348-2704-453c-b15c-2b51c81b663c",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "4d958843-76ca-4fea-bf17-3f8357ec8bb2",
+      "name": "브로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp 5c6160b5bc6fc5bb, bridge SSOT)"
+    },
+    {
+      "id": "59515d88-b24f-42d9-9565-837b04037b7a",
+      "name": "메로타제장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "59b4995d-f2d2-4e60-ab3a-fe7d96d6c544",
+      "name": "로메라제장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "59d637d5-385a-41f3-81bd-be611d8229d5",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "5c1c99ba-e8b0-4680-995e-d9af1b4866a2",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    },
+    {
+      "id": "62fe32af-ba19-4a4d-9160-e54874314696",
+      "name": "브로아제장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "63b40443-c59e-4d52-979c-611ca4f509ae",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "771195a4-36ad-43e5-9f78-52dc85d1f58c",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "78b31ccf-1777-4f0d-a8c3-fc2187318dd0",
+      "name": "벨라제정(브로멜라인)",
+      "reason": "비대상(fp 51043688afc1b422, bridge SSOT)"
+    },
+    {
+      "id": "7dfd4e11-1a78-4c9b-b20c-9541fa63fbc6",
+      "name": "벨라제정(브로멜라인)",
+      "reason": "비대상(fp 51043688afc1b422, bridge SSOT)"
+    },
+    {
+      "id": "82ec94d0-d6b9-490a-a042-5f2ef0cc88a4",
+      "name": "벨라제정(브로멜라인)",
+      "reason": "비대상(fp 51043688afc1b422, bridge SSOT)"
+    },
+    {
+      "id": "84777019-765b-4edb-8502-314135d11f52",
+      "name": "브로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp 5c6160b5bc6fc5bb, bridge SSOT)"
+    },
+    {
+      "id": "8495cf99-8f74-467d-955c-ec38d9bc1a9a",
+      "name": "로메라제장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "880b5aca-2ced-4e93-a44d-a5f9f22b4c4e",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "8b213c25-f0d9-4228-95c5-566a009eca6c",
+      "name": "브로아제장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "8b9beda0-331d-4582-8174-fe8d9e4ea717",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    },
+    {
+      "id": "8e4579d9-235e-461a-b525-150b4b4b104a",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "925c2607-d953-4198-8ef1-36cee5645c0a",
+      "name": "브롤라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "986a2ddf-8983-4615-b869-c99d4e1873d9",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "98f6446b-dae8-4a80-abff-91b087f139ca",
+      "name": "브로멜란장용정(브로멜라인)",
+      "reason": "비대상(fp 9b1526fc3dd4b79f, bridge SSOT)"
+    },
+    {
+      "id": "a128ec1b-bd29-472d-88bb-8970599d96fc",
+      "name": "키도멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "a2e14860-1edf-4528-9903-72a4d4c16a21",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "ab06d351-7cb0-4d5f-9175-40449a639792",
+      "name": "부로멜장용정(브로멜라인)",
+      "reason": "비대상(fp ef7094954139bcca, bridge SSOT)"
+    },
+    {
+      "id": "b2db1bfc-19c0-4e5e-8776-00c73a825106",
+      "name": "브로라제장용정(브로멜라인)",
+      "reason": "비대상(fp 53ae867c6036e430, bridge SSOT)"
+    },
+    {
+      "id": "b74aca8d-b25c-4c88-a1da-c4caf5f4cf93",
+      "name": "브로나인장용정(브로멜라인)",
+      "reason": "비대상(fp ad96bdaf17dd292b, bridge SSOT)"
+    },
+    {
+      "id": "be8ca2a2-6a46-40b5-ab87-b387b2eb1aea",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "bef668ca-0c2a-4786-acb7-eb2072533df5",
+      "name": "아이멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "c56a8be8-23dc-4d82-aef9-b384bdf79506",
+      "name": "부로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp a997a1bd77c64270, bridge SSOT)"
+    },
+    {
+      "id": "cb075a9a-3db3-4307-9a1b-5f57de5a3a9d",
+      "name": "아이멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "cc953eb3-4a81-41bf-b0c2-e4427967de42",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    },
+    {
+      "id": "d12d9b7f-bc04-4579-afeb-683390bd777c",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "d238adb7-f8dc-46ff-8eeb-0a0b50258062",
+      "name": "로메라제장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "d3738d2e-fdae-41d8-9c7f-1e06835b7a71",
+      "name": "아이멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "db71b900-cba8-42e2-a9c1-02bae6b2fab3",
+      "name": "아이멜라인장용정(브로멜라인)",
+      "reason": "비대상(fp 4ffd591092293d99, bridge SSOT)"
+    },
+    {
+      "id": "dbe27d29-45c3-4cb8-96b4-d0a8b344315a",
+      "name": "브로나인장용정(브로멜라인)",
+      "reason": "비대상(fp ad96bdaf17dd292b, bridge SSOT)"
+    },
+    {
+      "id": "e6a23d6f-9917-4943-a934-1235be63ea33",
+      "name": "브로멜라장용정(브로멜라인)",
+      "reason": "비대상(fp 5c6160b5bc6fc5bb, bridge SSOT)"
+    },
+    {
+      "id": "e9088702-b346-4a84-9c94-082b58af4740",
+      "name": "브로나인장용정(브로멜라인)",
+      "reason": "비대상(fp ad96bdaf17dd292b, bridge SSOT)"
+    },
+    {
+      "id": "ebf0eee8-5945-48c4-a928-42b3b98c60db",
+      "name": "브로나인장용정(브로멜라인)",
+      "reason": "비대상(fp ad96bdaf17dd292b, bridge SSOT)"
+    },
+    {
+      "id": "efe9f153-d7a0-49bf-9a4c-311b3b89a504",
+      "name": "브로자임정(브로멜라인)",
+      "reason": "비대상(fp bbbe8ddddb8e96fe, bridge SSOT)"
+    },
+    {
+      "id": "f1ead1d2-bdbc-496a-ad43-de49d5138718",
+      "name": "노바멜라인장용정100밀리그램(브로멜라인)",
+      "reason": "비대상(fp f9bdc85b3da537f8, bridge SSOT)"
+    },
+    {
+      "id": "f9086a13-bbf9-497c-93e0-4937bb7aa4f7",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    },
+    {
+      "id": "fe6827a5-52af-4277-af18-1b29dfad4728",
+      "name": "브로멜란장용정(브로멜라인)",
+      "reason": "비대상(fp 9b1526fc3dd4b79f, bridge SSOT)"
+    },
+    {
+      "id": "feede33b-0cf3-43b8-9c56-07d55043aa3d",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    },
+    {
+      "id": "ff6c0b5f-88f4-461f-938e-9bf00094e4b6",
+      "name": "브로다제장용정(브로멜라인)",
+      "reason": "비대상(fp b196c68bba8f3eea, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "0e3ec914-0ded-4a66-b150-7e716218427c",
+    "1201508c-67d9-4926-bf33-264bfd3866e8",
+    "14464597-90d2-4eab-8dae-1fc741738466",
+    "1a30da3e-2c60-4dcf-b78c-0016bd6e103a",
+    "278d58a9-c186-435d-ae4d-11e6b92ef64a",
+    "45c5a1ec-76b7-4ab5-8c7f-cd9ff18ed5e0",
+    "492d9c54-a49d-4123-8a87-6ae6e798c731",
+    "591260a3-8af3-4ffd-9135-6e27a5331f77",
+    "66f332dc-0ccf-4536-af9d-fd3188d05800",
+    "6e435b0e-6fd7-4108-8f80-d1ffcb064a8f",
+    "77fc3c73-d5d3-410f-8fbf-9c5dcb9c453f",
+    "9148a97e-324c-4600-a8ec-2016b7e27fbd",
+    "b0f2a66a-c80f-48c2-ad8e-55f677f7e2b3",
+    "c2c3e0f1-ade9-4168-8205-b5b67b0d6400",
+    "c7fee65b-a8d4-44e0-8480-a9f8640f9c73",
+    "cf19a2ce-e5fa-4841-8a1a-ab39bd3dc963",
+    "d1b8946d-dbdb-4a16-b697-cef9f961297d",
+    "d5acb352-db12-46dc-bc6d-002d572e6990",
+    "e9da295a-1305-42c7-b48e-ee2cdada0908",
+    "f2b4195a-2f02-4bd5-9cd6-08ce3cee5411",
+    "f5944ee2-46fd-4f9d-8c5e-66eee209e48a",
+    "fae25dff-3e16-4f59-86e5-f2e68897439b"
+  ],
+  "rollback_master_ids": [
+    "0e3ec914-0ded-4a66-b150-7e716218427c",
+    "1201508c-67d9-4926-bf33-264bfd3866e8",
+    "14464597-90d2-4eab-8dae-1fc741738466",
+    "1a30da3e-2c60-4dcf-b78c-0016bd6e103a",
+    "278d58a9-c186-435d-ae4d-11e6b92ef64a",
+    "45c5a1ec-76b7-4ab5-8c7f-cd9ff18ed5e0",
+    "492d9c54-a49d-4123-8a87-6ae6e798c731",
+    "591260a3-8af3-4ffd-9135-6e27a5331f77",
+    "66f332dc-0ccf-4536-af9d-fd3188d05800",
+    "6e435b0e-6fd7-4108-8f80-d1ffcb064a8f",
+    "77fc3c73-d5d3-410f-8fbf-9c5dcb9c453f",
+    "9148a97e-324c-4600-a8ec-2016b7e27fbd",
+    "b0f2a66a-c80f-48c2-ad8e-55f677f7e2b3",
+    "c2c3e0f1-ade9-4168-8205-b5b67b0d6400",
+    "c7fee65b-a8d4-44e0-8480-a9f8640f9c73",
+    "cf19a2ce-e5fa-4841-8a1a-ab39bd3dc963",
+    "d1b8946d-dbdb-4a16-b697-cef9f961297d",
+    "d5acb352-db12-46dc-bc6d-002d572e6990",
+    "e9da295a-1305-42c7-b48e-ee2cdada0908",
+    "f2b4195a-2f02-4bd5-9cd6-08ce3cee5411",
+    "f5944ee2-46fd-4f9d-8c5e-66eee209e48a",
+    "fae25dff-3e16-4f59-86e5-f2e68897439b"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "ef7094954139bcca",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "bbbe8ddddb8e96fe",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f79d8c596f934095",
+      "n": 22,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "9b1526fc3dd4b79f",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f9bdc85b3da537f8",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a997a1bd77c64270",
+      "n": 16,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ad96bdaf17dd292b",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "5c6160b5bc6fc5bb",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "53ae867c6036e430",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4ffd591092293d99",
+      "n": 9,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b196c68bba8f3eea",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "51043688afc1b422",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 22,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 22,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 22,
+  "htmlLen": 1537,
+  "contentHash": "ad63397c341ab6959fb8c3cdb7238360",
+  "summary": "브로멜라인 100mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 22,
+      "STEP_B_easy_canonical_demote": 22,
+      "STEP_B_authored_canonical_flip": 22,
+      "total": 66
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 22,
+      "total": 22
+    },
+    "grand_total": 88
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 22",
+    "policy_2A": "audit 2/master = 44 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
