@@ -148,4 +148,26 @@ basis/원료/제형/Guard 재사용: YES / 신규 0
 
 ---
 
-*§1~7 read-only 조사(select 실측). §8 생산은 승인·이중게이트 후 COMMIT 실행 완료.*
+## 9. 실행 기록 — #2 비타민D+셀레늄+아연 8 LIVE (Agent B · 2026-07-20 · COMMIT)
+
+§6 2순위 생산 실행 완료. **DB write 32 · COMMIT.** 기준선 복합형 597.
+
+| 단계 | 실측 |
+|------|------|
+| select (`--source db`, proxy 5433) | ELIGIBLE **8** · 제형 tablet 5·softgel 3 (§2 정확 일치)·정체 HOLD 4 일치. 은닉 0 |
+| generate·G-MULTI Guard | PASS **8** · REVIEW 0 · BLOCKED 0 · G-MULTI HOLD 0 · 자동HOLD 0. 전건 원료 카드 3(D+Se+Zn) ko/en |
+| dry-run(exec+rollback) | postVerifyPass ✓ · 예상=실측 32 · canonicalDup 0 → ROLLBACK(DB write 0) |
+| COMMIT (`--apply`, 이중게이트) | **완료** — ProductMaster 8 · candidate UPDATE 8 · STORE SPD ko 8 · en 8 = **32** |
+
+### 독립 사후검증 (새 DB 연결)
+- `hff-combo-verify-committed.ts --slug vd-se-zn --expect 8`: independentVerifyPass **true** · masters/candUpd/ko/en 8/8/8/8 · **canonicalDup 0** · spdRefLinks 16 · **existingTotal(baseline) 597 → totalComboLive 605**
+
+### 결과
+- **복합형 LIVE 597 → 605** (baseline 597 + vd-se-zn 8). 기존 LIVE drift 0.
+- tag `batch:single-nutrient-vd-se-zn` · rollback manifest `hff-vd-se-zn-apply-rollback-manifest.json` · 아티팩트 `docs/checks/data/product-description-guard/hff-combo-vd-se-zn.json` (target 8) · verifier allowlist 추가.
+
+> top3 신규 후보 배치 완료: #1 D+E 24(§8) + #2 D+Se+Zn 8(§9) = 32 LIVE. #3 fiber+zn 는 DROP(§2, 확정). 이후 Agent B 는 single-lutein 31 RETIRE+REPLACE 교정 파일럿으로 전환.
+
+---
+
+*§1~7 read-only 조사(select 실측). §8·§9 생산은 승인·이중게이트 후 COMMIT 실행 완료.*

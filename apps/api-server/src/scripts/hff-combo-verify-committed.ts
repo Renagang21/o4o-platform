@@ -30,6 +30,7 @@ const COMBO_NONPREFIXED_TAGS = [
   'batch:single-nutrient-g10-b126-vc-zn',
   'batch:single-nutrient-h4-ms-na-b126-zn-panto',
   'batch:single-nutrient-vd-ve',
+  'batch:single-nutrient-vd-se-zn',
 ];
 
 async function main(): Promise<void> {
