@@ -1192,6 +1192,8 @@ export function createStoreTabletRoutes(
   ];
   const setCols = (p: string) =>
     `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
+    // WO-O4O-SCREEN-SET-OWNER-SCOPE-SCHEMA-MIGRATION-V1: supplier_id(additive, store/operator=null) 응답 포함.
+    `${p}supplier_id AS "supplierId", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
     `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` +
     // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 연결된 screen_set QR slug(additive, nullable).

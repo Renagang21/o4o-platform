@@ -211,11 +211,15 @@ export type ContentListItem =
 
 export interface ScreenSet {
   id: string;
-  organizationId: string;
+  // WO-O4O-SCREEN-SET-OWNER-SCOPE-SCHEMA-MIGRATION-V1: 소유권 모델 — organization_id 는 매장(store) 전용.
+  //   operator/supplier 원본은 organizationId=null(service_key/supplierId 로 소유). ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1.
+  organizationId: string | null;
   serviceKey: string | null;
+  /** 공급자(origin='supplier') 원본 식별자. store/operator 는 null. soft-ref. */
+  supplierId: string | null;
   tabletId: string | null;
   name: string;
-  origin: 'store' | 'operator';
+  origin: 'store' | 'operator' | 'supplier';
   status: ScreenSetStatus;
   // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 화면 세트 렌더 템플릿 키.
   //   서버 GET 은 COALESCE 로 항상 non-null 반환(미지정 → corner_information_basic_v1).
