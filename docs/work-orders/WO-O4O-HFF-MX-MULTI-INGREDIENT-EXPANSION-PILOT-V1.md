@@ -130,3 +130,13 @@
 - **문제**: `hff-combo-verify-committed` baseline 쿼리가 `batch:single-nutrient-combo-%` 패턴만 집계 → higher-N 배치들(slug 이 `combo-` 접두 없는 b-complex-n8 / mg-mn-vd-zn-ca 등 6종)을 누락, `totalComboLive` 과소표시(예: g13 시점 실계 554 대비 도구값 낮음).
 - **수정**: baseline 조건에 `OR t = ANY(COMBO_NONPREFIXED_TAGS)` 추가(6개 비접두 복합형 slug 명시 allowlist). 단일영양소(53종, 전부 단일명)는 미포함 → 오집계 0. LIVE 정의·생산 로직 무변경, verifier 한정.
 - **회귀검증**: g13 재실행 → baseline 20태그(14 combo- + 6 신규) · existingTotal 544 · **totalComboLive 554 = 직접 카운트 SSOT 일치** · 중복집계 0 · dbWrite 0. 향후 신규 복합형은 slug `combo-` 접두 사용 시 자동 포함(allowlist 확장 불요).
+
+### higher-N V2 큐 선택그룹 LIVE (Agent B) — G10 B군+비타민C+아연 N5 9건
+
+- 기준·검수: Agent A V2(`9d417651e`) G10, READY_WITH_HOLD 9/7.
+- **대상 정제**: select 실측 mention 1163 · **ELIGIBLE 9**(Agent A와 정확 일치) · grounding HOLD 7 + HOLD_MULTI 1147. HOLD∩target overlap 0. 신규 원료/basis/제형 0(tablet 2·capsule 1·chewable 4·powder 2). B12 부재 → Guard 무이슈.
+- **generate**: 작성 9 · PASS 8 · **REVIEW 1** · BLOCKED 0 · G-MULTI HOLD 0.
+  - **REVIEW 1건 해소(known-safe)**: stmt `2013001712288`(면역건강365) — 표준 Guard `PRE-SRC-BASIS-UNVERIFIABLE-003`(2차 mg환산 파서가 비표준 형식 `8.5mg/500mg`[표시량() 래퍼·공백 없음]의 분모 미파싱 → 보수적 REVIEW). **1차 grounding 정확**: pool·draft 모두 basis 500mg + 5원료 value/ratio 전부 원문 verbatim 일치(B1 1.2/B2 1.4/B6 1.5/C 30/아연 8.5, 전부 /500mg). 새 해석·새 basis·수치 불명확 없음 → 포함(#11 MISMATCH-002 BLOCKED 오기와 성격 다름).
+- **dry-run(재확인) → apply(COMMIT, 승인)** → **독립검증(수정 verifier)** PASS: appliedProducts 9 · totalWrites 36(masters 9·candidate UPDATE 9·SPD ko9+en9) · canonicalDup 0 · candidateLinks 9 · spdRefLinks 18 · **existingTotal 554 · totalComboLive 563**(verifier 자체가 정확 집계 — 직접카운트 불요). tag `batch:single-nutrient-g10-b126-vc-zn`. rollback manifest 저장.
+- **복합형 누적 554 → 563**. g10 slug 도 `combo-` 비접두 → verifier `COMBO_NONPREFIXED_TAGS` 에 `batch:single-nutrient-g10-b126-vc-zn` **추가 완료**(baseline 21태그, g13 재검증 totalComboLive 563 확인). 향후 신규 복합형은 slug `combo-` 접두 권장(allowlist 확장 불요).
+- **다음**: #4 N7 밀크씨슬+B군+아연(READY_WITH_HOLD 9/22, 저수율) — 선택. lut-va `PAUSED_GROUP_DEFECT` 유지.

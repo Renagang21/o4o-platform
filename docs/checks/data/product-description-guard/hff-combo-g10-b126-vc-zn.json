@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "g10-b126-vc-zn-001",
+  "productName": "면역건강365",
+  "productNameEn": "면역건강365",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "20040017062174",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n\n[비타민B2] (1) 체내 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 하양색 점박이가 있는 노랑색의 장방형 정제\n2) 비타민C: 표시량(30 mg/500 mg)의 80~150%\n3) 비타민B1: 표시량(1.2 mg/500 mg)의 80~180%\n4) 비타민B2: 표시량(1.4 mg/500 mg)의 80~180%\n5) 비타민B6: 표시량(1.5 mg/500 mg)의 80~150%\n6) 아연: 표시량(8.5 mg/500 mg)의 80~150%\n7) 붕해도: 30분 이내\n8) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 위험이 있으니 주의하시기 바랍니다.\n3. 용기 안의 습기제거제는 드시지 마십시오.\n4. 과량 섭취하지 않도록 주의하십시오.\n5. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.\n6. 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 하양색 점박이가 있는 노랑색의 장방형 정제",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오. 개봉한 상태로 공기 중에 방치하거나 다른 용기에 보관하지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>면역건강365<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>30mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>30mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 하양색 점박이가 있는 노랑색의 장방형 정제 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 하양색 점박이가 있는 노랑색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오. 개봉한 상태로 공기 중에 방치하거나 다른 용기에 보관하지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>면역건강365<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>30mg</b> of Vitamin C, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>30mg</b> Vitamin C, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 하양색 점박이가 있는 노랑색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오. 개봉한 상태로 공기 중에 방치하거나 다른 용기에 보관하지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-002",
+  "productName": "프로큐",
+  "productNameEn": "프로큐",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020002919",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B1]①탄수화물과 에너지 대사에 필요\n[아연]①정상적인 면역기능에 필요② 정상적인 세포분열에 필요\n[비타민B2]①체내 에너지 생성에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고, 이미, 이취가 없으며 노란회색의 내용물을 함유한 회보라색의 장방형 경질캡슐\n2) 비타민B1 : 표시량(6.29mg/1000mg)의 80~180%\n3) 비타민B2 : 표시량(3.2mg/1000mg)의 80~180%\n4) 비타민B6 : 표시량(2.62mg/1000mg)의 80~150%\n5) 비타민C : 표시량(48mg/1000mg)의 80~150% \n6) 아연 : 표시량(6mg/1000mg)의 80~150%\n7) 대장균군 : 음성\n8) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없으며 노란회색의 내용물을 함유한 회보라색의 장방형 경질캡슐",
+   "storage": "수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 6.29,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 6.29mg</span><span class=\"sd-badge is-solid\">비타민 B2 3.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 2.62mg</span><span class=\"sd-badge is-solid\">비타민 C 48mg</span><span class=\"sd-badge is-solid\">아연 6mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>프로큐<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>6.29mg</b>, 비타민 B2 <b>3.2mg</b>, 비타민 B6 <b>2.62mg</b>, 비타민 C <b>48mg</b>, 아연 <b>6mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>6.29mg</b>, 비타민 B2 <b>3.2mg</b>, 비타민 B6 <b>2.62mg</b>, 비타민 C <b>48mg</b>, 아연 <b>6mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없으며 노란회색의 내용물을 함유한 회보라색의 장방형 경질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(6.29mg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(3.2mg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(2.62mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(48mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(6mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없으며 노란회색의 내용물을 함유한 회보라색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 6.29mg</span><span class=\"sd-badge is-solid\">Vitamin B2 3.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 2.62mg</span><span class=\"sd-badge is-solid\">Vitamin C 48mg</span><span class=\"sd-badge is-solid\">Zinc 6mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>프로큐<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>6.29mg</b> of Vitamin B1, <b>3.2mg</b> of Vitamin B2, <b>2.62mg</b> of Vitamin B6, <b>48mg</b> of Vitamin C, <b>6mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>6.29mg</b> Vitamin B1, <b>3.2mg</b> Vitamin B2, <b>2.62mg</b> Vitamin B6, <b>48mg</b> Vitamin C, <b>6mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (6.29mg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (3.2mg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (2.62mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (48mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (6mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없으며 노란회색의 내용물을 함유한 회보라색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-003",
+  "productName": "애니멀킹덤 츄어블 아연 플러스",
+  "productNameEn": "애니멀킹덤 츄어블 아연 플러스",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110803",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 코알라모양 정제\n2. 비타민B1 : 표시량(1.2㎎/1100㎎)의 80~180%\n3. 비타민B2 : 표시량(0.7㎎/1100㎎)의 80~180%\n4. 비타민B6 : 표시량(1.5㎎/1100㎎)의 80~150%\n5. 비타민C : 표시량(100㎎/1100㎎)의 80~150%\n6. 아연 : 표시량(8.5㎎/1100㎎)의 80~150%\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 코알라모양 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>애니멀킹덤 츄어블 아연 플러스<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 코알라모양 정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1100mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/1100mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 코알라모양 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>애니멀킹덤 츄어블 아연 플러스<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B1, <b>0.7mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1.2mg</b> Vitamin B1, <b>0.7mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1100mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 1100mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 코알라모양 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-004",
+  "productName": "면역건강365",
+  "productNameEn": "면역건강365",
+  "manufacturer": "주식회사 이수바이오",
+  "manufacturerEn": null,
+  "statementNo": "2013001712288",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1. 아연 : 1) 정상적인 면역기능에 필요  2)정상적인 세포분열에 필요\n2. 비타민B1 : 탄수화물과 에너지 대사에 필요\n3. 비타민B2 : 체내 에너지 생성에 필요\n4. 비타민B6 : 1) 단백질 및 아미노산 이용에 필요  2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n5. 비타민C : 1) 결합조직 형성과 기능유지에 필요  2) 철의 흡수에 필요  3)항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란색의 장방형 정제\n2. 아연 : 8.5mg/500mg의 80~150%\n3. 비타민B6 : 1.5mg/500mg의 80~150% \n4. 비타민B1 : 1.2mg/500mg의 80~180%\n5. 비타민B2 : 1.4mg/500mg의 80~180%\n6. 비타민C : 30mg/500mg의 80~150%\n7. 붕해시험 : 30분\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정(500mg)을 충분한 음용수와  함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오\n2)이상사례 발생시 섭취를 중단하고 전문가와 상담하십니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란색의 장방형 정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이 손에 닿지 않도록 주의 하십시오.직사광선을 피하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>면역건강365<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">주식회사 이수바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>30mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>30mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란색의 장방형 정제 · 주식회사 이수바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년까지</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이 손에 닿지 않도록 주의 하십시오.직사광선을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>면역건강365<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 이수바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>30mg</b> of Vitamin C, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>30mg</b> Vitamin C, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 이수바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년까지</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이 손에 닿지 않도록 주의 하십시오.직사광선을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-005",
+  "productName": "곰돌이비타플러스아연",
+  "productNameEn": "곰돌이비타플러스아연",
+  "manufacturer": "(주)뉴팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017014590",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미를 가진 연한 노란색의 원형정제\n② 비타민B1 : 표시량(1.2 mg/4,200 mg)의 80~180%\n③ 비타민B2 : 표시량(1.4 mg/4,200 mg)의 80~180%\n④ 비타민B6 : 표시량(1.5 mg/4,200 mg)의 80~150%\n⑤ 비타민C : 표시량(100 mg/4,200 mg)의 80~150%\n⑥ 아연 : 표시량(8.5 mg/4,200 mg)의 80~150%\n⑦ 비타민E : 표시량(11 mg α-TE/4,200 mg) 80~150%\n⑧ 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1정을 씹거나 녹여서 섭취하십시오",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 원형정제",
+   "storage": "직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 4200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>곰돌이비타플러스아연<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)뉴팜 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 원형정제 · (주)뉴팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/4200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/4200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/4200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/4200mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/4200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>곰돌이비타플러스아연<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by (주)뉴팜 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)뉴팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 4200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 4200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 4200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 4200mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 4200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-006",
+  "productName": "이너뷰 셀렌비타",
+  "productNameEn": "이너뷰 셀렌비타",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "20040017062166",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n\n[비타민B2] (1) 체내 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[셀렌] ①유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 노랑색의 입자성이 있는 분말\n2) 비타민C: 표시량(500 mg/2 g)의  80~150%\n3) 비타민B1: 표시량(0.36 mg/2 g)의  80~180%\n4) 비타민B2: 표시량(1.2 mg/2 g)의  80~180%\n5) 비타민B6: 표시량(0.45 mg/2 g)의 80~150%\n6) 셀렌: 표시량(16.5 ug/2 g)의 80~150%\n7) 아연: 표시량(4.25 mg/2 g)의 80~150%\n8) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하십시오.",
+   "caution": "1. 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n2. 영･유아, 어린이, 임산부 및 수유부, 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의하십시오.\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노랑색의 입자성이 있는 분말",
+   "storage": "실온 / 고온 다습한 곳을 피해 직사광선을 받지 않는 실온에 보관하시고, 개봉 후에는 바로 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.36,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.36mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.45mg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">아연 4.25mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>이너뷰 셀렌비타<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.36mg</b>, 비타민 B2 <b>1.2mg</b>, 비타민 B6 <b>0.45mg</b>, 비타민 C <b>500mg</b>, 아연 <b>4.25mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B1 <b>0.36mg</b>, 비타민 B2 <b>1.2mg</b>, 비타민 B6 <b>0.45mg</b>, 비타민 C <b>500mg</b>, 아연 <b>4.25mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑색의 입자성이 있는 분말 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.36mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.2mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.45mg/2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(4.25mg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 고온 다습한 곳을 피해 직사광선을 받지 않는 실온에 보관하시고, 개봉 후에는 바로 섭취하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.36mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.45mg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Zinc 4.25mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>이너뷰 셀렌비타<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.36mg</b> of Vitamin B1, <b>1.2mg</b> of Vitamin B2, <b>0.45mg</b> of Vitamin B6, <b>500mg</b> of Vitamin C, <b>4.25mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.36mg</b> Vitamin B1, <b>1.2mg</b> Vitamin B2, <b>0.45mg</b> Vitamin B6, <b>500mg</b> Vitamin C, <b>4.25mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.36mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.2mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.45mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4.25mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노랑색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 고온 다습한 곳을 피해 직사광선을 받지 않는 실온에 보관하시고, 개봉 후에는 바로 섭취하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-007",
+  "productName": "프리미엄 비타민C 1000 분말",
+  "productNameEn": "프리미엄 비타민C 1000 분말",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "2004001706280",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비타민B2]①체내 에너지 생성에 필요\r\n[비타민B1]①탄수화물과 에너지 대사에 필요\r\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\r\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 미황색의 분말로 이미,이취가 없어야 한다.\n② 비타민C : 표시량(1000 mg/4,000 mg)의 80~150%\n③ 비타민B1 : 표시량(0.72 mg/4,000 mg)의 80~180%\n④ 비타민B2 : 표시량(2.4 mg/4,000 mg)의 80~180% \n⑤ 비타민B6 : 표시량(0.9 mg/4,000 mg)의 80~150% \n⑥ 셀렌 : 표시량(33 ug /4,000 mg)의 80~150% \n⑦ 아연 : 표시량(8.5 mg/4,000 mg)의 80~150% \n⑧ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포씩 입안에서 녹여서 섭취하십시오.",
+   "caution": "1. 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n2. 임산부, 수유부, 영유아, 어린이, 기타 질병을 가진 분, 수술전·후 환자분 등은 섭취 전 의사와 상담하시기 바랍니다.\n3. 개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색의 분말로 이미, 이취가 없어야 한다",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉후에는 흡습되지 않게 밀봉하여 주십시오. 기온이 높은 곳에는 보관에 주의하시고, 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "mg",
+    "basisAmount": 4000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.72mg</span><span class=\"sd-badge is-solid\">비타민 B2 2.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.9mg</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>프리미엄 비타민C 1000 분말<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>2.4mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>1000mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>2.4mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>1000mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 분말로 이미, 이취가 없어야 한다 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.72mg/4000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(2.4mg/4000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.9mg/4000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/4000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/4000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 미황색의 분말로 이미, 이취가 없어야 한다</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉후에는 흡습되지 않게 밀봉하여 주십시오. 기온이 높은 곳에는 보관에 주의하시고, 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.72mg</span><span class=\"sd-badge is-solid\">Vitamin B2 2.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>프리미엄 비타민C 1000 분말<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72mg</b> of Vitamin B1, <b>2.4mg</b> of Vitamin B2, <b>0.9mg</b> of Vitamin B6, <b>1000mg</b> of Vitamin C, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>0.72mg</b> Vitamin B1, <b>2.4mg</b> Vitamin B2, <b>0.9mg</b> Vitamin B6, <b>1000mg</b> Vitamin C, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.72mg / 4000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (2.4mg / 4000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.9mg / 4000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 4000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 4000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 미황색의 분말로 이미, 이취가 없어야 한다</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 개봉후에는 흡습되지 않게 밀봉하여 주십시오. 기온이 높은 곳에는 보관에 주의하시고, 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-008",
+  "productName": "솔빛키즈",
+  "productNameEn": "솔빛키즈",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083854",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 황회색의 장방형 정제\n(2) 비타민C : 표시량(54mg/2,000mg)의 80~150%\n(3) 아연 : 표시량(6.6mg/2,000mg)의 80~150%\n(4) 비타민B6 : 표시량(1.2mg/2,000mg)의 80~150%\n(5) 비타민B1 : 표시량(0.6mg/2,000mg)의 80~180%\n(6) 비타민B2 : 표시량(0.8mg/2,000mg)의 80~180%\n(7) 대장균군 : 음성\n(8) 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2정을 씹거나 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 황회색의 장방형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.6,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.6mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.8mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.2mg</span><span class=\"sd-badge is-solid\">비타민 C 54mg</span><span class=\"sd-badge is-solid\">아연 6.6mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>솔빛키즈<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.6mg</b>, 비타민 B2 <b>0.8mg</b>, 비타민 B6 <b>1.2mg</b>, 비타민 C <b>54mg</b>, 아연 <b>6.6mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 B1 <b>0.6mg</b>, 비타민 B2 <b>0.8mg</b>, 비타민 B6 <b>1.2mg</b>, 비타민 C <b>54mg</b>, 아연 <b>6.6mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 황회색의 장방형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.6mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.8mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.2mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(54mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(6.6mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 황회색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.8mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin C 54mg</span><span class=\"sd-badge is-solid\">Zinc 6.6mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>솔빛키즈<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.6mg</b> of Vitamin B1, <b>0.8mg</b> of Vitamin B2, <b>1.2mg</b> of Vitamin B6, <b>54mg</b> of Vitamin C, <b>6.6mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>0.6mg</b> Vitamin B1, <b>0.8mg</b> Vitamin B2, <b>1.2mg</b> Vitamin B6, <b>54mg</b> Vitamin C, <b>6.6mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.6mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.8mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.2mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (54mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (6.6mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 황회색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "g10-b126-vc-zn-009",
+  "productName": "생그린 셀렌 비타민C 프리미엄",
+  "productNameEn": "생그린 셀렌 비타민C 프리미엄",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061221",
+  "category": "hff",
+  "source": {
+   "mainFunction": "비타민C : ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③ 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요  \n\n셀렌 : ①유해산소로부터 세포를 보호하는데 필요\n\n아연 : ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n비타민B6 : ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n비타민B1 : ①탄수화물과 에너지 대사에 필요\n\n비타민B2 : ①체내 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 함유한 하양 또는 흰 분홍의 장방형 츄어블 제피정제\n  2) 비타민C : 표시량(336 mg/4.8g)의 80~150%\n  3) 셀렌 : 표시량(41 ㎍/4.8g)의 80～150% \n  4) 아연 : 표시량(5.1 mg/4.8g)의 80~150%\n  5) 비타민B6 : 표시량(0.9 mg/4.8g)의 80~150%\n  6) 비타민B1 : 표시량(0.72 mg/4.8g)의 80~180%\n  7) 비타민B2 : 표시량(0.84 mg/4.8g)의 80~180%\n  8) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2정(1.6 g)을 씹어서(또는 충분한 양의 물과 함께)섭취하십시오.",
+   "caution": "① 임산부, 수유여성 및 어린이는 섭취에 주의하십시오.\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\n④ 질병치료 중인 분은 섭취 전 의사와 상담 후 섭취하십시오.\n⑤ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 함유한 하양 또는 흰 분홍의 장방형 츄어블 제피정제",
+   "storage": "① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오.   ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "mg",
+    "basisAmount": 4.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.72mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.84mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.9mg</span><span class=\"sd-badge is-solid\">비타민 C 336mg</span><span class=\"sd-badge is-solid\">아연 5.1mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>생그린 셀렌 비타민C 프리미엄<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>0.84mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>336mg</b>, 아연 <b>5.1mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>0.84mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>336mg</b>, 아연 <b>5.1mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 함유한 하양 또는 흰 분홍의 장방형 츄어블 제피정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.72mg/4.8g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.84mg/4.8g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.9mg/4.8g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(336mg/4.8g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(5.1mg/4.8g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 함유한 하양 또는 흰 분홍의 장방형 츄어블 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.72mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.84mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin C 336mg</span><span class=\"sd-badge is-solid\">Zinc 5.1mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>생그린 셀렌 비타민C 프리미엄<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72mg</b> of Vitamin B1, <b>0.84mg</b> of Vitamin B2, <b>0.9mg</b> of Vitamin B6, <b>336mg</b> of Vitamin C, <b>5.1mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 tablets): <b>0.72mg</b> Vitamin B1, <b>0.84mg</b> Vitamin B2, <b>0.9mg</b> Vitamin B6, <b>336mg</b> Vitamin C, <b>5.1mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.72mg / 4.8g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.84mg / 4.8g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.9mg / 4.8g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (336mg / 4.8g), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (5.1mg / 4.8g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이를 함유한 하양 또는 흰 분홍의 장방형 츄어블 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
