@@ -1,0 +1,187 @@
+{
+  "wo": "WO-O4O-OTC-LORATADINE-10MG-UPGRADE-PREP-AUDIT-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "groupKey": "로라타딘|10밀리그램|정",
+  "candidate": "0a7dee0b-e578-4015-967a-fad092071eef",
+  "anomalies": [],
+  "draftTitle": "로라타딘 10mg 정",
+  "coarseTotal": 41,
+  "target": 38,
+  "excluded": 3,
+  "other": 0,
+  "targetExcludeIntersection": 0,
+  "excludeFps": [
+    "168c9fc2508b87da"
+  ],
+  "fpDistribution": [
+    {
+      "fp": "83bcf192525baa16",
+      "n": 38,
+      "role": "target(그대로확장)"
+    },
+    {
+      "fp": "168c9fc2508b87da",
+      "n": 3,
+      "role": "비대상(exclude)"
+    }
+  ],
+  "target_master_ids": [
+    "0233f774-7583-43f4-9ee3-aa49b69e8ff6",
+    "0e6e14bb-aa5f-4ffe-aaad-e3d727fb6680",
+    "0e7e2b60-b7e0-49b5-ac11-60af759064ca",
+    "1003dc2b-1864-4ed8-ab5d-ea815290ed52",
+    "1ce2f2e5-4179-4fbc-9d66-fa7c706dd9f7",
+    "1e57032d-e1f6-4b9a-84c7-6b323de2313e",
+    "273702d6-5c10-4142-a73f-8398f0a9c964",
+    "2e865036-3bde-4cea-bfd1-99ed70fecf42",
+    "31b32422-4c81-40ca-95e9-d585630308e1",
+    "364436b5-98db-448a-98aa-b0af624fca7b",
+    "4df6f6d6-3f4f-40a2-b7aa-052762d99850",
+    "54fb5208-fd81-4ae9-9ebd-d1f0ce80e076",
+    "55b7caff-b9dd-4fd1-9013-08b094de94d7",
+    "5b749b59-e79f-453b-8d68-29affaefc76f",
+    "5d9a0b0f-9af2-47b6-8a60-f61f9a46d8e9",
+    "74164bbc-8cce-4306-832f-a1b3209902f2",
+    "751ea3d4-dce7-4c26-83f1-3267ca255acb",
+    "891089be-bd73-46de-9542-c2be3c8ba10c",
+    "8e40f629-4a39-4124-93e3-0b8aa3f07d45",
+    "9aede24d-b15d-405a-aa38-2da56b332deb",
+    "9d940b9c-4997-4d3b-9515-7bac9839f634",
+    "9e52e019-394e-4b7e-955a-da115d10447a",
+    "a34b0b8c-2cc9-4836-891b-ddea213c97fe",
+    "a3d8b0bf-fa7a-49cd-b299-9f4c7d98c9a7",
+    "a9ee575d-420d-4397-92f9-d9185b4453c6",
+    "b0c55000-4301-4330-a18b-8764d51a8cd5",
+    "b37d8693-2c7f-4a83-8ebf-045d9cb28e74",
+    "cd961b41-7b7f-4195-b582-0ac49f55c0e8",
+    "ce5dbc7d-ea0a-4710-93a8-5bbbc8f07d80",
+    "ceded157-cb51-4197-9b0c-56692b62574c",
+    "d08914d7-1736-48d4-960b-c598bf78a952",
+    "d14010bd-f241-4cf7-9aa1-ffe0d9a7dc77",
+    "d2097194-b29c-4771-97c4-03f425367aa3",
+    "dcf8fb8b-9d67-460b-9b67-a02fd3655da7",
+    "df076474-9975-4b2c-b71b-78e2e4c9013a",
+    "e85931da-c38c-4c0e-bff8-bfe7a7c50d25",
+    "f2d73e3a-daec-406e-af19-8628b1d0222e",
+    "f7982211-4b0d-4d09-86bf-16fc82d37113"
+  ],
+  "rollback_master_ids": [
+    "0233f774-7583-43f4-9ee3-aa49b69e8ff6",
+    "0e6e14bb-aa5f-4ffe-aaad-e3d727fb6680",
+    "0e7e2b60-b7e0-49b5-ac11-60af759064ca",
+    "1003dc2b-1864-4ed8-ab5d-ea815290ed52",
+    "1ce2f2e5-4179-4fbc-9d66-fa7c706dd9f7",
+    "1e57032d-e1f6-4b9a-84c7-6b323de2313e",
+    "273702d6-5c10-4142-a73f-8398f0a9c964",
+    "2e865036-3bde-4cea-bfd1-99ed70fecf42",
+    "31b32422-4c81-40ca-95e9-d585630308e1",
+    "364436b5-98db-448a-98aa-b0af624fca7b",
+    "4df6f6d6-3f4f-40a2-b7aa-052762d99850",
+    "54fb5208-fd81-4ae9-9ebd-d1f0ce80e076",
+    "55b7caff-b9dd-4fd1-9013-08b094de94d7",
+    "5b749b59-e79f-453b-8d68-29affaefc76f",
+    "5d9a0b0f-9af2-47b6-8a60-f61f9a46d8e9",
+    "74164bbc-8cce-4306-832f-a1b3209902f2",
+    "751ea3d4-dce7-4c26-83f1-3267ca255acb",
+    "891089be-bd73-46de-9542-c2be3c8ba10c",
+    "8e40f629-4a39-4124-93e3-0b8aa3f07d45",
+    "9aede24d-b15d-405a-aa38-2da56b332deb",
+    "9d940b9c-4997-4d3b-9515-7bac9839f634",
+    "9e52e019-394e-4b7e-955a-da115d10447a",
+    "a34b0b8c-2cc9-4836-891b-ddea213c97fe",
+    "a3d8b0bf-fa7a-49cd-b299-9f4c7d98c9a7",
+    "a9ee575d-420d-4397-92f9-d9185b4453c6",
+    "b0c55000-4301-4330-a18b-8764d51a8cd5",
+    "b37d8693-2c7f-4a83-8ebf-045d9cb28e74",
+    "cd961b41-7b7f-4195-b582-0ac49f55c0e8",
+    "ce5dbc7d-ea0a-4710-93a8-5bbbc8f07d80",
+    "ceded157-cb51-4197-9b0c-56692b62574c",
+    "d08914d7-1736-48d4-960b-c598bf78a952",
+    "d14010bd-f241-4cf7-9aa1-ffe0d9a7dc77",
+    "d2097194-b29c-4771-97c4-03f425367aa3",
+    "dcf8fb8b-9d67-460b-9b67-a02fd3655da7",
+    "df076474-9975-4b2c-b71b-78e2e4c9013a",
+    "e85931da-c38c-4c0e-bff8-bfe7a7c50d25",
+    "f2d73e3a-daec-406e-af19-8628b1d0222e",
+    "f7982211-4b0d-4d09-86bf-16fc82d37113"
+  ],
+  "exclude_master_ids": [
+    "7ad63fdf-f6ce-430c-905b-2524f42a8b0c",
+    "f1e1bcbd-3a79-4cf9-9eb6-e31110b00d90",
+    "f22fe18d-ded9-4d65-906d-ddd5ec6080ca"
+  ],
+  "excludeDetail": [
+    {
+      "id": "7ad63fdf-f6ce-430c-905b-2524f42a8b0c",
+      "name": "로타인정(로라타딘)",
+      "fp": "168c9fc2508b87da"
+    },
+    {
+      "id": "f1e1bcbd-3a79-4cf9-9eb6-e31110b00d90",
+      "name": "로타인정(로라타딘)",
+      "fp": "168c9fc2508b87da"
+    },
+    {
+      "id": "f22fe18d-ded9-4d65-906d-ddd5ec6080ca",
+      "name": "로타인정(로라타딘)",
+      "fp": "168c9fc2508b87da"
+    }
+  ],
+  "homogeneity": {
+    "dose": [
+      "10밀리그램"
+    ],
+    "form": [
+      "정"
+    ],
+    "route": [
+      "oral"
+    ],
+    "targetFpDistinct": 1
+  },
+  "nonOralNames": [],
+  "easyCanonicalExactly1": 38,
+  "easyCanonicalTotal": 38,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "draftChecks": {
+    "missingFields": [],
+    "htmlLen": 1661,
+    "contentHash": "db9f24b6bb045bbcf9afc4b1544f0498",
+    "hasTable": false,
+    "hasComment": false,
+    "doubleEscape": false,
+    "hasSdWarn": true
+  },
+  "summary": "로라타딘 10mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 38,
+      "STEP_B_easy_canonical_demote": 38,
+      "STEP_B_authored_canonical_flip": 38,
+      "total": 114
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 38,
+      "total": 38
+    },
+    "grand_total": 152
+  },
+  "groupRegistryDraft": {
+    "loratadine-10mg-jeong": {
+      "key": "로라타딘|10밀리그램|정",
+      "ingredient": "로라타딘",
+      "dose": "10밀리그램",
+      "formKeyword": "정",
+      "candidate": "0a7dee0b-e578-4015-967a-fad092071eef",
+      "targetFp": "83bcf192525baa16",
+      "excludeFp": "168c9fc2508b87da",
+      "expected": 38,
+      "excludedExpected": 3,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-loratadine-10mg-jeong"
+    }
+  },
+  "verdict": "READY"
+}
