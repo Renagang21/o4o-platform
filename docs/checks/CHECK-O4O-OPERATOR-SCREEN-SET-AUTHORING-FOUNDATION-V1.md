@@ -1,103 +1,108 @@
-# CHECK-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1 — ⛔ HOLD (중지 조건 발동)
+# CHECK-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1 — ✅ 재개·구현
 
 > WO: `WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1`
-> 성격: 운영자 Screen Set 원본 제작기 foundation.
+> 설계: `ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1`
+> 선행 스키마: `WO-O4O-SCREEN-SET-OWNER-SCOPE-SCHEMA-MIGRATION-V1` (organization_id nullable + supplier_id + `CHK_stss_owner_scope`, 프로덕션 LIVE·post-verify PASS 배포 e52aedba1 / b45211239)
 > Date: 2026-07-20
-> **상태: HOLD** — 실행 순서 1~2(조사·경계 확인) 수행 후 **중지 조건 확정**. 코드·DB write 0. 사용자 결정 = "여기서 중지하고 보고".
+> **상태: 구현 완료(재개)** — HOLD(2026-07-20, organization_id NOT NULL 중지) → 소유권 migration 완료 기준으로 재개.
 
 ---
 
 ## 0. 결론
 
-독립 운영자 원본을 저장하려면 `store_tablet_screen_sets.organization_id`(**NOT NULL**)에 값이 필요하나 **운영자는 organization 이 없다**. 이를 채우려면 Sentinel/가짜 organization 이 필요하므로 **WO 중지 조건 발동**:
+운영자가 매장 배포용 Screen Set 원본(`operator_template`)을 **제작·수정·미리보기·제거**할 수 있게 했다. 확정 소유권 계약:
 
-- **"운영자 원본 저장에 가짜 매장 organization이 필요함"**
-- **"기존 `operator_template` 계약으로 독립 원본을 표현할 수 없음"**
+```
+origin = 'operator' · organization_id = NULL · supplier_id = NULL ·
+service_key = 'kpa'(주입) · created_by_user_id = 작성자 · status = 'operator_template'
+```
 
-**Sentinel org(`00000000-…`)는 사용하지 않는다** — 운영자 원본을 가짜 매장 소유로 기록하고, organization 기반 권한·검색·삭제 로직에 영구 예외가 필요하며, "매장 API 자동 차단" 가정에 의존하고, 향후 공급자 원본까지 가짜 organization 이 늘어나므로 이번 WO 의 중지 조건에 **정확히 해당**한다. **이번 WO 는 migration 0 이므로 nullable migration 도 만들지 않는다.** 코드·DB 변경 없이 HOLD 종료.
+`store_tablet_screen_sets`(migration 20270210000000, LIVE)의 `CHK_stss_owner_scope` operator 브랜치를 서버 INSERT 가 정확히 충족한다. **신규 migration 0**. 매장 API·코너 연결·QR·매장 콘텐츠 조회는 이 라우터에 **존재하지 않는다**(WO 차단 조건).
 
 ---
 
-## 1. 기존 `operator_template` 계약 확인 (실행 1) — 완료
+## 1. 실행 1 — HOLD → 재개 근거
 
-`store_tablet_screen_sets`(migration `20270120000000`) 프로덕션 실측(read-only):
-- `origin ∈ {store, operator}` (CHECK), `status ∈ {draft, active, archived, operator_template}` (CHECK).
-- `organization_id UUID` **NOT NULL**(is_nullable=NO) · `service_key` NULL · `tablet_id` NULL · `created_by_user_id` NULL · `template_key` NULL.
-- **organization_id 에 FK 없음**(soft ref — organizations 참조 안 함). 제약 = origin/status CHECK + PK(id)뿐.
-- 설계 주석(경계 F6): "organization_id = Store Ops(soft ref); **service_key = 운영자 템플릿(Broadcast)**".
-- 기존 row 전량 `origin='store'`·`service_key=NULL`(active 12/archived 7/draft 3). **operator_template·origin='operator' row 0건**.
+- HOLD 원인(organization_id NOT NULL ↔ 운영자 무조직)은 선행 migration 이 `organization_id` nullable + `CHK_stss_owner_scope`(operator: org NULL·service_key/created_by NOT NULL) 로 해소.
+- migration post-verify(CHECK-...-MIGRATION §5): prod 라이브에서 `INSERT origin='operator' + organization_id` → `CHK_stss_owner_scope` **거부**, operator(org NULL) 브랜치 accept 확인. 본 WO 의 INSERT 는 그 accept 조합을 사용한다.
 
-## 2. 운영자 API·권한 경계 (실행 2) — 완료(설계만)
+## 2. 실행 2 — 운영자 API·service key 격리
 
-- 운영자 콘텐츠 컨트롤러 표준(`operator-blog.controller.ts` 등): `(dataSource, requireAuth, serviceKey)` → `/api/v1/{serviceKey}/operator/*`, inline guard `hasAnyServiceRole([{svc}:operator, {svc}:admin, platform:admin, platform:super_admin])`.
-- 서버 강제: `author_role='operator'`, `service_key=주입`, **`store_id=NULL`**(매장 무귀속), 소유권=`created_by_user_id`.
-- 즉 운영자 콘텐츠 관례 = **"매장 없음(NULL) + service_key 스코프"**. `store_blog_posts` 실측: operator row `store_id IS NULL`. `kpa_store_contents` 는 `author_role`(operator/store)로 구분.
+신규 `operator-screen-set.controller.ts` — `createOperatorScreenSetController(dataSource, requireAuth, serviceKey)` (operator-blog.controller 패턴):
+- 권한 inline guard `requireOperator` = `hasAnyServiceRole([{svc}:operator, {svc}:admin, platform:admin, platform:super_admin])`.
+- mount: `/api/v1/kpa/operator/screen-sets` (kpa.routes.ts). **매장 API `/api/v1/store/screen-sets` 와 별도 라우터**.
+- 격리: 모든 read/update/delete 가 `origin='operator' AND service_key=$svc AND deleted_at IS NULL`. **다른 서비스·매장(store)·공급자(supplier) 원본 접근 차단**.
 
-## 3. 중지 확정 — organization_id NOT NULL vs 운영자 무조직
+| 라우트 | 동작 |
+|--------|------|
+| `GET /` | 같은 service_key operator 원본 목록(+blockCount) |
+| `GET /:id` | 단일 + blocks |
+| `POST /` | 생성 — org NULL·supplier NULL·service_key 주입·created_by 강제·status=operator_template·template 4종 |
+| `PATCH /:id` | 이름·템플릿 수정(status/tablet/org 미지원) |
+| `PUT /:id/blocks` | 블록 전체 교체 — content_list 의 `store_content` 참조 **거부**(`OPERATOR_STORE_CONTENT_FORBIDDEN`) |
+| `POST /preview` | Operator Adapter draft 미리보기 |
+| `DELETE /:id` | 목록에서 제거(soft delete) |
+| `GET /content-sources/o4o-descriptions` | O4O 표준 설명서 검색(picker) — store-contents 검색 **미제공** |
 
-| 사실 | 근거(프로덕션 실측) |
-|------|------|
-| 운영자는 organization 없음 | `role_assignments` 전량 `scope_type='global'`(scope_id NULL). `service_memberships` 에 organization 컬럼 없음. |
-| 운영자 콘텐츠 관례 = org/store NULL + service_key | `store_blog_posts.author_role='operator'` → `store_id IS NULL`. |
-| `store_tablet_screen_sets.organization_id` = NOT NULL | §1. NULL 저장 불가 → 값 필요. |
+## 3. 실행 3 — Operator ContentSourceAdapter
 
-해소 후보 전부 WO 제약/중지 조건과 충돌 → **HOLD**:
+`createOperatorContentSourceAdapter(dataSource)` (store-public-tablet-content-source.ts, P3 seam 재사용):
+- `fetchProductDescription` = 기본 Store Adapter 재사용(SPD **STORE canonical** 만 → **승인되지 않은 비-canonical 공급자/초안 자연 제외**).
+- `fetchStoreContent` = **항상 null**(매장 제작 콘텐츠 차단). config 에 store 항목이 섞여도 resolver 가 null → skip.
+- 이중 차단: adapter(preview resolve) + `PUT /blocks` 저장 검증(store_content 거부).
 
-| 후보 | 판정 |
-|------|------|
-| Sentinel org `00000000-…` | ❌ 가짜 매장 소유 기록·org 로직 영구 예외·차단 가정 의존·공급자 확장 시 증식 → **중지 조건 "가짜 매장 organization" 해당**(사용자 명시 거부) |
-| organization_id nullable migration | ❌ 이번 WO 제외("신규 컬럼·migration") + "DB migration 0" → 이번 WO 에서 만들지 않음 |
-| 실 매장/조직 org 차용 | ❌ 중지 조건 "가짜 매장 organization" 직접 해당 |
+## 4. 실행 4 — 운영자 제작기 (4 템플릿·5단계 흐름 재사용)
 
-## 4. organization 기반 소비처 영향 범위 (후속 설계용)
+**동일한 단계형 제작 셸 재사용** — `TabletContentStepBuilder`(TabletScreenSetManager.tsx)를 export 하고 API·콘텐츠 출처를 주입 파라미터로 추가(**additive, 미주입=매장 기본 → store 회귀 0**):
+- `ScreenSetBuilderApi`(create/update/saveBlocks/preview/searchO4oDescriptions/searchStoreContents) 주입.
+- `ContentPickerModal`/`ContentListEditor` 에 `contentSources` 주입 — 운영자=`['spd']`(O4O 표준 설명서만, store 탭 미노출).
+- 운영자 페이지 `OperatorTabletScreenSetsPage`(list+builder inline), API 클라이언트 `operatorTabletScreenSets.ts`, route `/operator/tablet/screen-sets`, sidebar `매장 지원 › 매장 HUB 태블릿 화면`.
+- 5단계: 템플릿 → 대기 화면 → 코너 설명(RichTextEditor) → 추가 정보(content_list) → 미리보기·저장. **4 템플릿**: 기본 코너 안내형 / 상품 집중형 / 코너 소개형 / 제품 진열형 (legacy `idle_touch_video` 신규 선택 제외 — WO 제외).
+- 미리보기: 운영자는 매장 slug 없음 → previewLayoutOnly(sections 렌더, fetchProducts/fetchScreen 미호출) + stub previewApi + placeholder slug. 공용 tablet kiosk / Screen Set QR 모바일 renderer 재사용.
 
-`store_tablet_screen_sets` 는 **소프트 ref**(organization_id FK 없음) — organization_id nullable 전환 시 **스키마 파급 최소**.
+## 5. 실행 5·6·7 — 검증 (post-deploy, 아래 §7 갱신)
 
-**참조 FK(모두 `id` 기준, organization_id 무관)**: `store_tablet_screen_blocks`(CASCADE) · `store_tablet_corner_contents`(CASCADE) · `store_tablets.current_screen_set_id`(SET NULL).
+- (5) 저장·수정·재진입·미리보기
+- (6) Store API·코너·QR 차단
+- (7) 기존 매장 타블렛·QR·보호 샘플 회귀
 
-**인덱스**: `idx_stss_org_status (organization_id, status) WHERE deleted_at IS NULL` — btree 는 NULL 허용, nullable 전환에도 유효(store 조회 성능 유지).
+## 6. 정적 검증 (배포 전)
 
-**organization_id 로 screen set 을 필터하는 코드 소비처(전량 `= $storeOrg` 등가 비교)**:
-| 소비처 | 위치 | 영향 |
-|--------|------|------|
-| Store API 목록/상세/생성/수정/삭제/blocks/current-set/corner 연결 | `store-tablet.routes.ts` (1217·1233·1272·1289·1412·1442·1582·1656) | `organization_id = $storeOrg` → **NULL org(운영자) row 는 SQL 등가비교로 자동 제외**. 매장 격리 유지에 코드 변경 불필요 |
-| 공개 runtime/QR resolver | `store-public-screen-set-resolve.ts:126` (`AND organization_id=$2`) | 운영자 원본은 **공개 URL 미발급**(WO 범위 밖)이라 이 경로 미도달. 영향 없음 |
-| Screen Set QR slug ensure/update | `store-screen-set-qr.service.ts` (88·109·142·152, `WHERE id=$ AND organization_id=$`) | 운영자 원본 QR 미발급 → 미도달. 영향 없음 |
+- **api-server tsc(내 파일 3): 0 error** (pre-existing untracked drug/hff scripts 는 무관, 미커밋).
+- **web-kpa-society tsc: 0 error / vite build: ✅**(TabletScreenSetManager·OperatorRoutes 청크 정상).
+- store 제작기: 기본 api/contentSources 미주입 경로 유지 → 동작 불변(회귀 0, additive).
 
-→ **핵심**: nullable 전환 시 기존 store/public/QR 경로는 `= $storeOrg` 등가비교로 NULL-org 운영자 row 를 자연 제외. 매장 격리·공개 렌더 회귀 위험 낮음. 운영자 API 는 별도 `origin='operator' AND service_key=$svc` 로 조회.
+## 7. 프로덕션 검증 (실행 5·6·7·8) — ⏳ 배포 후 갱신 예정
 
-## 5. 최소 migration 안 (별도 후속 설계 WO 용 — 이번 WO 에서 실행 안 함)
+- [ ] operator 원본 생성 → 소유권 계약(origin/org/supplier/service_key/created_by/status) 프로덕션 실측.
+- [ ] 목록 = 같은 service_key operator 원본만. 다른 서비스·매장·공급자 원본 미노출.
+- [ ] 4 템플릿 제작 / 본문 payload HTML 문자열 / 추가 정보 수정·삭제·정렬·표시 / 저장 후 재진입 동일.
+- [ ] 미리보기(태블릿/QR 모바일).
+- [ ] Store API(매장 owner)로 operator 원본 조회·수정·삭제 불가 / 매장·코너 적용·QR 생성 불가.
+- [ ] 기존 매장 Screen Set·보호 샘플(구강/피부)·current 불변. 공개 타블렛/QR 회귀 0.
+- [ ] console·pageerror·예상 외 API 오류 0.
 
-```sql
--- (A) 최소안: organization_id nullable 전환
-ALTER TABLE store_tablet_screen_sets ALTER COLUMN organization_id DROP NOT NULL;
--- 운영자 원본: organization_id = NULL, origin='operator', status='operator_template', service_key=<svc>, created_by_user_id=<operator>
+## 8. 변경 파일
+
 ```
-- 파급: FK 없음·인덱스 NULL 허용·store 조회는 등가비교로 NULL 제외 → **데이터 backfill 0, 기존 row 무변경**.
-- 보강(권장, 정합성): origin 별 소유권 불변식을 DB CHECK 로 명문화(선택).
-```sql
--- (B) 보강안: origin 에 따른 소유권 CHECK (owner_role/owner_id 도입 여부는 설계 WO 에서 결정)
-ALTER TABLE store_tablet_screen_sets ADD CONSTRAINT "CHK_stss_owner_by_origin" CHECK (
-  (origin = 'store'    AND organization_id IS NOT NULL) OR
-  (origin = 'operator' AND service_key IS NOT NULL AND created_by_user_id IS NOT NULL)
-);
+apps/api-server/src/routes/o4o-store/controllers/operator-screen-set.controller.ts   (신규 운영자 API)
+apps/api-server/src/routes/platform/store-public/store-public-tablet-content-source.ts (createOperatorContentSourceAdapter 추가)
+apps/api-server/src/routes/kpa/kpa.routes.ts                                          (mount /operator/screen-sets)
+services/web-kpa-society/src/pages/pharmacy/TabletScreenSetManager.tsx                (제작 셸 export + api/contentSources 주입 — additive)
+services/web-kpa-society/src/api/operatorTabletScreenSets.ts                          (신규 운영자 API 클라이언트)
+services/web-kpa-society/src/pages/operator/tablet/OperatorTabletScreenSetsPage.tsx    (신규 운영자 제작기 페이지)
+services/web-kpa-society/src/routes/OperatorRoutes.tsx                                (route /operator/tablet/screen-sets)
+services/web-kpa-society/src/config/operatorMenuGroups.ts                             (sidebar 매장 지원 항목)
+docs/checks/CHECK-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1.md                  (본 CHECK)
 ```
-- 장기적으로는 `organization_id nullable + owner_role/owner_id 또는 origin 기반 CHECK` 가 더 정합적 — **별도 설계 WO 에서 확정**(공급자 원본 확장 대비 포함).
+- **신규 migration 0 · DB backfill 0.** 운영자 원본 생성은 실사용 시점에만 write.
 
-> **후속 설계 확정**: [`ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1`](../architecture/ADR-O4O-SCREEN-SET-OWNER-SCOPE-MODEL-V1.md) — 소유 주체(store/operator/supplier)별 유효 조합·주체별 컬럼·organization_id nullable·`CHK_stss_owner_scope`·주체별 API 격리·backfill 0 확정. 구현은 그 하위 migration/operator/supplier WO.
+## 9. 중지 조건 점검
 
-## 6. 조사 채널·안전
-
-- 프로덕션 DB **read-only SELECT/카탈로그 조회만**(cloud-sql-proxy:5442, o4o_api, o4o_platform). **write 0**.
-- 코드 변경 0 · 배포 0 · migration 0 · 보호 샘플·기존 매장 Screen Set 무접촉.
-
----
-
-## 완료 보고(HOLD)
-
-1. **operator_template 계약**: origin/status/service_key 축 존재, organization_id **NOT NULL**·FK 없음, 운영자 row 0.
-2. **운영자 API·권한 경계**: `/api/v1/{svc}/operator/*` + role guard, 운영자 콘텐츠 관례 = store/org NULL + service_key.
-3. **중지 원인**: organization_id NOT NULL ↔ 운영자 무조직 → 독립 원본 저장에 가짜 organization 필요(**중지 조건 발동**). Sentinel 거부, migration 미생성.
-4. **영향 범위**: soft-ref(FK 0)·store/public/QR 는 `=$storeOrg` 등가비교로 NULL-org 자동 제외·운영자 원본 공개 URL 미발급이라 resolver/QR 미도달.
-5. **최소 migration 안**: `ALTER COLUMN organization_id DROP NOT NULL`(+선택 origin CHECK) — backfill 0·기존 row 무변경. 별도 설계 WO 로 확정.
-6. **산출물**: 본 CHECK 만(docs-only). 코드·DB·migration 0.
+| 조건 | 발생? |
+|------|:-----:|
+| Store API 우회해야 운영자 원본 저장 | ❌ (별도 operator 라우터 INSERT) |
+| 운영자 원본에 organization 필요 | ❌ (org NULL, CHK operator 브랜치) |
+| HUB 게시·매장 복사 동시 구현 필요 | ❌ (제외 범위 미접촉) |
+| 매장 콘텐츠가 운영자 제작기에 노출 | ❌ (adapter null + 저장 거부 + picker store 탭 미노출) |
+| 기존 매장 공개 렌더 계약 변경 | ❌ (public runtime/resolver/QR 무접촉) |

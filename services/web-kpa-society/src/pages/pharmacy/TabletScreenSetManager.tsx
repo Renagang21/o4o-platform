@@ -36,6 +36,32 @@ import { buildProductVariantLabel } from '../../utils/productVariantLabel';
 
 type Toast = { type: 'success' | 'error'; message: string };
 
+// ── WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 제작 흐름 재사용을 위한 API 주입 경계 ──
+//   매장(store) 제작기와 운영자(operator) 제작기가 **동일한 단계형 제작 셸**을 공유하되, 저장/미리보기/검색은
+//   각자의 스코프 API 로 라우팅한다. 미주입 시 기본값 = 매장 API(store 동작 완전 불변, additive).
+//   운영자는 매장 콘텐츠 조회 불가 → contentSources 에서 store 출처를 제외한다.
+export type ContentSourceKind = 'spd' | 'o4o' | 'store';
+export const DEFAULT_CONTENT_SOURCES: ContentSourceKind[] = ['spd', 'o4o', 'store'];
+
+export interface ScreenSetBuilderApi {
+  create: (input: { name: string; status?: 'draft' | 'active'; templateKey?: string | null }) => Promise<ScreenSet>;
+  update: (id: string, input: { name?: string; status?: ScreenSetStatus; templateKey?: string | null }) => Promise<ScreenSet>;
+  saveBlocks: (id: string, blocks: ScreenBlock[]) => Promise<ScreenBlock[]>;
+  preview: (input: { templateKey?: string | null; blocks: ScreenBlock[] }) => Promise<TabletScreenResponse>;
+  searchO4oDescriptions: (q: string) => Promise<O4oDescriptionSearchResult[]>;
+  searchStoreContents: (q: string) => Promise<StoreContentSearchResult[]>;
+}
+
+// 기본(매장) API — 기존 module 함수 그대로 위임. store 제작기는 이 기본값을 쓴다(회귀 0).
+const defaultStoreBuilderApi: ScreenSetBuilderApi = {
+  create: (input) => createScreenSet({ ...input, tabletId: null }),
+  update: (id, input) => updateScreenSet(id, input),
+  saveBlocks: saveScreenSetBlocks,
+  preview: previewScreenSet,
+  searchO4oDescriptions: searchTabletO4oDescriptions,
+  searchStoreContents: searchTabletStoreContents,
+};
+
 // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1:
 //   같은 컴포넌트를 두 맥락에서 재사용한다.
 //   - 'corner'  : 코너별 운영 탭 — 이 코너에 '현재 사용 중' 세트 + 다른 세트로 교체(적용/해제)만. 원본 편집/생성/보관 없음.
@@ -401,7 +427,13 @@ function TemplateThumb({ templateKey }: { templateKey: string }) {
 // WO-O4O-KPA-TABLET-TOUCH-FIRST-CONTENT-LIST-EDITOR-V1: content_list 편집을 터치 카드로 정비.
 //   config 계약(sourceType/masterId+language/contentId/visible/sortOrder/override) 불변 — UI/UX 만.
 //   제목은 config 에 없으므로: override → 추가 시 캡처한 힌트(세션) → 출처 중립 라벨. (원본 resolve 는 API 확장 필요 → 안 함)
-function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onChange: (items: ContentListItem[]) => void }) {
+function ContentListEditor({ items, onChange, api = defaultStoreBuilderApi, contentSources = DEFAULT_CONTENT_SOURCES }: {
+  items: ContentListItem[];
+  onChange: (items: ContentListItem[]) => void;
+  // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: picker 검색 API·노출 출처 주입(미주입=매장 기본).
+  api?: Pick<ScreenSetBuilderApi, 'searchO4oDescriptions' | 'searchStoreContents'>;
+  contentSources?: ContentSourceKind[];
+}) {
   const [picking, setPicking] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [titleHints, setTitleHints] = useState<Record<string, string>>({});
@@ -491,6 +523,8 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
           onClose={() => setPicking(false)}
           onAdd={add}
           baseSort={items.length * 10}
+          api={api}
+          contentSources={contentSources}
         />
       )}
     </div>
@@ -502,18 +536,23 @@ function ContentListEditor({ items, onChange }: { items: ContentListItem[]; onCh
 // WO-O4O-KPA-TABLET-TOUCH-FIRST-CONTENT-LIST-EDITOR-V1: 콘텐츠 선택 모달 터치 정비.
 //   출처 탭/검색/dedup 유지. 결과=터치 카드(카드 전체 토글), 이미 추가된 항목 표시, 모바일 풀스크린.
 //   onAdd 는 선택 item + 제목 힌트(세션 표시용)를 함께 전달(config 미변경).
-function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
+function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort, api = defaultStoreBuilderApi, contentSources = DEFAULT_CONTENT_SOURCES }: {
   existingKeys: Set<string>;
   onClose: () => void;
   onAdd: (items: ContentListItem[], titles: Record<string, string>) => void;
   baseSort: number;
+  // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 검색 API·노출 출처 주입(미주입=매장 기본).
+  api?: Pick<ScreenSetBuilderApi, 'searchO4oDescriptions' | 'searchStoreContents'>;
+  contentSources?: ContentSourceKind[];
 }) {
   // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 출처 3분류.
   //   spd   = 상품 매장용 상세설명서 (o4o_product_description)
   //   o4o   = O4O 제공 콘텐츠  (store_content 중 source_type='snapshot_edit' — 운영자/HUB 원본을 매장이 가져온 것)
   //   store = 매장 제작 콘텐츠 (store_content 중 source_type='direct')
   //   저장 계약(ContentListItem.sourceType)은 2종 그대로 — 분류는 표시/필터 기준이며 API·DB 변경 없음.
-  const [tab, setTab] = useState<'spd' | 'o4o' | 'store'>('spd');
+  // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자는 spd(o4o 표준 설명서)만 노출(매장 콘텐츠 조회 차단).
+  const sources = contentSources.length ? contentSources : DEFAULT_CONTENT_SOURCES;
+  const [tab, setTab] = useState<ContentSourceKind>(sources[0]);
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [o4o, setO4o] = useState<O4oDescriptionSearchResult[]>([]);
@@ -524,11 +563,11 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
   const run = useCallback(async () => {
     setLoading(true);
     try {
-      if (tab === 'spd') setO4o(await searchTabletO4oDescriptions(q));
-      else setStore(await searchTabletStoreContents(q));
+      if (tab === 'spd') setO4o(await api.searchO4oDescriptions(q));
+      else setStore(await api.searchStoreContents(q));
     } catch { /* 검색 실패는 빈 목록으로 */ if (tab === 'spd') setO4o([]); else setStore([]); }
     finally { setLoading(false); }
-  }, [tab, q]);
+  }, [tab, q, api]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { run(); }, [tab]); // 탭 전환 시 자동 검색(매장 제작은 q 없이 최근순)
 
@@ -559,12 +598,15 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort }: {
           <h4 className="text-base font-bold text-slate-700">추가 정보 고르기</h4>
           <button onClick={onClose} className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
         </div>
-        {/* 출처 기준 3분류(성격 기준 아님) — WO-...-BUSINESS-FIELDS-V1 */}
-        <div className="px-4 pt-3 grid grid-cols-3 gap-1.5 flex-shrink-0">
-          <button onClick={() => setTab('spd')} className={tabBtn(tab === 'spd')}>매장용 상세설명서</button>
-          <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 제공<br className="sm:hidden" /> 콘텐츠</button>
-          <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작<br className="sm:hidden" /> 콘텐츠</button>
-        </div>
+        {/* 출처 기준 분류(성격 기준 아님) — WO-...-BUSINESS-FIELDS-V1.
+            WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 노출 출처는 contentSources 로 제어(운영자=spd 만). */}
+        {sources.length > 1 && (
+          <div className={`px-4 pt-3 grid gap-1.5 flex-shrink-0 ${sources.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+            {sources.includes('spd') && <button onClick={() => setTab('spd')} className={tabBtn(tab === 'spd')}>매장용 상세설명서</button>}
+            {sources.includes('o4o') && <button onClick={() => setTab('o4o')} className={tabBtn(tab === 'o4o')}>O4O 제공<br className="sm:hidden" /> 콘텐츠</button>}
+            {sources.includes('store') && <button onClick={() => setTab('store')} className={tabBtn(tab === 'store')}>매장 제작<br className="sm:hidden" /> 콘텐츠</button>}
+          </div>
+        )}
         <div className="px-4 py-2 flex gap-2 flex-shrink-0">
           <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && run()}
             placeholder={tab === 'spd' ? '상품명 · 바코드로 검색 (2자 이상)' : '콘텐츠 제목으로 검색 (비우면 최근순)'}
@@ -660,13 +702,17 @@ function stripIdleForMobilePreview(screen: TabletScreenResponse | null): TabletS
 
 // seedInitialBlocks / ensureAutoBlocks: @o4o/screen-content-core 에서 소비(로컬 정의 제거).
 
-function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug }: {
+// WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 단계형 제작 셸을 export 하여 운영자 제작기에서 재사용한다.
+//   api/contentSources 미주입 시 매장 기본값(회귀 0). 운영자는 operator API + spd 출처만 주입.
+export function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug, api = defaultStoreBuilderApi, contentSources = DEFAULT_CONTENT_SOURCES }: {
   initialDetail: ScreenSetDetail | null;
   onCancel: () => void;
   onSaved: () => void;
   onToast: (t: Toast) => void;
   previewApi?: TabletKioskApi;
   storeSlug?: string | null;
+  api?: ScreenSetBuilderApi;
+  contentSources?: ContentSourceKind[];
 }) {
   const isEdit = !!initialDetail;
   const [step, setStep] = useState(0);
@@ -694,7 +740,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     if (!canPreview || previewLoading) return;
     setPreviewLoading(true);
     try {
-      const screen = await previewScreenSet({ templateKey, blocks });
+      const screen = await api.preview({ templateKey, blocks });
       setPreview({ screen, view });
     } catch (e: any) {
       onToast({ type: 'error', message: e?.message || '미리보기를 불러오지 못했습니다.' });
@@ -715,7 +761,7 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     let cancelled = false;
     setLiveLoading(true);
     const timer = setTimeout(() => {
-      previewScreenSet({ templateKey, blocks })
+      api.preview({ templateKey, blocks })
         .then((s) => { if (!cancelled) { setLiveScreen(s); setLiveError(null); } })
         .catch((e: any) => {
           // WO-...-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.5:
@@ -803,13 +849,14 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
         //   draft 는 active 로 승격(선택 UI 제거 후 draft 를 적용 가능하게 만들 다른 경로가 없음).
         //   active/archived/operator_template 등은 그대로 유지(보관·특수 상태는 별도 흐름에서 관리).
         const nextStatus: ScreenSetStatus = initialDetail!.status === 'draft' ? 'active' : initialDetail!.status;
-        await updateScreenSet(id, { name: name.trim(), status: nextStatus, templateKey });
+        await api.update(id, { name: name.trim(), status: nextStatus, templateKey });
       } else {
         // library 재사용 세트(tabletId=null). 신규 저장은 기본 active(코너별 운영에서 바로 적용 가능). draft 는 UI 에서 만들지 않는다.
-        const created = await createScreenSet({ name: name.trim(), tabletId: null, status: 'active', templateKey });
+        //   운영자 API 는 status/tabletId 를 무시하고 operator_template 로 강제한다(계약 고정).
+        const created = await api.create({ name: name.trim(), status: 'active', templateKey });
         id = created.id;
       }
-      await saveScreenSetBlocks(id!, blocks);
+      await api.saveBlocks(id!, blocks);
       onToast({ type: 'success', message: isEdit ? '태블릿 콘텐츠가 저장되었습니다.' : `태블릿 콘텐츠 "${name.trim()}" 생성됨` });
       onSaved();
     } catch (e: any) {
@@ -934,6 +981,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
     <ContentListEditor
       items={Array.isArray(configOf('content_list').items) ? (configOf('content_list').items as ContentListItem[]) : []}
       onChange={(items) => replaceConfigOf('content_list', { items })}
+      api={api}
+      contentSources={contentSources}
     />
   );
 

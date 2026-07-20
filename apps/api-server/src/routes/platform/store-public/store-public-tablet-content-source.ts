@@ -114,3 +114,25 @@ export function createStoreContentSourceAdapter(dataSource: DataSource): Content
     },
   };
 }
+
+/**
+ * 운영자 Adapter — WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1
+ *
+ *   운영자 Screen Set 원본이 소비할 수 있는 콘텐츠 원본을 제한한다.
+ *   - fetchProductDescription: O4O 상품 상세설명서(SPD STORE canonical) — 기본 Store Adapter 와 동일.
+ *       STORE canonical 만 조회하므로 **승인되지 않은(비-canonical) 공급자·초안 콘텐츠는 자연 제외**된다.
+ *   - fetchStoreContent: **항상 null**(매장 제작 콘텐츠 조회 차단). 운영자는 특정 매장 org 에 속하지 않으며,
+ *       WO 차단 조건("매장 콘텐츠 조회") 을 adapter 경계에서 강제한다. content_list config 에 store 항목이
+ *       섞여 들어와도 resolver 가 null → 해당 카드 skip.
+ *
+ *   신규 테이블·컬럼·migration 없음. o4o 조회 로직은 Store Adapter 를 재사용(byte-equivalent).
+ */
+export function createOperatorContentSourceAdapter(dataSource: DataSource): ContentSourceAdapter {
+  const store = createStoreContentSourceAdapter(dataSource);
+  return {
+    fetchProductDescription: store.fetchProductDescription,
+    async fetchStoreContent() {
+      return null; // 매장 제작 콘텐츠는 운영자 원본에서 조회 불가(WO 차단 조건).
+    },
+  };
+}

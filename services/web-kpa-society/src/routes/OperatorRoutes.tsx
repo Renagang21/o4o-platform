@@ -44,6 +44,8 @@ import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import ForcedContentPage from '../pages/operator/signage/ForcedContentPage';
+// WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자 태블릿 화면 세트 원본 제작기
+import OperatorTabletScreenSetsPage from '../pages/operator/tablet/OperatorTabletScreenSetsPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 // WO-O4O-GUIDE-CONTENT-EDITOR-UI-V1
 import OperatorGuideContentsPage from '../pages/operator/OperatorGuideContentsPage';
@@ -118,6 +120,9 @@ export function OperatorRoutes() {
           <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />
           {/* 강제 콘텐츠 관리 (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) */}
           <Route path="signage/forced-content" element={<ForcedContentPage />} />
+
+          {/* WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자 태블릿 화면 세트 원본 제작기 */}
+          <Route path="tablet/screen-sets" element={<OperatorTabletScreenSetsPage />} />
 
           {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) — admin-only */}
           <Route path="legal" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><LegalManagementPage /></RoleGuard>} />
