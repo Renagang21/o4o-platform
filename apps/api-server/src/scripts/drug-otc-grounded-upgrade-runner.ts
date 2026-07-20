@@ -108,9 +108,9 @@ interface GroupUpgradeConfig {
   formKeyword: string;      // coarse 필터: name LIKE '%formKeyword%'
   candidate: string;        // authored draft candidate_id (= source_ref_id, 단일 write-owner)
   targetFp: string;         // bridge SSOT 그대로확장 fp
-  excludeFp: string;        // bridge SSOT 안전지문불일치 fp
+  excludeFp: string | string[]; // 비대상 fp — 단일(에르도스테인 안전지문불일치) 또는 다중(트리메부틴 비대상 11 fp)
   expected: number;         // 그대로확장 target 기대 수
-  excludedExpected: number; // 안전지문불일치 exclude 기대 수
+  excludedExpected: number; // 비대상 exclude 기대 수(모든 excludeFp 합)
   authoredSource: string;   // authored INSERT source_type (mfds_drug_otc | nutrition_combo)
   outBase: string;          // 산출 JSON 파일 stem (runner 네임스페이스 — 파일럿 산출물과 분리)
 }
@@ -133,6 +133,26 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-erdosteine-300mg-jeong',
   },
+  // 트리메부틴말레산염 100mg 정 — Track A 첫 범용 runner 파일럿(WO-...-TRIMEBUTINE-100MG-...-DA-V1).
+  //   감사 커밋 c15c6bbb4(에이전트 가) 기준. target 단일 fp 66 · 비대상 11 fp 61(coarse 127).
+  //   에르도스테인과 달리 exclude 가 다중 fp → excludeFp 배열.
+  'trimebutine-100mg-jeong': {
+    key: '트리메부틴말레산염|100밀리그램|정',
+    ingredient: '트리메부틴말레산염',
+    dose: '100밀리그램',
+    formKeyword: '정',
+    candidate: '003beef8-82c4-4897-a176-d0ea8a695699',
+    targetFp: '7a4aab0b31b1ed19',
+    excludeFp: [
+      '1ca482b8150f601b', '388fc082fcc5203c', '306ce8c4a6793871', 'c9c0d242a5e4a273',
+      '0e81c56580ba2501', '4b629892ee85ba89', 'ab9bf22ae1e54918', '4d59ddd48b0e1102',
+      '890ef511d4d823e8', '8567020910ac8454', 'f276b94cff37e58f',
+    ], // 비대상 11 fp = 12+11+9+7+4+4+4+3+3+2+2 = 61
+    expected: 66,
+    excludedExpected: 61,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-trimebutine-100mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────
@@ -145,16 +165,18 @@ interface Classification {
   nonOralNames: string[];
   anomalies: string[];
 }
+const excludeSetOf = (cfg: GroupUpgradeConfig): Set<string> => new Set(Array.isArray(cfg.excludeFp) ? cfg.excludeFp : [cfg.excludeFp]);
 function classifyByFingerprint(withFp: FpRow[], cfg: GroupUpgradeConfig): Classification {
+  const excludeFps = excludeSetOf(cfg);
   const target = withFp.filter((r) => r.fp === cfg.targetFp);
-  const excluded = withFp.filter((r) => r.fp === cfg.excludeFp);
-  const other = withFp.filter((r) => r.fp !== cfg.targetFp && r.fp !== cfg.excludeFp);
+  const excluded = withFp.filter((r) => excludeFps.has(r.fp));
+  const other = withFp.filter((r) => r.fp !== cfg.targetFp && !excludeFps.has(r.fp));
   const masterIds = target.map((r) => r.id).sort();
   const excludeIds = new Set(excluded.map((r) => r.id));
   const intersection = masterIds.filter((id) => excludeIds.has(id)).length;
   const duplicateTarget = new Set(masterIds).size !== masterIds.length;
   const fpDistribution = Object.entries(withFp.reduce((a: Record<string, number>, r) => { a[r.fp] = (a[r.fp] || 0) + 1; return a; }, {}))
-    .map(([fp, n]) => ({ fp, n, ssot: fp === cfg.targetFp ? '그대로확장' : fp === cfg.excludeFp ? '안전지문불일치' : '미분류' }));
+    .map(([fp, n]) => ({ fp, n, ssot: fp === cfg.targetFp ? '그대로확장' : excludeFps.has(fp) ? '비대상(exclude)' : '미분류' }));
   const nonOralNames = target.filter((r) => r.route !== 'oral').map((r) => r.name);
 
   const anomalies: string[] = [];
@@ -224,7 +246,7 @@ async function runGroundedUpgrade(cfg: GroupUpgradeConfig, opts: { apply: boolea
     const masterIds = cls.masterIds;
     report.coarseTotal = coarse.length;
     report.target = cls.target.length; report.excluded = cls.excluded.length; report.otherFp = cls.other.length;
-    report.excludedDetail = cls.excluded.map((r) => ({ id: r.id, name: r.name, reason: `안전지문불일치(fp ${cfg.excludeFp}, bridge SSOT)` }));
+    report.excludedDetail = cls.excluded.map((r) => ({ id: r.id, name: r.name, reason: `비대상(fp ${r.fp}, bridge SSOT)` }));
     report.target_master_ids = masterIds; report.rollback_master_ids = masterIds;
     report.targetExcludeIntersection = cls.intersection;
     report.fpDistribution = cls.fpDistribution;
@@ -418,8 +440,9 @@ function selfTest(): void {
   // classifyByFingerprint 게이트: 합성 26 target + 4 exclude, 교집합 0
   const cfg = GROUP_REGISTRY['erdosteine-300mg-jeong'];
   const synth: FpRow[] = [];
+  const exFp = Array.isArray(cfg.excludeFp) ? cfg.excludeFp[0] : cfg.excludeFp;
   for (let i = 0; i < cfg.expected; i++) synth.push({ id: `t${i}`, name: 'x(에르도스테인)', spec: '300밀리그램', content: '', fp: cfg.targetFp, route: 'oral', form: '정', ingredient: '에르도스테인' });
-  for (let i = 0; i < cfg.excludedExpected; i++) synth.push({ id: `e${i}`, name: 'x(에르도스테인)', spec: '300밀리그램', content: '', fp: cfg.excludeFp, route: 'oral', form: '정', ingredient: '에르도스테인' });
+  for (let i = 0; i < cfg.excludedExpected; i++) synth.push({ id: `e${i}`, name: 'x(에르도스테인)', spec: '300밀리그램', content: '', fp: exFp, route: 'oral', form: '정', ingredient: '에르도스테인' });
   const cls = classifyByFingerprint(synth, cfg);
   eq('cls.target', cls.target.length, cfg.expected);
   eq('cls.excluded', cls.excluded.length, cfg.excludedExpected);
