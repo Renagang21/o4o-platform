@@ -124,3 +124,9 @@
 - **dry-run → apply(COMMIT, 승인)** → **독립검증(새 연결)** PASS: appliedProducts 10 · totalWrites 40(masters 10·candidate UPDATE 10·SPD ko10+en10) · canonicalDup 0 · candidateLinks 10 · spdRefLinks 20. tag `batch:single-nutrient-g13-6mineral`. rollback manifest 저장.
 - **복합형 누적 544 → 554** (직접 카운트: combo14 421 + N5 20 + N8 43 + N6 28 + #9 17 + #11 15 + G13 10).
 - **다음(선택·저수율)**: #4 N7 밀크씨슬+B군+아연(READY_WITH_HOLD 9/22) · G10 N5 B군+비타민C+아연(READY_WITH_HOLD 9/7). deferred 교정 1건: #11 stmt 2020000997275 칼슘 basis. lut-va `PAUSED_GROUP_DEFECT` 유지.
+
+### verifier 집계 누락 수정 (유지보수, DB write 0)
+
+- **문제**: `hff-combo-verify-committed` baseline 쿼리가 `batch:single-nutrient-combo-%` 패턴만 집계 → higher-N 배치들(slug 이 `combo-` 접두 없는 b-complex-n8 / mg-mn-vd-zn-ca 등 6종)을 누락, `totalComboLive` 과소표시(예: g13 시점 실계 554 대비 도구값 낮음).
+- **수정**: baseline 조건에 `OR t = ANY(COMBO_NONPREFIXED_TAGS)` 추가(6개 비접두 복합형 slug 명시 allowlist). 단일영양소(53종, 전부 단일명)는 미포함 → 오집계 0. LIVE 정의·생산 로직 무변경, verifier 한정.
+- **회귀검증**: g13 재실행 → baseline 20태그(14 combo- + 6 신규) · existingTotal 544 · **totalComboLive 554 = 직접 카운트 SSOT 일치** · 중복집계 0 · dbWrite 0. 향후 신규 복합형은 slug `combo-` 접두 사용 시 자동 포함(allowlist 확장 불요).
