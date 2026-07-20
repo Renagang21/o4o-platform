@@ -1,0 +1,641 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "알마게이트|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01a231cd-b471-4d93-8071-b271f8c4627d",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "알마게이트 500mg 정",
+  "coarseTotal": 124,
+  "target": 37,
+  "excluded": 87,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0478b21f-2a69-458d-a4ac-2142fe4e2a7a",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "0600a207-0ce7-4345-810b-f9a3879a0185",
+      "name": "알바트정(알마게이트)",
+      "reason": "비대상(fp aa11b369fdd7268c, bridge SSOT)"
+    },
+    {
+      "id": "06143f11-2df2-4f8a-97d5-9e6eed94eb21",
+      "name": "알마린정(알마게이트)",
+      "reason": "비대상(fp 5815a604cf518c6a, bridge SSOT)"
+    },
+    {
+      "id": "06b6c6fb-8140-4e1b-a689-9cdad7b3f160",
+      "name": "오스게이트정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "0bb99e0d-bff2-4b80-8bb2-829297d2d839",
+      "name": "아마가정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "0d722e5d-9dc5-41bf-84dd-66c01740d2cd",
+      "name": "셀마겐정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "14ddfed7-5d1a-479a-b48d-ed6b5b67c7d6",
+      "name": "알마겐트정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "185644de-177c-4b74-953d-71601518b4ab",
+      "name": "알게마정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "18c5c31f-43a1-4927-913e-60cefb3e8ec1",
+      "name": "씨엠지알마게이트정500mg(알마게이트)",
+      "reason": "비대상(fp 56efd9c169329676, bridge SSOT)"
+    },
+    {
+      "id": "1c76a856-c9ea-47a0-8b93-401fa1647393",
+      "name": "알마펜정(알마게이트)",
+      "reason": "비대상(fp 0165936088bfcaa7, bridge SSOT)"
+    },
+    {
+      "id": "22a436ab-8ccd-477b-8cea-37f010317254",
+      "name": "알마겐트정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "22bae8b4-46fe-4c6d-8d79-76fb5c44b931",
+      "name": "알마로정(알마게이트)",
+      "reason": "비대상(fp eb4fa0d16182826f, bridge SSOT)"
+    },
+    {
+      "id": "27392236-4cee-4ddc-bf25-9b729c96368d",
+      "name": "마게이트정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "273e688c-0701-4463-8736-e52e4a444043",
+      "name": "알마시드정(알마게이트)",
+      "reason": "비대상(fp 8756eb34abe2d6d2, bridge SSOT)"
+    },
+    {
+      "id": "2894c366-8b3d-4bf7-863d-c6cf0819e063",
+      "name": "알마시드정(알마게이트)",
+      "reason": "비대상(fp 8756eb34abe2d6d2, bridge SSOT)"
+    },
+    {
+      "id": "2b558661-3472-4311-8b4e-46cfb23859a0",
+      "name": "메디알정500mg(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "2e05e469-2238-491c-89ea-dac4452d20eb",
+      "name": "알게나정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "2e79419b-3315-4b08-bf89-ab4ecfc40785",
+      "name": "알게이트정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "2ff1bfee-5178-47fd-b5de-17011049fe82",
+      "name": "알마펜정(알마게이트)",
+      "reason": "비대상(fp 0165936088bfcaa7, bridge SSOT)"
+    },
+    {
+      "id": "3081f865-cb89-458f-adcc-565eef65be8e",
+      "name": "알게이트정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "3393b879-ba5b-4a2c-b4d4-e5a5dc0fccbb",
+      "name": "알마시드정(알마게이트)",
+      "reason": "비대상(fp 8756eb34abe2d6d2, bridge SSOT)"
+    },
+    {
+      "id": "34547430-a728-4a83-a467-a6e5d33799b5",
+      "name": "알마린정(알마게이트)",
+      "reason": "비대상(fp 5815a604cf518c6a, bridge SSOT)"
+    },
+    {
+      "id": "34f0d7b7-706b-4e46-8c3c-2770b244e43e",
+      "name": "파티겔정(알마게이트)",
+      "reason": "비대상(fp 28b6c02e9e086790, bridge SSOT)"
+    },
+    {
+      "id": "355f940d-113b-44ed-856d-ce2c18036de7",
+      "name": "게이트정(알마게이트)",
+      "reason": "비대상(fp dc552be816d2403a, bridge SSOT)"
+    },
+    {
+      "id": "40ac7a77-0419-436c-a086-68d5e67f8b20",
+      "name": "알게나정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "47e80d3e-ffa6-4d12-a2f8-fd211023e180",
+      "name": "파티겔정(알마게이트)",
+      "reason": "비대상(fp 28b6c02e9e086790, bridge SSOT)"
+    },
+    {
+      "id": "4899df6e-2812-4cfc-b9aa-35190d6dd94c",
+      "name": "알바트정(알마게이트)",
+      "reason": "비대상(fp aa11b369fdd7268c, bridge SSOT)"
+    },
+    {
+      "id": "4b63cebc-8915-4f39-ab07-fdc08700fc9b",
+      "name": "알마노겐정(알마게이트)",
+      "reason": "비대상(fp d7e0734264663065, bridge SSOT)"
+    },
+    {
+      "id": "4b71b33f-d600-49c4-9077-d65981d77627",
+      "name": "알게마정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "4fd264a9-a68e-47c2-899a-f5106083c2ae",
+      "name": "아마가정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "4fe8cc2f-4f95-4074-93e6-5b3250fd6a81",
+      "name": "알마스콘정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "529d5b99-f6d9-4e6f-9c75-80e856e8459f",
+      "name": "파티겔정(알마게이트)",
+      "reason": "비대상(fp 28b6c02e9e086790, bridge SSOT)"
+    },
+    {
+      "id": "540566dd-d70f-45bc-9fe1-cbce2cce2067",
+      "name": "알마인정(알마게이트)",
+      "reason": "비대상(fp 5b53bf6a3de859dd, bridge SSOT)"
+    },
+    {
+      "id": "56e87577-07ea-445b-98a2-9ad6d22afb4a",
+      "name": "알마르정(알마게이트)",
+      "reason": "비대상(fp 83468fcb10c930aa, bridge SSOT)"
+    },
+    {
+      "id": "5eb5fb0d-4423-4aff-b412-82f0747d7086",
+      "name": "알마르정(알마게이트)",
+      "reason": "비대상(fp 83468fcb10c930aa, bridge SSOT)"
+    },
+    {
+      "id": "60631cc4-3d2f-4712-a913-1dcf940ed176",
+      "name": "알게론정500밀리그램(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "60b887e6-bf2e-4915-b4b6-0a71190f0e5c",
+      "name": "알마티정(알마게이트)",
+      "reason": "비대상(fp fc5e9901df83108d, bridge SSOT)"
+    },
+    {
+      "id": "623e40fc-b9ab-4c9d-96f1-c16210c3ceeb",
+      "name": "셀마겐정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "667b2cb6-29ea-43e0-b2b8-db6388cd0dd1",
+      "name": "알마로정(알마게이트)",
+      "reason": "비대상(fp eb4fa0d16182826f, bridge SSOT)"
+    },
+    {
+      "id": "6d4404e1-7d0e-4d2b-b47c-72f42c088256",
+      "name": "알게나정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "6ea3eda2-c2b3-490a-b2be-68182ab3348e",
+      "name": "알마겐트정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "71662cb9-2673-4040-8d5a-bfb69e2fdf3f",
+      "name": "알마겐정500밀리그램(알마게이트)",
+      "reason": "비대상(fp 73c83c801de51129, bridge SSOT)"
+    },
+    {
+      "id": "72285788-5fa2-45e6-97a5-92b533c6aee6",
+      "name": "셀마겐정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "756bb05b-9f0a-45cd-a4e2-186dec617829",
+      "name": "마그엠정(알마게이트)",
+      "reason": "비대상(fp 0165936088bfcaa7, bridge SSOT)"
+    },
+    {
+      "id": "78182831-e489-402d-b672-c7978a8b4960",
+      "name": "오스게이트정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "7c088cc3-a237-40bf-ae18-b91ef097b0f5",
+      "name": "알마인정(알마게이트)",
+      "reason": "비대상(fp 5b53bf6a3de859dd, bridge SSOT)"
+    },
+    {
+      "id": "7eb27b17-26a0-4b9f-acf5-c827b60faac2",
+      "name": "알마겐정500밀리그램(알마게이트)",
+      "reason": "비대상(fp 73c83c801de51129, bridge SSOT)"
+    },
+    {
+      "id": "858600f2-c3f1-48ea-af9b-7024fd230bc5",
+      "name": "알마르정(알마게이트)",
+      "reason": "비대상(fp 83468fcb10c930aa, bridge SSOT)"
+    },
+    {
+      "id": "87146b63-7689-4b29-9ca6-90b2edd5ef90",
+      "name": "알마르정(알마게이트)",
+      "reason": "비대상(fp 83468fcb10c930aa, bridge SSOT)"
+    },
+    {
+      "id": "87c16345-4710-4220-877e-b8327bbc1db7",
+      "name": "알미온정500mg(알마게이트)",
+      "reason": "비대상(fp 6f4a3a2de951b186, bridge SSOT)"
+    },
+    {
+      "id": "87ecb41f-9341-4961-b307-1183797032d5",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "8c29da06-cecc-457b-823e-e1af6912ad8d",
+      "name": "알마겐정500밀리그램(알마게이트)",
+      "reason": "비대상(fp 73c83c801de51129, bridge SSOT)"
+    },
+    {
+      "id": "8e58eed5-de89-4359-a8fd-221a77578030",
+      "name": "알게론정500밀리그램(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "91fc9838-7d51-4c01-86ad-67fb75086ae1",
+      "name": "파티겔정(알마게이트)",
+      "reason": "비대상(fp 28b6c02e9e086790, bridge SSOT)"
+    },
+    {
+      "id": "93b68c9c-6d62-4a85-915a-b0e7dbdc48eb",
+      "name": "알마시드정(알마게이트)",
+      "reason": "비대상(fp 8756eb34abe2d6d2, bridge SSOT)"
+    },
+    {
+      "id": "98fd8fd2-95e4-4ae7-8b55-32fe1c1df9e5",
+      "name": "알마온정500mg(알마게이트)",
+      "reason": "비대상(fp 6f4a3a2de951b186, bridge SSOT)"
+    },
+    {
+      "id": "99757e79-f794-4de1-9699-3fc39fd990b9",
+      "name": "알게마정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "9a7dd0cf-aa9e-4852-9055-479b4d205325",
+      "name": "메디알정500mg(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "9cd17784-9613-4fa6-930c-60492d132cd1",
+      "name": "아마가정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "a166a973-1010-45ab-9b6f-8ca048bf4dba",
+      "name": "알게론정500밀리그램(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "a5d8eb08-1c4a-49f7-9b91-c962d7dcab8f",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "ab46b5a5-f57c-4d79-921d-39f78f5b1073",
+      "name": "알마펜정(알마게이트)",
+      "reason": "비대상(fp 0165936088bfcaa7, bridge SSOT)"
+    },
+    {
+      "id": "b05af285-558d-4bbd-8d5b-f12ff563ea8c",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "b5421b76-dc00-4b70-9467-395f560eee11",
+      "name": "마그엠정(알마게이트)",
+      "reason": "비대상(fp 0165936088bfcaa7, bridge SSOT)"
+    },
+    {
+      "id": "b74fa247-767c-48a3-9d0b-fb8e50e28005",
+      "name": "알마겐트정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "b8bc04e6-b0ae-438d-b549-47b2f6ac4f55",
+      "name": "씨엠지알마게이트정500mg(알마게이트)",
+      "reason": "비대상(fp 56efd9c169329676, bridge SSOT)"
+    },
+    {
+      "id": "bbf49426-d697-400f-930e-f0fe79ac8c51",
+      "name": "알마노겐정(알마게이트)",
+      "reason": "비대상(fp d7e0734264663065, bridge SSOT)"
+    },
+    {
+      "id": "bddd701d-9d87-4b33-8b8d-705513375b7e",
+      "name": "알게이트정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "c0906195-efc0-4a45-9a4a-1ceba584f56d",
+      "name": "알마린정(알마게이트)",
+      "reason": "비대상(fp 5815a604cf518c6a, bridge SSOT)"
+    },
+    {
+      "id": "c3114c82-3b4d-46d8-ac0d-44a18d0095c8",
+      "name": "알마스콘정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "c3b91d33-a208-4c5e-80aa-40de309fd737",
+      "name": "알마티정(알마게이트)",
+      "reason": "비대상(fp fc5e9901df83108d, bridge SSOT)"
+    },
+    {
+      "id": "c3fa1c93-f65e-430c-ac10-61d1b5e283ee",
+      "name": "알마테정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "c43209ad-9fd9-47e6-9be1-65762219b46b",
+      "name": "알게이트정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "d080c3f1-2c00-4189-9197-29cc3bf3908a",
+      "name": "알마테정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "d3293d4f-7f8d-4288-b25b-ca8f648dce12",
+      "name": "알마노겐정(알마게이트)",
+      "reason": "비대상(fp d7e0734264663065, bridge SSOT)"
+    },
+    {
+      "id": "d416df8a-555f-4c4c-9032-8c3cf4257a22",
+      "name": "게이트정(알마게이트)",
+      "reason": "비대상(fp dc552be816d2403a, bridge SSOT)"
+    },
+    {
+      "id": "d57d8f9d-f765-48e1-8555-58afbbb6f1e8",
+      "name": "알게나정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "dadc5a64-ee88-4c85-9c07-ce5aea41e46b",
+      "name": "알게마정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "e3d98557-242d-439a-8fec-3697f1349fe9",
+      "name": "알마테정(알마게이트)",
+      "reason": "비대상(fp 8a5c24ed7ab7bb90, bridge SSOT)"
+    },
+    {
+      "id": "e3efdfaf-e2c4-432c-8b00-a59a68bbe76f",
+      "name": "알게나정(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "e5fe50e9-5a12-4cb5-86bb-f2934e2eefdb",
+      "name": "오스게이트정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "e6beff71-bb81-47f9-94c3-14540ae4bee1",
+      "name": "셀마겐정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "e7368c7d-985d-4c10-9d59-30788387fb24",
+      "name": "마게이트정(알마게이트)",
+      "reason": "비대상(fp 6efc5656c935af21, bridge SSOT)"
+    },
+    {
+      "id": "e935b9b6-506b-4218-a1eb-f91221cb368c",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    },
+    {
+      "id": "eb05911d-68bb-4251-9294-fb5bced535dd",
+      "name": "알마인정(알마게이트)",
+      "reason": "비대상(fp 5b53bf6a3de859dd, bridge SSOT)"
+    },
+    {
+      "id": "f2285a0b-3cae-4dea-a9c3-cb72bb58010a",
+      "name": "메디알정500mg(알마게이트)",
+      "reason": "비대상(fp da3a46edb73780c3, bridge SSOT)"
+    },
+    {
+      "id": "f518b36a-8944-4d59-a32c-0f6737448c7e",
+      "name": "알마스정(알마게이트)",
+      "reason": "비대상(fp 081db4afdf104715, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "10e42ba5-5c43-4fe3-8e9f-41f629014856",
+    "12c34713-55e5-4d3e-b434-789148685c8a",
+    "13f21f07-2973-4223-80ff-335ec921e1a4",
+    "16849ca2-d76d-47cf-9163-0625496ebcb5",
+    "1812e0a9-74b8-4f83-b7f7-4da3c577af52",
+    "1c777b13-a929-4122-bbfe-2da63595ade4",
+    "3effb5e7-7da3-49c5-9237-56b86c53323a",
+    "42d086cb-9396-425b-ad9c-a99aa7f33c8a",
+    "46ae7005-87e9-4b8e-9438-05741774ce21",
+    "4a859f4a-fd1a-4ca0-bf6f-cab77e91b30f",
+    "4cd64cf7-f070-4901-a2bc-7ed62f5b6688",
+    "59b74528-c8fb-48db-885b-154d34ca2e7d",
+    "609ccb20-db5f-459f-85f0-2a671ab3f1cc",
+    "65d14762-fb59-4a54-b326-7adcf1e5f227",
+    "6bafb078-ff48-4bc9-ad8e-c36420d11570",
+    "748bb20c-64ca-4b7b-aa1c-da9456338dbd",
+    "7a86b4bf-0290-46a3-ae44-4e356af86d44",
+    "7edde73b-bd11-4e29-adc7-7fd0f8578246",
+    "913f310d-bb2a-4b0e-9139-6a3b326cc227",
+    "9481f99b-20d7-47ad-b2fa-f59aa60eca4c",
+    "960fc018-b4cd-4df4-b2be-c1d3562ee08c",
+    "9a47ddcd-6a9c-4cac-a5bf-d02427bd5019",
+    "a0e90322-8dba-49de-bdaa-6af523bfec42",
+    "aa5a149f-c3d9-4626-a4bf-a7fa62748c01",
+    "b747d8b7-9ec0-478f-97a7-bc7f1d1df547",
+    "bbd5120e-bdab-44c4-a488-43b847ce07ae",
+    "bf667e07-a8a2-442e-92f1-eac19edabc4d",
+    "c35397e2-1700-4842-ad7e-9a1847acc84e",
+    "c73de97c-d689-4dd9-91b2-562ac953d4af",
+    "ca56adfc-8ede-4343-9f8f-2930980f0886",
+    "d40f8203-8305-4f47-a2d3-e60c9b9c5475",
+    "d62c2541-ae74-4cbd-a12f-24c29101adb2",
+    "d77ec44b-dfcb-4eb3-8c94-b45b2cbf393f",
+    "dca6366f-b627-42a3-88c1-9d58c37103db",
+    "e08a460d-47ab-4b42-977d-c537fe172991",
+    "f5dd6471-9369-4236-9398-45260c095f12",
+    "f69c0bfe-15e1-4fc3-854a-0bc281fad469"
+  ],
+  "rollback_master_ids": [
+    "10e42ba5-5c43-4fe3-8e9f-41f629014856",
+    "12c34713-55e5-4d3e-b434-789148685c8a",
+    "13f21f07-2973-4223-80ff-335ec921e1a4",
+    "16849ca2-d76d-47cf-9163-0625496ebcb5",
+    "1812e0a9-74b8-4f83-b7f7-4da3c577af52",
+    "1c777b13-a929-4122-bbfe-2da63595ade4",
+    "3effb5e7-7da3-49c5-9237-56b86c53323a",
+    "42d086cb-9396-425b-ad9c-a99aa7f33c8a",
+    "46ae7005-87e9-4b8e-9438-05741774ce21",
+    "4a859f4a-fd1a-4ca0-bf6f-cab77e91b30f",
+    "4cd64cf7-f070-4901-a2bc-7ed62f5b6688",
+    "59b74528-c8fb-48db-885b-154d34ca2e7d",
+    "609ccb20-db5f-459f-85f0-2a671ab3f1cc",
+    "65d14762-fb59-4a54-b326-7adcf1e5f227",
+    "6bafb078-ff48-4bc9-ad8e-c36420d11570",
+    "748bb20c-64ca-4b7b-aa1c-da9456338dbd",
+    "7a86b4bf-0290-46a3-ae44-4e356af86d44",
+    "7edde73b-bd11-4e29-adc7-7fd0f8578246",
+    "913f310d-bb2a-4b0e-9139-6a3b326cc227",
+    "9481f99b-20d7-47ad-b2fa-f59aa60eca4c",
+    "960fc018-b4cd-4df4-b2be-c1d3562ee08c",
+    "9a47ddcd-6a9c-4cac-a5bf-d02427bd5019",
+    "a0e90322-8dba-49de-bdaa-6af523bfec42",
+    "aa5a149f-c3d9-4626-a4bf-a7fa62748c01",
+    "b747d8b7-9ec0-478f-97a7-bc7f1d1df547",
+    "bbd5120e-bdab-44c4-a488-43b847ce07ae",
+    "bf667e07-a8a2-442e-92f1-eac19edabc4d",
+    "c35397e2-1700-4842-ad7e-9a1847acc84e",
+    "c73de97c-d689-4dd9-91b2-562ac953d4af",
+    "ca56adfc-8ede-4343-9f8f-2930980f0886",
+    "d40f8203-8305-4f47-a2d3-e60c9b9c5475",
+    "d62c2541-ae74-4cbd-a12f-24c29101adb2",
+    "d77ec44b-dfcb-4eb3-8c94-b45b2cbf393f",
+    "dca6366f-b627-42a3-88c1-9d58c37103db",
+    "e08a460d-47ab-4b42-977d-c537fe172991",
+    "f5dd6471-9369-4236-9398-45260c095f12",
+    "f69c0bfe-15e1-4fc3-854a-0bc281fad469"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "081db4afdf104715",
+      "n": 14,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "aa11b369fdd7268c",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "5815a604cf518c6a",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6efc5656c935af21",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "da3a46edb73780c3",
+      "n": 18,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b08e3e7b13e8836f",
+      "n": 37,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "8a5c24ed7ab7bb90",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "56efd9c169329676",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0165936088bfcaa7",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "eb4fa0d16182826f",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8756eb34abe2d6d2",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "28b6c02e9e086790",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "dc552be816d2403a",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "d7e0734264663065",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "5b53bf6a3de859dd",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "83468fcb10c930aa",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "fc5e9901df83108d",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "73c83c801de51129",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6f4a3a2de951b186",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 37,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 37 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

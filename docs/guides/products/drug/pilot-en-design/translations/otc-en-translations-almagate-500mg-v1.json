@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-ALMAGATE-500MG-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "알마게이트 500mg 정 EN 번역 1건. grounded ko canonical(source_ref 01a231cd) 충실 번역. 동일 약물 out-of-scope 26 master 의 live en canonical(md5 8e5a52ffd631fe32252ddc7b847530de) 을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "chew two tablets (1 g) three times a day · 식후 30분~1시간 · 필요시 취침 전 1회 추가 — ko 용량·횟수·시점 보존(값 불변)",
+    "연령": "12 or older — ko 연령 보존",
+    "금기": "Do not take this if …(과민·알츠하이머·치질·부종·임신중독증·설사·미진단 소화관 출혈) — 강도 보존",
+    "주의": "Talk to a pharmacist(신장애·고령·흡수장애·흑색변 등 출혈징후·임부/수유) · 병용금기(tetracycline계) · 2주 미개선 시 중단·상담 — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 8e5a52ff 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "알마게이트|500밀리그램|정",
+      "title": "Almagate 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine neutralises stomach acid and eases symptoms of stomach and duodenal ulcers, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain and acid burping.",
+      "usage": "Adults and children 12 or older chew two tablets (1 g) three times a day, 30 minutes to 1 hour after meals. If needed, one more dose may be taken before bed.",
+      "caution": "Do not take this if you have ever reacted to it, if you have Alzheimer's disease, haemorrhoids, fluid retention (swelling), pregnancy-induced toxaemia or diarrhoea, or if you have bleeding in the digestive tract that has not been diagnosed. Talk to a pharmacist if you have kidney problems, are elderly, have trouble absorbing food, or have signs of bleeding such as black stools, or are pregnant or breastfeeding. Do not take it together with tetracycline antibiotics. If your symptoms do not improve after about 2 weeks, stop taking it and talk to a pharmacist or doctor.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Almagate 500 mg",
+        "How it works": "Neutralises stomach acid",
+        "Main symptoms": "Heartburn, excess stomach acid, acid burping, stomach pain, nausea",
+        "Who should be careful": "Kidney problems; take care with long-term use",
+        "Why this one": "An antacid that is chewed"
+      }
+    }
+  ],
+  "summary": "Heartburn, excess stomach acid, acid burping, stomach pain, nausea"
+}
