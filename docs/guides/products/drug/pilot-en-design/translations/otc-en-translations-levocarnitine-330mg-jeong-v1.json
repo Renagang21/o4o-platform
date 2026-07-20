@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "엘카르니틴 330mg 정 EN 번역 1건. grounded ko canonical(source_ref 035efa8f) 충실 번역. struct 는 마스터 번역(otc-en-translations-v1.json) 동일 groupKey entry 그대로 채택 → buildDrugOtcEnConsumerHtml 산출 md5 4319e705769e8e953a4c5018ff47b0b7 = 동일 약물 out 12 master live en canonical 과 byte-identical(diff 0). ko content: out-12 == target-16(적재 후 검증) 동일 약물 → 검토완료 EN 재사용, 새 medical fact 0. summary=summaryTable Main symptoms(out 컬럼값과 동일). 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "2–3 g a day, divided into two or three doses; 연령·증상 조정 — ko 보존",
+    "금기": "과민반응 이력 — 강도 보존",
+    "주의": "임부/수유부 · uraemia 환자 근육쇠약 시 중단 상담 — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 4319e705 byte-identical(diff 0) · ko out-12(94749597) vs target 적재 후 대조"
+  },
+  "translations": [
+    {
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "title": "L-Carnitine 330 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for primary and secondary carnitine deficiency, and for problems with heart muscle metabolism caused by reduced blood supply to the heart, such as angina and sudden heart attack.",
+      "usage": "Adults take 2–3 g a day, divided into two or three doses. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have ever reacted to it. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. If muscle weakness appears in a person with uraemia, stop taking it and get advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "L-carnitine 330 mg",
+        "How it works": "Supplies carnitine (improves heart muscle metabolism)",
+        "Main symptoms": "Carnitine deficiency; heart muscle metabolism problems from reduced blood supply",
+        "Who should be careful": "Pregnancy and breastfeeding",
+        "Why this one": "A metabolic preparation that replaces carnitine"
+      }
+    }
+  ],
+  "summary": "Carnitine deficiency; heart muscle metabolism problems from reduced blood supply"
+}

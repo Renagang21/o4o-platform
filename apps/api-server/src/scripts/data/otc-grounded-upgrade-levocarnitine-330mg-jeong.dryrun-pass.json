@@ -1,0 +1,278 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "엘카르니틴|330밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "035efa8f-cc53-4e64-a111-c4528689f457",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "엘카르니틴 330mg 정",
+  "coarseTotal": 42,
+  "target": 16,
+  "excluded": 26,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "00c350a7-f5a4-4809-916a-42f356636bd0",
+      "name": "엘카렉정(엘카르니틴)",
+      "reason": "비대상(fp a727d2db1e059599, bridge SSOT)"
+    },
+    {
+      "id": "072da727-d83a-4f02-aee9-e58ecdf4f09d",
+      "name": "에레스정(엘카르니틴)",
+      "reason": "비대상(fp d6a08d37d9648c25, bridge SSOT)"
+    },
+    {
+      "id": "1542a26f-bb13-4fbb-b8ec-161c75a4400f",
+      "name": "엘큐정(엘카르니틴)",
+      "reason": "비대상(fp 6599085d5e3901c9, bridge SSOT)"
+    },
+    {
+      "id": "18f1d7e9-1986-4912-9fb6-31401abcd508",
+      "name": "에레스정(엘카르니틴)",
+      "reason": "비대상(fp d6a08d37d9648c25, bridge SSOT)"
+    },
+    {
+      "id": "19526370-9991-408a-a191-c2dcda550b44",
+      "name": "엘카렌정(엘카르니틴)",
+      "reason": "비대상(fp 900a8110303e8f41, bridge SSOT)"
+    },
+    {
+      "id": "1a21d0b9-1918-40f3-9e18-0b156755bea3",
+      "name": "엘리스정(엘카르니틴)",
+      "reason": "비대상(fp ce70c85c245f0056, bridge SSOT)"
+    },
+    {
+      "id": "1cbc9dfb-abf5-4eef-ac5a-48965e77ecbe",
+      "name": "에르틴정(엘카르니틴)",
+      "reason": "비대상(fp ac7ba3027cafce45, bridge SSOT)"
+    },
+    {
+      "id": "1e80616e-4f06-4c3d-af99-d3fa83db4570",
+      "name": "엘카닐정(엘카르니틴)",
+      "reason": "비대상(fp 9017e0024031ff4c, bridge SSOT)"
+    },
+    {
+      "id": "26e83a2c-8afa-447e-8036-8a9d0a7b2473",
+      "name": "에르틴정(엘카르니틴)",
+      "reason": "비대상(fp ac7ba3027cafce45, bridge SSOT)"
+    },
+    {
+      "id": "28c34571-37e2-41c3-b8d1-dd9094f95fba",
+      "name": "엘카탄정(엘카르니틴)",
+      "reason": "비대상(fp 3b9730d3fc8d9ab1, bridge SSOT)"
+    },
+    {
+      "id": "30803a19-4cde-40cf-a1dd-a2f69eb48148",
+      "name": "엘카닐정(엘카르니틴)",
+      "reason": "비대상(fp 9017e0024031ff4c, bridge SSOT)"
+    },
+    {
+      "id": "3593a20c-44f8-467a-ad60-7ff0bd7ceb59",
+      "name": "엘라인정(엘카르니틴)",
+      "reason": "비대상(fp 9017e0024031ff4c, bridge SSOT)"
+    },
+    {
+      "id": "39f39839-fde0-4ee8-8b22-cad316fdc1f6",
+      "name": "디카틴정(엘카르니틴)",
+      "reason": "비대상(fp ac7ba3027cafce45, bridge SSOT)"
+    },
+    {
+      "id": "5c8905eb-c68a-4c5b-87ff-ef42ff9aa0e4",
+      "name": "엘라인정(엘카르니틴)",
+      "reason": "비대상(fp 9017e0024031ff4c, bridge SSOT)"
+    },
+    {
+      "id": "5fa5aaec-2c3a-49fd-93fc-225fbbf6077c",
+      "name": "엘탑정(엘카르니틴)",
+      "reason": "비대상(fp 900a8110303e8f41, bridge SSOT)"
+    },
+    {
+      "id": "6430b9c0-f826-4396-a874-cda8ba80f732",
+      "name": "엘리스정(엘카르니틴)",
+      "reason": "비대상(fp ce70c85c245f0056, bridge SSOT)"
+    },
+    {
+      "id": "85cec221-5429-400f-b466-df12c08d7d1c",
+      "name": "엘카렉정(엘카르니틴)",
+      "reason": "비대상(fp a727d2db1e059599, bridge SSOT)"
+    },
+    {
+      "id": "a5ac8ba6-0afc-471c-8028-5bfb3269649a",
+      "name": "엘카탄정(엘카르니틴)",
+      "reason": "비대상(fp 3b9730d3fc8d9ab1, bridge SSOT)"
+    },
+    {
+      "id": "a61d134c-e596-42b3-8018-c315de79d74f",
+      "name": "엘큐정(엘카르니틴)",
+      "reason": "비대상(fp 6599085d5e3901c9, bridge SSOT)"
+    },
+    {
+      "id": "b249cd1e-01d9-4e7d-8d98-319d204b45e9",
+      "name": "엘론드정(엘카르니틴)",
+      "reason": "비대상(fp 89cb14c846be1601, bridge SSOT)"
+    },
+    {
+      "id": "befa8f7a-45f1-45b1-a29f-d13a5ebd1936",
+      "name": "엘패스정(엘카르니틴)",
+      "reason": "비대상(fp 845d1bdeddd113fa, bridge SSOT)"
+    },
+    {
+      "id": "c6d417e0-a20e-47c7-8b0f-c7f60a335580",
+      "name": "엘탑정(엘카르니틴)",
+      "reason": "비대상(fp 900a8110303e8f41, bridge SSOT)"
+    },
+    {
+      "id": "dc8295c3-5964-4a81-8ec9-ef26353e18f3",
+      "name": "엘패스정(엘카르니틴)",
+      "reason": "비대상(fp 845d1bdeddd113fa, bridge SSOT)"
+    },
+    {
+      "id": "e1666549-7eb0-44fe-aa0e-d944ddc47c91",
+      "name": "엘론드정(엘카르니틴)",
+      "reason": "비대상(fp 89cb14c846be1601, bridge SSOT)"
+    },
+    {
+      "id": "e2f8e11d-bd8c-4902-af0b-b935c24a1426",
+      "name": "엘리스정(엘카르니틴)",
+      "reason": "비대상(fp ce70c85c245f0056, bridge SSOT)"
+    },
+    {
+      "id": "f312faa7-88e4-417a-9e3c-ca56620f19df",
+      "name": "디카틴정(엘카르니틴)",
+      "reason": "비대상(fp ac7ba3027cafce45, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "00271542-66ca-42e7-8d73-216c0ce247ee",
+    "09524fe0-ae94-4a9d-92a8-4b70e482d03b",
+    "0db2ea54-c0d2-471e-afd1-a06d4a3be9c9",
+    "2273e1fc-a205-45ec-8b19-6aa82643bed5",
+    "2515aae4-94be-47d5-a05c-4e54bbea0a2f",
+    "481d2189-6b8e-49e8-a941-2a00ab863b58",
+    "5126a652-c406-4a27-9ecc-37f65ecce0d8",
+    "5dff6127-bd29-41aa-9a17-ff1f37de10ed",
+    "6b1d53f8-1275-4aba-8564-440bc9cfa413",
+    "882725ce-3412-429f-a8df-28c752088c03",
+    "a1e6c2d4-aea0-4dcf-b432-74724b53e0c2",
+    "a5eaa8c7-d926-4df8-bc52-64facf5449ca",
+    "ace96b6d-1730-4327-84c2-a78f177a8723",
+    "c4da1a84-344b-4331-babc-d7e9388661a5",
+    "ebd42a1e-762e-463f-b97b-3f0948cc1881",
+    "ee69e1ac-b181-4d0c-944a-d70e25b9e2a5"
+  ],
+  "rollback_master_ids": [
+    "00271542-66ca-42e7-8d73-216c0ce247ee",
+    "09524fe0-ae94-4a9d-92a8-4b70e482d03b",
+    "0db2ea54-c0d2-471e-afd1-a06d4a3be9c9",
+    "2273e1fc-a205-45ec-8b19-6aa82643bed5",
+    "2515aae4-94be-47d5-a05c-4e54bbea0a2f",
+    "481d2189-6b8e-49e8-a941-2a00ab863b58",
+    "5126a652-c406-4a27-9ecc-37f65ecce0d8",
+    "5dff6127-bd29-41aa-9a17-ff1f37de10ed",
+    "6b1d53f8-1275-4aba-8564-440bc9cfa413",
+    "882725ce-3412-429f-a8df-28c752088c03",
+    "a1e6c2d4-aea0-4dcf-b432-74724b53e0c2",
+    "a5eaa8c7-d926-4df8-bc52-64facf5449ca",
+    "ace96b6d-1730-4327-84c2-a78f177a8723",
+    "c4da1a84-344b-4331-babc-d7e9388661a5",
+    "ebd42a1e-762e-463f-b97b-3f0948cc1881",
+    "ee69e1ac-b181-4d0c-944a-d70e25b9e2a5"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "a75d4ff900dbe2a9",
+      "n": 16,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "a727d2db1e059599",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "d6a08d37d9648c25",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6599085d5e3901c9",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "900a8110303e8f41",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ce70c85c245f0056",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ac7ba3027cafce45",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9017e0024031ff4c",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "3b9730d3fc8d9ab1",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "89cb14c846be1601",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "845d1bdeddd113fa",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 16,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 16,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 16,
+  "htmlLen": 1521,
+  "contentHash": "94749597f7a1c7a544d8ad928e791499",
+  "summary": "엘카르니틴 330mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 16,
+      "STEP_B_easy_canonical_demote": 16,
+      "STEP_B_authored_canonical_flip": 16,
+      "total": 48
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 16,
+      "total": 16
+    },
+    "grand_total": 64
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 16",
+    "policy_2A": "audit 2/master = 32 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "소브레롤|200밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0ff909f4-20dc-49d1-b8c5-91794ab62df6",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 15,
+  "targetMasters": 15,
+  "anomalies": [],
+  "koCanonical": 15,
+  "existingEnAny": 15,
+  "existingEnCanonical": 15,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "e987fc7c08e01fb3334951e18baf2149",
+      "n": 3
+    }
+  ],
+  "builtLen": 2357,
+  "builtMd5": "e987fc7c08e01fb3334951e18baf2149",
+  "consistencyMatch": true,
+  "summaryField": "Sudden and long-lasting bronchitis; breathing problems with increased mucus",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 15,
+    "STEP2_en_canonical_flip": 15,
+    "en_write_total": 30
+  },
+  "enTargetMd5": "e987fc7c08e01fb3334951e18baf2149",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(e987fc7c08e01fb3334951e18baf2149) — write 0, 정상 종료"
+}

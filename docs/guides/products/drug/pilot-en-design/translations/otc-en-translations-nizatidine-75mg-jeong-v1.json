@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "니자티딘 75mg 정 EN 번역 1건. grounded ko canonical(source_ref 048ba86f) 충실 번역. struct 는 마스터 번역(otc-en-translations-v1.json) 동일 groupKey entry 그대로 채택 → buildDrugOtcEnConsumerHtml 산출 md5 e18e8f8452a69ecc9799f5c301fed8ef = 동일 약물 out 33 master live en canonical 과 byte-identical(diff 0). ko content: out-33 == target-18(md5 570e1e97) 동일 약물 → 검토완료 EN 재사용, 새 medical fact 0. summary=summaryTable Main symptoms(out 컬럼값과 동일). 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "one tablet (75 mg) once a day; max two tablets (150 mg)/day; 15–79세; 음주 금지 — ko 보존",
+    "금기": "H2 blocker 과민·혈액질환·간/신·위/십이지장·천식/류마티스·15세 미만/80세 이상·임부/수유부 — 강도 보존",
+    "주의": "알레르기체질·65세 이상·인후통/기침/고열·체중감소·지속 복통 · 병용주의(제산제·스테로이드·항생제·항암제·azole 항진균·고용량 아스피린·gefitinib·prulifloxacin·atazanavir) — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 e18e8f84 byte-identical(diff 0) · ko out-33==target-18(570e1e97)"
+  },
+  "translations": [
+    {
+      "groupKey": "니자티딘|75밀리그램|정",
+      "title": "Nizatidine 75 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for excess stomach acid, heartburn and acid burping.",
+      "usage": "Adults aged 15–79 take one tablet (75 mg) once a day. If your symptoms have not improved after 8 hours, you may take one more tablet. Do not take more than two tablets (150 mg) in one day. Do not drink alcohol while taking this medicine.",
+      "caution": "Do not take this if you have ever reacted to this medicine or to another H2 blocker; if you have a blood disorder, liver or kidney disease, a stomach or duodenal condition, or asthma or rheumatism; if you are under 15 or 80 or older; or if you are pregnant or breastfeeding. Talk to a pharmacist before taking it if you are prone to allergies or are 65 or older, if you have a sore throat, cough or high fever, unexplained weight loss, or ongoing stomach pain. While taking this medicine, do not take other stomach medicines, steroids, antibiotics, anticancer drugs, azole antifungals, high-dose aspirin, gefitinib, prulifloxacin or atazanavir.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Nizatidine 75 mg",
+        "How it works": "Reduces stomach acid (H2 blocker)",
+        "Main symptoms": "Excess stomach acid, heartburn, acid burping",
+        "Who should be careful": "Under 15 or 80 and over; liver or kidney disease",
+        "Why this one": "An H2 blocker that reduces acid production"
+      }
+    }
+  ],
+  "summary": "Excess stomach acid, heartburn, acid burping"
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "엘카르니틴|330밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "035efa8f-cc53-4e64-a111-c4528689f457",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 16,
+  "targetMasters": 16,
+  "anomalies": [],
+  "koCanonical": 16,
+  "existingEnAny": 16,
+  "existingEnCanonical": 16,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "4319e705769e8e953a4c5018ff47b0b7",
+      "n": 12
+    }
+  ],
+  "builtLen": 2388,
+  "builtMd5": "4319e705769e8e953a4c5018ff47b0b7",
+  "consistencyMatch": true,
+  "summaryField": "Carnitine deficiency; heart muscle metabolism problems from reduced blood supply",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 16,
+    "STEP2_en_canonical_flip": 16,
+    "en_write_total": 32
+  },
+  "enTargetMd5": "4319e705769e8e953a4c5018ff47b0b7",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(4319e705769e8e953a4c5018ff47b0b7) — write 0, 정상 종료"
+}

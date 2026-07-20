@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NIZATIDINE-LEVOCARNITINE-SOBREROL-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "소브레롤 200mg 캡슐 EN 번역 1건. grounded ko canonical(source_ref 0ff909f4) 충실 번역. struct 는 마스터 번역(otc-en-translations-v1.json) 동일 groupKey entry 그대로 채택 → buildDrugOtcEnConsumerHtml 산출 md5 e987fc7c08e01fb3334951e18baf2149 = 동일 약물 out 3 master live en canonical 과 byte-identical(diff 0). ko content: out-3 == target-15(적재 후 검증) 동일 약물 → 검토완료 EN 재사용, 새 medical fact 0. summary=summaryTable Main symptoms(out 컬럼값과 동일). 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "one capsule (200 mg) twice a day — ko 보존",
+    "금기": "과민반응 이력 — 강도 보존",
+    "주의": "임부/임신가능/수유부 · 2세 미만 영아 · 가래/기침 장기 지속 시 상담 — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 e987fc7c byte-identical(diff 0) · ko out-3(c05847a8) vs target 적재 후 대조"
+  },
+  "translations": [
+    {
+      "groupKey": "소브레롤|200밀리그램|캡슐",
+      "title": "Sobrerol 200 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden and long-lasting bronchitis, bronchitis with asthma or a cough, inflammation of the nose and throat, and inflammation of the voice box and windpipe — that is, sudden and long-lasting breathing problems with increased mucus.",
+      "usage": "Adults take one capsule (200 mg) twice a day.",
+      "caution": "Do not take this if you have ever reacted to it. Talk to a pharmacist before taking it if you are pregnant, may be pregnant, are breastfeeding, or for a baby under 2. Get advice if the phlegm or cough lasts a long time.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Sobrerol 200 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Sudden and long-lasting bronchitis; breathing problems with increased mucus",
+        "Who should be careful": "Under 2; pregnancy and breastfeeding",
+        "Why this one": "A mucus-thinning treatment that helps clear phlegm"
+      }
+    }
+  ],
+  "summary": "Sudden and long-lasting bronchitis; breathing problems with increased mucus"
+}

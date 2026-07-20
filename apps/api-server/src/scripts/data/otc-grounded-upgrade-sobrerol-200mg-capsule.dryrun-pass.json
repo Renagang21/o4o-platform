@@ -1,0 +1,95 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "소브레롤|200밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0ff909f4-20dc-49d1-b8c5-91794ab62df6",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "소브레롤 200mg 캡슐",
+  "coarseTotal": 15,
+  "target": 15,
+  "excluded": 0,
+  "otherFp": 0,
+  "excludedDetail": [],
+  "target_master_ids": [
+    "03ba235e-17f8-4f27-b19a-a317abf87a29",
+    "317eb88c-6ef4-4434-9950-14b28cbd7562",
+    "359f288a-b878-4d82-96ef-6e29864376d5",
+    "35dfb72e-12ae-4962-9957-fec39d7102f5",
+    "4d8f4efd-709e-46e1-9166-db4e0083f00f",
+    "8133ebb3-5110-4d1c-910c-1bfe25cbf596",
+    "8424849d-0bc2-4415-993d-9892071d994d",
+    "93f4b962-518e-4758-94e8-c96de640aa6d",
+    "992c90e4-e9d8-45f2-be50-55fbac023af6",
+    "a408ce6f-0e91-4da6-be63-ea31e99a6b68",
+    "a8530c77-3b0a-4093-8b23-83c59b743757",
+    "b0dbe667-71d4-4bb2-9b2a-145f21597f01",
+    "bf8cfdc5-7ba3-4dc9-91d6-ffcac340d18a",
+    "ec37233b-de07-437a-a235-fa7972517c69",
+    "f01416b6-2aac-4dc5-b534-06a4d4228548"
+  ],
+  "rollback_master_ids": [
+    "03ba235e-17f8-4f27-b19a-a317abf87a29",
+    "317eb88c-6ef4-4434-9950-14b28cbd7562",
+    "359f288a-b878-4d82-96ef-6e29864376d5",
+    "35dfb72e-12ae-4962-9957-fec39d7102f5",
+    "4d8f4efd-709e-46e1-9166-db4e0083f00f",
+    "8133ebb3-5110-4d1c-910c-1bfe25cbf596",
+    "8424849d-0bc2-4415-993d-9892071d994d",
+    "93f4b962-518e-4758-94e8-c96de640aa6d",
+    "992c90e4-e9d8-45f2-be50-55fbac023af6",
+    "a408ce6f-0e91-4da6-be63-ea31e99a6b68",
+    "a8530c77-3b0a-4093-8b23-83c59b743757",
+    "b0dbe667-71d4-4bb2-9b2a-145f21597f01",
+    "bf8cfdc5-7ba3-4dc9-91d6-ffcac340d18a",
+    "ec37233b-de07-437a-a235-fa7972517c69",
+    "f01416b6-2aac-4dc5-b534-06a4d4228548"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "2e37307573cfb189",
+      "n": 15,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 15,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 15,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 15,
+  "htmlLen": 1523,
+  "contentHash": "c05847a8b9d3cd959f2298141ed2664e",
+  "summary": "소브레롤 200mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 15,
+      "STEP_B_easy_canonical_demote": 15,
+      "STEP_B_authored_canonical_flip": 15,
+      "total": 45
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 15,
+      "total": 15
+    },
+    "grand_total": 60
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 15",
+    "policy_2A": "audit 2/master = 30 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

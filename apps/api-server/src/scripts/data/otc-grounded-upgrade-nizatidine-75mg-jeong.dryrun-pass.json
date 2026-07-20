@@ -1,0 +1,122 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "니자티딘|75밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "048ba86f-f85e-42f8-97fd-7bc4e46cc092",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "니자티딘 75mg 정",
+  "coarseTotal": 21,
+  "target": 18,
+  "excluded": 3,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "3b034fb4-d6c3-4c5c-9799-b7a4d3785788",
+      "name": "니타딘정(니자티딘)",
+      "reason": "비대상(fp 7f88215cfd2455ef, bridge SSOT)"
+    },
+    {
+      "id": "b8e1b003-3973-4b4b-a430-ba60d0001517",
+      "name": "니타딘정(니자티딘)",
+      "reason": "비대상(fp 7f88215cfd2455ef, bridge SSOT)"
+    },
+    {
+      "id": "c2cb402a-94fd-40a7-abf4-a8a79c94315e",
+      "name": "니타딘정(니자티딘)",
+      "reason": "비대상(fp 7f88215cfd2455ef, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "130a196b-8602-4f1c-be6b-cb70c8314cb9",
+    "321798ee-d07e-49d5-9b4d-803c4b699f2f",
+    "34277b69-12f0-47a7-baa9-f4dd2d6aa47f",
+    "3df34e77-906c-423c-a5ef-25f8bbe61ccb",
+    "4741371a-887e-4875-8eb4-a53dd72eca2f",
+    "49fa340e-702c-46e6-84c4-683c4724736b",
+    "4a3f8637-3d9b-40ba-b1f8-a6482f9cd688",
+    "5fe92b8d-0f76-413b-9170-205b9920c945",
+    "653878b5-ba04-4cb4-b075-fc4126a2c969",
+    "678393c1-b52f-4448-bde7-3137f75efdb5",
+    "6d8a0b1b-1dc6-4dae-8b8c-7c93d91a067b",
+    "8c14e229-8f4b-480d-8731-b907cb7a091f",
+    "932559f9-492d-4f03-bec1-693976fb7d13",
+    "9d8f237b-66bf-44ae-a0cb-45bab8507a8b",
+    "b0020732-24aa-4746-ae4d-86976c6edcf8",
+    "b333b642-d064-4a83-bd51-05a1bafc2276",
+    "b8a28d4e-0aca-4ffb-a6c6-e442eb1fdbce",
+    "f5664005-8493-4f61-a5d4-17fe1bc16d7b"
+  ],
+  "rollback_master_ids": [
+    "130a196b-8602-4f1c-be6b-cb70c8314cb9",
+    "321798ee-d07e-49d5-9b4d-803c4b699f2f",
+    "34277b69-12f0-47a7-baa9-f4dd2d6aa47f",
+    "3df34e77-906c-423c-a5ef-25f8bbe61ccb",
+    "4741371a-887e-4875-8eb4-a53dd72eca2f",
+    "49fa340e-702c-46e6-84c4-683c4724736b",
+    "4a3f8637-3d9b-40ba-b1f8-a6482f9cd688",
+    "5fe92b8d-0f76-413b-9170-205b9920c945",
+    "653878b5-ba04-4cb4-b075-fc4126a2c969",
+    "678393c1-b52f-4448-bde7-3137f75efdb5",
+    "6d8a0b1b-1dc6-4dae-8b8c-7c93d91a067b",
+    "8c14e229-8f4b-480d-8731-b907cb7a091f",
+    "932559f9-492d-4f03-bec1-693976fb7d13",
+    "9d8f237b-66bf-44ae-a0cb-45bab8507a8b",
+    "b0020732-24aa-4746-ae4d-86976c6edcf8",
+    "b333b642-d064-4a83-bd51-05a1bafc2276",
+    "b8a28d4e-0aca-4ffb-a6c6-e442eb1fdbce",
+    "f5664005-8493-4f61-a5d4-17fe1bc16d7b"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "db6e1f0bb7d9763f",
+      "n": 18,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "7f88215cfd2455ef",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 18,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 18,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 18,
+  "htmlLen": 1716,
+  "contentHash": "570e1e972ca409e6a87a56f9e8e79337",
+  "summary": "니자티딘 75mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 18,
+      "STEP_B_easy_canonical_demote": 18,
+      "STEP_B_authored_canonical_flip": 18,
+      "total": 54
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 18,
+      "total": 18
+    },
+    "grand_total": 72
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 18",
+    "policy_2A": "audit 2/master = 36 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
