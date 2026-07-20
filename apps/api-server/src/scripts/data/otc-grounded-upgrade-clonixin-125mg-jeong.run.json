@@ -1,0 +1,229 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "클로닉신리시네이트|125밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01994863-920a-45ea-97d1-f493416cafa7",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "클로닉신리시네이트 125mg 정",
+  "coarseTotal": 51,
+  "target": 26,
+  "excluded": 25,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "00af8365-0851-411d-9c34-f160988dc031",
+      "name": "크로낙정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "066de9ab-9f0d-4b12-8038-d9205b72cc2e",
+      "name": "바로닉신정125밀리그램(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "0dba1e54-7440-4e44-ace9-6afb79ab2c57",
+      "name": "크레닉정125밀리그람(클로닉신리시네이트)",
+      "reason": "비대상(fp 4374e59805caee92, bridge SSOT)"
+    },
+    {
+      "id": "1151a83f-6ddd-4efe-b402-cefc415791e6",
+      "name": "바르젠정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "1ee103a8-c9d6-4fb1-910c-68bd82dfe7a8",
+      "name": "크레닉정125밀리그람(클로닉신리시네이트)",
+      "reason": "비대상(fp 4374e59805caee92, bridge SSOT)"
+    },
+    {
+      "id": "20c256f0-220f-44f6-8b96-f28b42a7281f",
+      "name": "바르젠정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "37d923f3-cb0d-4aef-8c42-dab21af76063",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "46d2eddc-0818-48d3-bbf7-7f259b3833d3",
+      "name": "바로닉신정125밀리그램(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "61702b78-7164-4a42-8545-ff152ebb000d",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "66cc32cd-f72f-4265-a242-ebde879e0948",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "6bdad241-f815-4455-938a-833584cd24da",
+      "name": "페릭신정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "708d046f-e5b1-4fec-a21a-b555bfd34caf",
+      "name": "바르젠정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "78b01097-fd3f-48c7-ad70-9fd2d6a1bd36",
+      "name": "크레닉정125밀리그람(클로닉신리시네이트)",
+      "reason": "비대상(fp 4374e59805caee92, bridge SSOT)"
+    },
+    {
+      "id": "95a4f0ce-2766-407f-8a0d-9159d896cf98",
+      "name": "크로낙정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "96a34f84-959e-4223-a76e-dcf64fc8a8d0",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "a7bfffca-4e71-4ba1-acf7-11273f54bed5",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "caaa9b81-0286-4df3-bf35-789e57df5d08",
+      "name": "크로낙정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "cbb15b01-9646-4224-83c3-439b94c6fe54",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "daa28c0a-5f6d-4ffd-834a-2d0eed02beb5",
+      "name": "크레닉정125밀리그람(클로닉신리시네이트)",
+      "reason": "비대상(fp 4374e59805caee92, bridge SSOT)"
+    },
+    {
+      "id": "e06d5274-bada-463c-8454-debaac47142f",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "e3dc15f6-a1c1-4cd0-ab7b-3e6bf740a035",
+      "name": "바로닉신정125밀리그램(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "e566ab36-3587-49f4-a782-6d18c51026ee",
+      "name": "크레닉정125밀리그람(클로닉신리시네이트)",
+      "reason": "비대상(fp 4374e59805caee92, bridge SSOT)"
+    },
+    {
+      "id": "eb21a4dd-d22c-4e9e-b7ae-2e22f24a2090",
+      "name": "크로낙정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "f552ae70-7275-4fd6-a3ec-420056171693",
+      "name": "페릭신정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    },
+    {
+      "id": "fcbde015-3bf1-46e5-b9a3-9e6472e5a651",
+      "name": "디크로닉정(클로닉신리시네이트)",
+      "reason": "비대상(fp 84b185d46ada5a83, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "038cd6d8-c13e-43e1-a810-6abc6da6e0aa",
+    "040a24a2-3228-4a41-a2c7-17fa44d8d5b7",
+    "09e55f5b-f745-4b5a-be99-15a357e4e005",
+    "0b221062-4625-4025-a9d4-97b937aafbd8",
+    "0bd3559b-a19c-4c00-892f-2499d9317a5e",
+    "0d077dc0-0982-429c-86e9-1603655474bc",
+    "1835b4e8-b10b-49dd-80aa-b6957c4b5df4",
+    "20d941ae-ba1c-4b6a-a0a7-70a14b11c4c2",
+    "3cbcfb81-c634-4c91-80bd-0767d8c52693",
+    "4e0706c7-a161-4639-9077-ea7fc6abbb35",
+    "5447f53a-8d2d-4451-a952-7e105102d05c",
+    "82693eba-39a4-455e-a046-0c88c55b0932",
+    "8f1c77db-70af-4259-8b31-2432f357775f",
+    "9249a84c-5e2a-4ef0-ae56-4b9d3c129a3f",
+    "943ef87c-a6b1-4804-9d04-dcde2626c72e",
+    "954e0f68-f320-42a0-9e23-acb0c9bb0bdd",
+    "a2c33d4f-a529-402b-978c-5358f30e0fd7",
+    "a3589d1c-a592-4d7a-b2a4-3c3735c3fa72",
+    "a81648ec-f68c-45be-b229-e0e18f041b93",
+    "af2d05d5-3ba7-4476-a0fd-dcc2071401d7",
+    "af7aeb58-6494-4814-93d7-64fcb8192e36",
+    "c3e922d9-6008-4b21-92b2-fa918cddd04b",
+    "dc44b83a-34e1-40d5-96ae-8feba407f7f1",
+    "e4acb46f-ab76-4f1f-8e6c-f3afacc71e03",
+    "ed29b7a5-5307-4b65-a449-2ffd3755f434",
+    "f2324b19-0e81-4b77-98d0-c6cc50e34052"
+  ],
+  "rollback_master_ids": [
+    "038cd6d8-c13e-43e1-a810-6abc6da6e0aa",
+    "040a24a2-3228-4a41-a2c7-17fa44d8d5b7",
+    "09e55f5b-f745-4b5a-be99-15a357e4e005",
+    "0b221062-4625-4025-a9d4-97b937aafbd8",
+    "0bd3559b-a19c-4c00-892f-2499d9317a5e",
+    "0d077dc0-0982-429c-86e9-1603655474bc",
+    "1835b4e8-b10b-49dd-80aa-b6957c4b5df4",
+    "20d941ae-ba1c-4b6a-a0a7-70a14b11c4c2",
+    "3cbcfb81-c634-4c91-80bd-0767d8c52693",
+    "4e0706c7-a161-4639-9077-ea7fc6abbb35",
+    "5447f53a-8d2d-4451-a952-7e105102d05c",
+    "82693eba-39a4-455e-a046-0c88c55b0932",
+    "8f1c77db-70af-4259-8b31-2432f357775f",
+    "9249a84c-5e2a-4ef0-ae56-4b9d3c129a3f",
+    "943ef87c-a6b1-4804-9d04-dcde2626c72e",
+    "954e0f68-f320-42a0-9e23-acb0c9bb0bdd",
+    "a2c33d4f-a529-402b-978c-5358f30e0fd7",
+    "a3589d1c-a592-4d7a-b2a4-3c3735c3fa72",
+    "a81648ec-f68c-45be-b229-e0e18f041b93",
+    "af2d05d5-3ba7-4476-a0fd-dcc2071401d7",
+    "af7aeb58-6494-4814-93d7-64fcb8192e36",
+    "c3e922d9-6008-4b21-92b2-fa918cddd04b",
+    "dc44b83a-34e1-40d5-96ae-8feba407f7f1",
+    "e4acb46f-ab76-4f1f-8e6c-f3afacc71e03",
+    "ed29b7a5-5307-4b65-a449-2ffd3755f434",
+    "f2324b19-0e81-4b77-98d0-c6cc50e34052"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "84b185d46ada5a83",
+      "n": 20,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "30552579b0a3088e",
+      "n": 26,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "4374e59805caee92",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 26,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 26 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

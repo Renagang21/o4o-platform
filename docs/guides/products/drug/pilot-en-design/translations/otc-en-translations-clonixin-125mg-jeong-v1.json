@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-CLONIXIN-125MG-TABLET-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "클로닉신리시네이트 125mg 정 EN 번역 1건. grounded ko canonical(source_ref 01994863) 충실 번역. 동일 약물 out-of-scope 29 master 의 live en canonical(md5 67144df254a3d2a4ce92efc34ecd4a59, summary null)을 재현하는 검증본. struct 는 bulk batch-01 번역(otc-en-translations-batch-01-v1.json)의 동일 groupKey entry 에서 그대로 채택 → buildDrugOtcEnConsumerHtml 산출 md5 가 live out en 과 byte-identical(diff 0). ko content: out-29 == target-26(md5 c1c0bede…) 동일 약물 → 검토완료 EN 재사용으로 새 medical fact 0 증명. 125mg 연질캡슐(source_ref 03de1849, md5 d359211f)과 별개 제형 — 재사용 금지, title 'Tablet' 로 구분. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "one to two tablets (125–250 mg) three times a day · 다른 소염진통제 병용금지 — ko 용량·횟수 보존(값 불변)",
+    "금기": "Do not take this if …(소화성궤양·천식/두드러기/아스피린 등 소염진통제 알레르기·CABG 수술 통증·중증 간/신장애·중증 심부전·염증성 장질환·임부) — 강도 보존",
+    "주의": "Talk to a pharmacist(고혈압·심부전·기관지천식·간/신장애) — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 67144df254a3d2a4ce92efc34ecd4a59 byte-identical 재현(diff 0) · ko out-29==target-26(c1c0bede) 동일 약물"
+  },
+  "translations": [
+    {
+      "groupKey": "클로닉신리시네이트|125밀리그램|정",
+      "title": "Clonixin Lysinate 125 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve mild to moderate pain such as muscle pain, nerve pain, pain after injury or surgery, headache, toothache and earache.",
+      "usage": "Adults take one to two tablets (125–250 mg) three times a day. Do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have a peptic ulcer; if you have ever had asthma, hives or an allergy to this medicine, to aspirin or to other anti-inflammatory painkillers; for pain around coronary artery bypass graft (CABG) surgery; if you have severe liver or kidney disease, severe heart failure or inflammatory bowel disease; or if you are pregnant. Talk to a pharmacist before taking it if you have ever had high blood pressure, heart failure, bronchial asthma, or liver or kidney disease.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Clonixin lysinate 125 mg",
+        "How it works": "Relieves pain and inflammation",
+        "Main symptoms": "Muscle and nerve pain, headache, toothache, earache, pain after injury or surgery",
+        "Who should be careful": "Peptic ulcer, severe liver or kidney disease, pregnancy",
+        "Why this one": "An anti-inflammatory painkiller for mild to moderate pain"
+      }
+    }
+  ],
+  "summary": null
+}
