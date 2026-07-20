@@ -85,6 +85,34 @@
 
 ---
 
+## 0-C. EN 전개 master 스코프 가드 (Grounded Upgrade 그룹 — 필수)
+
+> 근거: WO-O4O-OTC-EN-MASTER-SCOPE-GUARD-DOC-NA-V1 (2026-07-20, 문서 정비·DB write 0). 트리메부틴말레산염 100mg 정에서 발견된 스코프 오염(하나의 `source_ref_id`(candidate)를 coarse 127 master 가 공유하나 ko 승격 target 은 fingerprint 확정 **66** 뿐 — 제외 61 은 11개 비대상 fp) 방지. [TRIMEBUTINE-100MG-RUNNER §1~§5](../../../checks/CHECK-O4O-OTC-TRIMEBUTINE-100MG-UPGRADE-RUNNER-PILOT-DA-V1.md).
+
+### 0-C-1. 스코프 정본 = runner 확정 target master_id 집합
+
+- **EN 전개 대상은 `source_ref_id` 를 공유하는 master 전체가 아니라, 해당 ko 승격 runner 가 확정한 `target master_id` 집합을 정본으로 삼는다.** (Grounded Upgrade 는 coarse 그룹을 fingerprint 로 분할해 **일부 fp 만** 승격하므로, `source_ref_id`(candidate) 공유 집합 ⊋ target 이 정상이다.)
+  - 정본 소스 = runner 산출 `report.rollback_master_ids` (= dry-run 이 확정한 target IDs, 예: 트리메부틴 `otc-grounded-upgrade-<group>.run.json` 66).
+- **`source_ref_id` 는 번역·grounding 연결값(어느 ko 원천에서 왔는가)이지, 안전한 master 범위 식별자가 아니다.** `source_ref_id` 단독으로 master 를 열거하면 승격되지 않은(제외 fp) master 까지 EN 이 전개돼 스코프가 오염된다.
+
+### 0-C-2. 실행 전 필수 조사·게이트
+
+EN persist(§4) 이전에 다음을 확정한다:
+
+| # | 게이트 | 의미 |
+|---|---|---|
+| 1 | **`source_ref_id` 공유 master 수 조사** | candidate 를 공유하는 전체 master 수를 먼저 센다(예: 트리메부틴 coarse 127). target(66) 과의 차(제외 61)를 명시 확인. |
+| 2 | **target 밖 기존 en canonical 보호** | target 외(out-of-scope) master 의 기존 en STORE canonical 은 **미접촉**. persist·flip 대상에서 제외. |
+| 3 | **`target master IDs ∩ out-of-scope IDs = 0`** | 정본 target 과 스코프 밖 집합의 교집합 0 을 게이트로 검증. |
+| 4 | **예상 대상 수 ≠ persist 대상 수 → ABORT** | dry-run 이 확정한 target 수와 실제 persist 대상 수 불일치 시 **전체 ABORT**(§6 수량 가드의 스코프 판). |
+
+### 0-C-3. herbal 열거 방식 재사용 금지
+
+- **기존 herbal 방식의 `source_ref_id`(candidate) 단독 master 열거를 Grounded Upgrade 그룹에 재사용하지 않는다.** herbal(299)은 그룹 전체가 단일 승격 대상이라 `source_ref_id=candidate` 열거가 곧 target 이었으나, Grounded Upgrade 는 fingerprint 분할로 candidate 공유 집합 ≠ target 이다.
+- 따라서 §4 의 "master 집합 = 그룹 ko canonical(`source_ref_id=candidate`)" 은 **herbal 계열 그룹에 한정**하며, **Grounded Upgrade 그룹은 §0-C-1 의 runner 확정 target master_id 집합으로 대상을 고정**한다(§4 주석 참조).
+
+---
+
 ## 1. 배치 단위
 
 - **10~20 그룹 단위**로 배치. 그룹 = `성분|함량|제형`(3축, DR-005/DR-019).
@@ -129,11 +157,13 @@
 
 > 스크립트 패턴: `drug-otc-herbal-en-persist.ts`
 
-- **master 집합 = 그룹 ko canonical**(`source_ref_id=candidate`) → **ko↔en `master_id`·`source_ref_id` 정합**.
+- **master 집합**:
+  - **herbal 계열 그룹**: 그룹 ko canonical(`source_ref_id=candidate`) → **ko↔en `master_id`·`source_ref_id` 정합**.
+  - **Grounded Upgrade 그룹**: `source_ref_id` 단독 열거 금지 → **runner 확정 `target master_id` 집합(§0-C)** 을 정본으로 대상 고정. `source_ref_id` 는 정합 검증값으로만 사용.
 - content = `buildDrugOtcEnConsumerHtml(번역)`.
 - 저장: `description_type=STORE · language=en · status=needs_review · source_type=mfds_drug_otc · source_ref_id=candidate`.
 - INSERT: `WHERE NOT EXISTS(en STORE needs_review/canonical)` → 충돌 0 + 멱등.
-- 게이트(전건): 번역 그룹당 1건 · ko canonical 예상수 존재 · master 교집합 0 · 필수필드 누락 0 · **한글 0** · `<table>` 0 · 주석 0 · sd-warn.
+- 게이트(전건): 번역 그룹당 1건 · ko canonical 예상수 존재 · master 교집합 0 · 필수필드 누락 0 · **한글 0** · `<table>` 0 · 주석 0 · sd-warn · **(Grounded Upgrade) target∩out-of-scope=0 · 예상 target 수==persist 수, 불일치 ABORT(§0-C-2)**.
 
 ---
 
