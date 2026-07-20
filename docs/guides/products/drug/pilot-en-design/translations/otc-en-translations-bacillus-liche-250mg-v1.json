@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "동일 약물(source_ref_id 022f4af0) out56 8건이 이미 en canonical(md5 377e7f4ca23fc4846b7cd401bbf31f7b)로 LIVE. 본 번역은 그 검토완료 en 을 재구성해 56 target 에 확장한다(새 medical fact 0, 약물 전체 en 일관성). 빌드 결과가 live 8 en 과 byte-identical 임을 스크립트가 게이트로 증명한다.",
+  "translations": [
+    {
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "title": "Bacillus licheniformis 250 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden and long-lasting bowel inflammation, sudden and long-lasting diarrhoea, sudden dysentery, and abnormal fermentation in the bowel from various causes.",
+      "usage": "Adults take two capsules three times a day (four capsules for the first dose). Children take one capsule three times a day. For infants, the contents of the capsule may be mixed with a small amount of water or milk.",
+      "caution": "Talk to a pharmacist before giving this to a baby under 3 months old. Talk to a pharmacist if it is taken together with certain antibiotics such as ciprofloxacin. Get advice if the diarrhoea lasts a long time or comes with a fever or blood in the stool.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bacillus licheniformis 250 mg",
+        "How it works": "Settles the gut (improves the balance of gut bacteria)",
+        "Main symptoms": "Sudden and long-lasting bowel inflammation, diarrhoea, abnormal fermentation in the bowel",
+        "Who should be careful": "Babies under 3 months",
+        "Why this one": "A live-culture treatment that helps balance the gut"
+      }
+    }
+  ],
+  "summary": "Sudden and long-lasting bowel inflammation, diarrhoea, abnormal fermentation in the bowel"
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 56,
+  "targetMasters": 56,
+  "anomalies": [],
+  "koCanonical": 56,
+  "existingEnAny": 56,
+  "existingEnCanonical": 56,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "377e7f4ca23fc4846b7cd401bbf31f7b",
+      "n": 8
+    }
+  ],
+  "builtLen": 2564,
+  "builtMd5": "377e7f4ca23fc4846b7cd401bbf31f7b",
+  "consistencyMatch": true,
+  "summaryField": "Sudden and long-lasting bowel inflammation, diarrhoea, abnormal fermentation in the bowel",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 56,
+    "STEP2_en_canonical_flip": 56,
+    "en_write_total": 112
+  },
+  "enTargetMd5": "377e7f4ca23fc4846b7cd401bbf31f7b",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(377e7f4ca23fc4846b7cd401bbf31f7b) — write 0, 정상 종료"
+}
