@@ -208,9 +208,15 @@ async function evaluate(ds: any, e: Entry): Promise<any> {
   const enReuseFeasible = reusableEnFromRef > 0 && reusableEnMd5Count === 1;
 
   const reproduced = target.length === bridge_n;
-  const authoredNrInsert = masterIds.length - existingNr;
-  const koWriteTotal = authoredNrInsert + masterIds.length + masterIds.length + masterIds.length; // ~= target×4
-  const enWriteTarget = masterIds.length - enCanonical;
+  // 정본 write 산식 (coordinator 확정): T = target master 수
+  //   ko = 4T : authored needs_review INSERT + easy demote + authored canonical flip + audit
+  //   en = 2T : en needs_review INSERT + en canonical flip
+  //   총  = 6T
+  const T = masterIds.length;
+  const authoredNrInsert = T;
+  const koWriteTotal = 4 * T;
+  const enNrInsert = T, enCanonFlip = T;
+  const enWriteTarget = 2 * T;
 
   const reasons: string[] = [];
   if (sensitive) reasons.push('민감 약효군');
@@ -235,8 +241,10 @@ async function evaluate(ds: any, e: Entry): Promise<any> {
     sensitive, authored_source_ref_id: authoredSourceRef, authored_draft_count: draftCount,
     source_ref_scope: { masters_sharing_ref: refScopeMasters, out_of_target_total: refOutOfTarget.length, out_same_group_already_applied: outSameGroup, out_cross_group_leak: outCrossGroup, cross_group_samples: crossGroupSamples, scope_separable: outCrossGroup === 0 },
     existing_en: { masters_with_en: mastersWithEn, en_canonical: enCanonical, en_needs_review: enNeedsReview, reusable_reviewed_en_from_ref: reusableEnFromRef, reusable_en_distinct_md5: reusableEnMd5Count, byte_identical_en_reuse_feasible: enReuseFeasible },
-    expected_ko_write: { STEP_A_authored_needs_review_INSERT: authoredNrInsert, STEP_B_easy_canonical_demote: masterIds.length, STEP_B_authored_canonical_flip: masterIds.length, audit_canonical_replaced: masterIds.length, ko_total: koWriteTotal },
-    expected_en_write: { target_masters_needing_en: enWriteTarget },
+    write_formula: 'ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T',
+    target_T: T,
+    expected_ko_write: { STEP_A_authored_needs_review_INSERT: authoredNrInsert, STEP_B_easy_canonical_demote: T, STEP_B_authored_canonical_flip: T, audit_canonical_replaced: T, ko_total: koWriteTotal },
+    expected_en_write: { en_needs_review_INSERT: enNrInsert, en_canonical_flip: enCanonFlip, en_total: enWriteTarget },
     total_write: koWriteTotal + enWriteTarget,
     stop_reason: reasons,
     target_master_ids: masterIds,
@@ -294,7 +302,7 @@ async function main(): Promise<void> {
   const forBundling = [...readySorted].sort((a, b) => b.total_write - a.total_write || (a.groupKey < b.groupKey ? -1 : 1));
   const bundleGa: any[] = [], bundleDa: any[] = []; let sumGa = 0, sumDa = 0;
   for (const r of forBundling) {
-    const item = { groupKey: r.groupKey, target: r.target_master, ko: r.expected_ko_write.ko_total, en: r.expected_en_write.target_masters_needing_en, total: r.total_write, zeroExclude: r.exclude_nonTarget === 0 };
+    const item = { groupKey: r.groupKey, target: r.target_master, ko: r.expected_ko_write.ko_total, en: r.expected_en_write.en_total, total: r.total_write, zeroExclude: r.exclude_nonTarget === 0 };
     if ((sumGa <= sumDa && bundleGa.length < 4) || bundleDa.length >= 4) { bundleGa.push(item); sumGa += r.total_write; }
     else { bundleDa.push(item); sumDa += r.total_write; }
   }
@@ -310,7 +318,14 @@ async function main(): Promise<void> {
     excludedGroupKeys: [...EXCLUDE].sort(),
     skippedTopSample: skipped.filter((s) => s.reason.startsWith('empty')).sort((a, b) => (b.bridge_n || 0) - (a.bridge_n || 0)).slice(0, 8),
     candidates_examined: examined,
-    ready_selected: readySorted.map((r) => ({ order: r.recommended_run_order, groupKey: r.groupKey, targetFp: r.bridgeFp, target: r.target_master, exclude: r.exclude_nonTarget, ko: r.expected_ko_write.ko_total, en: r.expected_en_write.target_masters_needing_en, total: r.total_write, source_ref_id: r.authored_source_ref_id, reusable_en: r.existing_en.reusable_reviewed_en_from_ref, en_reuse_feasible: r.existing_en.byte_identical_en_reuse_feasible })),
+    write_formula: 'T=target master 수 · ko=4T · en=2T · total=6T',
+    grand_totals: {
+      target_T: readySorted.reduce((a, r) => a + r.target_master, 0),
+      ko: readySorted.reduce((a, r) => a + r.expected_ko_write.ko_total, 0),
+      en: readySorted.reduce((a, r) => a + r.expected_en_write.en_total, 0),
+      total: readySorted.reduce((a, r) => a + r.total_write, 0),
+    },
+    ready_selected: readySorted.map((r) => ({ order: r.recommended_run_order, groupKey: r.groupKey, targetFp: r.bridgeFp, target: r.target_master, exclude: r.exclude_nonTarget, ko: r.expected_ko_write.ko_total, en: r.expected_en_write.en_total, total: r.total_write, source_ref_id: r.authored_source_ref_id, reusable_en: r.existing_en.reusable_reviewed_en_from_ref, en_reuse_feasible: r.existing_en.byte_identical_en_reuse_feasible })),
     bundles: {
       에이전트가: { groups: bundleGa, group_count: bundleGa.length, total_write: sumGa },
       에이전트다: { groups: bundleDa, group_count: bundleDa.length, total_write: sumDa },
@@ -326,7 +341,8 @@ async function main(): Promise<void> {
   console.log('JSON_SUMMARY_BEGIN');
   console.log(JSON.stringify({
     poolSize: pool.length, examined: examined.length, summary: out.summary,
-    examined_lines: examined.map((c) => `${c.verdict} | ${c.groupKey} [fp ${c.bridgeFp}] target ${c.target_master}/bridge ${c.bridge_n} coarse ${c.coarseTotal} exclude ${c.exclude_nonTarget}${JSON.stringify(c.excludeFormBreak)} easy1 ${c.easyCanonicalExactly1} 충돌 ${c.authoredConflict} nr ${c.existingAuthoredNeedsReview} ref ${c.authored_source_ref_id ? c.authored_source_ref_id.slice(0, 8) : 'none'} refScope ${c.source_ref_scope.masters_sharing_ref}(same ${c.source_ref_scope.out_same_group_already_applied}/cross ${c.source_ref_scope.out_cross_group_leak}) reuseEN ${c.existing_en.reusable_reviewed_en_from_ref}(md5 ${c.existing_en.reusable_en_distinct_md5},feasible ${c.existing_en.byte_identical_en_reuse_feasible}) ko ${c.expected_ko_write.ko_total} en ${c.expected_en_write.target_masters_needing_en}${c.stop_reason.length ? ' STOP:' + c.stop_reason.join(';') : ''}`),
+    examined_lines: examined.map((c) => `${c.verdict} | ${c.groupKey} [fp ${c.bridgeFp}] target ${c.target_master}/bridge ${c.bridge_n} coarse ${c.coarseTotal} exclude ${c.exclude_nonTarget}${JSON.stringify(c.excludeFormBreak)} easy1 ${c.easyCanonicalExactly1} 충돌 ${c.authoredConflict} nr ${c.existingAuthoredNeedsReview} ref ${c.authored_source_ref_id ? c.authored_source_ref_id.slice(0, 8) : 'none'} refScope ${c.source_ref_scope.masters_sharing_ref}(same ${c.source_ref_scope.out_same_group_already_applied}/cross ${c.source_ref_scope.out_cross_group_leak}) reuseEN ${c.existing_en.reusable_reviewed_en_from_ref}(md5 ${c.existing_en.reusable_en_distinct_md5},feasible ${c.existing_en.byte_identical_en_reuse_feasible}) ko ${c.expected_ko_write.ko_total} en ${c.expected_en_write.en_total} total ${c.total_write}${c.stop_reason.length ? ' STOP:' + c.stop_reason.join(';') : ''}`),
+    grand_totals: out.grand_totals,
     ready_selected: out.ready_selected,
     bundles: out.bundles,
   }, null, 2));

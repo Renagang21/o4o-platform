@@ -129,6 +129,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 13,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 13,
         "STEP_B_easy_canonical_demote": 13,
@@ -137,9 +139,11 @@
         "ko_total": 52
       },
       "expected_en_write": {
-        "target_masters_needing_en": 13
+        "en_needs_review_INSERT": 13,
+        "en_canonical_flip": 13,
+        "en_total": 26
       },
-      "total_write": 65,
+      "total_write": 78,
       "stop_reason": [],
       "target_master_ids": [
         "0f13a9a8-1425-490a-8d42-073ca3aa053f",
@@ -290,6 +294,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 13,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 13,
         "STEP_B_easy_canonical_demote": 13,
@@ -298,9 +304,11 @@
         "ko_total": 52
       },
       "expected_en_write": {
-        "target_masters_needing_en": 13
+        "en_needs_review_INSERT": 13,
+        "en_canonical_flip": 13,
+        "en_total": 26
       },
-      "total_write": 65,
+      "total_write": 78,
       "stop_reason": [],
       "target_master_ids": [
         "00e091f9-792c-419e-9397-9355d616aff4",
@@ -419,6 +427,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 12,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 12,
         "STEP_B_easy_canonical_demote": 12,
@@ -427,9 +437,11 @@
         "ko_total": 48
       },
       "expected_en_write": {
-        "target_masters_needing_en": 12
+        "en_needs_review_INSERT": 12,
+        "en_canonical_flip": 12,
+        "en_total": 24
       },
-      "total_write": 60,
+      "total_write": 72,
       "stop_reason": [],
       "target_master_ids": [
         "0b00f16b-ed31-42ac-a627-8b0def9d4194",
@@ -520,6 +532,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 10,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 10,
         "STEP_B_easy_canonical_demote": 10,
@@ -528,9 +542,11 @@
         "ko_total": 40
       },
       "expected_en_write": {
-        "target_masters_needing_en": 10
+        "en_needs_review_INSERT": 10,
+        "en_canonical_flip": 10,
+        "en_total": 20
       },
-      "total_write": 50,
+      "total_write": 60,
       "stop_reason": [],
       "target_master_ids": [
         "00ea8449-b6a4-4fde-bd12-1c15bbe020a0",
@@ -651,6 +667,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 9,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 9,
         "STEP_B_easy_canonical_demote": 9,
@@ -659,9 +677,11 @@
         "ko_total": 36
       },
       "expected_en_write": {
-        "target_masters_needing_en": 9
+        "en_needs_review_INSERT": 9,
+        "en_canonical_flip": 9,
+        "en_total": 18
       },
-      "total_write": 45,
+      "total_write": 54,
       "stop_reason": [],
       "target_master_ids": [
         "063ab12e-a4a2-4cb8-acab-fedc30262096",
@@ -764,6 +784,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 9,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 9,
         "STEP_B_easy_canonical_demote": 9,
@@ -772,9 +794,11 @@
         "ko_total": 36
       },
       "expected_en_write": {
-        "target_masters_needing_en": 9
+        "en_needs_review_INSERT": 9,
+        "en_canonical_flip": 9,
+        "en_total": 18
       },
-      "total_write": 45,
+      "total_write": 54,
       "stop_reason": [],
       "target_master_ids": [
         "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
@@ -877,6 +901,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 9,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 9,
         "STEP_B_easy_canonical_demote": 9,
@@ -885,9 +911,11 @@
         "ko_total": 36
       },
       "expected_en_write": {
-        "target_masters_needing_en": 9
+        "en_needs_review_INSERT": 9,
+        "en_canonical_flip": 9,
+        "en_total": 18
       },
-      "total_write": 45,
+      "total_write": 54,
       "stop_reason": [],
       "target_master_ids": [
         "11b3d1f7-83de-455e-9b87-193f3a6a7eed",
@@ -1126,6 +1154,8 @@
         "reusable_en_distinct_md5": 1,
         "byte_identical_en_reuse_feasible": true
       },
+      "write_formula": "ko=4T (authored NR INSERT + easy demote + authored flip + audit) · en=2T (en NR INSERT + en canonical flip) · total=6T",
+      "target_T": 8,
       "expected_ko_write": {
         "STEP_A_authored_needs_review_INSERT": 8,
         "STEP_B_easy_canonical_demote": 8,
@@ -1134,9 +1164,11 @@
         "ko_total": 32
       },
       "expected_en_write": {
-        "target_masters_needing_en": 8
+        "en_needs_review_INSERT": 8,
+        "en_canonical_flip": 8,
+        "en_total": 16
       },
-      "total_write": 40,
+      "total_write": 48,
       "stop_reason": [],
       "target_master_ids": [
         "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
@@ -1161,6 +1193,13 @@
       "recommended_run_order": 8
     }
   ],
+  "write_formula": "T=target master 수 · ko=4T · en=2T · total=6T",
+  "grand_totals": {
+    "target_T": 83,
+    "ko": 332,
+    "en": 166,
+    "total": 498
+  },
   "ready_selected": [
     {
       "order": 1,
@@ -1169,8 +1208,8 @@
       "target": 13,
       "exclude": 0,
       "ko": 52,
-      "en": 13,
-      "total": 65,
+      "en": 26,
+      "total": 78,
       "source_ref_id": "177466cf-a57b-4381-b1ff-44bc87c12673",
       "reusable_en": 13,
       "en_reuse_feasible": true
@@ -1182,8 +1221,8 @@
       "target": 13,
       "exclude": 26,
       "ko": 52,
-      "en": 13,
-      "total": 65,
+      "en": 26,
+      "total": 78,
       "source_ref_id": "0175e433-a171-44ec-b601-ad65a805171d",
       "reusable_en": 3,
       "en_reuse_feasible": true
@@ -1195,8 +1234,8 @@
       "target": 12,
       "exclude": 17,
       "ko": 48,
-      "en": 12,
-      "total": 60,
+      "en": 24,
+      "total": 72,
       "source_ref_id": "0436f0d8-3dbe-4939-b511-de3bcd69593c",
       "reusable_en": 21,
       "en_reuse_feasible": true
@@ -1208,8 +1247,8 @@
       "target": 10,
       "exclude": 0,
       "ko": 40,
-      "en": 10,
-      "total": 50,
+      "en": 20,
+      "total": 60,
       "source_ref_id": "0908968f-30c8-4c9b-95ed-5631212adbc9",
       "reusable_en": 10,
       "en_reuse_feasible": true
@@ -1221,8 +1260,8 @@
       "target": 9,
       "exclude": 12,
       "ko": 36,
-      "en": 9,
-      "total": 45,
+      "en": 18,
+      "total": 54,
       "source_ref_id": "0d2b2ef8-cce5-4771-9ed7-159fd10c1715",
       "reusable_en": 4,
       "en_reuse_feasible": true
@@ -1234,8 +1273,8 @@
       "target": 9,
       "exclude": 9,
       "ko": 36,
-      "en": 9,
-      "total": 45,
+      "en": 18,
+      "total": 54,
       "source_ref_id": "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4",
       "reusable_en": 3,
       "en_reuse_feasible": true
@@ -1247,8 +1286,8 @@
       "target": 9,
       "exclude": 9,
       "ko": 36,
-      "en": 9,
-      "total": 45,
+      "en": 18,
+      "total": 54,
       "source_ref_id": "068e2176-ee92-4e94-a47d-2dc632bacf53",
       "reusable_en": 8,
       "en_reuse_feasible": true
@@ -1260,8 +1299,8 @@
       "target": 8,
       "exclude": 88,
       "ko": 32,
-      "en": 8,
-      "total": 40,
+      "en": 16,
+      "total": 48,
       "source_ref_id": "006f1a2b-f1f7-40a6-ac10-7f0093a150a1",
       "reusable_en": 40,
       "en_reuse_feasible": true
@@ -1274,37 +1313,37 @@
           "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
           "target": 13,
           "ko": 52,
-          "en": 13,
-          "total": 65,
+          "en": 26,
+          "total": 78,
           "zeroExclude": true
         },
         {
           "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
           "target": 12,
           "ko": 48,
-          "en": 12,
-          "total": 60,
+          "en": 24,
+          "total": 72,
           "zeroExclude": false
         },
         {
           "groupKey": "아세틸시스테인|100밀리그램|캡슐",
           "target": 9,
           "ko": 36,
-          "en": 9,
-          "total": 45,
+          "en": 18,
+          "total": 54,
           "zeroExclude": false
         },
         {
           "groupKey": "나프록센나트륨|275밀리그램|정",
           "target": 8,
           "ko": 32,
-          "en": 8,
-          "total": 40,
+          "en": 16,
+          "total": 48,
           "zeroExclude": false
         }
       ],
       "group_count": 4,
-      "total_write": 210
+      "total_write": 252
     },
     "에이전트다": {
       "groups": [
@@ -1312,37 +1351,37 @@
           "groupKey": "트리메부틴말레산염|200밀리그램|정",
           "target": 13,
           "ko": 52,
-          "en": 13,
-          "total": 65,
+          "en": 26,
+          "total": 78,
           "zeroExclude": false
         },
         {
           "groupKey": "메코발라민|500마이크로그램|캡슐",
           "target": 10,
           "ko": 40,
-          "en": 10,
-          "total": 50,
+          "en": 20,
+          "total": 60,
           "zeroExclude": true
         },
         {
           "groupKey": "덱스판테놀|100밀리그램|정",
           "target": 9,
           "ko": 36,
-          "en": 9,
-          "total": 45,
+          "en": 18,
+          "total": 54,
           "zeroExclude": false
         },
         {
           "groupKey": "폴산|1밀리그램|정",
           "target": 9,
           "ko": 36,
-          "en": 9,
-          "total": 45,
+          "en": 18,
+          "total": 54,
           "zeroExclude": false
         }
       ],
       "group_count": 4,
-      "total_write": 205
+      "total_write": 246
     }
   },
   "summary": {
