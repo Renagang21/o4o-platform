@@ -140,3 +140,14 @@
 - **dry-run(재확인) → apply(COMMIT, 승인)** → **독립검증(수정 verifier)** PASS: appliedProducts 9 · totalWrites 36(masters 9·candidate UPDATE 9·SPD ko9+en9) · canonicalDup 0 · candidateLinks 9 · spdRefLinks 18 · **existingTotal 554 · totalComboLive 563**(verifier 자체가 정확 집계 — 직접카운트 불요). tag `batch:single-nutrient-g10-b126-vc-zn`. rollback manifest 저장.
 - **복합형 누적 554 → 563**. g10 slug 도 `combo-` 비접두 → verifier `COMBO_NONPREFIXED_TAGS` 에 `batch:single-nutrient-g10-b126-vc-zn` **추가 완료**(baseline 21태그, g13 재검증 totalComboLive 563 확인). 향후 신규 복합형은 slug `combo-` 접두 권장(allowlist 확장 불요).
 - **다음**: #4 N7 밀크씨슬+B군+아연(READY_WITH_HOLD 9/22, 저수율) — 선택. lut-va `PAUSED_GROUP_DEFECT` 유지.
+
+### higher-N V2 큐 마지막 선택배치 LIVE (Agent B) — #4 N7 밀크씨슬+B군+아연 9건
+
+- 기준·검수: Agent A V2 #4, READY_WITH_HOLD 9/22(저수율 선택).
+- **대상 정제**: select 실측 mention 154 · **ELIGIBLE 9**(Agent A와 정확 일치) · grounding HOLD 22 + HOLD_MULTI 123. HOLD∩target overlap 0. 신규 원료/basis/제형 0(tablet 6·softgel 3). B12 부재 → Guard 무이슈.
+- **generate**: 작성 9 · PASS 8 · REVIEW 1(D-CLAIM-GROUNDED-002 코팅정제 known-safe) · BLOCKED 0 · G-MULTI HOLD 0.
+- **dry-run → apply(COMMIT, 승인)** → **독립검증(수정 verifier)** PASS: appliedProducts 9 · totalWrites 36(masters 9·candidate UPDATE 9·SPD ko9+en9) · canonicalDup 0 · candidateLinks 9 · spdRefLinks 18 · **existingTotal 563 · totalComboLive 572**. tag `batch:single-nutrient-h4-ms-na-b126-zn-panto`. verifier allowlist 에 h4 추가(baseline 22태그, g10 재검증 572 확인). rollback manifest 저장.
+- **복합형 누적 563 → 572**.
+- **higher-N 생산 라인 종료**: Agent A V1/V2 검수 주요·선택 그룹 전부 소진(N5 20·N8 43·N6 28·#9 17·#11 15·G13 10·G10 9·#4 9 = Agent B 신규 151, combo14 421 → **572**). 잔여는 아래 2축으로 분리.
+  1. **HOLD 교정 트랙**: #11 stmt 2020000997275 칼슘 basis 오기(공식 표시사항 확보 후) · lut-va(lu-va 7) `PAUSED_GROUP_DEFECT` 그룹 결함.
+  2. **신규 후보 재탐색 트랙**: 기존 인벤토리 밖 추가 조합 · 신규 원료·basis 필요 그룹(Agent A 신규 검수 필요).

@@ -55,7 +55,8 @@ Agent B 권장 순서(통합): #9(17) → #11(16) → G13(10) → #4(9,선택) �
 - **#11 mg+vd+vk+zn+ca(N5) 15건 LIVE**(2026-07-20). select ELIGIBLE 16 → generate 표준 Guard에서 **1건 정당 HOLD**(stmt 2020000997275, 원문 basis 오기 `칼슘 1,1500mg`, `PRE-SRC-BASIS-MISMATCH-002` — 데이터 결함, 오탐 아님, 후속 원문 교정 대기) → target 15. generate PASS 15·REVIEW 0·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 60 → apply COMMIT → 독립검증 PASS(기존 529 무변경). **복합형 529 → 544**(직접 카운트). tag `batch:single-nutrient-mg-vd-vk-zn-ca`. 상세: 상위 WO §6 "higher-N V2 큐 2순위 LIVE".
 - **G13 6미네랄(N6) 10건 LIVE**(2026-07-20). select ELIGIBLE **10**·grounding HOLD 2(검수 정확 일치, near-clean). generate PASS 9·REVIEW 1(코팅정제)·BLOCKED 0·G-MULTI HOLD 0(basis 오기 0). dry-run 예상=실측 40 → apply COMMIT → 독립검증 PASS(기존 544 무변경). **복합형 544 → 554**(직접 카운트). tag `batch:single-nutrient-g13-6mineral`. 상세: 상위 WO §6 "higher-N V2 큐 3순위 LIVE".
 - **G10 B군+비타민C+아연(N5) 9건 LIVE**(2026-07-20). select ELIGIBLE **9**·grounding HOLD 7(검수 정확 일치). generate PASS 8·REVIEW 1·BLOCKED 0·G-MULTI HOLD 0. REVIEW 1(면역건강365, `PRE-SRC-BASIS-UNVERIFIABLE-003`)은 basis 500mg·value·ratio 원문 verbatim 일치 확인 → known-safe 포함(#11 오기 BLOCKED와 성격 다름). dry-run 예상=실측 36 → apply COMMIT → 독립검증(수정 verifier) PASS(totalComboLive 563). **복합형 554 → 563**. tag `batch:single-nutrient-g10-b126-vc-zn`. 상세: 상위 WO §6.
-- 다음: 저수율 선택 #4(N7, 9/22). higher-N 주요 그룹 소진, 잔여는 선택 그룹만.
+- **#4 N7 밀크씨슬+B군+아연 9건 LIVE**(2026-07-20). select ELIGIBLE **9**·grounding HOLD 22(검수 정확 일치). generate PASS 8·REVIEW 1(코팅정제 known-safe)·BLOCKED 0·G-MULTI HOLD 0. dry-run 예상=실측 36 → apply COMMIT → 독립검증 PASS(totalComboLive 572). **복합형 563 → 572**. tag `batch:single-nutrient-h4-ms-na-b126-zn-panto`. 상세: 상위 WO §6.
+- **higher-N 생산 라인 종료**(주요+선택 전부 소진). 잔여 2축: HOLD 교정(#11 칼슘 basis·lut-va) / 신규 후보 재탐색(Agent A 신규 검수).
 중지 사유: 없음
 ```
 
