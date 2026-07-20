@@ -1,0 +1,1354 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-NEXT-BATCH-8-AUDIT-NA-V1",
+  "agent": "나",
+  "readOnly": true,
+  "dbWrite": 0,
+  "track": "A (grounded upgrade: e약은요 STORE ko canonical → authored canonical 교체 + EN 동반)",
+  "basis": "bridge authored그대로확장 fp-entry walk(bridge_n desc) — 완료/진행+pilot+민감+비경구+empty-ingredient 제외, NEXT-5 gate VERBATIM",
+  "generatedAt_note": "deterministic — no timestamps (byte-stable)",
+  "poolSize": 39,
+  "examinedCount": 8,
+  "wantReady": 8,
+  "excludedGroupKeys": [
+    "나프록센|250밀리그램|연질캡슐",
+    "니자티딘|75밀리그램|정",
+    "디오스민|300밀리그램|캡슐",
+    "로라타딘|10밀리그램|정",
+    "바실루스리케니포르미스균|250밀리그램|캡슐",
+    "브로멜라인|100밀리그램|정",
+    "소브레롤|200밀리그램|캡슐",
+    "아세트아미노펜|325밀리그램|연질캡슐",
+    "알마게이트|500밀리그램|정",
+    "알벤다졸|400밀리그램|정",
+    "에르도스테인|300밀리그램|정",
+    "엘카르니틴|330밀리그램|정",
+    "클로닉신리시네이트|125밀리그램|연질캡슐",
+    "클로닉신리시네이트|125밀리그램|정",
+    "트리메부틴말레산염|100밀리그램|정",
+    "트리메부틴말레산염|150밀리그램|정"
+  ],
+  "skippedTopSample": [
+    {
+      "groupKey": "|475밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 21
+    },
+    {
+      "groupKey": "|800밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 9
+    },
+    {
+      "groupKey": "|618.56밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 8
+    },
+    {
+      "groupKey": "|250밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 8
+    },
+    {
+      "groupKey": "|50밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 8
+    },
+    {
+      "groupKey": "|750밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 7
+    },
+    {
+      "groupKey": "|5밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 7
+    },
+    {
+      "groupKey": "|250밀리그램|정",
+      "reason": "empty-ingredient(다성분 콤보 — coarse-by-(ingredient) 부적용)",
+      "bridge_n": 7
+    }
+  ],
+  "candidates_examined": [
+    {
+      "verdict": "READY",
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "pharmKey": "ing:락토바실루스아시도필루스균|300밀리그램|캡슐|oral",
+      "sample": "락토필캡슐300밀리그램(락토바실루스아시도필루스균)",
+      "atc": "A07FA01",
+      "bridgeFp": "4ec78870b3318967",
+      "bridge_n": 13,
+      "coarseTotal": 13,
+      "target_master": 13,
+      "target_reproduced": true,
+      "exclude_nonTarget": 0,
+      "excludeFormBreak": {},
+      "fpDistribution": [
+        {
+          "fp": "4ec78870b3318967",
+          "n": 13,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+          "target": true
+        }
+      ],
+      "easyCanonicalExactly1": 13,
+      "easyCanonicalTotal": 13,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "300밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "177466cf-a57b-4381-b1ff-44bc87c12673",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 13,
+        "out_of_target_total": 13,
+        "out_same_group_already_applied": 13,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 13,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 13,
+        "STEP_B_easy_canonical_demote": 13,
+        "STEP_B_authored_canonical_flip": 13,
+        "audit_canonical_replaced": 13,
+        "ko_total": 52
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 13
+      },
+      "total_write": 65,
+      "stop_reason": [],
+      "target_master_ids": [
+        "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+        "1131564e-2600-4385-9c29-57d38148324b",
+        "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+        "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+        "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+        "416d87fa-0847-460e-982d-f12386710bdc",
+        "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+        "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+        "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+        "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+        "bf138001-0f2b-4814-bd2e-df1827108516",
+        "cea084b4-06fd-467f-af9a-182dc47d7a64",
+        "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d"
+      ],
+      "rollback_master_ids": [
+        "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+        "1131564e-2600-4385-9c29-57d38148324b",
+        "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+        "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+        "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+        "416d87fa-0847-460e-982d-f12386710bdc",
+        "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+        "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+        "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+        "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+        "bf138001-0f2b-4814-bd2e-df1827108516",
+        "cea084b4-06fd-467f-af9a-182dc47d7a64",
+        "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d"
+      ],
+      "recommended_run_order": 1
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "pharmKey": "ing:트리메부틴말레산염|200밀리그램|정|oral",
+      "sample": "트리마정200밀리그램(트리메부틴말레산염)",
+      "atc": "A03AA05",
+      "bridgeFp": "559c4ffae3658ec7",
+      "bridge_n": 13,
+      "coarseTotal": 39,
+      "target_master": 13,
+      "target_reproduced": true,
+      "exclude_nonTarget": 26,
+      "excludeFormBreak": {
+        "정": 26
+      },
+      "fpDistribution": [
+        {
+          "fp": "559c4ffae3658ec7",
+          "n": 13,
+          "form": "정",
+          "route": "oral",
+          "sample": "트리마정200밀리그램(트리메부틴말레산염)",
+          "target": true
+        },
+        {
+          "fp": "f17325f333c26450",
+          "n": 9,
+          "form": "정",
+          "route": "oral",
+          "sample": "트리부틴정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "c9fa109aceee2ef9",
+          "n": 7,
+          "form": "정",
+          "route": "oral",
+          "sample": "리부트정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "082b8090363bd2bd",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "바로부틴정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "2015f1b8688204bf",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "트라부틴정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "4b2fc042e06b43ce",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "제이부틴더블정(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "55cc4180bcad2033",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "쓰담정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        },
+        {
+          "fp": "ad3da743a3eef800",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "트리싹정200밀리그램(트리메부틴말레산염)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 13,
+      "easyCanonicalTotal": 13,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "200밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "0175e433-a171-44ec-b601-ad65a805171d",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 3,
+        "out_of_target_total": 3,
+        "out_same_group_already_applied": 3,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 3,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 13,
+        "STEP_B_easy_canonical_demote": 13,
+        "STEP_B_authored_canonical_flip": 13,
+        "audit_canonical_replaced": 13,
+        "ko_total": 52
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 13
+      },
+      "total_write": 65,
+      "stop_reason": [],
+      "target_master_ids": [
+        "00e091f9-792c-419e-9397-9355d616aff4",
+        "100fb0f4-278f-4238-b74e-62858560acd0",
+        "2529fdd4-1780-482a-a2c2-dbf45ce274c9",
+        "37a0fa73-6b5b-4e1b-b10f-fb361e959b34",
+        "37d703a6-b068-4d0c-ba2b-4b14ae7b1ef7",
+        "4b9e6c8d-d9e7-4949-881a-5f6448963bf9",
+        "5e399f90-ad85-4277-b927-0708cae4b4f7",
+        "76737d0a-a0e1-435c-842d-f33fd0512bf7",
+        "83e6b6cb-6986-4772-bdca-5ba05e1ae192",
+        "cc180d7c-00dc-48ec-8a54-a5334a847470",
+        "dcc8629d-5db1-402a-9150-325747a3e0d8",
+        "e96bf36e-85f4-4b51-9914-221c184290d3",
+        "ef7a781e-1314-477a-b36f-f769766138d1"
+      ],
+      "rollback_master_ids": [
+        "00e091f9-792c-419e-9397-9355d616aff4",
+        "100fb0f4-278f-4238-b74e-62858560acd0",
+        "2529fdd4-1780-482a-a2c2-dbf45ce274c9",
+        "37a0fa73-6b5b-4e1b-b10f-fb361e959b34",
+        "37d703a6-b068-4d0c-ba2b-4b14ae7b1ef7",
+        "4b9e6c8d-d9e7-4949-881a-5f6448963bf9",
+        "5e399f90-ad85-4277-b927-0708cae4b4f7",
+        "76737d0a-a0e1-435c-842d-f33fd0512bf7",
+        "83e6b6cb-6986-4772-bdca-5ba05e1ae192",
+        "cc180d7c-00dc-48ec-8a54-a5334a847470",
+        "dcc8629d-5db1-402a-9150-325747a3e0d8",
+        "e96bf36e-85f4-4b51-9914-221c184290d3",
+        "ef7a781e-1314-477a-b36f-f769766138d1"
+      ],
+      "recommended_run_order": 2
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "pharmKey": "ing:알파칼시돌|0.5마이크로그램|연질캡슐|oral",
+      "sample": "리치칼슘연질캡슐(알파칼시돌)",
+      "atc": "A11CC03",
+      "bridgeFp": "8ac89c4550d02b6d",
+      "bridge_n": 12,
+      "coarseTotal": 29,
+      "target_master": 12,
+      "target_reproduced": true,
+      "exclude_nonTarget": 17,
+      "excludeFormBreak": {
+        "연질캡슐": 17
+      },
+      "fpDistribution": [
+        {
+          "fp": "8ac89c4550d02b6d",
+          "n": 12,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "알파칼연질캡슐(알파칼시돌)",
+          "target": true
+        },
+        {
+          "fp": "8822d57a6053186c",
+          "n": 9,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "화니돌0.5마이크로그램연질캡슐(알파칼시돌)",
+          "target": false
+        },
+        {
+          "fp": "d981726c2fe54e53",
+          "n": 4,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+          "target": false
+        },
+        {
+          "fp": "e083a096a082c0c1",
+          "n": 4,
+          "form": "연질캡슐",
+          "route": "oral",
+          "sample": "알파디연질캡슐(알파칼시돌)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 12,
+      "easyCanonicalTotal": 12,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "연질캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "0.5마이크로그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "0436f0d8-3dbe-4939-b511-de3bcd69593c",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 21,
+        "out_of_target_total": 21,
+        "out_same_group_already_applied": 21,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 21,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 12,
+        "STEP_B_easy_canonical_demote": 12,
+        "STEP_B_authored_canonical_flip": 12,
+        "audit_canonical_replaced": 12,
+        "ko_total": 48
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 12
+      },
+      "total_write": 60,
+      "stop_reason": [],
+      "target_master_ids": [
+        "0b00f16b-ed31-42ac-a627-8b0def9d4194",
+        "250d5967-3dbd-49c3-b1f1-6b7919511ad3",
+        "260edf3f-0366-4e62-b344-8a231e2c410d",
+        "44e8ef9d-1661-441c-bb00-b3333153d37e",
+        "5374abc4-6a7b-4c2f-8040-3b33ce1e8194",
+        "54db584b-93dd-4c2e-9552-8359b32c6336",
+        "67e5dcba-79c2-4893-979a-1545a4600450",
+        "6b99ef51-b72f-4fc1-9fc0-c6c54def00a3",
+        "887b6b1c-61e5-44bc-a80d-791894a695fe",
+        "c4f79d90-6e55-4e6d-9d4b-9dc028739960",
+        "c76c16a4-9031-4fc8-b852-d18f82cca963",
+        "cc445659-1465-4229-aae7-eefcad435227"
+      ],
+      "rollback_master_ids": [
+        "0b00f16b-ed31-42ac-a627-8b0def9d4194",
+        "250d5967-3dbd-49c3-b1f1-6b7919511ad3",
+        "260edf3f-0366-4e62-b344-8a231e2c410d",
+        "44e8ef9d-1661-441c-bb00-b3333153d37e",
+        "5374abc4-6a7b-4c2f-8040-3b33ce1e8194",
+        "54db584b-93dd-4c2e-9552-8359b32c6336",
+        "67e5dcba-79c2-4893-979a-1545a4600450",
+        "6b99ef51-b72f-4fc1-9fc0-c6c54def00a3",
+        "887b6b1c-61e5-44bc-a80d-791894a695fe",
+        "c4f79d90-6e55-4e6d-9d4b-9dc028739960",
+        "c76c16a4-9031-4fc8-b852-d18f82cca963",
+        "cc445659-1465-4229-aae7-eefcad435227"
+      ],
+      "recommended_run_order": 3
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "pharmKey": "ing:메코발라민|500마이크로그램|캡슐|oral",
+      "sample": "메코민캡슐(메코발라민)",
+      "atc": "B03BA05",
+      "bridgeFp": "c6c4dcfbf46d229c",
+      "bridge_n": 10,
+      "coarseTotal": 10,
+      "target_master": 10,
+      "target_reproduced": true,
+      "exclude_nonTarget": 0,
+      "excludeFormBreak": {},
+      "fpDistribution": [
+        {
+          "fp": "c6c4dcfbf46d229c",
+          "n": 10,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "메코민캡슐(메코발라민)",
+          "target": true
+        }
+      ],
+      "easyCanonicalExactly1": 10,
+      "easyCanonicalTotal": 10,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "500마이크로그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "0908968f-30c8-4c9b-95ed-5631212adbc9",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 10,
+        "out_of_target_total": 10,
+        "out_same_group_already_applied": 10,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 10,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 10,
+        "STEP_B_easy_canonical_demote": 10,
+        "STEP_B_authored_canonical_flip": 10,
+        "audit_canonical_replaced": 10,
+        "ko_total": 40
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 10
+      },
+      "total_write": 50,
+      "stop_reason": [],
+      "target_master_ids": [
+        "00ea8449-b6a4-4fde-bd12-1c15bbe020a0",
+        "06fcb4a6-f4f4-4fb4-9cbf-0d543c46d4db",
+        "0a19707d-feb9-48a6-837b-0368b66bc6e0",
+        "29ce8ee3-6a06-4450-8291-26930e26944a",
+        "3e373437-5d17-4742-b783-69bb54a1bfdd",
+        "7b2601a2-9aa9-434b-bc8d-d3c895d856c5",
+        "9be6330a-fd75-4083-9d8e-39f04061e558",
+        "a6ea9799-8362-4891-9f15-353a62e1a806",
+        "afdfedd5-59de-473c-bb41-bea2ed68b722",
+        "d3af16ff-1b48-4731-932c-54713f423b40"
+      ],
+      "rollback_master_ids": [
+        "00ea8449-b6a4-4fde-bd12-1c15bbe020a0",
+        "06fcb4a6-f4f4-4fb4-9cbf-0d543c46d4db",
+        "0a19707d-feb9-48a6-837b-0368b66bc6e0",
+        "29ce8ee3-6a06-4450-8291-26930e26944a",
+        "3e373437-5d17-4742-b783-69bb54a1bfdd",
+        "7b2601a2-9aa9-434b-bc8d-d3c895d856c5",
+        "9be6330a-fd75-4083-9d8e-39f04061e558",
+        "a6ea9799-8362-4891-9f15-353a62e1a806",
+        "afdfedd5-59de-473c-bb41-bea2ed68b722",
+        "d3af16ff-1b48-4731-932c-54713f423b40"
+      ],
+      "recommended_run_order": 4
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "pharmKey": "ing:덱스판테놀|100밀리그램|정|oral",
+      "sample": "새로덱스정100밀리그램(덱스판테놀)",
+      "atc": "D11AX",
+      "bridgeFp": "37d1268f8f721dda",
+      "bridge_n": 9,
+      "coarseTotal": 21,
+      "target_master": 9,
+      "target_reproduced": true,
+      "exclude_nonTarget": 12,
+      "excludeFormBreak": {
+        "정": 12
+      },
+      "fpDistribution": [
+        {
+          "fp": "37d1268f8f721dda",
+          "n": 9,
+          "form": "정",
+          "route": "oral",
+          "sample": "덱스녹실정(덱스판테놀)",
+          "target": true
+        },
+        {
+          "fp": "6e082e14e7ab4380",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "다모판텐정100밀리그램(덱스판테놀)",
+          "target": false
+        },
+        {
+          "fp": "ed9a02f0aeed741d",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "알로판텐정100mg(덱스판테놀)",
+          "target": false
+        },
+        {
+          "fp": "b021fd203c757c36",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "케어모닉정100밀리그램(덱스판테놀)",
+          "target": false
+        },
+        {
+          "fp": "bd458ff8b113d9d1",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "판덱스정(덱스판테놀)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 9,
+      "easyCanonicalTotal": 9,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "100밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "0d2b2ef8-cce5-4771-9ed7-159fd10c1715",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 4,
+        "out_of_target_total": 4,
+        "out_same_group_already_applied": 4,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 4,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 9,
+        "STEP_B_easy_canonical_demote": 9,
+        "STEP_B_authored_canonical_flip": 9,
+        "audit_canonical_replaced": 9,
+        "ko_total": 36
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 9
+      },
+      "total_write": 45,
+      "stop_reason": [],
+      "target_master_ids": [
+        "063ab12e-a4a2-4cb8-acab-fedc30262096",
+        "0f740402-eca7-43b9-b95d-95c8bab346bc",
+        "646a78c0-b758-479b-95a7-b226644ddfb5",
+        "7b8903c0-a572-4c42-99fb-311f6dccac14",
+        "95f7bc4d-7f0d-4a00-a7d5-972efd48686e",
+        "b09ddb9e-73ff-4438-9a1c-a024b75eaaab",
+        "c773e96f-0b6c-430b-ac16-9bc877a0de13",
+        "cc226d8a-dd53-43a4-9ea6-2b9de3fb258f",
+        "f5802f4d-bb68-43e6-a9c8-ed58107454e0"
+      ],
+      "rollback_master_ids": [
+        "063ab12e-a4a2-4cb8-acab-fedc30262096",
+        "0f740402-eca7-43b9-b95d-95c8bab346bc",
+        "646a78c0-b758-479b-95a7-b226644ddfb5",
+        "7b8903c0-a572-4c42-99fb-311f6dccac14",
+        "95f7bc4d-7f0d-4a00-a7d5-972efd48686e",
+        "b09ddb9e-73ff-4438-9a1c-a024b75eaaab",
+        "c773e96f-0b6c-430b-ac16-9bc877a0de13",
+        "cc226d8a-dd53-43a4-9ea6-2b9de3fb258f",
+        "f5802f4d-bb68-43e6-a9c8-ed58107454e0"
+      ],
+      "recommended_run_order": 5
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "pharmKey": "ing:아세틸시스테인|100밀리그램|캡슐|oral",
+      "sample": "튜란트캡슐100밀리그램(아세틸시스테인)",
+      "atc": "R05CB01",
+      "bridgeFp": "41701ec292bc3fa6",
+      "bridge_n": 9,
+      "coarseTotal": 18,
+      "target_master": 9,
+      "target_reproduced": true,
+      "exclude_nonTarget": 9,
+      "excludeFormBreak": {
+        "캡슐": 9
+      },
+      "fpDistribution": [
+        {
+          "fp": "41701ec292bc3fa6",
+          "n": 9,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "뮤코스텐캡슐100밀리그램(아세틸시스테인)",
+          "target": true
+        },
+        {
+          "fp": "f868ae4a8e341fba",
+          "n": 6,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "뮤테란캡슐100밀리그램(아세틸시스테인)",
+          "target": false
+        },
+        {
+          "fp": "88c905bf4f255ccd",
+          "n": 3,
+          "form": "캡슐",
+          "route": "oral",
+          "sample": "뮤라텐캡슐100밀리그램(아세틸시스테인)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 9,
+      "easyCanonicalTotal": 9,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "캡슐"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "100밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 3,
+        "out_of_target_total": 3,
+        "out_same_group_already_applied": 3,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 3,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 9,
+        "STEP_B_easy_canonical_demote": 9,
+        "STEP_B_authored_canonical_flip": 9,
+        "audit_canonical_replaced": 9,
+        "ko_total": 36
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 9
+      },
+      "total_write": 45,
+      "stop_reason": [],
+      "target_master_ids": [
+        "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
+        "24cc1e70-feeb-4cb0-9c15-90eeef521301",
+        "4490855b-6fb0-4fe1-8402-7872be5775fd",
+        "5a46babe-a1aa-4edc-ad61-ebb52a20211c",
+        "812690a4-15ef-4798-9e8a-56d4aec8738a",
+        "aa4a5182-0f6b-4295-b64a-9d9fc0591c81",
+        "c52ee592-9df9-4b69-a040-e1f1437c09d1",
+        "d5bced50-d301-4386-b71e-15a805963eea",
+        "dde775af-35ee-48a7-80d3-ecf1f9abf801"
+      ],
+      "rollback_master_ids": [
+        "14c7a2fd-3fb9-4ae4-9546-f493d4167ad6",
+        "24cc1e70-feeb-4cb0-9c15-90eeef521301",
+        "4490855b-6fb0-4fe1-8402-7872be5775fd",
+        "5a46babe-a1aa-4edc-ad61-ebb52a20211c",
+        "812690a4-15ef-4798-9e8a-56d4aec8738a",
+        "aa4a5182-0f6b-4295-b64a-9d9fc0591c81",
+        "c52ee592-9df9-4b69-a040-e1f1437c09d1",
+        "d5bced50-d301-4386-b71e-15a805963eea",
+        "dde775af-35ee-48a7-80d3-ecf1f9abf801"
+      ],
+      "recommended_run_order": 6
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "폴산|1밀리그램|정",
+      "pharmKey": "ing:폴산|1밀리그램|정|oral",
+      "sample": "폴레디정(폴산)",
+      "atc": "B03BB01",
+      "bridgeFp": "cb05e790cbe3b054",
+      "bridge_n": 9,
+      "coarseTotal": 18,
+      "target_master": 9,
+      "target_reproduced": true,
+      "exclude_nonTarget": 9,
+      "excludeFormBreak": {
+        "정": 9
+      },
+      "fpDistribution": [
+        {
+          "fp": "cb05e790cbe3b054",
+          "n": 9,
+          "form": "정",
+          "route": "oral",
+          "sample": "폴가정(폴산)",
+          "target": true
+        },
+        {
+          "fp": "2e23851a06e1b65e",
+          "n": 7,
+          "form": "정",
+          "route": "oral",
+          "sample": "폴시드정(폴산)",
+          "target": false
+        },
+        {
+          "fp": "404be54966089625",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "폴스원정(폴산)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 9,
+      "easyCanonicalTotal": 9,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "1밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "068e2176-ee92-4e94-a47d-2dc632bacf53",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 8,
+        "out_of_target_total": 8,
+        "out_same_group_already_applied": 8,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 8,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 9,
+        "STEP_B_easy_canonical_demote": 9,
+        "STEP_B_authored_canonical_flip": 9,
+        "audit_canonical_replaced": 9,
+        "ko_total": 36
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 9
+      },
+      "total_write": 45,
+      "stop_reason": [],
+      "target_master_ids": [
+        "11b3d1f7-83de-455e-9b87-193f3a6a7eed",
+        "200d81fa-9075-4aec-99b5-a6ea3009b65f",
+        "39be241e-a132-4e7d-8664-87c8525fbcc9",
+        "71ff03ef-719e-4bc2-b66f-fd172d0e6931",
+        "7b06b043-0d7f-4c76-9ca5-8e46622a7486",
+        "c278e379-3e66-4028-822a-9cb4592e0f98",
+        "c5e1a39d-e1e0-4590-aaae-383633f0bfb7",
+        "de306f3b-63bf-4152-a2f7-d55b795a9c3a",
+        "f5f56a62-f29b-4801-8d97-083a5cf66365"
+      ],
+      "rollback_master_ids": [
+        "11b3d1f7-83de-455e-9b87-193f3a6a7eed",
+        "200d81fa-9075-4aec-99b5-a6ea3009b65f",
+        "39be241e-a132-4e7d-8664-87c8525fbcc9",
+        "71ff03ef-719e-4bc2-b66f-fd172d0e6931",
+        "7b06b043-0d7f-4c76-9ca5-8e46622a7486",
+        "c278e379-3e66-4028-822a-9cb4592e0f98",
+        "c5e1a39d-e1e0-4590-aaae-383633f0bfb7",
+        "de306f3b-63bf-4152-a2f7-d55b795a9c3a",
+        "f5f56a62-f29b-4801-8d97-083a5cf66365"
+      ],
+      "recommended_run_order": 7
+    },
+    {
+      "verdict": "READY",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "pharmKey": "ing:나프록센나트륨|275밀리그램|정|oral",
+      "sample": "나로펜정(나프록센나트륨)",
+      "atc": "M01AE02",
+      "bridgeFp": "124cccc95fde01af",
+      "bridge_n": 8,
+      "coarseTotal": 96,
+      "target_master": 8,
+      "target_reproduced": true,
+      "exclude_nonTarget": 88,
+      "excludeFormBreak": {
+        "정": 88
+      },
+      "fpDistribution": [
+        {
+          "fp": "a41e78e8f3b1b2da",
+          "n": 12,
+          "form": "정",
+          "route": "oral",
+          "sample": "나프록신정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "0b7e1039e851f2b3",
+          "n": 9,
+          "form": "정",
+          "route": "oral",
+          "sample": "나프롱정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "124cccc95fde01af",
+          "n": 8,
+          "form": "정",
+          "route": "oral",
+          "sample": "나로펜정(나프록센나트륨)",
+          "target": true
+        },
+        {
+          "fp": "02cd3e1f93a68b10",
+          "n": 7,
+          "form": "정",
+          "route": "oral",
+          "sample": "동인당나프록센정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "45cf6d1c6ee40d1e",
+          "n": 7,
+          "form": "정",
+          "route": "oral",
+          "sample": "세록센정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "b6ce175875836460",
+          "n": 7,
+          "form": "정",
+          "route": "oral",
+          "sample": "알삭센정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "3b15ee57c0203f23",
+          "n": 5,
+          "form": "정",
+          "route": "oral",
+          "sample": "아나프록스정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "68605f78af44cbe7",
+          "n": 5,
+          "form": "정",
+          "route": "oral",
+          "sample": "프리나정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "7133d6c4ab036b16",
+          "n": 5,
+          "form": "정",
+          "route": "oral",
+          "sample": "아나탁심정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "4d06f3b60f675882",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "아낙스정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "f3dc34b75d99b68b",
+          "n": 4,
+          "form": "정",
+          "route": "oral",
+          "sample": "자이날정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "10e86c53aee132d0",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "나프록소정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "6a1826e241940b79",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "폭센정275밀리그램(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "77f2de3486d5fad2",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "프로트린정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "e71bb077affe3ed4",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "제이프록센정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "ef09f520f59e5fed",
+          "n": 3,
+          "form": "정",
+          "route": "oral",
+          "sample": "플라낙스정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "232c3531147b2ab7",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "엔에이피정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "43bdb6112340036e",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "나프노펜정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "e2304999f9eda137",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "다나프록센정(나프록센나트륨)",
+          "target": false
+        },
+        {
+          "fp": "e64971bbc936ec4e",
+          "n": 2,
+          "form": "정",
+          "route": "oral",
+          "sample": "노바프록센정(나프록센나트륨)",
+          "target": false
+        }
+      ],
+      "easyCanonicalExactly1": 8,
+      "easyCanonicalTotal": 8,
+      "authoredConflict": 0,
+      "existingAuthoredNeedsReview": 0,
+      "homogeneity": {
+        "distinctForms": [
+          "정"
+        ],
+        "distinctRoutes": [
+          "oral"
+        ],
+        "distinctStrengths": [
+          "275밀리그램"
+        ],
+        "distinctCauHashCount": 1,
+        "nonOralInTarget": []
+      },
+      "sensitive": false,
+      "authored_source_ref_id": "006f1a2b-f1f7-40a6-ac10-7f0093a150a1",
+      "authored_draft_count": 1,
+      "source_ref_scope": {
+        "masters_sharing_ref": 40,
+        "out_of_target_total": 40,
+        "out_same_group_already_applied": 40,
+        "out_cross_group_leak": 0,
+        "cross_group_samples": [],
+        "scope_separable": true
+      },
+      "existing_en": {
+        "masters_with_en": 0,
+        "en_canonical": 0,
+        "en_needs_review": 0,
+        "reusable_reviewed_en_from_ref": 40,
+        "reusable_en_distinct_md5": 1,
+        "byte_identical_en_reuse_feasible": true
+      },
+      "expected_ko_write": {
+        "STEP_A_authored_needs_review_INSERT": 8,
+        "STEP_B_easy_canonical_demote": 8,
+        "STEP_B_authored_canonical_flip": 8,
+        "audit_canonical_replaced": 8,
+        "ko_total": 32
+      },
+      "expected_en_write": {
+        "target_masters_needing_en": 8
+      },
+      "total_write": 40,
+      "stop_reason": [],
+      "target_master_ids": [
+        "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
+        "25c77066-dc75-413e-9183-704c6e77d3e6",
+        "2e7714a3-cbac-4fb2-8c87-b25515225d51",
+        "77d68cee-0d00-4244-8a41-889a7aeeca23",
+        "c4a026e1-307c-4cf9-b52c-52d72955b6d8",
+        "d2e2c08d-6e70-4731-9481-4cdc3b350590",
+        "da2acd60-4f53-4232-a645-27a9e392a945",
+        "eb4d88be-e89d-46a3-ab46-d7ac1cb54d8f"
+      ],
+      "rollback_master_ids": [
+        "07b0f545-92dc-4c5c-af87-7a7eab8f3ad7",
+        "25c77066-dc75-413e-9183-704c6e77d3e6",
+        "2e7714a3-cbac-4fb2-8c87-b25515225d51",
+        "77d68cee-0d00-4244-8a41-889a7aeeca23",
+        "c4a026e1-307c-4cf9-b52c-52d72955b6d8",
+        "d2e2c08d-6e70-4731-9481-4cdc3b350590",
+        "da2acd60-4f53-4232-a645-27a9e392a945",
+        "eb4d88be-e89d-46a3-ab46-d7ac1cb54d8f"
+      ],
+      "recommended_run_order": 8
+    }
+  ],
+  "ready_selected": [
+    {
+      "order": 1,
+      "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+      "targetFp": "4ec78870b3318967",
+      "target": 13,
+      "exclude": 0,
+      "ko": 52,
+      "en": 13,
+      "total": 65,
+      "source_ref_id": "177466cf-a57b-4381-b1ff-44bc87c12673",
+      "reusable_en": 13,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 2,
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "targetFp": "559c4ffae3658ec7",
+      "target": 13,
+      "exclude": 26,
+      "ko": 52,
+      "en": 13,
+      "total": 65,
+      "source_ref_id": "0175e433-a171-44ec-b601-ad65a805171d",
+      "reusable_en": 3,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 3,
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "targetFp": "8ac89c4550d02b6d",
+      "target": 12,
+      "exclude": 17,
+      "ko": 48,
+      "en": 12,
+      "total": 60,
+      "source_ref_id": "0436f0d8-3dbe-4939-b511-de3bcd69593c",
+      "reusable_en": 21,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 4,
+      "groupKey": "메코발라민|500마이크로그램|캡슐",
+      "targetFp": "c6c4dcfbf46d229c",
+      "target": 10,
+      "exclude": 0,
+      "ko": 40,
+      "en": 10,
+      "total": 50,
+      "source_ref_id": "0908968f-30c8-4c9b-95ed-5631212adbc9",
+      "reusable_en": 10,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 5,
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "targetFp": "37d1268f8f721dda",
+      "target": 9,
+      "exclude": 12,
+      "ko": 36,
+      "en": 9,
+      "total": 45,
+      "source_ref_id": "0d2b2ef8-cce5-4771-9ed7-159fd10c1715",
+      "reusable_en": 4,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 6,
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "targetFp": "41701ec292bc3fa6",
+      "target": 9,
+      "exclude": 9,
+      "ko": 36,
+      "en": 9,
+      "total": 45,
+      "source_ref_id": "240871d7-3dce-43e9-a0d5-3b3bcbd7c5a4",
+      "reusable_en": 3,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 7,
+      "groupKey": "폴산|1밀리그램|정",
+      "targetFp": "cb05e790cbe3b054",
+      "target": 9,
+      "exclude": 9,
+      "ko": 36,
+      "en": 9,
+      "total": 45,
+      "source_ref_id": "068e2176-ee92-4e94-a47d-2dc632bacf53",
+      "reusable_en": 8,
+      "en_reuse_feasible": true
+    },
+    {
+      "order": 8,
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "targetFp": "124cccc95fde01af",
+      "target": 8,
+      "exclude": 88,
+      "ko": 32,
+      "en": 8,
+      "total": 40,
+      "source_ref_id": "006f1a2b-f1f7-40a6-ac10-7f0093a150a1",
+      "reusable_en": 40,
+      "en_reuse_feasible": true
+    }
+  ],
+  "bundles": {
+    "에이전트가": {
+      "groups": [
+        {
+          "groupKey": "락토바실루스아시도필루스균|300밀리그램|캡슐",
+          "target": 13,
+          "ko": 52,
+          "en": 13,
+          "total": 65,
+          "zeroExclude": true
+        },
+        {
+          "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+          "target": 12,
+          "ko": 48,
+          "en": 12,
+          "total": 60,
+          "zeroExclude": false
+        },
+        {
+          "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+          "target": 9,
+          "ko": 36,
+          "en": 9,
+          "total": 45,
+          "zeroExclude": false
+        },
+        {
+          "groupKey": "나프록센나트륨|275밀리그램|정",
+          "target": 8,
+          "ko": 32,
+          "en": 8,
+          "total": 40,
+          "zeroExclude": false
+        }
+      ],
+      "group_count": 4,
+      "total_write": 210
+    },
+    "에이전트다": {
+      "groups": [
+        {
+          "groupKey": "트리메부틴말레산염|200밀리그램|정",
+          "target": 13,
+          "ko": 52,
+          "en": 13,
+          "total": 65,
+          "zeroExclude": false
+        },
+        {
+          "groupKey": "메코발라민|500마이크로그램|캡슐",
+          "target": 10,
+          "ko": 40,
+          "en": 10,
+          "total": 50,
+          "zeroExclude": true
+        },
+        {
+          "groupKey": "덱스판테놀|100밀리그램|정",
+          "target": 9,
+          "ko": 36,
+          "en": 9,
+          "total": 45,
+          "zeroExclude": false
+        },
+        {
+          "groupKey": "폴산|1밀리그램|정",
+          "target": 9,
+          "ko": 36,
+          "en": 9,
+          "total": 45,
+          "zeroExclude": false
+        }
+      ],
+      "group_count": 4,
+      "total_write": 205
+    }
+  },
+  "summary": {
+    "READY": 8,
+    "HOLD": 0,
+    "EXCLUDED": 0,
+    "selected": 8
+  }
+}
