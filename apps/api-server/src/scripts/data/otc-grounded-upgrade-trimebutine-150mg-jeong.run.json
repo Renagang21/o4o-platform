@@ -1,0 +1,233 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "트리메부틴말레산염|150밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "00f0325a-c5a4-4d3c-b900-1774a24509f5",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "트리메부틴말레산염 150mg 정",
+  "coarseTotal": 49,
+  "target": 28,
+  "excluded": 21,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "047c359b-c27d-4b67-9efc-7abccbcd5eb7",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "0eeb814d-68be-4178-962f-9dd9248fd0b6",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "2afdb54f-d438-4c69-b51b-7117d624d668",
+      "name": "트리탄정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp be9514b40da07abf, bridge SSOT)"
+    },
+    {
+      "id": "3e75fcd0-e69d-4bfa-8cad-66f399df81c4",
+      "name": "포부틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp 5d0f4525dc4e59a4, bridge SSOT)"
+    },
+    {
+      "id": "4b668225-e207-4bd4-b149-c8c5b31f9f6e",
+      "name": "포부틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp 5d0f4525dc4e59a4, bridge SSOT)"
+    },
+    {
+      "id": "54ef7392-9dfe-46de-ac96-9a401e3b72f0",
+      "name": "메부란정(트리메부틴말레산염)",
+      "reason": "비대상(fp 9e942b7fc499581a, bridge SSOT)"
+    },
+    {
+      "id": "61e973f6-f8e4-4311-8608-297c33605231",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "678cfb72-cf14-406b-bbb4-eccfeff0850d",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "70fad15b-77e4-4fd7-a079-41bd6bcb885c",
+      "name": "바이메틴정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp afd4c9b27d3e2543, bridge SSOT)"
+    },
+    {
+      "id": "76994693-8183-43ec-b253-8010b547fb5b",
+      "name": "위트리정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp ed411d6f9dda8b53, bridge SSOT)"
+    },
+    {
+      "id": "7f0141ea-3d56-4db1-aa54-9833e7e7fb6e",
+      "name": "메부란정(트리메부틴말레산염)",
+      "reason": "비대상(fp 9e942b7fc499581a, bridge SSOT)"
+    },
+    {
+      "id": "87eb32ec-4b70-4c32-8c88-64ae58ebfc58",
+      "name": "메부란정(트리메부틴말레산염)",
+      "reason": "비대상(fp 9e942b7fc499581a, bridge SSOT)"
+    },
+    {
+      "id": "8b543755-80db-4882-a0ae-46adcbfa3322",
+      "name": "바이메틴정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp afd4c9b27d3e2543, bridge SSOT)"
+    },
+    {
+      "id": "a0300367-cd72-49ac-bd07-df1a0991340f",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "aca1ec3b-16ae-4ae0-a9c8-2ff232493506",
+      "name": "삼메틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp f38569d82d11e1e3, bridge SSOT)"
+    },
+    {
+      "id": "af080458-c4ad-4341-88f7-17ecbec8812e",
+      "name": "트리탄정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp be9514b40da07abf, bridge SSOT)"
+    },
+    {
+      "id": "af2941f3-f0f5-401c-b0f7-e79f285cdb5c",
+      "name": "바이메틴정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp afd4c9b27d3e2543, bridge SSOT)"
+    },
+    {
+      "id": "baf4eb98-809e-4024-a9e8-ebc12bca1c0f",
+      "name": "트리탄정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp be9514b40da07abf, bridge SSOT)"
+    },
+    {
+      "id": "da8be808-37f3-4fb6-8463-05dfd7d4a5c0",
+      "name": "포부틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp 5d0f4525dc4e59a4, bridge SSOT)"
+    },
+    {
+      "id": "e3d42c8f-8eff-4be9-a4ae-921f46912a34",
+      "name": "포부틴정(트리메부틴말레산염)",
+      "reason": "비대상(fp 5d0f4525dc4e59a4, bridge SSOT)"
+    },
+    {
+      "id": "e906d6f7-c932-4543-ab33-3259f57c35f9",
+      "name": "위트리정150밀리그램(트리메부틴말레산염)",
+      "reason": "비대상(fp ed411d6f9dda8b53, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "0660d9ba-3bbd-4f7f-9838-65fbbd8a23a7",
+    "085f83a5-bebf-4fc8-bd0b-2ad8db630ff5",
+    "1a668658-8e3c-4d21-be3f-f4ff4b7731c8",
+    "1feed7e9-cd79-405c-bb26-c40e974c1eae",
+    "3b9fbf7d-806e-49a6-956a-408057832cc9",
+    "3ee3ffe8-ffc6-44f6-8192-88419644bf1e",
+    "41478373-cf25-4932-8325-e6140c29c75a",
+    "523dffde-1d0f-4c62-b442-fcd69a4d1627",
+    "5766369d-f2aa-4bb3-8c02-162d0c857e00",
+    "5cbf522e-d08d-41b3-99a3-08e56377ad94",
+    "6466aaf2-81c6-44ca-969c-0a6c49ae1640",
+    "683a4110-7add-4f37-a05f-f607512fac59",
+    "709a8733-f436-45c3-a4e9-d135534e0239",
+    "90f0f10f-a938-4493-9bb2-b49d5375a8c8",
+    "a26d6e11-afe5-46ab-b8b5-237292840e88",
+    "a413486a-3273-42ed-9b53-1d5a02666de3",
+    "a621cd5c-bafd-46bd-af60-0e14dc6e0048",
+    "b440729e-ba56-4e98-b248-034cb32795be",
+    "c26369b4-d1dd-4c0b-a8c9-01eaf90c2737",
+    "c6057883-cfcf-4fcc-b757-e3e0b0c9994d",
+    "d3720e5a-4747-4f2a-8c1b-b1c9e40a3c03",
+    "ddfd987c-16d9-4942-b7de-abe79c2abac5",
+    "e02cc337-1002-427c-a919-1893c2fa8a4f",
+    "e22362a1-af36-4c2e-bb5a-708d14798c62",
+    "e84d2332-67f4-4aed-a161-d24a758e30ad",
+    "ef46c9bc-65f6-4faa-81b7-7fc9d895442f",
+    "f5468094-4388-47ac-a969-588ccc84fd11",
+    "fe01aaed-cb6d-4c6a-a3ed-8b2e65bc08fd"
+  ],
+  "rollback_master_ids": [
+    "0660d9ba-3bbd-4f7f-9838-65fbbd8a23a7",
+    "085f83a5-bebf-4fc8-bd0b-2ad8db630ff5",
+    "1a668658-8e3c-4d21-be3f-f4ff4b7731c8",
+    "1feed7e9-cd79-405c-bb26-c40e974c1eae",
+    "3b9fbf7d-806e-49a6-956a-408057832cc9",
+    "3ee3ffe8-ffc6-44f6-8192-88419644bf1e",
+    "41478373-cf25-4932-8325-e6140c29c75a",
+    "523dffde-1d0f-4c62-b442-fcd69a4d1627",
+    "5766369d-f2aa-4bb3-8c02-162d0c857e00",
+    "5cbf522e-d08d-41b3-99a3-08e56377ad94",
+    "6466aaf2-81c6-44ca-969c-0a6c49ae1640",
+    "683a4110-7add-4f37-a05f-f607512fac59",
+    "709a8733-f436-45c3-a4e9-d135534e0239",
+    "90f0f10f-a938-4493-9bb2-b49d5375a8c8",
+    "a26d6e11-afe5-46ab-b8b5-237292840e88",
+    "a413486a-3273-42ed-9b53-1d5a02666de3",
+    "a621cd5c-bafd-46bd-af60-0e14dc6e0048",
+    "b440729e-ba56-4e98-b248-034cb32795be",
+    "c26369b4-d1dd-4c0b-a8c9-01eaf90c2737",
+    "c6057883-cfcf-4fcc-b757-e3e0b0c9994d",
+    "d3720e5a-4747-4f2a-8c1b-b1c9e40a3c03",
+    "ddfd987c-16d9-4942-b7de-abe79c2abac5",
+    "e02cc337-1002-427c-a919-1893c2fa8a4f",
+    "e22362a1-af36-4c2e-bb5a-708d14798c62",
+    "e84d2332-67f4-4aed-a161-d24a758e30ad",
+    "ef46c9bc-65f6-4faa-81b7-7fc9d895442f",
+    "f5468094-4388-47ac-a969-588ccc84fd11",
+    "fe01aaed-cb6d-4c6a-a3ed-8b2e65bc08fd"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "f38569d82d11e1e3",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f4c610df21cf32ef",
+      "n": 28,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "be9514b40da07abf",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "5d0f4525dc4e59a4",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9e942b7fc499581a",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "afd4c9b27d3e2543",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ed411d6f9dda8b53",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 28,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 28 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

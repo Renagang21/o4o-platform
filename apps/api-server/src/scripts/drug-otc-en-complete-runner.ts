@@ -121,6 +121,17 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-clonixin-125mg-softcap-v1.json',
     outBase: 'otc-en-complete-clonixin-125mg-softcap',
   },
+  // 트리메부틴말레산염 150mg 정 (WO-O4O-OTC-TRIMEBUTINE-150MG-KO-EN-COMPLETE-DA-V1 · 에이전트 다)
+  //   100mg 그룹과 별개 함량. source_ref 00f0325a = 67 ko 공유(28 target + 39 out). out39 이미 en canonical LIVE(md5 a575ea00).
+  //   28 ko == 39 ko(동일 약물·150mg) → out39 en 재구성. 28 master_id 스코프(source_ref 스코프 금지).
+  'trimebutine-150mg-jeong': {
+    key: '트리메부틴말레산염|150밀리그램|정',
+    candidate: '00f0325a-c5a4-4d3c-b900-1774a24509f5',
+    sourceType: 'mfds_drug_otc', expected: 28,
+    koRunBase: 'otc-grounded-upgrade-trimebutine-150mg-jeong',
+    translationFile: 'otc-en-translations-trimebutine-150mg-v1.json',
+    outBase: 'otc-en-complete-trimebutine-150mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

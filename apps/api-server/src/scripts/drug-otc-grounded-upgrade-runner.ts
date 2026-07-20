@@ -256,6 +256,25 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-clonixin-125mg-softcap',
   },
+  // 트리메부틴말레산염 150mg 정 — Track A(WO-O4O-OTC-TRIMEBUTINE-150MG-KO-EN-COMPLETE-DA-V1 · 에이전트 다).
+  //   100mg 그룹과 별개. target 단일 fp 28 · 비대상 21(안전지문불일치 14 + 비대상 authored 7, coarse 49, other 0).
+  //   excludeFp 는 dry-run fpDistribution 으로 확정(아래 배열).
+  'trimebutine-150mg-jeong': {
+    key: '트리메부틴말레산염|150밀리그램|정',
+    ingredient: '트리메부틴말레산염',
+    dose: '150밀리그램',
+    formKeyword: '정',
+    candidate: '00f0325a-c5a4-4d3c-b900-1774a24509f5',
+    targetFp: 'f4c610df21cf32ef',
+    excludeFp: [
+      'f38569d82d11e1e3', '5d0f4525dc4e59a4', 'be9514b40da07abf',
+      '9e942b7fc499581a', 'afd4c9b27d3e2543', 'ed411d6f9dda8b53',
+    ], // 비대상 6 fp = 6+4+3+3+3+2 = 21 (안전지문불일치 14 + 비대상 authored 7)
+    expected: 28,
+    excludedExpected: 21,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-trimebutine-150mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

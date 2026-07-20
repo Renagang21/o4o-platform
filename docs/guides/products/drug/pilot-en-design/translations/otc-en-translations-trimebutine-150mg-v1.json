@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRIMEBUTINE-150MG-KO-EN-COMPLETE-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "트리메부틴 150mg 정(100mg 그룹과 별개 함량). 동일 약물(source_ref_id 00f0325a) out 39건이 이미 en canonical(md5 a575ea00d1e754c60df114f82b981056)로 LIVE. 본 번역은 그 검토완료 en 을 재구성해 28 target 에 확장한다(새 medical fact 0). 빌드 결과가 live 39 en 과 byte-identical 임을 스크립트가 게이트로 증명한다. 함량 150mg·용법(100~200mg 1일 3회)은 150mg ko canonical 에 grounding.",
+  "translations": [
+    {
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "title": "Trimebutine Maleate 150 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for acid reflux and hiatal hernia; for the digestive problems that come with gastritis, duodenitis or ulcers — stomach pain, indigestion, nausea and vomiting; and for irritable bowel syndrome and spastic colon.",
+      "usage": "Adults take 100–200 mg three times a day, before meals. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have an inherited problem with lactose metabolism, such as galactose intolerance. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. Get advice if your symptoms last a long time or get worse.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Trimebutine maleate 150 mg",
+        "How it works": "Regulates gut movement",
+        "Main symptoms": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms",
+        "Who should be careful": "Inherited lactose metabolism disorders; pregnancy and breastfeeding",
+        "Why this one": "A digestive aid that regulates gut movement"
+      }
+    }
+  ],
+  "summary": "Stomach pain, indigestion, nausea, vomiting, irritable bowel symptoms"
+}
