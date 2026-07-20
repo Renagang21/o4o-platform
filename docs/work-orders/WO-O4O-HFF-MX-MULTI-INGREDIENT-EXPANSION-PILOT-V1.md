@@ -59,3 +59,11 @@
 - **MX 4-원료 클린 조합 종료**: 대형 미네랄 조합(mg+zn+ca+vd 69·mg+vd+vk+ca 26·mg+mn+vd+ca 12·vc+vd+se+zn 9·밀크씨슬+B 9)은 완료(복합형 421 LIVE). 남은 4-원료는 전부 단자릿수 B군(제품이 대개 5+종 종합비타민이라 "정확히 4"가 드묾) → **반복 스윕 종료**(수확체감).
 - **다음(별도 준비)**: ① ADC 기반 durable proxy 안정화(WO-...-PROXY-SERVICE-AND-ENV-PRESERVATION-V1) ② higher-N 5~8종 종합비타민 후보군 정확 인벤토리(select 엄격추출 기준 실제 full-set) → 그룹화 → 신규 배치. `--token` 프록시 상태에서는 대량 probe 미진행.
 - composeCombo/G-MULTI는 N-원료 무변경 처리 확인(4원료 실증) → higher-N도 구조 변경 없이 가능 전망(단, 카드 5+ 렌더·selection full-set 확정 필요).
+
+### higher-N(5~8) STRICT 인벤토리 완료 (read-only, DB write 0) — `CHECK-O4O-HFF-HIGHER-N-5-8-STRICT-INVENTORY-V1`
+
+- 도구 `hff-combo-mx-inventory-strict.ts` 신설: select 엄격 SPEC+CLS 이식으로 실제 full-set 예측(mx-inventory loose 과대집계 회피).
+- scanned 41,261 · strict clean 후보 **1,351**(609조합): N5 431·N6 393·N7 283·N8 244. attribution 불명확(unknown>0 제외) 960. 상위40 조합 전부 basis 100%(shelfOnly 0).
+- 최다 그룹: **비타민B 컴플렉스 완전형(N8) 49** · 나이아신+밀크씨슬 B군(N6) 42 · **미네랄 멀티 mg+mn+vd+zn+ca(N5) 22**(LIVE 4원료 확장). 기존 LIVE(전량 N≤4)와 제품 중복 0.
+- compose N-제너릭·G-MULTI(카드수/순서) 강제 → 5~8 카드 구조 변경 불요, 최고 N 시각 스모크 1회만 권장.
+- **권장 첫 배치 = mg+mn+vd+zn+ca(N5, 22)**(전 원료 attribution/basis 기 실증, 신규표면 0) → 이후 헤드라인 B-complex N8 49. generate/dry-run/apply 미실행 · COMMIT 직전 승인.
