@@ -85,6 +85,9 @@ interface Props {
   usageBySet: Record<string, string[]>;
   /** templateKey → 사람이 읽는 라벨(부모 TEMPLATE_OPTIONS 기준). */
   templateLabel: (key: string | null | undefined) => string;
+  /** WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 필터 드롭다운에서 숨길 legacy 전용 template_key.
+   *  (기존 콘텐츠는 목록 '템플릿 전체'에 그대로 노출·편집 가능 — 필터 선택지에서만 제외.) */
+  hiddenTemplateFilterKeys?: string[];
   /** 태블릿 화면 만들기 진입(부모 생성 폼 오픈). */
   onCreate: () => void;
   /** 개별 수정(부모 인라인 편집 패널 오픈). dirty guard 는 부모에서 처리. */
@@ -106,6 +109,7 @@ export default function TabletContentLibraryList({
   busy,
   usageBySet,
   templateLabel,
+  hiddenTemplateFilterKeys,
   onCreate,
   onEdit,
   onArchive,
@@ -144,9 +148,12 @@ export default function TabletContentLibraryList({
 
   // ── 필터 옵션(현재 목록에서 도출) ──
   const templateOptions = useMemo(() => {
-    const keys = Array.from(new Set(sets.map((s) => s.templateKey)));
+    // WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: legacy 전용 키(idle_touch_video)는 필터 선택지에서 제외.
+    //   해당 콘텐츠는 '템플릿 전체'에 여전히 노출되며 badge/편집은 유지된다.
+    const hidden = new Set(hiddenTemplateFilterKeys ?? []);
+    const keys = Array.from(new Set(sets.map((s) => s.templateKey))).filter((k) => !hidden.has(k));
     return keys.map((k) => ({ key: k, label: templateLabel(k) })).sort((a, b) => a.label.localeCompare(b.label, 'ko'));
-  }, [sets, templateLabel]);
+  }, [sets, templateLabel, hiddenTemplateFilterKeys]);
   const cornerOptions = useMemo(() => {
     const names = new Set<string>();
     Object.values(usageBySet).forEach((arr) => arr.forEach((n) => names.add(n)));

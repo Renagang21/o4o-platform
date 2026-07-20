@@ -171,6 +171,20 @@ const templateMeta = (key: string | null | undefined): TemplateMeta =>
 //   쓰도록 export(라벨 드리프트 방지). 내부 template_key 는 노출하지 않는다.
 export const templateLabel = (key: string | null | undefined) => templateMeta(key).label;
 
+// WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: '대기 영상형'(idle_touch_video) 을 신규 제작 선택지에서 제거.
+//   이유: 모든 템플릿이 '대기 화면'(대기 영상) 단계를 갖게 되어 전용 템플릿이 중복 선택지가 됨.
+//   ── 신규 선택 가능 목록 / legacy 호환 metadata 분리 ──
+//   · TEMPLATE_OPTIONS(위, 5종) = legacy 포함 metadata → templateMeta/templateLabel/TemplateThumb 가
+//     기존 idle_touch_video 콘텐츠의 라벨·썸네일을 계속 해석(기존 콘텐츠 표시/편집 진입 유지).
+//   · SELECTABLE_TEMPLATE_OPTIONS(4종) = 신규 제작 카드 + 필터가 노출하는 목록(idle_touch_video 제외).
+//   기존 idle_touch_video 화면 세트는 자동 변환하지 않으며(template_key 유지), 편집 진입 시 다른 4종으로 변경 가능.
+export const LEGACY_ONLY_TEMPLATE_KEYS: string[] = ['idle_touch_video'];
+const isLegacyOnlyTemplate = (key: string | null | undefined): boolean =>
+  !!key && LEGACY_ONLY_TEMPLATE_KEYS.includes(key);
+const SELECTABLE_TEMPLATE_OPTIONS: TemplateMeta[] = TEMPLATE_OPTIONS.filter(
+  (t) => !LEGACY_ONLY_TEMPLATE_KEYS.includes(t.key),
+);
+
 // WO-O4O-KPA-TABLET-SCREEN-SET-DIRTY-GUARD-V1: 미저장 변경 경고 문구 + 블록 비교 정규화
 const DISCARD_MSG = '저장되지 않은 변경이 있습니다.\n저장하지 않고 이동하면 변경사항이 사라질 수 있습니다.\n계속하시겠습니까?';
 // normalizeBlocks / defaultConfig: @o4o/screen-content-core 에서 소비(로컬 정의 제거).
@@ -288,6 +302,7 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           busy={busy}
           usageBySet={usageBySet}
           templateLabel={templateLabel}
+          hiddenTemplateFilterKeys={LEGACY_ONLY_TEMPLATE_KEYS}
           onCreate={openCreate}
           onEdit={openEdit}
           onArchive={handleArchive}
@@ -302,7 +317,7 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
 }
 
 // ── 템플릿 축소 미리보기(와이어프레임) — WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1 ──
-//   카드 5장에 kiosk 인스턴스를 띄우면 preview POST 5회 + 렌더 비용이 커지므로, 카드는 '배치 스케치'만 보여준다.
+//   각 카드에 kiosk 인스턴스를 띄우면 preview POST 다회 + 렌더 비용이 커지므로, 카드는 '배치 스케치'만 보여준다.
 //   실제 결과 화면은 오른쪽 고정 미리보기(TabletKioskPage embedded)가 담당한다.
 //   (WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1 의 드롭다운 TemplateSelectField 를 대체)
 function TemplateThumb({ templateKey }: { templateKey: string }) {
@@ -957,7 +972,8 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
       <div className="space-y-4 min-w-0">
       {/* ── 단계 본문 ── */}
       <div className="border border-indigo-100 rounded-xl p-4 bg-indigo-50/20 min-h-[220px]">
-        {/* WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 드롭다운 → 카드 선택(5종). 클릭 즉시 선택 + 오른쪽 미리보기 반영. */}
+        {/* WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 드롭다운 → 카드 선택. 클릭 즉시 선택 + 오른쪽 미리보기 반영.
+            WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 신규 선택 카드는 SELECTABLE_TEMPLATE_OPTIONS(4종). */}
         {step === 0 && (
           <div className="space-y-3">
             <div>
@@ -967,8 +983,16 @@ function TabletContentStepBuilder({ initialDetail, onCancel, onSaved, onToast, p
                 카드를 누르면 오른쪽 미리보기에 바로 반영됩니다.
               </p>
             </div>
+            {/* WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 기존 idle_touch_video 콘텐츠 편집 진입 시 안내만 표시.
+                자동 변환하지 않으며, 아래 4종 중 하나를 고르면 변경되고 고르지 않으면 기존 템플릿이 유지된다. */}
+            {isLegacyOnlyTemplate(templateKey) && (
+              <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                이 콘텐츠는 기존 템플릿 <b>{templateLabel(templateKey)}</b>(으)로 만들어졌습니다.
+                그대로 저장하면 유지되며, 아래에서 다른 템플릿을 고르면 변경됩니다.
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {TEMPLATE_OPTIONS.map((t) => {
+              {SELECTABLE_TEMPLATE_OPTIONS.map((t) => {
                 const selected = t.key === templateKey;
                 return (
                   <button
