@@ -127,6 +127,14 @@ export function HubScreenSetLibraryPage() {
     }
   }, [detail, importing]);
 
+  // QR 모바일 미리보기는 대기 화면(idle_media)을 제외한다 — 실제 QR 채널 규칙(resolver)과 동일.
+  const mobileScreen = useMemo<TabletScreenResponse | null>(() => {
+    if (!screen) return null;
+    const sections = (screen as any).sections;
+    if (!Array.isArray(sections)) return screen;
+    return { ...(screen as any), sections: sections.filter((s: any) => s?.blockType !== 'idle_media') };
+  }, [screen]);
+
   // 미리보기 전용 kiosk API — 상품은 코너 문맥이 없으므로 빈 목록(임의 추정 금지), 상담 요청 차단.
   const previewApi = useMemo<TabletKioskApi>(() => ({
     fetchProducts: (_slug, params) =>
@@ -287,15 +295,18 @@ export function HubScreenSetLibraryPage() {
               {detailLoading ? (
                 <div className="text-sm text-slate-400 py-8 text-center">불러오는 중…</div>
               ) : screen ? (
-                <div className={view === 'mobile' ? 'max-w-[360px] mx-auto' : ''}>
-                  <TabletKioskPage
-                    api={previewApi}
-                    slug={storeSlug ?? undefined}
-                    previewScreen={screen}
-                    embedded
-                    showQrBadge={false}
-                    previewLayoutOnly
-                  />
+                // kiosk 뷰어는 뷰포트를 채우도록 렌더되므로 반드시 relative+overflow:hidden 박스로 가둔다
+                // (제작기 미리보기와 동일 패턴). 없으면 패널 전체를 덮어 버튼 클릭이 막힌다.
+                <div className="bg-slate-100 p-3 flex items-center justify-center rounded-lg">
+                  {view === 'tablet' ? (
+                    <div style={{ position: 'relative', overflow: 'hidden', width: '100%', aspectRatio: '16 / 10', background: '#000', borderRadius: 10 }}>
+                      <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={screen} embedded showQrBadge={false} previewLayoutOnly />
+                    </div>
+                  ) : (
+                    <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 240px)', aspectRatio: '9 / 19', background: '#000', borderRadius: 18 }}>
+                      <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={mobileScreen} embedded showQrBadge={false} previewLayoutOnly />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-sm text-slate-400 py-8 text-center">미리보기를 불러오지 못했습니다.</div>
