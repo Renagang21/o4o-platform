@@ -137,4 +137,37 @@ DB write 0 · canonical 변경 0 · apply 미실행
 
 ---
 
-*read-only · DB write 0 · canonical 변경 0. 고N 3건 등 31 외 대상 미포함.*
+## 9. apply 완료 — Agent A 독립 사후검증 (새 연결, read-only)
+
+- Agent B 가 `ade71c6cb` 에서 파서 gap 2종(본 CHECK §2 권고분) 수정 + 31건 RETIRE+REPLACE **apply COMMIT 완료**. 본 절은 그와 **독립된 새 DB 연결**에서 Agent A 가 재검증한 결과다(재-apply 아님 — 재실행은 이중 write 로 canonicalDup 유발하므로 금지).
+- 검증 시점 HEAD `d192a3962`.
+
+| 항목 | 승인 범위 | 독립검증 실측 | 판정 |
+|---|:-:|:-:|:-:|
+| stmt→master 링크 | 31 | 31 (distinct master 31) | ✅ |
+| 기존 단일 canonical 은퇴 | 62 | `deprecated` **62** | ✅ |
+| 신규 복합형 canonical | 62 | `canonical` **62** (ko 31 · en 31) | ✅ |
+| 총 write | 124 | 62 은퇴 + 62 신규 = **124** | ✅ |
+| canonicalDup | 0 | **0** | ✅ |
+| master / source_ref | 불변 | master 31 불변 · canonical source_ref NOT NULL **62** | ✅ |
+| 본문 그룹 분포 | 21 / 8 / 2 | ko 본문 마커 **21 / 8 / 2** (queue verifiedFullSet 대비 불일치 0) | ✅ |
+| 단일 루테인 잔존 | 0 | **0** (31건 전부 "N원료 복합" 복합형 본문) | ✅ |
+
+- 본문 샘플(200400170061613): 배지 `루테인 20mg · 비타민 A 210μg · 비타민 E 3.3mg` + 원료별 공식 기능성 3블록 = 정상 3원료 복합형(단일 루테인 콘텐츠 아님).
+- **중지조건 전무**: write=124 · canonicalDup 0 · master/source_ref 불변 · 그룹 21/8/2 정합 → 승인 범위와 정확히 일치. **재-apply 불요(이미 완료)**.
+
+## 보고 요약 (apply 후 갱신)
+
+```text
+상태: apply COMMIT 완료(Agent B ade71c6cb) + Agent A 독립 사후검증 PASS
+은퇴 62 · 신규 복합형 canonical 62 · 총 write 124 · canonicalDup 0
+그룹(LIVE 본문): 루테인+비타민A+비타민E 21 · 루테인+비타민A 8 · 루테인+비타민E 2 · 단일유지 0
+master/candidate/source_ref: 불변
+파서 gap 2종: 수정 완료(콜론 모드·ug 수식어 경계) → 5건 정상 생산
+결과: 단일형 오분류 31건 → 정확한 복합형 설명서로 대체 완료
+검증: read-only(새 연결) · DB write 0
+```
+
+---
+
+*본 CHECK 의 검수·사후검증은 read-only · DB write 0. apply COMMIT 은 Agent B(`ade71c6cb`, 사용자 승인 기반). 고N 3건 등 31 외 대상 미포함.*
