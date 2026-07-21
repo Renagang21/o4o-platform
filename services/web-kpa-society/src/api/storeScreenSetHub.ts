@@ -15,10 +15,40 @@
  * 기존 매장 Screen Set 규칙(withQrLink lazy ensure)으로 관리된다.
  */
 
-import { authClient } from '@o4o/auth-client';
+import { getAccessToken } from '../contexts/AuthContext';
+import { tryRefreshToken } from './token-refresh';
 import type { ScreenBlock, ScreenSet } from './tabletDisplays';
 
-const BASE = '/store/screen-set-hub';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+const BASE = `${API_BASE}/api/v1/store/screen-set-hub`;
+
+/**
+ * /store/* 계열 공통 요청 헬퍼 — tabletDisplays.ts 와 동일 패턴.
+ * (authClient.api 는 이 경로에 토큰을 붙이지 않아 401 → 명시 Bearer + 401 refresh 재시도.)
+ */
+async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const token = getAccessToken();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+    ...options.headers,
+  };
+  let response = await fetch(url, { ...options, headers });
+  if (response.status === 401) {
+    const newToken = await tryRefreshToken();
+    if (newToken) {
+      response = await fetch(url, { ...options, headers: { ...headers, Authorization: `Bearer ${newToken}` } });
+    }
+  }
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({ message: 'Network error' }));
+    const error: any = new Error(body.error || body.message || `HTTP ${response.status}`);
+    error.status = response.status;
+    error.code = body.code;
+    throw error;
+  }
+  return response.json();
+}
 
 /** HUB 목록 행 — 운영자 원본(공개 URL·QR 없음). */
 export interface OperatorTemplateListItem {
@@ -46,14 +76,14 @@ export async function listOperatorTemplates(params?: { q?: string; templateKey?:
   if (params?.q) qs.set('q', params.q);
   if (params?.templateKey) qs.set('templateKey', params.templateKey);
   const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  const res = await authClient.api.get(`${BASE}/templates${suffix}`);
-  return res.data?.data ?? [];
+  const res = await request<{ success: boolean; data: OperatorTemplateListItem[] }>(`${BASE}/templates${suffix}`);
+  return res.data ?? [];
 }
 
 /** 운영자 원본 상세 + blocks. */
 export async function getOperatorTemplate(id: string): Promise<OperatorTemplateDetail> {
-  const res = await authClient.api.get(`${BASE}/templates/${id}`);
-  return res.data?.data;
+  const res = await request<{ success: boolean; data: OperatorTemplateDetail }>(`${BASE}/templates/${id}`);
+  return res.data;
 }
 
 /**
@@ -62,6 +92,9 @@ export async function getOperatorTemplate(id: string): Promise<OperatorTemplateD
  * 반복 가져오기 허용 — 호출마다 새 사본이 생성된다.
  */
 export async function importOperatorTemplate(id: string): Promise<ScreenSet> {
-  const res = await authClient.api.post(`${BASE}/templates/${id}/import`, {});
-  return res.data?.data;
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/templates/${id}/import`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+  return res.data;
 }
