@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "수산화마그네슘 500mg 정 EN 번역 1건. grounded ko canonical(source_ref 048b8e71) 충실 번역. 동일 약물 out-of-scope 11 master 의 live en canonical(md5 b68a955b4f61c39580ec2774f689004b)을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "제산: 2–5 tablets (1–2.5 g) a day in divided doses · 변비: 2–4 tablets (1–2 g) a day in one or two doses · 연령·증상에 따라 조절 — ko 용량 범위·분복 보존(값 불변)",
+    "금기": "Do not take this if …(신장애·설사) — 강도 보존",
+    "주의": "심장질환·고마그네슘혈증 상담 · 테트라사이클린계 병용금지 · 다량의 우유/칼슘제 병용 시 우유알칼리증후군 — 대상·강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 b68a955b 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "title": "Magnesium Hydroxide 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to neutralise stomach acid and ease symptoms of stomach and duodenal ulcers, gastritis and excess stomach acid, and to relieve constipation.",
+      "usage": "To neutralise acid, take 2–5 tablets (1–2.5 g) a day in divided doses. For constipation, take 2–4 tablets (1–2 g) a day in one or two doses. The dose may be adjusted to suit your age and symptoms.",
+      "caution": "Do not take this if you have kidney problems or diarrhoea. Talk to a pharmacist before taking it if you have heart problems or high magnesium levels in the blood, and do not take it together with tetracycline antibiotics. Taking it with a lot of milk or calcium supplements can cause milk-alkali syndrome.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Magnesium hydroxide 500 mg",
+        "How it works": "Neutralises stomach acid and relieves constipation",
+        "Main symptoms": "Heartburn, excess stomach acid, constipation",
+        "Who should be careful": "Kidney problems, diarrhoea, high magnesium levels",
+        "Why this one": "A magnesium preparation used both to neutralise acid and to relieve constipation"
+      }
+    }
+  ],
+  "summary": "Heartburn, excess stomach acid, constipation"
+}

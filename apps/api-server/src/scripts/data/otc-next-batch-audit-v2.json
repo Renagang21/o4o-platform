@@ -1,0 +1,568 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "basis": "bridge full-content fingerprint (fingerprintOf 정본) — groupKey별 dominant fp 대표, target fp 하위 그룹만",
+  "excludedDoneGroupKeys": 24,
+  "candidates": [
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "pharmKey": "ing:덱시부프로펜|300밀리그램|정|oral",
+      "targetFp": "605e64748c7bc3da",
+      "sample": "팬스타정(덱시부프로펜)",
+      "atc": "M01AE14",
+      "route": "oral",
+      "bridge_n": 8,
+      "coarseTotal": 97,
+      "target": 8,
+      "exclude": 89,
+      "other": 0,
+      "excludeFps": [
+        "0137a72612912f7f",
+        "0da704ccb35bd198",
+        "155dd2ffef13c8dc",
+        "16e90af9107c8689",
+        "1aced0574f7023c8",
+        "365224e49d4e53a2",
+        "56294ed4c3d756a1",
+        "61c17a8585a9efc5",
+        "6a00153d2e1954dc",
+        "7a9b6871c835b7a4",
+        "8242e59d3f17b689",
+        "98c9177907417a44",
+        "aed2641f270d450b",
+        "b44efa6125fc38f1",
+        "cdec8f3a5765ef68",
+        "e5b598f9b640132d",
+        "eee438064d1ded32",
+        "f19cea60bb45cdae"
+      ],
+      "excludeFpCount": 18,
+      "candidate": "002c309a-8576-48ec-938a-19bc1478bacb",
+      "easyCanonicalExactly1": 8,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "300밀리그램"
+        ],
+        "form": [
+          "정"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 15,
+        "outOfScopeMasters": 15
+      },
+      "reviewedEnSibling": {
+        "md5": "3419f518a17d78991dc2ce97eebae4dd",
+        "summary": "Arthritis, pain and swelling after injury or surgery, pain with fever",
+        "n": 15,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": "[8 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "pharmKey": "ing:디오스민|600밀리그램|정|oral",
+      "targetFp": "bbb731cc8414d08a",
+      "sample": "센스민정(디오스민)",
+      "atc": "C05CA03",
+      "route": "oral",
+      "bridge_n": 8,
+      "coarseTotal": 64,
+      "target": 8,
+      "exclude": 56,
+      "other": 0,
+      "excludeFps": [
+        "0c29973df03bb30b",
+        "0c37f95dd421fbff",
+        "1d2ac2d1ed8eff59",
+        "2e50e025ddcc79e5",
+        "41b6e0e1cac5c33c",
+        "59a5f7ed73721534",
+        "6056b2a5fb9af9d7",
+        "6f326895ec050401",
+        "8326bba7abd32bad",
+        "8e2f26c9f29e0c60",
+        "95bd6150d96c06f1",
+        "a6b0dd2590024e11",
+        "a6c5974fb2f4fd0f",
+        "c22e7ea66c009586",
+        "d05a5af45f9f021c",
+        "e00fc37e2636de9a",
+        "ea1507ac2a4a2e53"
+      ],
+      "excludeFpCount": 17,
+      "candidate": "014af1cd-d228-4de9-8036-3a0679b2af87",
+      "easyCanonicalExactly1": 8,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "600밀리그램"
+        ],
+        "form": [
+          "정"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 26,
+        "outOfScopeMasters": 26
+      },
+      "reviewedEnSibling": {
+        "md5": "23caa83e33fd5e2b4aac4389f529389a",
+        "summary": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "n": 26,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": "[8 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "pharmKey": "ing:수산화마그네슘|500밀리그램|정|oral",
+      "targetFp": "2d3b7629b0aeafca",
+      "sample": "마로겔정500밀리그람(수산화마그네슘)",
+      "atc": "A02AA04",
+      "route": "oral",
+      "bridge_n": 8,
+      "coarseTotal": 15,
+      "target": 8,
+      "exclude": 7,
+      "other": 0,
+      "excludeFps": [
+        "190a6698c388ebde"
+      ],
+      "excludeFpCount": 1,
+      "candidate": "048b8e71-c651-49da-9d27-de5900c11d9f",
+      "easyCanonicalExactly1": 8,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "500밀리그램"
+        ],
+        "form": [
+          "정"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 11,
+        "outOfScopeMasters": 11
+      },
+      "reviewedEnSibling": {
+        "md5": "b68a955b4f61c39580ec2774f689004b",
+        "summary": "Heartburn, excess stomach acid, constipation",
+        "n": 11,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": "[8 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "pharmKey": "ing:니푸록사지드|200밀리그램|캡슐|oral",
+      "targetFp": "0a755506d14ebefe",
+      "sample": "에세푸릴캡슐(니푸록사지드)",
+      "atc": "A07AX03",
+      "route": "oral",
+      "bridge_n": 7,
+      "coarseTotal": 19,
+      "target": 7,
+      "exclude": 12,
+      "other": 0,
+      "excludeFps": [
+        "628e1eabd4f25d34",
+        "9915014661de4a10",
+        "bad1fc09d46f260c"
+      ],
+      "excludeFpCount": 3,
+      "candidate": "05c733cd-5c5e-4a09-9e3c-4f4d470d2a10",
+      "easyCanonicalExactly1": 7,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "200밀리그램"
+        ],
+        "form": [
+          "캡슐"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 11,
+        "outOfScopeMasters": 11
+      },
+      "reviewedEnSibling": {
+        "md5": "07211b8e7879af6e731de5485b952711",
+        "summary": "Sudden bacterial diarrhoea",
+        "n": 11,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 28,
+        "en_2T": 14,
+        "total_6T": 42,
+        "breakdown": {
+          "ko_nr_INSERT": 7,
+          "easy_demote": 7,
+          "authored_flip": 7,
+          "audit": 7,
+          "en_nr_INSERT": 7,
+          "en_flip": 7
+        }
+      },
+      "target_master_ids": "[7 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "pharmKey": "ing:사카로마이세스보울라르디균|282.5밀리그램|캡슐|oral",
+      "targetFp": "ba82fd1299f5d730",
+      "sample": "바이메드캡슐(사카로마이세스보울라르디균)",
+      "atc": "A07FA02",
+      "route": "oral",
+      "bridge_n": 7,
+      "coarseTotal": 11,
+      "target": 7,
+      "exclude": 4,
+      "other": 0,
+      "excludeFps": [
+        "d91a692d447d8808"
+      ],
+      "excludeFpCount": 1,
+      "candidate": "16f0c2ef-44eb-4629-a82c-e7fc69511b94",
+      "easyCanonicalExactly1": 7,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "282.5밀리그램"
+        ],
+        "form": [
+          "캡슐"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 5,
+        "outOfScopeMasters": 5
+      },
+      "reviewedEnSibling": {
+        "md5": "7574cc9aff8b329662f329125a8532a7",
+        "summary": "Upset gut balance from antibiotics, constipation, loose stools, bloating",
+        "n": 5,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 28,
+        "en_2T": 14,
+        "total_6T": 42,
+        "breakdown": {
+          "ko_nr_INSERT": 7,
+          "easy_demote": 7,
+          "authored_flip": 7,
+          "audit": 7,
+          "en_nr_INSERT": 7,
+          "en_flip": 7
+        }
+      },
+      "target_master_ids": "[7 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "pharmKey": "ing:아르기닌티디아시케이트|200밀리그램|연질캡슐|oral",
+      "targetFp": "509aaaf470ce860f",
+      "sample": "헬민200연질캡슐(아르기닌티디아시케이트)",
+      "atc": "A05BA07",
+      "route": "oral",
+      "bridge_n": 7,
+      "coarseTotal": 7,
+      "target": 7,
+      "exclude": 0,
+      "other": 0,
+      "excludeFps": [],
+      "excludeFpCount": 0,
+      "candidate": "20d395df-0846-428a-b5e1-684cb9e08fb6",
+      "easyCanonicalExactly1": 7,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "200밀리그램"
+        ],
+        "form": [
+          "연질캡슐"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 10,
+        "outOfScopeMasters": 10
+      },
+      "reviewedEnSibling": {
+        "md5": "063d7188951c61bc185e4ff40ea9df0d",
+        "summary": null,
+        "n": 10,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 28,
+        "en_2T": 14,
+        "total_6T": 42,
+        "breakdown": {
+          "ko_nr_INSERT": 7,
+          "easy_demote": 7,
+          "authored_flip": 7,
+          "audit": 7,
+          "en_nr_INSERT": 7,
+          "en_flip": 7
+        }
+      },
+      "target_master_ids": "[7 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    }
+  ],
+  "picked": [
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "targetFp": "605e64748c7bc3da",
+      "candidate": "002c309a-8576-48ec-938a-19bc1478bacb",
+      "target": 8,
+      "exclude": 89,
+      "excludeFps": [
+        "0137a72612912f7f",
+        "0da704ccb35bd198",
+        "155dd2ffef13c8dc",
+        "16e90af9107c8689",
+        "1aced0574f7023c8",
+        "365224e49d4e53a2",
+        "56294ed4c3d756a1",
+        "61c17a8585a9efc5",
+        "6a00153d2e1954dc",
+        "7a9b6871c835b7a4",
+        "8242e59d3f17b689",
+        "98c9177907417a44",
+        "aed2641f270d450b",
+        "b44efa6125fc38f1",
+        "cdec8f3a5765ef68",
+        "e5b598f9b640132d",
+        "eee438064d1ded32",
+        "f19cea60bb45cdae"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "3419f518a17d78991dc2ce97eebae4dd",
+        "summary": "Arthritis, pain and swelling after injury or surgery, pain with fever",
+        "n": 15,
+        "uniform": true
+      },
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": [
+        "3e5acac6-b9ef-44c5-86e9-5a07008001b1",
+        "531fd3f0-d201-49af-addb-cb336ebf96ca",
+        "7b6b466c-7d30-4314-a2d4-4621e1dd115d",
+        "9753167b-264c-4230-a085-0c4dd86d6c5c",
+        "a50e66ea-522a-4136-876d-6dca7e700e86",
+        "c75b87e2-2532-4c4b-9727-0097d0dfde37",
+        "e2da7a5b-1d46-4a08-9e9d-370e32dddf4d",
+        "f4c3c824-e238-442a-be98-114f7e58140e"
+      ]
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "targetFp": "bbb731cc8414d08a",
+      "candidate": "014af1cd-d228-4de9-8036-3a0679b2af87",
+      "target": 8,
+      "exclude": 56,
+      "excludeFps": [
+        "0c29973df03bb30b",
+        "0c37f95dd421fbff",
+        "1d2ac2d1ed8eff59",
+        "2e50e025ddcc79e5",
+        "41b6e0e1cac5c33c",
+        "59a5f7ed73721534",
+        "6056b2a5fb9af9d7",
+        "6f326895ec050401",
+        "8326bba7abd32bad",
+        "8e2f26c9f29e0c60",
+        "95bd6150d96c06f1",
+        "a6b0dd2590024e11",
+        "a6c5974fb2f4fd0f",
+        "c22e7ea66c009586",
+        "d05a5af45f9f021c",
+        "e00fc37e2636de9a",
+        "ea1507ac2a4a2e53"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "23caa83e33fd5e2b4aac4389f529389a",
+        "summary": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "n": 26,
+        "uniform": true
+      },
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": [
+        "4d5e925f-0f5c-4e74-a03e-4a876fe57b5d",
+        "6c831b21-3d91-4608-9922-991e81f523a9",
+        "871c4517-2b7a-4b3d-8c9b-7f2ac94f88f8",
+        "96d3cb84-2e80-4aba-b506-e6ffc6f8abda",
+        "a6799861-8cc8-4507-9c13-3788573fa3cb",
+        "af8fc4b1-5fbd-4469-8907-7a35f9bac134",
+        "bdf36756-1fa7-462e-a29f-58a48d5a436c",
+        "c18d02bc-724c-4bdf-b342-6ae8768afd21"
+      ]
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "targetFp": "2d3b7629b0aeafca",
+      "candidate": "048b8e71-c651-49da-9d27-de5900c11d9f",
+      "target": 8,
+      "exclude": 7,
+      "excludeFps": [
+        "190a6698c388ebde"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "b68a955b4f61c39580ec2774f689004b",
+        "summary": "Heartburn, excess stomach acid, constipation",
+        "n": 11,
+        "uniform": true
+      },
+      "예상write": {
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
+        "breakdown": {
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
+        }
+      },
+      "target_master_ids": [
+        "07dae041-1ef3-4ec7-93d8-c5c3d8ed22a2",
+        "0a237c5c-0674-450e-a01a-7972197bfbbf",
+        "2c8db716-18b7-496a-b889-479d789bafab",
+        "46f1df5d-2ea1-4d6b-b260-5e975699267f",
+        "49a67c91-9981-4b23-85c8-a767ac31e60a",
+        "90ba3578-52b5-49b6-b875-fe0a87803296",
+        "a0b9f6e4-5318-4ba9-ab96-d730984681a4",
+        "e8bf17d7-3746-4866-8bf9-a87046642866"
+      ]
+    }
+  ],
+  "summary": {
+    "evaluated": 6,
+    "READY": 6,
+    "picked": 3
+  }
+}

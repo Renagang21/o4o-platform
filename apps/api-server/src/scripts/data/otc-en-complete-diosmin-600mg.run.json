@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "디오스민|600밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "014af1cd-d228-4de9-8036-3a0679b2af87",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 8,
+  "targetMasters": 8,
+  "anomalies": [],
+  "koCanonical": 8,
+  "existingEnAny": 8,
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "23caa83e33fd5e2b4aac4389f529389a",
+      "n": 26
+    }
+  ],
+  "builtLen": 2464,
+  "builtMd5": "23caa83e33fd5e2b4aac4389f529389a",
+  "consistencyMatch": true,
+  "summaryField": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_en_canonical_flip": 8,
+    "en_write_total": 16
+  },
+  "enTargetMd5": "23caa83e33fd5e2b4aac4389f529389a",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(23caa83e33fd5e2b4aac4389f529389a) — write 0, 정상 종료"
+}

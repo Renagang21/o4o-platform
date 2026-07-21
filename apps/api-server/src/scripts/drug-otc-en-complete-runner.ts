@@ -297,6 +297,32 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-folic-acid-1mg-jeong-v1.json',
     outBase: 'otc-en-complete-folic-acid-1mg-jeong',
   },
+  // ── WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1 (에이전트 가) 상위 3 READY ──
+  //    각 그룹 out-of-scope reviewed EN sibling 존재 → build == live out en byte-identical 재사용.
+  'dexibuprofen-300mg-jeong': {
+    key: '덱시부프로펜|300밀리그램|정',
+    candidate: '002c309a-8576-48ec-938a-19bc1478bacb',
+    sourceType: 'mfds_drug_otc', expected: 8,
+    koRunBase: 'otc-grounded-upgrade-dexibuprofen-300mg-jeong',
+    translationFile: 'otc-en-translations-dexibuprofen-300mg-v1.json',
+    outBase: 'otc-en-complete-dexibuprofen-300mg',
+  },
+  'diosmin-600mg-jeong': {
+    key: '디오스민|600밀리그램|정',
+    candidate: '014af1cd-d228-4de9-8036-3a0679b2af87',
+    sourceType: 'mfds_drug_otc', expected: 8,
+    koRunBase: 'otc-grounded-upgrade-diosmin-600mg-jeong',
+    translationFile: 'otc-en-translations-diosmin-600mg-v1.json',
+    outBase: 'otc-en-complete-diosmin-600mg',
+  },
+  'magnesium-hydroxide-500mg-jeong': {
+    key: '수산화마그네슘|500밀리그램|정',
+    candidate: '048b8e71-c651-49da-9d27-de5900c11d9f',
+    sourceType: 'mfds_drug_otc', expected: 8,
+    koRunBase: 'otc-grounded-upgrade-magnesium-hydroxide-500mg-jeong',
+    translationFile: 'otc-en-translations-magnesium-hydroxide-500mg-v1.json',
+    outBase: 'otc-en-complete-magnesium-hydroxide-500mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

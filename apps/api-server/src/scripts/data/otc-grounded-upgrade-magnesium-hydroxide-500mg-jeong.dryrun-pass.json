@@ -1,0 +1,122 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "수산화마그네슘|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "048b8e71-c651-49da-9d27-de5900c11d9f",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "수산화마그네슘 500mg 정",
+  "coarseTotal": 15,
+  "target": 8,
+  "excluded": 7,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "2be1ca7c-07d4-410d-a8ef-3e82fa31535e",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "431b31fe-f389-4800-9c54-2607fe585a4c",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "5297ee7e-2089-440c-b079-e6178e433085",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "6351ae13-8687-4712-8c58-821af40348fc",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "a4adc65c-717b-442e-99c4-31e9c496c09c",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "c43d7263-2504-4515-8e48-b195f9ea6f19",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    },
+    {
+      "id": "f6d8039b-0859-4dd1-a669-d97aaa5cc75a",
+      "name": "마그밀정(수산화마그네슘)",
+      "reason": "비대상(fp 190a6698c388ebde, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "07dae041-1ef3-4ec7-93d8-c5c3d8ed22a2",
+    "0a237c5c-0674-450e-a01a-7972197bfbbf",
+    "2c8db716-18b7-496a-b889-479d789bafab",
+    "46f1df5d-2ea1-4d6b-b260-5e975699267f",
+    "49a67c91-9981-4b23-85c8-a767ac31e60a",
+    "90ba3578-52b5-49b6-b875-fe0a87803296",
+    "a0b9f6e4-5318-4ba9-ab96-d730984681a4",
+    "e8bf17d7-3746-4866-8bf9-a87046642866"
+  ],
+  "rollback_master_ids": [
+    "07dae041-1ef3-4ec7-93d8-c5c3d8ed22a2",
+    "0a237c5c-0674-450e-a01a-7972197bfbbf",
+    "2c8db716-18b7-496a-b889-479d789bafab",
+    "46f1df5d-2ea1-4d6b-b260-5e975699267f",
+    "49a67c91-9981-4b23-85c8-a767ac31e60a",
+    "90ba3578-52b5-49b6-b875-fe0a87803296",
+    "a0b9f6e4-5318-4ba9-ab96-d730984681a4",
+    "e8bf17d7-3746-4866-8bf9-a87046642866"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "2d3b7629b0aeafca",
+      "n": 8,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "190a6698c388ebde",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 8,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 8,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 8,
+  "htmlLen": 1587,
+  "contentHash": "5aa53fbcf9ad4a8f006ccd00129c1256",
+  "summary": "수산화마그네슘 500mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 8,
+      "STEP_B_easy_canonical_demote": 8,
+      "STEP_B_authored_canonical_flip": 8,
+      "total": 24
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 8,
+      "total": 8
+    },
+    "grand_total": 32
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 8",
+    "policy_2A": "audit 2/master = 16 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

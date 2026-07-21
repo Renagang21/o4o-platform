@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "디오스민 600mg 정 EN 번역 1건(디오스민 300mg 캡슐 완료본과 별개 groupKey). grounded ko canonical(source_ref 014af1cd) 충실 번역. 동일 약물 out-of-scope 26 master 의 live en canonical(md5 23caa83e33fd5e2b4aac4389f529389a)을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "정맥순환: one tablet (600 mg) once a day, before breakfast · 치질: one tablet two to three times a day with meals — ko 용량·횟수·복용시점 보존(값 불변)",
+    "금기": "Do not take this if …(과민·수유부) — 강도 보존",
+    "주의": "임부 상담 · 장기 복용 금지 · 증상 미개선 시 항문 검사 또는 약사 상담 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 23caa83e 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "title": "Diosmin 600 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for heaviness and pain in the legs caused by poor vein circulation, as a supportive treatment for problems caused by fragile capillaries, and to treat the signs of haemorrhoids.",
+      "usage": "For poor vein circulation, take one tablet (600 mg) once a day, before breakfast. For haemorrhoids, take one tablet two to three times a day with meals.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are breastfeeding. Talk to a pharmacist before taking it if you are pregnant. Do not take it for a long period. If your symptoms do not improve quickly, have an examination of the anus or talk to a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diosmin 600 mg",
+        "How it works": "Improves vein circulation",
+        "Main symptoms": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids",
+        "Who should be careful": "Breastfeeding; long-term use",
+        "Why this one": "A vein circulation treatment for heavy legs and haemorrhoid symptoms"
+      }
+    }
+  ],
+  "summary": "Heavy, aching legs from poor vein circulation; signs of haemorrhoids"
+}

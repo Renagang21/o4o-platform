@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "덱시부프로펜|300밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "002c309a-8576-48ec-938a-19bc1478bacb",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 8,
+  "targetMasters": 8,
+  "anomalies": [],
+  "koCanonical": 8,
+  "existingEnAny": 8,
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "3419f518a17d78991dc2ce97eebae4dd",
+      "n": 15
+    }
+  ],
+  "builtLen": 3109,
+  "builtMd5": "3419f518a17d78991dc2ce97eebae4dd",
+  "consistencyMatch": true,
+  "summaryField": "Arthritis, pain and swelling after injury or surgery, pain with fever",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_en_canonical_flip": 8,
+    "en_write_total": 16
+  },
+  "enTargetMd5": "3419f518a17d78991dc2ce97eebae4dd",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(3419f518a17d78991dc2ce97eebae4dd) — write 0, 정상 종료"
+}

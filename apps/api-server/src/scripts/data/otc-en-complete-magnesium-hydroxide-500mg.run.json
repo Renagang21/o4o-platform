@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "수산화마그네슘|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "048b8e71-c651-49da-9d27-de5900c11d9f",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 8,
+  "targetMasters": 8,
+  "anomalies": [],
+  "koCanonical": 8,
+  "existingEnAny": 8,
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "b68a955b4f61c39580ec2774f689004b",
+      "n": 11
+    }
+  ],
+  "builtLen": 2600,
+  "builtMd5": "b68a955b4f61c39580ec2774f689004b",
+  "consistencyMatch": true,
+  "summaryField": "Heartburn, excess stomach acid, constipation",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_en_canonical_flip": 8,
+    "en_write_total": 16
+  },
+  "enTargetMd5": "b68a955b4f61c39580ec2774f689004b",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(b68a955b4f61c39580ec2774f689004b) — write 0, 정상 종료"
+}

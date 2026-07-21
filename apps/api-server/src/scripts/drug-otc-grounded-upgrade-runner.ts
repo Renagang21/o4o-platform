@@ -532,6 +532,59 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-folic-acid-1mg-jeong',
   },
+  // ── WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1 (에이전트 가) 상위 3 READY ──
+  //    감사 산출: data/otc-next-batch-audit-v2.json. 각 target 단일 fp, other 0.
+  'dexibuprofen-300mg-jeong': {
+    key: '덱시부프로펜|300밀리그램|정',
+    ingredient: '덱시부프로펜',
+    dose: '300밀리그램',
+    formKeyword: '정',
+    candidate: '002c309a-8576-48ec-938a-19bc1478bacb',
+    targetFp: '605e64748c7bc3da',
+    excludeFp: [
+      '0137a72612912f7f', '0da704ccb35bd198', '155dd2ffef13c8dc', '16e90af9107c8689',
+      '1aced0574f7023c8', '365224e49d4e53a2', '56294ed4c3d756a1', '61c17a8585a9efc5',
+      '6a00153d2e1954dc', '7a9b6871c835b7a4', '8242e59d3f17b689', '98c9177907417a44',
+      'aed2641f270d450b', 'b44efa6125fc38f1', 'cdec8f3a5765ef68', 'e5b598f9b640132d',
+      'eee438064d1ded32', 'f19cea60bb45cdae',
+    ], // 비대상 18 fp = 89 (coarse 97 = 8 + 89)
+    expected: 8,
+    excludedExpected: 89,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-dexibuprofen-300mg-jeong',
+  },
+  'diosmin-600mg-jeong': {
+    key: '디오스민|600밀리그램|정',
+    ingredient: '디오스민',
+    dose: '600밀리그램',
+    formKeyword: '정',
+    candidate: '014af1cd-d228-4de9-8036-3a0679b2af87',
+    targetFp: 'bbb731cc8414d08a',
+    excludeFp: [
+      '0c29973df03bb30b', '0c37f95dd421fbff', '1d2ac2d1ed8eff59', '2e50e025ddcc79e5',
+      '41b6e0e1cac5c33c', '59a5f7ed73721534', '6056b2a5fb9af9d7', '6f326895ec050401',
+      '8326bba7abd32bad', '8e2f26c9f29e0c60', '95bd6150d96c06f1', 'a6b0dd2590024e11',
+      'a6c5974fb2f4fd0f', 'c22e7ea66c009586', 'd05a5af45f9f021c', 'e00fc37e2636de9a',
+      'ea1507ac2a4a2e53',
+    ], // 비대상 17 fp = 56 (coarse 64 = 8 + 56). 디오스민 300mg 캡슐(완료)과 별개 groupKey.
+    expected: 8,
+    excludedExpected: 56,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-diosmin-600mg-jeong',
+  },
+  'magnesium-hydroxide-500mg-jeong': {
+    key: '수산화마그네슘|500밀리그램|정',
+    ingredient: '수산화마그네슘',
+    dose: '500밀리그램',
+    formKeyword: '정',
+    candidate: '048b8e71-c651-49da-9d27-de5900c11d9f',
+    targetFp: '2d3b7629b0aeafca',
+    excludeFp: '190a6698c388ebde', // 비대상 단일 fp = 7 (coarse 15 = 8 + 7)
+    expected: 8,
+    excludedExpected: 7,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-magnesium-hydroxide-500mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

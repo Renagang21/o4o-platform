@@ -1,0 +1,423 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "디오스민|600밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "014af1cd-d228-4de9-8036-3a0679b2af87",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "디오스민 600mg 정",
+  "coarseTotal": 64,
+  "target": 8,
+  "excluded": 56,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0f6b976b-1787-4152-8f99-3911fb3e4d4f",
+      "name": "아나파치정(디오스민)",
+      "reason": "비대상(fp ea1507ac2a4a2e53, bridge SSOT)"
+    },
+    {
+      "id": "15672f39-be24-4d01-929e-ef620b009b65",
+      "name": "한미치쏙정600밀리그램(디오스민)",
+      "reason": "비대상(fp 8e2f26c9f29e0c60, bridge SSOT)"
+    },
+    {
+      "id": "171a5df7-56c7-4fb6-863a-dc0a40f53299",
+      "name": "제일치오스민정(디오스민)",
+      "reason": "비대상(fp 0c37f95dd421fbff, bridge SSOT)"
+    },
+    {
+      "id": "206d3527-b8ad-4728-9b66-95a39ae5e792",
+      "name": "베노론디정600밀리그램(디오스민)",
+      "reason": "비대상(fp a6c5974fb2f4fd0f, bridge SSOT)"
+    },
+    {
+      "id": "23930fbb-8b7d-4d37-bac9-7d6d3c1d06bd",
+      "name": "유유베노스민정600밀리그램(디오스민)",
+      "reason": "비대상(fp a6b0dd2590024e11, bridge SSOT)"
+    },
+    {
+      "id": "262685d6-adb0-425f-8451-39857c1feff1",
+      "name": "나노디오정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6f326895ec050401, bridge SSOT)"
+    },
+    {
+      "id": "312ebf4b-76c9-4821-bd64-e269cef14ebd",
+      "name": "한미치쏙정600밀리그램(디오스민)",
+      "reason": "비대상(fp 8e2f26c9f29e0c60, bridge SSOT)"
+    },
+    {
+      "id": "34df69b6-e984-4932-9b9b-f8e39167a2fb",
+      "name": "디오맥스정600밀리그램(디오스민)",
+      "reason": "비대상(fp c22e7ea66c009586, bridge SSOT)"
+    },
+    {
+      "id": "38c74713-9a0d-4376-9b64-375abd8620de",
+      "name": "푸리디오스정(디오스민)",
+      "reason": "비대상(fp 1d2ac2d1ed8eff59, bridge SSOT)"
+    },
+    {
+      "id": "3a25899c-336a-4e49-9dde-58b26599a732",
+      "name": "한미치쏙정600밀리그램(디오스민)",
+      "reason": "비대상(fp 8e2f26c9f29e0c60, bridge SSOT)"
+    },
+    {
+      "id": "3cbfa769-71da-4a57-9bdd-fe5040e5d565",
+      "name": "푸리디오스정(디오스민)",
+      "reason": "비대상(fp 1d2ac2d1ed8eff59, bridge SSOT)"
+    },
+    {
+      "id": "41f9a1ed-5b92-4801-b3c5-337e022edce7",
+      "name": "치지렌정600밀리그램(디오스민)",
+      "reason": "비대상(fp 41b6e0e1cac5c33c, bridge SSOT)"
+    },
+    {
+      "id": "45c27577-d89a-401f-a768-3d1759858270",
+      "name": "치렉스정600밀리그램(디오스민)",
+      "reason": "비대상(fp e00fc37e2636de9a, bridge SSOT)"
+    },
+    {
+      "id": "46aa7496-d04b-4c84-8571-b9779b9c6b6c",
+      "name": "제일치오스민정(디오스민)",
+      "reason": "비대상(fp 0c37f95dd421fbff, bridge SSOT)"
+    },
+    {
+      "id": "46b8e593-e252-4cd7-aec7-caf3ac225065",
+      "name": "푸레파센600정(디오스민)",
+      "reason": "비대상(fp 95bd6150d96c06f1, bridge SSOT)"
+    },
+    {
+      "id": "4e1e21cb-e8c8-41b2-b769-071aeb34ba37",
+      "name": "유유베노스민정600밀리그램(디오스민)",
+      "reason": "비대상(fp a6b0dd2590024e11, bridge SSOT)"
+    },
+    {
+      "id": "4f7769ba-a91a-4c29-87ef-5ddeaf484005",
+      "name": "디오맥스정600밀리그램(디오스민)",
+      "reason": "비대상(fp c22e7ea66c009586, bridge SSOT)"
+    },
+    {
+      "id": "505852dd-f1b0-42d4-a869-0a6b2e3da1b7",
+      "name": "치킬정(디오스민)",
+      "reason": "비대상(fp 8326bba7abd32bad, bridge SSOT)"
+    },
+    {
+      "id": "5210b393-be33-4b99-87e5-f39e1e82dd0d",
+      "name": "프라디오정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "5ab65b9a-2d44-4b8f-b5bf-acb6e5b75bf1",
+      "name": "아나파치정(디오스민)",
+      "reason": "비대상(fp ea1507ac2a4a2e53, bridge SSOT)"
+    },
+    {
+      "id": "5ac55d4c-cf0d-4882-a2ac-ac3846f226ba",
+      "name": "디오라인정600밀리그램(디오스민)",
+      "reason": "비대상(fp 59a5f7ed73721534, bridge SSOT)"
+    },
+    {
+      "id": "5d76cc6c-3663-4761-9e57-0350e3b64b4d",
+      "name": "프라디오정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "644de836-c099-4b59-8d1c-0ce34ab52dfd",
+      "name": "제일치오스민정(디오스민)",
+      "reason": "비대상(fp 0c37f95dd421fbff, bridge SSOT)"
+    },
+    {
+      "id": "66e26b93-0bf7-4279-87cc-2e747a24c2c6",
+      "name": "푸레파센600정(디오스민)",
+      "reason": "비대상(fp 95bd6150d96c06f1, bridge SSOT)"
+    },
+    {
+      "id": "773ccf19-fe72-4cf4-8690-60b07210aa3f",
+      "name": "치지렌정600밀리그램(디오스민)",
+      "reason": "비대상(fp 41b6e0e1cac5c33c, bridge SSOT)"
+    },
+    {
+      "id": "78fa47d6-e045-4c00-b97f-5674aba18390",
+      "name": "메디오스정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6056b2a5fb9af9d7, bridge SSOT)"
+    },
+    {
+      "id": "83a64d79-d86d-4071-92aa-a7c5995ec741",
+      "name": "프라디오정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "87de0c30-6c85-497e-9c5c-83afbb46c8c8",
+      "name": "디오치민정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "8811a222-1ad7-4922-8882-5005d34d1ac3",
+      "name": "나노디오정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6f326895ec050401, bridge SSOT)"
+    },
+    {
+      "id": "8a5d865f-984d-45c7-8d1c-21268d017ace",
+      "name": "나노디오정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6f326895ec050401, bridge SSOT)"
+    },
+    {
+      "id": "8b6f2595-dd23-47ff-941f-fc07b668636f",
+      "name": "디오라인정600밀리그램(디오스민)",
+      "reason": "비대상(fp 59a5f7ed73721534, bridge SSOT)"
+    },
+    {
+      "id": "8c3bedd6-b707-4c65-a6cd-72c7dc1c89f6",
+      "name": "나노디오정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6f326895ec050401, bridge SSOT)"
+    },
+    {
+      "id": "9052c9d7-d460-42a2-91ad-d8d6a7feaca6",
+      "name": "디오치민정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "973f6f66-5497-488b-9bf5-6bbe116d6a41",
+      "name": "나노디오정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6f326895ec050401, bridge SSOT)"
+    },
+    {
+      "id": "9b2b3839-e145-4f84-a6dc-754fe822845e",
+      "name": "메디오스정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6056b2a5fb9af9d7, bridge SSOT)"
+    },
+    {
+      "id": "9d26c003-c608-4ced-b29e-ea46641dcc74",
+      "name": "푸레파센600정(디오스민)",
+      "reason": "비대상(fp 95bd6150d96c06f1, bridge SSOT)"
+    },
+    {
+      "id": "9f82042d-5b62-4f94-a4a6-1ef8e3bb59ee",
+      "name": "메디오스정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6056b2a5fb9af9d7, bridge SSOT)"
+    },
+    {
+      "id": "a10b89d6-ddef-405c-a14f-4d16e539b940",
+      "name": "치센정600밀리그램(디오스민)",
+      "reason": "비대상(fp 0c29973df03bb30b, bridge SSOT)"
+    },
+    {
+      "id": "a3fee400-aae3-4015-aade-96f1c18df604",
+      "name": "치지렌정600밀리그램(디오스민)",
+      "reason": "비대상(fp 41b6e0e1cac5c33c, bridge SSOT)"
+    },
+    {
+      "id": "a7720580-86cf-45e7-9109-d2530074a067",
+      "name": "베노론디정600밀리그램(디오스민)",
+      "reason": "비대상(fp a6c5974fb2f4fd0f, bridge SSOT)"
+    },
+    {
+      "id": "af20ccbb-7fd2-4f79-83ff-2f4f221d140f",
+      "name": "치센정600밀리그램(디오스민)",
+      "reason": "비대상(fp 0c29973df03bb30b, bridge SSOT)"
+    },
+    {
+      "id": "b51f7962-4678-4206-9f8e-e5a32e69511a",
+      "name": "베노론디정600밀리그램(디오스민)",
+      "reason": "비대상(fp a6c5974fb2f4fd0f, bridge SSOT)"
+    },
+    {
+      "id": "b88180ba-bce1-4cc0-b8f2-5aba01260038",
+      "name": "치킬정(디오스민)",
+      "reason": "비대상(fp 8326bba7abd32bad, bridge SSOT)"
+    },
+    {
+      "id": "babb937f-ca80-419f-8771-d7664d015781",
+      "name": "마더스민정600밀리그램(디오스민)",
+      "reason": "비대상(fp 2e50e025ddcc79e5, bridge SSOT)"
+    },
+    {
+      "id": "bcc7796a-c75b-4397-b4ab-28c4e92715a6",
+      "name": "치렉스정600밀리그램(디오스민)",
+      "reason": "비대상(fp e00fc37e2636de9a, bridge SSOT)"
+    },
+    {
+      "id": "bf72cbfe-f4b5-4390-804e-0300e7d282e2",
+      "name": "디오치민정(디오스민)",
+      "reason": "비대상(fp d05a5af45f9f021c, bridge SSOT)"
+    },
+    {
+      "id": "c00e71b6-9e62-4e2f-8b03-4183e795bc59",
+      "name": "제일치오스민정(디오스민)",
+      "reason": "비대상(fp 0c37f95dd421fbff, bridge SSOT)"
+    },
+    {
+      "id": "c0a2689e-0685-42bf-8976-77ec7a9f538c",
+      "name": "아나파치정(디오스민)",
+      "reason": "비대상(fp ea1507ac2a4a2e53, bridge SSOT)"
+    },
+    {
+      "id": "cff2374f-14cc-45e8-acd2-dcd32a219f33",
+      "name": "아나파치정(디오스민)",
+      "reason": "비대상(fp ea1507ac2a4a2e53, bridge SSOT)"
+    },
+    {
+      "id": "dc04cc93-271b-4fbc-b6a4-dae12a5b98d1",
+      "name": "푸리디오스정(디오스민)",
+      "reason": "비대상(fp 1d2ac2d1ed8eff59, bridge SSOT)"
+    },
+    {
+      "id": "e8324c33-379e-433e-b28d-283b5db52517",
+      "name": "마더스민정600밀리그램(디오스민)",
+      "reason": "비대상(fp 2e50e025ddcc79e5, bridge SSOT)"
+    },
+    {
+      "id": "eafd0b17-e74d-426b-a7e3-e05ed56361cf",
+      "name": "디오라인정600밀리그램(디오스민)",
+      "reason": "비대상(fp 59a5f7ed73721534, bridge SSOT)"
+    },
+    {
+      "id": "f11fe8d6-d6da-4584-8057-de68ad1dbcc8",
+      "name": "메디오스정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6056b2a5fb9af9d7, bridge SSOT)"
+    },
+    {
+      "id": "f1266f7d-e210-4b58-a125-93279f509700",
+      "name": "마더스민정600밀리그램(디오스민)",
+      "reason": "비대상(fp 2e50e025ddcc79e5, bridge SSOT)"
+    },
+    {
+      "id": "f5117f9a-8916-412d-af9d-a7abc7c31411",
+      "name": "디오맥스정600밀리그램(디오스민)",
+      "reason": "비대상(fp c22e7ea66c009586, bridge SSOT)"
+    },
+    {
+      "id": "fb57fa82-075b-488a-bdf2-bf6f06208b95",
+      "name": "메디오스정600밀리그램(디오스민)",
+      "reason": "비대상(fp 6056b2a5fb9af9d7, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "4d5e925f-0f5c-4e74-a03e-4a876fe57b5d",
+    "6c831b21-3d91-4608-9922-991e81f523a9",
+    "871c4517-2b7a-4b3d-8c9b-7f2ac94f88f8",
+    "96d3cb84-2e80-4aba-b506-e6ffc6f8abda",
+    "a6799861-8cc8-4507-9c13-3788573fa3cb",
+    "af8fc4b1-5fbd-4469-8907-7a35f9bac134",
+    "bdf36756-1fa7-462e-a29f-58a48d5a436c",
+    "c18d02bc-724c-4bdf-b342-6ae8768afd21"
+  ],
+  "rollback_master_ids": [
+    "4d5e925f-0f5c-4e74-a03e-4a876fe57b5d",
+    "6c831b21-3d91-4608-9922-991e81f523a9",
+    "871c4517-2b7a-4b3d-8c9b-7f2ac94f88f8",
+    "96d3cb84-2e80-4aba-b506-e6ffc6f8abda",
+    "a6799861-8cc8-4507-9c13-3788573fa3cb",
+    "af8fc4b1-5fbd-4469-8907-7a35f9bac134",
+    "bdf36756-1fa7-462e-a29f-58a48d5a436c",
+    "c18d02bc-724c-4bdf-b342-6ae8768afd21"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "ea1507ac2a4a2e53",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8e2f26c9f29e0c60",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0c37f95dd421fbff",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a6c5974fb2f4fd0f",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a6b0dd2590024e11",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6f326895ec050401",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c22e7ea66c009586",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "1d2ac2d1ed8eff59",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "41b6e0e1cac5c33c",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e00fc37e2636de9a",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "95bd6150d96c06f1",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "bbb731cc8414d08a",
+      "n": 8,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "8326bba7abd32bad",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "d05a5af45f9f021c",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "59a5f7ed73721534",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6056b2a5fb9af9d7",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0c29973df03bb30b",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "2e50e025ddcc79e5",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 8,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 8 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

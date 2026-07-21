@@ -1,0 +1,617 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "덱시부프로펜|300밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "002c309a-8576-48ec-938a-19bc1478bacb",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "덱시부프로펜 300mg 정",
+  "coarseTotal": 97,
+  "target": 8,
+  "excluded": 89,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "00f1e7bc-f5c3-465f-9202-4973110e00e1",
+      "name": "맥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "0158fa94-7128-4f8a-b8eb-f4878dfde9c7",
+      "name": "덱시로펜정(덱시부프로펜)",
+      "reason": "비대상(fp 7a9b6871c835b7a4, bridge SSOT)"
+    },
+    {
+      "id": "01d7aea0-cdb0-41ee-aade-96c255441bd6",
+      "name": "에스프로펜정(덱시부프로펜)",
+      "reason": "비대상(fp f19cea60bb45cdae, bridge SSOT)"
+    },
+    {
+      "id": "04651505-7bc4-4708-8daa-9aa6df5ca1b5",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "050a3c2e-9772-428f-a8c9-0d9a648b7854",
+      "name": "펜타우드정(덱시부프로펜)",
+      "reason": "비대상(fp eee438064d1ded32, bridge SSOT)"
+    },
+    {
+      "id": "09e5a96c-602a-4d79-89f8-6941ebd0f3c8",
+      "name": "소니펜정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "0f5a9594-7e72-4979-bcbd-5cbd3ea2f6f1",
+      "name": "덱사펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "0fd704e0-5009-4224-89b5-c48d5336fd72",
+      "name": "팍스정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "146b9d23-5d72-4820-9bcb-409b614725df",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "19fb0dce-1c9f-497d-87da-27b449a35596",
+      "name": "덱펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "1a908c5c-2da5-4034-a937-cc1d8b70fdb3",
+      "name": "애니펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 6a00153d2e1954dc, bridge SSOT)"
+    },
+    {
+      "id": "1ee524e3-74d2-4651-9e18-3abbac4ea69c",
+      "name": "에스부펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "21410199-c5f7-4f85-aaf7-f6abc292caeb",
+      "name": "덱시네정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "25fdf089-86f4-4cdf-a238-161a2cc846f9",
+      "name": "애니펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 6a00153d2e1954dc, bridge SSOT)"
+    },
+    {
+      "id": "2792bb5b-9033-4eb8-9f6a-0dbb5c56b794",
+      "name": "덱펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "29316ff2-242d-4f0e-92b5-1d6a57dacf98",
+      "name": "맥시부펜이알정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp aed2641f270d450b, bridge SSOT)"
+    },
+    {
+      "id": "2b60d14f-da78-49fc-8eab-255404c67c19",
+      "name": "펜타우드정(덱시부프로펜)",
+      "reason": "비대상(fp eee438064d1ded32, bridge SSOT)"
+    },
+    {
+      "id": "3076867b-a774-44ba-ae52-83d3364e1d8e",
+      "name": "파날디정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    },
+    {
+      "id": "334a6714-008e-48b9-a247-c773743656b4",
+      "name": "애니펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 6a00153d2e1954dc, bridge SSOT)"
+    },
+    {
+      "id": "35343d4a-0ab1-4692-9c38-ae15d5fbd855",
+      "name": "글로덱시정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 16e90af9107c8689, bridge SSOT)"
+    },
+    {
+      "id": "368dbaa8-3472-4e52-9101-646a3d83b1c7",
+      "name": "파나덱스정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 0da704ccb35bd198, bridge SSOT)"
+    },
+    {
+      "id": "376260e0-a1e9-4a48-8137-2cb205a94bea",
+      "name": "덱스트론정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 56294ed4c3d756a1, bridge SSOT)"
+    },
+    {
+      "id": "3a23655f-d16e-489e-8e6a-d51781c18b0f",
+      "name": "덱시네정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "3af1bc8e-9ac3-458f-92d5-efe39911b2d9",
+      "name": "에스프로펜정(덱시부프로펜)",
+      "reason": "비대상(fp f19cea60bb45cdae, bridge SSOT)"
+    },
+    {
+      "id": "40b55d18-b7e7-4e26-8481-34ac7c2ff134",
+      "name": "덱시네정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "40ef9b5d-d979-4c25-98a6-2e2a3c690424",
+      "name": "엑시펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "414915ef-ea62-4800-b7e4-c653753f939d",
+      "name": "맥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "52510c82-66c1-4a01-9898-6023c5b022ff",
+      "name": "덱시로펜정(덱시부프로펜)",
+      "reason": "비대상(fp 7a9b6871c835b7a4, bridge SSOT)"
+    },
+    {
+      "id": "57806a7e-826d-4039-b91a-953e4281d2a3",
+      "name": "에스부펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "588da048-32ba-4637-9433-8f80590634b0",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "5a541c96-4aad-4b02-988d-aafcb6ea4f36",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "5b7f5eb2-58fa-4056-af13-4fcec14acae1",
+      "name": "덱사펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "64a582fc-9a6e-4c98-8838-9c63a959ad47",
+      "name": "소니펜정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "65cb3160-f485-4fc7-9635-483e5cf96e24",
+      "name": "맥시부펜이알정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp aed2641f270d450b, bridge SSOT)"
+    },
+    {
+      "id": "71753418-7073-47a8-9774-702c3e3ae9d5",
+      "name": "로노펜정(덱시부프로펜)",
+      "reason": "비대상(fp 365224e49d4e53a2, bridge SSOT)"
+    },
+    {
+      "id": "72007827-48a0-4628-9c81-a31c7a60e4d3",
+      "name": "펜타우드정(덱시부프로펜)",
+      "reason": "비대상(fp eee438064d1ded32, bridge SSOT)"
+    },
+    {
+      "id": "78b44376-006a-4b13-bc4d-62f8559bf5d6",
+      "name": "덱브펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 61c17a8585a9efc5, bridge SSOT)"
+    },
+    {
+      "id": "78c73e5f-d51e-42c5-99f9-979f4fb0bf2f",
+      "name": "맥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "7cdb244f-d1b8-4d9b-b017-6d4c036ae17b",
+      "name": "엑시펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "7f050ae2-a5b3-4fcc-8df7-25baa146b7a3",
+      "name": "파날디정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    },
+    {
+      "id": "84b129af-601c-423f-9df3-2bdb0219fe98",
+      "name": "디뉴펜정(덱시부프로펜)",
+      "reason": "비대상(fp e5b598f9b640132d, bridge SSOT)"
+    },
+    {
+      "id": "8698b99a-ba40-4a9f-8df3-2f43a7b6fb75",
+      "name": "맥시부펜이알정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp aed2641f270d450b, bridge SSOT)"
+    },
+    {
+      "id": "8acf7bfa-fbe0-4216-9731-ff7bd3abd454",
+      "name": "무로펜정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    },
+    {
+      "id": "8b2b25fa-865e-44e8-860c-9f5deebb9b07",
+      "name": "팍스정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "8c82be63-8678-40cb-9ebe-e247fdc5ae25",
+      "name": "에스프로펜정(덱시부프로펜)",
+      "reason": "비대상(fp f19cea60bb45cdae, bridge SSOT)"
+    },
+    {
+      "id": "8e4ee601-5b0b-4344-b901-6ba9f6c16a21",
+      "name": "로노펜정(덱시부프로펜)",
+      "reason": "비대상(fp 365224e49d4e53a2, bridge SSOT)"
+    },
+    {
+      "id": "92284102-93e6-48ad-9a0c-9473b74b931a",
+      "name": "에스부펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "93efba2d-668a-44d4-9e33-39d9396ebd39",
+      "name": "글로덱시정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 16e90af9107c8689, bridge SSOT)"
+    },
+    {
+      "id": "9d3cfc78-7ddf-49e4-a439-e6bc3371a850",
+      "name": "덱시파인정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "9dd9f355-9096-4def-889c-bd9bcc5efdfa",
+      "name": "에스부펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "9ea11727-e0ee-4ede-87e3-0a5da58c2f81",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "9eff839f-37cb-4002-81ba-0d80a5a5a2dc",
+      "name": "덱시파인정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "9f4868f0-1766-4723-8467-fa27f86747ce",
+      "name": "파날디정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    },
+    {
+      "id": "9ff345dc-6d7c-4d35-aa91-0be427826c85",
+      "name": "파나덱스정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 0da704ccb35bd198, bridge SSOT)"
+    },
+    {
+      "id": "a03987fc-ff1f-43d0-9c05-66701f3b4e49",
+      "name": "맥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "a3226983-63a8-427e-8ce7-5d58f8f35d8d",
+      "name": "무로펜정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    },
+    {
+      "id": "a7687c55-73c2-436d-afff-9bd5ae93333c",
+      "name": "덱시파인정(덱시부프로펜)",
+      "reason": "비대상(fp 98c9177907417a44, bridge SSOT)"
+    },
+    {
+      "id": "a867068e-a5fa-455c-9505-f46960305203",
+      "name": "덱사펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "b3f4a820-6476-401b-be38-992b47f89fb4",
+      "name": "로노펜정(덱시부프로펜)",
+      "reason": "비대상(fp 365224e49d4e53a2, bridge SSOT)"
+    },
+    {
+      "id": "b67b6a1a-ce85-4322-9011-09ea973890c9",
+      "name": "애스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "b6a782fb-3088-4e89-a68d-e84d0d5bb794",
+      "name": "그리펜-에스정(덱시부프로펜)",
+      "reason": "비대상(fp b44efa6125fc38f1, bridge SSOT)"
+    },
+    {
+      "id": "ba78efce-4108-4d70-a8cc-2c1b1b430c89",
+      "name": "덱브펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 61c17a8585a9efc5, bridge SSOT)"
+    },
+    {
+      "id": "be5a0c9b-8d38-48b4-ac26-8e770afe3200",
+      "name": "파나덱스정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 0da704ccb35bd198, bridge SSOT)"
+    },
+    {
+      "id": "be79463f-e97d-488a-ae83-d09862216519",
+      "name": "팍스정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "c1ff3eb6-65a7-4b9b-b681-5602209ac0d6",
+      "name": "소니펜정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "c249db73-9720-4f52-81e6-e4523bf7d5dc",
+      "name": "디뉴펜정(덱시부프로펜)",
+      "reason": "비대상(fp e5b598f9b640132d, bridge SSOT)"
+    },
+    {
+      "id": "c33f168f-5e95-48d4-b3f2-09ebe1411ef2",
+      "name": "엑시펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "c4684646-4359-480b-aeb0-45bbdc78e74a",
+      "name": "덱브펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 61c17a8585a9efc5, bridge SSOT)"
+    },
+    {
+      "id": "c4d7cbb5-e22f-4163-9c6c-32c9e48a471e",
+      "name": "글로덱시정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 16e90af9107c8689, bridge SSOT)"
+    },
+    {
+      "id": "cdc34735-0014-4405-b47f-e0787ce473e5",
+      "name": "덱펜정(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "d0c4abb3-1a12-469c-bad6-5e314b2b2880",
+      "name": "엑시펜정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "d9390c12-3574-4668-88ca-f636cc0c7714",
+      "name": "닥스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 0137a72612912f7f, bridge SSOT)"
+    },
+    {
+      "id": "dbc0e1af-2551-4c33-8166-7fde58e98e35",
+      "name": "맥시부펜이알정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp aed2641f270d450b, bridge SSOT)"
+    },
+    {
+      "id": "dd004e2b-b05f-488d-9b0a-366a4a7d3c19",
+      "name": "애스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "dda1ef06-7851-478a-b2eb-a9d750e3d927",
+      "name": "덱시로펜정(덱시부프로펜)",
+      "reason": "비대상(fp 7a9b6871c835b7a4, bridge SSOT)"
+    },
+    {
+      "id": "e1d0edc0-8f58-406c-a273-34c5faf291db",
+      "name": "애스펜정(덱시부프로펜)",
+      "reason": "비대상(fp 155dd2ffef13c8dc, bridge SSOT)"
+    },
+    {
+      "id": "e305a49f-b480-4d17-9990-180c8248ee43",
+      "name": "로노펜정(덱시부프로펜)",
+      "reason": "비대상(fp 365224e49d4e53a2, bridge SSOT)"
+    },
+    {
+      "id": "e3f08f6d-bf5d-4824-80a4-f0254701199c",
+      "name": "글로덱시정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 16e90af9107c8689, bridge SSOT)"
+    },
+    {
+      "id": "ecd00794-3ffd-414c-8335-ab5f0d14c7b5",
+      "name": "맥시부펜이알정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp aed2641f270d450b, bridge SSOT)"
+    },
+    {
+      "id": "ee3c1c3c-32fc-4287-bed3-499b7808388a",
+      "name": "펜타우드정(덱시부프로펜)",
+      "reason": "비대상(fp eee438064d1ded32, bridge SSOT)"
+    },
+    {
+      "id": "efcffe94-7ad1-415f-9c39-2d3b70ebf451",
+      "name": "덱시로펜정(덱시부프로펜)",
+      "reason": "비대상(fp 7a9b6871c835b7a4, bridge SSOT)"
+    },
+    {
+      "id": "f0c12e87-f0ed-47bf-8bad-ab929d9b641b",
+      "name": "팍스정(덱시부프로펜)",
+      "reason": "비대상(fp 8242e59d3f17b689, bridge SSOT)"
+    },
+    {
+      "id": "f11bf091-af05-4f6a-9d4a-dbeb934f4107",
+      "name": "그리펜-에스정(덱시부프로펜)",
+      "reason": "비대상(fp b44efa6125fc38f1, bridge SSOT)"
+    },
+    {
+      "id": "f68f8117-3301-45ea-b702-9064ca29862b",
+      "name": "그리펜-에스정(덱시부프로펜)",
+      "reason": "비대상(fp b44efa6125fc38f1, bridge SSOT)"
+    },
+    {
+      "id": "f806ee95-5899-4956-bd96-f6755356b66c",
+      "name": "애니펜정300밀리그램(덱시부프로펜)",
+      "reason": "비대상(fp 6a00153d2e1954dc, bridge SSOT)"
+    },
+    {
+      "id": "fa1468b7-8fcf-4690-a039-4ab84ee8acc2",
+      "name": "소니펜정300mg(덱시부프로펜)",
+      "reason": "비대상(fp 1aced0574f7023c8, bridge SSOT)"
+    },
+    {
+      "id": "fb866ccd-ca5a-43f5-b900-bc3da04f9398",
+      "name": "에스프로펜정(덱시부프로펜)",
+      "reason": "비대상(fp f19cea60bb45cdae, bridge SSOT)"
+    },
+    {
+      "id": "fbf8949c-fb43-4207-8a04-c6028a6d027a",
+      "name": "디뉴펜정(덱시부프로펜)",
+      "reason": "비대상(fp e5b598f9b640132d, bridge SSOT)"
+    },
+    {
+      "id": "fe5135c7-7c9f-4252-a9ac-4460cb9005a3",
+      "name": "무로펜정(덱시부프로펜)",
+      "reason": "비대상(fp cdec8f3a5765ef68, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "3e5acac6-b9ef-44c5-86e9-5a07008001b1",
+    "531fd3f0-d201-49af-addb-cb336ebf96ca",
+    "7b6b466c-7d30-4314-a2d4-4621e1dd115d",
+    "9753167b-264c-4230-a085-0c4dd86d6c5c",
+    "a50e66ea-522a-4136-876d-6dca7e700e86",
+    "c75b87e2-2532-4c4b-9727-0097d0dfde37",
+    "e2da7a5b-1d46-4a08-9e9d-370e32dddf4d",
+    "f4c3c824-e238-442a-be98-114f7e58140e"
+  ],
+  "rollback_master_ids": [
+    "3e5acac6-b9ef-44c5-86e9-5a07008001b1",
+    "531fd3f0-d201-49af-addb-cb336ebf96ca",
+    "7b6b466c-7d30-4314-a2d4-4621e1dd115d",
+    "9753167b-264c-4230-a085-0c4dd86d6c5c",
+    "a50e66ea-522a-4136-876d-6dca7e700e86",
+    "c75b87e2-2532-4c4b-9727-0097d0dfde37",
+    "e2da7a5b-1d46-4a08-9e9d-370e32dddf4d",
+    "f4c3c824-e238-442a-be98-114f7e58140e"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "155dd2ffef13c8dc",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7a9b6871c835b7a4",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f19cea60bb45cdae",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0137a72612912f7f",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "eee438064d1ded32",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "1aced0574f7023c8",
+      "n": 11,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8242e59d3f17b689",
+      "n": 11,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6a00153d2e1954dc",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "98c9177907417a44",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "aed2641f270d450b",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "cdec8f3a5765ef68",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "16e90af9107c8689",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0da704ccb35bd198",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "56294ed4c3d756a1",
+      "n": 1,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "605e64748c7bc3da",
+      "n": 8,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "365224e49d4e53a2",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "61c17a8585a9efc5",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e5b598f9b640132d",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b44efa6125fc38f1",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 8,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 8,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 8,
+  "htmlLen": 1764,
+  "contentHash": "0f43addaa2ea71ae047f662320a38488",
+  "summary": "덱시부프로펜 300mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 8,
+      "STEP_B_easy_canonical_demote": 8,
+      "STEP_B_authored_canonical_flip": 8,
+      "total": 24
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 8,
+      "total": 8
+    },
+    "grand_total": 32
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 8",
+    "policy_2A": "audit 2/master = 16 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
