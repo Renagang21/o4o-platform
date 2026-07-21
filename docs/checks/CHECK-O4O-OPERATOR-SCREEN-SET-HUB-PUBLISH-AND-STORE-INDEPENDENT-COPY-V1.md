@@ -61,16 +61,43 @@ AND service_key = <현재 서비스> AND deleted_at IS NULL
 - **반복 허용**: 호출마다 새 사본(기존 `WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1` 관례 — UNIQUE 제약 없음, "이미 가져옴" 차단 없음). 기존 복사 계약과 충돌 없음.
 - **provenance**: `recordDerivations()` best-effort — `source_kind='operator_screen_set'`, `source_id=<원본>`, `derived_kind='screen_set'`, `derived_id=<사본>`, org·service_key·created_by·`metadata.importedAt`. **FK 없음 · 실패해도 가져오기 성공**(추적 전용). 신규 kind 2개는 application-level 카탈로그에 추가(DB enum 없음 → migration 0).
 
-## 7~11. 독립성·회귀 검증 (실행 5·6·7) — DEFERRED (배포 후 프로덕션 검증)
+## 7~11. 독립성·회귀 검증 (실행 5·6·7) — ✅ PASS (프로덕션, 2026-07-21)
 
-- [ ] 운영자 원본 수정 → 기존 매장 사본 불변
-- [ ] 운영자 원본 보관·삭제 → 매장 사본 조회·수정·렌더 정상
-- [ ] 매장 사본 수정·삭제 → 운영자 원본 불변
-- [ ] 두 매장이 같은 원본을 가져와도 서로 독립 / 같은 매장 반복 가져오기 = 독립 사본 2개
-- [ ] 코너 자동 미적용(current 미지정 · "코너에는 아직 적용되지 않았습니다" 안내)
-- [ ] 타블렛 idle_media 포함 · QR 채널 idle 제외(기존 resolver 규칙 유지)
-- [ ] 보호 샘플(구강/피부)·current 불변, 기존 매장 목록·공개 타블렛·QR 회귀 0
-- [ ] console/pageerror/예상 외 API 오류 0
+테스트 데이터: 운영자 원본 3건 생성(검증 후 전량 정리) · 매장 사본 3건(전량 정리). 보호 샘플 무접촉.
+
+**7. 원본 수정·보관·삭제 후 사본 독립성**
+- 운영자가 원본 **이름 + 코너 본문 수정** → 매장 사본 2건 모두 **미전파**(사본 본문 = 가져온 시점 값) ✅
+- 운영자가 원본 **삭제(soft)** → 사본 2건 **alive**, 블록 각 **5개 유지**(연쇄삭제 0) ✅
+- 삭제된 원본은 **HUB 목록에서 즉시 제거**(공개 HUB 0건) ✅
+- 원본 삭제 후에도 사본 **QR 공개 렌더 정상**(`/qr/public/a` → landingType=screen_set, 사본 이름·섹션 정상) ✅
+
+**8. 매장 수정·삭제 후 원본 불변**
+- 매장이 사본 이름·코너 본문 수정 → **원본 name/본문 불변** ✅
+- 사본1(수정) ↔ 사본2(미수정) **상호 독립**(같은 원본에서 온 두 사본) ✅
+
+**9. 코너 자동 미적용**
+- 사본 `tablet_id=NULL`, `store_tablets.current_screen_set_id` 참조 **0**, `store_tablet_corner_contents` **0** ✅
+- 목록에 **"현재 미적용"** 표시 ✅ · UI 안내 **"코너에는 아직 적용되지 않았습니다. …'코너별 운영'에서 이 콘텐츠를 선택해 주세요."** ✅
+
+**10. 타블렛 idle 포함 · QR idle 제외**
+- 공개 타블렛(보호 샘플): sections **5** = `[idle_media, corner_description, content_list, product_list, qr_guide]` — **idle 포함** ✅
+- 사본 QR 공개: `[corner_description, content_list, qr_guide]` — **idle 제외** ✅ (기존 resolver 규칙 유지). QR 모바일 **미리보기**도 동일하게 idle 제외 처리.
+- 표시 상태 복사가 렌더에 반영: 원본에서 숨긴 `product_list`(is_visible=false)·`content_list` item(visible=false)이 사본 렌더에서도 제외 ✅
+
+**11. 보호 샘플·회귀**
+- 검증 전후 활성 세트 **12건 동일**, 보호 샘플 코너 적용 불변(구강관리 코너→구강관리 기본 코너 안내형 / 피부관리 코너→피부관리 기본 화면 세트) ✅
+- 공개 타블렛 content_list **5카드 불변** ✅
+- HUB 격리: 타 service_key(glycopharm) **0건**, `producer=supplier` **0건** ✅
+- 정리 후 운영자 원본 0 · HUB 0 · 매장 세트 12(원상복구). provenance 3행은 **의도적으로 보존**(추적 이력, 사본 삭제와 무관·FK 없음) ✅
+
+### 브라우저 검증에서 발견·수정한 버그 2건
+| # | 증상 | 원인 | 수정 |
+|---|------|------|------|
+| 1 | HUB 목록 **401** | `authClient.api` 가 `/store/*` 에 토큰 미부착 | `tabletDisplays.ts` 와 동일 `request` 헬퍼(명시 Bearer + 401 refresh 재시도) — `547e71a55` |
+| 2 | **가져오기 버튼 클릭 불가** | kiosk 뷰어가 뷰포트를 채워 패널을 덮음 | 제작기와 동일 `relative+overflow:hidden` 종횡비 박스로 가둠 + QR 모바일 미리보기 idle 제외 — `6387c151a` |
+
+### 정직한 관찰(기존 동작, 이번 WO 도입 아님)
+- 매장 사본 QR slug 가 `a` / `a-2` 로 생성됨 — 이름 `[검증] 운영자 원본 A` 에서 **기존 slug 생성기**가 한글을 제거해 ASCII "A" 만 남긴 결과. 충돌은 `-2` 접미사로 처리. 매장 Screen Set QR 규칙(`ensureScreenSetQr`) 그대로이며 **본 WO 가 변경한 부분이 아니다**(한글 전용 이름 → 기존에도 `tablet-corner-N` 폴백). 개선은 별도 WO 후보.
 
 ## 12. DB·migration·백필
 
