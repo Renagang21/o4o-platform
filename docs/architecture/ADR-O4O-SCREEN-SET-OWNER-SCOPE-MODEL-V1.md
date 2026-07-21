@@ -25,7 +25,7 @@
 |-----------|:---:|:---:|:---:|---|:---:|
 | **매장 store** | **필수** | 조직에서 파생(service_key 불필요) | 불필요 | draft / active / archived | 발급(기존) |
 | **운영자 operator** | **없음(NULL)** | **service_key 필수** | `created_by_user_id`(작성자 추적) | operator_template | 미발급 |
-| **공급자 supplier** | **없음(NULL)** | **service_key 필수(대상 서비스)** | **supplier 식별자 필수** | (후속 정의, 예: supplier_template) | 미발급 |
+| **공급자 supplier** | **없음(NULL)** | **service_key 필수(대상 서비스)** | **supplier 식별자 필수** | **draft(작성) / active(HUB 게시) / archived(보관)** — `supplier_template` 미도입 | 미발급 |
 
 ## 3. 핵심 결정
 
@@ -76,7 +76,10 @@ ALTER TABLE store_tablet_screen_sets ADD CONSTRAINT "CHK_stss_owner_scope" CHECK
 );
 ```
 
-- status 값: operator=`operator_template`(기존 CHECK 에 존재). supplier 는 후속에서 `supplier_template` 등 추가 시 status CHECK 도 함께 확장(이 ADR 은 자리만 예약).
+- status 값: operator=`operator_template`(기존 CHECK 에 존재).
+  **supplier 확정(2026-07-21, `WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1`)**: 신규 상태값을 추가하지 않고
+  **기존 허용값을 재사용**한다 — `draft`(작성 중) / `active`(HUB 게시 중) / `archived`(보관). 게시 해제 = `active → draft`.
+  **`supplier_template` 은 도입하지 않으며 status CHECK 허용목록은 변경하지 않는다.**
 - 순서: (1)(2)(3) 은 무해 additive → (4) CHECK 는 기존 row 가 store 브랜치를 만족해야 추가 가능(아래 §5 확인).
 
 ### D5. API 격리 조건(주체별)
@@ -131,8 +134,9 @@ ALTER TABLE store_tablet_screen_sets ADD CONSTRAINT "CHK_stss_owner_scope" CHECK
 
 ## 8. 미결 질문(구현 WO 에서 확정)
 
-- supplier status 값 명칭 및 status CHECK 확장 범위.
-- `supplier_id` 를 `organizations(type='supplier')` 에 대한 soft ref 로 둘지, 별도 supplier 도메인 식별자로 둘지.
+- ~~supplier status 값 명칭 및 status CHECK 확장 범위.~~ → **확정(2026-07-21)**: `draft`/`active`/`archived` 재사용, `supplier_template` 미도입, status CHECK 무변경. §3 D4 참조.
+- ~~`supplier_id` 를 `organizations(type='supplier')` 에 대한 soft ref 로 둘지, 별도 supplier 도메인 식별자로 둘지.~~ → **현행 유지 확정(2026-07-21)**: `supplier_id` → **`neture_suppliers.id`** soft-ref(FK 없음). `organization_id` 를 공급자 소유권에 재사용하지 않는다. supplier→organizations SSOT 이관(`WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1`, Design Phase)은 **별도 작업으로 유지**하며 본 계약을 변경하지 않는다.
+- **게시 대상 매장 유형**(2026-07-21 신규 확정): `hub_target_store_type`(nullable, `pharmacy`/`non_pharmacy`/`all`) — 공급자 전용, `origin='supplier' AND status='active'` 시 필수. migration `20270211000000`. 상세는 `CHECK-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1`.
 - operator/supplier 원본의 "매장 가져오기(사본)" 진입점(별 WO — 이번 범위 밖, copy-on-import 불변식 준수).
 - operator 원본 목록의 service_key 다중 소유(운영자가 여러 서비스 operator 인 경우) 노출 정책.
 

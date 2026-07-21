@@ -212,11 +212,21 @@ IR/ADR-SCREEN-CONTENT-CORE-AND-ROLE-EXTENSION-ARCHITECTURE-V1 완료
    →해석(resolveScreenSetSections 공통 1개)→렌더(@o4o/tablet-kiosk-core 3서비스 공유). tablet+ScreenSetQR 동일 set/resolver 공유.
 2. 확정 아키텍처: 새 패키지·새 테이블 신설 아님. 기존 자산에 Core/Extension 경계 명명. 부분 GO.
 3. Core 범위: 블록 스키마+pure 정규화+resolver 오케스트레이션+kiosk-core 렌더 계약(+프론트 pure 헬퍼 선택추출).
-4. Role/Channel Extension: Role(store 제작·적용 / operator 템플릿→매장copy / supplier 직접없음) · Channel(tablet / ScreenSetQR 공유 / generalQR 별 landing_type).
+4. Role/Channel Extension: Role(store 제작·적용 / operator 템플릿→매장copy / **supplier 제한적 Screen Set Producer**) · Channel(tablet / ScreenSetQR 공유 / generalQR 별 landing_type).
+   - **supplier 역할 정정(2026-07-21, `WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1`)**: 종전 "supplier 직접없음" 은
+     **O4O 공통 canonical 콘텐츠에 한정**한 서술이었다. 정정 후 범위 =
+     · **금지(유지)**: 공급자가 O4O 공통 **canonical 콘텐츠를 직접 생성·게시**(상품 설명서 canonical 승격은 **운영자 검수 흐름 유지**).
+     · **허용(신규)**: 공급자가 **자기 상품 + 사용이 허용된 콘텐츠**로 **공급자 소유 Screen Set**(canonical 아님)을 제작하여
+       **인증된 대상 매장 HUB**(일반 인터넷 공개 아님)에 제공. 매장은 **가져오기 → 독립 사본**. 공급자는 매장 사본을 원격 수정·회수할 수 없다.
+     · 공급자 원본은 **공개 URL·QR 미발급**. Screen Set 전체 운영자 검수는 요구하지 않되, **포함되는 상품·콘텐츠의 소유권·승인·사용범위는 검증**한다.
 5. 소유권·복사: 값복사+provenance(FK 없음)+비멱등+미디어 참조복사. 자동동기화·연쇄삭제 없음. 텍스트 독립, 미디어만 조건부(H1).
 6. 데이터/API 변경: 신규 테이블 REJECT. resolver store_content seam화, (H1)미디어정책, (H2)QR teardown만 후속.
 7. 유지·추출·폐기: 유지=kiosk-core/resolver/screen_sets/qr_codes/asset-copy/HUB. 추출=블록상수·pure정규화(→screen-content-core, 선택). 폐기=screen_content_packages(반려)+dead DUPLICATE_SNAPSHOT 경로.
 8. 후속 WO: P0 baseline→P1 HOLD결정(H1/H2)→P2 pure추출→P3 seam→P4 운영자저작(무신규테이블)→P5 QR core.
-9. HOLD/미결정: ①신규테이블 반려(발동) ②③미디어독립성(부분/정책공백) ④QR teardown 정의 / ⑤공급자·⑥공개계약 미발동. H1·H2 확정 전 구현 착수 금지.
+9. HOLD/미결정: ①신규테이블 반려(발동) ②③미디어독립성(부분/정책공백) ④QR teardown 정의 / ~~⑤공급자~~·⑥공개계약 미발동. H1·H2 확정 전 구현 착수 금지.
+   - **⑤공급자 HOLD 해제(2026-07-21, `WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1`)**: 위 §4 정정으로 공급자 Screen Set 의
+     정책·상태·게시 대상 계약이 확정되어 **공급자 트랙의 구현 착수 금지는 해제**된다(후속 `…-AUTHORING-AND-HUB-PUBLISH-V2`).
+     "H1·H2 확정 전 구현 착수 금지" 는 **①~④·⑥(미디어 독립성·QR teardown·공개 계약)에 계속 적용**되며, 공급자 트랙에는 적용하지 않는다.
+     단 공급자 트랙도 **canonical 콘텐츠 생성·공개 URL/QR 발급은 여전히 금지**다.
 10. 코드·DB 변경 0 확인: ✅ (read-only 조사, 산출물=문서 1개)
 ```

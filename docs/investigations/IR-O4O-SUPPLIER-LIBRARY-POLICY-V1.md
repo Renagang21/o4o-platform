@@ -10,6 +10,8 @@
 
 > **`/supplier/library` 는 LIVE 이지만 이미 메뉴에서 제거된(de-emphasized) 공급자 private 보관소다.** 2026-05-23 `WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1` 이 **"공급자는 O4O 내부 Producer 가 아니다 — canonical 흐름은 '공급자 → 오프라인 전달 → Operator 등록 → HUB'"** 로 결정하면서 supplier 사이드바의 자료실 진입점을 제거했다(route 는 북마크 호환용으로만 유지).
 >
+> **적용 범위 정정 (2026-07-21, `WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1`)**: 위 "공급자는 O4O 내부 Producer 가 아니다" 는 **O4O 공통 canonical 콘텐츠에 한정**한 판정이다. 공급자는 자기 상품·사용 허용 콘텐츠로 **공급자 소유 Screen Set**(canonical 아님)을 제작해 **인증된 대상 매장 HUB** 에 제공할 수 있다. **본 문서의 `/supplier/library`(일반 자료함) 판정은 그대로 유지**되며(재노출 아님), Screen Set 은 자료함이 아닌 별도 트랙이다.
+>
 > **정책 판정: D(보류·현 상태 유지) + E(장기 cleanup 후보).** 운영자 검수/전환 흐름(C)은 **이미 확정된 offline-handoff 철학과 모순**되므로 신설하지 않는다. 명칭은 재노출 시에만 "공급자 자료실"로(현재 메뉴 미노출이라 시급성 낮음). public `/resources` 와 데이터·페르소나가 완전히 분리되어 있어 같은 "자료실" 명칭은 혼동 소지.
 
 ## 1. 조사 개요

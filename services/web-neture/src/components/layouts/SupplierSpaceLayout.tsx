@@ -115,9 +115,15 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [{ label: '공급자 정보', path: '/mypage/business-profile' }],
   },
   // WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
-  //   "Content > Library" 메뉴 제거. 공급자는 O4O 내부 Producer 가 아니다 —
-  //   Canonical 흐름은 "공급자 → 오프라인 전달 → Operator 등록 → HUB" 이다.
+  //   "Content > Library" 메뉴 제거. 공급자는 O4O **공통 canonical 콘텐츠**의 내부 Producer 가 아니다 —
+  //   canonical 흐름은 "공급자 → 오프라인 전달 → Operator 등록/검수 → HUB" 이다.
   //   /supplier/library 라우트 자체는 유지 (북마크·링크 호환). 메뉴 진입점만 차단.
+  //
+  // WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1 (2026-07-21) 적용 범위 정정:
+  //   위 "Producer 아님" 은 **canonical 콘텐츠에 한정**한다. 공급자는 자기 상품과 사용이 허용된
+  //   콘텐츠로 **공급자 소유 Screen Set**(canonical 아님)을 제작해 **인증된 대상 매장 HUB** 에 제공할 수 있다
+  //   (매장은 가져오기→독립 사본. 공급자 원본은 공개 URL·QR 미발급, 매장 사본 원격 수정·회수 불가).
+  //   → 일반 자료함(Content > Library) 부활이 아니며, 이 메뉴 차단은 그대로 유지한다.
   {
     label: 'Community',
     icon: MessageSquare,

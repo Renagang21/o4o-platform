@@ -197,9 +197,11 @@ const SupplierRequestCategoryPage = lazy(() =>
 // Signage Content Hub
 // WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
 //   SignageContentHubPage 의 공급자 진입점 (/supplier/signage/content) 제거.
-//   공급자는 O4O 내부 Producer 가 아니다 — Canonical 흐름은
-//   "공급자 → 오프라인 전달 → Operator 등록 → HUB" 이다.
+//   공급자는 O4O **공통 canonical 콘텐츠**의 내부 Producer 가 아니다 — canonical 흐름은
+//   "공급자 → 오프라인 전달 → Operator 등록/검수 → HUB" 이다.
 //   페이지 파일 자체는 유지 (Operator/Store 향후 진입 가능).
+// WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1 (2026-07-21): 위 문장은 canonical 콘텐츠 한정.
+//   공급자 소유 Screen Set(canonical 아님)의 대상 매장 HUB 제공은 별도로 허용된다(사이니지 진입점 부활 아님).
 
 // Supplier Product Create
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
