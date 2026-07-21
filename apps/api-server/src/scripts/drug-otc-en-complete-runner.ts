@@ -323,6 +323,33 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-magnesium-hydroxide-500mg-v1.json',
     outBase: 'otc-en-complete-magnesium-hydroxide-500mg',
   },
+  // ── WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1 (에이전트 가) 2차 배치 상위 3 READY ──
+  //    각 그룹 out-of-scope reviewed EN sibling 존재 → build == live out en byte-identical 재사용.
+  //    아르기닌티디아시케이트는 표준 번역파일 entry 부재 → live out en HTML 역구성(diff 0 확인).
+  'nifuroxazide-200mg-capsule': {
+    key: '니푸록사지드|200밀리그램|캡슐',
+    candidate: '05c733cd-5c5e-4a09-9e3c-4f4d470d2a10',
+    sourceType: 'mfds_drug_otc', expected: 7,
+    koRunBase: 'otc-grounded-upgrade-nifuroxazide-200mg-capsule',
+    translationFile: 'otc-en-translations-nifuroxazide-200mg-v1.json',
+    outBase: 'otc-en-complete-nifuroxazide-200mg',
+  },
+  'saccharomyces-boulardii-282-5mg-capsule': {
+    key: '사카로마이세스보울라르디균|282.5밀리그램|캡슐',
+    candidate: '16f0c2ef-44eb-4629-a82c-e7fc69511b94',
+    sourceType: 'mfds_drug_otc', expected: 7,
+    koRunBase: 'otc-grounded-upgrade-saccharomyces-boulardii-282-5mg-capsule',
+    translationFile: 'otc-en-translations-saccharomyces-boulardii-282-5mg-v1.json',
+    outBase: 'otc-en-complete-saccharomyces-boulardii-282-5mg',
+  },
+  'arginine-tidiacicate-200mg-softcap': {
+    key: '아르기닌티디아시케이트|200밀리그램|연질캡슐',
+    candidate: '20d395df-0846-428a-b5e1-684cb9e08fb6',
+    sourceType: 'mfds_drug_otc', expected: 7,
+    koRunBase: 'otc-grounded-upgrade-arginine-tidiacicate-200mg-softcap',
+    translationFile: 'otc-en-translations-arginine-tidiacicate-200mg-v1.json',
+    outBase: 'otc-en-complete-arginine-tidiacicate-200mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

@@ -1,0 +1,131 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "니푸록사지드|200밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "05c733cd-5c5e-4a09-9e3c-4f4d470d2a10",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "니푸록사지드 200mg 캡슐",
+  "coarseTotal": 19,
+  "target": 7,
+  "excluded": 12,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "18783f29-2d80-449b-9907-568b902e5993",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "2b38358e-e8e4-4c80-b18c-652f5e76153c",
+      "name": "샤젠캡슐(니푸록사지드)",
+      "reason": "비대상(fp 628e1eabd4f25d34, bridge SSOT)"
+    },
+    {
+      "id": "703ae46a-aac9-4bd3-8569-252028c61324",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "73a41958-5dc7-4f68-ab05-5c56bf7e1228",
+      "name": "샤젠캡슐(니푸록사지드)",
+      "reason": "비대상(fp 628e1eabd4f25d34, bridge SSOT)"
+    },
+    {
+      "id": "8b55cf6c-67c3-47a0-8ddb-bf65a0df1d6a",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "91fb9021-ab67-4397-8d9f-ab2c7e8a0e24",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "a569f2e5-1d0c-49e8-b491-345efe77ca00",
+      "name": "샤젠캡슐(니푸록사지드)",
+      "reason": "비대상(fp 628e1eabd4f25d34, bridge SSOT)"
+    },
+    {
+      "id": "a65e116c-ba4d-4108-8d6f-a185fe5bf209",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "c6f17627-3741-4f92-9cac-33ce716f205b",
+      "name": "샤젠캡슐(니푸록사지드)",
+      "reason": "비대상(fp 628e1eabd4f25d34, bridge SSOT)"
+    },
+    {
+      "id": "e253da3c-5904-420c-afd3-d697c65b231f",
+      "name": "엔터폴캡슐(니푸록사지드)",
+      "reason": "비대상(fp 9915014661de4a10, bridge SSOT)"
+    },
+    {
+      "id": "f3e4298f-186d-4f58-85d3-f60635e5935b",
+      "name": "레피즈캡슐(니푸록사지드)",
+      "reason": "비대상(fp bad1fc09d46f260c, bridge SSOT)"
+    },
+    {
+      "id": "f902ec65-6355-415c-a19d-2045dd9185c2",
+      "name": "레피즈캡슐(니푸록사지드)",
+      "reason": "비대상(fp bad1fc09d46f260c, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "58c4b4f8-a922-4e1e-9c68-288e0bfda4db",
+    "66bfe7e2-1de1-4c58-bfb4-3c50d79bccba",
+    "68e51c74-650e-4e08-94d9-b6e57e90b13a",
+    "842bdd4e-7317-4e01-ad34-241bbf62f8bc",
+    "9798ee61-e1ce-404d-a987-2da54f18f5ee",
+    "c97a6d80-f1e2-4a0b-910f-c04c504a91fe",
+    "f03b992f-dcc5-426a-a243-6bea931507c0"
+  ],
+  "rollback_master_ids": [
+    "58c4b4f8-a922-4e1e-9c68-288e0bfda4db",
+    "66bfe7e2-1de1-4c58-bfb4-3c50d79bccba",
+    "68e51c74-650e-4e08-94d9-b6e57e90b13a",
+    "842bdd4e-7317-4e01-ad34-241bbf62f8bc",
+    "9798ee61-e1ce-404d-a987-2da54f18f5ee",
+    "c97a6d80-f1e2-4a0b-910f-c04c504a91fe",
+    "f03b992f-dcc5-426a-a243-6bea931507c0"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "9915014661de4a10",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "628e1eabd4f25d34",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0a755506d14ebefe",
+      "n": 7,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "bad1fc09d46f260c",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 7,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 7 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

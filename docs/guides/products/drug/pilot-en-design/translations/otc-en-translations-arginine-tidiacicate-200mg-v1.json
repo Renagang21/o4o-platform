@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "아르기닌티디아시케이트 200mg 연질캡슐 EN 번역 1건. grounded ko canonical(source_ref 20d395df) 충실 번역. 동일 약물 out-of-scope 10 master 의 live en canonical(md5 063d7188951c61bc185e4ff40ea9df0d)을 재현하는 검증본. 표준 번역 파일에 entry 부재 → live out en HTML 에서 DrugOtcEnTranslation 필드를 역구성해 buildDrugOtcEnConsumerHtml 산출이 live out en 과 byte-identical(diff 0) 임을 확인, 검토완료 EN 재사용으로 새 medical fact 0 증명. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "100–200 mg twice a day, after food — ko 용량 범위·횟수·복용시점 보존(값 불변)",
+    "연령": "15세 이하 소아 금지 — ko 연령 경계 보존",
+    "금기": "Do not take this if …(15세 이하 소아·중증 신부전) — 강도 보존",
+    "주의": "임부·수유부 약사 상담 · 약 1개월 미개선 시 상담 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 063d7188 byte-identical 재현(diff 0)"
+  },
+  "translations": [
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "title": "Arginine Tidiacicate 200 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as an adjunctive treatment for impaired liver function.",
+      "usage": "Adults take 100–200 mg twice a day, after food.",
+      "caution": "Do not take this if you are a child aged 15 or under, or if you have severe kidney failure. If you are pregnant or breastfeeding, talk to a pharmacist before taking it, and if there is no improvement after about a month, seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Arginine tidiacicate 200 mg",
+        "How it works": "Supports liver function",
+        "Main symptoms": "Adjunctive care for impaired liver function",
+        "Who should be careful": "Children aged 15 or under, severe kidney failure",
+        "Why this one": "An arginine preparation used to support liver function"
+      }
+    }
+  ],
+  "summary": null
+}

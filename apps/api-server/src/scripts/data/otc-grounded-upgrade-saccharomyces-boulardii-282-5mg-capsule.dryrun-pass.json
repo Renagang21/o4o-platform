@@ -1,0 +1,105 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "16f0c2ef-44eb-4629-a82c-e7fc69511b94",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "사카로마이세스보울라르디균 282.5mg 캡슐",
+  "coarseTotal": 11,
+  "target": 7,
+  "excluded": 4,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "2f2e4bf0-db79-49de-9899-34bcd87dd2fd",
+      "name": "비오플250캡슐(사카로마이세스보울라르디균)",
+      "reason": "비대상(fp d91a692d447d8808, bridge SSOT)"
+    },
+    {
+      "id": "7b524fdd-fb8f-4804-a5cd-da67a6400e9d",
+      "name": "비오플250캡슐(사카로마이세스보울라르디균)",
+      "reason": "비대상(fp d91a692d447d8808, bridge SSOT)"
+    },
+    {
+      "id": "9159d6f0-3abf-40b0-965d-95b969dbee20",
+      "name": "비오플250캡슐(사카로마이세스보울라르디균)",
+      "reason": "비대상(fp d91a692d447d8808, bridge SSOT)"
+    },
+    {
+      "id": "d12f5bad-0513-41f7-9457-606174aa2fa4",
+      "name": "비오플250캡슐(사카로마이세스보울라르디균)",
+      "reason": "비대상(fp d91a692d447d8808, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "17bdc2d4-9a28-4f80-9a8d-9646aadd21f3",
+    "3a11c560-adde-48c0-a4f2-b96d639b1c88",
+    "3c94d0a6-ac7b-4c69-b0a3-d3613eb00eae",
+    "94338f56-a4a8-4679-b6d8-102dd4dd8065",
+    "b9194ba5-afba-4b06-be00-1a1f2617cc9e",
+    "bbdd53b0-99dd-4742-ae2d-0e7c3980c772",
+    "efe21b3c-96c5-4238-bbaa-e6d5c2982c44"
+  ],
+  "rollback_master_ids": [
+    "17bdc2d4-9a28-4f80-9a8d-9646aadd21f3",
+    "3a11c560-adde-48c0-a4f2-b96d639b1c88",
+    "3c94d0a6-ac7b-4c69-b0a3-d3613eb00eae",
+    "94338f56-a4a8-4679-b6d8-102dd4dd8065",
+    "b9194ba5-afba-4b06-be00-1a1f2617cc9e",
+    "bbdd53b0-99dd-4742-ae2d-0e7c3980c772",
+    "efe21b3c-96c5-4238-bbaa-e6d5c2982c44"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "ba82fd1299f5d730",
+      "n": 7,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "d91a692d447d8808",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 7,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 7,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 7,
+  "htmlLen": 1571,
+  "contentHash": "319eb4a08d0f75b2ce684b4004c72a00",
+  "summary": "사카로마이세스보울라르디균 282.5mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 7,
+      "STEP_B_easy_canonical_demote": 7,
+      "STEP_B_authored_canonical_flip": 7,
+      "total": 21
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 7,
+      "total": 7
+    },
+    "grand_total": 28
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 7",
+    "policy_2A": "audit 2/master = 14 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

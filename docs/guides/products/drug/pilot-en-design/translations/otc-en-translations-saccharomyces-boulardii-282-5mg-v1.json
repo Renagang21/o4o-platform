@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "사카로마이세스보울라르디균 282.5mg 캡슐 EN 번역 1건. grounded ko canonical(source_ref 16f0c2ef) 충실 번역. 동일 약물 out-of-scope 5 master 의 live en canonical(md5 7574cc9aff8b329662f329125a8532a7)을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "12세 이상 one to two capsules twice a day · 3세~12세 미만 one capsule three times a day — ko 연령 구간별 용량·횟수 보존(값 불변)",
+    "연령": "3 months 미만 상담 · 3세 경계 — ko 연령 경계 보존",
+    "주의": "생후 3개월 미만 약사 상담 · 약 1개월 미개선 시 중단·상담 · 보관(서늘한 곳) — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 7574cc9a 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "title": "Saccharomyces boulardii 282.5 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to settle the gut when the balance of gut bacteria is upset — for example by antibiotics or chemotherapy — and to help with constipation, loose stools, bloating and abnormal fermentation in the bowel.",
+      "usage": "Adults and children 12 or older take one to two capsules twice a day. Children aged 3 to under 12 take one capsule three times a day.",
+      "caution": "Talk to a pharmacist before giving this to a baby under 3 months old. If there is no improvement after about a month, stop taking it and get advice. (The domestic pack should be kept in a cool place.)",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Saccharomyces boulardii 282.5 mg",
+        "How it works": "Settles the gut (live yeast)",
+        "Main symptoms": "Upset gut balance from antibiotics, constipation, loose stools, bloating",
+        "Who should be careful": "Babies under 3 months",
+        "Why this one": "A yeast-based gut treatment for antibiotic-related upset of gut bacteria"
+      }
+    }
+  ],
+  "summary": "Upset gut balance from antibiotics, constipation, loose stools, bloating"
+}

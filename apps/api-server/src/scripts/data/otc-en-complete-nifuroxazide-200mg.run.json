@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "니푸록사지드|200밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "05c733cd-5c5e-4a09-9e3c-4f4d470d2a10",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 7,
+  "targetMasters": 7,
+  "anomalies": [],
+  "koCanonical": 7,
+  "existingEnAny": 7,
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "07211b8e7879af6e731de5485b952711",
+      "n": 11
+    }
+  ],
+  "builtLen": 2267,
+  "builtMd5": "07211b8e7879af6e731de5485b952711",
+  "consistencyMatch": true,
+  "summaryField": "Sudden bacterial diarrhoea",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_en_canonical_flip": 7,
+    "en_write_total": 14
+  },
+  "enTargetMd5": "07211b8e7879af6e731de5485b952711",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(07211b8e7879af6e731de5485b952711) — write 0, 정상 종료"
+}

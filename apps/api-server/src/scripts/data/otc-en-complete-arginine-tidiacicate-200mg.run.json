@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "20d395df-0846-428a-b5e1-684cb9e08fb6",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 7,
+  "targetMasters": 7,
+  "anomalies": [],
+  "koCanonical": 7,
+  "existingEnAny": 7,
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "063d7188951c61bc185e4ff40ea9df0d",
+      "n": 10
+    }
+  ],
+  "builtLen": 2180,
+  "builtMd5": "063d7188951c61bc185e4ff40ea9df0d",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_en_canonical_flip": 7,
+    "en_write_total": 14
+  },
+  "enTargetMd5": "063d7188951c61bc185e4ff40ea9df0d",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(063d7188951c61bc185e4ff40ea9df0d) — write 0, 정상 종료"
+}

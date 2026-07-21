@@ -28,17 +28,23 @@ const EVAL_LIMIT = 10;
 const SENSITIVE_RE = /아스피린|아세틸살리실산|와파린|클로피도그렐|헤파린|덱사메타손|프레드니솔론|하이드로코르티손|모르핀|코데인|메칠페니데이트|인슐린|레보티록신/;
 const AUTHORED_SOURCES = ['mfds_drug_otc', 'nutrition_combo'];
 
-/** 기완료 groupKey — ko runner GROUP_REGISTRY key 필드 (2026-07-21 기준 24종) */
-const DONE_GROUPKEYS = new Set([
-  '에르도스테인|300밀리그램|정', '트리메부틴말레산염|100밀리그램|정', '바실루스리케니포르미스균|250밀리그램|캡슐',
-  '로라타딘|10밀리그램|정', '알벤다졸|400밀리그램|정', '알마게이트|500밀리그램|정', '디오스민|300밀리그램|캡슐',
-  '클로닉신리시네이트|125밀리그램|연질캡슐', '트리메부틴말레산염|150밀리그램|정', '브로멜라인|100밀리그램|정',
-  '클로닉신리시네이트|125밀리그램|정', '아세트아미노펜|325밀리그램|연질캡슐', '나프록센|250밀리그램|연질캡슐',
-  '니자티딘|75밀리그램|정', '엘카르니틴|330밀리그램|정', '소브레롤|200밀리그램|캡슐',
-  '락토바실루스아시도필루스균|300밀리그램|캡슐', '알파칼시돌|0.5마이크로그램|연질캡슐', '아세틸시스테인|100밀리그램|캡슐',
-  '나프록센나트륨|275밀리그램|정', '트리메부틴말레산염|200밀리그램|정', '메코발라민|500마이크로그램|캡슐',
-  '덱스판테놀|100밀리그램|정', '폴산|1밀리그램|정',
-]);
+/**
+ * 기완료 groupKey — ko/en runner GROUP_REGISTRY·EN_REGISTRY 의 `key:` 필드에서 **동적 파생**.
+ * (하드코딩 stale 방지 · 타 에이전트가 등재한 그룹도 자동 제외 = write 중 groupKey 회피)
+ */
+function loadDoneGroupKeys(): Set<string> {
+  const files = [
+    path.resolve(process.cwd(), 'src/scripts/drug-otc-grounded-upgrade-runner.ts'),
+    path.resolve(process.cwd(), 'src/scripts/drug-otc-en-complete-runner.ts'),
+  ];
+  const done = new Set<string>();
+  for (const f of files) {
+    if (!fs.existsSync(f)) continue;
+    for (const m of fs.readFileSync(f, 'utf8').matchAll(/key:\s*'([^']+)'/g)) done.add(m[1]);
+  }
+  return done;
+}
+const DONE_GROUPKEYS = loadDoneGroupKeys();
 
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
 const H = (s: string): string => md5(s).slice(0, 16);

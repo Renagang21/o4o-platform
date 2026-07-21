@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "니푸록사지드 200mg 캡슐 EN 번역 1건. grounded ko canonical(source_ref 05c733cd) 충실 번역. 동일 약물 out-of-scope 11 master 의 live en canonical(md5 07211b8e7879af6e731de5485b952711)을 재현하는 검증본(otc-en-translations-v1.json 로부터 verbatim 채용) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일(공유 파일 미수정).",
+  "testLog": {
+    "수치·용법": "one capsule (200 mg) four times a day · 3일 초과 복용 금지 · 수분 충분히 섭취 — ko 용량·횟수·기간 상한 보존(값 불변)",
+    "연령": "under 18 금지 · 2일 후 지속 시 수분 보충/상담 — ko 연령·경과 기준 보존",
+    "금기": "Do not take this if …(과민·18세 미만 소아/청소년) — 강도 보존",
+    "주의": "임부·수유부 약사 상담 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 07211b8e 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "title": "Nifuroxazide 200 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for sudden diarrhoea caused by bacteria.",
+      "usage": "Adults take one capsule (200 mg) four times a day. Do not take it for more than 3 days. Drink plenty of fluids while taking it.",
+      "caution": "Do not take this if you have ever reacted to it, or if you are a child or teenager under 18. Talk to a pharmacist before taking it if you are pregnant or breastfeeding. If the diarrhoea continues after 2 days of treatment, consider replacing lost fluids or get advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Nifuroxazide 200 mg",
+        "How it works": "Acts on bacteria in the gut (anti-diarrhoeal)",
+        "Main symptoms": "Sudden bacterial diarrhoea",
+        "Who should be careful": "Under 18; do not take for more than 3 days",
+        "Why this one": "An anti-diarrhoeal that works inside the gut"
+      }
+    }
+  ],
+  "summary": "Sudden bacterial diarrhoea"
+}

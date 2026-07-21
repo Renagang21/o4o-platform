@@ -585,6 +585,47 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-magnesium-hydroxide-500mg-jeong',
   },
+  // ── WO-O4O-OTC-NEXT-BATCH-AUDIT-AND-KO-EN-COMPLETE-GA-V1 (에이전트 가) 2차 배치 상위 3 READY ──
+  //    감사 산출: data/otc-next-batch-audit-v2.json. 각 target 단일 fp, other 0.
+  'nifuroxazide-200mg-capsule': {
+    key: '니푸록사지드|200밀리그램|캡슐',
+    ingredient: '니푸록사지드',
+    dose: '200밀리그램',
+    formKeyword: '캡슐',
+    candidate: '05c733cd-5c5e-4a09-9e3c-4f4d470d2a10',
+    targetFp: '0a755506d14ebefe',
+    excludeFp: ['628e1eabd4f25d34', '9915014661de4a10', 'bad1fc09d46f260c'], // 비대상 3 fp = 12 (coarse 19 = 7 + 12)
+    expected: 7,
+    excludedExpected: 12,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-nifuroxazide-200mg-capsule',
+  },
+  'saccharomyces-boulardii-282-5mg-capsule': {
+    key: '사카로마이세스보울라르디균|282.5밀리그램|캡슐',
+    ingredient: '사카로마이세스보울라르디균',
+    dose: '282.5밀리그램',
+    formKeyword: '캡슐',
+    candidate: '16f0c2ef-44eb-4629-a82c-e7fc69511b94',
+    targetFp: 'ba82fd1299f5d730',
+    excludeFp: 'd91a692d447d8808', // 비대상 단일 fp = 4 (coarse 11 = 7 + 4)
+    expected: 7,
+    excludedExpected: 4,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-saccharomyces-boulardii-282-5mg-capsule',
+  },
+  'arginine-tidiacicate-200mg-softcap': {
+    key: '아르기닌티디아시케이트|200밀리그램|연질캡슐',
+    ingredient: '아르기닌티디아시케이트',
+    dose: '200밀리그램',
+    formKeyword: '연질캡슐',
+    candidate: '20d395df-0846-428a-b5e1-684cb9e08fb6',
+    targetFp: '509aaaf470ce860f',
+    excludeFp: [], // 비대상 0 (coarse 7 = target 7 전량 동일 fp)
+    expected: 7,
+    excludedExpected: 0,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-arginine-tidiacicate-200mg-softcap',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

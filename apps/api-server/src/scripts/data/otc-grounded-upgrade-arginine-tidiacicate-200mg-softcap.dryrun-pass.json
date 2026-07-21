@@ -1,0 +1,79 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "20d395df-0846-428a-b5e1-684cb9e08fb6",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "아르기닌티디아시케이트 200mg 연질캡슐",
+  "coarseTotal": 7,
+  "target": 7,
+  "excluded": 0,
+  "otherFp": 0,
+  "excludedDetail": [],
+  "target_master_ids": [
+    "1e0824ad-491f-438e-95b0-3d9545d8fbfe",
+    "42a902e4-e0d5-469b-9e65-9eca6e9b8294",
+    "4547f2c7-08db-4fdf-8034-8ffa21070999",
+    "5c39007e-81a4-4a8f-b3be-d709a137d3dd",
+    "5cfbecb6-626b-4240-86ed-ef192731a5d0",
+    "9e942430-a40b-45ce-a0f5-3eb75d4406de",
+    "b9ebe05a-020c-4ee1-be6c-2c59bca20a24"
+  ],
+  "rollback_master_ids": [
+    "1e0824ad-491f-438e-95b0-3d9545d8fbfe",
+    "42a902e4-e0d5-469b-9e65-9eca6e9b8294",
+    "4547f2c7-08db-4fdf-8034-8ffa21070999",
+    "5c39007e-81a4-4a8f-b3be-d709a137d3dd",
+    "5cfbecb6-626b-4240-86ed-ef192731a5d0",
+    "9e942430-a40b-45ce-a0f5-3eb75d4406de",
+    "b9ebe05a-020c-4ee1-be6c-2c59bca20a24"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "509aaaf470ce860f",
+      "n": 7,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 7,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 7,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 7,
+  "htmlLen": 1460,
+  "contentHash": "33af92d228a4f79317e9555c5ef6cb2c",
+  "summary": "아르기닌티디아시케이트 200mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 7,
+      "STEP_B_easy_canonical_demote": 7,
+      "STEP_B_authored_canonical_flip": 7,
+      "total": 21
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 7,
+      "total": 7
+    },
+    "grand_total": 28
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 7",
+    "policy_2A": "audit 2/master = 14 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}
