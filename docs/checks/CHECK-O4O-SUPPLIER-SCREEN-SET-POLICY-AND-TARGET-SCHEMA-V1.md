@@ -102,13 +102,24 @@ TEMP replica(세션 로컬, prod 무변경, ROLLBACK) + **기존 프로덕션 36
 **허용 9**: supplier+draft+NULL · supplier+draft+pharmacy · supplier+active+pharmacy · supplier+active+non_pharmacy · supplier+active+all · supplier+archived+NULL · **supplier+archived+all**(보관 시 값 유지) · operator+operator_template+NULL · store+active+NULL
 **거부 6**: supplier+active+**NULL** · supplier+active+**임의문자열** · operator+operator_template+**pharmacy** · store+active+**all** · 비supplier origin+대상값 · **`supplier_template` status**(기존 status CHECK 유지)
 
-## 10. 프로덕션 적용·사후검증 (실행 7·8·9) — DEFERRED(배포 후 갱신)
+## 10. 프로덕션 적용·사후검증 (실행 7·8·9) — ✅ PASS (배포 b11088807, 2026-07-21)
 
-- [ ] CI/CD migration 자동 실행 성공
-- [ ] `hub_target_store_type` 컬럼 · `CHK_stss_hub_target` · `idx_stss_supplier_hub` 존재
-- [ ] 기존 행 수·값 불변, hub_target_store_type 전량 NULL(백필 0)
-- [ ] 기존 status·owner scope 제약 정의 불변
-- [ ] 공개 타블렛·Screen Set QR·운영자/매장 흐름 회귀 0
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | migration 적용·컬럼 타입/nullable | CI/CD "Deploy API Server" **success** → `typeorm_migrations` 에 `AddScreenSetHubTargetStoreType20270211000000` 기록. 컬럼 `hub_target_store_type` = **character varying(20) · is_nullable=YES · default 없음** ✅ |
+| 2 | `CHK_stss_hub_target` 실제 정의 | 배포된 정의 = 설계와 일치(허용값 `pharmacy/non_pharmacy/all` + `origin='supplier'` 전용 + `origin<>'supplier' OR status<>'active' OR NOT NULL`), **`convalidated=t`**(NOT VALID 아님) ✅ |
+| 3 | 허용 9·거부 6 **프로덕션 재검증** | 실 테이블 `BEGIN…ROLLBACK` probe → **15 pass / 0 fail** ✅ (검증 후 행 수 36 불변 = write 0) |
+| 4 | 기존 36행 계속 유효 | 제약 적용 상태에서 위반 행 **0** ✅ |
+| 5 | 백필 0 | 총 36행 중 `hub_target_store_type IS NOT NULL` = **0** ✅ |
+| 6 | status·owner scope CHECK 불변 | `CHK_..._status` = `('draft','active','archived','operator_template')` 그대로 · `CHK_stss_owner_scope` 3-way 그대로 · `CHK_..._origin` 그대로, 모두 `convalidated=t` ✅ |
+| 7 | 신규 부분 인덱스 | `idx_stss_supplier_hub (service_key, hub_target_store_type) WHERE origin='supplier' AND status='active' AND deleted_at IS NULL` · **`indisvalid=t`, `indisready=t`** ✅ |
+| 8 | 운영자·매장 행 수·핵심 필드 불변 | 분포 = operator/operator_template **9** · store/active **12** · store/archived **12** · store/draft **3** = **36**(migration 전 dry-run 적재 수와 동일) ✅ |
+| 9 | 태블릿·QR 흐름 영향 | 공개 타블렛 `mode=screen_set`, sections **5**(idle 포함), content_list **5카드** / Screen Set QR `landingType=screen_set`, sections 4(idle 제외), content_list **5카드** — **회귀 0** ✅ |
+| 10 | **멱등성(정직 기록)** | `ADD COLUMN IF NOT EXISTS` → no-op(**멱등**) · `CREATE INDEX IF NOT EXISTS` → no-op(**멱등**) · **`ADD CONSTRAINT` → `duplicate_object` 오류(비멱등)** — PostgreSQL 이 `ADD CONSTRAINT IF NOT EXISTS` 를 지원하지 않기 때문. 실제 재실행은 `typeorm_migrations` 기록으로 차단되므로 운영상 문제 없음. **수동 재적용·스키마 동기화 시에는 제약 존재 여부를 먼저 확인해야 한다.** |
+| 11 | typecheck·test·build | api-server(내 파일) tsc **0** · web-neture tsc **0** · 인접 테스트 `store-public-tablet-screen`·`store-tablet-idle-block`·`store-public-tablet-content-resolve` **23 PASS** ✅ |
+| 12 | CHECK 갱신·commit·push | 본 절 갱신 + pathspec 커밋(아래) ✅ |
+
+**데이터 write 0** — 사후검증은 read-only SELECT + ROLLBACK probe 만 사용했다.
 
 ## 11. 후속 V2 착수 계약 (실행 11)
 
