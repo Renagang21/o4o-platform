@@ -19,6 +19,10 @@ export const STORE_ASSET_SOURCE_KINDS = [
   'store_execution_asset', // store_execution_assets (일반)
   // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: content_hub 원본(kpa_contents) → 매장 사본 추적
   'content_hub',          // kpa_contents (운영자 콘텐츠 허브 원본)
+  // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1:
+  //   운영자 Screen Set 원본(store_tablet_screen_sets origin='operator') → 매장 독립 사본 추적.
+  //   추적(provenance) 전용 — FK·자동 동기화·연쇄삭제 없음.
+  'operator_screen_set',
 ] as const;
 
 export const STORE_ASSET_DERIVED_KINDS = [
@@ -29,6 +33,8 @@ export const STORE_ASSET_DERIVED_KINDS = [
   'signage_playlist', // store_playlists (후속)
   // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: content_hub 원본에서 생성된 매장 사본
   'store_execution_asset', // store_execution_assets (content_hub 사본 등)
+  // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 운영자 원본에서 만든 매장 Screen Set 사본
+  'screen_set',            // store_tablet_screen_sets (origin='store' 매장 사본)
 ] as const;
 
 export type StoreAssetSourceKind = (typeof STORE_ASSET_SOURCE_KINDS)[number];

@@ -23,7 +23,10 @@ const VALID_PRODUCERS: string[] = ['operator', 'supplier', 'community'];
 //   allowedAssetTypes 'qr' 등록. 실 구현은 Phase 2 후속. operator_qr_templates entity
 //   기반 — 매장 가져가기 시 기존 store_qr_codes 에 매장 사본 INSERT (Phase 3-B).
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 (2026-06-23): 'video' 추가 (QR 전용 동영상 콘텐츠).
-const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop', 'qr', 'video'];
+// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (2026-07-21): 'screen-set' 추가.
+//   운영자 Screen Set 원본(origin='operator' AND status='operator_template' AND service_key AND deleted_at IS NULL).
+//   상세·미리보기·가져오기는 매장 인증이 필요하므로 /api/v1/store/screen-set-hub/* 로 분리(여기는 공개 목록만).
+const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop', 'qr', 'video', 'screen-set'];
 
 export function createHubContentRouter(dataSource: DataSource): Router {
   const router = Router();

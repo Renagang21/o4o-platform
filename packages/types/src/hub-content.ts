@@ -39,7 +39,10 @@ export type HubVisibility = 'global' | 'service' | 'store';
  */
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 (2026-06-23): 'video' 추가 (additive — 기존 소비처 무영향).
 //   QR 전용 동영상 콘텐츠 도메인. 사이니지와 무관 (별도 도메인).
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr' | 'video';
+// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (2026-07-21): 'screen-set' 추가.
+//   운영자 Screen Set 원본(store_tablet_screen_sets origin='operator' status='operator_template')을
+//   매장 HUB 에 노출. 매장 가져가기 = 매장 소유 독립 사본 생성(가져오기=사본 불변식).
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr' | 'video' | 'screen-set';
 
 // =============================================================================
 // API Response DTOs
@@ -72,6 +75,11 @@ export interface HubContentItemResponse {
   itemCount?: number;
   totalDuration?: number;
   creatorName?: string | null;
+
+  // Screen Set-specific (sourceDomain = 'screen-set')
+  // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 템플릿 필터·배지용.
+  templateKey?: string;
+  blockCount?: number;
 }
 
 /** HUB 콘텐츠 목록 응답 */
@@ -114,4 +122,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   pop: 'POP',
   qr: 'QR-code',
   video: '동영상',
+  'screen-set': '타블렛 화면',
 };

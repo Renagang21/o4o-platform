@@ -194,6 +194,8 @@ const HubPopLibraryPage = lazy(() => import('./pages/pharmacy/HubPopLibraryPage'
 const PharmacyPopPage = lazy(() => import('./pages/pharmacy/PharmacyPopPage').then(m => ({ default: m.PharmacyPopPage })));
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기, 내 매장 동영상 사본 관리 (QR 전용)
 const HubVideoLibraryPage = lazy(() => import('./pages/pharmacy/HubVideoLibraryPage').then(m => ({ default: m.HubVideoLibraryPage })));
+// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 매장 HUB 타블렛 화면(운영자 원본) 진열 + 가져오기
+const HubScreenSetLibraryPage = lazy(() => import('./pages/pharmacy/HubScreenSetLibraryPage').then(m => ({ default: m.HubScreenSetLibraryPage })));
 const PharmacyVideoPage = lazy(() => import('./pages/pharmacy/PharmacyVideoPage').then(m => ({ default: m.PharmacyVideoPage })));
 // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 매장 HUB QR 진열 + 가져가기 (매장 사본은 기존 StoreQRPage)
 const HubQrLibraryPage = lazy(() => import('./pages/pharmacy/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
@@ -732,6 +734,8 @@ function App() {
             <Route path="qr" element={<HubQrLibraryPage />} />
             {/* WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 진열 + 가져가기 */}
             <Route path="video" element={<HubVideoLibraryPage />} />
+            {/* WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 타블렛 화면(운영자 원본) 진열 + 매장 독립 사본 가져오기 */}
+            <Route path="screen-set" element={<HubScreenSetLibraryPage />} />
             {/* WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1: 다국어 상품 콘텐츠 진열 + 가져가기 */}
             <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
             <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />

@@ -54,11 +54,19 @@ import { createStoreContentSourceAdapter } from './store-public/store-public-tab
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
 import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
+// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 가져오기 provenance(추적 전용, FK 없음).
+import { recordDerivations } from '../o4o-store/services/store-asset-derivation.service.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 // 태블릿 관리 라우트는 KPA 전용(/api/v1/store 마운트, service-agnostic). QR URL/서비스 스코프 기본 kpa.
 const TABLET_QR_SERVICE_KEY = 'kpa';
+// WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1:
+//   매장 HUB 가 열람·복사하는 운영자 원본의 service_key.
+//   **주의**: 운영자 Screen Set 컨트롤러는 kpa.routes 에서 serviceKey='kpa' 로 주입된다
+//   (operator-screen-set.controller 는 이 값을 그대로 service_key 에 저장) → 반드시 'kpa' 와 일치해야 한다.
+//   (운영자 공용 idle 등 일부 경로가 쓰는 'kpa-society' 와 다른 값이므로 혼용 금지.)
+const OPERATOR_TEMPLATE_SERVICE_KEY = 'kpa';
 
 // 저장 응답에 QR 링크 정보를 additive 로 병합. ensure 실패는 저장을 무효화하지 않고 플래그로 표기(§3 복구 가능).
 async function withQrLink(
@@ -1528,6 +1536,146 @@ export function createStoreTabletRoutes(
     } catch (error: any) {
       console.error('[StoreTablet] POST /screen-sets/preview error:', error);
       res.status(500).json({ success: false, error: 'Failed to build preview', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // ── 매장 HUB: 운영자 Screen Set 원본 열람 + 매장 독립 사본 가져오기 ──
+  //   WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1
+  //
+  //   경로는 top-level `/screen-set-hub/*` — 기존 `/screen-sets/:id` 의 :id 포획을 피한다.
+  //   노출 조건(WO §2): origin='operator' AND status='operator_template' AND service_key=대상 서비스
+  //                     AND deleted_at IS NULL. (매장·공급자 Screen Set / 타 service_key / 보관·삭제 제외.)
+  //   미리보기는 별도 엔드포인트를 만들지 않는다 — 상세로 blocks 를 받아 기존
+  //   POST /screen-sets/preview 로 렌더한다(= 내 매장 기준 미리보기, 기존 draft preview 재사용).
+  //   운영자 원본에는 공개 URL·QR 을 발급하지 않는다(publicQrSlug 미노출).
+
+  /** 운영자 원본 조회 공통 WHERE(재검증에도 동일 사용). */
+  const OPERATOR_TEMPLATE_WHERE =
+    `origin = 'operator' AND status = 'operator_template' AND service_key = $SVC AND deleted_at IS NULL`;
+
+  // GET /screen-set-hub/templates — 목록(검색 q + 템플릿 필터 templateKey)
+  router.get('/screen-set-hub/templates', withStoreAuth(async (req, res, _organizationId) => {
+    try {
+      const params: any[] = [OPERATOR_TEMPLATE_SERVICE_KEY];
+      const where: string[] = [OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')];
+      const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+      if (q) { params.push(`%${q}%`); where.push(`name ILIKE $${params.length}`); }
+      const tk = typeof req.query.templateKey === 'string' ? req.query.templateKey : '';
+      if (tk) { params.push(tk); where.push(`COALESCE(template_key, 'corner_information_basic_v1') = $${params.length}`); }
+      const rows = await dataSource.query(
+        `SELECT id, name, COALESCE(template_key, 'corner_information_basic_v1') AS "templateKey",
+                created_at AS "createdAt", updated_at AS "updatedAt",
+                (SELECT COUNT(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
+         FROM store_tablet_screen_sets s
+         WHERE ${where.join(' AND ')}
+         ORDER BY updated_at DESC
+         LIMIT 200`,
+        params,
+      );
+      res.json({ success: true, data: rows });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-set-hub/templates error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch operator templates', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // GET /screen-set-hub/templates/:id — 상세 + blocks(미리보기 입력)
+  router.get('/screen-set-hub/templates/:id', withStoreAuth(async (req, res, _organizationId) => {
+    try {
+      const rows = await dataSource.query(
+        `SELECT id, name, COALESCE(template_key, 'corner_information_basic_v1') AS "templateKey",
+                created_at AS "createdAt", updated_at AS "updatedAt"
+         FROM store_tablet_screen_sets
+         WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+        [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+      );
+      if (!rows?.[0]) { res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' }); return; }
+      const blocks = await dataSource.query(
+        `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
+        [req.params.id],
+      );
+      res.json({ success: true, data: { ...rows[0], blocks } });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-set-hub/templates/:id error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch operator template', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /screen-set-hub/templates/:id/import — 매장 소유 독립 사본 생성(단일 트랜잭션)
+  //   사본 계약: organization_id=매장 / origin='store' / status='active' / service_key=대상 서비스 /
+  //             supplier_id=NULL / tablet_id=NULL. 새 ID 로 값 복사.
+  //   원본 FK·자동 동기화·연쇄삭제 없음. 코너 자동 적용 없음(current 미지정).
+  //   반복 가져오기 허용(기존 관례 WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 호출마다 새 사본).
+  router.post('/screen-set-hub/templates/:id/import', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const userId = (req as any).user?.id ?? null;
+      // 1) 원본 소유권·서비스·상태 재검증(트랜잭션 밖 선검증 + 안에서 재확인)
+      const srcRows = await dataSource.query(
+        `SELECT id, name, template_key AS "templateKey"
+         FROM store_tablet_screen_sets
+         WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+        [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+      );
+      const src = srcRows?.[0];
+      if (!src) { res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' }); return; }
+
+      let created: any = null;
+      await dataSource.transaction(async (m) => {
+        // 재검증(동시 보관·삭제 방어)
+        const reSrc = await m.query(
+          `SELECT id, name, template_key AS "templateKey"
+           FROM store_tablet_screen_sets
+           WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+          [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+        );
+        const s = reSrc?.[0];
+        if (!s) throw Object.assign(new Error('source gone'), { code: 'OPERATOR_TEMPLATE_NOT_FOUND' });
+
+        // 2) 매장 사본 생성(값 복사. 원본 id 를 소유권 FK 로 연결하지 않는다)
+        const ins = await m.query(
+          `INSERT INTO store_tablet_screen_sets
+             (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
+           VALUES ($1, $2, NULL, NULL, $3, 'store', 'active', $4, $5)
+           RETURNING ${setCols('')}`,
+          [organizationId, OPERATOR_TEMPLATE_SERVICE_KEY, s.name, s.templateKey, userId],
+        );
+        created = ins?.[0];
+
+        // 3) 블록 값 복사(종류·순서·표시 상태·config 전체). 새 ID 로 생성.
+        await m.query(
+          `INSERT INTO store_tablet_screen_blocks (screen_set_id, block_type, sort_order, is_visible, config)
+           SELECT $1, block_type, sort_order, is_visible, config
+             FROM store_tablet_screen_blocks
+            WHERE screen_set_id = $2`,
+          [created.id, s.id],
+        );
+      });
+
+      // 4) provenance 기록(best-effort, 기존 store_asset_derivations 재사용 — 신규 컬럼·테이블 0, FK 없음)
+      try {
+        await recordDerivations(dataSource, {
+          serviceKey: OPERATOR_TEMPLATE_SERVICE_KEY,
+          organizationId,
+          createdBy: userId,
+          derivedKind: 'screen_set',
+          derivedId: created.id,
+          derivedTitle: created.name,
+          sources: [{ kind: 'operator_screen_set', id: src.id, title: src.name }],
+          metadata: { importedAt: new Date().toISOString() },
+        });
+      } catch (provErr: any) {
+        console.warn('[StoreTablet] screen-set import provenance skipped:', provErr?.message);
+      }
+
+      // 5) 매장 사본 반환. QR 은 기존 매장 Screen Set 규칙(withQrLink lazy ensure)으로 관리.
+      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, created.id, created) });
+    } catch (error: any) {
+      if (error?.code === 'OPERATOR_TEMPLATE_NOT_FOUND') {
+        res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' });
+        return;
+      }
+      console.error('[StoreTablet] POST /screen-set-hub/templates/:id/import error:', error);
+      res.status(500).json({ success: false, error: 'Failed to import operator template', code: 'INTERNAL_ERROR' });
     }
   }));
 

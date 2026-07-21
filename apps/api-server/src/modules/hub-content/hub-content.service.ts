@@ -115,6 +115,9 @@ export class HubContentQueryService {
       case 'video':
         // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 운영자 게시 동영상 (QR 전용)
         return this.queryVideo(serviceKey, producer, page, limit);
+      case 'screen-set':
+        // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 운영자 타블렛 화면 원본
+        return this.queryScreenSet(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
@@ -565,6 +568,77 @@ export class HubContentQueryService {
       thumbnailUrl: null,
       createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
       authorRole: 'operator',
+    };
+  }
+
+  // ── Screen Set (WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1) ──
+  //
+  // 운영자가 제작한 타블렛 화면 원본(operator_template)을 매장 HUB 목록에 노출한다.
+  // 노출 조건(WO §2): origin='operator' AND status='operator_template' AND service_key=현재 서비스
+  //                   AND deleted_at IS NULL.
+  //   → 다른 service_key 원본 / 보관·삭제 원본 / 매장(origin='store') / 공급자(origin='supplier') Screen Set 제외.
+  // 운영자 원본에는 공개 타블렛 URL·Screen Set QR 을 발급하지 않으므로 public_qr_slug 를 노출하지 않는다.
+  // 상세·미리보기·가져오기는 매장 인증 필요 → /api/v1/store/screen-set-hub/* (여기는 목록만).
+  //
+  // producer 인자가 명시되면 'operator' 만 통과(이 도메인의 유일한 HUB producer).
+  // Raw SQL + Parameter Binding (Boundary Policy: Guard Rule 2).
+  private async queryScreenSet(
+    serviceKey: string,
+    producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    if (producer && producer !== 'operator') {
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+    try {
+      const offset = (page - 1) * limit;
+      const where = `s.service_key = $1
+           AND s.origin = 'operator'
+           AND s.status = 'operator_template'
+           AND s.deleted_at IS NULL`;
+
+      const rows = await this.dataSource.query(
+        `SELECT s.id, s.name, s.template_key, s.created_at, s.updated_at,
+                (SELECT COUNT(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS block_count
+         FROM store_tablet_screen_sets s
+         WHERE ${where}
+         ORDER BY s.updated_at DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
+      );
+
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total FROM store_tablet_screen_sets s WHERE ${where}`,
+        [serviceKey],
+      );
+      const total = countRows[0]?.total ?? 0;
+
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapScreenSetItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      console.error('[HubContent] queryScreenSet error:', error);
+      return { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    }
+  }
+
+  private mapScreenSetItem(s: any): HubContentItemResponse {
+    const createdAtRaw = s.updated_at ?? s.created_at;
+    return {
+      id: s.id,
+      sourceDomain: 'screen-set',
+      producer: 'operator',
+      title: s.name,
+      description: null,
+      thumbnailUrl: null,
+      createdAt: createdAtRaw instanceof Date ? createdAtRaw.toISOString() : String(createdAtRaw),
+      authorRole: 'operator',
+      // 템플릿 필터·배지용(신규 4종 중 하나. legacy idle_touch_video 는 운영자 신규 제작 대상 아님).
+      templateKey: s.template_key ?? 'corner_information_basic_v1',
+      blockCount: s.block_count ?? 0,
     };
   }
 
