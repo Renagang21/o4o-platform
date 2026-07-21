@@ -1,0 +1,238 @@
+{
+ "wo": "Agent C — 신규 영양소 전용 후보 5그룹 strict select 실측",
+ "date": "2026-07-21",
+ "readOnly": true,
+ "dbWrite": 0,
+ "generateApply": "none",
+ "baseline": {
+  "comboLive": 605,
+  "inventoryCommit": "1ee2d3fcb",
+  "parserHardeningCommit": "6a2769045"
+ },
+ "source": "file JSONL G:/…/mfds-health-functional-food-info-raw.jsonl (44,885)",
+ "tools": {
+  "production": "hff-combo-select.ts --source file (미수정 실행)",
+  "audit": "hff-combo-c5-audit.ts (신규 · 감사 전용 · 판정 미수행)"
+ },
+ "metricNote": "mention = TARGET spec 집합 일치(추가 기능성 원료 허용) · exactFullSet = mention − HOLD_MULTI_FUNCTIONAL (순수 조합) · ELIGIBLE = exactFullSet − 나머지 HOLD",
+ "totals": {
+  "mention": 7026,
+  "exactFullSet": 125,
+  "eligible": 76,
+  "liveDuplicate": 0,
+  "hiddenLeak": 1
+ },
+ "blocker": {
+  "id": "C5-BLOCKER-1",
+  "severity": "HIGH",
+  "statementNo": "20040015104115",
+  "productName": "리버케어지티",
+  "group": "g5-b5",
+  "summary": "SPEC_RE 미매칭 → 은닉 기능성 원료(곰피추출물/디에콜)가 spec·unknownLabels 양쪽에서 소실 → 순수 조합으로 ELIGIBLE 통과. 나아가 곰피의 \"간 건강\" 기능성이 비타민B1 에 오귀속되어 허위 표시 위험.",
+  "rootCause": [
+   "SPEC_RE 는 기준량 뒤 비율을 `[)][의] X~Y%` 로만 허용. 실데이터 `9.9mg/850mg(표시량의 80∼120%)` 처럼 **기준량 뒤 괄호 안에 표시량+비율**이 오는 포맷은 불발.",
+   "불발 시 라벨이 unknownLabels 에도 누락 → select 의 `unknown>0` HOLD_MULTI 가드가 발동하지 않음(가드 우회).",
+   "splitFunctions 가 `[곰피추출물]` 브래킷을 제거한 뒤 문장이 분리되지 않아, fnBelongsTo(비타민B1) 매칭 시 간건강 문구가 함께 끌려감."
+  ],
+  "action": "생산 파서 수정은 본 WO 범위 밖. 별도 WO 로 (1) SPEC_RE 비율 포맷 확장 (2) 미매칭 spec-like 라인 → unknownLabels 강제 편입 결정 필요. 그 전까지 g5-b5 생산 금지."
+ },
+ "verdictSummary": {
+  "READY": [
+   "g4-vd-zn-ca (39)",
+   "g2-va-ve (30)"
+  ],
+  "REVIEW": [
+   "g3-b5c (4)",
+   "g5-b5 (3, 블로커 포함)"
+  ],
+  "DROP": [
+   "g1-mg-mn-ca (0)"
+  ]
+ },
+ "productionPriority": [
+  {
+   "rank": 1,
+   "group": "비타민D+아연+칼슘",
+   "eligible": 39,
+   "reason": "최대 수율 · 은닉 0 · LIVE 중복 0 · 귀속 정확"
+  },
+  {
+   "rank": 2,
+   "group": "비타민A+비타민E",
+   "eligible": 30,
+   "reason": "차순위 수율 · 은닉 0 · 귀속 정확"
+  },
+  {
+   "rank": 3,
+   "group": "나이아신+B1+B2+B6+비타민C+판토텐산",
+   "eligible": 4,
+   "reason": "수율 낮음 — 배치 단독 비경제, 타 B군과 묶어 검토"
+  },
+  {
+   "rank": null,
+   "group": "나이아신+B1+B2+B6+판토텐산",
+   "eligible": 3,
+   "reason": "BLOCKER 해소 전 생산 금지"
+  },
+  {
+   "rank": null,
+   "group": "마그네슘+망간+칼슘",
+   "eligible": 0,
+   "reason": "DROP"
+  }
+ ],
+ "inventoryCalibration": "하드닝(6a2769045) 이후 realBasis 는 상한으로 성립하지 않는다. G4 56>30 · G2 39>35 로 초과, G1 3<<36 로 붕괴. 방향성도 신뢰 불가 → 그룹별 실측 필수.",
+ "groups": [
+  {
+   "key": "g1-mg-mn-ca",
+   "combo": "마그네슘+망간+칼슘",
+   "inventoryCapPreHardening": 36,
+   "mention": 422,
+   "exactFullSet": 3,
+   "holdMultiFunctional": 419,
+   "eligible": 0,
+   "holdByReason": {
+    "HOLD_GROUNDING": 3
+   },
+   "liveDuplicate": 0,
+   "hiddenIngredient": {
+    "H1_knownOutsideTarget": 0,
+    "H3_unclassifiedSpecLabel": 0,
+    "detail": []
+   },
+   "attribution": {
+    "disagreeTotal": 0,
+    "registryMultiAttribution_benign": 0,
+    "segmentationWhitespaceVariant": 0,
+    "auditFnMode": {}
+   },
+   "verdict": "DROP"
+  },
+  {
+   "key": "g2-va-ve",
+   "combo": "비타민A+비타민E",
+   "inventoryCapPreHardening": 35,
+   "mention": 2007,
+   "exactFullSet": 39,
+   "holdMultiFunctional": 1968,
+   "eligible": 30,
+   "holdByReason": {
+    "HOLD_EXPORT_ONLY": 5,
+    "HOLD_GROUNDING": 4
+   },
+   "liveDuplicate": 0,
+   "hiddenIngredient": {
+    "H1_knownOutsideTarget": 0,
+    "H3_unclassifiedSpecLabel": 0,
+    "detail": []
+   },
+   "attribution": {
+    "disagreeTotal": 18,
+    "registryMultiAttribution_benign": 14,
+    "segmentationWhitespaceVariant": 4,
+    "auditFnMode": {
+     "bracket": 16,
+     "inline": 14
+    }
+   },
+   "verdict": "READY"
+  },
+  {
+   "key": "g3-b5c",
+   "combo": "나이아신+비타민B1+B2+B6+비타민C+판토텐산",
+   "inventoryCapPreHardening": 31,
+   "mention": 1525,
+   "exactFullSet": 6,
+   "holdMultiFunctional": 1519,
+   "eligible": 4,
+   "holdByReason": {
+    "HOLD_GROUNDING": 2
+   },
+   "liveDuplicate": 0,
+   "hiddenIngredient": {
+    "H1_knownOutsideTarget": 0,
+    "H3_unclassifiedSpecLabel": 0,
+    "detail": []
+   },
+   "attribution": {
+    "disagreeTotal": 4,
+    "registryMultiAttribution_benign": 1,
+    "segmentationWhitespaceVariant": 3,
+    "auditFnMode": {
+     "bracket": 3,
+     "inline": 1
+    }
+   },
+   "verdict": "REVIEW"
+  },
+  {
+   "key": "g4-vd-zn-ca",
+   "combo": "비타민D+아연+칼슘",
+   "inventoryCapPreHardening": 30,
+   "mention": 749,
+   "exactFullSet": 56,
+   "holdMultiFunctional": 693,
+   "eligible": 39,
+   "holdByReason": {
+    "HOLD_UNSUPPORTED_DIMENSION": 3,
+    "BULK": 1,
+    "HOLD_EXPORT_ONLY": 4,
+    "HOLD_GROUNDING": 9
+   },
+   "liveDuplicate": 0,
+   "hiddenIngredient": {
+    "H1_knownOutsideTarget": 0,
+    "H3_unclassifiedSpecLabel": 0,
+    "detail": []
+   },
+   "attribution": {
+    "disagreeTotal": 15,
+    "registryMultiAttribution_benign": 11,
+    "segmentationWhitespaceVariant": 4,
+    "auditFnMode": {
+     "bracket": 20,
+     "inline": 11,
+     "numbered": 8
+    }
+   },
+   "verdict": "READY"
+  },
+  {
+   "key": "g5-b5",
+   "combo": "나이아신+비타민B1+B2+B6+판토텐산",
+   "inventoryCapPreHardening": 30,
+   "mention": 2323,
+   "exactFullSet": 21,
+   "holdMultiFunctional": 2302,
+   "eligible": 3,
+   "holdByReason": {
+    "HOLD_UNSUPPORTED_DIMENSION": 3,
+    "HOLD_EXPORT_ONLY": 4,
+    "HOLD_GROUNDING": 11
+   },
+   "liveDuplicate": 0,
+   "hiddenIngredient": {
+    "H1_knownOutsideTarget": 0,
+    "H3_unclassifiedSpecLabel": 1,
+    "detail": [
+     {
+      "stmt": "20040015104115",
+      "name": "리버케어지티",
+      "labels": [
+       "디에콜(Dieckol) :: 디에콜(Dieckol) 함량 : 9.9mg/850mg"
+      ]
+     }
+    ]
+   },
+   "attribution": {
+    "disagreeTotal": 3,
+    "registryMultiAttribution_benign": 0,
+    "segmentationWhitespaceVariant": 3,
+    "auditFnMode": {
+     "bracket": 3
+    }
+   },
+   "verdict": "REVIEW"
+  }
+ ]
+}
