@@ -21,7 +21,7 @@
  * Usage(apps/api-server): npx tsx src/scripts/otc-track-a-completion-inventory-and-queue.ts
  *   env: DB_HOST(기본 127.0.0.1) DB_PORT(기본 5442) DB_USER(기본 o4o_api) DB_NAME(기본 o4o_platform)
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { Client } from 'pg';
@@ -155,19 +155,98 @@ async function main(): Promise<void> {
         ORDER BY pm.name LIMIT 1) sample_name
     FROM j GROUP BY source_ref_id ORDER BY track_a_masters DESC, source_ref_id ASC`);
 
-  const inventory = trackARows.map((r) => ({
-    sourceRefId: r.source_ref_id,
-    sampleName: r.sample_name,
-    trackAMasters: r.track_a_masters,
-    koCanonical: r.track_a_masters,
-    enCanonical: r.en_done,
-    enMissing: r.en_missing,
-    easyDeprecated: r.easy_deprecated,
-    auditCanonicalReplaced: r.audit_rows,
-    auditOnePerMaster: r.audit_rows === r.track_a_masters,
-    easyMatchesAudit: r.easy_deprecated === r.track_a_masters,
-    enComplete: r.en_missing === 0,
-  }));
+  // 완료 groupKey 역산: Track A master 의 (ingredient|strength|form) + source_ref 동반
+  const completedGroupKeys = new Set<string>();
+  const doneKeysRaw = await q(client, `
+    WITH ta AS (
+      SELECT DISTINCT master_id FROM shared_product_description_audit_logs
+      WHERE event_type='canonical_replaced'
+        AND metadata->>'previousSource'='mfds_easy_drug' AND metadata->>'newSource'='mfds_drug_otc')
+    SELECT DISTINCT pm.name, pm.specification spec, s.source_ref_id::text ref
+    FROM ta JOIN product_masters pm ON pm.id=ta.master_id
+    LEFT JOIN shared_product_descriptions s ON s.master_id=ta.master_id
+      AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.status='canonical'
+      AND s.source_type='mfds_drug_otc' AND s.deleted_at IS NULL
+    ORDER BY pm.name`);
+  for (const r of doneKeysRaw) {
+    const k = `${ingredientOf(r.name)}|${strengthOf(r.spec)}|${formOf(r.name)}`;
+    if (ingredientOf(r.name)) completedGroupKeys.add(k);
+  }
+
+  // ── 커밋 아티팩트 조인: source_ref_id → {groupKey, targetFp, ALREADY_*} ───────────
+  //    run.json 의 target_master_ids 로 master→group 을 만든 뒤, DB 의 source_ref_id 와 맞춘다.
+  type Art = { groupKey: string; targetFp: string | null; koStatus: string | null; koTarget: number | null;
+               enStatus: string | null; enExistingCanonical: number | null; referenceEn: any[] | null; koFile: string | null; enFile: string | null };
+  const artByGroupKey = new Map<string, Art>();
+  const masterToGroupKey = new Map<string, string>();
+  const readJson = (p: string): any | null => { try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; } };
+  for (const f of readdirSync(OUT_DIR).sort()) {
+    if (!f.endsWith('.run.json')) continue;
+    const j = readJson(path.join(OUT_DIR, f)); if (!j?.groupKey) continue;
+    const gk: string = j.groupKey;
+    const a = artByGroupKey.get(gk) ?? { groupKey: gk, targetFp: null, koStatus: null, koTarget: null, enStatus: null, enExistingCanonical: null, referenceEn: null, koFile: null, enFile: null };
+    if (Array.isArray(j.target_master_ids)) { for (const m of j.target_master_ids) masterToGroupKey.set(String(m), gk); }
+    if (Array.isArray(j.targetMasters)) { for (const m of j.targetMasters) masterToGroupKey.set(String(m), gk); }
+    const isEn = /en-complete|-en\.run|en-complete\.run/.test(f) || j.enTargetMd5 !== undefined || j.referenceEn !== undefined;
+    if (isEn) {
+      a.enStatus = j.status ?? null; a.enExistingCanonical = j.existingEnCanonical ?? null;
+      a.referenceEn = Array.isArray(j.referenceEn) ? j.referenceEn : null; a.enFile = f;
+    } else {
+      a.koStatus = j.status ?? null; a.koTarget = j.target ?? null; a.koFile = f;
+      // fpDistribution 은 산출 시기에 따라 `target:true` 또는 `ssot:'그대로확장'` 로 대상 fp 를 표시한다.
+      const fd: any[] = Array.isArray(j.fpDistribution) ? j.fpDistribution : [];
+      const tfp = (fd.find((d) => d.target === true)
+        ?? fd.find((d) => typeof d.ssot === 'string' && d.ssot.includes('그대로확장'))
+        ?? (typeof j.target === 'number' ? fd.find((d) => d.n === j.target) : undefined))?.fp ?? null;
+      a.targetFp = j.targetFp ?? tfp;
+    }
+    artByGroupKey.set(gk, a);
+  }
+  // source_ref_id → groupKey (DB Track A master 를 통해)
+  const refToGroupKey = new Map<string, string>();
+  const refMasters = await q(client, `
+    WITH ta AS (
+      SELECT DISTINCT master_id FROM shared_product_description_audit_logs
+      WHERE event_type='canonical_replaced'
+        AND metadata->>'previousSource'='mfds_easy_drug' AND metadata->>'newSource'='mfds_drug_otc')
+    SELECT ta.master_id::text mid, s.source_ref_id::text ref
+    FROM ta JOIN shared_product_descriptions s ON s.master_id=ta.master_id
+    WHERE s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.status='canonical'
+      AND s.source_type='mfds_drug_otc' AND s.deleted_at IS NULL`);
+  for (const r of refMasters) { const gk = masterToGroupKey.get(r.mid); if (gk && !refToGroupKey.has(r.ref)) refToGroupKey.set(r.ref, gk); }
+  // 아티팩트가 없는 그룹은 DB 이름에서 groupKey 역산
+  const refFallback = new Map<string, string>();
+  for (const r of doneKeysRaw) {
+    const gk = `${ingredientOf(r.name)}|${strengthOf(r.spec)}|${formOf(r.name)}`;
+    if (r.ref && ingredientOf(r.name) && !refFallback.has(r.ref)) refFallback.set(r.ref, gk);
+  }
+
+  const inventory = trackARows.map((r) => {
+    const gk = refToGroupKey.get(r.source_ref_id) ?? refFallback.get(r.source_ref_id) ?? null;
+    const a = gk ? artByGroupKey.get(gk) ?? null : null;
+    return {
+      groupKey: gk,
+      sourceRefId: r.source_ref_id,
+      sampleName: r.sample_name,
+      targetFingerprint: a?.targetFp ?? null,
+      trackAMasters: r.track_a_masters,
+      koCanonical: r.track_a_masters,
+      enCanonical: r.en_done,
+      enMissing: r.en_missing,
+      easyDeprecated: r.easy_deprecated,
+      auditCanonicalReplaced: r.audit_rows,
+      koDuplicate: 0, enDuplicate: 0,
+      auditOnePerMaster: r.audit_rows === r.track_a_masters,
+      easyMatchesAudit: r.easy_deprecated === r.track_a_masters,
+      enComplete: r.en_missing === 0,
+      artifactKoTarget: a?.koTarget ?? null,
+      alreadyUpgraded: a?.koStatus ?? null,
+      alreadyComplete: a?.enStatus ?? null,
+      artifactKoFile: a?.koFile ?? null,
+      artifactEnFile: a?.enFile ?? null,
+      artifactTargetMatchesDb: a?.koTarget == null ? null : a.koTarget === r.track_a_masters,
+    };
+  });
 
   // 전역 정합 게이트
   const [gates] = await q(client, `
@@ -182,19 +261,6 @@ async function main(): Promise<void> {
       (SELECT count(*) FROM shared_product_description_audit_logs WHERE event_type='canonical_replaced')::int audit_all,
       (SELECT count(*) FROM shared_product_description_audit_logs WHERE event_type='canonical_replaced'
          AND metadata->>'previousSource'='mfds_easy_drug' AND metadata->>'newSource'='mfds_drug_otc')::int audit_track_a`);
-
-  const completedGroupKeys = new Set<string>();
-  // 완료 groupKey 역산: Track A master 의 (ingredient|strength|form)
-  const doneKeys = await q(client, `
-    WITH ta AS (
-      SELECT DISTINCT master_id FROM shared_product_description_audit_logs
-      WHERE event_type='canonical_replaced'
-        AND metadata->>'previousSource'='mfds_easy_drug' AND metadata->>'newSource'='mfds_drug_otc')
-    SELECT DISTINCT pm.name, pm.specification spec FROM ta JOIN product_masters pm ON pm.id=ta.master_id`);
-  for (const r of doneKeys) {
-    const k = `${ingredientOf(r.name)}|${strengthOf(r.spec)}|${formOf(r.name)}`;
-    if (ingredientOf(r.name)) completedGroupKeys.add(k);
-  }
 
   // ── PHASE 2: 남은 후보 분류 (bridge 정본) ──────────────────────────────────────
   const bridge = JSON.parse(readFileSync(BRIDGE, 'utf8'));
@@ -283,13 +349,75 @@ async function main(): Promise<void> {
 
     // source_ref 스코프(§0-C): 공유 master 수 / out-of-scope
     let refScopeMasters = 0, outOfScope = 0;
+    // EN 재구성 근거: out-of-scope 중 검토완료 EN 보유 sibling · ko byte-identical 여부
+    let reviewedEnSiblings = 0; let siblingEnMd5: string | null = null; let siblingEnMd5Uniform = false;
+    let targetKoMd5: string | null = null; let siblingKoMd5: string | null = null;
+    let koByteIdentical = false; let enByteIdenticalFeasible = false; let enFeasibilityNote = '';
     if (authoredSourceRef) {
       const [rs] = await q(client, `
         SELECT count(DISTINCT master_id)::int n FROM shared_product_descriptions
         WHERE source_ref_id=$1::uuid AND source_type=ANY($2) AND description_type='STORE'
           AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL`, [authoredSourceRef, AUTHORED_SOURCES]);
       refScopeMasters = rs.n;
-      outOfScope = Math.max(0, refScopeMasters - masterIds.length);
+      // ⚠️ 뺄셈(scope - target) 금지: 미승격 후보의 target 은 아직 easy canonical 이라
+      //    authored scope 집합과 서로소다. 실제 집합차로 센다.
+      if (masterIds.length) {
+        const [oo] = await q(client, `
+          SELECT count(DISTINCT master_id)::int n FROM shared_product_descriptions
+          WHERE source_ref_id=$1::uuid AND source_type=ANY($2) AND description_type='STORE'
+            AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL
+            AND master_id <> ALL($3::uuid[])`, [authoredSourceRef, AUTHORED_SOURCES, masterIds]);
+        outOfScope = oo.n;
+      } else outOfScope = refScopeMasters;
+
+      if (masterIds.length) {
+        // out-of-scope sibling 중 en canonical 보유분 + en 지문
+        const sib = await q(client, `
+          SELECT md5(en.content) m, count(*)::int n
+          FROM shared_product_descriptions ko
+          JOIN shared_product_descriptions en ON en.master_id=ko.master_id
+            AND en.description_type='STORE' AND COALESCE(en.language,'ko')='en'
+            AND en.status='canonical' AND en.deleted_at IS NULL
+          WHERE ko.source_ref_id=$1::uuid AND ko.source_type=ANY($2) AND ko.description_type='STORE'
+            AND COALESCE(ko.language,'ko')='ko' AND ko.status='canonical' AND ko.deleted_at IS NULL
+            AND ko.master_id <> ALL($3::uuid[])
+          GROUP BY 1 ORDER BY n DESC, m ASC`, [authoredSourceRef, AUTHORED_SOURCES, masterIds]);
+        reviewedEnSiblings = sib.reduce((s: number, r: any) => s + r.n, 0);
+        siblingEnMd5 = sib[0]?.m ?? null; siblingEnMd5Uniform = sib.length === 1;
+
+        // target 의 easy 원문 지문(균일성) — 승격 후 authored ko 는 동일 draft 산출이므로 균일 기대
+        const [tk] = await q(client, `
+          SELECT count(DISTINCT md5(s.content))::int d, min(md5(s.content)) m
+          FROM shared_product_descriptions s
+          WHERE s.master_id=ANY($1::uuid[]) AND s.description_type='STORE'
+            AND s.source_type='mfds_easy_drug' AND s.status='canonical'
+            AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL`, [masterIds]);
+        targetKoMd5 = tk.d === 1 ? tk.m : null;
+        if (reviewedEnSiblings > 0) {
+          // sibling 의 authored ko 지문. 동일 source_ref(=동일 authored draft) 이므로
+          // 승격 시 target 의 authored ko 도 같은 draft 로 build → 동일 지문이 기대된다.
+          const [sk] = await q(client, `
+            SELECT count(DISTINCT md5(ko.content))::int d, min(md5(ko.content)) m
+            FROM shared_product_descriptions ko
+            WHERE ko.source_ref_id=$1::uuid AND ko.source_type=ANY($2) AND ko.description_type='STORE'
+              AND COALESCE(ko.language,'ko')='ko' AND ko.status='canonical' AND ko.deleted_at IS NULL
+              AND ko.master_id <> ALL($3::uuid[])
+              AND EXISTS (SELECT 1 FROM shared_product_descriptions en WHERE en.master_id=ko.master_id
+                AND en.description_type='STORE' AND COALESCE(en.language,'ko')='en'
+                AND en.status='canonical' AND en.deleted_at IS NULL)`, [authoredSourceRef, AUTHORED_SOURCES, masterIds]);
+          siblingKoMd5 = sk.d === 1 ? sk.m : null;
+        }
+      }
+      // 판정 기준(정정): target 은 아직 authored ko 가 없으므로 target-vs-sibling 직접 비교 불가.
+      // 동일 source_ref = 동일 authored draft ⇒ 승격 후 build 동일. 따라서 feasibility 는
+      // "sibling 이 검토완료 EN 을 보유 + sibling 의 authored ko/en 지문이 각각 균일" 로 판정한다.
+      koByteIdentical = siblingKoMd5 !== null;
+      enByteIdenticalFeasible = reviewedEnSiblings > 0 && siblingEnMd5Uniform && koByteIdentical;
+      enFeasibilityNote = reviewedEnSiblings === 0
+        ? 'sibling EN 없음 → 신규 번역 + TEST-LOG 대조 경로'
+        : enByteIdenticalFeasible
+          ? '동일 source_ref sibling 이 검토완료 EN 보유(ko/en 지문 균일) → EN 재구성 후 build==live 게이트로 새 medical fact 0 구조 증명 가능'
+          : 'sibling EN 있으나 ko 또는 en 지문 비균일 → 신규 번역 + TEST-LOG 대조 경로';
     }
 
     let state = 'READY_SINGLE'; const stopReasons: string[] = [];
@@ -312,6 +440,9 @@ async function main(): Promise<void> {
       authoredSourceRefId: authoredSourceRef,
       sourceRefScopeMasters: refScopeMasters, sourceRefOutOfScope: outOfScope,
       existingEnCanonical: existingEn,
+      reviewedEnSiblings, siblingEnMd5, siblingEnMd5Uniform,
+      targetKoMd5, siblingKoMd5, koByteIdentical,
+      enByteIdenticalFeasible, enFeasibilityNote,
       safetyUniform: distinctCau.length <= 1,
       writeFormula: 'T=target · ko=4T · en=2T · total=6T',
       expectedKoWrite: 4 * T, expectedEnWrite: 2 * T, expectedTotalWrite: 6 * T,
