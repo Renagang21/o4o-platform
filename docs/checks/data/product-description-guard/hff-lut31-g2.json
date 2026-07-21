@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "lut31-a-001",
+  "productName": "플래티넘루테인플러스",
+  "productNameEn": "플래티넘루테인플러스",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083520",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[루테인 제품]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미,이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질 캡슐\n(2) 루테인: 표시량(20mg/500mg)의 80~120%\n(3) 비타민A: 표시량(230μg RE/500mg)의 80~150%\n(4) 중금속\n (가) 납(mg/kg) : 1.0이하\n (나) 카드뮴(mg/kg) : 1.0이하\n (다) 수은(mg/kg) : 1.0이하\n (라) 비소(mg/kg) : 1.0이하\n(5) 헥산(mg/kg) : 5.0이하\n(6) 대장균군 : 음성\n(7) 붕해시험: 적합",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 섭취.",
+   "caution": "[루테인 제품]과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음.\r\n1) 알레르기 체질이신 분은 원재료를 확인 후 섭취하십시오.\r\n2) 임산부는 섭취 전 의사와 상담이 필요합니다.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질 캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 230μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>플래티넘루테인플러스<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>230μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>230μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질 캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(230μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 230μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>플래티넘루테인플러스<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>230μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>230μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (230μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-002",
+  "productName": "아이파워루테인포르테",
+  "productNameEn": "아이파워루테인포르테",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007396",
+  "category": "hff",
+  "source": {
+   "mainFunction": "마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n비타민A : 어두운 곳에서 시각 적응을 위해 필요 / 피부와 점막을 형성하고 기능을 유지하는데 필요 / 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 어두운 검은 빨간색의  타원형 연질캡슐\n2. 루테인 : 표시량(20 mg/500 mg)의 80~120% \n3. 비타민A : 표시량(700 μgRE/500 mg) 80~150%\n4. 납(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 1.0 이하\n7. 비소(mg/kg) : 1.0 이하\n8. 대장균군 : 음성\n9. 붕해 : 적합(20분 이내)\n10. 헥산(mg/kg) : 5.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "-특이체질, 알레르기 체질이신 경우에는 원료를 확인한 후 섭취하십시오.\n-소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n-과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n-영유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n-흡연자는 섭취 시 전문가와 상담하십시오.\n-이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 어두운 검은 빨간색의  타원형 연질캡슐",
+   "storage": "-고온다습(30℃ 이상, 상대습도 75%이상)·직사광선을 피하여 서늘한 곳에 보관하십시오.-개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.-어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이파워루테인포르테<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>700μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 어두운 검은 빨간색의 타원형 연질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 어두운 검은 빨간색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> -고온다습(30℃ 이상, 상대습도 75%이상)·직사광선을 피하여 서늘한 곳에 보관하십시오.-개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.-어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이파워루테인포르테<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>700μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>700μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 어두운 검은 빨간색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> -고온다습(30℃ 이상, 상대습도 75%이상)·직사광선을 피하여 서늘한 곳에 보관하십시오.-개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.-어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-003",
+  "productName": "눈 건강엔 포커스 루테인 A+",
+  "productNameEn": "눈 건강엔 포커스 루테인 A+",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007565",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[비타민A] : 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미 이취가 없는 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐\n2. 루테인 : 표시량(20 mg/500 mg)의 80~120% \n3. 비타민A : 표시량(210 μg RE/500 mg)의 80~150%\n4. 납(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 1.0 이하\n7. 비소(mg/kg) : 1.0 이하\n8. 헥산(mg/kg) : 5.0 이하\n9. 초산에틸(mg/kg) : 50.0 이하\n10. 대장균군 : 음성 . \n11. 붕해 : 적합",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미 이취가 없는 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐",
+   "storage": "고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 210μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>눈 건강엔 포커스 루테인 A+<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>210μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>210μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 이취가 없는 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음   : 어두운 곳에서 시각 적응을 위해 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음   : 어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(210μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 이취가 없는 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 210μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>눈 건강엔 포커스 루테인 A+<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>210μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>210μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (210μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 이취가 없는 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-004",
+  "productName": "아이센루테인",
+  "productNameEn": "아이센루테인",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083657",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[루테인 제품]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 밝은 적갈색의 내용물을 함유한 적갈색의 연질캡슐\r\n(2) 루테인 : 표시량(20 ㎎/500 ㎎)의 80~120%\r\n(3) 비타민A : 표시량(766 ㎍ RE/500 ㎎)의 80~150%\r\n(4) 중금속\r\n (가) 납(㎎/㎏) : 1.0이하\r\n (나) 카드뮴(㎎/㎏) : 1.0이하\r\n (다) 총수은(㎎/㎏) : 1.0이하\r\n (라) 총비소(㎎/㎏) : 1.0이하\r\n(5) 헥산(㎎/㎏) : 5.0이하\r\n(6) 대장균군 : 음성\r\n(7) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "[루테인 제품]과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음.\r\n알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 밝은 적갈색의 내용물을 함유한 적갈색의 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 766μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이센루테인<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>766μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>766μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 밝은 적갈색의 내용물을 함유한 적갈색의 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(766μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 밝은 적갈색의 내용물을 함유한 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 766μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이센루테인<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>766μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>766μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (766μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 밝은 적갈색의 내용물을 함유한 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-005",
+  "productName": "루테인",
+  "productNameEn": "루테인",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061059",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[루테인 제품]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "① 성상 : 적색의 점조성 내용물을 함유한 암적색 연질캡슐\r\n② 루테인 : 표시량(20 mg/0.5g)의 80~120%\r\n③ 비타민A : 표시량(700 ㎍RE/0.5g)의 80~150%\r\n④ 헥산(mg/kg) : 5.0 이하\r\n⑤ 초산에틸(mg/kg) : 50.0 이하\r\n⑥ 납(mg/kg) : 1.0 이하\r\n⑦ 카드뮴(mg/kg) : 1.0 이하\r\n⑧ 총수은(mg/kg) : 1.0 이하\r\n⑨ 총비소(mg/kg) : 1.0 이하\r\n⑩ 대장균군 : 음성\r\n⑪ 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(0.5 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음.\r\n     ② 임산부와 수유부는 섭취에 주의하십시오.\r\n     ③ 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n     ④ 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "적색의 점조성 내용물을 함유한 암적색 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 0.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>루테인<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>700μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>적색의 점조성 내용물을 함유한 암적색 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/0.5g)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 적색의 점조성 내용물을 함유한 암적색 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>루테인<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>700μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>700μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 0.5g), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 0.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 적색의 점조성 내용물을 함유한 암적색 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-006",
+  "productName": "필리 루테인",
+  "productNameEn": "필리 루테인",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351475",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n①노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[비타민A]\n①어두운 곳에서 시각 적응을 위해 필요\n②피부와 점막을 형성하고 기능을 유지하는데 필요\n③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐\n2. 붕해도: 20분이내\n3. 루테인: 표시량(20mg/500mg)의 80~120% \n4. 비타민A: 표시량(210μgRE/500mg)의 80~150% \n5. 헥산(mg/kg): 5.0 이하\n6. 납(mg/kg): 1.0 이하\n7. 카드뮴(mg/kg): 1.0 이하\n8. 총수은(mg/kg): 1.0 이하\n9. 총비소(mg/kg): 1.0 이하\n10. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n- 영•유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n- 흡연자는 섭취 시 전문가와 상담하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n- 강력방습제(실리카겔)는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐",
+   "storage": "- 수분 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고, 어린이 손에 닿지 않는 곳에 보관 하십시오.- 충격에 제품이 깨질 수 있으니 주의하십시오.- 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 꼭 닫아 보관 하십시오.",
+   "shelfLife": "제조일로부터24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 210μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>필리 루테인<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>210μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>210μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(210μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>보관</b> - 수분 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고, 어린이 손에 닿지 않는 곳에 보관 하십시오.- 충격에 제품이 깨질 수 있으니 주의하십시오.- 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 꼭 닫아 보관 하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 210μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>필리 루테인<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>210μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>210μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (210μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>Storage</b> - 수분 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고, 어린이 손에 닿지 않는 곳에 보관 하십시오.- 충격에 제품이 깨질 수 있으니 주의하십시오.- 제품 개봉 후에는 흡습이 일어날 수 있으니 뚜껑을 꼭 닫아 보관 하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-007",
+  "productName": "뉴:트립 맥스 눈건강 루테인비타민A",
+  "productNameEn": "뉴:트립 맥스 눈건강 루테인비타민A",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022869",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음.\n2) 비타민A : 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐\n2) 루테인 : 표시량(20mg/500mg)의 80~120%\n3) 비타민A : 표시량(700ug RE/500mg)의 80~150%\n4) 헥산(mg/kg) : 5.0 이하\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 1.0 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 대장균군 : 음성\n10) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴:트립 맥스 눈건강 루테인비타민A<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>700μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴:트립 맥스 눈건강 루테인비타민A<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>700μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>700μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "lut31-a-008",
+  "productName": "필리 루테인",
+  "productNameEn": "필리 루테인",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061351",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[비타민A] ①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 빨간색 타원형 연질캡슐\n2) 루테인 : 표시량(20 mg/300mg)의 80~120%\n3) 비타민A : 표시량(210 ugRE/300mg)의 80~150%\n4) 납(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 1.0 이하\n7) 비소(mg/kg) : 1.0 이하\n8) 헥산(mg/kg) : 5.0 이하\n9) 붕해시험 : 20분 이내\n10) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 빨간색 타원형 연질캡슐",
+   "storage": "실온/ 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 210μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>필리 루테인<small>루테인 · 비타민 A</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>210μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>210μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 빨간색 타원형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/300mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(210μg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 빨간색 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 210μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>필리 루테인<small>Lutein · Vitamin A</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>210μg</b> of Vitamin A as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>210μg</b> Vitamin A</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 300mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (210μg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 빨간색 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

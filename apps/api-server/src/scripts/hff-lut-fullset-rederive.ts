@@ -6,7 +6,7 @@
  * 산출: BASE spec / MAIN_FNCTN attributed / verifiedFullSet / 근거 원문 / PASS·REVIEW / 큐 diff.
  *
  * PASS 조건(전부 충족):
- *   - 기능성 귀속이 **명시 구조**(bracket|numbered) — 인라인 추정 금지
+ *   - 기능성 귀속이 **명시 구조**(bracket|numbered|colon) — 인라인 추정 금지
  *   - 미분류 라벨 0
  *   - 비타민E 가 '항산화 단독' 로 fullSet 소속을 좌우하지 않음(정책 미확정 → REVIEW)
  * 그 외 전부 REVIEW. **근거 없는 자동 확정 금지.**
@@ -48,7 +48,8 @@ async function main(): Promise<void> {
       const fnOnly = fnKeys.filter((k) => !sp.byKey.has(k));
 
       const reasons: string[] = [];
-      if (fa.mode !== 'bracket' && fa.mode !== 'numbered') reasons.push(`FN_MODE_${fa.mode.toUpperCase()}`);
+      // 명시 구조 3형식(bracket|numbered|colon) 인정 — colon 은 원문 `원료 : 기능성` 라벨로 추정 귀속이 아니다.
+      if (fa.mode !== 'bracket' && fa.mode !== 'numbered' && fa.mode !== 'colon') reasons.push(`FN_MODE_${fa.mode.toUpperCase()}`);
       if (sp.unknownLabels.length) reasons.push('SPEC_UNKNOWN_LABEL');
       if (fa.unknownLabels.length) reasons.push('FN_UNKNOWN_LABEL');
       // 비타민E 항산화 단독 → 정책 미확정이므로 자동 포함/제외 금지

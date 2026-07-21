@@ -48,7 +48,9 @@ export function normalizeSpecText(raw: string): string {
   s = s.replace(/\bmg\s*[aα]\s*-\s*TE\b/gi, 'mg α-TE');
   s = s.replace(/(?<![A-Za-zα])a\s*-\s*TE\b/gi, 'α-TE');
   // ASCII u 단위: 숫자/공백/괄호 뒤의 "ug" → "μg" (단어 내부 오탐 방지)
-  s = s.replace(/(?<=[\d\s(])u\s*g\b/gi, 'μg');
+  // 단위 수식어 결합형(`700ugRAE`·`210 ugRE`)은 g 뒤가 단어문자라 `\b` 가 성립하지 않아 정규화 실패 →
+  // spec 전체 누락(과소추출)했다. 수식어(RAE|RE|NE|DFE|α-TE) 선행도 경계로 인정한다.
+  s = s.replace(/(?<=[\d\s(])u\s*g(?=\s*(?:RAE|RE|NE|DFE|α-?TE)\b|\b)/gi, 'μg');
   return s.replace(/\s+/g, ' ');
 }
 
@@ -92,13 +94,14 @@ export function splitFunctions(mainFn: string): string[] {
     .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x)))];
 }
 
-export type FnMode = 'bracket' | 'numbered' | 'inline' | 'none';
+export type FnMode = 'bracket' | 'numbered' | 'colon' | 'inline' | 'none';
 export interface FnParse { mode: FnMode; byKey: Map<string, string[]>; unattributed: string[]; unknownLabels: string[] }
 
 /**
  * MAIN_FNCTN → 원료별 기능성 귀속.
- *  1) `[원료] 기능성…` 브래킷    2) `1) 원료 : 기능성…` 번호목록   → **명시 구조 우선**(임의 다중귀속 없음)
- *  3) 구조 없으면 인라인 폴백(registry `fnBelongsTo`) — 이때만 한 기능성이 복수 원료에 걸릴 수 있어 호출부가 REVIEW 처리해야 한다.
+ *  1) `[원료] 기능성…` 브래킷   2) `1) 원료 : 기능성…` 번호목록   3) `원료 : 기능성…` 콜론 라벨(2건 이상)
+ *     → **명시 구조 우선**(임의 다중귀속 없음). 3형식 모두 원문 라벨에만 근거하며 추정 귀속을 하지 않는다.
+ *  4) 구조 없으면 인라인 폴백(registry `fnBelongsTo`) — 이때만 한 기능성이 복수 원료에 걸칠 수 있어 호출부가 REVIEW 처리해야 한다.
  */
 export function parseFnAttribution(mainFn: string): FnParse {
   const t = normalizeSpecText(mainFn);
@@ -137,7 +140,23 @@ export function parseFnAttribution(mainFn: string): FnParse {
     if (byKey.size) return { mode: 'numbered', byKey, unattributed: [], unknownLabels };
   }
 
-  // 3) 인라인 폴백(registry 귀속)
+  // 3) 콜론 라벨 `원료 : 기능성…` (번호 없는 명시 구조 — 3형식 중 ③)
+  //    inline(registry 추정) 폴백보다 **먼저** 인정해야 한다. 미인정 시 콜론형이 폴백으로 떨어져
+  //    원문에 없는 원료(구리·망간·비타민C·셀레늄 등)로 추정 귀속되는 오귀속이 발생했다.
+  //    라벨 클래스에 공백을 넣지 않아(번호 앵커가 없어 과다 캡처 위험) 2건 이상일 때만 인정 → 미달 시 기존 동작 유지.
+  const colon = [...t.matchAll(/(?:^|\s)([가-힣A-Za-z0-9()\-·]{2,25})\s*[:：]\s*/g)];
+  if (colon.length >= 2) {
+    for (let i = 0; i < colon.length; i++) {
+      const label = colon[i][1].trim();
+      const start = (colon[i].index ?? 0) + colon[i][0].length;
+      const end = i + 1 < colon.length ? (colon[i + 1].index ?? t.length) : t.length;
+      const k = classify(label); if (!k) { unknownLabels.push(label); continue; }
+      pushFns(k, t.slice(start, end));
+    }
+    if (byKey.size) return { mode: 'colon', byKey, unattributed: [], unknownLabels };
+  }
+
+  // 4) 인라인 폴백(registry 귀속)
   const all = splitFunctions(mainFn); const attributed = new Set<string>();
   for (const c of CLS) {
     const fns = all.filter((f) => fnBelongsTo(f, c.k));

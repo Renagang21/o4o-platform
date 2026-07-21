@@ -1,0 +1,1118 @@
+[
+ {
+  "stmt": "200400170061613",
+  "productName": "PNT 루테인 하트츄어블",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "비타민A": "2) 비타민A: 표시량(210 μgRE/600 mg)의 80~150%",
+    "비타민E": "3) 비타민E: 표시량(3.3 mg α-TE/600 mg)의 80~150%",
+    "루테인": "4) 루테인: 표시량(20 mg/600 mg)의 80~120%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20190004553406",
+  "productName": "건강 프로젝트 365 루테인+비타민A",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "4) 루테인 : 표시량 (20mg / 500 mg) 의 80~120%",
+    "비타민E": "5) 비타민E : 표시량 (5.5mg α-TE / 500 mg) 의 80~150%",
+    "비타민A": "6) 비타민A : 표시량 (700μg RAE / 500 mg) 의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040020006920",
+  "productName": "굿아이케어",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(12 mg/0.5g)의 80~120%",
+    "비타민E": "비타민E : 표시량(6.7 mg α-TE/0.5g)의 80~150%",
+    "비타민A": "비타민A : 표시량(600 μgRE/0.5g)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20220020002114",
+  "productName": "눈 건강 루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20 mg/300 mg)의 80 ~120%",
+    "비타민E": "비타민 E : 표시량(11 mg α-TE/300 mg)의 80 ~150%",
+    "비타민A": "비타민 A : 표시량(700 μg RAE/300 mg)의 80 ~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요 피부와 점막을 형성하고 기능을 유지하는데 필요 상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20120019007565",
+  "productName": "눈 건강엔 포커스 루테인 A+",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20 mg/500 mg)의 80~120%",
+    "비타민A": "비타민A : 표시량(210 μg RE/500 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200141549",
+  "productName": "눈건강 홍 루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20 mg/500 mg)의 80~120%",
+    "비타민A": "비타민A : 표시량(700 μg RAE/500 mg)의 80~150%",
+    "비타민E": "비타민E : 표시량(11 mg α-TE/500 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200141406",
+  "productName": "눈건강비타민A",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20 mg/500 mg)의 80~120%",
+    "비타민E": "비타민E : 표시량(6.6 mg α-TE/500 mg)의 80~150%",
+    "비타민A": "비타민A : 표시량(700 μg RAE/500 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200022869",
+  "productName": "뉴:트립 맥스 눈건강 루테인비타민A",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "numbered",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20mg/500mg)의 80~120%",
+    "비타민A": "3) 비타민A : 표시량(700μg RE/500mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040015083571",
+  "productName": "루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "(2) 루테인 : 표시량(20 mg/400 mg)의 80~120%",
+    "비타민A": "(3) 비타민A : 표시량(461 μg RE/400 mg)의 80~150%",
+    "비타민E": "(4) 비타민E : 표시량(4.38 mg α-TE/400 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200061059",
+  "productName": "루테인",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20 mg/0.5g)의 80~120%",
+    "비타민A": "비타민A : 표시량(700 μgRE/0.5g)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400170061602",
+  "productName": "루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인: 표시량(20 mg/ 300 mg)의 80~120%",
+    "비타민A": "비타민A: 표시량(700 μg RAE/ 300 mg)의 80~150%",
+    "비타민E": "비타민E: 표시량(11 mg α-TE/ 300 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "201200190071247",
+  "productName": "루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20mg/300mg)의 80~120%",
+    "비타민E": "비타민E : 표시량(11mg α-TE/300mg)의 80~150%",
+    "비타민A": "비타민A : 표시량(700μgRAE/300mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20070017035374",
+  "productName": "루테인 골드",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20mg/600mg)의 80~120%",
+    "비타민A": "3) 비타민A : 표시량(430μg RE/600mg)의 80~150%",
+    "비타민E": "4) 비타민E : 표시량(3.6mg α-TE/600mg)의 80~150%"
+   },
+   "functions": {
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200600200081366",
+  "productName": "루테인 아이케어",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20mg/300mg)의 80~120%",
+    "비타민E": "비타민E : 표시량(11mg α-TE/300mg)의 80~150%",
+    "비타민A": "비타민A : 표시량(700μg RAE/300mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20190004553405",
+  "productName": "루테인+비타민 A",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "4) 루테인 : 표시량 (20mg / 500 mg) 의 80~120%",
+    "비타민E": "5) 비타민E : 표시량 (5.5mg α-TE / 500 mg) 의 80~150%",
+    "비타민A": "6) 비타민A : 표시량 (700μg RAE / 500 mg) 의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20070017035608",
+  "productName": "뷰라이트루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "rederivedFullSet": "루테인+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민E",
+  "fnAttributedKeys": "루테인+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20mg/550mg)의 80~120%",
+    "비타민E": "비타민E : 표시량(4mg α-TE/550mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040017006644",
+  "productName": "브라이트 루테인 플로라글로",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량 (20 mg / 300 mg)의 80~120%",
+    "비타민A": "비타민A : 표시량 (495 μg RE / 300 mg)의 80~150%",
+    "비타민E": "비타민E : 표시량(11 mg α-TE / 300 mg)의 80~150%"
+   },
+   "functions": {
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040017006974",
+  "productName": "셀티바 루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량 (20 mg /300 mg )의 80~120%",
+    "비타민A": "비타민A : 표시량 (700 μgRE /300 mg )의 80~150%",
+    "비타민E": "비타민E : 표시량 ( 11 mg α-TE / 300 mg )의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200023677",
+  "productName": "싱글맥스 루테인20",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "numbered",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20mg/300mg)의 80~120%",
+    "비타민A": "3) 비타민A : 표시량(210μg RAE/300mg)의 80~150%",
+    "비타민E": "4) 비타민E : 표시량(11mg α-TE/300mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040015083657",
+  "productName": "아이센루테인",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "(2) 루테인 : 표시량(20 mg/500 mg)의 80~120%",
+    "비타민A": "(3) 비타민A : 표시량(766 μg RE/500 mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040020006460",
+  "productName": "아이시안루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "rederivedFullSet": "루테인+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민E",
+  "fnAttributedKeys": "루테인+비타민E",
+  "fnMode": "colon",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "(2) 루테인 : 표시량(20mg/0.5g)의 80~120%",
+    "비타민E": "(3) 비타민E : 표시량(3.3mg α-TE/0.5g)의 80~150%"
+   },
+   "functions": {
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200600200081422",
+  "productName": "아이케어 루테인 지아잔틴 미니",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(9.9016mg/150mg)의 80~120%",
+    "비타민E": "비타민E : 표시량(11mgα-TE/150mg)의 80~150%",
+    "비타민A": "비타민A : 표시량(700μgRAE/150mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 (영문) May support eye health by maintaining the density of macular pigments which can be affected by aging"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040017006722",
+  "productName": "아이클리어 루테인 미니캡슐",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인: 표시량(20 mg / 120 mg)의 80 ~ 120%",
+    "비타민A": "3) 비타민A: 표시량(400 μg RE / 120 mg)의 80 ~ 150%",
+    "비타민E": "4) 비타민E: 표시량(10 mg α-TE / 120 mg)의 80 ~ 150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400170061390",
+  "productName": "아이클리어 루테인지아잔틴 미니캡슐",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(18.2 mg/112 mg)의 80 ~ 120%",
+    "비타민E": "4) 비타민E : 표시량(10 mg α-TE/112 mg)의 80 ~ 150%",
+    "비타민A": "5) 비타민A : 표시량(400 μgRAE/112 mg)의 80 ~ 150%"
+   },
+   "functions": {
+    "루테인": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20120019007396",
+  "productName": "아이파워루테인포르테",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "colon",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20 mg/500 mg)의 80~120%",
+    "비타민A": "비타민A : 표시량(700 μgRE/500 mg) 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040017021708",
+  "productName": "옵티멈루테인20",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20mg/500mg)의 80~120%",
+    "비타민A": "비타민A : 표시량(210μgRE/500mg)의 80~150%",
+    "비타민E": "비타민E : 표시량(3.3 mg α-TE/500mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "2021001285525",
+  "productName": "파워 루테인 액트 플러스",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인 : 표시량(20mg/500mg)의 80~120%",
+    "비타민E": "비타민 E: 표시량(11mg α-TE/500mg)의 80~150%",
+    "비타민A": "비타민 A: 표시량(750μg RAE/500mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "20040015083520",
+  "productName": "플래티넘루테인플러스",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "(2) 루테인: 표시량(20mg/500mg)의 80~120%",
+    "비타민A": "(3) 비타민A: 표시량(230μg RE/500mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200700170351475",
+  "productName": "필리 루테인",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "루테인: 표시량(20mg/500mg)의 80~120%",
+    "비타민A": "비타민A: 표시량(210μgRE/500mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400170061351",
+  "productName": "필리 루테인",
+  "verdict": "PASS",
+  "reasons": [],
+  "queueFullSet": "루테인+비타민A",
+  "rederivedFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A",
+  "fnAttributedKeys": "루테인+비타민A",
+  "fnMode": "bracket",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20 mg/300mg)의 80~120%",
+    "비타민A": "3) 비타민A : 표시량(210 μgRE/300mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ },
+ {
+  "stmt": "200400200023870",
+  "productName": "하루엔진 눈 건강 루테인",
+  "verdict": "REVIEW",
+  "reasons": [
+   "E_ANTIOXIDANT_ONLY"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "rederivedFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "specKeys": "루테인+비타민A+비타민E",
+  "fnAttributedKeys": "루테인+비타민A+비타민E",
+  "fnMode": "numbered",
+  "specOnly": "",
+  "fnOnly": "",
+  "evidence": {
+   "specs": {
+    "루테인": "2) 루테인 : 표시량(20mg/300mg)의 80~120%",
+    "비타민A": "3) 비타민A : 표시량(700μg RAE/300mg)의 80~150%",
+    "비타민E": "4) 비타민E : 표시량(11mg α-TE/300mg)의 80~150%"
+   },
+   "functions": {
+    "루테인": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "비타민A": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "비타민E": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ]
+   },
+   "unknownSpecLabels": [],
+   "unknownFnLabels": []
+  }
+ }
+]
