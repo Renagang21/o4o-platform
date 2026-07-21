@@ -1,0 +1,746 @@
+[
+ {
+  "statementNo": "200400170061613",
+  "productName": "PNT 루테인 하트츄어블",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 진한 빨강색의 내용물을 함유한 진한 빨강색의 하트모양 츄어블 연질캡슐 2) 비타민A: 표시량(210 μgRE/600 mg)의 80~150% 3) 비",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20190004553406",
+  "productName": "건강 프로젝트 365 루테인+비타민A",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐 2) 붕해 : 물에서 20분 이내 적합 3) 대장균군 : 음성 4) 루테인 : 표시량 (20mg ",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040020006920",
+  "productName": "굿아이케어",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "① 성상 : 적색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제 ② 루테인 : 표시량(12 mg/0.5g)의 80~120% ③ 비타민E : 표시량(6.7 mg",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20220020002114",
+  "productName": "눈 건강 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 진한 빨강의 내용물을 함유한 검은색의 타원형 연질캡슐 2) 루테인 : 표시량(20 mg/300 mg)의 80 ",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20120019007565",
+  "productName": "눈 건강엔 포커스 루테인 A+",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400200141549",
+  "productName": "눈건강 홍 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 진한빨강의 점도가 있는 내용물을 함유한 빨강의 타원형 연질캡슐 2. 루테인 : 표시량(20 mg/500 mg)",
+   "fnEvidence": "① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400200141406",
+  "productName": "눈건강비타민A",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "① 성상 : 고유의 향미가 있고 이미·이취가 없으며 진한 빨강색의 점도가 있는 내용물을 함유한 진한 적갈색의 타원형 연질캡슐 ② 루테인 : 표시량(20 mg/50",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400200022869",
+  "productName": "뉴:트립 맥스 눈건강 루테인비타민A",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "numbered",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040015083571",
+  "productName": "루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없다.. (2) 루테인 : 표시량(20 mg/400 mg)의 80~120% (3) 비타민A : 표시량(461 μg RE/400 mg)의 80~150% (",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400200061059",
+  "productName": "루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400170061602",
+  "productName": "루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 진한 주황색의 내용물을 함유한 검정색의 타원형 연질캡슐 2. 루테인: 표시량(20 mg/ 300 mg)의 80~120% 3. 비타민A: 표시량(70",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "201200190071247",
+  "productName": "루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없으며 선명한 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐 2. 루테인 : 표시량(20mg/300mg)의 80~120% 3. 비타민E : 표시량(1",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": false,
+  "requiresParserFix": [
+   "UNIT_MODIFIER_UG_RAE"
+  ],
+  "agentBReady": false
+ },
+ {
+  "statementNo": "20070017035374",
+  "productName": "루테인 골드",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 진한주황색의 점도가 있는 내용물을 함유한 적갈색의 타원형 연질 캡슐 2) 루테인 : 표시량(20mg/600mg",
+   "fnEvidence": "① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200600200081366",
+  "productName": "루테인 아이케어",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 2. 루테인 : 표시량(20mg/300mg",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20190004553405",
+  "productName": "루테인+비타민 A",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐 2) 붕해 : 물에서 20분 이내 적합 3) 대장균군 : 음성 4) 루테인 : 표시량 (20mg ",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20070017035608",
+  "productName": "뷰라이트루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 진한주황색의 점도가 있는 내용물을 함유한 적갈색의 타원형 연질 캡슐 2. 루테인 : 표시량(20mg/550mg",
+   "fnEvidence": "① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040017006644",
+  "productName": "브라이트 루테인 플로라글로",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없고 고유의 향미가 있는 빨간주황색의 내용물을 함유한 진한 적갈색의 타원형 연질캡슐 2. 루테인 : 표시량 (20 mg / 300 mg)의 80~120%",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040017006974",
+  "productName": "셀티바 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 빨간 갈색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐 2. 루테인 : 표시량 (20 mg /300 mg )의 80~120% 3. 비타민A :",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400200023677",
+  "productName": "싱글맥스 루테인20",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 적색의 내용물을 함유한 빨강색의 타원형 연질캡슐 2) 루테인 : 표시량(20mg/300mg)의 80~120% 3) 비타민A : 표시량(210μg R",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+  },
+  "attributionMode": "numbered",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040015083657",
+  "productName": "아이센루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040020006460",
+  "productName": "아이시안루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 적색 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐 (2) 루테인 : 표시량(20mg/0.5g)의 80~120% (3) 비타민E : 표시량(3",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데"
+  },
+  "attributionMode": "colon",
+  "parserAgrees": false,
+  "requiresParserFix": [
+   "FN_MODE_COLON"
+  ],
+  "agentBReady": false
+ },
+ {
+  "statementNo": "200600200081422",
+  "productName": "아이케어 루테인 지아잔틴 미니",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 2. 루테인 : 표시량(9.9016mg/1",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": false,
+  "requiresParserFix": [
+   "UNIT_MODIFIER_UG_RAE"
+  ],
+  "agentBReady": false
+ },
+ {
+  "statementNo": "20040017006722",
+  "productName": "아이클리어 루테인 미니캡슐",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 빨강색의 내용물을 함유한 빨강색 타원형 연질캡슐 2) 루테인: 표시량(20 mg / 120 mg)의 80 ~ 120% 3) 비타민A: 표시량(400",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400170061390",
+  "productName": "아이클리어 루테인지아잔틴 미니캡슐",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 진한 주황색의 내용물을 함유한 빨간색의 타원형 연질캡슐 2) 루테인 : 표시량(18.2 mg/112 mg)의 80 ~ 120% 3) 총 지아잔틴 :",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20120019007396",
+  "productName": "아이파워루테인포르테",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "colon",
+  "parserAgrees": false,
+  "requiresParserFix": [
+   "FN_MODE_COLON"
+  ],
+  "agentBReady": false
+ },
+ {
+  "statementNo": "20040017021708",
+  "productName": "옵티멈루테인20",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민A+비타민E",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없고 고유의 향미가 있는 적색의 내용물이 함유된 적색의 연질캡슐 ②루테인 : 표시량(20mg/500mg)의 80~120% ③비타민A : 표시량(210μg",
+   "fnEvidence": "①유해산소로부터 세포를 보호하는데 필요"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "2021001285525",
+  "productName": "파워 루테인 액트 플러스",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 선명한 빨간 주황색의 내용물을 함유한 검정색의 타원형 연질캡슐 ② 루테인 : 표시량(20mg/500mg)의 80~120% ③ 비타민 E: 표시량(1",
+   "fnEvidence": "① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "20040015083520",
+  "productName": "플래티넘루테인플러스",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200700170351475",
+  "productName": "필리 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ },
+ {
+  "statementNo": "200400170061351",
+  "productName": "필리 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A"
+  ],
+  "queueFullSet": "루테인+비타민A",
+  "changedVsQueue": false,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": false,
+   "fnExplicitlyAttributed": false,
+   "included": false,
+   "specEvidence": "",
+   "fnEvidence": ""
+  },
+  "attributionMode": "bracket",
+  "parserAgrees": false,
+  "requiresParserFix": [
+   "UNIT_MODIFIER_UG_RAE"
+  ],
+  "agentBReady": false
+ },
+ {
+  "statementNo": "200400200023870",
+  "productName": "하루엔진 눈 건강 루테인",
+  "verdict": "PASS",
+  "verifiedFullSet": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ],
+  "queueFullSet": "루테인+비타민E",
+  "changedVsQueue": true,
+  "action": "RETIRE_REPLACE",
+  "vitaminE": {
+   "specPresent": true,
+   "fnExplicitlyAttributed": true,
+   "included": true,
+   "specEvidence": " 이취가 없는 밝은 적갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐 2) 루테인 : 표시량(20mg/300mg)의 80~120% 3) 비타민A : 표시량(700",
+   "fnEvidence": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+  },
+  "attributionMode": "numbered",
+  "parserAgrees": true,
+  "requiresParserFix": [],
+  "agentBReady": true
+ }
+]
