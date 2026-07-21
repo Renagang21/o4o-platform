@@ -1,0 +1,86 @@
+{
+  "wo": "WO-O4O-OTC-KO-EN-BUNDLE-RUNNER-HARDENING-DA-V1",
+  "bundleKey": "regression-completed-da",
+  "mode": "dry-run",
+  "writeOwner": "agent-da",
+  "groupOrder": [
+    "trimebutine-100mg-jeong",
+    "bacillus-liche-250mg-capsule",
+    "diosmin-300mg-capsule"
+  ],
+  "groupCount": 3,
+  "dbWrite": 0,
+  "groups": [
+    {
+      "groupKey": "trimebutine-100mg-jeong",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 66,
+      "excluded": 61,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 132
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "bacillus-liche-250mg-capsule",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 56,
+      "excluded": 32,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 112
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "diosmin-300mg-capsule",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 38,
+      "excluded": 7,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 76
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    }
+  ],
+  "totals": {
+    "koPlan": 0,
+    "koActual": 0,
+    "enPlan": 320,
+    "enActual": 0,
+    "planTotal": 320,
+    "actualTotal": 0
+  },
+  "bundleStatus": "NO_OP",
+  "abortedAt": null,
+  "abortReason": null,
+  "statusCounts": {
+    "ALREADY_COMPLETE": 3
+  }
+}
