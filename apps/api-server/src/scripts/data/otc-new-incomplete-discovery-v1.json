@@ -1,0 +1,114 @@
+{
+  "wo": "WO-O4O-OTC-NEW-INCOMPLETE-GROUP-DISCOVERY-AUDIT-NA-V1",
+  "agent": "나",
+  "readOnly": true,
+  "dbWrite": 0,
+  "ssot": {
+    "origin_main_check": "92fc065f4",
+    "bridge": "otc-full-corpus-authored-bridge-groups-v1.json"
+  },
+  "preCounts": {
+    "total": 122,
+    "eligible_oral_realing_nonsensitive": 55
+  },
+  "repoSignals": {
+    "registryOrConfigKeys": 49,
+    "runJsonManifests": 50
+  },
+  "summary": {
+    "pool_eligible": 55,
+    "EXCLUDE_LIVE": 48,
+    "EXCLUDE_ASSIGNED": 0,
+    "REVIEW_LATER_NO_TARGET": 1,
+    "REVIEW_LATER_GATE": 6,
+    "NEW_READY": 0
+  },
+  "formula": "T=target master · ko=4T · en=2T · total=6T",
+  "bundle_A_ga": [],
+  "bundle_B_da": [],
+  "bundle_totals": {
+    "A_T": 0,
+    "A_total": 0,
+    "B_T": 0,
+    "B_total": 0,
+    "grand_T": 0,
+    "grand_total": 0
+  },
+  "crossBundleIntersection": 0,
+  "review_later": {
+    "gate": [
+      {
+        "groupKey": "펙소페나딘염산염|120밀리그램|정",
+        "T": 14,
+        "A_ko": 34,
+        "A_en": 34,
+        "reasons": [
+          "fp재현 14!=5"
+        ],
+        "note": "형제 선행생산 A_ko=34, 미생산 target 잔량 14"
+      },
+      {
+        "groupKey": "비오틴|5밀리그램|정",
+        "T": 8,
+        "A_ko": 0,
+        "A_en": 0,
+        "reasons": [
+          "registry/config 배정됨",
+          "fp재현 8!=6"
+        ],
+        "note": "미착수, target 8"
+      },
+      {
+        "groupKey": "토코페롤아세테이트|100밀리그램|연질캡슐",
+        "T": 5,
+        "A_ko": 0,
+        "A_en": 0,
+        "reasons": [
+          "draft 없음"
+        ],
+        "note": "미착수, target 5"
+      },
+      {
+        "groupKey": "수출용|50밀리그램|연질캡슐",
+        "T": 1,
+        "A_ko": 0,
+        "A_en": 0,
+        "reasons": [
+          "draft 없음"
+        ],
+        "note": "미착수, target 1"
+      },
+      {
+        "groupKey": "수출용|500밀리그램|연질캡슐",
+        "T": 1,
+        "A_ko": 0,
+        "A_en": 0,
+        "reasons": [
+          "draft 없음"
+        ],
+        "note": "미착수, target 1"
+      },
+      {
+        "groupKey": "수출용|50밀리그램|정",
+        "T": 1,
+        "A_ko": 0,
+        "A_en": 0,
+        "reasons": [
+          "draft 없음"
+        ],
+        "note": "미착수, target 1"
+      }
+    ],
+    "no_target": [
+      {
+        "groupKey": "아스코르브산97%과립|1000밀리그램|과립/산",
+        "A_ko": 0,
+        "A_en": 0,
+        "hasDraft": false
+      }
+    ]
+  },
+  "exclude_assigned": [],
+  "ready_detail": [],
+  "verdict": "NO_NEW_BATCH"
+}
