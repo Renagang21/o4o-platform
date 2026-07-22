@@ -434,7 +434,18 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **콘텐츠 문서 체계 (진입점)** | `docs/guides/common/DOCUMENT-INDEX.md` — 설명서·QR·POP·블로그·동영상 등 콘텐츠 규칙의 단일 진입점(common/content-authoring/ai/products/services 5축, Rule Registry CR/DR/AR). 상세 규칙은 이 진입점에서만 찾고 CLAUDE.md에 복사하지 않는다. |
 | **Product Resource Architecture (F12 Baseline)** | `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md` — 2계층(Product Resource / Store Production Material) + 6불변식. 상세=`docs/architecture/IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1.md` · `docs/architecture/WO-O4O-PRODUCT-CONTENT-RESOURCE-PERSISTENCE-DESIGN-V1.md` |
 
-> **콘텐츠 작성 불변 원칙**: 의약품 등 소비자 콘텐츠는 **외부 LLM 초안 자동생성 안 함**(공식 원문 grounding) · **투여경로/제형 다르면 공유 금지** · **read-only 조사**(DB 반영은 승인·이중게이트 후). 상세는 `docs/guides/common/DOCUMENT-INDEX.md`.
+> **콘텐츠 작성 불변 원칙**
+>
+> - 의약품 등 소비자 콘텐츠에서 **공식 원문에 없는 의료 사실을 외부 LLM이 생성·보강하는 것은 금지**한다.
+> - MFDS·e약은요·허가사항 등 공식 원문을 grounding으로 사용한 **매장용 설명서 저작은 허용된 정규 작업**이다. 기존 authored draft 부재는 저작 금지 사유가 아니다.
+> - 공식 원문의 효능·용법·금기·주의사항을 보존하면서 제목·요약·소제목·문장 구조·표현·디자인을 소비자 친화적으로 새로 구성할 수 있다.
+> - 매장용 의약품 설명서는 약사가 있는 매장에서 상담을 보조하는 콘텐츠이므로, 공식 원문에 있는 **질병명·질환명·증상명·허가 효능을 회피하거나 모호하게 약화하지 않는다.**
+> - 주의·제한 중심으로 만들어 제품의 용도와 구매 판단을 흐리는 방어적 작성은 금지한다.
+> - 제품 간 조성·투여경로·효능·용법·안전정보가 다르면 혼합하지 않고 subgroup 또는 제품별로 분리한다.
+> - 모든 의약품 매장용 설명서에는 매장 내 약사 등 전문가 문의 안내를 유지한다.
+> - DB 반영은 승인된 WO 범위에서 dry-run·이중게이트·독립검증·rollback 계약을 통과한 뒤 수행한다.
+>
+> 상세 SSOT: `docs/guides/common/DOCUMENT-INDEX.md` → `docs/guides/products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md` → `docs/guides/products/drug/DRUG-WRITING.md`
 
 ---
 
