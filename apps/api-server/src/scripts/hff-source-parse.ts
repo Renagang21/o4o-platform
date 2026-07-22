@@ -45,7 +45,9 @@ export function normalizeSpecText(raw: string): string {
   s = s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0));
   s = s.replace(/㎎/g, 'mg').replace(/㎍/g, 'μg').replace(/µ/g, 'μ');
   // 깨진 α-TE 변형: "mga-TE" / "mgα-TE" / 단독 "a-TE" → "mg α-TE" / "α-TE"
-  s = s.replace(/\bmg\s*[aα]\s*-\s*TE\b/gi, 'mg α-TE');
+  // ⚠️ 숫자 인접(`7mga-TE`·`3.3mga-TE`)은 `\b`(mg 앞) 가 digit-m 사이에서 성립하지 않아 정규화 실패 →
+  //    비타민E spec 누락(과소추출). `\b` 대신 **문자 접합만 배제**(digit/공백/괄호/시작 앞은 허용).
+  s = s.replace(/(?<![A-Za-z가-힣])mg\s*[aα]\s*-\s*TE\b/gi, 'mg α-TE');
   s = s.replace(/(?<![A-Za-zα])a\s*-\s*TE\b/gi, 'α-TE');
   // ASCII u 단위: 숫자/공백/괄호 뒤의 "ug" → "μg" (단어 내부 오탐 방지)
   // 단위 수식어 결합형(`700ugRAE`·`210 ugRE`)은 g 뒤가 단어문자라 `\b` 가 성립하지 않아 정규화 실패 →

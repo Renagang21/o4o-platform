@@ -10,7 +10,7 @@ import '../env-loader.js';
 import fs from 'node:fs';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo, normFn } from './hff-nutrient-registry.js';
-import { resolveSource } from './hff-raw-source.js';
+import { resolveSource, dbStmtNosSource } from './hff-raw-source.js';
 import { DataSource } from 'typeorm';
 // 파서 단일화 — 생산(본 select) · 감사 스크립트가 **동일 spec 정규화/분류 모듈**을 사용한다.
 // (단위 수식어 `ug`/`㎍`/`mga-TE`·라벨 공백·표시량 접두 누락 과소추출 해소. CHECK-...-PILOT-BLOCKER-B-V1 §3)
@@ -89,7 +89,20 @@ if (SHARD_COUNT > 0 && SHARD !== '' && String(MY_SHARD) !== SHARD) {
   process.exit(0);
 }
 
-const src = resolveSource(process.argv, process.env, baseLike.length ? baseLike : undefined);
+// statementNo 직접주입 경로: shard-plan 산출 목록만 조회(ILIKE 전수 스캔 회피). strict 검증은 아래 루프에서 동일 수행.
+const STMT_FILE = arg('statement-nos-file');
+let src: { kind: string; gen: AsyncGenerator<RawItem>; label: string };
+if (STMT_FILE) {
+  const raw = fs.readFileSync(STMT_FILE, 'utf8').trim();
+  let stmtNos: string[];
+  try { const j = JSON.parse(raw); stmtNos = Array.isArray(j) ? j.map(String) : (j.statementNos ?? j.ids ?? []).map(String); }
+  catch { stmtNos = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean); }
+  const port = parseInt(process.env.PROXY_PORT ?? '5442', 10);
+  console.error(`[source] statementNo 직접주입 (${stmtNos.length}건, ILIKE 스캔 생략)`);
+  src = { kind: 'stmtnos', gen: dbStmtNosSource(port, process.env.DB_USERNAME, process.env.DB_PASSWORD, process.env.DB_NAME, stmtNos) as AsyncGenerator<RawItem>, label: `stmtnos:${stmtNos.length}` };
+} else {
+  src = resolveSource(process.argv, process.env, baseLike.length ? baseLike : undefined) as { kind: string; gen: AsyncGenerator<RawItem>; label: string };
+}
 for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const base = it.BASE_STANDARD ?? ''; const name = (it.PRDUCT ?? '').trim(); const srv = it.SRV_USE ?? ''; const sungsang = it.SUNGSANG ?? ''; const stmt = (it.STTEMNT_NO ?? '').trim();
   const { byKey, unknown, nonTarget } = extractSpecs(base);

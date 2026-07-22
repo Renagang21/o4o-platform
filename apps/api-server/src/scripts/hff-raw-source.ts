@@ -74,6 +74,28 @@ export async function* dbStmtListSource(port: number, username: string | undefin
 }
 
 /**
+ * statementNo 직접주입 소스 — shard-plan 이 산출한 signature별 STTEMNT_NO 목록만 조회.
+ * ILIKE 전수 스캔 대신 지정 신고번호만 fetch → 파싱 대상 대폭 축소(수천 → 수십). strict 검증은 소비부(select)가 동일 수행.
+ * 청크 단위 `= ANY` 조회. 순서 무관(select 가 exact-set 재검).
+ */
+export async function* dbStmtNosSource(port: number, username: string | undefined, password: string | undefined, database: string | undefined, stmtNos: string[]): AsyncGenerator<HffRawItem> {
+  const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username, password, database, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 300000 } });
+  await ds.initialize();
+  const uniq = [...new Set(stmtNos.map((s) => String(s).trim()).filter(Boolean))];
+  console.error(`[source] DB statementNo 직접주입: ${uniq.length}건`);
+  try {
+    for (let i = 0; i < uniq.length; i += 1000) {
+      const chunk = uniq.slice(i, i + 1000);
+      const rows: Array<{ src: HffRawItem }> = await ds.query(
+        `SELECT raw_payload->'source' AS src FROM product_candidates
+         WHERE source_label='MFDS_HEALTH_FUNCTIONAL_FOOD' AND deleted_at IS NULL
+           AND raw_payload->'source'->>'STTEMNT_NO' = ANY($1::text[])`, [chunk]);
+      for (const r of rows) if (r.src) yield r.src;
+    }
+  } finally { await ds.destroy(); }
+}
+
+/**
  * --source db|file 선택 + 실사용 소스 로그.
  * **기본 = db**(product_candidates.raw_payload — 동치검증 PASS, G: 비의존). `--source file` 로 파일 raw(회귀/대조).
  * `--statement-nos-file <path>`(JSON 배열 또는 개행 목록) 지정 시 **직접 주입 소스**(ILIKE 스캔 제거) — baseLike 무시.
