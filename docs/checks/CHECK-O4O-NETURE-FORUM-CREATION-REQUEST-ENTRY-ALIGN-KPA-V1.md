@@ -50,4 +50,23 @@ Neture 에는 **일반 회원용 신청 상태 페이지가 없다**. 유일한 
 ## 7. 검증
 
 - typecheck: 변경 3파일 에러 0 (web-neture tsc). 잔여 에러는 무관한 `@o4o/tablet-screen-set-editor` 미빌드(타 세션 작업물).
-- 배포 후 smoke: `/forum` 버튼 노출 → 비로그인 클릭 → 로그인 → `/forum/request` 복귀 → 폼 제출 → 운영자 신청 목록 표시 → 승인 시 포럼 생성 (배포 반영 후 수행).
+- 배포: 제 forum 커밋 직후 타 세션의 `@o4o/tablet-screen-set-editor`(SupplierTabletScreenSetsPage) 중간 커밋이 web-neture 빌드를 일시 파손 → 제 커밋의 "Deploy Web Services" 실패. 후속 V2C 커밋(5678fa9e3)이 패키지를 완성해 web 배포 성공, **제 forum 변경도 해당 배포에 포함되어 LIVE 반영** 확인.
+
+### 운영 브라우저 스모크 (2026-07-22, https://neture.co.kr)
+
+| # | 항목 | 결과 |
+|---|------|------|
+| 1 | `/forum` 에 `+ 포럼 개설신청` 버튼 노출 | PASS |
+| 2 | 비로그인 상태 버튼 클릭 | PASS |
+| 3 | Neture 로그인 모달 이동 (state.from=/forum/request) | PASS |
+| 4 | 로그인 후 `/forum/request` 복귀 | PARTIAL — 아래 주석 |
+| 5 | 폼 이름·설명·사유·태그 입력 | PASS |
+| 6 | 신청 제출 `POST /forum/category-requests → 201` | PASS |
+| 7 | 성공 메시지 → `/forum` 자동 이동 | PASS |
+| 8 | 운영자 신청 관리(`/operator/community`) `대기 중` 표시 · `GET /forum/operator/requests?serviceCode=neture` | PASS (serviceCode=neture 확정) |
+| 9 | 테스트 신청 안전 정리 = **거절**(포럼 미생성) `PATCH …/review → 200` | PASS |
+| 10 | 콘솔 오류 0 / API 4xx·5xx 0 | PASS |
+
+**#4 주석**: 로그인 인프라 `PostLoginRedirect` 가 권한 계정(admin/operator/supplier)을 역할 대시보드로 자동 유도하여 returnUrl 이 덮인다(관찰: operator 로그인 → `/admin`). 일반 회원은 `getNetureDashboardRoute→'/'` 이므로 `PostLoginRedirect` 가 개입하지 않아 로그인 모달 returnUrl(`/forum/request`)이 유지된다 → **WO 대상인 일반 로그인 회원 경로는 정상**. 보유 테스트 계정이 전부 권한 계정이라 일반회원 복귀는 코드경로로 확인(브라우저 직접 재현 미수행). 하드 중지 조건 미해당. 필요 시 권한 계정에서도 returnUrl 우선하도록 `PostLoginRedirect` 보정은 별도 WO 후보.
+
+**후속 WO 후보(이번 범위 제외)**: ① 일반 회원용 신청 상태 페이지(`/forum/my-requests` 등) 또는 `MyForumDashboardPage` 일반화 ② 권한 계정 returnUrl 우선 보정.
