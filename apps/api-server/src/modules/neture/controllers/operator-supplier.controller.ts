@@ -290,6 +290,60 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   });
 
   /**
+   * PATCH /operator/suppliers/:id
+   * WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1
+   * 운영자가 승인 전 공급자의 미흡한 기본 정보를 직접 보완/수정한다.
+   * 공급자 본인의 updateSupplierProfile 도메인 로직을 재사용하되, 운영자 scope 에서는
+   * 승인 판단에 필요한 기본 정보 필드만 화이트리스트로 허용한다(정산/배송/연락처 가시성 등은 제외).
+   *   허용: representativeName / managerName / managerPhone / businessNumber / taxInvoiceEmail
+   * 활성화 가능 여부는 backend 가 단일 권위이므로, 프론트가 저장 후 목록 refetch 로 재수신한다.
+   */
+  router.patch('/suppliers/:id', async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.params;
+      const operatorId = req.user?.id;
+      if (!operatorId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const body = (req.body || {}) as Record<string, unknown>;
+      const str = (v: unknown): string | undefined => (typeof v === 'string' ? v : undefined);
+
+      // 승인 기본 정보 필드만 화이트리스트로 추출 (payload 에 포함된 키만 update)
+      const data: {
+        representativeName?: string;
+        managerName?: string;
+        managerPhone?: string;
+        businessNumber?: string;
+        taxInvoiceEmail?: string;
+      } = {};
+      if ('representativeName' in body) data.representativeName = str(body.representativeName)?.trim() ?? '';
+      if ('managerName' in body) data.managerName = str(body.managerName)?.trim() ?? '';
+      if ('managerPhone' in body) data.managerPhone = str(body.managerPhone)?.trim() ?? '';
+      if ('businessNumber' in body) data.businessNumber = str(body.businessNumber)?.trim() ?? '';
+      if ('taxInvoiceEmail' in body) data.taxInvoiceEmail = str(body.taxInvoiceEmail)?.trim() ?? '';
+
+      if (Object.keys(data).length === 0) {
+        return res.status(400).json({ success: false, error: { code: 'NO_FIELDS', message: 'No editable fields provided' } });
+      }
+
+      const result = await netureService.updateSupplierProfile(id, data);
+      if (!result) {
+        return res.status(404).json({ success: false, error: { code: 'SUPPLIER_NOT_FOUND' } });
+      }
+
+      actionLogService.logSuccess('neture', operatorId, 'neture.operator.supplier_basic_info_update', {
+        meta: { supplierId: id, fields: Object.keys(data) },
+      }).catch(() => {});
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture Operator API] Error updating supplier basic info:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update supplier' } });
+    }
+  });
+
+  /**
    * POST /operator/suppliers/:id/approve
    * 공급자 활성화 (PENDING → ACTIVE)
    */

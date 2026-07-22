@@ -19,7 +19,7 @@
  * 프론트는 필드를 재계산하지 않고 그대로 사용한다(구버전 payload 대비 fallback 만 유지).
  */
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   DataTable,
   Pagination,
@@ -41,6 +41,32 @@ function activationLabels(s: AdminSupplier): string[] {
 // backend 단일 권위. 구버전 payload(activationReady undefined) 대비 representativeName fallback.
 function isActivationReady(s: AdminSupplier): boolean {
   return s.activationReady ?? !!s.representativeName;
+}
+
+// WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1:
+// 운영자가 승인 전 직접 보완 가능한 기본 정보 필드 (backend PATCH 화이트리스트와 일치)
+interface SupplierEditForm {
+  representativeName: string;
+  managerName: string;
+  managerPhone: string;
+  businessNumber: string;
+  taxInvoiceEmail: string;
+}
+const EMPTY_EDIT_FORM: SupplierEditForm = {
+  representativeName: '',
+  managerName: '',
+  managerPhone: '',
+  businessNumber: '',
+  taxInvoiceEmail: '',
+};
+function toEditForm(s: AdminSupplier): SupplierEditForm {
+  return {
+    representativeName: s.representativeName || '',
+    managerName: s.managerName || '',
+    managerPhone: s.managerPhone || '',
+    businessNumber: s.businessNumber || '',
+    taxInvoiceEmail: s.taxInvoiceEmail || '',
+  };
 }
 
 const statusLabels: Record<string, string> = {
@@ -105,6 +131,11 @@ export default function OperatorSupplierApprovalPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1: 운영자 기본 정보 보완 (Drawer 내 편집)
+  const [editing, setEditing] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editForm, setEditForm] = useState<SupplierEditForm>(EMPTY_EDIT_FORM);
+
   const batch = useBatchAction();
 
   // ─── 표준 리스트 상태 (server-driven, URL sync) ───
@@ -152,6 +183,45 @@ export default function OperatorSupplierApprovalPage() {
   const selectedItems = suppliers.filter((s) => selectedIds.has(s.id));
   const selectedNotReady = selectedItems.filter((s) => !isActivationReady(s));
   const approveDisabled = selectedItems.length === 0 || selectedNotReady.length > 0;
+
+  // 드로어를 다시 열 때(다른 공급자 선택) 편집 모드 초기화
+  useEffect(() => {
+    setEditing(false);
+  }, [drawer?.id]);
+
+  // 저장 후 refetch 로 목록이 갱신되면, 열려 있는 드로어를 최신 행으로 동기화하여
+  // backend 가 재계산한 activationReady/missingActivationFields 를 그대로 반영한다(프론트 재계산 금지).
+  useEffect(() => {
+    if (!drawer) return;
+    const fresh = suppliers.find((s) => s.id === drawer.id);
+    if (fresh && fresh !== drawer) setDrawer(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suppliers]);
+
+  const handleStartEdit = () => {
+    if (!drawer) return;
+    setEditForm(toEditForm(drawer));
+    setEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setEditForm(EMPTY_EDIT_FORM);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!drawer) return;
+    setSavingEdit(true);
+    const res = await operatorSupplierApi.updateBasicInfo(drawer.id, editForm);
+    setSavingEdit(false);
+    if (res.success) {
+      setActionMessage({ type: 'success', text: `${drawer.name || '공급자'} 기본 정보를 저장했습니다.` });
+      setEditing(false);
+      refetch();
+    } else {
+      setActionMessage({ type: 'error', text: '정보 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+    }
+  };
 
   // ─── 일괄 처리 ───
   const handleBulkApprove = async () => {
@@ -470,6 +540,14 @@ export default function OperatorSupplierApprovalPage() {
             supplier={drawer}
             onOpenCategories={() => setCategoryModal({ id: drawer.id, name: drawer.name })}
             onDownload={handleDownloadDocument}
+            editable={drawer.status === 'PENDING'}
+            editing={editing}
+            editForm={editForm}
+            savingEdit={savingEdit}
+            onChangeEditForm={(patch) => setEditForm((prev) => ({ ...prev, ...patch }))}
+            onStartEdit={handleStartEdit}
+            onCancelEdit={handleCancelEdit}
+            onSaveEdit={handleSaveEdit}
           />
         )}
       </BaseDetailDrawer>
@@ -536,10 +614,26 @@ function SupplierDetailBody({
   supplier: s,
   onOpenCategories,
   onDownload,
+  editable,
+  editing,
+  editForm,
+  savingEdit,
+  onChangeEditForm,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
 }: {
   supplier: AdminSupplier;
   onOpenCategories: () => void;
   onDownload: (id: string, type: 'business_registration' | 'bank_statement' | 'mail_order_report') => void;
+  editable: boolean;
+  editing: boolean;
+  editForm: SupplierEditForm;
+  savingEdit: boolean;
+  onChangeEditForm: (patch: Partial<SupplierEditForm>) => void;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onSaveEdit: () => void;
 }) {
   const ready = isActivationReady(s);
   const missing = activationLabels(s);
@@ -552,15 +646,74 @@ function SupplierDetailBody({
     </div>
   );
 
+  // 인라인 .map() 으로 렌더 — 별도 컴포넌트로 분리하면 매 렌더 remount 되어 입력 포커스가 빠진다.
+  const editFields: { label: string; field: keyof SupplierEditForm; placeholder: string }[] = [
+    { label: '대표자', field: 'representativeName', placeholder: '대표자명' },
+    { label: '담당자명', field: 'managerName', placeholder: '담당자명' },
+    { label: '담당자 연락처', field: 'managerPhone', placeholder: '숫자만 입력' },
+    { label: '사업자번호', field: 'businessNumber', placeholder: '000-00-00000' },
+    { label: '세금계산서', field: 'taxInvoiceEmail', placeholder: '세금계산서 이메일' },
+  ];
+
   return (
     <div className="text-sm text-slate-700">
       {/* 기본 정보 */}
       <div className="mb-5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold text-slate-500">기본 정보</span>
+          {editable && !editing && (
+            <button
+              type="button"
+              onClick={onStartEdit}
+              className="text-xs px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium"
+            >
+              정보 보완
+            </button>
+          )}
+        </div>
         <Row label="공급자명" value={s.name || '-'} />
         <Row label="이메일" value={s.email || '-'} />
-        <Row label="대표자" value={s.representativeName || '-'} />
-        <Row label="담당자" value={[s.managerName, s.managerPhone].filter(Boolean).join(' / ') || '-'} />
-        <Row label="사업자번호" value={s.businessNumber || '-'} />
+        {editing ? (
+          <>
+            {editFields.map(({ label, field, placeholder }) => (
+              <div key={field} className="flex gap-3 mb-2.5 items-center">
+                <span className="font-semibold text-slate-500 min-w-[88px] shrink-0">{label}</span>
+                <input
+                  type="text"
+                  value={editForm[field]}
+                  placeholder={placeholder}
+                  onChange={(e) => onChangeEditForm({ [field]: e.target.value } as Partial<SupplierEditForm>)}
+                  className="flex-1 px-2.5 py-1.5 border border-slate-200 rounded-md text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+            ))}
+            <div className="flex gap-2 justify-end mt-3">
+              <button
+                type="button"
+                onClick={onCancelEdit}
+                disabled={savingEdit}
+                className="px-3 py-1.5 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 text-sm disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={onSaveEdit}
+                disabled={savingEdit}
+                className="px-3 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 text-sm disabled:opacity-50"
+              >
+                {savingEdit ? '저장 중…' : '저장'}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <Row label="대표자" value={s.representativeName || '-'} />
+            <Row label="담당자" value={[s.managerName, s.managerPhone].filter(Boolean).join(' / ') || '-'} />
+            <Row label="사업자번호" value={s.businessNumber || '-'} />
+            <Row label="세금계산서" value={s.taxInvoiceEmail || '-'} />
+          </>
+        )}
         <Row
           label="상태"
           value={
@@ -596,7 +749,6 @@ function SupplierDetailBody({
               : '정산 정보 없음'
           }
         />
-        <Row label="세금계산서" value={s.taxInvoiceEmail || '-'} />
       </div>
 
       {/* 통신판매업 */}

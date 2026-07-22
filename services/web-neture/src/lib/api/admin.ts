@@ -335,6 +335,27 @@ export const operatorSupplierApi = {
     } catch { return false; }
   },
 
+  // WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1:
+  // 운영자가 승인 전 미흡한 기본 정보를 직접 보완/수정. 저장 후 화면은 목록 refetch 로
+  // 갱신된 activationReady/missingActivationFields 를 재수신한다(프론트 재계산 금지).
+  async updateBasicInfo(
+    id: string,
+    data: Partial<{
+      representativeName: string;
+      managerName: string;
+      managerPhone: string;
+      businessNumber: string;
+      taxInvoiceEmail: string;
+    }>,
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await api.patch(`/neture/operator/suppliers/${id}`, data);
+      return { success: !!response.data?.success };
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error?.code || 'UPDATE_FAILED' };
+    }
+  },
+
   async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
     try {
       const response = await api.get(`/neture/operator/suppliers/${id}/documents/${documentType}/download`, {
