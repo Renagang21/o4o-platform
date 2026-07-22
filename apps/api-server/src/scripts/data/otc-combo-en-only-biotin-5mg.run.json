@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비오틴|5mg|정제(combo)",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "79a515f0-fb13-4b58-a01b-3f1b524c29f0",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 8,
+  "anomalies": [],
+  "targetMasters": 8,
+  "target_master_ids": [
+    "20d9ad64-2942-48cb-bdee-2a81260bfc30",
+    "4da4307e-9cd8-4ae4-abfb-1f6efb402bc9",
+    "51acdef4-9a0c-4eb5-88a0-be1445143a18",
+    "7a0a7d8e-b2a7-4247-bc6e-885f2a6a8f18",
+    "99b65ad6-7faa-473f-8657-29281359482d",
+    "a0c6c314-0a16-4f2a-98fa-0d3a308067a7",
+    "b84447cb-c574-46d2-a7bd-fcc3a47286c2",
+    "de9b3a8f-6a6f-4a39-9e4e-e21a3c12a5e1"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 8,
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2184,
+  "builtMd5": "9e32340840d153e35947798a9bc64b7f",
+  "summaryField": "Poor nail or hair growth from biotin deficiency",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_en_canonical_flip": 8,
+    "en_write_total": 16
+  },
+  "enTargetMd5": "9e32340840d153e35947798a9bc64b7f",
+  "note": "대상 en 이미 canonical · build byte-identical(9e32340840d153e35947798a9bc64b7f) — write 0"
+}

@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-COMPLEX-EN-3H-PILOT-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo(source_ref 2bb82579) 칼슘·비타민D 정제. 2성분·단일 통합 목적(뼈 건강)으로 ko 가 이미 통합 효능 기재 → 성분별 효능 합성 없이 ko 충실 번역. fact-0. ko 미변경. ko 요지=효능: 임신/수유/발육기/노년기 비타민D 보급 + 칼슘 결핍 및 기타 칼슘 보급 + 뼈·이 발육불량·구루병 예방 / 용법: 만 8세 이상·성인 1일 1회 1정 / 주의 금기: 과민·고칼슘혈증·유육종증·신장질환·신장결석·심한신부전·12개월미만; 상담: 심장순환신장·강심배당체; 병용금지: 인산염·칼슘염·테트라사이클린·제산제.",
+  "translations": [
+    {
+      "groupKey": "칼슘·비타민D|정제(combo)",
+      "title": "Calcium and Vitamin D Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamin D during pregnancy, breastfeeding, childhood growth and old age, to supply calcium for calcium deficiency and other calcium needs, and to help prevent poor development of the bones and teeth and rickets.",
+      "usage": "Adults and children aged 8 years and over take one tablet once a day.",
+      "caution": "Do not take this if you are hypersensitive to it, have high blood calcium, sarcoidosis, kidney disease, kidney stones or severe kidney failure, or are a baby under 12 months old. Talk to a pharmacist if you have a heart, circulatory or kidney disorder or are taking cardiac glycosides, and do not take it together with phosphates, calcium salts, tetracycline antibiotics or antacids.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Calcium and vitamin D",
+        "How it works": "Supplies calcium and vitamin D",
+        "Main symptoms": "Calcium and vitamin D deficiency; poor development of the bones and teeth",
+        "Who should be careful": "People with high blood calcium, kidney disease or kidney stones",
+        "Why this one": "A calcium and vitamin D tablet (chewable available)"
+      }
+    }
+  ],
+  "summary": "Calcium and vitamin D supplementation for bone health"
+}

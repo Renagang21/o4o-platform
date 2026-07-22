@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-COMPLEX-EN-3H-PILOT-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo(source_ref 79a515f0) 비오틴 5mg 정제. 단일 성분(비오틴). EN-only 는 79a515f0 의 authored ko canonical 8 master 만 스코프(split 무관 — 별도 easy-canonical master 는 다른 source_ref·미접촉). ko canonical 충실 번역(fresh). fact-0. ko 미변경. ko 요지=효능: 비오틴 결핍성 손발톱·모발 성장장애 / 용법: 1일 1회 1정 식전 / 주의: 과민·3개월미만 금기, 임부수유부 상담, 날계란 병용금지, 항경련제(카르바마제핀·페니토인)·항생제 상담.",
+  "translations": [
+    {
+      "groupKey": "비오틴|5mg|정제(combo)",
+      "title": "Biotin 5 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for poor growth of the nails or hair caused by biotin deficiency.",
+      "usage": "Take one tablet once a day, before a meal.",
+      "caution": "Do not take this if you are hypersensitive to it or are a baby under 3 months old. Talk to a pharmacist if you are pregnant or breastfeeding. Do not take it with raw eggs, and talk to a pharmacist if you are taking anticonvulsants such as carbamazepine or phenytoin, or antibiotics.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Biotin 5 mg",
+        "How it works": "Supplies biotin",
+        "Main symptoms": "Poor growth of the nails or hair from biotin deficiency",
+        "Who should be careful": "People taking anticonvulsants or antibiotics, and during pregnancy or breastfeeding",
+        "Why this one": "A single-ingredient biotin tablet"
+      }
+    }
+  ],
+  "summary": "Poor nail or hair growth from biotin deficiency"
+}

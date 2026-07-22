@@ -1,0 +1,22 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-COMPLEX-EN-3H-PILOT-NA-V1 (에이전트 나) 자기 전용 복합제 EN-only config. 공용 registry 미수정. runner=otc-nutrition-combo-en-only-runner-na.ts --config=<이 파일> --group=<key>. 대상 master_id=source_ref+source_type ko canonical 전체 고정. ko 불변. fresh 번역. READY_SIMPLE_COMBO(단일 통합 목적·성분별 합성 없음)만.",
+  "round": "nutrition-combo-complex-en-3h-2026-07-22",
+  "en": {
+    "biotin-5mg-combo": {
+      "key": "비오틴|5mg|정제(combo)",
+      "sourceRef": "79a515f0-fb13-4b58-a01b-3f1b524c29f0",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 8,
+      "translationFile": "otc-en-translations-biotin-5mg-combo-na-v1.json",
+      "outBase": "otc-combo-en-only-biotin-5mg"
+    },
+    "calcium-vitd-combo": {
+      "key": "칼슘·비타민D|정제(combo)",
+      "sourceRef": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 317,
+      "translationFile": "otc-en-translations-calcium-vitd-combo-na-v1.json",
+      "outBase": "otc-combo-en-only-calcium-vitd"
+    }
+  }
+}
