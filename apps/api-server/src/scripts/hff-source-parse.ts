@@ -66,31 +66,60 @@ const SPEC_RE = new RegExp(
   '([\\d][\\d,.]*)\\s*(mg|g|μg|mcg|IU)' +                                // 값 + 단위
   '\\s*(?:RAE|RE|α-?TE|NE|DFE)?\\s*' +                                   // 수식어(선택)
   '\\/\\s*([\\d][\\d,.]*)\\s*(mg|g)\\s*\\)?' +                           // 기준량
-  '\\s*(?:의\\s*)?(?:([\\d.]+\\s*[~∼\\-]\\s*[\\d.]+)\\s*%|(이상))',      // 비율(필수)
+  // 비율(필수). 표준형 `)의 X~Y%` + 괄호형 `(표시량의 X~Y%)`(기준량 뒤 괄호 안에 표시량의+비율) 모두 허용.
+  '\\s*\\(?\\s*(?:의\\s*)?(?:표시량의\\s*)?(?:([\\d.]+\\s*[~∼\\-]\\s*[\\d.]+)\\s*%|(이상))\\s*\\)?', // 비율(필수)
   'gi',
 );
 const uNorm = (u: string): string => { const x = u.replace(/\s/g, ''); if (/^(mcg|μg)$/i.test(x)) return 'μg'; if (/^iu$/i.test(x)) return 'IU'; return x.toLowerCase() === 'g' ? 'g' : 'mg'; };
 const numOf = (s: string): number => parseFloat(s.replace(/,/g, ''));
 
 export interface SpecParse { byKey: Map<string, Spec>; unknownLabels: string[] }
+
+// 느슨한 spec-like 탐지: `라벨 [함량] : [표시량] 값단위[수식어] / 기준단위` — 비율 tail 불요.
+// 기준량이 mg|g 인 것만(오염물 `/kg` 라인 배제). SPEC_RE 가 잡지 못한 규격 라인 검출용(안전망).
+const LOOSE_SPEC_RE = new RegExp(
+  '([가-힣A-Za-z0-9()\\-·]{1,20}(?:\\s[가-힣A-Za-z0-9()\\-·]{1,12})?)' +
+  '\\s*[:：]\\s*(?:표시량\\s*)?\\(?\\s*' +
+  '[\\d][\\d,.]*\\s*(?:mg|g|μg|mcg|IU)\\s*(?:RAE|RE|α-?TE|NE|DFE)?\\s*' +
+  '\\/\\s*[\\d][\\d,.]*\\s*(?:mg|g)\\b',
+  'gi',
+);
+
 export function parseSpecs(base: string): SpecParse {
   const b = normalizeSpecText(base);
   const byKey = new Map<string, Spec>(); const unknownLabels: string[] = [];
+  const matchedSpans: Array<[number, number]> = [];
   SPEC_RE.lastIndex = 0; let m: RegExpExecArray | null;
   while ((m = SPEC_RE.exec(b)) !== null) {
+    matchedSpans.push([m.index, m.index + m[0].length]);
     const label = m[1].trim(); if (NONFUNC.test(label)) continue;
     const k = classify(label); if (!k) { unknownLabels.push(label); continue; }
     if (byKey.has(k)) continue;
     byKey.set(k, { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio: m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : '표시량 이상', evidence: m[0].trim() });
+  }
+  // 안전망: 값/기준 규격을 가졌으나 SPEC_RE 가 캡처하지 못한 라인은 소실시키지 않고 unknownLabels 로 강제 편입한다.
+  // (비율 포맷을 아무리 늘려도 미지 변이는 남으므로 «파싱 못한 규격 라인 있으면 HOLD» 가 안전한 기본값.)
+  LOOSE_SPEC_RE.lastIndex = 0; let lm: RegExpExecArray | null;
+  while ((lm = LOOSE_SPEC_RE.exec(b)) !== null) {
+    const label = lm[1].trim(); if (NONFUNC.test(label)) continue;
+    const start = lm.index, end = lm.index + lm[0].length;
+    if (matchedSpans.some(([s, e]) => start < e && end > s)) continue; // SPEC_RE 가 이미 처리
+    unknownLabels.push(label); // 규격 라인이나 미파싱 → HOLD 유발
   }
   return { byKey, unknownLabels };
 }
 
 /** 기능성 문장 분리(인라인 폴백용) */
 export function splitFunctions(mainFn: string): string[] {
-  let t = normalizeSpecText(mainFn); t = t.replace(/\[[^\]]*\]/g, ' ');
-  return [...new Set(t.split(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\((?:가|나|다|라|마|바|사|\d+)\)|(?:^|\s)\d+[).]|(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\s*[.,。、/]?\s+(?=[가-힣])/)
-    .map((x) => x.trim().replace(/^[-•*\s:：·]+/, '').replace(/[.。]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
+  // `[원료]` 브래킷은 원료 라벨 경계다. 공백 치환하면 `[곰피추출물]간건강…(May help)   [비타민B1] 탄수화물…`
+  // 처럼 앞 문장이 `)` 로 끝나 다음 분리자에 안 걸려 다음 원료로 기능성이 끌려간다(허위 귀속).
+  // → 브래킷을 하드 경계 sentinel(U+0001)로 치환하고 그 경계로도 분리한다.
+  const SENT = String.fromCharCode(1);
+  let t = normalizeSpecText(mainFn); t = t.replace(/\[[^\]]*\]/g, SENT);
+  return [...new Set(t.split(new RegExp(
+    SENT + '|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\\((?:가|나|다|라|마|바|사|\\d+)\\)|(?:^|\\s)\\d+[).]|' +
+    '(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\\s*[.,。、/]?\\s+(?=[가-힣])'))
+    .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
     .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x)))];
 }
 
