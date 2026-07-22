@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s134-001",
+  "productName": "메타볼릭퓨어",
+  "productNameEn": "메타볼릭퓨어",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "2007001703547",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미·이취가 없는 갈색의 내용물을 함유한 투명한 장방형 경질캡슐\n2. 비타민B6(mg) : 표시량(25.98mg/2,700mg)의 80.0~150.0%\n3. 판토텐산(mg): 표시량(60.00mg/2,700mg)의 80.0~150.0%\n4. 붕해시험: 적합\n5. 대장균군: 음성",
+   "intake": "1일 2회, 1회 3캅셀 물과 함께 섭취",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인 한 후 섭취여부를 결정하여야 함.\n② 섭취량을 조절하거나 이상 반응이 있을시 제품에 기재된 소비자 상담실로 문의 요망함.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 갈색의 내용물을 함유한 투명한 장방형 경질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25.98,
+    "unit": "mg",
+    "basisAmount": 2700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B6 25.98mg</span><span class=\"sd-badge is-solid\">판토텐산 60mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메타볼릭퓨어<small>비타민 B6 · 판토텐산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B6 <b>25.98mg</b>, 판토텐산 <b>60mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 비타민 B6 <b>25.98mg</b>, 판토텐산 <b>60mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 갈색의 내용물을 함유한 투명한 장방형 경질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B6</b> 표시량(25.98mg/2700mg)의 80.0~150.0%</div><div class=\"sd-item\"><b>판토텐산</b> 표시량(60mg/2700mg)의 80.0~150.0%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 갈색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B6 · 판토텐산 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B6 25.98mg</span><span class=\"sd-badge is-solid\">Pantothenic acid 60mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메타볼릭퓨어<small>Vitamin B6 · Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>25.98mg</b> of Vitamin B6, <b>60mg</b> of Pantothenic acid as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (3 capsules): <b>25.98mg</b> Vitamin B6, <b>60mg</b> Pantothenic acid</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Pantothenic acid</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B6</b> labelled (25.98mg / 2700mg), 80.0~150.0%</div><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (60mg / 2700mg), 80.0~150.0%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 갈색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B6 · Pantothenic acid together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

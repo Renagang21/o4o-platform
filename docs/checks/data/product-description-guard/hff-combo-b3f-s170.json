@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s170-001",
+  "productName": "뽀로로 튼튼키즈 비타민 ABC",
+  "productNameEn": "뽀로로 튼튼키즈 비타민 ABC",
+  "manufacturer": "주식회사 내츄럴엔",
+  "manufacturerEn": null,
+  "statementNo": "20200012016196",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 A]\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요\n[비타민 B1]\n(1) 탄수화물과 에너지 대사에 필요\n[비타민 B2]\n(1) 체내 에너지 생성에 필요\n[비타민 B6]\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민 C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미를 가지고, 이미 이취가 없는 하양색 원형 츄어블 정제\n2. 비타민A : 450ug RAE/12g 의 80~150% \n3. 비타민B1 : 1.2 mg/12g의 80~180%\n4. 비타민B2 : 1.4 mg/12g의 80~180%\n5. 비타민B6 : 1.5 mg/12g의 80~150%\n6. 비타민C : 100mg/12g의 80~150%\n7. 대장균군 : 음성",
+   "intake": "1일 5회, 1회 2정(2400mg/2정)을 씹거나 녹여서 섭취를 하십시오.",
+   "caution": "1. 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n2. 과량 섭취하지 않도록 주의할 것\n3. 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n4. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지고, 이미 이취가 없는 하양색 원형 츄어블 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 서늘한 장소에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 450,
+    "unit": "μg",
+    "basisAmount": 12,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 5,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 450μg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 5회</span></div>\n  <h1>뽀로로 튼튼키즈 비타민 ABC<small>비타민 A · 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C</small></h1><p class=\"sd-meta\">주식회사 내츄럴엔 제조 · 1일 5회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>450μg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 5회(2정) 섭취로 비타민 A <b>450μg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지고, 이미 이취가 없는 하양색 원형 츄어블 정제 · 주식회사 내츄럴엔 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 5회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(450μg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/12g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/12g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/12g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지고, 이미 이취가 없는 하양색 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 서늘한 장소에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 450μg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">5 times a day</span></div>\n  <h1>뽀로로 튼튼키즈 비타민 ABC<small>Vitamin A · Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 주식회사 내츄럴엔 · 5 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>450μg</b> of Vitamin A, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>5 times a day (2 tablets): <b>450μg</b> Vitamin A, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 내츄럴엔</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">5 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (450μg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 12g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 12g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지고, 이미 이취가 없는 하양색 원형 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 서늘한 장소에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

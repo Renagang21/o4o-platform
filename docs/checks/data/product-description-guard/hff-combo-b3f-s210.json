@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s210-001",
+  "productName": "비너젠에스",
+  "productNameEn": "비너젠에스",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "201200170101",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1]①탄수화물과 에너지 대사에 필요\r\n[비타민B12]①정상적인 엽산 대사에 필요\r\n[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐\n2) 붕해도 : 20분 이내\n3) 대장균군 : 음성\n4) 비타민B1 : 표시량(7㎎/1.4g)의 80~180%\n5) 구리 : 표시량(0.525㎎/1.4g)의 80~150%\n6) 비타민B12 : 표시량(0.6㎍/1.4g)의 80~180%",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 갈색투명경질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.525,
+    "unit": "mg",
+    "basisAmount": 1.4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.525mg</span><span class=\"sd-badge is-solid\">비타민 B1 7mg</span><span class=\"sd-badge is-solid\">비타민 B12 0.6μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비너젠에스<small>구리 · 비타민 B1 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.525mg</b>, 비타민 B1 <b>7mg</b>, 비타민 B12 <b>0.6μg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 구리 <b>0.525mg</b>, 비타민 B1 <b>7mg</b>, 비타민 B12 <b>0.6μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 갈색투명경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.525mg/1.4g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(7mg/1.4g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.6μg/1.4g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 갈색투명경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 비타민 B1 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.525mg</span><span class=\"sd-badge is-solid\">Vitamin B1 7mg</span><span class=\"sd-badge is-solid\">Vitamin B12 0.6μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비너젠에스<small>Copper · Vitamin B1 · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.525mg</b> of Copper, <b>7mg</b> of Vitamin B1, <b>0.6μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.525mg</b> Copper, <b>7mg</b> Vitamin B1, <b>0.6μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.525mg / 1.4g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (7mg / 1.4g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.6μg / 1.4g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 갈색투명경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Vitamin B1 · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

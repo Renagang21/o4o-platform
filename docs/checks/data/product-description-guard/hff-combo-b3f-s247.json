@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s247-001",
+  "productName": "근육 건강 마그네슘",
+  "productNameEn": "근육 건강 마그네슘",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20220020002119",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘]\n에너지 이용에 필요\n신경과 근육 기능 유지에 필요\n\n[아연]\n정상적인 면역기능에 필요\n정상적인 세포분열에 필요\n\n[비타민 B12] \n정상적인 엽산 대사에 필요\n\n[비타민 B1] \n탄수화물과 에너지 대사에 필요\n\n[비타민 B2]\n체내 에너지 생성에 필요\n\n[비오틴] \n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 코팅 정제\n\n2) 마그네슘 : 표시량(350 ㎎/1,000 ㎎)의  80~150%\n3) 아연 : 표시량(8.5 ㎎/1,000 ㎎)의  80~150%\n4) 비타민B12 : 표시량(2.4 ㎍/1,000 ㎎)의  80~180%\n5) 비타민B1 : 표시량(1.2 ㎎/1,000 ㎎)의  80~180%\n6) 비타민B2 : 표시량(1.4 ㎎/1,000 ㎎)의  80~180%\n7) 비오틴 : 표시량(30 ㎍/1,000 ㎎)의  80~180%\n\n8) 붕해도 : 60분 이내\n9) 대장균군 : 음   성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담해 주십시오.\n2) 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n3) 특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 코팅 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 350,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 350mg</span><span class=\"sd-badge is-solid\">비오틴 30μg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>근육 건강 마그네슘<small>마그네슘 · 비오틴 · 비타민 B1 · 비타민 B12 · 비타민 B2 · 아연</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>350mg</b>, 비오틴 <b>30μg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B2 <b>1.4mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>350mg</b>, 비오틴 <b>30μg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B2 <b>1.4mg</b>, 아연 <b>8.5mg</b></li><li>고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 코팅 정제 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(350mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>비오틴</b> 표시량(30μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비오틴 · 비타민 B1 · 비타민 B12 · 비타민 B2 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 350mg</span><span class=\"sd-badge is-solid\">Biotin 30μg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>근육 건강 마그네슘<small>Magnesium · Biotin · Vitamin B1 · Vitamin B12 · Vitamin B2 · Zinc</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>350mg</b> of Magnesium, <b>30μg</b> of Biotin, <b>1.2mg</b> of Vitamin B1, <b>2.4μg</b> of Vitamin B12, <b>1.4mg</b> of Vitamin B2, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>350mg</b> Magnesium, <b>30μg</b> Biotin, <b>1.2mg</b> Vitamin B1, <b>2.4μg</b> Vitamin B12, <b>1.4mg</b> Vitamin B2, <b>8.5mg</b> Zinc</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (350mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Biotin</b> labelled (30μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Biotin · Vitamin B1 · Vitamin B12 · Vitamin B2 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

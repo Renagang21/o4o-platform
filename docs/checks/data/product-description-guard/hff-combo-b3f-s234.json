@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s234-001",
+  "productName": "멀티비타민플러스",
+  "productNameEn": "멀티비타민플러스",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "2004002000337",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①탄수화물과 에너지 대사에 필요\r\n①체내 에너지 생성에 필요\r\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n①유해산소로부터 세포를 보호하는데 필요\r\n①체내 에너지 생성에 필요\r\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 연분홍색의 정제\n2. 비타민B1 : 표시량(0.5mg/1500mg)의 80~180%\n3. 비타민B2 : 표시량(0.7mg/1500mg)의 80~180%\n4. 비타민B6 : 표시량(0.9mg/1500mg)의 80~150%\n5. 비타민C : 표시량(140mg/1500mg)의 80~150%\n6. 비타민E : 표시량(21mg/1500mg)의 80~180%\n7. 나이아신 : 표시량(4.3mg/1500mg)의 80~180%\n8. 판토텐산 : 표시량(3.5mg/1500mg)의 80~180%\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 5정을 씹어서 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로, 성분을 확인하신 후 섭취하시기 바랍니다.\n2) 어린이의 손이 닿지 않는 곳에 보관하여 주십시오\n3)임신, 수유부는 제품을 사용하기 전에 의사와 상담하시고 섭취하십시요",
+   "dosageForm": "연분홍색의 정제",
+   "storage": "",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 4.3,
+    "unit": "mg",
+    "basisAmount": 1500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 5,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 4.3mg</span><span class=\"sd-badge is-solid\">비타민 B1 0.5mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.9mg</span><span class=\"sd-badge is-solid\">비타민 C 140mg</span><span class=\"sd-badge is-solid\">비타민 E 21mg</span><span class=\"sd-badge is-solid\">판토텐산 3.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>멀티비타민플러스<small>나이아신 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 비타민 E · 판토텐산</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 1회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>4.3mg</b>, 비타민 B1 <b>0.5mg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>140mg</b>, 비타민 E <b>21mg</b>, 판토텐산 <b>3.5mg</b>를 표시량으로 담은 7원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(5정) 섭취로 나이아신 <b>4.3mg</b>, 비타민 B1 <b>0.5mg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>140mg</b>, 비타민 E <b>21mg</b>, 판토텐산 <b>3.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연분홍색의 정제 · 태웅식품(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(4.3mg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.5mg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.9mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(140mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(21mg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>판토텐산</b> 표시량(3.5mg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 연분홍색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 비타민 E · 판토텐산 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 4.3mg</span><span class=\"sd-badge is-solid\">Vitamin B1 0.5mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin C 140mg</span><span class=\"sd-badge is-solid\">Vitamin E 21mg</span><span class=\"sd-badge is-solid\">Pantothenic acid 3.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>멀티비타민플러스<small>Niacin · Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Vitamin E · Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · Once a day · 5 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>4.3mg</b> of Niacin, <b>0.5mg</b> of Vitamin B1, <b>0.7mg</b> of Vitamin B2, <b>0.9mg</b> of Vitamin B6, <b>140mg</b> of Vitamin C, <b>21mg</b> of Vitamin E, <b>3.5mg</b> of Pantothenic acid as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (5 tablets): <b>4.3mg</b> Niacin, <b>0.5mg</b> Vitamin B1, <b>0.7mg</b> Vitamin B2, <b>0.9mg</b> Vitamin B6, <b>140mg</b> Vitamin C, <b>21mg</b> Vitamin E, <b>3.5mg</b> Pantothenic acid</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Pantothenic acid</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (4.3mg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.5mg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.9mg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (140mg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (21mg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (3.5mg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 연분홍색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Vitamin E · Pantothenic acid together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s136-001",
+  "productName": "광동 리프레C 비타민C",
+  "productNameEn": "광동 리프레C 비타민C",
+  "manufacturer": "(주)바이오 로제트",
+  "manufacturerEn": null,
+  "statementNo": "20040017015371",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n(1) 정상적인 엽산 대사에 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말\n(2) 비타민 C : 표시량(500mg/2g)의 80 ~ 150%\n(3) 아연 : 표시량(2.55mg/2g)의 80 ~ 150%\n(4) 비타민 B12 : 표시량(0.72μg/2g)의 80 ~ 180%\n(5) 비타민 B1 : 표시량(0.36mg/2g)의 80 ~ 180%\n(6) 비타민 B2 : 표시량(0.42mg/2g)의 80 ~ 180%\n(7) 엽산 : 표시량(120μg/2g)의 80 ~ 150%\n(8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 직접 또는 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말",
+   "storage": "1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.    2) 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.36,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.36mg</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">비타민 B2 0.42mg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge is-solid\">엽산 120μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>광동 리프레C 비타민C<small>비타민 B1 · 비타민 B12 · 비타민 B2 · 비타민 C · 아연 · 엽산</small></h1><p class=\"sd-meta\">(주)바이오 로제트 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.36mg</b>, 비타민 B12 <b>0.72μg</b>, 비타민 B2 <b>0.42mg</b>, 비타민 C <b>500mg</b>, 아연 <b>2.55mg</b>, 엽산 <b>120μg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B1 <b>0.36mg</b>, 비타민 B12 <b>0.72μg</b>, 비타민 B2 <b>0.42mg</b>, 비타민 C <b>500mg</b>, 아연 <b>2.55mg</b>, 엽산 <b>120μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말 · (주)바이오 로제트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.36mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.42mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/2g)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(120μg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오. 2) 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B12 · 비타민 B2 · 비타민 C · 아연 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.36mg</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.42mg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge is-solid\">Folate 120μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>광동 리프레C 비타민C<small>Vitamin B1 · Vitamin B12 · Vitamin B2 · Vitamin C · Zinc · Folate</small></h1><p class=\"sd-meta\">Made by (주)바이오 로제트 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.36mg</b> of Vitamin B1, <b>0.72μg</b> of Vitamin B12, <b>0.42mg</b> of Vitamin B2, <b>500mg</b> of Vitamin C, <b>2.55mg</b> of Zinc, <b>120μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.36mg</b> Vitamin B1, <b>0.72μg</b> Vitamin B12, <b>0.42mg</b> Vitamin B2, <b>500mg</b> Vitamin C, <b>2.55mg</b> Zinc, <b>120μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)바이오 로제트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.36mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.42mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Folate</b> labelled (120μg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오. 2) 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B12 · Vitamin B2 · Vitamin C · Zinc · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

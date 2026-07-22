@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3f-s177-001",
+  "productName": "하이파워 비타민 ACE",
+  "productNameEn": "하이파워 비타민 ACE",
+  "manufacturer": "(주)세모",
+  "manufacturerEn": null,
+  "statementNo": "2004001704975",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상: 고유의 향미가 있고, 이미 이취가 없는 흐린 자주색의 입자성이 있는 분말\n② 비타민A: 표시량(840㎍ RAE/3,000mg)의 80 ~ 150%\n③ 비타민C: 표시량(240mg/3,000mg)의 80 ~ 150%\n④ 비타민E: 표시량(14mg α-TE/3,000mg)의 80 ~ 150% \n⑤ 셀레늄: 표시량(90㎍/3,000mg)의 80 ~ 150% \n⑥ 망간 : 표시량(1.5mg/3,000mg)의 80 ~ 150% \n⑦ 대장균군: 음성",
+   "intake": "1일 2회, 1회 1포를 씹어 드시거나, 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고, 이미 이취가 없는 흐린 자주색의 입자성이 있는 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘하고 건조한 곳에 보관하여 주십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.5,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 1.5mg</span><span class=\"sd-badge is-solid\">비타민 A 840μg</span><span class=\"sd-badge is-solid\">비타민 C 240mg</span><span class=\"sd-badge is-solid\">비타민 E 14mg</span><span class=\"sd-badge is-solid\">셀레늄 90μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>하이파워 비타민 ACE<small>망간 · 비타민 A · 비타민 C · 비타민 E · 셀레늄</small></h1><p class=\"sd-meta\">(주)세모 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 망간 <b>1.5mg</b>, 비타민 A <b>840μg</b>, 비타민 C <b>240mg</b>, 비타민 E <b>14mg</b>, 셀레늄 <b>90μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 망간 <b>1.5mg</b>, 비타민 A <b>840μg</b>, 비타민 C <b>240mg</b>, 비타민 E <b>14mg</b>, 셀레늄 <b>90μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미 이취가 없는 흐린 자주색의 입자성이 있는 분말 · (주)세모 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>망간</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(1.5mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(840μg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(240mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(14mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(90μg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미 이취가 없는 흐린 자주색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘하고 건조한 곳에 보관하여 주십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 · 비타민 A · 비타민 C · 비타민 E · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin A 840μg</span><span class=\"sd-badge is-solid\">Vitamin C 240mg</span><span class=\"sd-badge is-solid\">Vitamin E 14mg</span><span class=\"sd-badge is-solid\">Selenium 90μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>하이파워 비타민 ACE<small>Manganese · Vitamin A · Vitamin C · Vitamin E · Selenium</small></h1><p class=\"sd-meta\">Made by (주)세모 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.5mg</b> of Manganese, <b>840μg</b> of Vitamin A, <b>240mg</b> of Vitamin C, <b>14mg</b> of Vitamin E, <b>90μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>1.5mg</b> Manganese, <b>840μg</b> Vitamin A, <b>240mg</b> Vitamin C, <b>14mg</b> Vitamin E, <b>90μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세모</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for bone formation</li><li>Needed for energy utilisation</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (1.5mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (840μg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (240mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (14mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (90μg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미 이취가 없는 흐린 자주색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘하고 건조한 곳에 보관하여 주십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Manganese · Vitamin A · Vitamin C · Vitamin E · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
