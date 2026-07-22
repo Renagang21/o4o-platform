@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "에이프로젠알마게이트정|A02AD03|500밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "3129fd32-33e7-6c6b-7714-271642aa0c36",
+  "expected": 22,
+  "anomalies": [],
+  "fetched": 22,
+  "easyCanonicalExactly1": 22,
+  "authoredConflict": 0,
+  "anyCanonical": 22,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1804,
+  "htmlMd5": "adc5dcdea59bdeb1ecc50a4353f3e85f",
+  "summary": "위·십이지장궤양, 위염, 위산과다, 속쓰림, 구역, 구토, 위통, 신트림의 제산작용 및 증상의 개선",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 22,
+    "STEP_B_easy_demote": 22,
+    "STEP_B_authored_flip": 22,
+    "audit": 22
+  },
+  "stepA_inserted": 22,
+  "writeActual": {
+    "stepA_inserted": 22,
+    "demoted": 22,
+    "flipped": 22,
+    "audited": 22
+  },
+  "post": {
+    "canonical1": 22,
+    "authored": 22,
+    "deprecatedEasy": 22,
+    "dup": 0
+  }
+}

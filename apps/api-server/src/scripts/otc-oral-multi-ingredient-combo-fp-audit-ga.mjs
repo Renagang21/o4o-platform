@@ -67,7 +67,7 @@ try {
     let authKo=0, authEn=0, pending=0;
     for (const m of mem){ const a=authMap.get(m.master_id); if(a&&a.ko>0){authKo++; if(a.en>0)authEn++;} else pending++; }
     out.push({ fp, atc:rep.atc, strength:rep.strength, form:rep.form, size:mem.length,
-      sample:rep.name, forms, routes:routes.length, distinctSafety:safeties.length,
+      sample:rep.name, ingredient:rep.ingredient, forms, routes:routes.length, distinctSafety:safeties.length,
       distinctSrc:srcHashes.length, authKo, authEn, pending,
       target_ids: mem.filter(m=>{const a=authMap.get(m.master_id);return !(a&&a.ko>0);}).map(m=>m.master_id).sort() });
   }
@@ -99,11 +99,13 @@ try {
     HOLD: hold.length, holdReasonCount,
   };
   // candidate pilot subgroups: clean, small, uniform — pending easy-only clusters ready for source-grounded fresh authoring
-  const candidates = out.filter(g => g.size>=3 && g.size<=8 && g.distinctSafety===1 && g.distinctSrc===1 && g.forms.length===1 && g.routes===1 && g.pending===g.size)
-    .sort((a,b)=>a.size-b.size || (a.fp<b.fp?-1:1))
+  // genuine atc-keyed oral tablet/capsule combos, uniform source/safety, all-pending — sorted by size DESC (large-target priority)
+  const OKFORM = new Set(['정','캡슐','연질캡슐']);
+  const candidates = out.filter(g => g.size>=3 && !g.ingredient && OKFORM.has(g.form) && g.distinctSafety===1 && g.distinctSrc===1 && g.forms.length===1 && g.routes===1 && g.pending===g.size)
+    .sort((a,b)=>b.size-a.size || (a.fp<b.fp?-1:1))
     .map(g => ({ fp:g.fp, atc:g.atc, strength:g.strength, form:g.form, size:g.size, sample:g.sample, target_ids:g.target_ids }));
-  writeFileSync('C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/831fdb57-1dfa-46b3-b7a7-789d46db9f18/scratchpad/atc-combo-audit-result.json', JSON.stringify({ summary, candidates_count: candidates.length, candidates: candidates.slice(0,60) }, null, 1), 'utf8');
-  console.log('candidates(3<=size<=8, uniform, all-pending):', candidates.length);
+  writeFileSync('C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/831fdb57-1dfa-46b3-b7a7-789d46db9f18/scratchpad/atc-combo-candidates-bysize.json', JSON.stringify({ summary, candidates_count: candidates.length, total_pending_masters: candidates.reduce((s,c)=>s+c.size,0), candidates: candidates.slice(0,200) }, null, 1), 'utf8');
+  console.log('candidates(atc-keyed 정/캡슐/연질캡슐, uniform, all-pending):', candidates.length, 'top sizes:', candidates.slice(0,15).map(c=>c.size).join(','));
   console.log(JSON.stringify(summary, null, 2));
   console.log('--- READY_SHARED_CANONICAL (top 20) ---');
   for (const g of ready.slice(0,20)) console.log(`fp=${g.fp} atc=${g.atc} ${g.strength}|${g.form} size=${g.size} authKo=${g.authKo} authEn=${g.authEn} pending=${g.pending} | ${g.sample}`);

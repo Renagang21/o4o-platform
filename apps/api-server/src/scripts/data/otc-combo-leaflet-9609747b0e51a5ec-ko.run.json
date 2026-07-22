@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "네오칼큐정|A12AX|475밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "63680e47-9e10-a2db-a4cd-a0a43c3e0fb4",
+  "expected": 21,
+  "anomalies": [],
+  "fetched": 21,
+  "easyCanonicalExactly1": 21,
+  "authoredConflict": 0,
+  "anyCanonical": 21,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1789,
+  "htmlMd5": "a1344d2fef7c6629daf72a9865a7d31b",
+  "summary": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 21,
+    "STEP_B_easy_demote": 21,
+    "STEP_B_authored_flip": 21,
+    "audit": 21
+  },
+  "stepA_inserted": 21,
+  "writeActual": {
+    "stepA_inserted": 21,
+    "demoted": 21,
+    "flipped": 21,
+    "audited": 21
+  },
+  "post": {
+    "canonical1": 21,
+    "authored": 21,
+    "deprecatedEasy": 21,
+    "dup": 0
+  }
+}

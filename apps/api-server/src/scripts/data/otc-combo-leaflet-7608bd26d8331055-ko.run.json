@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "안타신정|A02AD01|250밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "068d0d5a-d574-7e93-a81c-8e2092924829",
+  "expected": 16,
+  "anomalies": [],
+  "fetched": 16,
+  "easyCanonicalExactly1": 16,
+  "authoredConflict": 0,
+  "anyCanonical": 16,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1335,
+  "htmlMd5": "f3c04db59c9fcdda974271edc0f5da72",
+  "summary": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 16,
+    "STEP_B_easy_demote": 16,
+    "STEP_B_authored_flip": 16,
+    "audit": 16
+  },
+  "stepA_inserted": 16,
+  "writeActual": {
+    "stepA_inserted": 16,
+    "demoted": 16,
+    "flipped": 16,
+    "audited": 16
+  },
+  "post": {
+    "canonical1": 16,
+    "authored": 16,
+    "deprecatedEasy": 16,
+    "dup": 0
+  }
+}

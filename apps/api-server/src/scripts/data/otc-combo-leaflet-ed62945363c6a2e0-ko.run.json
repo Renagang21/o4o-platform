@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "아로나민골드정|A11JA|72.2밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "8bbc0828-e8af-862a-f5cc-72b4b576ae8b",
+  "expected": 13,
+  "anomalies": [],
+  "fetched": 13,
+  "easyCanonicalExactly1": 13,
+  "authoredConflict": 0,
+  "anyCanonical": 13,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1894,
+  "htmlMd5": "6806799579f8285845a093c29322e222",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기(간유, 비타민…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 13,
+    "STEP_B_easy_demote": 13,
+    "STEP_B_authored_flip": 13,
+    "audit": 13
+  },
+  "stepA_inserted": 13,
+  "writeActual": {
+    "stepA_inserted": 13,
+    "demoted": 13,
+    "flipped": 13,
+    "audited": 13
+  },
+  "post": {
+    "canonical1": 13,
+    "authored": 13,
+    "deprecatedEasy": 13,
+    "dup": 0
+  }
+}

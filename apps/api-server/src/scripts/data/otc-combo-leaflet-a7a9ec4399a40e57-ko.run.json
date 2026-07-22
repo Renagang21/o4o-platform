@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "베스자임정|A09AA02|400밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d4fcc1ec-2163-b82a-8502-d4bf3da033be",
+  "expected": 17,
+  "anomalies": [],
+  "fetched": 17,
+  "easyCanonicalExactly1": 17,
+  "authoredConflict": 0,
+  "anyCanonical": 17,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1437,
+  "htmlMd5": "aaadb796aea4f3f4f8481daf7a142667",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 17,
+    "STEP_B_easy_demote": 17,
+    "STEP_B_authored_flip": 17,
+    "audit": 17
+  },
+  "stepA_inserted": 17,
+  "writeActual": {
+    "stepA_inserted": 17,
+    "demoted": 17,
+    "flipped": 17,
+    "audited": 17
+  },
+  "post": {
+    "canonical1": 17,
+    "authored": 17,
+    "deprecatedEasy": 17,
+    "dup": 0
+  }
+}

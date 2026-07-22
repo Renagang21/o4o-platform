@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "헤파비트에프연질캡슐|A05BA|100밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "77be441b-8dc0-4969-afcb-e8c5d9208da9",
+  "expected": 16,
+  "anomalies": [],
+  "fetched": 16,
+  "easyCanonicalExactly1": 16,
+  "authoredConflict": 0,
+  "anyCanonical": 16,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1434,
+  "htmlMd5": "4f3004c242734d492eeaca4c6295309a",
+  "summary": "만성 간질환, 독성 간질환의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 16,
+    "STEP_B_easy_demote": 16,
+    "STEP_B_authored_flip": 16,
+    "audit": 16
+  },
+  "stepA_inserted": 16,
+  "writeActual": {
+    "stepA_inserted": 16,
+    "demoted": 16,
+    "flipped": 16,
+    "audited": 16
+  },
+  "post": {
+    "canonical1": 16,
+    "authored": 16,
+    "deprecatedEasy": 16,
+    "dup": 0
+  }
+}

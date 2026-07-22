@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "제텐비정|A11JB|69.15밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "5de01d8e-216d-f7ad-2d33-0befda87f0b7",
+  "expected": 17,
+  "anomalies": [],
+  "fetched": 17,
+  "easyCanonicalExactly1": 17,
+  "authoredConflict": 0,
+  "anyCanonical": 17,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2240,
+  "htmlMd5": "06c88dd66946473e24cdc2ed13893129",
+  "summary": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 17,
+    "STEP_B_easy_demote": 17,
+    "STEP_B_authored_flip": 17,
+    "audit": 17
+  },
+  "stepA_inserted": 17,
+  "writeActual": {
+    "stepA_inserted": 17,
+    "demoted": 17,
+    "flipped": 17,
+    "audited": 17
+  },
+  "post": {
+    "canonical1": 17,
+    "authored": 17,
+    "deprecatedEasy": 17,
+    "dup": 0
+  }
+}

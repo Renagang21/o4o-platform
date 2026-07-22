@@ -12,6 +12,7 @@
     { "groupKey": "마그온플러스연질캡슐|A11JC|250밀리그램|연질캡슐", "targetFp": "0a6f44cbfe69f3d6", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" },
     { "groupKey": "엑세라민에이스정|A11AA|50밀리그램|정", "targetFp": "0c9f8cf9cd9f4d24", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" },
     { "groupKey": "쎌레타민정|A11JC|100밀리그램|정", "targetFp": "10b3d08d29374834", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" },
-    { "groupKey": "헤모글루탑연질캡슐|B03AE10|200밀리그램|연질캡슐", "targetFp": "10c78d7cf8373260", "sourceType": "mfds_drug_otc", "masters": 3, "op": "KO_EN", "status": "DONE" }
+    { "groupKey": "헤모글루탑연질캡슐|B03AE10|200밀리그램|연질캡슐", "targetFp": "10c78d7cf8373260", "sourceType": "mfds_drug_otc", "masters": 3, "op": "KO_EN", "status": "DONE" },
+    { "groupKey": "batch3 결정론 KO 15그룹 271 master (config otc-oral-combo-leaflet-config-batch3.ga.json)", "sourceType": "mfds_drug_otc/nutrition_combo", "masters": 271, "op": "KO", "status": "KO_DONE_EN_PENDING", "note": "결정론 composer 신규저작 KO LIVE. EN 후속." }
   ]
 }

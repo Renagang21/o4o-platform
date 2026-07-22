@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "스토마제정|A09AA|175밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "5976f13a-12b6-c9f2-c6ac-87a9b244f6ec",
+  "expected": 12,
+  "anomalies": [],
+  "fetched": 12,
+  "easyCanonicalExactly1": 12,
+  "authoredConflict": 0,
+  "anyCanonical": 12,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1470,
+  "htmlMd5": "935239eb0ad21acdda5baa330df7a010",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부(상복부)팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 12,
+    "STEP_B_easy_demote": 12,
+    "STEP_B_authored_flip": 12,
+    "audit": 12
+  },
+  "stepA_inserted": 12,
+  "writeActual": {
+    "stepA_inserted": 12,
+    "demoted": 12,
+    "flipped": 12,
+    "audited": 12
+  },
+  "post": {
+    "canonical1": 12,
+    "authored": 12,
+    "deprecatedEasy": 12,
+    "dup": 0
+  }
+}

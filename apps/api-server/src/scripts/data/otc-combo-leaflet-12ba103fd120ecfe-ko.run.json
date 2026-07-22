@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "아미노포르테정|A13A|18.75밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "c6494a70-ac01-6780-03c2-0cdd234babe3",
+  "expected": 15,
+  "anomalies": [],
+  "fetched": 15,
+  "easyCanonicalExactly1": 15,
+  "authoredConflict": 0,
+  "anyCanonical": 15,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1662,
+  "htmlMd5": "888edda5e3349cc8f6818e623a274f19",
+  "summary": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모질환, 임신수유기 등의 경우의 …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 15,
+    "STEP_B_easy_demote": 15,
+    "STEP_B_authored_flip": 15,
+    "audit": 15
+  },
+  "stepA_inserted": 15,
+  "writeActual": {
+    "stepA_inserted": 15,
+    "demoted": 15,
+    "flipped": 15,
+    "audited": 15
+  },
+  "post": {
+    "canonical1": 15,
+    "authored": 15,
+    "deprecatedEasy": 15,
+    "dup": 0
+  }
+}

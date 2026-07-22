@@ -70,6 +70,15 @@ Batch2 보존 안전정보 예: 비타민 A 5,000 IU 임신 초기 금기 경고
 - `apps/api-server/src/scripts/data/otc-combo-leaflet-*.run.json` (6 실행 manifest)
 - 본 CHECK
 
+## 6-B. Batch 3 (V3 연속 생산 — 결정론 KO composer)
+
+WO-O4O-OTC-ORAL-MULTI-INGREDIENT-CONTINUOUS-PRODUCTION-GA-V3.
+
+- **결정론 KO composer** `otc-combo-ko-compose.ga.mjs`: 공식 easy_drug 원문 섹션(효능/용법/경고/주의/상호작용/이상반응)을 소비자 sd-* 카드 구조 content_json 으로 **충실 재구성**(신규 의료사실 0·강도 약화 0·마케팅 0·조성 창작 0, 어투만 소비자화 마십시오→마세요·의사또는약사→약사, caution 을 경고/금기/상담/상호작용/이상반응 항목으로 분리). 요약: 순수 원문 재구성이라 자유 저작보다 왜곡 위험이 낮음.
+- **생산 스크린** `otc-combo-prodscreen.ga.mjs`: 명확한 복합제 ATC 계열 allowlist(A11·A12·A13A·B03AE 비타민/미네랄/토닉/철복합, A02AD/AH/AX 제산복합, A09AA 소화효소복합, A05 간담즙복합, A16A) — 단일성분·감기·민감(항혈소판/호르몬)·구강국소·예약계열 제외.
+- **Batch3 = 15 fp 그룹 / 271 master KO LIVE**(헤모텐 46·알마게이트 22·네오칼큐 21 등). KO 교체 271, 전량 dry-run PASS·독립검증(global ko dup 0, GA canonical_replaced audit 292=21+271). EN 후속(KO 우선).
+- 세션 누계: **22 fp 그룹 / 292 master KO**(그중 7그룹 21master EN 완결). authored_ko_canon 3,891→4,190.
+
 ## 7. 다음 (계속 생산)
 
 후보 1,587 중 예약계열·감기약 제외, clean 균일 subgroup 부터 연속 저작·적재. 계약 안정 확인됨(3/3 PASS·독립검증 통과).
