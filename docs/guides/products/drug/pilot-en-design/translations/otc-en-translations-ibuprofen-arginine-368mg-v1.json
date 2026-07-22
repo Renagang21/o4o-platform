@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "이부프로펜아르기닌 368.9mg 정. 동일 source_ref 11b84cc1 sibling 검토완료 en(md5 9107dafe58aac9342a2f9e9a2cbc01a0) 재구성 → target 6 확장. build==live sibling en byte-identical 게이트로 새 medical fact 0 증명.",
+  "translations": [
+    {
+      "groupKey": "이부프로펜아르기닌|368.9밀리그램|정",
+      "title": "Ibuprofen Arginine 368.9 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for rheumatoid arthritis, osteoarthritis, low back pain, headache, menstrual pain, anti-inflammatory pain relief after injury, and fever and pain from influenza.",
+      "usage": "Adults and children aged 12 and over take one to two tablets every 4 to 6 hours with water, up to a maximum of six tablets (1,200 mg as ibuprofen) a day.",
+      "caution": "Do not take this if you have a peptic ulcer or a severe blood disorder; if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have bronchial asthma; for pain around CABG surgery; if you have had a heart attack; or if you are pregnant. If you have liver or kidney impairment or heart failure, or are an older adult, talk to a pharmacist before taking it, and discuss taking it with other anti-inflammatory painkillers or anticoagulants.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen arginine 368.9 mg (ibuprofen class)",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Headache, menstrual pain, low back pain, arthritis, pain after injury, cold fever",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, pregnancy",
+        "Why this one": "An ibuprofen arginine salt formulated for fast absorption"
+      }
+    }
+  ],
+  "summary": null
+}

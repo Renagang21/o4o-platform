@@ -1,0 +1,46 @@
+{
+  "wo": "WO-O4O-OTC-KO-EN-BUNDLE-RUNNER-HARDENING-DA-V1",
+  "bundleKey": "track-a-1h-da",
+  "mode": "dry-run",
+  "writeOwner": "agent-da",
+  "groupOrder": [
+    "alfacalcidol-1mcg-softcap",
+    "ibuprofen-arginine-368mg-jeong",
+    "polysaccharide-iron-326mg-capsule"
+  ],
+  "groupCount": 3,
+  "dbWrite": 0,
+  "groups": [
+    {
+      "groupKey": "alfacalcidol-1mcg-softcap",
+      "writeOwner": "agent-da",
+      "koStatus": "FAILED",
+      "enStatus": null,
+      "status": "FAILED",
+      "target": null,
+      "excluded": null,
+      "otherFp": null,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": null,
+      "enWriteActual": null,
+      "disposition": "abort",
+      "reason": "ko 분류 불가 실패(보수적 중단)",
+      "anomalies": []
+    }
+  ],
+  "totals": {
+    "koPlan": 0,
+    "koActual": 0,
+    "enPlan": 0,
+    "enActual": 0,
+    "planTotal": 0,
+    "actualTotal": 0
+  },
+  "bundleStatus": "ABORTED",
+  "abortedAt": "alfacalcidol-1mcg-softcap",
+  "abortReason": "ko 분류 불가 실패(보수적 중단)",
+  "statusCounts": {
+    "FAILED": 1
+  }
+}

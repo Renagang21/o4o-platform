@@ -1,0 +1,69 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "이부프로펜아르기닌|368.9밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "11b84cc1-a386-47b5-9337-6643dc1ab438",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "이부프로펜아르기닌 368.9mg 정",
+  "coarseTotal": 8,
+  "target": 6,
+  "excluded": 2,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0fca1795-39f3-4465-a9ed-75d19c607a46",
+      "name": "이부쎈에프정(이부프로펜아르기닌)",
+      "reason": "비대상(fp 9a163757ea551666, bridge SSOT)"
+    },
+    {
+      "id": "117f0b10-4a8e-4df1-8e98-6f52f8aca72a",
+      "name": "이부쎈에프정(이부프로펜아르기닌)",
+      "reason": "비대상(fp 9a163757ea551666, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "3215124b-f48a-43d8-b349-06c552f16eaf",
+    "42fc4933-4143-4190-a2dc-7d63d458efde",
+    "53c5290e-8615-4a3b-8195-40b81025e7b2",
+    "65c08c23-d2d1-41d4-9df3-5daea947df49",
+    "88d1e488-b584-43c7-8f0a-d22b067ec230",
+    "dd8bca8e-f3dc-4e56-ac5c-fd30c8f4874a"
+  ],
+  "rollback_master_ids": [
+    "3215124b-f48a-43d8-b349-06c552f16eaf",
+    "42fc4933-4143-4190-a2dc-7d63d458efde",
+    "53c5290e-8615-4a3b-8195-40b81025e7b2",
+    "65c08c23-d2d1-41d4-9df3-5daea947df49",
+    "88d1e488-b584-43c7-8f0a-d22b067ec230",
+    "dd8bca8e-f3dc-4e56-ac5c-fd30c8f4874a"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "9a163757ea551666",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "76e28dff9afce6d4",
+      "n": 6,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 6,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 6 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

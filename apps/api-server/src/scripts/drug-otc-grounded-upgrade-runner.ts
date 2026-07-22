@@ -675,6 +675,37 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-bromelain-45mg-jeong',
   },
+  // ── WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1 (에이전트 다) — 나 inventory 감사(READY_SINGLE) 기준 ──
+  'alfacalcidol-1mcg-softcap': {
+    key: '알파칼시돌|1마이크로그램|연질캡슐',
+    ingredient: '알파칼시돌', dose: '1마이크로그램', formKeyword: '연질캡슐',
+    candidate: '06a1eed0-e249-402a-a4f0-e234d1f952ed',
+    targetFp: '7c9fbdf7fb512fb4',
+    excludeFp: 'a6ff82eb02321cda', // 비대상 단일 fp = 4 (coarse 10)
+    expected: 6, excludedExpected: 4,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-alfacalcidol-1mcg-softcap',
+  },
+  'ibuprofen-arginine-368mg-jeong': {
+    key: '이부프로펜아르기닌|368.9밀리그램|정',
+    ingredient: '이부프로펜아르기닌', dose: '368.9밀리그램', formKeyword: '정',
+    candidate: '11b84cc1-a386-47b5-9337-6643dc1ab438',
+    targetFp: '76e28dff9afce6d4',
+    excludeFp: '9a163757ea551666', // 비대상 단일 fp = 2 (coarse 8)
+    expected: 6, excludedExpected: 2,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-ibuprofen-arginine-368mg-jeong',
+  },
+  'polysaccharide-iron-326mg-capsule': {
+    key: '폴리사카리드철착염|326.1밀리그램|캡슐',
+    ingredient: '폴리사카리드철착염', dose: '326.1밀리그램', formKeyword: '캡슐',
+    candidate: '096e8a7c-d0a7-4d71-a55a-f3eb9bc5923c',
+    targetFp: '8a412570da8697c4',
+    excludeFp: ['5008384544eb4d91', 'eaafd5180b160186'], // 비대상 2 fp = 3+2 = 5 (coarse 11)
+    expected: 6, excludedExpected: 5,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-polysaccharide-iron-326mg-capsule',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

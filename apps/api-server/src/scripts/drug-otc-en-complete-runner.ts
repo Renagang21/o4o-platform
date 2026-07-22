@@ -375,6 +375,45 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-bromelain-45mg-v1.json',
     outBase: 'otc-en-complete-bromelain-45mg',
   },
+  // ── WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1 (에이전트 다) — sibling en byte-identical 재사용 ──
+  'alfacalcidol-1mcg-softcap': {
+    key: '알파칼시돌|1마이크로그램|연질캡슐',
+    candidate: '06a1eed0-e249-402a-a4f0-e234d1f952ed',
+    sourceType: 'mfds_drug_otc', expected: 6,
+    koRunBase: 'otc-grounded-upgrade-alfacalcidol-1mcg-softcap',
+    translationFile: 'otc-en-translations-alfacalcidol-1mcg-v1.json',
+    outBase: 'otc-en-complete-alfacalcidol-1mcg-softcap',
+  },
+  'ibuprofen-arginine-368mg-jeong': {
+    key: '이부프로펜아르기닌|368.9밀리그램|정',
+    candidate: '11b84cc1-a386-47b5-9337-6643dc1ab438',
+    sourceType: 'mfds_drug_otc', expected: 6,
+    koRunBase: 'otc-grounded-upgrade-ibuprofen-arginine-368mg-jeong',
+    translationFile: 'otc-en-translations-ibuprofen-arginine-368mg-v1.json',
+    outBase: 'otc-en-complete-ibuprofen-arginine-368mg-jeong',
+  },
+  'polysaccharide-iron-326mg-capsule': {
+    key: '폴리사카리드철착염|326.1밀리그램|캡슐',
+    candidate: '096e8a7c-d0a7-4d71-a55a-f3eb9bc5923c',
+    sourceType: 'mfds_drug_otc', expected: 6,
+    koRunBase: 'otc-grounded-upgrade-polysaccharide-iron-326mg-capsule',
+    translationFile: 'otc-en-translations-polysaccharide-iron-326mg-v1.json',
+    outBase: 'otc-en-complete-polysaccharide-iron-326mg-capsule',
+  },
+  // ── WO-O4O-OTC-TRACK-A-1H-PRODUCTION-NA-V1 (에이전트 나) — Track A 유일 en 결손 완결 ──
+  //   에르도스테인 300mg 정: Track A 최초 파일럿(ko 26 LIVE, en 0). source_ref 03e0af9d = 35 ko 공유
+  //   (26 target + 9 out). out9 이미 en canonical LIVE(md5 2b7c07261d89e55c17a53fe80ff57d79).
+  //   26 ko == 9 ko(동일 약물, md5 459f20ef) → out9 en 을 빌더 계약 역매핑으로 복원(새 medical fact 0,
+  //   build == live out en byte-identical 게이트로 증명). 26 master_id 스코프(source_ref 스코프 금지).
+  //   koRunBase = pilot 파생 스코프(otc-grounded-upgrade-erdosteine-300mg-jeong.run.json.rollback_master_ids).
+  'erdosteine-300mg-jeong': {
+    key: '에르도스테인|300밀리그램|정',
+    candidate: '03e0af9d-5236-460a-86d4-1af8b0c00c61',
+    sourceType: 'mfds_drug_otc', expected: 26,
+    koRunBase: 'otc-grounded-upgrade-erdosteine-300mg-jeong',
+    translationFile: 'otc-en-translations-erdosteine-300mg-jeong-v1.json',
+    outBase: 'otc-en-complete-erdosteine-300mg-jeong',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

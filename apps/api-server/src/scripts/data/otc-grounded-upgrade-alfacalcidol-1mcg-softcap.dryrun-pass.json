@@ -1,0 +1,103 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "06a1eed0-e249-402a-a4f0-e234d1f952ed",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "알파칼시돌 1㎍ 연질캡슐",
+  "coarseTotal": 10,
+  "target": 6,
+  "excluded": 4,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "062ac5ce-c577-4502-84a9-57350847ba92",
+      "name": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp a6ff82eb02321cda, bridge SSOT)"
+    },
+    {
+      "id": "21f34f2a-770b-438f-85cd-3af380f51464",
+      "name": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp a6ff82eb02321cda, bridge SSOT)"
+    },
+    {
+      "id": "545c0343-a56b-4624-8161-9dc63c3437bc",
+      "name": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp a6ff82eb02321cda, bridge SSOT)"
+    },
+    {
+      "id": "5f42343c-96a4-4f8e-a787-59c97227d5bf",
+      "name": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+      "reason": "비대상(fp a6ff82eb02321cda, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "4da13d5c-dfcb-44bd-80ee-7c0dfb24251e",
+    "534b5a62-2bfc-4555-ac8d-d99a75c75652",
+    "54de3581-336f-4efd-8699-72cbf33c8ed1",
+    "5e786daa-0aca-4f65-8f96-aa7916900deb",
+    "7c3c4cae-68b4-41f3-8ae3-93530f2dc224",
+    "a5739abd-114d-4be0-9028-02e3ee15ea08"
+  ],
+  "rollback_master_ids": [
+    "4da13d5c-dfcb-44bd-80ee-7c0dfb24251e",
+    "534b5a62-2bfc-4555-ac8d-d99a75c75652",
+    "54de3581-336f-4efd-8699-72cbf33c8ed1",
+    "5e786daa-0aca-4f65-8f96-aa7916900deb",
+    "7c3c4cae-68b4-41f3-8ae3-93530f2dc224",
+    "a5739abd-114d-4be0-9028-02e3ee15ea08"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "a6ff82eb02321cda",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7c9fbdf7fb512fb4",
+      "n": 6,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 6,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 6,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 6,
+  "htmlLen": 1655,
+  "contentHash": "cc2b0467cb2ca12e4a52a036a457c192",
+  "summary": "알파칼시돌 1㎍",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 6,
+      "STEP_B_easy_canonical_demote": 6,
+      "STEP_B_authored_canonical_flip": 6,
+      "total": 18
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 6,
+      "total": 6
+    },
+    "grand_total": 24
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 6",
+    "policy_2A": "audit 2/master = 12 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

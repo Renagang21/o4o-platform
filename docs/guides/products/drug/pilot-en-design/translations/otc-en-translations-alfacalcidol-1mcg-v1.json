@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "알파칼시돌 1μg 연질캡슐. 동일 source_ref 06a1eed0 sibling(out-of-scope) 검토완료 en(md5 0948bfa5ac8d3f895b7cfb038bfb63f0) 재구성 → target 6 확장. build==live sibling en byte-identical 게이트로 새 medical fact 0 증명.",
+  "translations": [
+    {
+      "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+      "title": "Alfacalcidol 1 μg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to improve symptoms that accompany abnormal vitamin D metabolism, such as low blood calcium and bone pain, in chronic kidney failure, hypoparathyroidism, and vitamin D–resistant rickets or osteomalacia, and for osteoporosis.",
+      "usage": "The dose is adjusted while your blood calcium level is kept under control. For osteoporosis or chronic kidney failure, adults take half to one capsule (0.5–1 μg) once a day. Do not take it together with products containing calcium, vitamin D or magnesium.",
+      "caution": "Do not take this if you have high blood calcium, high blood phosphate or high blood magnesium, or signs of vitamin D toxicity. If you are pregnant or breastfeeding, a child, an older adult, or have had kidney stones, talk to a pharmacist before taking it, and take care not to exceed the set dose.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Alfacalcidol 1 μg",
+        "How it works": "Supplies active vitamin D for calcium metabolism",
+        "Main symptoms": "Osteoporosis; low blood calcium and bone pain from abnormal vitamin D metabolism",
+        "Who should be careful": "High blood calcium, kidney stones, pregnancy or breastfeeding",
+        "Why this one": "A high-strength active vitamin D preparation"
+      }
+    }
+  ],
+  "summary": null
+}

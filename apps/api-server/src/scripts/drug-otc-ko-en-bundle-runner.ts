@@ -73,7 +73,7 @@ interface GroupResult {
 // ── 실패 분류 (§5) ───────────────────────────────────────────────────────────
 /** bundle 전체 중단 — 공통 장애·계약 위반·안전 침해. */
 const ABORT_PATTERNS: Array<[RegExp, string]> = [
-  [/ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT|connect .*failed|password authentication|role .* does not exist|SASL|no pg_hba/i, 'DB 연결·인증 장애'],
+  [/ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT|connect .*failed|password authentication|role .* does not exist|SASL|no pg_hba|remaining connection slots|too many connections|too many clients|sorry, too many|connection terminated|Connection terminated|server closed the connection/i, 'DB 연결·인증 장애'],
   [/--group=<key> 필요|등록:|Cannot find module|SyntaxError|is not a function/i, 'runner 계약 불일치'],
   [/column .* does not exist|relation .* does not exist|type .* does not exist/i, '공통 스키마 불일치'],
   [/사후검증 실패|ROLLBACK/i, 'TX 사후검증 실패'],
@@ -171,6 +171,12 @@ const BUNDLE_REGISTRY: Record<string, BundleConfig> = {
     bundleKey: 'regression-completed-da',
     writeOwner: 'agent-da',
     groups: ['trimebutine-100mg-jeong', 'bacillus-liche-250mg-capsule', 'diosmin-300mg-capsule'],
+  },
+  // WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1 (에이전트 다) — 생산 bundle 3그룹
+  'track-a-1h-da': {
+    bundleKey: 'track-a-1h-da',
+    writeOwner: 'agent-da',
+    groups: ['alfacalcidol-1mcg-softcap', 'ibuprofen-arginine-368mg-jeong', 'polysaccharide-iron-326mg-capsule'],
   },
 };
 
@@ -411,13 +417,14 @@ async function selfTest(): Promise<void> {
 
     // S7. 분류기 단위
     eq('S7 abort/DB', classifyFailure('ECONNREFUSED 127.0.0.1:5442').disposition, 'abort');
+    eq('S7 abort/connslots', classifyFailure('FATAL remaining connection slots are reserved for non-replication superuser connections').reason, 'DB 연결·인증 장애');
     eq('S7 abort/TX', classifyFailure('사후검증 실패 canon1=0 → ROLLBACK').disposition, 'abort');
     eq('S7 continue/EN', classifyFailure('일관성 불일치: build md5 !== live out en').disposition, 'continue');
     eq('S7 continue/fp', classifyFailure('SSOT 미분류 fingerprint 3').disposition, 'continue');
     eq('S7 unknown→abort', classifyFailure('완전히 새로운 알 수 없는 오류').disposition, 'abort');
 
     if (fails.length) { console.error('SELFTEST FAIL\n  ' + fails.join('\n  ')); process.exit(1); }
-    console.log('SELFTEST PASS (28건) — no-op 집계 · HOLD 후 계속 · 공통장애 중단 · 계약불일치 중단 · write 4T/2T/6T · 결정론 · ko실패시 en미실행 · 실패분류. DB 미접속·자식프로세스 미기동.');
+    console.log('SELFTEST PASS (29건) — no-op 집계 · HOLD 후 계속 · 공통장애 중단 · 계약불일치 중단 · write 4T/2T/6T · 결정론 · ko실패시 en미실행 · 실패분류(연결슬롯 포함). DB 미접속·자식프로세스 미기동.');
   }
 }
 

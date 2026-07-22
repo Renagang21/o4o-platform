@@ -1,0 +1,89 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "096e8a7c-d0a7-4d71-a55a-f3eb9bc5923c",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "폴리사카리드철착염 326.1mg 캡슐",
+  "coarseTotal": 11,
+  "target": 6,
+  "excluded": 5,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "3eedd58b-d3d1-41f7-99d1-541e0f625767",
+      "name": "헤모데이캡슐(폴리사카리드철착염)",
+      "reason": "비대상(fp 5008384544eb4d91, bridge SSOT)"
+    },
+    {
+      "id": "55e221ff-179b-4013-a75f-36aa19b67712",
+      "name": "헤모데이캡슐(폴리사카리드철착염)",
+      "reason": "비대상(fp 5008384544eb4d91, bridge SSOT)"
+    },
+    {
+      "id": "ca78551f-9e30-4c81-964c-c1e52c161afc",
+      "name": "헤모데이캡슐(폴리사카리드철착염)",
+      "reason": "비대상(fp 5008384544eb4d91, bridge SSOT)"
+    },
+    {
+      "id": "ea87c030-97d0-4acb-aa44-916bbec99510",
+      "name": "모아훼린캡슐(폴리사카리드철착염)",
+      "reason": "비대상(fp eaafd5180b160186, bridge SSOT)"
+    },
+    {
+      "id": "f904023e-b99f-4a91-8efd-3e622ed93dfd",
+      "name": "모아훼린캡슐(폴리사카리드철착염)",
+      "reason": "비대상(fp eaafd5180b160186, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "203840a1-8243-48c1-af4b-e7b5b45f7cda",
+    "54c4d8cc-bf01-47d4-80d1-78abe0f1caf1",
+    "63f17242-db2b-4927-a060-83e2abc20d67",
+    "71daf24c-9400-4fc0-b957-5724aad12fb1",
+    "77866f60-20d6-45e1-a9ed-abb1a6f8d423",
+    "7f8b023d-7531-49da-809c-bfbe58397ab1"
+  ],
+  "rollback_master_ids": [
+    "203840a1-8243-48c1-af4b-e7b5b45f7cda",
+    "54c4d8cc-bf01-47d4-80d1-78abe0f1caf1",
+    "63f17242-db2b-4927-a060-83e2abc20d67",
+    "71daf24c-9400-4fc0-b957-5724aad12fb1",
+    "77866f60-20d6-45e1-a9ed-abb1a6f8d423",
+    "7f8b023d-7531-49da-809c-bfbe58397ab1"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "8a412570da8697c4",
+      "n": 6,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "5008384544eb4d91",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "eaafd5180b160186",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 6,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 6 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

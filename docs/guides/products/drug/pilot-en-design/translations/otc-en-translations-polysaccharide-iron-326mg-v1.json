@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "폴리사카리드철착염 326.1mg 캡슐. 동일 source_ref 096e8a7c sibling 검토완료 en(md5 db0edf7ad019e5c8c8405beeba17005d) 재구성 → target 6 확장. build==live sibling en byte-identical 게이트로 새 medical fact 0 증명.",
+  "translations": [
+    {
+      "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+      "title": "Polysaccharide Iron Complex 326.1 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for iron deficiency anaemia.",
+      "usage": "Adults take one capsule (150 mg as iron) once a day. Avoid green tea, black tea, milk and dairy products just before and after taking it.",
+      "caution": "Do not take this if you have ever reacted to it, for a baby under 12 months, or if you have haemochromatosis, chronic pancreatitis, liver cirrhosis, anaemia that is not caused by iron deficiency, or a problem using iron. If a child takes too much, iron poisoning can be fatal — always keep it out of the reach of children. Talk to a pharmacist before taking it if you have a peptic ulcer or kidney problems, and do not take it together with an antacid, tetracycline or a calcium supplement.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Polysaccharide iron complex 326.1 mg (150 mg as iron)",
+        "How it works": "Supplies iron",
+        "Main symptoms": "Iron deficiency anaemia",
+        "Who should be careful": "Keep away from children (overdose risk); anaemia not caused by iron deficiency",
+        "Why this one": "An iron treatment for anaemia"
+      }
+    }
+  ],
+  "summary": "Iron deficiency anaemia"
+}
