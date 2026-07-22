@@ -1,10 +1,15 @@
 {
- "agent": "A", "wo": "WO-O4O-HFF-SF-INDEPENDENT-TODO-A-V1", "status": "RUNNING",
- "ownership": ["뮤코다당단백", "히알루론산", "additional-joint-skin"], "started": "2026-07-22",
+ "agent": "A", "wo": "WO-O4O-HFF-SF-INDEPENDENT-TODO-A-V1", "status": "DONE",
+ "ownership": ["뮤코다당단백", "히알루론산", "additional-joint-skin"], "started": "2026-07-22", "ended": "2026-07-22",
  "items": [
   {"ingredient": "뮤코다당단백", "slug": "mucopolysaccharide-protein", "state": "DONE", "live": 51, "reviewLater": 3, "hold": 0, "tag": "batch:single-functional-mucopolysaccharide-protein-a1"},
   {"ingredient": "히알루론산", "slug": "hyaluronic-acid", "state": "DONE", "live": 0, "reviewLater": 2, "hold": 1, "note": "generate PASS 0 (Guard REVIEW/BLOCKED)"},
-  {"ingredient": "additional-joint-skin", "state": "DISCOVERY"}
+  {"ingredient": "로즈힙", "slug": "rosehip", "state": "DONE", "live": 0, "reviewLater": 0, "hold": 0, "note": "readyTotal 0 (taken/EN-pending/non-parseable)"}
  ],
- "round1": {"newLive": 51, "dbWrite": 204, "canonicalDup": 0, "stmtDupMasters": 0}
+ "pendingShared": [
+  {"ingredient": "MSM", "series": "관절", "producibleEstimate": 21, "reason": "SF_INGREDIENTS 미등재(공용 registry 추가 필요)", "research": "hff-sf-research/sf-research-msm.json"},
+  {"ingredient": "글루코사민", "series": "관절", "producibleEstimate": 3, "reason": "SF_INGREDIENTS 미등재", "research": "hff-sf-research/sf-research-glucosamine.json"},
+  {"ingredient": "보스웰리아/초록입홍합/콜라겐/세라마이드", "series": "관절·피부", "reason": "SF_INGREDIENTS 미등재 + 일부 EN lookup 미확정"}
+ ],
+ "totals": {"newLive": 51, "dbWrite": 204, "canonicalDup": 0, "stmtDupMasters": 0, "existingLiveDrift": 0}
 }
