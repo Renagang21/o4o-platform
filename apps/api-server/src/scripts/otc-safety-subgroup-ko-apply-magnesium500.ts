@@ -1,21 +1,31 @@
 /**
- * WO-O4O-OTC-SAFETY-MISMATCH-STORE-LEAFLET-PRODUCTION-NA-V2 — 나. 수산화마그네슘 500mg 정 subgroup KO 매장설명서 생산.
+ * WO-O4O-OTC-SAFETY-MISMATCH-APPLY-DEMOTE-INSERT-AUDIT-FIX-NA-V2 — 나. 수산화마그네슘 500mg 정 subgroup KO 매장설명서 생산.
  * grounded: 공식 원문(mfds_easy_drug, easy md5 0c8bcf57, 7 master 균질)에서 효능·용법·주의 **전부 보존** 재구성. 원문 외 의료사실 0.
- * 비민감(비-DR-008) → status='canonical' 자동 apply. 이중게이트: dry-run 기본, --apply + OTC_SAFETY_SUBGROUP_CONFIRM=YES.
- * 안전: INSERT-only(WHERE NOT EXISTS canonical) · target 7 master 한정 · 단일 TX · 사후 canonicalDup 0 & insert==plan 아니면 ROLLBACK.
- * proxy: DB_PORT(기본 5445).
+ *
+ * ⚠️ 설계정정(main 파일럿 검출): SAFETY_MISMATCH 잔여는 **easy-canonical 베이스라인**. 이전 INSERT-only(WHERE NOT EXISTS canonical)는
+ *    planInsert=0 영구 no-op(저작본이 canonical 로 안 올라감). → batch-8 grounded-upgrade 검증패턴(demote easy + insert authored + audit) 복제.
+ *
+ * 단일 TX 계약: ① 기존 mfds_easy_drug KO canonical → deprecated(UPDATE, 본문 덮어쓰지 않음/별도 row)
+ *   ② authored KO canonical INSERT(source_type=mfds_drug_otc, source_ref=subgroup provenance) ③ canonical_replaced audit INSERT.
+ * 이중게이트: dry-run 기본, --apply + OTC_SAFETY_SUBGROUP_CONFIRM=YES. 비민감→canonical flip, 민감(DR-008)→needs_review 보류.
+ * 사후검증(실패 시 전체 ROLLBACK): before easy canonical=T & authored=0 · after easy deprecated=T · authored canonical=T ·
+ *   audit=T · canonicalDup(ko·en)=0 · source_ref scope==T · EN canonical drift=0 · writePlan==writeActual · target 밖 write=0.
+ * 재실행 no-op: 이미 authored canonical & easy deprecated → STEP A insert 0, STEP B per-master skip, write 0 (ALREADY_COMPLETE_NOOP).
+ * ko write = stepA insert T + demote T + flip T + audit T (=4T). EN 은 별도 2T(본 스크립트 범위 밖). proxy: DB_PORT(기본 5445).
+ * 실행(main): DB_PORT=5445 OTC_SAFETY_SUBGROUP_CONFIRM=YES npx tsx src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts --apply
  */
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc-description-consumer-html.js';
 const ENV_PATH = 'C:\\Users\\sohae\\o4o-platform\\apps\\api-server\\.env';
 const readPw = (): string => readFileSync(ENV_PATH, 'utf8').match(/^DB_PASSWORD=(.*)$/m)![1].trim();
 
 const GROUP_KEY = '수산화마그네슘|500밀리그램|정';
 const SAFETY_FP = '47b61841f0d337dc';
-const SOURCE_REF = 'a7d0e1c2-5f34-4b8a-9c11-2e6f0a3b7d51'; // 고정 provenance UUID(이 subgroup 전용)
+const SOURCE_REF = 'a7d0e1c2-5f34-4b8a-9c11-2e6f0a3b7d51'; // 고정 provenance UUID(이 subgroup 전용, SPD.source_ref_id 무-FK)
 const SOURCE_TYPE = 'mfds_drug_otc';
-const EXPECT_EASY_MD5 = '0c8bcf57'; // 원문 균질 확인용(앞 8자)
+const EASY_SOURCE = 'mfds_easy_drug';
+const AUTHORED = ['mfds_drug_otc', 'nutrition_combo'];
+const EXPECT_EASY_MD5 = '0c8bcf57';
 const TITLE = '마그밀정 (수산화마그네슘 500mg)';
 const SENSITIVE = false; // 제산·완하제, DR-008 아님
 const MASTER_IDS = [
@@ -44,11 +54,8 @@ const CONTENT = {
     '이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.',
   ].join('\n\n'),
   summaryTable: {
-    분류: '일반의약품',
-    성분: '수산화마그네슘 500mg',
-    작용: '제산(위산 중화), 완하(배변 완화)',
-    '주요 증상': '위·십이지장궤양, 위염, 위산과다, 변비',
-    '주의 대상': '신장애, 설사, 심기능 장애, 고마그네슘혈증',
+    분류: '일반의약품', 성분: '수산화마그네슘 500mg', 작용: '제산(위산 중화), 완하(배변 완화)',
+    '주요 증상': '위·십이지장궤양, 위염, 위산과다, 변비', '주의 대상': '신장애, 설사, 심기능 장애, 고마그네슘혈증',
     '선택 포인트': '위산과다 증상과 변비에 사용하는 제산·완하제',
   },
 };
@@ -56,57 +63,125 @@ const CONTENT = {
 async function main(): Promise<void> {
   const apply = process.argv.includes('--apply') && process.env.OTC_SAFETY_SUBGROUP_CONFIRM === 'YES';
   const mode = apply ? 'APPLY' : 'dry-run';
+  const T = MASTER_IDS.length;
   const built = buildDrugOtcConsumerHtml(CONTENT as never, { title: TITLE });
   const summary = CONTENT.summaryTable['성분'];
   const anomalies: string[] = [];
+  if (new Set(MASTER_IDS).size !== T) anomalies.push('master_id 중복');
   if (built.missing.length) anomalies.push(`필수필드 누락 ${built.missing.join(',')}`);
   if (!built.html) anomalies.push('빈 html');
   if (built.html.includes('<table')) anomalies.push('<table>');
   if (built.html.includes('<!--')) anomalies.push('주석');
   if (!built.html.includes('sd-warn')) anomalies.push('sd-warn 없음');
-  if (SENSITIVE) anomalies.push('DR-008 민감 → needs_review 경로 필요(본 스크립트는 canonical 전용)');
 
   const { DataSource } = await import('typeorm');
   const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port: parseInt(process.env.DB_PORT || '5445', 10), username: 'o4o_api', password: readPw(), database: 'o4o_platform', entities: [], synchronize: false, logging: ['error'] });
   await ds.initialize();
-  const report: any = { wo: 'WO-O4O-OTC-SAFETY-MISMATCH-STORE-LEAFLET-PRODUCTION-NA-V2', mode, groupKey: GROUP_KEY, safetyFp: SAFETY_FP, T: MASTER_IDS.length, sourceRef: SOURCE_REF, dbWrite: 0, anomalies, htmlLen: built.html.length };
+  const report: any = { wo: 'WO-O4O-OTC-SAFETY-MISMATCH-APPLY-DEMOTE-INSERT-AUDIT-FIX-NA-V2', mode, groupKey: GROUP_KEY, safetyFp: SAFETY_FP, T, sourceRef: SOURCE_REF, sensitive: SENSITIVE, dbWrite: 0, anomalies, htmlLen: built.html.length };
   try {
-    // 원문 균질 재확인(오적재 방지): 7 master easy md5 단일 & 기대값 일치
-    const md5 = await ds.query(`SELECT md5(content) h, count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND source_type='mfds_easy_drug' AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL GROUP BY 1`, [MASTER_IDS]);
+    // 원문 균질 재확인(오적재 방지)
+    const md5 = await ds.query(`SELECT md5(content) h FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND source_type='mfds_easy_drug' AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL GROUP BY 1`, [MASTER_IDS]);
     if (md5.length !== 1) anomalies.push(`easy md5 종류 ${md5.length}!=1`);
     else if (!md5[0].h.startsWith(EXPECT_EASY_MD5)) anomalies.push(`easy md5 ${md5[0].h.slice(0, 8)}!=${EXPECT_EASY_MD5}`);
-    // 기존 canonical 없음(신규 insert 대상) 확인
-    const already = await ds.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL`, [MASTER_IDS]);
-    report.existingKoCanonical = already[0].n;
-    const ni = await ds.query(`SELECT count(*)::int n FROM unnest($1::uuid[]) mid WHERE NOT EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)`, [MASTER_IDS]);
-    report.planInsert = ni[0].n;
+
+    // ── BEFORE 스냅샷 ──
+    const slot = await ds.query(`SELECT mid::text mid, (SELECT s.source_type FROM shared_product_descriptions s WHERE s.master_id=mid AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.status='canonical' AND s.deleted_at IS NULL LIMIT 1) src FROM unnest($1::uuid[]) mid`, [MASTER_IDS]);
+    const easyCanonBefore = slot.filter((r: any) => r.src === EASY_SOURCE).length;
+    const authoredCanonBefore = slot.filter((r: any) => r.src && AUTHORED.includes(r.src)).length;
+    const noneCanonBefore = slot.filter((r: any) => !r.src).length;
+    const otherCanonBefore = slot.filter((r: any) => r.src && r.src !== EASY_SOURCE && !AUTHORED.includes(r.src)).length;
+    const enCanonBefore = (await ds.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND language='en' AND deleted_at IS NULL`, [MASTER_IDS]))[0].n;
+    report.before = { targetMasters: slot.length, easyCanonical: easyCanonBefore, authoredKoCanonical: authoredCanonBefore, noneCanonical: noneCanonBefore, otherCanonical: otherCanonBefore, enCanonical: enCanonBefore };
+    if (slot.length !== T) anomalies.push(`target master ${slot.length}!=${T}`);
+    if (noneCanonBefore > 0) anomalies.push(`canonical 없음 ${noneCanonBefore}`);
+    if (otherCanonBefore > 0) anomalies.push(`예상밖 canonical source ${otherCanonBefore}`);
+
+    const isNoop = authoredCanonBefore === T;          // 재실행(이미 완료)
+    const isFresh = easyCanonBefore === T && authoredCanonBefore === 0; // 최초 apply
+    if (!isNoop && !isFresh) anomalies.push(`혼재 상태 easy=${easyCanonBefore} authored=${authoredCanonBefore} (fresh/noop 아님)`);
+    report.writePlan = isNoop ? 0 : 4 * T; // stepA insert + demote + flip + audit
+    report.reexecNoop = isNoop;
 
     if (anomalies.length) { report.status = 'ABORT'; console.log(JSON.stringify(report, null, 2)); return; }
+    if (!apply) { report.status = isNoop ? 'ALREADY_COMPLETE_NOOP' : 'DRYRUN_PASS'; console.log(JSON.stringify(report, null, 2)); console.log('\n--- rendered KO leaflet ---\n' + built.html); return; }
 
-    if (apply && report.planInsert > 0) {
-      const qr = ds.createQueryRunner(); await qr.connect(); await qr.startTransaction();
-      try {
-        const res = await qr.query(
-          `INSERT INTO shared_product_descriptions (master_id, content, summary, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
-           SELECT mid, $2, $3, $4, $5::uuid, 'canonical', 'ko', 'STORE', now(), now()
-           FROM unnest($1::uuid[]) mid
-           WHERE NOT EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)
-           RETURNING id`, [MASTER_IDS, built.html, summary, SOURCE_TYPE, SOURCE_REF]);
-        report.inserted = Array.isArray(res) ? res.length : 0;
-        const dup = await qr.query(`SELECT count(*)::int n FROM (SELECT master_id FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL GROUP BY master_id HAVING count(*)>1) t`, [MASTER_IDS]);
-        // target 밖 write 정황: 이 source_ref 로 들어간 row 가 정확히 7 master 인지
-        const scope = await qr.query(`SELECT count(*)::int n, count(DISTINCT master_id)::int m FROM shared_product_descriptions WHERE source_ref_id=$1::uuid AND deleted_at IS NULL`, [SOURCE_REF]);
-        if (dup[0].n > 0) throw new Error(`canonicalDup ${dup[0].n} → ROLLBACK`);
-        if (report.inserted !== report.planInsert) throw new Error(`inserted ${report.inserted} != plan ${report.planInsert} → ROLLBACK`);
-        if (scope[0].m !== MASTER_IDS.length || scope[0].n !== MASTER_IDS.length) throw new Error(`source_ref scope ${scope[0].n}/${scope[0].m} != ${MASTER_IDS.length} → ROLLBACK`);
-        await qr.commitTransaction();
-        report.dbWrite = report.inserted; report.status = 'APPLIED'; report.canonicalDup = dup[0].n; report.scopeMasters = scope[0].m;
-      } catch (e) { await qr.rollbackTransaction(); report.status = 'ROLLBACK'; report.error = e instanceof Error ? e.message : String(e); }
-    } else {
-      report.status = report.planInsert === 0 ? 'ALREADY_COMPLETE_NOOP' : 'DRYRUN_PASS';
+    const qr = ds.createQueryRunner(); await qr.connect();
+    // STEP A: authored needs_review 준비(멱등) — easy 본문을 덮어쓰지 않고 별도 row INSERT
+    await qr.startTransaction();
+    try {
+      const insA = await qr.query(
+        `INSERT INTO shared_product_descriptions (master_id, content, summary, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+         SELECT mid, $3, $4, $2, $5::uuid, 'needs_review', 'ko', 'STORE', now(), now()
+         FROM unnest($1::uuid[]) mid
+         WHERE NOT EXISTS (SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.status IN ('canonical','needs_review'))
+         RETURNING id`, [MASTER_IDS, SOURCE_TYPE, built.html, summary, SOURCE_REF]);
+      report.stepA_inserted = Array.isArray(insA) ? insA.length : 0;
+      await qr.commitTransaction();
+    } catch (e) { await qr.rollbackTransaction(); await qr.release(); throw e; }
+
+    if (SENSITIVE) { // DR-008: needs_review 보류, canonical flip 금지 (easy canonical 유지)
+      report.status = 'NEEDS_REVIEW_HELD'; report.dbWrite = report.stepA_inserted; report.writeActual = report.stepA_inserted; await qr.release();
+      console.log(JSON.stringify(report, null, 2)); return;
     }
+
+    // STEP B: 단일 TX — demote easy(UPDATE status→deprecated) + flip authored(needs_review→canonical) + audit canonical_replaced
+    await qr.startTransaction();
+    try {
+      let demoted = 0, flipped = 0, audited = 0;
+      for (const mid of MASTER_IDS) {
+        const cur = await qr.query(`SELECT id::text id, source_type FROM shared_product_descriptions WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL`, [mid]);
+        if (cur.length === 0) throw new Error(`master ${mid} canonical 0 → ABORT`);
+        if (cur.length > 1) throw new Error(`master ${mid} canonical ${cur.length} → ABORT`);
+        if (AUTHORED.includes(cur[0].source_type)) continue; // 이미 authored → no-op(재실행)
+        if (cur[0].source_type !== EASY_SOURCE) throw new Error(`master ${mid} canonical source ${cur[0].source_type} 예상밖 → ABORT`);
+        const easyId = cur[0].id;
+        const demote = await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical' RETURNING id`, [easyId]);
+        if (demote.length !== 1) throw new Error(`master ${mid} demote ${demote.length}!=1 → ABORT`); demoted++;
+        const flip = await qr.query(`UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND status='needs_review' AND deleted_at IS NULL RETURNING id`, [mid]);
+        const newId = flip[0]?.id;
+        if (flip.length !== 1 || !newId) throw new Error(`master ${mid} flip ${flip.length} → ABORT`); flipped++;
+        await qr.query(`INSERT INTO shared_product_description_audit_logs (event_type, description_type, master_id, language, previous_description_id, new_description_id, previous_status, new_status, metadata, performed_at)
+           VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb, now())`,
+          [mid, easyId, newId, JSON.stringify({ targetMaster: mid, beforeSource: EASY_SOURCE, afterSource: SOURCE_TYPE, previousDemotedTo: 'deprecated', source_ref_id: SOURCE_REF, groupKey: GROUP_KEY, safetyFp: SAFETY_FP, reason: 'safety-subgroup grounded 매장용 설명서 canonical 승격(easy→authored, 원문 보존 재구성)', wo: report.wo })]);
+        audited++;
+      }
+      // ── AFTER 사후검증 ──
+      const post = (await qr.query(`SELECT
+          count(*) FILTER (WHERE canoncnt=1)::int canon1, count(*) FILTER (WHERE authored_canon)::int authored,
+          count(*) FILTER (WHERE dep_easy)::int dep, count(*) FILTER (WHERE canoncnt>1)::int dup,
+          count(*) FILTER (WHERE en_dup)::int en_dup, count(*) FILTER (WHERE easy_canon_left)::int easy_left
+        FROM (SELECT mid,
+          (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL) canoncnt,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.deleted_at IS NULL) authored_canon,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL) dep_easy,
+          ((SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND s.language='en' AND s.deleted_at IS NULL)>1) en_dup,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL) easy_canon_left
+          FROM unnest($1::uuid[]) mid) t`, [MASTER_IDS]))[0];
+      const scope = (await qr.query(`SELECT count(*)::int n, count(DISTINCT master_id)::int m FROM shared_product_descriptions WHERE source_ref_id=$1::uuid AND status='canonical' AND deleted_at IS NULL`, [SOURCE_REF]))[0];
+      const outside = (await qr.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE source_ref_id=$1::uuid AND deleted_at IS NULL AND NOT master_id=ANY($2::uuid[])`, [SOURCE_REF, MASTER_IDS]))[0];
+      const auditN = (await qr.query(`SELECT count(*)::int n FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND event_type='canonical_replaced' AND (metadata->>'source_ref_id')=$2`, [MASTER_IDS, SOURCE_REF]))[0];
+      const enCanonAfter = (await qr.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND language='en' AND deleted_at IS NULL`, [MASTER_IDS]))[0].n;
+      const writeActual = report.stepA_inserted + demoted + flipped + audited;
+      report.after = { canonical1: post.canon1, authoredKoCanonical: post.authored, easyDeprecated: post.dep, easyCanonicalLeft: post.easy_left, canonicalDupKo: post.dup, canonicalDupEn: post.en_dup, sourceRefScopeMasters: scope.m, sourceRefRows: scope.n, targetOutsideWrite: outside.n, audit: auditN.n, enCanonical: enCanonAfter };
+      report.writeActual = { spd: { stepA: report.stepA_inserted, demoted, flipped }, audit: audited, total: writeActual };
+      const fails: string[] = [];
+      if (post.canon1 !== T) fails.push(`canon1=${post.canon1}`);
+      if (post.authored !== T) fails.push(`authored=${post.authored}`);
+      if (post.dep !== T) fails.push(`easyDeprecated=${post.dep}`);
+      if (post.easy_left !== 0) fails.push(`easyCanonLeft=${post.easy_left}`);
+      if (post.dup !== 0) fails.push(`koDup=${post.dup}`);
+      if (post.en_dup !== 0) fails.push(`enDup=${post.en_dup}`);
+      if (scope.m !== T || scope.n !== T) fails.push(`sourceRefScope=${scope.n}/${scope.m}`);
+      if (outside.n !== 0) fails.push(`targetOutsideWrite=${outside.n}`);
+      if (auditN.n !== T) fails.push(`audit=${auditN.n}`);
+      if (enCanonAfter !== enCanonBefore) fails.push(`enDrift ${enCanonBefore}->${enCanonAfter}`);
+      if (writeActual !== report.writePlan) fails.push(`writePlan ${report.writePlan}!=actual ${writeActual}`);
+      if (fails.length) throw new Error(`사후검증 실패 [${fails.join(', ')}] → ROLLBACK`);
+      await qr.commitTransaction();
+      report.status = 'APPLIED'; report.dbWrite = writeActual;
+    } catch (e) { await qr.rollbackTransaction(); await qr.release(); report.status = 'ROLLBACK'; report.error = e instanceof Error ? e.message : String(e); console.log(JSON.stringify(report, null, 2)); return; }
+    await qr.release();
   } finally { await ds.destroy(); }
   console.log(JSON.stringify(report, null, 2));
-  console.log('\n--- rendered KO leaflet (dry-run preview) ---\n' + built.html);
 }
 main().catch((e) => { console.error('FATAL', e instanceof Error ? e.message : e); process.exit(1); });

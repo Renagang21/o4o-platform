@@ -1,31 +1,43 @@
 # CHECK-O4O-OTC-SAFETY-SUBGROUP-MAGNESIUM500-KO-NA-V2
 
-WO: **WO-O4O-OTC-SAFETY-MISMATCH-STORE-LEAFLET-PRODUCTION-NA-V2** (에이전트 나) — 첫 저위험 subgroup 실생산.
+WO: **WO-O4O-OTC-SAFETY-MISMATCH-APPLY-DEMOTE-INSERT-AUDIT-FIX-NA-V2** (에이전트 나) — 첫 저위험 subgroup apply 로직 정정.
 정본: grounded 저작 허용(`6f80a8177`). DB proxy `127.0.0.1:5445`.
-상태: **KO 저작 완료 + 빌더 게이트 PASS. DB apply 는 tool classifier 가 write 스크립트 실행을 차단 → main 에 프록시/권한 요청, 진행분 커밋.**
+상태: **KO 저작 + 빌더 게이트 PASS + apply 로직 정정(demote+insert+audit) + dry-run PASS. 실제 apply 는 main 실행(자율 write 금지).**
+
+## 설계 결함 → 정정
+- **결함(main 파일럿 검출)**: SAFETY_MISMATCH 잔여 7 master 는 `mfds_easy_drug` **canonical 베이스라인**. 이전 `INSERT-only WHERE NOT EXISTS canonical` 은 easy 가 슬롯을 점유 → `planInsert=0` → 영구 no-op(저작본이 canonical 로 안 올라가고 소비자에겐 raw easy 만 노출). 파일럿 실행 결과 `existingKoCanonical:7, planInsert:0, ALREADY_COMPLETE_NOOP` — 아무것도 안 쓰였고 LIVE 불변.
+- **정정**: batch-8 grounded-upgrade 러너 검증패턴(demote+insert+audit) 복제(공용 runner 미수정, 본 subgroup 스크립트에만).
 
 ## 대상 subgroup
-- groupKey `수산화마그네슘|500밀리그램|정`, safety fp `47b61841f0d337dc`, **T=7** master(전부 마그밀정), 공식 원문 easy md5 `0c8bcf57` 단일(균질 확인). 비민감(비-DR-008, 제산·완하제) → canonical 자동 apply 대상.
-- 고정 master_id 7 (스크립트 `MASTER_IDS`).
+- groupKey `수산화마그네슘|500밀리그램|정`, safety fp `47b61841f0d337dc`, **T=7**(전부 마그밀정), 공식 원문 easy md5 `0c8bcf57` 단일. 비민감(비-DR-008) → canonical flip.
 
-## KO 저작 (grounded, 원문 외 의료사실 0)
-공식 원문(효능·효과 / 용법·용량 / 사용상 주의사항 / 상호작용 / 이상반응 / 저장)의 **모든 정보축 보존** 재구성:
-- 효능: 위·십이지장궤양·위염·위산과다 제산 + 변비 (질병명·허가효능 명확 표시).
-- 용법: 1일 2~5정(1~2.5g) 분할 / 변비 2~4정(1~2g) 1~2회 / 연령·증상 증감 — 수치 정확 보존.
-- 주의: 금기(신장애·설사), 상의(심기능 장애·고마그네슘혈증), 상호작용(테트라사이클린 병용금지·우유알칼리증후군), 이상반응(마그네슘 중독·설사), 저장 — 강도·항목 전부 보존.
-- 하단 **약사 문의 footer** 포함(KO). summaryTable 6항목.
-- 빌더 게이트 **PASS**: missing 0 · `<table>` 0 · 주석 0 · `sd-warn` 有 · htmlLen 1861. (렌더 산출물 커밋)
+## KO 저작 (grounded, 원문 외 의료사실 0 — 변경 없음, 본문 재저작 안 함)
+공식 원문 효능·용법·주의·상호작용·이상반응·저장 **전 정보축 보존** 재구성. 질병명·허가효능 명확(위·십이지장궤양/위염/위산과다/변비), 수치 정확(2~5정 1~2.5g / 2~4정 1~2g), 금기·상호작용(테트라사이클린·우유알칼리증후군)·이상반응 강도 보존, 약사 footer(KO). 빌더 게이트 PASS(missing0·table0·주석0·sd-warn有·htmlLen1861).
 
-## apply 계약 (준비 완료, 미실행)
-- 스크립트 `otc-safety-subgroup-ko-apply-magnesium500.ts`: 이중게이트(`--apply` + `OTC_SAFETY_SUBGROUP_CONFIRM=YES`), INSERT-only(WHERE NOT EXISTS canonical), target 7 한정, 단일 TX, 사후 canonicalDup 0 & inserted==plan & source_ref scope==7 아니면 ROLLBACK. source_ref `a7d0e1c2-…`(SPD source_ref_id 는 무-FK provenance).
-- 예상 write: KO 4T=28 (신규 canonical 7 INSERT; ko write 회계상 draft NR/demote/audit 없이 canonical INSERT 경로 — subgroup 신규 저작). EN 후속 2T.
+## apply 계약 (정정본, 단일 TX)
+1. 기존 `mfds_easy_drug` KO canonical 7 → **UPDATE status='deprecated'**(별도 row, easy 본문 덮어쓰지 않음).
+2. authored KO canonical 7 **INSERT**(source_type=`mfds_drug_otc`, status='canonical'(STEP A needs_review→STEP B flip), source_ref=`a7d0e1c2-…` provenance).
+3. `shared_product_description_audit_logs` **canonical_replaced 7**(metadata: targetMaster·beforeSource·afterSource·source_ref_id·groupKey·reason — batch-8 검증기 형식).
+- 이중게이트: `--apply` + `OTC_SAFETY_SUBGROUP_CONFIRM=YES`. 민감(DR-008)=STEP A 만(needs_review 보류).
+- **사후검증(하나라도 실패 시 전체 ROLLBACK)**: before easy canonical=7 & authored=0 → after easy deprecated=7 · authored canonical=7 · easy canonical 잔여 0 · audit=7 · canonicalDup(ko·en)=0 · source_ref scope==7 · target 밖 write=0 · EN canonical drift=0 · **writePlan==writeActual**.
+- **재실행 no-op**: 이미 authored canonical & easy deprecated → STEP A insert 0 · STEP B per-master skip · write 0 (ALREADY_COMPLETE_NOOP).
 
-## 차단 사유 (환경/툴, 정책 아님)
-`npx tsx` 로 write 가능 apply 스크립트 실행 시 auto-mode classifier 가 거부(dry-run 포함). read-only 렌더는 통과. → 자율 실행으로 apply 불가. main 에 (a) 프록시 유지 + (b) write 스크립트 실행 허용(Bash 권한 룰) 또는 main 이 직접 apply 실행 요청.
+## dry-run 결과 (write 0, 검증됨)
+`status: DRYRUN_PASS` · before `{targetMasters:7, easyCanonical:7, authoredKoCanonical:0, enCanonical:0}` · `writePlan:28` · `reexecNoop:false` · anomalies 0 · html 1861. → 결함 해소 확인(easy 베이스라인 → demote+insert 경로 동작).
+
+## write 회계
+- writePlan = **KO 4T = 28** (stepA insert 7 + easy demote 7 + authored flip 7 + audit 7). EN 은 별도 2T(본 스크립트 범위 밖, 후속).
+
+## 실행 (main — 자율 write 금지, main 이 apply)
+```
+DB_PORT=5445 OTC_SAFETY_SUBGROUP_CONFIRM=YES npx tsx src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts --apply
+```
+기대: `status:APPLIED, dbWrite:28, after{authoredKoCanonical:7, easyDeprecated:7, audit:7, canonicalDupKo/En:0, sourceRefScopeMasters:7, targetOutsideWrite:0, enCanonical:0}`. 재실행 시 `ALREADY_COMPLETE_NOOP, dbWrite:0`.
 
 ## 산출물
-- 저작 content_json + 렌더 HTML + 게이트: `apps/api-server/src/scripts/data/otc-safety-subgroup-magnesium500-ko-render.json`
-- apply 스크립트: `apps/api-server/src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts`
+- apply 스크립트(정정): `apps/api-server/src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts`
+- 저작 content_json + 렌더 HTML: `apps/api-server/src/scripts/data/otc-safety-subgroup-magnesium500-ko-render.json`
 - 렌더 검증기: `apps/api-server/src/scripts/otc-safety-subgroup-ko-render-preview.ts`
 - 인벤토리 SSOT: `otc-safety-subgroup-authoring-inventory-v1.json`(`98c4e6f6c`).
-- DB write 0(apply 미실행). 기존 LIVE 미접촉.
+- 동일 결함 복제 스크립트: **없음**(apply 로직 보유 스크립트는 magnesium500 단 1개, inventory·render-preview 는 write 경로 없음).
+- 이 세션 DB write 0(apply 미실행). 기존 LIVE 미접촉.
