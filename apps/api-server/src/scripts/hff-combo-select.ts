@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo, normFn } from './hff-nutrient-registry.js';
 import { resolveSource } from './hff-raw-source.js';
+import { DataSource } from 'typeorm';
 // 파서 단일화 — 생산(본 select) · 감사 스크립트가 **동일 spec 정규화/분류 모듈**을 사용한다.
 // (단위 수식어 `ug`/`㎍`/`mga-TE`·라벨 공백·표시량 접두 누락 과소추출 해소. CHECK-...-PILOT-BLOCKER-B-V1 §3)
 // 기능성 **귀속 정책**은 생산=TARGET 스코프 registry(기존 계약), 감사=명시 구조 우선으로 의도적으로 다르다(아래 주석 참조).
@@ -23,6 +24,17 @@ const TARGET = COMBO.split(/[,+]/).map((x) => x.trim());
 const metaOf = (k: string) => NUTRIENT_META[k] ?? FUNCTIONAL_META[k];
 for (const k of TARGET) if (!metaOf(k)) throw new Error(`미지원 원료: ${k}`);
 const TARGET_SET = [...TARGET].sort().join('|');
+
+// ── 병렬 완결형 세션 충돌 방지 (WO 정비) ──
+// 1) signature→shard: 정렬된 combo signature 를 stableHash % shard-count 로 분리.
+//    --shard/--shard-count 지정 시 내 shard 가 아닌 조합은 즉시 빈 결과(다른 세션 담당).
+// 2) --exclude-taken: master 연결(사전승격) 또는 canonical STORE SPD 존재 후보를 사전 제외(중복 생산·ALREADY_PROMOTED 차단).
+function stableHash(s: string): number { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
+const SHARD = arg('shard'); const SHARD_COUNT = parseInt(arg('shard-count', '0'), 10);
+const SIG_SORTED = [...TARGET].sort().join('+'); // 표시용 signature
+const MY_SHARD = SHARD_COUNT > 0 ? stableHash(SIG_SORTED) % SHARD_COUNT : -1;
+const EXCLUDE_TAKEN = process.argv.includes('--exclude-taken');
+export const SHARD_INFO = { sig: SIG_SORTED, shardCount: SHARD_COUNT, shard: MY_SHARD };
 
 // NONFUNC / CLS / classify / SPEC 정규식 / 기능성 분리 → 전부 `hff-source-parse.ts` 로 이관(생산·감사 공용).
 /** 공용 파서 결과를 기존 select 계약(TARGET 한정 byKey + unknown + nonTarget)으로 투영 */
@@ -68,6 +80,15 @@ const NECESSARY: Record<string, string> = {
 // --no-prefilter: 저선택도 단일 prefilter(예 '아연')는 비인덱스 JSONB ILIKE 스캔이 느려 timeout →
 // prefilter를 끄고 전량 fetch(id 인덱스 순) 후 JS에서 동일 선별. 선별 결과 동일(prefilter=필요조건 superset).
 const baseLike = process.argv.includes('--no-prefilter') ? [] : [...new Set(TARGET.map((k) => NECESSARY[k] ?? '').filter(Boolean))];
+
+// shard 조기 스킵: 내 shard 가 아니면 스캔 없이 빈 결과(다른 세션 담당) — 교집합 0 보장.
+if (SHARD_COUNT > 0 && SHARD !== '' && String(MY_SHARD) !== SHARD) {
+  fs.writeFileSync(OUT, JSON.stringify([], null, 1));
+  fs.writeFileSync(OUT.replace(/\.json$/, '.hold.json'), JSON.stringify([], null, 1));
+  console.log(`[shard] ${SIG_SORTED} → shard ${MY_SHARD} ≠ 내 shard ${SHARD} · SKIP (빈 결과)`);
+  process.exit(0);
+}
+
 const src = resolveSource(process.argv, process.env, baseLike.length ? baseLike : undefined);
 for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const base = it.BASE_STANDARD ?? ''; const name = (it.PRDUCT ?? '').trim(); const srv = it.SRV_USE ?? ''; const sungsang = it.SUNGSANG ?? ''; const stmt = (it.STTEMNT_NO ?? '').trim();
@@ -115,8 +136,40 @@ for await (const it of src.gen as AsyncGenerator<RawItem>) {
   });
   bump('ELIGIBLE');
 }
+// ── taken-exclusion: 사전승격(master 연결) 또는 canonical STORE SPD 존재 후보 사전 제외 ──
+let takenExcluded = 0;
+if (EXCLUDE_TAKEN && eligible.length) {
+  const stmts = eligible.map((e) => String((e as { statementNo: string }).statementNo));
+  const port = parseInt(process.env.PROXY_PORT ?? '5442', 10);
+  const ds = new DataSource({ type: 'postgres', host: process.env.PROXY_HOST ?? '127.0.0.1', port, username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 120000 } });
+  await ds.initialize();
+  try {
+    // (a) candidate 가 master 에 연결됨  (b) 그 신고번호의 master 에 canonical STORE SPD 존재
+    const taken: Array<{ stmt: string }> = await ds.query(
+      `SELECT DISTINCT s AS stmt FROM (
+         SELECT raw_payload::jsonb->'source'->>'STTEMNT_NO' AS s
+           FROM product_candidates
+          WHERE source_label='MFDS_HEALTH_FUNCTIONAL_FOOD' AND deleted_at IS NULL
+            AND raw_payload::jsonb->'source'->>'STTEMNT_NO' = ANY($1)
+            AND matched_product_master_id IS NOT NULL
+         UNION
+         SELECT m.mfds_permit_number AS s
+           FROM product_masters m
+           JOIN shared_product_descriptions sp ON sp.master_id=m.id
+          WHERE m.mfds_permit_number = ANY($1)
+            AND sp.description_type='STORE' AND sp.status='canonical' AND sp.deleted_at IS NULL
+       ) x WHERE s IS NOT NULL`, [stmts]);
+    const takenSet = new Set(taken.map((t) => t.stmt));
+    if (takenSet.size) {
+      const before = eligible.length;
+      for (let i = eligible.length - 1; i >= 0; i--) if (takenSet.has(String((eligible[i] as { statementNo: string }).statementNo))) eligible.splice(i, 1);
+      takenExcluded = before - eligible.length;
+    }
+  } finally { await ds.destroy(); }
+}
+
 fs.writeFileSync(OUT, JSON.stringify(eligible, null, 1));
 fs.writeFileSync(OUT.replace(/\.json$/, '.hold.json'), JSON.stringify(holds, null, 1));
-console.log(`═══ ${COMBO} 복합형 선정 ═══`);
-console.log(`mention ${counts['mention'] ?? 0} · ELIGIBLE ${counts['ELIGIBLE'] ?? 0} · HOLD_MULTI ${counts['HOLD_MULTI'] ?? 0} · 액상 ${counts['HOLD_UNSUPPORTED'] ?? 0} · 벌크 ${counts['BULK'] ?? 0} · 수출 ${counts['EXPORT'] ?? 0} · grounding ${counts['HOLD_GROUNDING'] ?? 0} · 정체 ${counts['HOLD_IDENTITY'] ?? 0}`);
+console.log(`═══ ${COMBO} 복합형 선정 ${SHARD_COUNT > 0 ? `(shard ${MY_SHARD}/${SHARD_COUNT})` : ''} ═══`);
+console.log(`mention ${counts['mention'] ?? 0} · ELIGIBLE ${counts['ELIGIBLE'] ?? 0} · HOLD_MULTI ${counts['HOLD_MULTI'] ?? 0} · 액상 ${counts['HOLD_UNSUPPORTED'] ?? 0} · 벌크 ${counts['BULK'] ?? 0} · 수출 ${counts['EXPORT'] ?? 0} · grounding ${counts['HOLD_GROUNDING'] ?? 0} · 정체 ${counts['HOLD_IDENTITY'] ?? 0}${EXCLUDE_TAKEN ? ` · taken제외 ${takenExcluded}` : ''}`);
 console.log(`→ ${OUT} (${eligible.length}) · hold (${holds.length})`);
