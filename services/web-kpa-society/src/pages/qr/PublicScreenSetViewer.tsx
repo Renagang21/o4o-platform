@@ -107,7 +107,7 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
               <div style={{ minWidth: 0 }}>
-                {openCard.sourceBadge && <span style={styles.badge}>{openCard.sourceBadge}</span>}
+                {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지 공개 미노출(sourceBadge 데이터는 보존). */}
                 <h2 style={styles.modalTitle}>{openCard.title}</h2>
               </div>
               <button onClick={() => setOpenCard(null)} style={styles.modalClose} aria-label="닫기">✕</button>
@@ -204,7 +204,7 @@ function SectionBlock({
                   </div>
                 )}
                 <div style={styles.cardBody}>
-                  {c.sourceBadge && <span style={styles.badge}>{c.sourceBadge}</span>}
+                  {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지 공개 미노출(sourceBadge 데이터는 보존). */}
                   {c.title && <span style={styles.cardTitle}>{c.title}</span>}
                   {c.summary && <span style={styles.cardSummary}>{c.summary}</span>}
                   {c.relatedProductName && <span style={styles.cardRelated}>{c.relatedProductName}</span>}
@@ -369,15 +369,7 @@ const styles: Record<string, React.CSSProperties> = {
     minWidth: 0,
     flex: 1,
   },
-  badge: {
-    alignSelf: 'flex-start',
-    fontSize: '11px',
-    fontWeight: 600,
-    color: colors.primary,
-    backgroundColor: '#eff6ff',
-    borderRadius: '6px',
-    padding: '2px 8px',
-  },
+  // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지(badge) 공개 미노출로 스타일 제거.
   cardTitle: { fontSize: '15px', fontWeight: 600, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
   cardSummary: { fontSize: '13px', color: colors.neutral500, lineHeight: 1.5 },
   cardRelated: { fontSize: '12px', color: colors.neutral400 },

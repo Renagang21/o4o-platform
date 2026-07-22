@@ -930,7 +930,8 @@ export function TabletKioskPage({
                     </div>
                   )}
                   <div style={styles.contentCardBody}>
-                    <span style={styles.contentBadge}>{c.sourceBadge}</span>
+                    {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 출처 배지(O4O 표준/매장 제작) 공개 미노출.
+                        내부 sourceType/sourceBadge 데이터는 보존(관리/판별용). */}
                     <span style={styles.contentCardTitle}>{c.title}</span>
                     {c.summary && <span style={styles.contentCardSummary}>{c.summary}</span>}
                     {c.relatedProductName && <span style={styles.contentCardRelated}>{c.relatedProductName}</span>}
@@ -1009,9 +1010,7 @@ export function TabletKioskPage({
                     <span style={styles.productMore}>자세히 보기 ›</span>
                   </div>
                 </div>
-                {p.type === 'local' && (
-                  <div style={styles.localBadge}>자체</div>
-                )}
+                {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: '자체'(local) 출처 배지 공개 미노출. p.type 데이터는 보존. */}
               </div>
               );
             })}
@@ -1046,7 +1045,7 @@ export function TabletKioskPage({
           <div style={styles.contentModal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.contentModalHeader}>
               <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '4px', minWidth: 0 }}>
-                <span style={styles.contentBadge}>{openContentCard.sourceBadge}</span>
+                {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: 상세 모달 출처 배지 공개 미노출. */}
                 <h2 style={styles.contentModalTitle}>{openContentCard.title}</h2>
                 {openContentCard.relatedProductName && (
                   <span style={styles.contentCardRelated}>{openContentCard.relatedProductName}</span>
@@ -1499,17 +1498,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     color: '#2563eb',
   },
-  localBadge: {
-    position: 'absolute' as const,
-    top: '8px',
-    right: '8px',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    backgroundColor: '#f59e0b',
-    color: '#fff',
-    fontSize: '11px',
-    fontWeight: 700,
-  },
+  // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: localBadge('자체') 공개 미노출로 스타일 제거.
   // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기 골격(중립 회색 블록).
   skeletonCard: {
     backgroundColor: '#fff',
@@ -2004,15 +1993,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '4px',
     padding: '12px 14px',
   },
-  contentBadge: {
-    alignSelf: 'flex-start',
-    fontSize: '11px',
-    fontWeight: 700,
-    color: '#1d4ed8',
-    backgroundColor: '#eff6ff',
-    borderRadius: '4px',
-    padding: '2px 8px',
-  },
+  // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: contentBadge(출처) 공개 미노출로 스타일 제거.
   contentCardTitle: {
     fontSize: 'clamp(14px, 1.6vw, 16px)',
     fontWeight: 700,

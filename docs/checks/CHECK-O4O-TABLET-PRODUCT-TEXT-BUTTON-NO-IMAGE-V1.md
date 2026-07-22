@@ -121,3 +121,30 @@
 - **specification 실측(§4)**: 파이프라인(`pm.specification AS specification` → `mapSupplierProduct` → `p.specification && …`)은 코드·배포 검증. **매장 자체(local) 상품은 규격 미보유 → 이름만(빈 줄 없음) 확인** ✓.
   - O4O **공급자 상품의 규격 2행 화면 표출**은 미확인: 스모크 가능한 테스트 코너의 product_list 8개가 전부 `type: 'local'`(QR public 응답·`/tablet/products` supplier count 0). 공급자 상품이 편성된 코너가 없어 **데이터 부재**로 시각 확인 불가(코드/전달 결함 아님). 공급자 상품 편성 코너 확보 시 규격 2행 자동 표출됨(전달 경로 정상).
   - 상품명과 specification은 두 줄 분리 렌더(문자열 병합 없음) — 코드 확인 ✓.
+
+---
+
+## 9. 후속 — 공개 화면 출처 배지 제거 (WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1)
+
+> 태블릿·QR **공개 소비자 화면**에서 내부 출처 배지(`O4O 표준` / `매장 제작` / `자체` 등)를 렌더하지 않는다. 내부 `sourceType`/`sourceBadge`/`p.type` 데이터·API·DB 계약은 그대로 보존(관리/판별용).
+
+### 9.1 기존 노출 위치
+- `TabletKioskPage.tsx`: 상품 카드 `localBadge`('자체'), content_list 카드 `contentBadge`(`c.sourceBadge`), 콘텐츠 상세 모달 `contentBadge`.
+- `PublicScreenSetViewer.tsx`(QR): content_list 카드 `styles.badge`(`c.sourceBadge`), 콘텐츠 상세 모달 `styles.badge`(`openCard.sourceBadge`). (QR 상품 카드에는 출처 배지 없었음.)
+
+### 9.2 변경 파일
+- `packages/tablet-kiosk-core/src/TabletKioskPage.tsx` (JSX 렌더 3곳 제거 + 미사용 스타일 `localBadge`/`contentBadge` 제거)
+- `services/web-kpa-society/src/pages/qr/PublicScreenSetViewer.tsx` (JSX 렌더 2곳 제거 + 미사용 스타일 `badge` 제거)
+
+### 9.3 제거 결과
+- 상품 배지: 태블릿 상품 카드 '자체' 미노출. (QR 상품 카드는 원래 배지 없음.)
+- 콘텐츠 배지: 태블릿/QR content_list 카드·상세 모달의 `O4O 표준`/`매장 제작` 미노출.
+- 상품 카드/상세는 상품명·규격·가격·설명·관련 상품명만 표시. 카드 클릭·상세 진입 동작 유지.
+
+### 9.4 보존
+- 내부 `sourceType`/`sourceBadge`/`p.type`/`sourceId`/`relatedProductName` 데이터·타입·API·DB 무변경(신규 옵션 없음, 공개 정책으로 고정). 관리자·운영자·매장 제작 화면 출처 표시 무변경(공개 렌더러만 수정).
+- 중지조건 검증: 배지는 공개 렌더러 내부 인라인 `<span>`(관리 화면 미공유), 제거가 상세 연결(hasDetail/detail.html)에 무영향, 상품명에 출처 문자열 저장 없음, migration 불필요 → **미발동**.
+
+### 9.5 검증
+- typecheck: tablet-kiosk-core 0 / web-kpa-society 0.
+- (배포/스모크: 아래 기록 — `O4O 표준` 콘텐츠 / `매장 제작` 콘텐츠 / 매장 자체 상품 3종 모두 공개 화면 배지 미노출 확인)
