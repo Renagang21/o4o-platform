@@ -1,0 +1,9 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "FAIL",
+  "dbWrite": 0,
+  "groupKey": "비오틴|5밀리그램|정",
+  "anomalies": [],
+  "error": "이상 1건 → ABORT\n  excluded 11 !== 5 (안전지문불일치 SSOT 재고정 불일치)"
+}
