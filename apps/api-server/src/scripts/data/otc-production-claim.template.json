@@ -1,0 +1,19 @@
+{
+  "_doc": "WO-O4O-OTC-NEXT-POOL-RECLASSIFY-AND-CLAIM-CONTRACT-NA-V1 — 에이전트 간 그룹 선점(claim) 계약 템플릿. 장시간 병렬 생산 전 중복 선점 방지용. 각 에이전트는 자기 claim 파일 1개만 소유하고 path-specific commit·push 한다. 파일명 규약: otc-production-claim.<agent>.json (agent ∈ ga|da|na).",
+  "schemaVersion": 1,
+  "owner": "agent-na",
+  "round": "production-10h-2026-07-22",
+  "claimedAtNote": "commit 타임스탬프가 선점 시각의 SSOT (파일 내 시각 미기재 — 결정론). git log 로 확인.",
+  "track": "one of: TRACK_A_GROUNDED | NUTRITION_COMBO_EN_ONLY | KO_COMPLETE_EN_MISSING",
+  "claims": [
+    {
+      "groupKey": "성분|함량|제형",
+      "sourceRef": "<authored source_ref_id uuid>",
+      "sourceType": "mfds_drug_otc | mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 0,
+      "op": "EN_ONLY | KO_EN",
+      "status": "CLAIMED"
+    }
+  ]
+}

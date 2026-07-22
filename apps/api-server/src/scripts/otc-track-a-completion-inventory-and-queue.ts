@@ -50,7 +50,7 @@ const readEnv = (k: string): string | null => {
 };
 
 const BUCKET = 'authored그대로확장';
-const AUTHORED_SOURCES = ['mfds_drug_otc', 'nutrition_combo'];
+const AUTHORED_SOURCES = ['mfds_drug_otc', 'nutrition_combo', 'mfds_drug_otc_nutrition_combo'];
 const SENSITIVE_RE = /아스피린|아세틸살리실산|와파린|클로피도그렐|헤파린|덱사메타손|프레드니솔론|하이드로코르티손|모르핀|코데인|메칠페니데이트|인슐린|레보티록신/;
 const WANT_QUEUE = Number(process.env.WANT_QUEUE ?? 12);
 const MAX_EXAMINE = Number(process.env.MAX_EXAMINE ?? 40);
