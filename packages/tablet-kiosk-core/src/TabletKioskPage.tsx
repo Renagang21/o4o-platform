@@ -83,6 +83,22 @@ const LOCALE_LABELS: Record<string, string> = {
 };
 const localeLabel = (code: string): string => LOCALE_LABELS[code] ?? code.toUpperCase();
 
+// WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+//   이용자 표시 언어 선택 목록 = **기존 LOCALE_LABELS 재사용**(태블렛 전용 목록을 새로 하드코딩하지 않음).
+//   O4O 1차 지원 7개 언어(ko/en/zh/ja/vi/th/id) — 순서는 LOCALE_LABELS 정의 순(ko 우선).
+//   선택값은 브라우저 localStorage 에만 유지(서버·Screen Set 저장 없음). fallback = 선택 언어 → ko → 없음(서버 strict).
+const SUPPORTED_VIEWER_LOCALES: string[] = Object.keys(LOCALE_LABELS);
+const VIEWER_LANG_STORAGE_KEY = 'o4o_tablet_viewer_lang';
+const DEFAULT_VIEWER_LANG = 'ko';
+function readStoredViewerLang(): string {
+  try {
+    const v = typeof window !== 'undefined' ? window.localStorage.getItem(VIEWER_LANG_STORAGE_KEY) : null;
+    return v && SUPPORTED_VIEWER_LOCALES.includes(v) ? v : DEFAULT_VIEWER_LANG;
+  } catch {
+    return DEFAULT_VIEWER_LANG;
+  }
+}
+
 // ── Display & view types (internal) ──
 
 /**
@@ -396,6 +412,20 @@ export function TabletKioskPage({
     setDetailLocale(null);
   }, [selectedProduct?.id]);
 
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+  //   이용자 표시 언어(브라우저 로컬 유지). content_list STORE 설명서를 선택 언어 → ko → 없음 으로 조회한다.
+  //   서버·Screen Set 에 저장하지 않으므로 다른 브라우저·이용자에게 전파되지 않는다.
+  const [viewerLang, setViewerLang] = useState<string>(readStoredViewerLang);
+  const selectViewerLang = (code: string) => {
+    if (!SUPPORTED_VIEWER_LOCALES.includes(code) || code === viewerLang) return;
+    setViewerLang(code);
+    try {
+      window.localStorage.setItem(VIEWER_LANG_STORAGE_KEY, code);
+    } catch {
+      /* localStorage 비활성 환경 무시 */
+    }
+  };
+
   // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1:
   //   content_list 카드 상세(모달). product detail(reducer) 와 독립 — 콘텐츠 카드는 상품이 아니므로
   //   기존 상품 상세 흐름을 건드리지 않고 경량 오버레이로 표시. detail.html 은 ContentRenderer 로만 렌더.
@@ -448,11 +478,12 @@ export function TabletKioskPage({
     if (previewScreen) return;
     if (!slug || !api.fetchScreen) return;
     let cancelled = false;
-    api.fetchScreen(slug)
+    // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 선택 언어를 조회에 전달(변경 시 재조회).
+    api.fetchScreen(slug, { language: viewerLang })
       .then((s) => { if (!cancelled) setFetchedScreen(s && s.mode === 'screen_set' ? s : null); })
       .catch(() => { if (!cancelled) setFetchedScreen(null); });
     return () => { cancelled = true; };
-  }, [slug, api, previewScreen]);
+  }, [slug, api, previewScreen, viewerLang]);
   // 주입 우선(previewScreen) → 없으면 fetch 결과. mode='screen_set' 인 것만 유효.
   const screen = (previewScreen && previewScreen.mode === 'screen_set') ? previewScreen : fetchedScreen;
 
@@ -498,6 +529,9 @@ export function TabletKioskPage({
   //   idle_touch 는 상단 hero 에 QR chip 이 이미 있어 별도 버튼 없이 헤더만 숨긴다.
   const hideHeaderBand = !!qrGuide?.url;
   const showFloatingQr = !!qrGuide?.url && !isIdleTouch && displaySettings?.showQr !== false;
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 언어 선택은 실제 태블렛 런타임(비-미리보기)에서
+  //   적용된 Screen Set(콘텐츠 존재)일 때만 노출. legacy/미리보기/임베드는 미노출.
+  const showLangSelector = !previewScreen && !previewLayoutOnly && !!slug && !!api.fetchScreen && screen?.mode === 'screen_set';
   const hideProductsBody = isCornerOverview; // 코너 소개형: 설명·콘텐츠·QR 중심 → 상품 그리드 생략
 
   // Submit interest request
@@ -883,6 +917,24 @@ export function TabletKioskPage({
         <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrBtn} aria-label="휴대전화로 보기">
           <span style={styles.floatingQrIcon} aria-hidden>▣</span> 휴대전화로 보기
         </button>
+      )}
+
+      {/* WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 우상단 QR 버튼과 대칭인 좌상단 표시 언어 선택.
+          7개 언어(LOCALE_LABELS 재사용) · 선택값 브라우저 로컬 유지 · 변경 시 STORE 설명서 재조회(선택→ko→없음). */}
+      {showLangSelector && (
+        <div style={styles.langSelector}>
+          <span style={styles.langSelectorIcon} aria-hidden>🌐</span>
+          <select
+            value={viewerLang}
+            onChange={(e) => selectViewerLang(e.target.value)}
+            style={styles.langSelectorSelect}
+            aria-label="표시 언어 선택"
+          >
+            {SUPPORTED_VIEWER_LOCALES.map((code) => (
+              <option key={code} value={code}>{localeLabel(code)}</option>
+            ))}
+          </select>
+        </div>
       )}
 
       {/* 코너 설명 섹션 — 코너 제목(header)과 시각적으로 구분된 별도 섹션.
@@ -1404,6 +1456,34 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
   },
   floatingQrIcon: { fontSize: '14px', lineHeight: 1, color: '#4f46e5' },
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 좌상단 표시 언어 선택(터치 44px).
+  langSelector: {
+    position: 'absolute',
+    top: '12px',
+    left: '12px',
+    zIndex: 30,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    minHeight: '44px',
+    padding: '4px 10px 4px 12px',
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    border: '1px solid #e2e8f0',
+    borderRadius: '999px',
+    boxShadow: '0 2px 8px rgba(15,23,42,0.12)',
+  },
+  langSelectorIcon: { fontSize: '15px', lineHeight: 1 },
+  langSelectorSelect: {
+    minHeight: '36px',
+    padding: '4px 6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#0f172a',
+    backgroundColor: 'transparent',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+  },
   qrModal: {
     background: '#fff',
     borderRadius: '20px',

@@ -171,8 +171,12 @@ export async function fetchTabletSettings(slug: string): Promise<TabletDisplaySe
  * 공개 태블릿 화면 구성 조회. 적용된 screen set 있으면 mode='screen_set'+sections, 없으면 'legacy'.
  * 실패 시 null 반환 → kiosk-core 는 legacy(/products+/idle) 로 동작.
  */
-export async function fetchTabletScreen(slug: string, tabletId?: string): Promise<TabletScreenResponse | null> {
-  const qs = tabletId ? `?tabletId=${encodeURIComponent(tabletId)}` : '';
+export async function fetchTabletScreen(slug: string, tabletId?: string, language?: string): Promise<TabletScreenResponse | null> {
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 이용자 선택 언어를 쿼리로 전달(선택 언어 → ko → 없음).
+  const params = new URLSearchParams();
+  if (tabletId) params.set('tabletId', tabletId);
+  if (language) params.set('language', language);
+  const qs = params.toString() ? `?${params.toString()}` : '';
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/screen${qs}`;
   try {
     const res = await fetch(url);

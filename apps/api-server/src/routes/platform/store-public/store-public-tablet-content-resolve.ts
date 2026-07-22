@@ -52,6 +52,10 @@ export async function resolveContentListItems(
   source: ContentSourceAdapter,
   organizationId: string,
   config: unknown,
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+  //   태블릿 이용자가 선택한 표시 언어. 지정 시 o4o SPD 카드는 item.language 를 무시하고 이 언어로,
+  //   **선택 언어 → ko → 없음**(strict) 으로 조회한다. 미지정(기존 소비처: QR·미리보기) → item.language + 기존 fallback.
+  viewerLanguage?: string | null,
 ): Promise<ContentListCard[]> {
   const parsed = parseContentListConfig(config);
   if (!parsed.ok) return [];
@@ -61,12 +65,18 @@ export async function resolveContentListItems(
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .slice(0, RESOLVE_LIMIT);
 
+  const viewerLang = viewerLanguage && viewerLanguage.trim() ? viewerLanguage.trim() : null;
+
   const cards: ContentListCard[] = [];
   for (const item of items) {
     try {
       const src =
         item.sourceType === 'o4o_product_description'
-          ? await source.fetchProductDescription(item.masterId, item.language)
+          ? await source.fetchProductDescription(
+              item.masterId,
+              viewerLang ?? item.language,
+              viewerLang ? { strictFallback: true } : undefined,
+            )
           : await source.fetchStoreContent(organizationId, item.contentId);
       if (!src) continue; // 원본 미존재 / 접근 불가 → skip
       cards.push({

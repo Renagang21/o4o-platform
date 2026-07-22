@@ -144,7 +144,8 @@ export interface TabletKioskApi {
    */
   fetchScreen?: (
     slug: string,
-    params?: { tabletId?: string },
+    // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: language = 이용자 선택 표시 언어(옵션).
+    params?: { tabletId?: string; language?: string },
   ) => Promise<TabletScreenResponse | null>;
 }
 

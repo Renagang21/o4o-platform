@@ -36,8 +36,15 @@ export interface ResolvedSourceContent {
  *  - 반환 null = 미존재 / 접근 불가(타 org, archived, 설명 없음) → resolver 가 해당 item skip.
  */
 export interface ContentSourceAdapter {
-  /** o4o_product_description(SPD STORE canonical) 원본 조회. ProductMaster/설명 없으면 null. */
-  fetchProductDescription(masterId: string, language: string): Promise<ResolvedSourceContent | null>;
+  /**
+   * o4o_product_description(SPD STORE canonical) 원본 조회. ProductMaster/설명 없으면 null.
+   *
+   * WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+   *   opts.strictFallback=true → **선택 언어 → ko → 없음** 으로만 제한(다른 외국어 임의 표시 안 함).
+   *   미지정(기본) → 기존 동작(선택 언어 → ko → 그 외 최신). 태블릿 이용자 언어 선택 경로에서만 strict 를 쓴다
+   *   (QR·매장/운영자/공급자 미리보기 등 기존 소비처는 opts 미전달 → byte-equivalent).
+   */
+  fetchProductDescription(masterId: string, language: string, opts?: { strictFallback?: boolean }): Promise<ResolvedSourceContent | null>;
   /** store_content(kpa_store_contents) 원본 조회. 미존재/타 org/archived 면 null. */
   fetchStoreContent(organizationId: string, contentId: string): Promise<ResolvedSourceContent | null>;
 }
@@ -51,7 +58,11 @@ function asString(v: unknown): string {
  */
 export function createStoreContentSourceAdapter(dataSource: DataSource): ContentSourceAdapter {
   return {
-    async fetchProductDescription(masterId, language) {
+    async fetchProductDescription(masterId, language, opts) {
+      // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+      //   strictFallback → LATERAL 을 (선택 언어, ko) 로만 제한 → 둘 다 없으면 row 없음 → null(설명서 없음).
+      //   기본(미지정) → 기존 순위(선택 → ko → 그 외 최신)로 어떤 언어든 반환(byte-equivalent).
+      const langFilter = opts?.strictFallback ? `AND d.language IN ($2, 'ko')` : '';
       const rows = await dataSource.query(
         `SELECT pm.name AS "masterName", spd.content AS "content", spd.summary AS "summary"
            FROM product_masters pm
@@ -62,6 +73,7 @@ export function createStoreContentSourceAdapter(dataSource: DataSource): Content
                 AND d.description_type = 'STORE'
                 AND d.status = 'canonical'
                 AND d.deleted_at IS NULL
+                ${langFilter}
               ORDER BY (d.language = $2) DESC, (d.language = 'ko') DESC, d.updated_at DESC
               LIMIT 1
            ) spd ON true

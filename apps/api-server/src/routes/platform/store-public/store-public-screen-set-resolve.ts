@@ -58,6 +58,12 @@ export interface ResolveScreenSetInput {
    * 기본값: tabletContext 있으면 'full', 없으면 'org'.
    */
   productMode?: 'full' | 'org' | 'skip';
+  /**
+   * WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
+   *   태블릿 이용자가 선택한 표시 언어. 지정 시 content_list 의 o4o STORE 설명서를 이 언어로
+   *   **선택 언어 → ko → 없음**(strict) 조회. 미지정(QR/미리보기 등 기존 소비처) → 기존 동작 불변.
+   */
+  viewerLanguage?: string | null;
 }
 
 export interface ResolvedScreenSet {
@@ -207,7 +213,7 @@ export async function resolveScreenSetSections(
         const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
         sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
       } else if (b.blockType === 'content_list') {
-        const cards = await resolveContentListItems(contentSource, input.storeId, b.config);
+        const cards = await resolveContentListItems(contentSource, input.storeId, b.config, input.viewerLanguage);
         sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });
       } else if (b.blockType === 'qr_guide') {
         // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §5:

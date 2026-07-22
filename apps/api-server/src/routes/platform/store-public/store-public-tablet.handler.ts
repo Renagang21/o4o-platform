@@ -489,6 +489,11 @@ export function createStorePublicTabletRoutes(deps: {
       if (!resolved) return;
 
       const requestedTabletId = typeof req.query.tabletId === 'string' ? req.query.tabletId : null;
+      // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 이용자 선택 표시 언어(O4O 1차 7개 언어).
+      //   허용값만 통과(그 외/미지정 → undefined → 기존 동작: 저작 item.language). 스키마·DB 변경 없음.
+      const VIEWER_LANGS = new Set(['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id']);
+      const rawLang = typeof req.query.language === 'string' ? req.query.language.trim().toLowerCase() : '';
+      const viewerLanguage = VIEWER_LANGS.has(rawLang) ? rawLang : undefined;
       const displaySource = await resolveTabletDisplaySource(dataSource, resolved.storeId, requestedTabletId);
       const tabletId = displaySource.tabletId;
 
@@ -519,6 +524,7 @@ export function createStorePublicTabletRoutes(deps: {
         storeId: resolved.storeId,
         storeSlug: req.params.slug,
         tabletContext: { tabletId, configured: displaySource.configured },
+        viewerLanguage,
       }, createStoreContentSourceAdapter(dataSource));
       if (!resolvedSet) {
         res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source, note: 'applied screen set unavailable → legacy fallback' } });

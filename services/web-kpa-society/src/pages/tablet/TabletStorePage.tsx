@@ -68,7 +68,8 @@ export function TabletStorePage() {
         submitInterest: submitTabletInterest,
         checkStatus: checkTabletInterestStatus,
         // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1: 적용 screen set 소비(코너별 tabletId 주입)
-        fetchScreen: (s) => fetchTabletScreen(s, tabletId),
+        // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 이용자 선택 언어 전달(params.language).
+        fetchScreen: (s, params) => fetchTabletScreen(s, tabletId, params?.language),
       }}
       showQrBadge={fromQr}
       idleTimeoutMs={IDLE_TIMEOUT_MS}
