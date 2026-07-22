@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "셀타골드에스 연질캡슐 nutrition_combo EN-only fresh 번역. 다효능 병렬 보존. '마그네슘 결핍으로 인한 근육경련'은 ko 원문에 명시된 인과라 그대로 유지(신규 인과 생성 아님). 비타A·철 미함유 사실 유지. ko 미변경.",
+  "testLog": {
+    "셀타골드에스": {
+      "효능축(병렬)": "비타민 E·B1·B2·B6 보급 / 신경통·근육통·관절통 / 구각염·구내염 / 각기·눈의 피로 / 말초혈행·수족냉증 / 마그네슘 결핍 근육경련(ko 명시 인과) — 병렬, 신규 합성 0",
+      "용법": "만 12세 이상·성인 1캡슐 1일 2회",
+      "금기·상담": "대두 과민·12개월 미만·중증 신부전 금기 / 혈전소인·지방대사이상 상담 / 비타A·철 없음"
+    }
+  },
+  "translations": [
+    {
+      "groupKey": "셀타골드에스|연질캡슐(combo)",
+      "title": "Multivitamin Soft Capsule — Vitamins E and B + Magnesium (no vitamin A, no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins E, B1, B2 and B6 during physical fatigue, low energy and old age; for neuralgia, muscle pain and joint pain; for angular cheilitis and mouth sores; for beriberi and eye fatigue; to relieve peripheral circulation problems and cold hands and feet; and for muscle cramps caused by magnesium deficiency.",
+      "usage": "Children aged 12 or older and adults take one capsule twice a day.",
+      "caution": "Do not take this if you are hypersensitive to soybean oil, soy or peanuts, if the child is under 12 months old, or if you have severe kidney failure. If you are prone to blood clots or have abnormal fat metabolism, consult a pharmacist. This combination does not contain vitamin A or iron.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins E and B, with magnesium (no vitamin A, no iron)",
+        "How it works": "Supplies vitamins and magnesium",
+        "Main symptoms": "Physical fatigue, neuralgia and muscle pain, mouth sores, peripheral circulation, muscle cramps from magnesium deficiency",
+        "Who should be careful": "Soy hypersensitivity; severe kidney failure",
+        "Why this one": "A vitamin B and magnesium soft capsule without vitamin A or iron"
+      }
+    }
+  ],
+  "summary": "Physical fatigue, muscle cramps, peripheral circulation"
+}

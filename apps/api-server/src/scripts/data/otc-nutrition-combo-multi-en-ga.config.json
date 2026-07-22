@@ -25,6 +25,30 @@
       "expected": 21,
       "translationFile": "otc-en-translations-combo-multi-ga-v1.json",
       "outBase": "otc-combo-en-only-ga-nunmoa"
+    },
+    "seltagold-s": {
+      "key": "셀타골드에스|연질캡슐(combo)",
+      "sourceRef": "029b8650-257b-47bb-ae3e-a42444c39d93",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 169,
+      "translationFile": "otc-en-translations-combo-seltagold-ga-v1.json",
+      "outBase": "otc-combo-en-only-ga-seltagold-s"
+    },
+    "vitacombo-c-plus": {
+      "key": "비타콤보씨플러스|정제(combo)",
+      "sourceRef": "b21c54a6-e248-477f-bc23-f5f1a6701587",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 208,
+      "translationFile": "otc-en-translations-combo-multi-ga-v2.json",
+      "outBase": "otc-combo-en-only-ga-vitacombo-c-plus"
+    },
+    "centbon": {
+      "key": "센트본|정제(combo)",
+      "sourceRef": "26c2af33-f6ba-4a09-a686-da8c98137aff",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 331,
+      "translationFile": "otc-en-translations-combo-multi-ga-v2.json",
+      "outBase": "otc-combo-en-only-ga-centbon"
     }
   }
 }

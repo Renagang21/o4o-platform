@@ -1,0 +1,52 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo EN-only fresh 번역(배치2). 다효능 병렬 보존(합성 금지)·수치/연령/금기 전수 보존·ko 미변경. 상태 기반 상담 문구는 직접 번역(해석 불필요). 비타A·철 미함유 사실은 ko 원문 그대로 유지.",
+  "testLog": {
+    "비타콤보씨플러스": {
+      "효능축(병렬)": "비타민 D·E·B1·B2·B6·C 보급 / 구루병 예방 / 신경통·근육통·관절통 / 구각염·구내염 / 각기·눈의 피로 / 아연 보급 — 병렬, 합성 0",
+      "용법": "만 12세 이상·성인 1정 1일 1회",
+      "금기·상담": "과민·고칼슘혈증·유육종증·신장질환/결석·중증 신부전·대두 과민·12개월 미만 영아 금기 / 당뇨·통풍·지방대사이상 상담 / 비타A·철 없음"
+    },
+    "센트본": {
+      "효능축(병렬)": "비타민 B1·B2·B6·C·D·E 보급+구루병 예방 / 신경통·근육통·관절통 / 구각염·구내염 / 각기·눈의 피로 / 아연 보급 — 병렬",
+      "용법": "만 8세 이상·성인 1정 1일 1회",
+      "금기·상담": "과민·고칼슘혈증·유육종증·신장질환/결석·대두 과민·12개월 미만 금기 / 통풍·혈전소인·폴산부족 상담 / 비타A·철 없어 임신 5,000 IU·철중독 경고 해당無(ko 원문 그대로)"
+    }
+  },
+  "translations": [
+    {
+      "groupKey": "비타콤보씨플러스|정제(combo)",
+      "title": "Multivitamin-Mineral Tablet — Vitamins D, E, B and C + Zinc (no vitamin A, no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins D, E, B1, B2, B6 and C during physical fatigue, low energy, the growth period and old age; to help prevent rickets; for neuralgia, muscle pain and joint pain; for angular cheilitis and mouth sores; to relieve beriberi and eye fatigue; and to supply zinc.",
+      "usage": "Children aged 12 or older and adults take one tablet once a day.",
+      "caution": "Do not take this if you are hypersensitive, or if you have high blood calcium, sarcoidosis, kidney disease, kidney stones, severe kidney failure or soy hypersensitivity, or if the child is under 12 months old. If you have diabetes, gout or abnormal fat metabolism, consult a pharmacist. This combination does not contain vitamin A or iron.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins D, E, B and C, with zinc (no vitamin A, no iron)",
+        "How it works": "Supplies multiple vitamins and zinc",
+        "Main symptoms": "Physical fatigue, rickets prevention, neuralgia and muscle pain, mouth sores, beriberi and eye fatigue",
+        "Who should be careful": "High blood calcium, kidney disease; soy hypersensitivity",
+        "Why this one": "A multivitamin-mineral tablet without vitamin A or iron"
+      }
+    },
+    {
+      "groupKey": "센트본|정제(combo)",
+      "title": "Multivitamin Tablet — Vitamins B, C, D and E + Zinc (no vitamin A, no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins B1, B2, B6, C, D and E during physical fatigue, pregnancy and breastfeeding, low energy during and after illness, the growth period and old age and to help prevent rickets; for neuralgia, muscle pain and joint pain; for angular cheilitis and mouth sores; to relieve beriberi and eye fatigue; and to supply zinc.",
+      "usage": "Children aged 8 or older and adults take one tablet once a day.",
+      "caution": "Do not take this if you are hypersensitive, or if you have high blood calcium, sarcoidosis, kidney disease, kidney stones or soy hypersensitivity, or if the child is under 12 months old. If you have gout, are prone to blood clots or are low in folate, consult a pharmacist. Because this combination does not contain vitamin A or iron, the warnings about 5,000 IU of vitamin A in pregnancy and iron poisoning do not apply.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins B, C, D and E, with zinc (no vitamin A, no iron)",
+        "How it works": "Supplies multiple vitamins and zinc",
+        "Main symptoms": "Physical fatigue, rickets prevention, neuralgia and muscle pain, mouth sores, beriberi and eye fatigue",
+        "Who should be careful": "High blood calcium, kidney disease; soy hypersensitivity",
+        "Why this one": "A multivitamin tablet without vitamin A or iron"
+      }
+    }
+  ],
+  "summary": "Physical fatigue, nutritional supply"
+}
