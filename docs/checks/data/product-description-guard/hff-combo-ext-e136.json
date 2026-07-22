@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "ext-e136-001",
+  "productName": "휴트리 오케어",
+  "productNameEn": "휴트리 오케어",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007907",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[프로폴리스추출물] 구강에서의 항균작용에 도움을 줄 수 있음\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요 / 뼈의 형성과 유지에 필요 / 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 연한 갈색의 내용물을 함유한 녹갈색의 타원형 츄어블 연질캡슐\n2. 총 플라보노이드 : 표시량(1mg/500mg)의 80~120%\n3. 비타민D : 표시량(50μg/500mg)의 80~180%\n4. 파라(ρ)-쿠마르산 : 확인\n5. 계피산 : 확인\n6. 납(mg/kg) : 1.0 이하\n7. 디에틸렌글리콜 : 불검출\n8. 테트라싸이클린(mg/kg) : 불검출\n9. 클로르테트라싸이클린(mg/kg) : 불검출\n10. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 씹어서 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n프로폴리스에 알레르기를 나타내는 사람은 섭취에 주의하십시오.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 연한 갈색의 내용물을 함유한 녹갈색의 타원형 츄어블 연질캡슐",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 50,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 50μg</span><span class=\"sd-badge is-solid\">프로폴리스 1mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>휴트리 오케어<small>비타민 D · 프로폴리스</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>50μg</b>, 프로폴리스 <b>1mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 D <b>50μg</b>, 프로폴리스 <b>1mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 연한 갈색의 내용물을 함유한 녹갈색의 타원형 츄어블 연질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>프로폴리스</b><ul class=\"sd-why\"><li>구강에서의 항균작용에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(50μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>프로폴리스</b> 표시량(1mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 연한 갈색의 내용물을 함유한 녹갈색의 타원형 츄어블 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 프로폴리스 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 50μg</span><span class=\"sd-badge is-solid\">Propolis 1mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>휴트리 오케어<small>Vitamin D · Propolis</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>50μg</b> of Vitamin D, <b>1mg</b> of Propolis as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>50μg</b> Vitamin D, <b>1mg</b> Propolis</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Propolis</b><ul class=\"sd-why\"><li>May help with antibacterial action in the mouth</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (50μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Propolis</b> labelled (1mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 연한 갈색의 내용물을 함유한 녹갈색의 타원형 츄어블 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Propolis together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
