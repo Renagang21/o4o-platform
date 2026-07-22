@@ -1,6 +1,7 @@
 # CHECK — 프로바이오틱스 고형 pure-single stmt-shard 1 완결 생산 (Agent B) V1
 
 - 성격: **완결형 생산 (자동 apply · 사전승인 반복 생산)** — 선정 → 결정적 grounded compose → Guard → dry-run → apply → 독립검증.
+- 자동 승인 계약(정본): [`WO-O4O-HFF-CONTENT-PRODUCTION-AUTO-AUTHORIZATION-CONTRACT-V1`](../work-orders/WO-O4O-HFF-CONTENT-PRODUCTION-AUTO-AUTHORIZATION-CONTRACT-V1.md) — composer 복원·번역 lookup·dry-run·apply·독립검증·commit/push 사전승인, 안전 게이트 불변.
 - 시작 `2026-07-22 19:59 +0900` · 종료(apply~독립검증) 단일 세션.
 - 샤딩: **stmt-축 FNV-1a · shard-count 3 · Agent B = shard 1**.
 - 기준선: 복합형 LIVE 3,845(tag-agnostic) 불변(본 배치는 단일 기능성 = 카드<2).
