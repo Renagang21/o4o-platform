@@ -12,6 +12,24 @@
       "track": "NUTRITION_COMBO_EN_ONLY",
       "masters": 3,
       "op": "EN_ONLY",
+      "status": "DONE"
+    },
+    {
+      "groupKey": "비타민E|400IU|연질캡슐",
+      "sourceRef": "03751234-7793-4635-8043-26257b32a3fd",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 7,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
+    },
+    {
+      "groupKey": "비타민E|1000IU|연질캡슐",
+      "sourceRef": "6343c0f5-cfe9-434b-925a-d42ae1cc86d8",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 18,
+      "op": "EN_ONLY",
       "status": "CLAIMED"
     }
   ]
