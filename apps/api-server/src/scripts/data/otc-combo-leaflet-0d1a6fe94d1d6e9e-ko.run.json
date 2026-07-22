@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "헤몰빈큐플러스캡슐|B03AE01|326.1밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "33c1abfd-a20a-be8b-16c1-692f536a2534",
+  "expected": 8,
+  "anomalies": [],
+  "fetched": 8,
+  "easyCanonicalExactly1": 8,
+  "authoredConflict": 0,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1906,
+  "htmlMd5": "63d9712817a844bf9c7a896305f56eb2",
+  "summary": "철 결핍성 빈혈의 예방 및 치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 8,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "stepA_inserted": 8,
+  "writeActual": {
+    "stepA_inserted": 8,
+    "demoted": 8,
+    "flipped": 8,
+    "audited": 8
+  },
+  "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "deprecatedEasy": 8,
+    "dup": 0
+  }
+}

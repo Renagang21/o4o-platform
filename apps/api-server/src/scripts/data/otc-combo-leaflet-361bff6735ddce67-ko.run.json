@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "베스타제당의정|A09AA02|75밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "7422b57b-c191-1baa-a0c8-08a6957da6ed",
+  "expected": 10,
+  "anomalies": [],
+  "fetched": 10,
+  "easyCanonicalExactly1": 10,
+  "authoredConflict": 0,
+  "anyCanonical": 10,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1474,
+  "htmlMd5": "267c37906f9899fa2d8155650337bca6",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 10,
+    "STEP_B_easy_demote": 10,
+    "STEP_B_authored_flip": 10,
+    "audit": 10
+  },
+  "stepA_inserted": 10,
+  "writeActual": {
+    "stepA_inserted": 10,
+    "demoted": 10,
+    "flipped": 10,
+    "audited": 10
+  },
+  "post": {
+    "canonical1": 10,
+    "authored": 10,
+    "deprecatedEasy": 10,
+    "dup": 0
+  }
+}

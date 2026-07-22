@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "맥스타민콘드로800정|A11JC|800밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "8f2b36a9-118f-7412-7120-def9b4be52fa",
+  "expected": 9,
+  "anomalies": [],
+  "fetched": 9,
+  "easyCanonicalExactly1": 9,
+  "authoredConflict": 0,
+  "anyCanonical": 9,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1809,
+  "htmlMd5": "5c832c674665ac81418d620b4cae3899",
+  "summary": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 9,
+    "STEP_B_easy_demote": 9,
+    "STEP_B_authored_flip": 9,
+    "audit": 9
+  },
+  "stepA_inserted": 9,
+  "writeActual": {
+    "stepA_inserted": 9,
+    "demoted": 9,
+    "flipped": 9,
+    "audited": 9
+  },
+  "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "deprecatedEasy": 9,
+    "dup": 0
+  }
+}

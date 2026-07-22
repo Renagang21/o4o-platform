@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "복합우루사연질캡슐|A13A|300밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "d4e0c975-2d53-6856-83d9-efd55992f2c9",
+  "expected": 11,
+  "anomalies": [],
+  "fetched": 11,
+  "easyCanonicalExactly1": 11,
+  "authoredConflict": 0,
+  "anyCanonical": 11,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1488,
+  "htmlMd5": "2a7c7a75d9ab5075ca381caf78d97db9",
+  "summary": "육체피로 개선, 자양강장, 병중ㆍ병후의 비타민 B1 보급",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 11,
+    "STEP_B_easy_demote": 11,
+    "STEP_B_authored_flip": 11,
+    "audit": 11
+  },
+  "stepA_inserted": 11,
+  "writeActual": {
+    "stepA_inserted": 11,
+    "demoted": 11,
+    "flipped": 11,
+    "audited": 11
+  },
+  "post": {
+    "canonical1": 11,
+    "authored": 11,
+    "deprecatedEasy": 11,
+    "dup": 0
+  }
+}

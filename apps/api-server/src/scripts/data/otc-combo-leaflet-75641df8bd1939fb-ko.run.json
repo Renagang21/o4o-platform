@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "스피자임정|A09AA|25밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d29a6658-065d-e6f5-0f8c-815793699374",
+  "expected": 9,
+  "anomalies": [],
+  "fetched": 9,
+  "easyCanonicalExactly1": 9,
+  "authoredConflict": 0,
+  "anyCanonical": 9,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1511,
+  "htmlMd5": "0e57810c20d01157d357b78d84880282",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부(상복부)팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 9,
+    "STEP_B_easy_demote": 9,
+    "STEP_B_authored_flip": 9,
+    "audit": 9
+  },
+  "stepA_inserted": 9,
+  "writeActual": {
+    "stepA_inserted": 9,
+    "demoted": 9,
+    "flipped": 9,
+    "audited": 9
+  },
+  "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "deprecatedEasy": 9,
+    "dup": 0
+  }
+}

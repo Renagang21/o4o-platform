@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "베스타제포르테정|A09AA02|15밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "0666ed4b-c5e1-f341-3336-5e318556af01",
+  "expected": 11,
+  "anomalies": [],
+  "fetched": 11,
+  "easyCanonicalExactly1": 11,
+  "authoredConflict": 0,
+  "anyCanonical": 11,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1417,
+  "htmlMd5": "f0cb8541c350a4f65db1f6b6c6cf936b",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 11,
+    "STEP_B_easy_demote": 11,
+    "STEP_B_authored_flip": 11,
+    "audit": 11
+  },
+  "stepA_inserted": 11,
+  "writeActual": {
+    "stepA_inserted": 11,
+    "demoted": 11,
+    "flipped": 11,
+    "audited": 11
+  },
+  "post": {
+    "canonical1": 11,
+    "authored": 11,
+    "deprecatedEasy": 11,
+    "dup": 0
+  }
+}

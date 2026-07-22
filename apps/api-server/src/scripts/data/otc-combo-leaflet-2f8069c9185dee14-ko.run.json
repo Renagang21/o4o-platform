@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "윈탈정|A02AX|40밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "a21e3a73-7406-0d07-8129-4b1084d92ff1",
+  "expected": 9,
+  "anomalies": [],
+  "fetched": 9,
+  "easyCanonicalExactly1": 9,
+  "authoredConflict": 0,
+  "anyCanonical": 9,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1857,
+  "htmlMd5": "8cf19eb55b2315a77ade8605a209461d",
+  "summary": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 9,
+    "STEP_B_easy_demote": 9,
+    "STEP_B_authored_flip": 9,
+    "audit": 9
+  },
+  "stepA_inserted": 9,
+  "writeActual": {
+    "stepA_inserted": 9,
+    "demoted": 9,
+    "flipped": 9,
+    "audited": 9
+  },
+  "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "deprecatedEasy": 9,
+    "dup": 0
+  }
+}

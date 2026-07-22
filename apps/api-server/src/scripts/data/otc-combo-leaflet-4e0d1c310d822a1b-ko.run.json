@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "마그칼연질캡슐|A12AX|590밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "7d496d43-3e03-a54a-7384-0353d6d34c51",
+  "expected": 10,
+  "anomalies": [],
+  "fetched": 10,
+  "easyCanonicalExactly1": 10,
+  "authoredConflict": 0,
+  "anyCanonical": 10,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1799,
+  "htmlMd5": "b399582335049a39ec6c1e2af0d586a5",
+  "summary": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 10,
+    "STEP_B_easy_demote": 10,
+    "STEP_B_authored_flip": 10,
+    "audit": 10
+  },
+  "stepA_inserted": 10,
+  "writeActual": {
+    "stepA_inserted": 10,
+    "demoted": 10,
+    "flipped": 10,
+    "audited": 10
+  },
+  "post": {
+    "canonical1": 10,
+    "authored": 10,
+    "deprecatedEasy": 10,
+    "dup": 0
+  }
+}

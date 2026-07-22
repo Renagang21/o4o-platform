@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "헵타마인플러스연질캡슐|A05BA|200밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "199e1eed-3dc5-48e3-dd1c-717a357b084a",
+  "expected": 8,
+  "anomalies": [],
+  "fetched": 8,
+  "easyCanonicalExactly1": 8,
+  "authoredConflict": 0,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1417,
+  "htmlMd5": "2c5470f0f9b812c701dd6003534c5336",
+  "summary": "만성 간질환, 간경변, 독성 간질환의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 8,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "stepA_inserted": 8,
+  "writeActual": {
+    "stepA_inserted": 8,
+    "demoted": 8,
+    "flipped": 8,
+    "audited": 8
+  },
+  "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "deprecatedEasy": 8,
+    "dup": 0
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "경남비타민씨정|A11GA01|1031밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "10bade28-381b-3dc8-fb6d-4c241a362a71",
+  "expected": 8,
+  "anomalies": [],
+  "fetched": 8,
+  "easyCanonicalExactly1": 8,
+  "authoredConflict": 0,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2005,
+  "htmlMd5": "bf8ce74aaab7847564d1479060a52999",
+  "summary": "괴혈병의 예방과 치료와 임신, 수유기 및 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 8,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "stepA_inserted": 8,
+  "writeActual": {
+    "stepA_inserted": 8,
+    "demoted": 8,
+    "flipped": 8,
+    "audited": 8
+  },
+  "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "deprecatedEasy": 8,
+    "dup": 0
+  }
+}

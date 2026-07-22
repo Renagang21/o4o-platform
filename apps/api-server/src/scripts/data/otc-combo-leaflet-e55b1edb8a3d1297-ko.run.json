@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "알파우루사연질캡슐|A05AA|50밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "ab1e2060-ee9b-34ba-3595-7454524b4c1f",
+  "expected": 11,
+  "anomalies": [],
+  "fetched": 11,
+  "easyCanonicalExactly1": 11,
+  "authoredConflict": 0,
+  "anyCanonical": 11,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1727,
+  "htmlMd5": "27d7a0670e1c65b0c3f7c96db3c863c4",
+  "summary": "만성 간질환의 간기능 개선과 간기능 장애에 의한 육체피로, 전신권태 증상의 개선",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 11,
+    "STEP_B_easy_demote": 11,
+    "STEP_B_authored_flip": 11,
+    "audit": 11
+  },
+  "stepA_inserted": 11,
+  "writeActual": {
+    "stepA_inserted": 11,
+    "demoted": 11,
+    "flipped": 11,
+    "audited": 11
+  },
+  "post": {
+    "canonical1": 11,
+    "authored": 11,
+    "deprecatedEasy": 11,
+    "dup": 0
+  }
+}

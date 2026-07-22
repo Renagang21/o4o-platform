@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "액티넘이엑스플러스정|A11DB|36.39밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "7f26ad48-587e-0347-6a40-354ab48ffbc7",
+  "expected": 8,
+  "anomalies": [],
+  "fetched": 8,
+  "easyCanonicalExactly1": 8,
+  "authoredConflict": 0,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1641,
+  "htmlMd5": "1940f1c076799fcf495b4a5c9bc74baa",
+  "summary": "육체피로, 병중ㆍ병후의 체력 저하 시, 임신ㆍ수유기의 비타민 B1, B6, B12의 보급과 눈의 피로, …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 8,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "stepA_inserted": 8,
+  "writeActual": {
+    "stepA_inserted": 8,
+    "demoted": 8,
+    "flipped": 8,
+    "audited": 8
+  },
+  "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "deprecatedEasy": 8,
+    "dup": 0
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "아로나민씨플러스정|A11JB|618.56밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "2fa17b87-b593-b8e2-15d6-397c05e220aa",
+  "expected": 8,
+  "anomalies": [],
+  "fetched": 8,
+  "easyCanonicalExactly1": 8,
+  "authoredConflict": 0,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2463,
+  "htmlMd5": "1924b3c6c819c2843580345fe7a1716b",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 8,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "stepA_inserted": 8,
+  "writeActual": {
+    "stepA_inserted": 8,
+    "demoted": 8,
+    "flipped": 8,
+    "audited": 8
+  },
+  "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "deprecatedEasy": 8,
+    "dup": 0
+  }
+}

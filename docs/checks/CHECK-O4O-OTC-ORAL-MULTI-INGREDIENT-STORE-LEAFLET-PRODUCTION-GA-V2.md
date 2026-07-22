@@ -79,6 +79,12 @@ WO-O4O-OTC-ORAL-MULTI-INGREDIENT-CONTINUOUS-PRODUCTION-GA-V3.
 - **Batch3 = 15 fp 그룹 / 271 master KO LIVE**(헤모텐 46·알마게이트 22·네오칼큐 21 등). KO 교체 271, 전량 dry-run PASS·독립검증(global ko dup 0, GA canonical_replaced audit 292=21+271). EN 후속(KO 우선).
 - 세션 누계: **22 fp 그룹 / 292 master KO**(그중 7그룹 21master EN 완결). authored_ko_canon 3,891→4,190.
 
+## 6-C. Batch 4 (V3 연속 생산) — 종료 임계 달성
+
+- **Batch4 = 25 fp 그룹 / 238 master KO LIVE**(소화효소·제산·간담즙·비타민 복합제). 결정론 composer 동일 파이프라인. 전량 dry-run PASS.
+- **세션 누계: 47 fp 그룹 / 530 master KO LIVE** — V3 종료 임계 **≥40 그룹 AND ≥400 master 동시 달성**.
+- 독립검증: GA `canonical_replaced` audit **530**(=21+271+238) · global ko dup **0** · easy∩authored canonical **0**(교체 무결). EN 완결 7그룹 21master, EN 후속 40그룹 509master(다음 재시작).
+
 ## 7. 다음 (계속 생산)
 
 후보 1,587 중 예약계열·감기약 제외, clean 균일 subgroup 부터 연속 저작·적재. 계약 안정 확인됨(3/3 PASS·독립검증 통과).

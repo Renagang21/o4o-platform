@@ -60,7 +60,8 @@ function composeKo(source){
 }
 
 const LIMIT = parseInt(process.env.LIMIT||'999',10);
-const picks = JSON.parse(readFileSync(PROD,'utf8')).filter(r=>r.pick && (FPS.length===0 || FPS.includes(r.fp))).slice(0, LIMIT);
+const OFFSET = parseInt(process.env.OFFSET||'0',10);
+const picks = JSON.parse(readFileSync(PROD,'utf8')).filter(r=>r.pick && (FPS.length===0 || FPS.includes(r.fp))).slice(OFFSET, OFFSET+LIMIT);
 const NUTR = /^(A11|A12|A13A|B03AE)/;
 const { DataSource } = await import('typeorm');
 const ds = new DataSource({ type:'postgres', host:'127.0.0.1', port:parseInt(process.env.AUDIT_DB_PORT||'5455',10), username:'o4o_api', password:pw, database:'o4o_platform', entities:[], synchronize:false, logging:['error'] });
