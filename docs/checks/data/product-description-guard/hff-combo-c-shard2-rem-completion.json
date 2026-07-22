@@ -1,0 +1,92 @@
+{
+ "wo": "Agent C — HFF shard 2 잔여 완결 생산",
+ "start": "2026-07-22 18:53:56 +0900",
+ "end": "2026-07-22 19:08:00 +0900",
+ "elapsedMin": 14,
+ "ssot": {
+  "baseline_totalComboLive": 3845,
+  "final_totalComboLive": 3936,
+  "delta": 91,
+  "ko_en_aligned": true
+ },
+ "shard": {
+  "stableHash": "FNV-1a",
+  "shardCount": 3,
+  "agent": "C",
+  "shard": 2,
+  "md5ShardForbidden": true
+ },
+ "harvest": {
+  "scanned": 41261,
+  "signaturesEligible": 1028,
+  "totalEligible": 4523,
+  "totalFresh_allShards": 893,
+  "shardFreshDist": {
+   "0": 443,
+   "1": 319,
+   "2": 131
+  },
+  "shard2_fresh": 131,
+  "shard2_sigs": 59,
+  "producedTakenSet": 7757
+ },
+ "pipeline": {
+  "pool_fresh": 131,
+  "generate_inputs": 109,
+  "auto_HOLD": 22,
+  "PASS": 96,
+  "REVIEW": 13,
+  "hidden_H1": 4,
+  "hidden_H3": 1,
+  "READY": 91,
+  "REVIEW_LATER": 13,
+  "hidden_excluded": 5
+ },
+ "holdCodes": {
+  "HOLD_GUARD_BLOCKED": 9,
+  "HOLD_MULTI_GUARD": 8,
+  "HOLD_NAME_UNGROUNDED_CLAIM": 5
+ },
+ "reviewLaterRules": {
+  "PRE-SRC-BASIS-UNVERIFIABLE-003": 12,
+  "Q-TRUNCATED-PARTIAL-005": 3
+ },
+ "apply": {
+  "expectedWrite": 364,
+  "actualWrite": 364,
+  "product_masters": 91,
+  "candidates_update": 91,
+  "shared_product_descriptions": 182,
+  "postVerify": {
+   "masters": 91,
+   "spdKo": 91,
+   "spdEn": 91,
+   "canonicalDup": 0,
+   "candidatesLinked": 91,
+   "spdRefLinked": 182
+  },
+  "skippedStmts": 0,
+  "result": "COMMIT"
+ },
+ "independentVerify": {
+  "masters": 91,
+  "regTypeHffBarcodeNull": 91,
+  "spdKo_card_ge2": 91,
+  "spdEn": 91,
+  "canonicalDupLocal": 0,
+  "candidatesLinked": 91,
+  "tagAgnostic_totalComboLive_ko": 3936,
+  "totalComboLive_en": 3936,
+  "globalCanonicalDup": 0,
+  "existingLiveDrift": 0
+ },
+ "functionalPresenceInReady": {
+  "오메가3": 29,
+  "은행잎": 1
+ },
+ "stopConditions": "none (기능성 오귀속 0·shard 교집합 0·master 오연결 0·canonical/rollback 오류 0·예상=실측 write 364·독립검증 PASS)",
+ "rollbackManifest": "hff-combo-c-shard2-rem-rollback-manifest.json",
+ "createdMasters": 91,
+ "createdSpd": 182,
+ "candIds": 91
+}
