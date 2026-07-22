@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "b3-y6-001",
+  "productName": "파워썸",
+  "productNameEn": "파워썸",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007205",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 회색의 분말이 함유된 흰색의 식물성 불투명 경질캡슐\n② 아연 : 표시량(20 mg/2,000 mg)의 80~150% \n③ 비타민B1 : 표시량(10 mg/2,000 mg)의 80~180% \n④ 비타민B2 : 표시량(10 mg/2,000 mg)의 80~180% \n⑤ 비타민B6 : 표시량(10 mg/2,000 mg)의 80~150% \n⑥ 대장균군 : 음성\n⑦ 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회색의 분말이 함유된 흰색의 식물성 불투명 경질캡슐",
+   "storage": "- 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오.- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 10mg</span><span class=\"sd-badge is-solid\">비타민 B2 10mg</span><span class=\"sd-badge is-solid\">비타민 B6 10mg</span><span class=\"sd-badge is-solid\">아연 20mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>파워썸<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 아연</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>10mg</b>, 비타민 B2 <b>10mg</b>, 비타민 B6 <b>10mg</b>, 아연 <b>20mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>10mg</b>, 비타민 B2 <b>10mg</b>, 비타민 B6 <b>10mg</b>, 아연 <b>20mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회색의 분말이 함유된 흰색의 식물성 불투명 경질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(10mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(10mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(10mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(20mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말이 함유된 흰색의 식물성 불투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오.- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 10mg</span><span class=\"sd-badge is-solid\">Vitamin B2 10mg</span><span class=\"sd-badge is-solid\">Vitamin B6 10mg</span><span class=\"sd-badge is-solid\">Zinc 20mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>파워썸<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10mg</b> of Vitamin B1, <b>10mg</b> of Vitamin B2, <b>10mg</b> of Vitamin B6, <b>20mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>10mg</b> Vitamin B1, <b>10mg</b> Vitamin B2, <b>10mg</b> Vitamin B6, <b>20mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (10mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (10mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (10mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (20mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말이 함유된 흰색의 식물성 불투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> - 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오.- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
