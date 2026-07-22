@@ -1,72 +1,10 @@
 {
-  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1 — 에이전트 가 claim 파일. 자기 소유 1개만. path-specific commit. 타 claim/config 미접촉. NUTRITION_COMBO_EN_ONLY 다효능 병렬 보존 계약(합성 금지) 대상, 비상호작용·비대형(<500) READY_PARALLEL_PRESERVE 그룹.",
+  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-10H-PRODUCTION-GA-V1 — 에이전트 가(GA) claim. 자기 소유 1개만. path-specific commit. 타 claim/config(na·da) 미접촉. 본 라운드 = 경구 복합성분 일반의약품 전수 감사. 이전 라운드(NUTRITION_COMBO_EN_ONLY 7그룹 DONE)는 git 이력·nutrition_combo CHECK 에 보존.",
   "schemaVersion": 1,
   "owner": "agent-ga",
-  "round": "production-10h-2026-07-22",
-  "track": "NUTRITION_COMBO_EN_ONLY",
-  "claims": [
-    {
-      "groupKey": "벤포벨브이|정제(combo)",
-      "sourceRef": "fcf616ee-339e-489f-9672-a431489fb1ac",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 4,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "셀레트론플러스|연질캡슐(combo)",
-      "sourceRef": "5a342fe9-1cdf-49c1-863d-84654d433720",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 5,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "눈모아|연질캡슐(combo)",
-      "sourceRef": "270a10a2-70a3-4a04-a370-9b5316c4a0b4",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 21,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "셀타골드에스|연질캡슐(combo)",
-      "sourceRef": "029b8650-257b-47bb-ae3e-a42444c39d93",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 169,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "비타콤보씨플러스|정제(combo)",
-      "sourceRef": "b21c54a6-e248-477f-bc23-f5f1a6701587",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 208,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "센트본|정제(combo)",
-      "sourceRef": "26c2af33-f6ba-4a09-a686-da8c98137aff",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 331,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "티티아민(비타민DEC복합)|정제(combo)",
-      "sourceRef": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "track": "NUTRITION_COMBO_EN_ONLY",
-      "masters": 138,
-      "op": "EN_ONLY",
-      "status": "DONE"
-    }
-  ]
+  "round": "oral-multi-ingredient-10h-2026-07-22",
+  "track": "ORAL_MULTI_INGREDIENT",
+  "verdict": "NO_NEW_BATCH",
+  "verdictNote": "경구 복합 fingerprint 클러스터 2,826 그룹/11,439 master 전수 감사 — full-source-fingerprint 안전 확장 가능 그룹 0(authored anchor 와 easy_drug 원문 disjoint). 잔여 전량 신규 저술(복합 효능 합성=신규 의료 판단) 필요 → HOLD. CHECK-O4O-OTC-ORAL-MULTI-INGREDIENT-COMBO-DISCOVERY-AUDIT-GA-V1.md.",
+  "claims": []
 }
