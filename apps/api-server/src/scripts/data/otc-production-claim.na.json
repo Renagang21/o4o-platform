@@ -30,6 +30,15 @@
       "track": "NUTRITION_COMBO_EN_ONLY",
       "masters": 18,
       "op": "EN_ONLY",
+      "status": "DONE"
+    },
+    {
+      "groupKey": "비타민C|1000mg|정제",
+      "sourceRef": "6f143bbc-ff49-4ffc-9271-42e50cf2e84d",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 25,
+      "op": "EN_ONLY",
       "status": "CLAIMED"
     }
   ]
