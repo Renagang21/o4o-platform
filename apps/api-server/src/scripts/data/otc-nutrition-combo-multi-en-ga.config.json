@@ -1,0 +1,30 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1 (에이전트 가) 자기 전용 combo EN-only config. 공용 runner=otc-nutrition-combo-en-only-runner-na.ts --config=<이 파일> --group=<key>. ko 불변·fresh 번역·다효능 병렬 보존.",
+  "round": "nutrition-combo-multi-en-3h-2026-07-22",
+  "en": {
+    "benfovel-v": {
+      "key": "벤포벨브이|정제(combo)",
+      "sourceRef": "fcf616ee-339e-489f-9672-a431489fb1ac",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 4,
+      "translationFile": "otc-en-translations-combo-multi-ga-v1.json",
+      "outBase": "otc-combo-en-only-ga-benfovel-v"
+    },
+    "seletron-plus": {
+      "key": "셀레트론플러스|연질캡슐(combo)",
+      "sourceRef": "5a342fe9-1cdf-49c1-863d-84654d433720",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 5,
+      "translationFile": "otc-en-translations-combo-multi-ga-v1.json",
+      "outBase": "otc-combo-en-only-ga-seletron-plus"
+    },
+    "nunmoa": {
+      "key": "눈모아|연질캡슐(combo)",
+      "sourceRef": "270a10a2-70a3-4a04-a370-9b5316c4a0b4",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 21,
+      "translationFile": "otc-en-translations-combo-multi-ga-v1.json",
+      "outBase": "otc-combo-en-only-ga-nunmoa"
+    }
+  }
+}

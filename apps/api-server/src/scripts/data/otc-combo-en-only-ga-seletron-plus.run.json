@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "셀레트론플러스|연질캡슐(combo)",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "5a342fe9-1cdf-49c1-863d-84654d433720",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 5,
+  "anomalies": [],
+  "targetMasters": 5,
+  "target_master_ids": [
+    "0ae40940-39f6-4355-8279-6d756ef18d06",
+    "6a3005df-0e07-4af1-a7b0-86f9c3e08c85",
+    "a6eaf7a9-45c6-4b49-9646-70c17efaf38b",
+    "ae43ebd2-fea2-4b8e-b7ec-c711e2d74ad9",
+    "d1df4a3d-16b1-48a0-bca6-0724d2e936d7"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 5,
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2520,
+  "builtMd5": "4d48e777547e43e589cbb4c6f3ac4f16",
+  "summaryField": "Nutritional supply (including vitamin A)",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_en_canonical_flip": 5,
+    "en_write_total": 10
+  },
+  "enTargetMd5": "4d48e777547e43e589cbb4c6f3ac4f16",
+  "note": "대상 en 이미 canonical · build byte-identical(4d48e777547e43e589cbb4c6f3ac4f16) — write 0"
+}

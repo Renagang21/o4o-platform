@@ -1,0 +1,35 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "벤포벨브이|정제(combo)",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "fcf616ee-339e-489f-9672-a431489fb1ac",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 4,
+  "anomalies": [],
+  "targetMasters": 4,
+  "target_master_ids": [
+    "28c84da4-b43f-4c07-b367-732fb5dae92a",
+    "4fa1a037-5c19-4f53-a54e-a56cf85a71ce",
+    "bf240ec1-c404-4da0-abb8-f65eff72d4ed",
+    "cadf9e63-fb28-4264-9da8-e8f4f1b161a6"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 4,
+  "existingEnCanonical": 4,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2751,
+  "builtMd5": "cd298d68100a6d8b6d32fc6633696612",
+  "summaryField": "Nutritional supply (including vitamin A)",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_en_canonical_flip": 4,
+    "en_write_total": 8
+  },
+  "enTargetMd5": "cd298d68100a6d8b6d32fc6633696612",
+  "note": "대상 en 이미 canonical · build byte-identical(cd298d68100a6d8b6d32fc6633696612) — write 0"
+}

@@ -1,0 +1,52 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "눈모아|연질캡슐(combo)",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "270a10a2-70a3-4a04-a370-9b5316c4a0b4",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 21,
+  "anomalies": [],
+  "targetMasters": 21,
+  "target_master_ids": [
+    "02c02e78-39c8-433c-bb3b-d154065138ab",
+    "0422b9e2-b2f8-4057-ad38-d7a1b4ba6598",
+    "15b95f6e-0d18-49c2-a2ab-12b4c5188553",
+    "18006742-0ae3-4982-ab61-f09e5a31f0c0",
+    "45c36aad-6238-43b8-b970-1cf5ba47d64b",
+    "484485d8-8379-4866-8926-c1ac2e3a9bd3",
+    "56d60f03-de12-4f00-a21b-dbba7ac9aa43",
+    "5e09a27a-c71e-4f7d-9076-3ecb63c5c773",
+    "621f5523-bad4-4477-ba6e-caabf5c008fd",
+    "6222afb7-dc53-4bc3-a674-0dd4f5e2380a",
+    "7955930f-8883-44c4-8deb-247ad8c115f0",
+    "85cbc026-af60-46cd-8428-528d33b903b8",
+    "b7360bd6-ce33-4441-9596-c7fec34120da",
+    "becf4172-5452-4ff7-952f-aadd8332b856",
+    "c2f02f76-3731-412d-a650-f10de306c4d5",
+    "c952ab09-0ebe-4e33-874a-366fab20c344",
+    "ca0d52d4-2402-40b4-8fb2-8a8726bd765d",
+    "d4091be8-556f-40af-896a-53348f42d021",
+    "f2ec1efd-8d06-408f-868f-ebfff32c7a4d",
+    "f569f6c1-7b64-49cd-82cf-4d37ebd250af",
+    "f637a6ff-c3e6-4f23-8c17-a99ee22637e7"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 21,
+  "existingEnCanonical": 21,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2635,
+  "builtMd5": "89264359539bdb5ba8b261012195d617",
+  "summaryField": "Nutritional supply (including vitamin A)",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 21,
+    "STEP2_en_canonical_flip": 21,
+    "en_write_total": 42
+  },
+  "enTargetMd5": "89264359539bdb5ba8b261012195d617",
+  "note": "대상 en 이미 canonical · build byte-identical(89264359539bdb5ba8b261012195d617) — write 0"
+}

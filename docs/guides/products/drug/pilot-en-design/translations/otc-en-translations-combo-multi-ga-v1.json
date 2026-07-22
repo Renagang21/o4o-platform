@@ -1,0 +1,73 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo(mfds_drug_otc_nutrition_combo) EN-only fresh 번역. 유일 원문=ko canonical. 다효능 병렬 보존 계약: ko 효능 축·순서 그대로 병렬 번역, 성분별 효능 합성·인과 생성 금지, 수치/연령/횟수/금기 전수 보존. sd-* 빌더(buildDrugOtcEnConsumerHtml). ko 미변경. byte-identical 참조본 없음(first-EN) → 충실번역+구조게이트+ko불변 사후검증으로 fact-0.",
+  "testLog": {
+    "벤포벨브이": {
+      "효능축(병렬 3)": "①비타민 A·B1·B2·B6·C·D·E 보급(육체피로·임신수유·병중병후·발육기·노년기) ②눈 건조/야맹증 완화 ③뼈·이 발육불량·구루병 예방 — EN 3절 병렬 유지, 합성 없음",
+      "수치·연령": "vitamin A 5,000 IU/day · 임신 3개월 · 12개월 미만 영아 — 값 불변",
+      "금기(3)": "비타민A 임신 · 아스파탐/PKU · 고칼슘혈증/신장질환/신장결석/영아 — 전수 보존, 강도 유지"
+    },
+    "셀레트론플러스": {
+      "효능축(병렬)": "비타민 A·E·B1·B2·B6·C 보급 / 눈 건조·야맹증 / 말초혈행·수족냉증 / 색소침착·잇몸·코 출혈 예방 — 병렬 유지",
+      "용법": "만 8세 이상·성인 1회 1캡슐 1일 1회 — 값 불변",
+      "금기": "비타민A 임신 5,000 IU · 대두유/콩/땅콩 과민 · 12개월 미만 — 보존"
+    },
+    "눈모아": {
+      "효능축(병렬 7)": "비타민 A·B1·B2·B6·C·E 보급 / 눈 건조·야맹증 / 신경통·근육통 / 구각염·구내염 / 색소침착·잇몸·코 출혈 예방 / 말초혈행·수족냉증 / 아연 보급 — 병렬 유지, 합성 없음",
+      "용법": "성인 1회 1캡슐 1일 2회 — 값 불변",
+      "금기": "비타민A 임신 5,000 IU · 대두유/콩/땅콩 과민 · 12개월 미만 — 보존"
+    }
+  },
+  "translations": [
+    {
+      "groupKey": "벤포벨브이|정제(combo)",
+      "title": "Multivitamin Tablet — Vitamins A, B, C, D and E (no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins A, B1, B2, B6, C, D and E during physical fatigue, pregnancy and breastfeeding, low energy during and after illness, the growth period and old age; to relieve eye dryness and night blindness; and to help prevent poor development of the bones and teeth and rickets.",
+      "usage": "Take it according to each product's strength and the age of the person; chewable forms are available for children. Follow the stated dosage.",
+      "caution": "If you take more than 5,000 IU of vitamin A a day there is a risk of birth defects, so women within the first 3 months of pregnancy or who may be pregnant should not take it. Products that contain aspartame should not be taken by people with phenylketonuria. Do not take it if you have high blood calcium, kidney disease or kidney stones, or if the child is under 12 months old.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins A, B, C, D and E (with zinc), no iron",
+        "How it works": "Supplies multiple vitamins",
+        "Main symptoms": "Nutritional supply (including vitamin A), eye dryness and night blindness, bone and teeth development",
+        "Who should be careful": "Vitamin A in pregnancy; phenylketonuria (aspartame)",
+        "Why this one": "A multivitamin that includes vitamin A"
+      }
+    },
+    {
+      "groupKey": "셀레트론플러스|연질캡슐(combo)",
+      "title": "Multivitamin Soft Capsule — Vitamins A, E, B and C (no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins A, E, B1, B2, B6 and C during physical fatigue, low energy and old age; to relieve eye dryness and night blindness; for peripheral circulation and cold hands and feet; and to help prevent skin pigmentation and bleeding of the gums and nose.",
+      "usage": "Children aged 8 or older and adults take one capsule once a day.",
+      "caution": "If you take more than 5,000 IU of vitamin A a day there is a risk of birth defects, so women within the first 3 months of pregnancy or who may be pregnant should not take it. Do not take it if you are hypersensitive to soybean oil, soy or peanuts, or if the child is under 12 months old.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins A, E, B and C, no iron",
+        "How it works": "Supplies multiple vitamins",
+        "Main symptoms": "Nutritional supply (including vitamin A), eye dryness and night blindness, peripheral circulation, prevention of pigmentation and bleeding",
+        "Who should be careful": "Vitamin A in pregnancy; soy hypersensitivity",
+        "Why this one": "A vitamin-A soft capsule"
+      }
+    },
+    {
+      "groupKey": "눈모아|연질캡슐(combo)",
+      "title": "Multivitamin Soft Capsule — Vitamins A, B, C and E (no iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins A, B1, B2, B6, C and E during physical fatigue, low energy and old age; to relieve eye dryness and night blindness; for neuralgia and muscle pain; for angular cheilitis and mouth sores; to help prevent skin pigmentation and bleeding of the gums and nose; to relieve peripheral circulation problems and cold hands and feet; and to supply zinc.",
+      "usage": "Adults take one capsule twice a day.",
+      "caution": "If you take more than 5,000 IU of vitamin A a day there is a risk of birth defects, so women within the first 3 months of pregnancy or who may be pregnant should not take it. Do not take it if you are hypersensitive to soybean oil, soy or peanuts, or if the child is under 12 months old.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins A, B, C and E (with zinc), no iron",
+        "How it works": "Supplies multiple vitamins and zinc",
+        "Main symptoms": "Nutritional supply (including vitamin A), eye dryness and night blindness, neuralgia and muscle pain, mouth sores, peripheral circulation",
+        "Who should be careful": "Vitamin A in pregnancy; soy hypersensitivity",
+        "Why this one": "A vitamin-A soft capsule"
+      }
+    }
+  ],
+  "summary": "Nutritional supply (including vitamin A)"
+}
