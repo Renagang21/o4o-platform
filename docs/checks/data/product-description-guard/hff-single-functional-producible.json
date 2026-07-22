@@ -1,0 +1,102 @@
+{
+ "scanned": 41261,
+ "pureSingleTotal": 867,
+ "shardCount": 3,
+ "ranked": [
+  {
+   "key": "프로바이오틱스",
+   "raw": 643,
+   "pureSingle": 643,
+   "pureSingleSolidAvail": 403,
+   "produced": 234,
+   "liquid": 12,
+   "shard": 1
+  },
+  {
+   "key": "바나바잎추출물",
+   "raw": 51,
+   "pureSingle": 51,
+   "pureSingleSolidAvail": 46,
+   "produced": 0,
+   "liquid": 5,
+   "shard": 1
+  },
+  {
+   "key": "포스파티딜세린",
+   "raw": 46,
+   "pureSingle": 46,
+   "pureSingleSolidAvail": 46,
+   "produced": 0,
+   "liquid": 0,
+   "shard": 1
+  },
+  {
+   "key": "히알루론산",
+   "raw": 41,
+   "pureSingle": 41,
+   "pureSingleSolidAvail": 30,
+   "produced": 0,
+   "liquid": 11,
+   "shard": 1
+  },
+  {
+   "key": "헤마토코쿠스추출물",
+   "raw": 20,
+   "pureSingle": 20,
+   "pureSingleSolidAvail": 20,
+   "produced": 0,
+   "liquid": 0,
+   "shard": 1
+  },
+  {
+   "key": "쏘팔메토열매추출물",
+   "raw": 19,
+   "pureSingle": 19,
+   "pureSingleSolidAvail": 19,
+   "produced": 0,
+   "liquid": 0,
+   "shard": 2
+  },
+  {
+   "key": "홍경천추출물",
+   "raw": 13,
+   "pureSingle": 13,
+   "pureSingleSolidAvail": 13,
+   "produced": 0,
+   "liquid": 0,
+   "shard": 2
+  },
+  {
+   "key": "회화나무열매추출물",
+   "raw": 13,
+   "pureSingle": 13,
+   "pureSingleSolidAvail": 13,
+   "produced": 0,
+   "liquid": 0,
+   "shard": 2
+  },
+  {
+   "key": "홍국",
+   "raw": 13,
+   "pureSingle": 13,
+   "pureSingleSolidAvail": 12,
+   "produced": 0,
+   "liquid": 1,
+   "shard": 1
+  },
+  {
+   "key": "대두이소플라본",
+   "raw": 8,
+   "pureSingle": 8,
+   "pureSingleSolidAvail": 6,
+   "produced": 0,
+   "liquid": 2,
+   "shard": 2
+  }
+ ],
+ "shardTotals": {
+  "1": 557,
+  "2": 51
+ },
+ "grandProducible": 608
+}

@@ -4,6 +4,12 @@
  *
  * apply 의 in-transaction postVerify 와 **독립**된 새 연결에서 tag 기준 재검증.
  * 대상 tag = batch:single-nutrient-${slug}. 기존 복합형 193 무변경 확인 포함.
+ *
+ * ⚠️ DEPRECATED (전역 집계 한정) — `totalComboLive`/`existingTotal` 의 **combo-% 접두 + allowlist** 집계는
+ *    폐기한다. 실측(2026-07-21): tag-agnostic 3,845 vs combo-% 접두 2,923 → **922 과소집계**.
+ *    batch tag 종류가 368종이라 allowlist 유지 불가. **전역 복합형 LIVE 집계는 반드시**
+ *    `hff-combo-live-verify.ts` (tag-agnostic 정본: STORE·canonical·ko·o4o_hff_generated·카드≥2·distinct master) 를 사용한다.
+ *    본 스크립트의 `--slug --expect` **단일 배치 postVerify** 용도(해당 slug master 수 == expect)만 유효하게 유지한다.
  */
 import '../env-loader.js';
 import { DataSource } from 'typeorm';
