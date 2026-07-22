@@ -1,0 +1,109 @@
+{
+ "wo": "Agent C — HFF 완결형 생산 Batch 3 (shard 2, FNV-1a)",
+ "start": "2026-07-22 14:41:02 +0900",
+ "end": "2026-07-22 14:52:46 +0900",
+ "elapsedMin": 12,
+ "baseCommit": "cf95b9d5c",
+ "shard": {
+  "hash": "FNV-1a",
+  "shardCount": 3,
+  "mine": 2,
+  "freshDist": {
+   "shard0": 238,
+   "shard1": 114,
+   "shard2": 248
+  }
+ },
+ "tooling": "hff-combo-select --shard 2 --shard-count 3 --exclude-taken --statement-nos-file (공식 계약). 발견=hff-combo-c-harvest(drift-0 검증). md5 미사용.",
+ "poolExhaustion": "shard 2 미승격 fresh 187 (104 그룹) — 3차 병렬 생산으로 풀 고갈. exclude-taken 이 272 후보 중 86 DB-taken 제거 → 186 eligible. 목표 500 은 풀 부족으로 미달(시간 아닌 풀 한계).",
+ "funnel": {
+  "shard2Groups": 104,
+  "selectEligible": 186,
+  "generate": {
+   "written": 181,
+   "autoHold": 5
+  },
+  "hiddenH1": 2,
+  "hiddenH3": 0,
+  "reviewLater": 3,
+  "READY": 178
+ },
+ "mgaRecovery": {
+  "veInReady": 29,
+  "mgaTErecovered": 7,
+  "ugRAErecovered": 2,
+  "totalRecovered": 9,
+  "note": "Agent B cf95b9d5c mga-TE 숫자인접 보강으로 비타민E 복구. batch-2 H1 16건은 신 signature 가 shard 0/1 로 가 본 shard 밖."
+ },
+ "residualParserGap": {
+  "h1": 2,
+  "variants": [
+   "9mgɑ-TE (Latin ɑ U+0271, α아님)",
+   "11mg α-TE-/ (α-TE 뒤 trailing dash)"
+  ],
+  "action": "2건 REVIEW_LATER 제외, 별도 파서 WO 권고"
+ },
+ "reviewLater": {
+  "count": 3,
+  "items": [
+   {
+    "statementNo": "20040015104218",
+    "productName": "우리 아이(eye) 튼튼",
+    "group": "cb3",
+    "rules": [
+     "HIDDEN_INGREDIENT_H1"
+    ]
+   },
+   {
+    "statementNo": "200700170352120",
+    "productName": "유판씨 멀티 구미 딸기맛",
+    "group": "cb3",
+    "rules": [
+     "HIDDEN_INGREDIENT_H1"
+    ]
+   },
+   {
+    "statementNo": "20040020020222",
+    "productName": "활기찬청춘애멀티비타",
+    "group": "cb3",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   }
+  ]
+ },
+ "write": {
+  "committed": 178,
+  "product_masters": 178,
+  "product_candidates_update": 178,
+  "spd_ko": 178,
+  "spd_en": 178,
+  "total": 712
+ },
+ "apply": {
+  "result": "COMMIT 완료 (자동 apply — 게이트 전통과)",
+  "skipped": 0,
+  "inTxnPostVerify": {
+   "masters": 178,
+   "spdKo": 178,
+   "spdEn": 178,
+   "canonicalDup": 0,
+   "candidatesLinked": 178,
+   "spdRefLinked": 356
+  }
+ },
+ "independentVerify": {
+  "masters": 178,
+  "spdKo": 178,
+  "spdEn": 178,
+  "canonicalDup": 0,
+  "candidatesLinked": 178,
+  "sourceHff": 356,
+  "pass": true
+ },
+ "comboLiveFinalSSOT": 2782,
+ "existingLiveDrift": 0,
+ "canonicalDup": 0,
+ "throughputPerHour": 890,
+ "rollbackManifest": "manifests/hff-combo-c-batch3-apply-rollback-manifest.json (masters 178·spd 356)"
+}
