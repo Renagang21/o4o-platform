@@ -1,0 +1,528 @@
+{
+  "wo": "WO-O4O-OTC-FEXOFENADINE-120MG-REHARVEST-AND-CLOSEOUT-NA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "group": "펙소페나딘염산염|120밀리그램|정",
+  "bridge_n_recorded": 5,
+  "bridgeSplit": {
+    "targetFpEntry": {
+      "fp": "078e29228e12cc30",
+      "size": 14,
+      "counts": {
+        "안전지문불일치": 9,
+        "authored그대로확장": 5
+      }
+    },
+    "allEntries": [
+      {
+        "fp": "078e29228e12cc30",
+        "size": 14,
+        "counts": {
+          "안전지문불일치": 9,
+          "authored그대로확장": 5
+        }
+      },
+      {
+        "fp": "10dfbe57ec1048a1",
+        "size": 5,
+        "counts": {
+          "안전지문불일치": 5
+        }
+      },
+      {
+        "fp": "4e73cfa1f9627072",
+        "size": 3,
+        "counts": {
+          "안전지문불일치": 3
+        }
+      },
+      {
+        "fp": "b93e8446bdda44b3",
+        "size": 3,
+        "counts": {
+          "안전지문불일치": 3
+        }
+      },
+      {
+        "fp": "07a012f62eb865bd",
+        "size": 2,
+        "counts": {
+          "안전지문불일치": 2
+        }
+      },
+      {
+        "fp": "90e8282342ac679e",
+        "size": 2,
+        "counts": {
+          "안전지문불일치": 2
+        }
+      }
+    ]
+  },
+  "safety_fingerprint_mismatch": 9,
+  "authored_expand_bucket": 5,
+  "live_easy_source_present": false,
+  "reharvest": {
+    "coarseTotal": 63,
+    "targetFp": "078e29228e12cc30",
+    "liveCount": 0,
+    "newCount": 14,
+    "sameCoarseDiffFpCount": 49,
+    "noFpCount": 34,
+    "anomalyCount": 0,
+    "fpKinds": 6,
+    "fpDistribution": [
+      {
+        "fp": "078e29228e12cc30",
+        "n": 14,
+        "authored": 0,
+        "easy": 14,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": true
+      },
+      {
+        "fp": "10dfbe57ec1048a1",
+        "n": 5,
+        "authored": 0,
+        "easy": 5,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": false
+      },
+      {
+        "fp": "b93e8446bdda44b3",
+        "n": 3,
+        "authored": 0,
+        "easy": 3,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": false
+      },
+      {
+        "fp": "4e73cfa1f9627072",
+        "n": 3,
+        "authored": 0,
+        "easy": 3,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": false
+      },
+      {
+        "fp": "90e8282342ac679e",
+        "n": 2,
+        "authored": 0,
+        "easy": 2,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": false
+      },
+      {
+        "fp": "07a012f62eb865bd",
+        "n": 2,
+        "authored": 0,
+        "easy": 2,
+        "indKinds": 1,
+        "dosKinds": 1,
+        "cauKinds": 1,
+        "target": false
+      }
+    ],
+    "live_source_ref_ids": [],
+    "live_authored_md5_kinds": 0,
+    "live_en_md5_kinds": 0,
+    "live_en_canon_count": 0,
+    "new_authored_existing": 0,
+    "new_en_existing": 0,
+    "target_master_ids": [
+      "004846f0-2d72-402a-b53b-070da950a9fa",
+      "2c67c53a-daee-4d21-830b-2679fbfa6ee9",
+      "47eddfa5-8c86-4c02-8a49-4a94f734f94e",
+      "4f022fb1-51c7-4718-a6cc-ff4a1d197cfc",
+      "5ef35aeb-3331-4879-8237-bef0a405fbeb",
+      "6d24a3d1-1281-4968-8a85-331fd2982c1d",
+      "76ec30d5-7af2-42ed-88ec-94015823617d",
+      "7c3764ab-871f-4c23-974c-efb8d1d7622e",
+      "81b00b49-a899-4521-b6c5-411a9b96e641",
+      "a40b4774-1f4b-4257-add2-08d883e42472",
+      "ad64c6f4-7201-4a46-a04a-b666ffdc389e",
+      "aea3df10-7442-4a46-bcd1-b2f03979ad6e",
+      "b8aa79eb-25a0-4542-bb32-9ef2cf394cb4",
+      "fb8ab742-e650-4eda-8af0-f9d919aeff53"
+    ],
+    "live_master_ids": [],
+    "diffFp_master_ids": [
+      {
+        "id": "04b99bf7-057b-4d6e-a24a-5637fdfce224",
+        "name": "알레티브정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "0a4a9417-8f30-4829-b3ce-000ac85fce71",
+        "name": "노즈진정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "1f66b821-1cb3-4a19-954e-bfde51438a40",
+        "name": "알러비스정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "29df15a2-a750-40f1-b48d-78f1f3c612a2",
+        "name": "알러딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": "b93e8446bdda44b3",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "2a1929b8-3bb2-4cab-943f-bc5a04f16e23",
+        "name": "알레티브정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "37b14031-92c8-45ed-bb93-351eab165a78",
+        "name": "펙소틴정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "3a1ab44b-2eae-483c-a8e5-068ee12dd996",
+        "name": "알레티브정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "4903cda8-1804-4611-a35e-14093cf40113",
+        "name": "알페딘정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "4a92e2f5-7755-4d1c-b9e1-2d696f0b8565",
+        "name": "알레스타정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": "90e8282342ac679e",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "4e197717-98f7-4d03-91dc-9d6802937b46",
+        "name": "노즈진정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "4e577e72-9b31-4b50-a907-8c9f0e1d48a1",
+        "name": "알페나딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "5b35c37e-8d02-4d9f-af0a-17e7ef6fe1a6",
+        "name": "알레톡정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "615d2144-0488-476b-8e9b-7cd2b113403f",
+        "name": "알러비스정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0 / 정",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "62662539-2187-4e19-8532-8667a280542c",
+        "name": "알레펙정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": "10dfbe57ec1048a1",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "7b59f269-8e9d-4892-8462-66714b15c400",
+        "name": "알레톡정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "7c815e17-ccee-433c-8411-94578f344260",
+        "name": "알레지엔정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": "4e73cfa1f9627072",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "80be44e9-23c3-4232-861c-e83b9b985602",
+        "name": "네오펙소정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "8299d7af-04b4-4475-ba2c-8e7af262476d",
+        "name": "알레스타정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": "90e8282342ac679e",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "86153f2e-313f-431b-a1bd-5f8e0cf2b22a",
+        "name": "펙소틴정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "873662ee-b796-4659-9cde-3475f64f0b66",
+        "name": "알레펙정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": "10dfbe57ec1048a1",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "8761c7fb-422f-4355-a9a7-ea8ba41232ea",
+        "name": "알페딘정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "8ff3c6bc-1e07-487b-bd5f-f78dd67b975e",
+        "name": "알레드제로정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": "07a012f62eb865bd",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "9026e2f9-9b9f-479f-9375-8caab9c0f0e3",
+        "name": "알러비스정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "945f2ca1-20b3-4e49-a748-5925d3fe68f4",
+        "name": "알페딘정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "a87d77e0-ba5b-4a52-9b72-d709dc91e1df",
+        "name": "네오펙소정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "aa55a4a1-cfb9-4e81-8970-5a6d10595986",
+        "name": "노즈진정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "ab3a97cf-ab9d-4be1-bbb4-c2afed86efaf",
+        "name": "알레펙정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": "10dfbe57ec1048a1",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "abc39509-bb38-434c-932f-21fcfeb41ae0",
+        "name": "알레톡정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "abcc3e77-5f92-45b4-bf01-4df7c1743320",
+        "name": "알레드제로정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": "07a012f62eb865bd",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "b7587600-98aa-4044-9859-4660e564829f",
+        "name": "알러나딘정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "b9acb79b-7313-4450-93ac-3e9660e499e5",
+        "name": "알페나딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "ba2bc6a8-884a-4cdd-84d1-f2c437d21bb4",
+        "name": "네오펙소정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "bacf19f3-ee33-4229-8b6c-970c87500537",
+        "name": "알페나딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "bd6d7e3b-067a-4325-8066-7bf5b37b7a82",
+        "name": "알레펙정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": "10dfbe57ec1048a1",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "c29c8aca-3d59-4b8d-9041-92a69755afdf",
+        "name": "네오펙소정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "d1cdebda-8c94-4f14-aec6-ddc91c4b57c1",
+        "name": "알러딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": "b93e8446bdda44b3",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "d88fd752-9d75-4af6-a54b-c57ad74d2ae0",
+        "name": "알레지엔정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": "4e73cfa1f9627072",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "d8f26e48-99fc-421f-9dff-d820cce517fb",
+        "name": "알레티브정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "da5e9164-d862-4d0b-baad-498e3d227f64",
+        "name": "노즈진정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "dcb447cd-96fe-490f-85df-11211045d340",
+        "name": "펙시그라정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "e4343200-b84f-43a7-8810-08786a8c6ca1",
+        "name": "알레펙정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": "10dfbe57ec1048a1",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "e9dcfbc1-4f9b-4736-abe5-ef4201dad0a1",
+        "name": "알러비스정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "ea2dfeee-fd2e-43a7-a941-81a045da5ba1",
+        "name": "알러딘정(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 300 / 정 / 병",
+        "fp": "b93e8446bdda44b3",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "eecb5630-6f4c-4c24-8777-3474cf792a46",
+        "name": "알러나딘정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 10 / 정 / PTP",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "f34bd97e-5a85-4686-9c97-5a4f600a13cb",
+        "name": "펙소틴정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "f83c7a64-becf-4bc8-85ef-399ce8168838",
+        "name": "노즈진정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "f9c495f9-8ec4-4188-9941-535e82ac4b06",
+        "name": "알레지엔정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 30 / 정 / 병",
+        "fp": "4e73cfa1f9627072",
+        "ko_src": "mfds_easy_drug"
+      },
+      {
+        "id": "faa178eb-a065-4f05-9506-3b5b727b184c",
+        "name": "알레톡정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 100 / 정 / 병",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      },
+      {
+        "id": "fb9aa15b-0500-4b4f-91e3-a287078c6e2a",
+        "name": "네오펙소정120밀리그램(펙소페나딘염산염)",
+        "spec": "120밀리그램 / 0",
+        "fp": null,
+        "ko_src": "mfds_drug_otc"
+      }
+    ]
+  },
+  "gate": {
+    "fingerprint_single_kind": true,
+    "live_and_new_same_fp": false,
+    "ingredient_strength_form_route_uniform": true,
+    "efficacy_usage_caution_identical": true,
+    "other_zero": false,
+    "en_builder_byte_identical_reusable": false,
+    "new_no_existing_authored_or_en": true,
+    "live_authored_content_single": false,
+    "live_ref_single": false,
+    "no_safety_fingerprint_mismatch": false,
+    "live_easy_source_verifiable": false
+  },
+  "gatePass": false,
+  "cause": "CONTENT_VARIANT",
+  "expected_write_if_ready": {
+    "T": 14,
+    "ko": 56,
+    "en": 28,
+    "total": 84
+  },
+  "actual_write": 0,
+  "verdict": "HOLD_REVIEW_LATER"
+}
