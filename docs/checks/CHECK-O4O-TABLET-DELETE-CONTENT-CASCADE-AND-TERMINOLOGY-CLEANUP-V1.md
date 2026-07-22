@@ -67,10 +67,21 @@ DELETE /store/screen-sets/c2717d9d 200 ✅ (archive 성공 — 이전 orphan의 
 
 - part2 smoke 테스트 데이터: 태블렛 d113a0da(is_active=false) + 세트 c2717d9d(archived) → 앱 soft-delete 로 정리 완료. **신규 cascade 로 orphan 미형성**(연결·current 자동 정리) — LAST-MILE WO 와 달리 잔여 orphan 0.
 
-## 8. 잔여 테스트 데이터(bfcc2bf8) 정리 — 별도 승인 대기(정직 기록)
+## 8. 잔여 테스트 데이터(bfcc2bf8) 정리 — ✅ 완료 (정정 트랜잭션, 사용자 승인)
 
-- LAST-MILE WO 의 잔여 사본 `bfcc2bf8`(현재 미적용, 삭제된 태블렛 4f48e392 의 orphan current+corner_contents 로 archive 차단)은 **본 배포 이전에 형성된 과거 orphan** 이라 §범위 2(과거 일괄정리 없음)에 따라 자동 정리되지 않는다.
-- read-only 재확인 결과 승인된 계획과 **메커니즘이 상이**(corner_contents 는 deleted_at 없어 soft-delete 불가 → hard DELETE 필요 + 소프트삭제 태블렛의 current 참조 clear 추가). 사용자 지정 중지 조건("대상·관계가 보고와 다르면 DB write 없이 중지")에 해당 → **DB write 중지**. 정정된 최소 트랜잭션(태블렛 current=NULL + corner_contents DELETE + set deleted_at)으로 재승인 후 처리 예정.
+LAST-MILE WO 의 잔여 사본 `bfcc2bf8`(과거 orphan — 본 cascade 배포 이전 형성, §범위 2에 따라 자동 정리 대상 아님)을 사용자 승인 하에 정정된 최소 단일 트랜잭션으로 정리했다. `store_tablet_corner_contents`·`store_tablets` 에 `deleted_at` 컬럼이 없어 연결 행은 **hard DELETE 불가피**(기존 수동 연결 해제와 동일 계약).
+
+**대상(각 1건, read-only 6-가드 사전 확인 후 진행)**: 태블렛 `4f48e392`(is_active=false·current=bfcc2bf8), orphan corner_contents `019e81b0`(tablet=4f48e392·set=bfcc2bf8, 유일), set `bfcc2bf8`(origin=store·미삭제·QR is_active=true). 활성 태블렛 참조 0.
+
+**단일 트랜잭션(각 write 관계·상태 WHERE 포함, rowcount≠1 시 RAISE→ROLLBACK; 4단계 모두 =1 확인 후 COMMIT)**:
+1. `store_tablets` 4f48e392 `current_screen_set_id = NULL` (rc=1)
+2. `store_tablet_corner_contents` 019e81b0 **hard DELETE** (rc=1) — deleted_at 컬럼 없어 불가피
+3. `store_tablet_screen_sets` bfcc2bf8 `deleted_at = NOW(), status='archived', updated_at=NOW()` (rc=1) — 공식 archive 계약과 동일
+4. `store_qr_codes` (screen_set·bfcc2bf8) `is_active = false` (rc=1) — 공식 archive 의 `setScreenSetQrActive(false)` 와 동일
+
+**독립 사후검증 — 전항목 PASS**: 4f48e392 current=NULL · 019e81b0 잔존 0 · bfcc2bf8 status=archived·deleted_at 설정 · 활성 태블렛 참조 0 · bfcc2bf8 corner_contents 0(orphan 0) · QR is_active=false · **보호 샘플 태블렛 2건(current 포함) 불변** · 대상 외 변경 0 · 테스트 데이터 순증 0. **코드·재배포 없음(문서만).**
+
+> DB 접속 정정: 로컬 `apps/api-server/.env` 의 `DB_PASSWORD` 는 빈 값·`DB_USERNAME=o4o_user`(프로덕션 사용자는 **o4o_api**, 비밀번호는 Cloud Run env). 본 정리·검증은 올바른 프로덕션 DB 사용자로 정상 접속해 수행했다(자격증명 값은 문서·로그·커밋 미기록).
 
 ## 9. CHECK·commit·push
 
