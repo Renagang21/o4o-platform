@@ -1,0 +1,18 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-LARGE-GROUP-2H-DA-V1 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉.",
+  "schemaVersion": 1,
+  "owner": "agent-da",
+  "round": "nutrition-combo-large-2h-2026-07-22",
+  "track": "NUTRITION_COMBO_EN_ONLY",
+  "claims": [
+    {
+      "groupKey": "진셀몬큐디플러스연질캡슐",
+      "sourceRef": "d29b1340-498e-4128-b6e1-b667e0135035",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 585,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
+    }
+  ]
+}
