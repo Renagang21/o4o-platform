@@ -52,11 +52,43 @@ export async function* dbCandidateSource(port: number, username?: string, passwo
 }
 
 /**
+ * statementNo 직접 주입 소스 — shard-plan 이 산출한 대상 STTEMNT_NO 만 fetch(ILIKE 전수 스캔 제거).
+ * 결과 row 형태는 dbCandidateSource 와 동일(raw_payload->'source') → 하위 strict 검증 경로 무변경.
+ */
+export async function* dbStmtListSource(port: number, username: string | undefined, password: string | undefined, database: string | undefined, stmts: string[]): AsyncGenerator<HffRawItem> {
+  const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port, username, password, database, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 300000 } });
+  await ds.initialize();
+  const uniq = [...new Set(stmts.filter((s) => s && s.trim()))];
+  console.error(`[source] DB 직접주입 STTEMNT_NO ${uniq.length}건 (ILIKE 스캔 없음)`);
+  try {
+    const CHUNK = 1000;
+    for (let i = 0; i < uniq.length; i += CHUNK) {
+      const slice = uniq.slice(i, i + CHUNK);
+      const rows: Array<{ src: HffRawItem }> = await ds.query(
+        `SELECT raw_payload->'source' AS src FROM product_candidates
+          WHERE source_label='MFDS_HEALTH_FUNCTIONAL_FOOD' AND deleted_at IS NULL
+            AND raw_payload->'source'->>'STTEMNT_NO' = ANY($1::text[])`, [slice]);
+      for (const r of rows) if (r.src) yield r.src;
+    }
+  } finally { await ds.destroy(); }
+}
+
+/**
  * --source db|file 선택 + 실사용 소스 로그.
  * **기본 = db**(product_candidates.raw_payload — 동치검증 PASS, G: 비의존). `--source file` 로 파일 raw(회귀/대조).
+ * `--statement-nos-file <path>`(JSON 배열 또는 개행 목록) 지정 시 **직접 주입 소스**(ILIKE 스캔 제거) — baseLike 무시.
  * 파일 부재 시 자동 전환 없음 — 명시적 선택만.
  */
 export function resolveSource(argv: string[], env: NodeJS.ProcessEnv, baseLike?: string[]): { kind: 'db' | 'file'; gen: AsyncGenerator<HffRawItem>; label: string } {
+  const si = argv.indexOf('--statement-nos-file');
+  if (si >= 0 && argv[si + 1]) {
+    const path = argv[si + 1];
+    const raw = fs.readFileSync(path, 'utf8').trim();
+    const stmts: string[] = raw.startsWith('[') ? JSON.parse(raw) : raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    const port = parseInt(env.PROXY_PORT ?? '5446', 10);
+    console.error(`[source] DB 직접주입(statement-nos-file ${path}, ${stmts.length}건, proxy ${port})`);
+    return { kind: 'db', gen: dbStmtListSource(port, env.DB_USERNAME, env.DB_PASSWORD, env.DB_NAME, stmts), label: `db:stmtList@${port}` };
+  }
   const i = argv.indexOf('--source'); const kind = (i >= 0 && argv[i + 1] === 'file') ? 'file' : 'db';
   if (kind === 'db') {
     const port = parseInt(env.PROXY_PORT ?? '5446', 10);
