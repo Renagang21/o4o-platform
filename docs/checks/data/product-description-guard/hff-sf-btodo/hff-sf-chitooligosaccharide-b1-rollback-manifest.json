@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-chitooligosaccharide-b1",
+  "createdMasters": [
+    "5cadfaec-37b0-483a-be03-1ea04926643f",
+    "59bacba3-06dc-4168-acee-7da47e816197"
+  ],
+  "createdSpd": [
+    "13ee37f7-eb77-4ba9-9f7a-e0b0c0ffe9fa",
+    "0771ee8e-2dcf-4d93-b503-b34ba3bc2d3b",
+    "9d6c102c-e129-4fc0-a7ff-05302f266d0b",
+    "d822a209-80ed-47c1-963f-8ac38b9a1c45"
+  ],
+  "candIds": [
+    "5b741359-e912-4a56-b939-6b9f0803333f",
+    "8d0e99fe-1cc7-4ec8-970c-6b9a28cf9d31"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "5b741359-e912-4a56-b939-6b9f0803333f",
+      "stmt": "20040015083728",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8d0e99fe-1cc7-4ec8-970c-6b9a28cf9d31",
+      "stmt": "20040017006270",
+      "prev_status": "pending"
+    }
+  ]
+}

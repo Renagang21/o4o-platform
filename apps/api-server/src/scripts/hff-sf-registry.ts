@@ -34,6 +34,9 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '홍국': { key: '홍국', slug: 'red-yeast-rice', displayKo: '홍국', displayEn: 'Red yeast rice', labelRe: /홍국/, statusHint: 'READY' },
   '로즈힙': { key: '로즈힙', slug: 'rosehip', displayKo: '로즈힙', displayEn: 'Rosehip', labelRe: /로즈힙/, statusHint: 'READY' },
   '키토올리고당': { key: '키토올리고당', slug: 'chitooligosaccharide', displayKo: '키토올리고당', displayEn: 'Chitooligosaccharide', labelRe: /키토올리고/, statusHint: 'READY' },
+  // ── B TODO 추가 대사(체지방) 계열: EN=mapFunctionEn '체지방 감소' HIT, displayEn=표준 식물명 lookup(§3)
+  '콜레우스포스콜리': { key: '콜레우스포스콜리', slug: 'coleus-forskohlii', displayKo: '콜레우스포스콜리 추출물', displayEn: 'Coleus forskohlii extract', labelRe: /콜레우스\s*포스콜리|포스콜린/, statusHint: 'READY' },
+  '돌외잎': { key: '돌외잎', slug: 'gynostemma', displayKo: '돌외잎 추출물', displayEn: 'Gynostemma pentaphyllum extract', labelRe: /돌외/, statusHint: 'READY' },
 };
 
 /** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/·(중점) 구분. */

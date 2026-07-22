@@ -1,0 +1,170 @@
+[
+ {
+  "candidateId": "07b7ed0a-8717-4541-bc29-9a47169fb2b9",
+  "productName": "다이어트포스 프로",
+  "productNameEn": "다이어트포스 프로",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "manufacturerEn": null,
+  "statementNo": "200400200073127",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스포스콜리추출물] 체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "1.  성   상 : 고유의 향미가 있고 이미·이취가 없는 갈색의 타원형 제피정제\n2.  포스콜린 : 표시량의 80% ~ 120% (표시량 : 50mg / 1,000mg)\n3.  납(mg/kg) : 1.0 이하\n4.  카드뮴(mg/kg) : 0.5 이하\n5.  수은(mg/kg) : 0.5 이하\n6.  비소(mg/kg) : 1.0 이하\n7.  대장균군 : 음성\n8.  붕해 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 항응고제 또는 혈압조절제를 복용하거나 혈압이 낮은 경우 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 갈색의 타원형 제피정제",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>다이어트포스 프로<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>(주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>다이어트포스 프로<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by (주)한국씨엔에스팜 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국씨엔에스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "515bb48b-02fc-4f4e-b7ed-983547aea89f",
+  "productName": "셀로맥스 콜레오파트라 스틱",
+  "productNameEn": "셀로맥스 콜레오파트라 스틱",
+  "manufacturer": "(주)네이처텍",
+  "manufacturerEn": null,
+  "statementNo": "20040020004594",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스포스콜리 추출물](1) 체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 황회색 또는 흐린 황갈색의 분말\n2) 포스콜린 : 표시량(50 mg/6,000 mg)의 80~120%\n3) 납(mg/kg) : 1.0 이하\n4) 비소(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 0.5 이하\n6) 수은(mg/kg) : 0.5 이하\n7) 대장균군 : 음성",
+   "intake": "1일 2회 1회 1포(3,000mg)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 항응고제 또는 혈압조절제를 복용하거나 혈압이 낮은 경우 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 황회색 또는 흐린 황갈색의 분말",
+   "storage": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>셀로맥스 콜레오파트라 스틱<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">(주)네이처텍 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 황회색 또는 흐린 황갈색의 분말 · (주)네이처텍 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 황회색 또는 흐린 황갈색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>셀로맥스 콜레오파트라 스틱<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by (주)네이처텍 · 2 times a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>2 times a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)네이처텍</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 황회색 또는 흐린 황갈색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "6418189c-be42-4710-a16a-a05426b4461a",
+  "productName": "나이트타임(Night Time Thief)",
+  "productNameEn": "나이트타임(Night Time Thief)",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046466",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스 포스콜리 추출물]체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "baseStandard": "1) 성상 : 초콜릿색의 경질캡슐\r\n2) 포스콜린 : 표시량(50.0mg/2,000mg)의 80~120% 이어야 한다.\r\n3) 납(mg/kg) : 1.0 이하\r\n4) 총비소(mg/kg) : 1.0 이하\r\n5) 카드뮴(mg/kg) : 0.5 이하\r\n6) 총수은(mg/kg) : 0.5 이하\r\n7) 붕해시험 : 20분 이내\r\n8) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취한다.",
+   "caution": "① 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\r\n② 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\r\n③ 임산부, 수유여성, 어린이는 섭취에 주의하시기 바랍니다.",
+   "dosageForm": "초콜릿색의 경질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>나이트타임(Night Time Thief)<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>초콜릿색의 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 초콜릿색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>나이트타임(Night Time Thief)<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 초콜릿색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "6ba3b88b-3d90-4abc-914c-cee711107862",
+  "productName": "라인컷 퀵앤이지",
+  "productNameEn": "라인컷 퀵앤이지",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046619",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스포스콜리추출물] 체지방 감소에 도움을 줄 수 있음 (생리활성기능 2등급)",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 분홍색의 경질캡슐\n2) 포스콜린 : 표시량(50mg/2,400mg)의 80~120% 이어야 한다.\n3) 납(mg/kg) : 1.0 이하\n4) 총비소(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 0.5 이하\n6) 총수은(mg/kg) : 0.5 이하\n7) 붕해시험 : 20분 이내\n8) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐을 물과 함께 섭취한다.",
+   "caution": "① 어린이, 임산부 및 수유부는 섭취에 주의하십시오.\n② 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n③ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\n④ 실리카겔은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 분홍색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>라인컷 퀵앤이지<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 분홍색의 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음 (생리활성기능 2등급)</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 분홍색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>라인컷 퀵앤이지<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 분홍색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "8bf491bc-cb8d-424e-869a-066a12eba295",
+  "productName": "다이어트N 콜레우스컷",
+  "productNameEn": "다이어트N 콜레우스컷",
+  "manufacturer": "(주)신비바이오",
+  "manufacturerEn": null,
+  "statementNo": "2023000229669",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스포스콜리추출물] 체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 회갈색의 장방형 제피정제\n2) 포스콜린: 표시량(50mg/2,000mg)의 80~120%\n3) 납(mg/kg): 1.0 이하  \n4) 카드뮴(mg/kg): 0.5 이하  \n5) 수은(mg/kg): 0.5 이하  \n6) 비소(mg/kg): 1.0 이하  \n7) 대장균군 : 음성\n8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 항응고제 또는 혈압조절제를 복용하거나 혈압이 낮은 경우 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 회갈색의 장방형 제피정제",
+   "storage": "습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>다이어트N 콜레우스컷<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">(주)신비바이오 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 회갈색의 장방형 제피정제 · (주)신비바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 회갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>다이어트N 콜레우스컷<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by (주)신비바이오 · Once a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)신비바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 회갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "e9ff22d6-4cac-48cb-960f-e4b5768c4719",
+  "productName": "콜레우스 포스콜리",
+  "productNameEn": "콜레우스 포스콜리",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915120",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[콜레우스포스콜리추출물] 체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미를 가지며 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 갈색의 투명한 경질캡슐\n2. 포스콜린 : 표시량 ( 50mg/900mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취 하십시오.",
+   "caution": "(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 항응고제 또는 혈압조절제를 복용하거나 혈압이 낮은 경우 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지며 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 갈색의 투명한 경질캡슐",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜레우스포스콜리 추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>콜레우스 포스콜리<small>콜레우스포스콜리 추출물</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜레우스포스콜리 추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜레우스포스콜리 추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 갈색의 투명한 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>콜레우스포스콜리 추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Coleus forskohlii extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>콜레우스 포스콜리<small>Coleus forskohlii extract</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Coleus forskohlii extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Coleus forskohlii extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with body-fat reduction</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Coleus forskohlii extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]

@@ -1,0 +1,65 @@
+{
+  "tag": "batch:single-functional-coleus-forskohlii-b1",
+  "createdMasters": [
+    "4538c8ee-4006-4c50-818b-edfb1f1ff9b1",
+    "f3b4249c-b6dd-44a8-91c1-52a072b72c68",
+    "a0232128-f206-4810-afe0-d3ef51c24c83",
+    "10055908-b849-4d2e-8ef2-8a8dd17dd4f0",
+    "4b76ec83-0cc0-4139-add4-615fd58c9d66",
+    "921f8fa5-a126-40fb-b5b7-621a9ec55179"
+  ],
+  "createdSpd": [
+    "022dc8e1-c8e3-41e5-9ae9-c35fb7b61d6f",
+    "6c98e334-fcdb-45d9-b9f6-6e0f655a609a",
+    "eb08df3b-2d0a-4af0-b14a-4050944323b6",
+    "71041953-fb2c-4b24-a721-f30b6d1d31ac",
+    "f951951e-7121-459a-a4e6-a6f1ae14a155",
+    "a55c2db3-a934-4494-ae1a-0f01d38e3f40",
+    "3646ebc6-e00e-43fd-ade2-b931470a8fb7",
+    "deba30e3-e8ca-470e-8955-feb153c46884",
+    "ca1cd976-f229-417e-98e6-22e6e97e6c32",
+    "6dde97a1-2b3f-4206-8de7-0cca9afc6927",
+    "86a50571-b724-47b0-9c80-7d0c45c64900",
+    "c38b7f2b-9427-4b93-9ffe-cc08591565af"
+  ],
+  "candIds": [
+    "07b7ed0a-8717-4541-bc29-9a47169fb2b9",
+    "515bb48b-02fc-4f4e-b7ed-983547aea89f",
+    "6418189c-be42-4710-a16a-a05426b4461a",
+    "6ba3b88b-3d90-4abc-914c-cee711107862",
+    "8bf491bc-cb8d-424e-869a-066a12eba295",
+    "e9ff22d6-4cac-48cb-960f-e4b5768c4719"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "07b7ed0a-8717-4541-bc29-9a47169fb2b9",
+      "stmt": "200400200073127",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "515bb48b-02fc-4f4e-b7ed-983547aea89f",
+      "stmt": "20040020004594",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "6418189c-be42-4710-a16a-a05426b4461a",
+      "stmt": "20040020046466",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "6ba3b88b-3d90-4abc-914c-cee711107862",
+      "stmt": "20040020046619",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8bf491bc-cb8d-424e-869a-066a12eba295",
+      "stmt": "2023000229669",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "e9ff22d6-4cac-48cb-960f-e4b5768c4719",
+      "stmt": "20180003915120",
+      "prev_status": "pending"
+    }
+  ]
+}
