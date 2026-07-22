@@ -1,0 +1,56 @@
+{
+  "tag": "batch:single-functional-aloe-whole-leaf-c",
+  "createdMasters": [
+    "956aa6ec-95cc-4cc1-b374-d4878cc59343",
+    "7858b155-821e-4459-92f6-26cfbaa63861",
+    "3d9f0dd9-a8ec-4ded-bc77-a1f77cda2cbb",
+    "92ff07cf-8bdb-4592-b1a9-cd6b164ff47b",
+    "3e3d8016-5348-4369-a4e0-232c4e20fb0a"
+  ],
+  "createdSpd": [
+    "82a58547-5e70-49ed-8838-fb5b69f6ae96",
+    "2b9108c5-8657-4966-bcd7-676f59c498a0",
+    "eccb7dfc-62bf-436b-8966-43ffc597abbc",
+    "d7af0612-bbbd-4c51-a9ae-6c4fc06c64ea",
+    "9e6ab045-501a-4955-9b61-7129e1ee776e",
+    "9c535da0-c710-4cd2-a724-d1eafd4bae59",
+    "396b5817-0451-46fc-8092-211e31c5b08f",
+    "16880162-97e6-4824-bdfa-209cbd91276a",
+    "c024e880-4579-46f8-a942-5efaf10c7148",
+    "2940e24b-ad57-4d61-80f7-f50a023ca93f"
+  ],
+  "candIds": [
+    "4a9bdf6c-b299-4038-831f-9a533b516400",
+    "535f451d-6ba0-4ad0-a0ff-52f07a043aff",
+    "864292a3-a77a-4d0a-a6c9-240fdc0f4ec3",
+    "902d5393-39c0-4ad4-b378-3b6cbe11f254",
+    "9848d115-6063-4d9d-9a47-6b90755c87eb"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "4a9bdf6c-b299-4038-831f-9a533b516400",
+      "stmt": "20120019007720",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "535f451d-6ba0-4ad0-a0ff-52f07a043aff",
+      "stmt": "20040017106360",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "864292a3-a77a-4d0a-a6c9-240fdc0f4ec3",
+      "stmt": "20040017106361",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "902d5393-39c0-4ad4-b378-3b6cbe11f254",
+      "stmt": "200400190197",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9848d115-6063-4d9d-9a47-6b90755c87eb",
+      "stmt": "2004001508142",
+      "prev_status": "pending"
+    }
+  ]
+}

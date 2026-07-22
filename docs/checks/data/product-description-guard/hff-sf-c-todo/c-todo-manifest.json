@@ -1,0 +1,100 @@
+{
+ "agent": "C",
+ "wo": "WO-O4O-HFF-SF-INDEPENDENT-TODO-C-V1",
+ "generated": "2026-07-22",
+ "todos": {
+  "C-01 알로에전잎": {
+   "status": "DONE",
+   "LIVE": 5,
+   "reviewLater": 5,
+   "tag": "batch:single-functional-aloe-whole-leaf-c"
+  },
+  "C-02 홍국": {
+   "status": "DONE",
+   "LIVE": 8,
+   "reviewLater": 1,
+   "tag": "batch:single-functional-red-yeast-rice-c"
+  },
+  "C-03 로즈힙": {
+   "status": "DONE",
+   "LIVE": 8,
+   "reviewLater": 0,
+   "tag": "batch:single-functional-rosehip-c"
+  },
+  "C-04 바나바잎추출물": {
+   "status": "REVIEW_LATER",
+   "LIVE": 0,
+   "reviewLater": 5,
+   "reason": "generate guard: D-CLAIM-GROUNDED 4 + PRE-SRC 2 + BLOCKED 1 (정본 sf-generate REVIEW 제외)"
+  },
+  "C-05 헤마토코쿠스추출물": {
+   "status": "HOLD",
+   "LIVE": 0,
+   "hold": 3,
+   "reason": "generate BLOCKED 3; 나머지 EN 미확정 → GROUNDING_PENDING"
+  },
+  "C-06 extras": {
+   "status": "DONE",
+   "note": "히알루론산 잔여 2 → generate PASS 0(REVIEW1+BLOCKED1) exhausted. 인삼/키토산/뮤코다당/키토올리고당=타계열/A·B, 미접근."
+  },
+  "C-07 additional": {
+   "status": "PENDING_SHARED",
+   "note": "담당 계열 고가치 후보가 hff-sf-registry 미등재 → 등재=공용코드(Agent B). 억지 처리 안 함."
+  }
+ },
+ "totalNewLive": 21,
+ "dbWrite": 84,
+ "canonicalDup": 0,
+ "stmtDupMasters": 0,
+ "PENDING_SHARED": [
+  {
+   "ingredient": "차전자피식이섬유",
+   "lineage": "gut",
+   "producible": 137,
+   "reason": "registry 미등재(labelRe/config 필요)"
+  },
+  {
+   "ingredient": "은행잎추출물",
+   "lineage": "cognitive",
+   "producible": 32,
+   "reason": "registry 미등재"
+  },
+  {
+   "ingredient": "난소화성말토덱스트린",
+   "lineage": "gut",
+   "producible": 14,
+   "reason": "registry 미등재"
+  },
+  {
+   "ingredient": "마리골드꽃추출물",
+   "lineage": "eye",
+   "producible": 10,
+   "reason": "registry 미등재(루테인 인접)"
+  },
+  {
+   "ingredient": "감마리놀렌산함유유지",
+   "lineage": "skin",
+   "producible": 7,
+   "reason": "registry 미등재"
+  },
+  {
+   "ingredient": "이눌린/치커리추출물",
+   "lineage": "gut",
+   "producible": 6,
+   "reason": "registry 미등재"
+  },
+  {
+   "ingredient": "포스파티딜세린",
+   "lineage": "skin/cognitive",
+   "producible": 0,
+   "reason": "EN 미확정(인지력·자외선피부건강) GROUNDING_PENDING"
+  },
+  {
+   "ingredient": "헤마토코쿠스(잔여)",
+   "lineage": "eye",
+   "producible": 0,
+   "reason": "눈 피로도 EN 미확정 + generate BLOCKED"
+  }
+ ],
+ "note": "전체 상세 후보 풀은 hff-sf-maxpool-C.json/manifest-C.json(409733b6d) 참조. EPA·DHA/루테인=combo/nutrient 트랙, 중복생산 안 함."
+}

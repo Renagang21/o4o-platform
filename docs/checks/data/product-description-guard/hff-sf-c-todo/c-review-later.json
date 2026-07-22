@@ -1,0 +1,117 @@
+{
+ "aloe-whole-leaf": [
+  {
+   "statementNo": "2004001516287",
+   "productName": "체감장정환",
+   "reason": "GROUNDING_PENDING_EN"
+  }
+ ],
+ "red-yeast-rice": [
+  {
+   "statementNo": "200700200036",
+   "productName": "케어홍국캡슐",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200700200037",
+   "productName": "매일아침 발효홍국",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200700200038",
+   "productName": "홍국균미캡슐",
+   "reason": "GROUNDING_PENDING_EN"
+  }
+ ],
+ "rosehip": [
+  {
+   "statementNo": "200400170211582",
+   "productName": "라이토플렉스 U플러스",
+   "reason": "GROUNDING_PENDING_EN"
+  }
+ ],
+ "banaba": [
+  {
+   "statementNo": "200400200141947",
+   "productName": "모로실 다이어트 & 혈당 관리를 모아담다",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200400200141972",
+   "productName": "이지루틴 다이어트 & 혈당 컷",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20040015104278",
+   "productName": "어쎔코드 I",
+   "reason": "BULK"
+  },
+  {
+   "statementNo": "20040015104294",
+   "productName": "어쎔코드 HI",
+   "reason": "BULK,GROUNDING_PENDING_EN"
+  }
+ ],
+ "haematococcus": [
+  {
+   "statementNo": "200400200073199",
+   "productName": "에이지 포뮬라 부스터 AG Formula Booster",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "201200190071175",
+   "productName": "루테인 지아잔틴 아스타잔틴 미니캡슐",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20060020008947",
+   "productName": "루테인 지아잔틴 아스타잔틴 24:4",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200400200073408",
+   "productName": "여에스더 아스타잔틴",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20040017006874",
+   "productName": "안국 아스타잔틴 미니",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "2024002023359",
+   "productName": "아스타잔틴",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200600200081213",
+   "productName": "눈 건강 아스타잔틴 12mg",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20060020008962",
+   "productName": "눈건강 글라우 16:4",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "200400150832441",
+   "productName": "눈 피로엔 아스타잔틴",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "201200190071214",
+   "productName": "아스타잔틴 지오(Astaxanthin go)",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20190009483788",
+   "productName": "순수 초임계 아스타잔틴 12mg",
+   "reason": "GROUNDING_PENDING_EN"
+  },
+  {
+   "statementNo": "20060020008945",
+   "productName": "데일리코어 루테인지아잔틴 아스타잔틴",
+   "reason": "GROUNDING_PENDING_EN"
+  }
+ ]
+}
