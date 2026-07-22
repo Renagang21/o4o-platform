@@ -1,0 +1,4681 @@
+{
+  "wo": "WO-O4O-OTC-SAFETY-MISMATCH-STORE-LEAFLET-PRODUCTION-NA-V2",
+  "agent": "나",
+  "readOnly": true,
+  "dbWrite": 0,
+  "authoring_note": "의약품 소비자 안전 본문 = 사람 저작(offline CHECK, klass auto/review/manual)이 정본(CLAUDE.md: 외부 LLM 초안 자동생성 금지). 본 인벤토리는 **저작 대상 subgroup 을 고정**(master_id·원문 완전성)하여 사람 저작 큐에 투입하기 위한 것. 자동 본문생성·apply 없음.",
+  "scope": {
+    "in_scope_groups": 45
+  },
+  "summary": {
+    "groups_decomposed": 45,
+    "total_subgroups": 279,
+    "READY_SAFETY_SUBGROUP": 278,
+    "ready_master_total": 1087,
+    "HOLD_SOURCE_INCOMPLETE": 1,
+    "hold_incomplete_master_total": 2,
+    "subgroup_master_intersection": 0,
+    "distinct_masters_covered": 1089
+  },
+  "write_plan_if_authored": {
+    "note": "KO=4T·EN=2T·총6T per subgroup (사람 저작 후)",
+    "ready_T": 1087,
+    "ko_4T": 4348,
+    "en_2T": 2174
+  },
+  "groups": [
+    {
+      "pk": "ing:알마게이트|500밀리그램|정|oral",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "ing": "알마게이트",
+      "strength": "500밀리그램",
+      "form": "정",
+      "easyMasters": 87,
+      "subgroupCount": 19,
+      "subgroups": [
+        {
+          "safetyFp": "ee6c83dacd0bf162",
+          "T": 18,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0bb99e0d-bff2-4b80-8bb2-829297d2d839",
+            "14ddfed7-5d1a-479a-b48d-ed6b5b67c7d6",
+            "22a436ab-8ccd-477b-8cea-37f010317254",
+            "2b558661-3472-4311-8b4e-46cfb23859a0",
+            "2e05e469-2238-491c-89ea-dac4452d20eb",
+            "40ac7a77-0419-436c-a086-68d5e67f8b20",
+            "4fd264a9-a68e-47c2-899a-f5106083c2ae",
+            "60631cc4-3d2f-4712-a913-1dcf940ed176",
+            "6d4404e1-7d0e-4d2b-b47c-72f42c088256",
+            "6ea3eda2-c2b3-490a-b2be-68182ab3348e",
+            "8e58eed5-de89-4359-a8fd-221a77578030",
+            "9a7dd0cf-aa9e-4852-9055-479b4d205325",
+            "9cd17784-9613-4fa6-930c-60492d132cd1",
+            "a166a973-1010-45ab-9b6f-8ca048bf4dba",
+            "b74fa247-767c-48a3-9d0b-fb8e50e28005",
+            "d57d8f9d-f765-48e1-8555-58afbbb6f1e8",
+            "e3efdfaf-e2c4-432c-8b00-a59a68bbe76f",
+            "f2285a0b-3cae-4dea-a9c3-cb72bb58010a"
+          ]
+        },
+        {
+          "safetyFp": "a3452e5b0564a6bc",
+          "T": 8,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0d722e5d-9dc5-41bf-84dd-66c01740d2cd",
+            "2e79419b-3315-4b08-bf89-ab4ecfc40785",
+            "3081f865-cb89-458f-adcc-565eef65be8e",
+            "623e40fc-b9ab-4c9d-96f1-c16210c3ceeb",
+            "72285788-5fa2-45e6-97a5-92b533c6aee6",
+            "bddd701d-9d87-4b33-8b8d-705513375b7e",
+            "c43209ad-9fd9-47e6-9be1-65762219b46b",
+            "e6beff71-bb81-47f9-94c3-14540ae4bee1"
+          ]
+        },
+        {
+          "safetyFp": "e005b053d97b2d97",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "06b6c6fb-8140-4e1b-a689-9cdad7b3f160",
+            "27392236-4cee-4ddc-bf25-9b729c96368d",
+            "4fe8cc2f-4f95-4074-93e6-5b3250fd6a81",
+            "78182831-e489-402d-b672-c7978a8b4960",
+            "c3114c82-3b4d-46d8-ac0d-44a18d0095c8",
+            "e5fe50e9-5a12-4cb5-86bb-f2934e2eefdb",
+            "e7368c7d-985d-4c10-9d59-30788387fb24"
+          ]
+        },
+        {
+          "safetyFp": "4f8299df22f609ea",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "185644de-177c-4b74-953d-71601518b4ab",
+            "4b71b33f-d600-49c4-9077-d65981d77627",
+            "99757e79-f794-4de1-9699-3fc39fd990b9",
+            "c3fa1c93-f65e-430c-ac10-61d1b5e283ee",
+            "d080c3f1-2c00-4189-9197-29cc3bf3908a",
+            "dadc5a64-ee88-4c85-9c07-ce5aea41e46b",
+            "e3d98557-242d-439a-8fec-3697f1349fe9"
+          ]
+        },
+        {
+          "safetyFp": "7d641ef454dacdfe",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0478b21f-2a69-458d-a4ac-2142fe4e2a7a",
+            "87ecb41f-9341-4961-b307-1183797032d5",
+            "a5d8eb08-1c4a-49f7-9b91-c962d7dcab8f",
+            "b05af285-558d-4bbd-8d5b-f12ff563ea8c",
+            "e935b9b6-506b-4218-a1eb-f91221cb368c",
+            "f518b36a-8944-4d59-a32c-0f6737448c7e"
+          ]
+        },
+        {
+          "safetyFp": "ce3ecd41211df7b7",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1c76a856-c9ea-47a0-8b93-401fa1647393",
+            "2ff1bfee-5178-47fd-b5de-17011049fe82",
+            "756bb05b-9f0a-45cd-a4e2-186dec617829",
+            "ab46b5a5-f57c-4d79-921d-39f78f5b1073",
+            "b5421b76-dc00-4b70-9467-395f560eee11"
+          ]
+        },
+        {
+          "safetyFp": "f213d6e50e19426d",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "56e87577-07ea-445b-98a2-9ad6d22afb4a",
+            "5eb5fb0d-4423-4aff-b412-82f0747d7086",
+            "858600f2-c3f1-48ea-af9b-7024fd230bc5",
+            "87146b63-7689-4b29-9ca6-90b2edd5ef90"
+          ]
+        },
+        {
+          "safetyFp": "863af09ffa8fa0fd",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "34f0d7b7-706b-4e46-8c3c-2770b244e43e",
+            "47e80d3e-ffa6-4d12-a2f8-fd211023e180",
+            "529d5b99-f6d9-4e6f-9c75-80e856e8459f",
+            "91fc9838-7d51-4c01-86ad-67fb75086ae1"
+          ]
+        },
+        {
+          "safetyFp": "50e6825f6f5a6b21",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "273e688c-0701-4463-8736-e52e4a444043",
+            "2894c366-8b3d-4bf7-863d-c6cf0819e063",
+            "3393b879-ba5b-4a2c-b4d4-e5a5dc0fccbb",
+            "93b68c9c-6d62-4a85-915a-b0e7dbdc48eb"
+          ]
+        },
+        {
+          "safetyFp": "f6387fabb33846e1",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "540566dd-d70f-45bc-9fe1-cbce2cce2067",
+            "7c088cc3-a237-40bf-ae18-b91ef097b0f5",
+            "eb05911d-68bb-4251-9294-fb5bced535dd"
+          ]
+        },
+        {
+          "safetyFp": "fd95111921904cdf",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4b63cebc-8915-4f39-ab07-fdc08700fc9b",
+            "bbf49426-d697-400f-930e-f0fe79ac8c51",
+            "d3293d4f-7f8d-4288-b25b-ca8f648dce12"
+          ]
+        },
+        {
+          "safetyFp": "8cf4b38d7f1f5e32",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "06143f11-2df2-4f8a-97d5-9e6eed94eb21",
+            "34547430-a728-4a83-a467-a6e5d33799b5",
+            "c0906195-efc0-4a45-9a4a-1ceba584f56d"
+          ]
+        },
+        {
+          "safetyFp": "f064d829f9fad987",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "71662cb9-2673-4040-8d5a-bfb69e2fdf3f",
+            "7eb27b17-26a0-4b9f-acf5-c827b60faac2",
+            "8c29da06-cecc-457b-823e-e1af6912ad8d"
+          ]
+        },
+        {
+          "safetyFp": "8ce8981c8274478a",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "87c16345-4710-4220-877e-b8327bbc1db7",
+            "98fd8fd2-95e4-4ae7-8b55-32fe1c1df9e5"
+          ]
+        },
+        {
+          "safetyFp": "50df57f51f4e4477",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "22bae8b4-46fe-4c6d-8d79-76fb5c44b931",
+            "667b2cb6-29ea-43e0-b2b8-db6388cd0dd1"
+          ]
+        },
+        {
+          "safetyFp": "3658a127fbf9b1ee",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "60b887e6-bf2e-4915-b4b6-0a71190f0e5c",
+            "c3b91d33-a208-4c5e-80aa-40de309fd737"
+          ]
+        },
+        {
+          "safetyFp": "656d72f30b3f58fe",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0600a207-0ce7-4345-810b-f9a3879a0185",
+            "4899df6e-2812-4cfc-b9aa-35190d6dd94c"
+          ]
+        },
+        {
+          "safetyFp": "18a5349c2ca20f46",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "18c5c31f-43a1-4927-913e-60cefb3e8ec1",
+            "b8bc04e6-b0ae-438d-b549-47b2f6ac4f55"
+          ]
+        },
+        {
+          "safetyFp": "9fc73bd653e2d3ae",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "355f940d-113b-44ed-856d-ce2c18036de7",
+            "d416df8a-555f-4c4c-9032-8c3cf4257a22"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:나프록센나트륨|275밀리그램|정|oral",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "ing": "나프록센나트륨",
+      "strength": "275밀리그램",
+      "form": "정",
+      "easyMasters": 88,
+      "subgroupCount": 19,
+      "subgroups": [
+        {
+          "safetyFp": "b22a2d04f6b5d48a",
+          "T": 12,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a5edd7c-0f33-4d94-aba3-ca846ee6d45b",
+            "25727b3a-f4fd-40a9-aeb4-ccfd910273ba",
+            "3aad3162-95fd-4ca4-bb6a-c6e9d5063360",
+            "3da426bc-2ebd-4590-b583-d0026dee0553",
+            "55ec7755-15dd-42ef-adcb-9fcb48fa0d5d",
+            "73e01a3c-4f62-4c9a-b00f-00c884cd2d61",
+            "78387d0b-9199-44e1-88f4-d1949fc8195c",
+            "992d1ca0-fe4f-48fd-9dbf-bd507b56890b",
+            "b521f931-855d-4352-8990-2032891f2f4f",
+            "b8b7131c-6b90-4a6a-bb0e-497d470633da",
+            "ce54d522-19d5-4155-9410-0d5c254e0785",
+            "ff26f029-967b-4003-98bf-b1593b089c9b"
+          ]
+        },
+        {
+          "safetyFp": "7842feb242424e9a",
+          "T": 9,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "153e9cb7-66f6-42ac-8100-4c35ed35430c",
+            "b2f9d98a-c85f-4491-bbbb-a5553566ad5e",
+            "b869353d-4893-4ae0-b7dd-dec06f4a7ad7",
+            "ba7c5526-953a-4c20-9daf-23aef16fdd1a",
+            "bdd3d89a-2194-4173-be3e-395a42f8a30e",
+            "d75028d3-c7b3-4e6c-ba54-8f156d913596",
+            "d972d4ab-a125-44ab-8836-b725595af261",
+            "da2c7643-c6a1-46b0-b0f0-6072cde0fb23",
+            "f0ef535a-4e65-4f72-af85-e7c268dffb1b"
+          ]
+        },
+        {
+          "safetyFp": "18e45445e9716032",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "04ec701d-150a-45be-ac48-704b63a064be",
+            "2b525fdb-6f8c-47e4-8e24-bdd467bbf2af",
+            "86d96afd-cad4-4bb5-88e9-fd66cfd965ed",
+            "b82d750c-35cd-4b6a-b12a-3de8b865edd5",
+            "c1446413-a7d0-4b8b-b6b3-9ff3605ce17b",
+            "d3b683fe-4d32-41a6-9417-174e5b1e5f8e",
+            "fc732f82-88e6-49a4-bedb-eddb8158da2e"
+          ]
+        },
+        {
+          "safetyFp": "16dd7068bdc5d1f3",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "011f0cbc-56e3-467a-931a-e2ed0cd1ddec",
+            "11c05de2-61b8-43e7-93e6-a05ee3fe22b1",
+            "2f9c47ec-b46b-42ab-b680-390a125fcf34",
+            "9b0078c0-1d67-4050-9358-c5761673d10e",
+            "b69dc6bb-8823-4d32-9854-20cac0abf41c",
+            "d56f58d2-fe2c-4db9-8015-fe04830c13fb",
+            "f3141f14-fec1-4c8f-beb9-97043a620d5b"
+          ]
+        },
+        {
+          "safetyFp": "9a2a32751fa5c368",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4c7f6332-d761-4182-8600-84094a9267e7",
+            "67e10529-e432-4bc6-b351-d3d5389aeb55",
+            "7918117f-920e-4909-a167-ad2119a18fbe",
+            "84b16613-5556-43ad-9af4-1004e02ecc38",
+            "c5fd5722-a7be-47be-bb7c-cfa64c128bf2",
+            "eaaf81c9-7f56-4681-812b-1ba0c725a54c",
+            "f48b680d-144e-4d9a-8716-53c6300dab38"
+          ]
+        },
+        {
+          "safetyFp": "b8e4aa10fb98743d",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "018ccd24-b01e-45a2-b9e8-d556fc7585dd",
+            "52924eb9-52c2-492d-b2fd-882a49c430c6",
+            "b6828d7f-da89-4128-ad08-e42dc6bc60df",
+            "e37c8406-bd2d-478d-817d-b35eb224dd85",
+            "ebe2cbe7-f2dd-423e-b6d9-a2f7b6bd63e1"
+          ]
+        },
+        {
+          "safetyFp": "7f0fee2f87dc91ab",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5bb651f6-9b13-4d20-bfcb-2310c1b5e599",
+            "6a5c148c-0927-4501-a5eb-879d69dfa818",
+            "9edb2d04-e962-4c01-9c32-ab10015dbacd",
+            "b529dfc7-7725-4f5f-9205-06bef49a7a82",
+            "fe93511c-27c7-406f-85c9-278d8d1be30a"
+          ]
+        },
+        {
+          "safetyFp": "d6e009ce461dd6b0",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "54c1d6cb-bbe2-45bc-aff7-ebeb043092d2",
+            "a7015b0f-d83e-426f-9ae0-2fd33b1cdd64",
+            "af160606-102e-4aa8-82fc-9ed86eadfdc5",
+            "b0dea2f4-e0c5-43fe-986d-c51498a56305",
+            "cad420aa-2273-4ae0-bc65-01222bbfcc13"
+          ]
+        },
+        {
+          "safetyFp": "61b33233474484bf",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2e2642ba-e31f-4d01-b99e-456d2f6cc1e2",
+            "820c6481-3126-451f-8be4-1ff15aa3423b",
+            "c70b7e3b-f498-4451-81e6-1fa25a05c1f5",
+            "df1da249-e43a-4f18-ba3c-a94db7589180"
+          ]
+        },
+        {
+          "safetyFp": "7a085fe4867179f6",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "25241d56-0e25-4782-8ef5-17f385a7127c",
+            "58b1b578-29f1-4e17-815b-72c569fd3842",
+            "b1a6a705-423e-428d-804a-9aba4a851fd0",
+            "e5d2be19-f6ce-489f-8c3d-2ddacdee15ce"
+          ]
+        },
+        {
+          "safetyFp": "281c372c3887dd3f",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "14b83174-05f6-4cfa-b119-bb2ed99f1418",
+            "f7766835-5bb1-4cc1-b427-d7e9b385c89c",
+            "fb5bcd14-fe46-4a04-8100-c9058d682458"
+          ]
+        },
+        {
+          "safetyFp": "237aa95f2fcae156",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "30b54d7b-f4dc-4742-9f02-c2f0968e21ca",
+            "86765bc7-1878-41ac-809f-5f6dea35d093",
+            "d2d43324-fc08-4656-a872-00c7f33653b4"
+          ]
+        },
+        {
+          "safetyFp": "da334edcaada77b7",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "056462c4-5325-4a2a-89f6-4afa2bc5bb8d",
+            "239ba6da-bbcd-4b17-b23d-e1d10f1a286e",
+            "99ff442a-445c-4ed6-a008-85247e76aced"
+          ]
+        },
+        {
+          "safetyFp": "639fe2f1616e5ee0",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3aa2c07d-3820-42df-acf5-44c5e1749fae",
+            "803075e4-249b-4d46-88f1-56263a6319fc",
+            "e9d799cd-33c0-41c2-92ae-fbaa082ee0dd"
+          ]
+        },
+        {
+          "safetyFp": "5b63f7934e7857fd",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "17e646e8-61f8-4424-bbe4-e7e4a35b7234",
+            "36f43fc1-faa5-44d8-a5da-42c882952030",
+            "b0d09e6e-0f06-4fea-9ec7-3cd31bbb9bd7"
+          ]
+        },
+        {
+          "safetyFp": "b0b518152c984ddc",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7a467f49-5772-4205-830b-bdd4b4dd0673",
+            "885db02c-0804-460b-9dff-cf0b4bdff271"
+          ]
+        },
+        {
+          "safetyFp": "fc4dcb55c5f84d17",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "376906c7-c330-4705-b4c7-15bb3081a5f8",
+            "8e0dc187-81d3-4654-9642-2e3a1b311700"
+          ]
+        },
+        {
+          "safetyFp": "33242f9a2eba4e61",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7bd7b2ea-4076-49d8-9174-9fb6c3e24f94",
+            "9f431049-a952-45a1-9850-5be4cc7d5f9d"
+          ]
+        },
+        {
+          "safetyFp": "7ee566401c85364e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "8ae9698f-d91a-4405-9d7b-cf2cf98dc638",
+            "d1d166c7-54f3-4d7d-84b4-e959e5ea449a"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:덱시부프로펜|300밀리그램|정|oral",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "ing": "덱시부프로펜",
+      "strength": "300밀리그램",
+      "form": "정",
+      "easyMasters": 89,
+      "subgroupCount": 19,
+      "subgroups": [
+        {
+          "safetyFp": "645ddf9a60bdddd6",
+          "T": 11,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0f5a9594-7e72-4979-bcbd-5cbd3ea2f6f1",
+            "0fd704e0-5009-4224-89b5-c48d5336fd72",
+            "40ef9b5d-d979-4c25-98a6-2e2a3c690424",
+            "5b7f5eb2-58fa-4056-af13-4fcec14acae1",
+            "7cdb244f-d1b8-4d9b-b017-6d4c036ae17b",
+            "8b2b25fa-865e-44e8-860c-9f5deebb9b07",
+            "a867068e-a5fa-455c-9505-f46960305203",
+            "be79463f-e97d-488a-ae83-d09862216519",
+            "c33f168f-5e95-48d4-b3f2-09ebe1411ef2",
+            "d0c4abb3-1a12-469c-bad6-5e314b2b2880",
+            "f0c12e87-f0ed-47bf-8bad-ab929d9b641b"
+          ]
+        },
+        {
+          "safetyFp": "0751d7d5d68ff2e3",
+          "T": 8,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "09e5a96c-602a-4d79-89f8-6941ebd0f3c8",
+            "1ee524e3-74d2-4651-9e18-3abbac4ea69c",
+            "57806a7e-826d-4039-b91a-953e4281d2a3",
+            "64a582fc-9a6e-4c98-8838-9c63a959ad47",
+            "92284102-93e6-48ad-9a0c-9473b74b931a",
+            "9dd9f355-9096-4def-889c-bd9bcc5efdfa",
+            "c1ff3eb6-65a7-4b9b-b681-5602209ac0d6",
+            "fa1468b7-8fcf-4690-a039-4ab84ee8acc2"
+          ]
+        },
+        {
+          "safetyFp": "17e24e44e6a9f2b4",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "00f1e7bc-f5c3-465f-9202-4973110e00e1",
+            "414915ef-ea62-4800-b7e4-c653753f939d",
+            "78c73e5f-d51e-42c5-99f9-979f4fb0bf2f",
+            "a03987fc-ff1f-43d0-9c05-66701f3b4e49",
+            "b67b6a1a-ce85-4322-9011-09ea973890c9",
+            "dd004e2b-b05f-488d-9b0a-366a4a7d3c19",
+            "e1d0edc0-8f58-406c-a273-34c5faf291db"
+          ]
+        },
+        {
+          "safetyFp": "829ef4f3ae2a7d39",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "04651505-7bc4-4708-8daa-9aa6df5ca1b5",
+            "146b9d23-5d72-4820-9bcb-409b614725df",
+            "588da048-32ba-4637-9433-8f80590634b0",
+            "5a541c96-4aad-4b02-988d-aafcb6ea4f36",
+            "9ea11727-e0ee-4ede-87e3-0a5da58c2f81",
+            "d9390c12-3574-4668-88ca-f636cc0c7714"
+          ]
+        },
+        {
+          "safetyFp": "09039cf9b1181f98",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3076867b-a774-44ba-ae52-83d3364e1d8e",
+            "7f050ae2-a5b3-4fcc-8df7-25baa146b7a3",
+            "8acf7bfa-fbe0-4216-9731-ff7bd3abd454",
+            "9f4868f0-1766-4723-8467-fa27f86747ce",
+            "a3226983-63a8-427e-8ce7-5d58f8f35d8d",
+            "fe5135c7-7c9f-4252-a9ac-4460cb9005a3"
+          ]
+        },
+        {
+          "safetyFp": "655d33a45e7aa3c5",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "21410199-c5f7-4f85-aaf7-f6abc292caeb",
+            "3a23655f-d16e-489e-8e6a-d51781c18b0f",
+            "40b55d18-b7e7-4e26-8481-34ac7c2ff134",
+            "9d3cfc78-7ddf-49e4-a439-e6bc3371a850",
+            "9eff839f-37cb-4002-81ba-0d80a5a5a2dc",
+            "a7687c55-73c2-436d-afff-9bd5ae93333c"
+          ]
+        },
+        {
+          "safetyFp": "11a2d5af39bdf963",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "29316ff2-242d-4f0e-92b5-1d6a57dacf98",
+            "65cb3160-f485-4fc7-9635-483e5cf96e24",
+            "8698b99a-ba40-4a9f-8df3-2f43a7b6fb75",
+            "dbc0e1af-2551-4c33-8166-7fde58e98e35",
+            "ecd00794-3ffd-414c-8335-ab5f0d14c7b5"
+          ]
+        },
+        {
+          "safetyFp": "219a82c2e9c8fd78",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01d7aea0-cdb0-41ee-aade-96c255441bd6",
+            "3af1bc8e-9ac3-458f-92d5-efe39911b2d9",
+            "8c82be63-8678-40cb-9ebe-e247fdc5ae25",
+            "fb866ccd-ca5a-43f5-b900-bc3da04f9398"
+          ]
+        },
+        {
+          "safetyFp": "67b22eabf1e2c1e8",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "35343d4a-0ab1-4692-9c38-ae15d5fbd855",
+            "93efba2d-668a-44d4-9e33-39d9396ebd39",
+            "c4d7cbb5-e22f-4163-9c6c-32c9e48a471e",
+            "e3f08f6d-bf5d-4824-80a4-f0254701199c"
+          ]
+        },
+        {
+          "safetyFp": "a7395d0b243cbb4a",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a908c5c-2da5-4034-a937-cc1d8b70fdb3",
+            "25fdf089-86f4-4cdf-a238-161a2cc846f9",
+            "334a6714-008e-48b9-a247-c773743656b4",
+            "f806ee95-5899-4956-bd96-f6755356b66c"
+          ]
+        },
+        {
+          "safetyFp": "0f962517614375ee",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0158fa94-7128-4f8a-b8eb-f4878dfde9c7",
+            "52510c82-66c1-4a01-9898-6023c5b022ff",
+            "dda1ef06-7851-478a-b2eb-a9d750e3d927",
+            "efcffe94-7ad1-415f-9c39-2d3b70ebf451"
+          ]
+        },
+        {
+          "safetyFp": "5fbf4826ae5c1498",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "71753418-7073-47a8-9774-702c3e3ae9d5",
+            "8e4ee601-5b0b-4344-b901-6ba9f6c16a21",
+            "b3f4a820-6476-401b-be38-992b47f89fb4",
+            "e305a49f-b480-4d17-9990-180c8248ee43"
+          ]
+        },
+        {
+          "safetyFp": "e6c2cb6b22863708",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "050a3c2e-9772-428f-a8c9-0d9a648b7854",
+            "2b60d14f-da78-49fc-8eab-255404c67c19",
+            "72007827-48a0-4628-9c81-a31c7a60e4d3",
+            "ee3c1c3c-32fc-4287-bed3-499b7808388a"
+          ]
+        },
+        {
+          "safetyFp": "8aa55c44d79230a0",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "368dbaa8-3472-4e52-9101-646a3d83b1c7",
+            "9ff345dc-6d7c-4d35-aa91-0be427826c85",
+            "be5a0c9b-8d38-48b4-ac26-8e770afe3200"
+          ]
+        },
+        {
+          "safetyFp": "0724b0692e32dfae",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "84b129af-601c-423f-9df3-2bdb0219fe98",
+            "c249db73-9720-4f52-81e6-e4523bf7d5dc",
+            "fbf8949c-fb43-4207-8a04-c6028a6d027a"
+          ]
+        },
+        {
+          "safetyFp": "d07b8f1356373d70",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "78b44376-006a-4b13-bc4d-62f8559bf5d6",
+            "ba78efce-4108-4d70-a8cc-2c1b1b430c89",
+            "c4684646-4359-480b-aeb0-45bbdc78e74a"
+          ]
+        },
+        {
+          "safetyFp": "1cc8ca321f17a768",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "19fb0dce-1c9f-497d-87da-27b449a35596",
+            "2792bb5b-9033-4eb8-9f6a-0dbb5c56b794",
+            "cdc34735-0014-4405-b47f-e0787ce473e5"
+          ]
+        },
+        {
+          "safetyFp": "68dd3997e8514c71",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "b6a782fb-3088-4e89-a68d-e84d0d5bb794",
+            "f11bf091-af05-4f6a-9d4a-dbeb934f4107",
+            "f68f8117-3301-45ea-b702-9064ca29862b"
+          ]
+        },
+        {
+          "safetyFp": "a0e2d0229e9c3a8c",
+          "T": 1,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "376260e0-a1e9-4a48-8137-2cb205a94bea"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:아세트아미노펜|650밀리그램|정|oral",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "ing": "아세트아미노펜",
+      "strength": "650밀리그램",
+      "form": "정",
+      "easyMasters": 71,
+      "subgroupCount": 15,
+      "subgroups": [
+        {
+          "safetyFp": "7ddb34dd7159584e",
+          "T": 8,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01cf5946-5804-4e21-9db7-bee978c9555a",
+            "1bc31f1b-d6e2-42e1-82d3-813d215ca8ae",
+            "3b9c75b6-d3e3-4641-8880-bf37de938c6a",
+            "6299f6b4-9c31-4b5d-b676-1fc480fd98bc",
+            "8af2f1e1-8dbc-4bf1-8aa8-a0845d05ec27",
+            "a7419cf7-dc5a-4e4d-9811-ac9dcea7f8cf",
+            "b5490c22-d5b8-4ac8-acb9-aaad2a05c305",
+            "e4bbd22a-fc90-48c8-9fd3-85222c538068"
+          ]
+        },
+        {
+          "safetyFp": "7c4e68555a9ffe18",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "10cd53c7-427f-495a-b113-03a26e792e41",
+            "3ee792ce-45b2-4043-9b10-0ba7aa5236f2",
+            "3fd2cb12-c7de-479a-bf16-16b0cee70604",
+            "4a816615-e28f-417c-9bad-921585177260",
+            "4ec3b4d8-671a-4c3a-90ea-f4f1c137276b",
+            "54ea2cd4-f19a-4ff7-b61a-1abf4196a9c5",
+            "7e14e999-a25e-480f-a3e7-eab8f8ea8645"
+          ]
+        },
+        {
+          "safetyFp": "72a7ed6b45bdcb5f",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5907b07c-2bd8-42e0-99a2-af1411a7cc79",
+            "72e357eb-dce8-4ec3-9692-55eb04110e51",
+            "8420ea2c-e5fc-43c9-aae5-6d4f07c8f1ec",
+            "d6d5dbe8-08b5-4000-90e9-767e3c1c613a",
+            "e6a9dac7-a6a6-4b5f-9725-10a39f72bb52",
+            "f0c45653-2908-464c-9a9a-e6f0489847c4"
+          ]
+        },
+        {
+          "safetyFp": "e997b71c716ae591",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "098843fc-452e-46c5-831e-4b5fd47c159f",
+            "484e8e81-cae4-46ce-88b7-29526d5ef6e0",
+            "669520e7-89ea-46f0-b220-d7f61d2f8674",
+            "8ddb29f3-0f71-488e-aceb-a41e8c2dacc0",
+            "b74684f5-547b-46b7-9531-5501999f2fc0",
+            "c0e82bd2-7b5b-4ad4-b7ad-39cb963e6286"
+          ]
+        },
+        {
+          "safetyFp": "4a20df65b36323dd",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "358e3b00-38f8-45a3-a5e4-71641adbc681",
+            "37b88e40-ea56-4e73-bba4-ddb4fbcd7340",
+            "671a2c0e-9136-4db6-9617-8602a3662d1e",
+            "82b32376-8287-442c-b769-59d6db068a8d",
+            "a2b4226d-a707-44fc-b475-e364e6b8a48c"
+          ]
+        },
+        {
+          "safetyFp": "a6c4246a12c29e90",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6fa0f21c-9d29-4e59-a486-e9fe0aa49375",
+            "80534de2-d3fa-4d1b-862e-0cb5b5959757",
+            "93807d9c-f42a-4b04-a88e-294cc660a376",
+            "9fe6b6f8-2103-4936-b3c4-b1aea119c15a",
+            "a36aa3d5-881c-4019-8c8d-d30b5e510e09"
+          ]
+        },
+        {
+          "safetyFp": "7140ad4c299c090b",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6f856ffb-3da8-4258-a62d-9d67e4ed7eeb",
+            "995622ca-2a2a-44ec-b376-e10a719c5b23",
+            "cbc1a1ff-7aa4-4927-98db-1bc9e06e45a6",
+            "f0b3e4e1-5246-4d30-b619-251f2c579df2"
+          ]
+        },
+        {
+          "safetyFp": "e9dda62d0dec3cb0",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0119f5ef-4bed-4787-affc-8dec3d89bc72",
+            "382e1ea1-bb86-4b5e-be06-42260dafd06b",
+            "653e616a-320e-41b2-902a-5c2e82c69a4f",
+            "87f30dca-7598-4d34-bb88-cd470256fd78"
+          ]
+        },
+        {
+          "safetyFp": "c91ecec875de9064",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "23b37987-3e90-42a0-8932-fea65c3d2654",
+            "346717b2-7e4c-4366-a9cb-8180260b260a",
+            "b8d4ec14-7b27-410c-a3c8-dfe9c5e211ce",
+            "ecf40e66-780e-4f19-a73b-2ec0ef71a5b0"
+          ]
+        },
+        {
+          "safetyFp": "ac400b733ed79295",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2508af59-a945-43c7-85b0-a513f62b0f08",
+            "40c403a1-f6da-4e98-bb49-33cbc020c90c",
+            "615b5898-6651-43e1-b2ae-26e6071b6e5f",
+            "947ed451-df49-49e2-a1aa-e732fa69dad3"
+          ]
+        },
+        {
+          "safetyFp": "35554d979d6c7474",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "147bc028-ad70-4571-80e1-e61bdbbb26f2",
+            "8c4c4b42-3ef0-44d0-947c-90e1e534256d",
+            "929440a3-0fcc-4431-a067-a92d0c69466c",
+            "eab9890c-a0aa-4cd1-85f0-4c51cf5081c5"
+          ]
+        },
+        {
+          "safetyFp": "9601dd11c3f269b5",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "08a96621-047c-47e9-9527-2b0fccfb70cc",
+            "9fbe3894-66e1-4d80-b2f0-ecce77cd8c98",
+            "b6be14e9-ae7d-4b44-b0cb-81209e4d3779",
+            "e2ee5850-a418-4432-8f58-e25e09f92a0f"
+          ]
+        },
+        {
+          "safetyFp": "cd133b3d6d67ddb0",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0420f964-edbf-4ce7-a815-cc197292bb13",
+            "21f8ae4c-92ba-4f0e-86e8-830bddc137b8",
+            "5309c607-760e-4eb7-8bc8-2c06b809e131",
+            "56d11e93-0aef-44f2-a72f-00c66945eb9b"
+          ]
+        },
+        {
+          "safetyFp": "8d934d3331a50984",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7019489e-5fb8-4429-84c9-1b91bf2254c3",
+            "74c7cb4a-aa36-46fc-9972-fdba12287efe",
+            "deb86a7c-c60b-4265-a765-c1e3e98f879a"
+          ]
+        },
+        {
+          "safetyFp": "18f4141c1739f06c",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0304ac7e-16ee-4c98-8fc4-d86fe94ed370",
+            "0fda6bda-f895-44c3-9507-6c1a5912b4a0",
+            "1cf404cb-697e-460b-9471-92c1efd43d3c"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:브로멜라인|100밀리그램|정|oral",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "ing": "브로멜라인",
+      "strength": "100밀리그램",
+      "form": "정",
+      "easyMasters": 64,
+      "subgroupCount": 11,
+      "subgroups": [
+        {
+          "safetyFp": "50f629465a309000",
+          "T": 16,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1ce9c07c-3c35-411c-8714-5ec8ea601319",
+            "21b4deb6-073c-4a0b-845d-c24bf6d8380a",
+            "308ff485-717a-472b-8241-f7862d95c129",
+            "31aee434-3e0f-4e18-9de6-531ccff0f40f",
+            "3ddc316d-ba6a-4b88-b3f6-795d82005f01",
+            "59515d88-b24f-42d9-9565-837b04037b7a",
+            "59d637d5-385a-41f3-81bd-be611d8229d5",
+            "62fe32af-ba19-4a4d-9160-e54874314696",
+            "63b40443-c59e-4d52-979c-611ca4f509ae",
+            "771195a4-36ad-43e5-9f78-52dc85d1f58c",
+            "880b5aca-2ced-4e93-a44d-a5f9f22b4c4e",
+            "8b213c25-f0d9-4228-95c5-566a009eca6c",
+            "925c2607-d953-4198-8ef1-36cee5645c0a",
+            "a128ec1b-bd29-472d-88bb-8970599d96fc",
+            "a2e14860-1edf-4528-9903-72a4d4c16a21",
+            "c56a8be8-23dc-4d82-aef9-b384bdf79506"
+          ]
+        },
+        {
+          "safetyFp": "fb577ffada6a1ced",
+          "T": 9,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "364b3c4f-6ac1-4935-8cde-76b8c45dd557",
+            "3de7a180-8c2e-4cbf-8faa-f6ff8391fcab",
+            "59b4995d-f2d2-4e60-ab3a-fe7d96d6c544",
+            "8495cf99-8f74-467d-955c-ec38d9bc1a9a",
+            "bef668ca-0c2a-4786-acb7-eb2072533df5",
+            "cb075a9a-3db3-4307-9a1b-5f57de5a3a9d",
+            "d238adb7-f8dc-46ff-8eeb-0a0b50258062",
+            "d3738d2e-fdae-41d8-9c7f-1e06835b7a71",
+            "db71b900-cba8-42e2-a9c1-02bae6b2fab3"
+          ]
+        },
+        {
+          "safetyFp": "0cedb40dc60df4ef",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0d570406-cad4-459e-bf51-0247da80d731",
+            "1b293daf-a1e0-47d6-bea1-efa5fdf01824",
+            "203cb044-e614-43d3-a0a8-e2b8894633a7",
+            "8e4579d9-235e-461a-b525-150b4b4b104a",
+            "986a2ddf-8983-4615-b869-c99d4e1873d9",
+            "efe9f153-d7a0-49bf-9a4c-311b3b89a504"
+          ]
+        },
+        {
+          "safetyFp": "8790edd4c0bf60f8",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "14aa966d-ea51-4f05-bc7d-1162b7aff0e9",
+            "152160ec-85e1-43c8-81c6-9a28afcc622c",
+            "4c45d348-2704-453c-b15c-2b51c81b663c",
+            "be8ca2a2-6a46-40b5-ab87-b387b2eb1aea",
+            "d12d9b7f-bc04-4579-afeb-683390bd777c",
+            "f1ead1d2-bdbc-496a-ad43-de49d5138718"
+          ]
+        },
+        {
+          "safetyFp": "b7b1e0a3de91c870",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5c1c99ba-e8b0-4680-995e-d9af1b4866a2",
+            "8b9beda0-331d-4582-8174-fe8d9e4ea717",
+            "cc953eb3-4a81-41bf-b0c2-e4427967de42",
+            "f9086a13-bbf9-497c-93e0-4937bb7aa4f7",
+            "feede33b-0cf3-43b8-9c56-07d55043aa3d",
+            "ff6c0b5f-88f4-461f-938e-9bf00094e4b6"
+          ]
+        },
+        {
+          "safetyFp": "2707f06cd3d38cca",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "24e9ed86-66f9-4b00-8f81-9c58675e56f4",
+            "b74aca8d-b25c-4c88-a1da-c4caf5f4cf93",
+            "dbe27d29-45c3-4cb8-96b4-d0a8b344315a",
+            "e9088702-b346-4a84-9c94-082b58af4740",
+            "ebf0eee8-5945-48c4-a928-42b3b98c60db"
+          ]
+        },
+        {
+          "safetyFp": "b8e029ca6666d18b",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2fb2985b-1fc8-4670-82df-a38ebea7394e",
+            "4d958843-76ca-4fea-bf17-3f8357ec8bb2",
+            "84777019-765b-4edb-8502-314135d11f52",
+            "e6a23d6f-9917-4943-a934-1235be63ea33"
+          ]
+        },
+        {
+          "safetyFp": "92387ab59d6162fe",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "05dc04e7-08ab-4404-9a1e-54955a2940f6",
+            "1255f78b-fdfe-4280-86c9-9accfd7df786",
+            "222ac1ee-47e4-4e8a-bf3e-138f4c9036a2",
+            "ab06d351-7cb0-4d5f-9175-40449a639792"
+          ]
+        },
+        {
+          "safetyFp": "3a27571e44825e15",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "78b31ccf-1777-4f0d-a8c3-fc2187318dd0",
+            "7dfd4e11-1a78-4c9b-b20c-9541fa63fbc6",
+            "82ec94d0-d6b9-490a-a042-5f2ef0cc88a4"
+          ]
+        },
+        {
+          "safetyFp": "de8724bd545b0bea",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1039feb9-db39-4d1a-b16f-ff79fabdb5bb",
+            "98f6446b-dae8-4a80-abff-91b087f139ca",
+            "fe6827a5-52af-4277-af18-1b29dfad4728"
+          ]
+        },
+        {
+          "safetyFp": "218ba7ff54ee4a8e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "34c5b763-f820-412a-92c8-0b0cb128e8f2",
+            "b2db1bfc-19c0-4e5e-8776-00c73a825106"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:나프록센|250밀리그램|연질캡슐|oral",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "ing": "나프록센",
+      "strength": "250밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 72,
+      "subgroupCount": 26,
+      "subgroups": [
+        {
+          "safetyFp": "545163103c30adef",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0a88fb94-63fa-47f7-b8ff-7cf57de43c0c",
+            "34b095dd-c7e1-441b-a987-59f3a24fc276",
+            "5b4621bb-1fd6-4e51-be3d-162ef5fa0e4e",
+            "99944216-6f26-4830-b388-12d19e0255a9",
+            "b6ca9d13-086b-4a11-b398-4c1a6c2d4ac7",
+            "cb2a6b81-cb09-4e42-9bed-2c077994f4ce",
+            "faba6457-a24c-4da5-81b1-0634af7424b5"
+          ]
+        },
+        {
+          "safetyFp": "3b957785c21b4799",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "04c49d9c-8231-4a6f-9738-207418cbf50b",
+            "0a9e19ca-f8f4-4062-975b-0be4fd82e601",
+            "23ec278d-1aff-472d-be96-552e2978836d",
+            "4d836c4a-5c92-40b0-a1d9-ad6e33c371a3",
+            "95e50fb7-2eca-4180-9b55-b1a4383e8fc6",
+            "9c474b52-72c2-41f5-8ac6-524490ffd7a9"
+          ]
+        },
+        {
+          "safetyFp": "f8d59317189a91fa",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "10127a6b-693a-4a6b-ae61-3a3816bc22ce",
+            "22001c58-8b8b-4d43-97d5-42f1b159b970",
+            "3b396ab7-7c36-443e-85ee-5ef6ba3d828a",
+            "5a652f7c-5c14-4d77-87c5-0948eb3ab065",
+            "bb3455b1-82a6-468a-b343-3394cf32298a",
+            "dccb41d8-bc4e-4ae9-878c-40aac1ff39cb"
+          ]
+        },
+        {
+          "safetyFp": "9548a69a51079527",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2b4e74e2-8161-4474-9811-5b63b3a58ff4",
+            "ab5ce96f-e897-4474-b83f-f5b5f8fe0483",
+            "cbac8206-8582-4176-9e3e-ac544e48055d",
+            "da8f0d65-f15a-471f-b50a-b93d5622e271",
+            "eed5d942-964a-4d53-abcc-33c227d93649"
+          ]
+        },
+        {
+          "safetyFp": "03cadfae0442af56",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0677183b-5c29-4001-9473-3ea02b0e1b23",
+            "114a77dd-f0c4-456f-b2ba-89b0b6a58cee",
+            "c60aaa0f-bff6-40c8-bdf0-58fc8a87db62",
+            "dcd968ae-9839-4ad6-87af-dd462e50d892"
+          ]
+        },
+        {
+          "safetyFp": "a66baf9a1882a2d7",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1b1042f2-8d71-49bf-b8d5-67600fd39db9",
+            "a254bc69-f78f-4e7c-8008-7a540a50da31",
+            "cc0ce30f-ede1-49ab-b037-626179e12ece"
+          ]
+        },
+        {
+          "safetyFp": "14df201139bad2be",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3be0fc9d-db5d-44ea-a1bd-52cf79735996",
+            "6e1febef-abe8-4bc4-9340-122d9cd645c8",
+            "85dc56cf-e8cb-44aa-b758-a3e3c9a30b5f"
+          ]
+        },
+        {
+          "safetyFp": "60c38a87a203762f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "968689f6-694b-4736-b22a-0bb60874a750",
+            "ab9f6ebc-52ad-4218-a710-6b7f32ddc507"
+          ]
+        },
+        {
+          "safetyFp": "7f7c8cf6607907c7",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6342bf2d-7030-41b6-9b79-dd6bc0100a05",
+            "fe29d98b-24bf-4445-8ac9-965e034378ee"
+          ]
+        },
+        {
+          "safetyFp": "102ff4fb95600899",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "28e89237-2deb-4641-9eaa-31d725286a4f",
+            "7bb6012a-ac71-446a-9aa0-f44a8f6c3b1b"
+          ]
+        },
+        {
+          "safetyFp": "c442636cfb7b54e7",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2c6e0ee2-f244-409c-b2f4-0874a1017e4d",
+            "59a87c03-cedb-456c-969b-e67ede937a69"
+          ]
+        },
+        {
+          "safetyFp": "8aa2226ed0aec378",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3ec25984-b0f5-4c86-973b-50681771a5d3",
+            "a3464519-73ff-46ee-a4a4-db3cc3d19826"
+          ]
+        },
+        {
+          "safetyFp": "2c6f48170f7e7387",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "b79efca9-d055-45d4-bea9-605d92ba2462",
+            "ebb8c753-f741-4e52-b9b5-d7d659d4b556"
+          ]
+        },
+        {
+          "safetyFp": "1e878c94dcead915",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1c660b1e-96e3-436a-ac81-c8b40ad4014b",
+            "c69350f2-5152-473f-8760-069161b041cb"
+          ]
+        },
+        {
+          "safetyFp": "4e482d4a3f589405",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2efea108-6afd-45c8-ab12-f2c443dbcb28",
+            "6e0cc1f2-791a-441c-84d0-899f264c0742"
+          ]
+        },
+        {
+          "safetyFp": "8f2aaf630a3780d0",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7c578e32-743e-4970-b445-f57b56cbe1d9",
+            "fc273b0a-9b47-4597-8d8a-bd057f010790"
+          ]
+        },
+        {
+          "safetyFp": "6913564359dd9622",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "19820a7f-235e-47a1-acfe-54ca9754de42",
+            "51a01e14-cdf0-4191-ad1b-f3b7c956e45d"
+          ]
+        },
+        {
+          "safetyFp": "72a14d6982859f6b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "106c6747-0074-4fdc-b36d-b9f8d48dd7b4",
+            "6152f92d-2f27-4a41-bfd7-69ade1a4c4de"
+          ]
+        },
+        {
+          "safetyFp": "2716ede1a0f10b64",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "dff90729-8713-49ee-a52f-4a356fb7017d",
+            "eeafc3c9-ab33-485a-b14b-f836480f0dd5"
+          ]
+        },
+        {
+          "safetyFp": "52af741225b42dd3",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "28cde90a-f00a-444d-9331-c45692ef1dd4",
+            "8fd232c1-700c-4e27-bf96-fdc39990117c"
+          ]
+        },
+        {
+          "safetyFp": "4c29322aa1c0eea8",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "280d7a10-db49-4fad-9c37-d2de0d7642be",
+            "3e3f980f-387e-43e7-ad6f-1c4b72a8088a"
+          ]
+        },
+        {
+          "safetyFp": "5ceb2bbf240077ec",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "75097470-9941-495b-8bd3-fb547ab0ca9d",
+            "e3b1ba13-1bde-4f03-9d64-edba851f520c"
+          ]
+        },
+        {
+          "safetyFp": "e51de413362bc63e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1253b972-00bd-47e5-ad5f-1edf1a82635f",
+            "bae6090e-bbdc-44c5-be88-e6d75a266e67"
+          ]
+        },
+        {
+          "safetyFp": "4c94fbc92efaafa3",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "054f2f9e-b056-4ceb-8ce0-d8cf6b47814f",
+            "ed086fc8-3c6d-4d9d-87c8-d0157db5a1a3"
+          ]
+        },
+        {
+          "safetyFp": "09738795aec0ddc1",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "46c5ac8b-f432-46e9-a7f5-3667853ebbbc",
+            "ef0ab361-0b76-4fee-820f-b446e32c7a39"
+          ]
+        },
+        {
+          "safetyFp": "ca251b28a836032b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4a22bbd3-f290-4421-856e-b789e87801bd",
+            "95f6808b-ed72-4c22-bb31-7fc350f7a138"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:디오스민|600밀리그램|정|oral",
+      "groupKey": "디오스민|600밀리그램|정",
+      "ing": "디오스민",
+      "strength": "600밀리그램",
+      "form": "정",
+      "easyMasters": 56,
+      "subgroupCount": 17,
+      "subgroups": [
+        {
+          "safetyFp": "16163a9e441311fc",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5210b393-be33-4b99-87e5-f39e1e82dd0d",
+            "5d76cc6c-3663-4761-9e57-0350e3b64b4d",
+            "83a64d79-d86d-4071-92aa-a7c5995ec741",
+            "87de0c30-6c85-497e-9c5c-83afbb46c8c8",
+            "9052c9d7-d460-42a2-91ad-d8d6a7feaca6",
+            "bf72cbfe-f4b5-4390-804e-0300e7d282e2"
+          ]
+        },
+        {
+          "safetyFp": "4626ec4963997004",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "262685d6-adb0-425f-8451-39857c1feff1",
+            "8811a222-1ad7-4922-8882-5005d34d1ac3",
+            "8a5d865f-984d-45c7-8d1c-21268d017ace",
+            "8c3bedd6-b707-4c65-a6cd-72c7dc1c89f6",
+            "973f6f66-5497-488b-9bf5-6bbe116d6a41"
+          ]
+        },
+        {
+          "safetyFp": "e1e66c9bed3b5ab6",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "78fa47d6-e045-4c00-b97f-5674aba18390",
+            "9b2b3839-e145-4f84-a6dc-754fe822845e",
+            "9f82042d-5b62-4f94-a4a6-1ef8e3bb59ee",
+            "f11fe8d6-d6da-4584-8057-de68ad1dbcc8",
+            "fb57fa82-075b-488a-bdf2-bf6f06208b95"
+          ]
+        },
+        {
+          "safetyFp": "4e0cc3122c0618d0",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "171a5df7-56c7-4fb6-863a-dc0a40f53299",
+            "46aa7496-d04b-4c84-8571-b9779b9c6b6c",
+            "644de836-c099-4b59-8d1c-0ce34ab52dfd",
+            "c00e71b6-9e62-4e2f-8b03-4183e795bc59"
+          ]
+        },
+        {
+          "safetyFp": "637fe405e55560c3",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0f6b976b-1787-4152-8f99-3911fb3e4d4f",
+            "5ab65b9a-2d44-4b8f-b5bf-acb6e5b75bf1",
+            "c0a2689e-0685-42bf-8976-77ec7a9f538c",
+            "cff2374f-14cc-45e8-acd2-dcd32a219f33"
+          ]
+        },
+        {
+          "safetyFp": "b062737b9efd072f",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "babb937f-ca80-419f-8771-d7664d015781",
+            "e8324c33-379e-433e-b28d-283b5db52517",
+            "f1266f7d-e210-4b58-a125-93279f509700"
+          ]
+        },
+        {
+          "safetyFp": "b1b8d0d3a6b4714b",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "46b8e593-e252-4cd7-aec7-caf3ac225065",
+            "66e26b93-0bf7-4279-87cc-2e747a24c2c6",
+            "9d26c003-c608-4ced-b29e-ea46641dcc74"
+          ]
+        },
+        {
+          "safetyFp": "6a72bdb2f01ab01e",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "15672f39-be24-4d01-929e-ef620b009b65",
+            "312ebf4b-76c9-4821-bd64-e269cef14ebd",
+            "3a25899c-336a-4e49-9dde-58b26599a732"
+          ]
+        },
+        {
+          "safetyFp": "dba8fd2dd1679830",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "206d3527-b8ad-4728-9b66-95a39ae5e792",
+            "a7720580-86cf-45e7-9109-d2530074a067",
+            "b51f7962-4678-4206-9f8e-e5a32e69511a"
+          ]
+        },
+        {
+          "safetyFp": "e047b476c7cd7808",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5ac55d4c-cf0d-4882-a2ac-ac3846f226ba",
+            "8b6f2595-dd23-47ff-941f-fc07b668636f",
+            "eafd0b17-e74d-426b-a7e3-e05ed56361cf"
+          ]
+        },
+        {
+          "safetyFp": "f111ec8fd295f45c",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "38c74713-9a0d-4376-9b64-375abd8620de",
+            "3cbfa769-71da-4a57-9bdd-fe5040e5d565",
+            "dc04cc93-271b-4fbc-b6a4-dae12a5b98d1"
+          ]
+        },
+        {
+          "safetyFp": "923c7a7ffab2bd83",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "41f9a1ed-5b92-4801-b3c5-337e022edce7",
+            "773ccf19-fe72-4cf4-8690-60b07210aa3f",
+            "a3fee400-aae3-4015-aade-96f1c18df604"
+          ]
+        },
+        {
+          "safetyFp": "860a98c429235edc",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "34df69b6-e984-4932-9b9b-f8e39167a2fb",
+            "4f7769ba-a91a-4c29-87ef-5ddeaf484005",
+            "f5117f9a-8916-412d-af9d-a7abc7c31411"
+          ]
+        },
+        {
+          "safetyFp": "eccbf92b92e9c388",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "23930fbb-8b7d-4d37-bac9-7d6d3c1d06bd",
+            "4e1e21cb-e8c8-41b2-b769-071aeb34ba37"
+          ]
+        },
+        {
+          "safetyFp": "eb472c50ae10c57c",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "505852dd-f1b0-42d4-a869-0a6b2e3da1b7",
+            "b88180ba-bce1-4cc0-b8f2-5aba01260038"
+          ]
+        },
+        {
+          "safetyFp": "20380f76af10acb0",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "a10b89d6-ddef-405c-a14f-4d16e539b940",
+            "af20ccbb-7fd2-4f79-83ff-2f4f221d140f"
+          ]
+        },
+        {
+          "safetyFp": "a4302c49e04ffe29",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "45c27577-d89a-401f-a768-3d1759858270",
+            "bcc7796a-c75b-4397-b4ab-28c4e92715a6"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:알벤다졸|400밀리그램|정|oral",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "ing": "알벤다졸",
+      "strength": "400밀리그램",
+      "form": "정",
+      "easyMasters": 54,
+      "subgroupCount": 7,
+      "subgroups": [
+        {
+          "safetyFp": "47e4e9a1b1083d15",
+          "T": 19,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0c8544b5-b241-478e-b68e-841823bc7ec0",
+            "17698352-1a66-4564-988b-730d0e851833",
+            "1c04373d-2247-4adb-ab96-8b06f8c4b35e",
+            "284f3168-a2eb-4840-973a-5e1964164a9d",
+            "3620fdf6-00ea-402f-b423-e7896836200e",
+            "3a764859-3ba6-4c32-ac65-3f55f25a59a5",
+            "5353b2f7-b6a0-44a9-884d-35de7a9a8d06",
+            "613db3d5-1a11-48b3-addb-22bded54fbbc",
+            "61ec194c-0091-4248-831b-29e1ed3c2c63",
+            "8ed0dcbe-2156-4342-b2de-bba047e8f7d9",
+            "9dc06d76-68bd-4877-a43d-907a93938b21",
+            "a03f0298-7252-453c-9741-3f15edb215d4",
+            "a9b8145b-c84d-481e-a0f3-2adf321458e6",
+            "ac44aff6-5325-4d4f-8ae5-338709684f93",
+            "b8330d79-3f85-4e0a-9633-67cde42b2652",
+            "b924f783-cf4d-4350-83bc-324673cae7bf",
+            "bc77f4f8-cabe-47a1-897e-936a6d393ab2",
+            "f6e6a4b2-4e25-4c93-9bfc-562b92894ccf",
+            "fcab04f9-cb6f-4a46-b244-8808336ee7c5"
+          ]
+        },
+        {
+          "safetyFp": "7125caaa24b3ba47",
+          "T": 17,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01bd3247-64dd-4918-9d2a-8d52c2dd24e5",
+            "0eb241d9-9bd0-4441-9e45-b0f70fe521c9",
+            "2a1c8aad-dedb-4a25-87a3-f4e75008a704",
+            "3e89f854-6db9-4a37-8e77-b7817cd677da",
+            "5eaa193e-585d-42f7-94b9-1f1938905186",
+            "64b407fb-f2fb-4b10-8cba-21aa0c6deca8",
+            "6c371139-1397-4713-9f94-0de9bba1eb92",
+            "76e45140-2e9a-4e16-8b0e-4365dec31c43",
+            "835546bf-4536-4518-98be-1258845a5fb8",
+            "9adc322f-bba6-4465-a3eb-2a545e6d5142",
+            "a4469022-2375-4e06-857b-088e28491b94",
+            "b35fceff-fe62-472c-a314-664ef0a7d011",
+            "bd2b9d8c-f077-4729-bcce-5816e16946a6",
+            "d71f6e10-19d0-46c9-b7f8-77b30be44464",
+            "dc8320c0-8bb3-4e37-b8fe-0c9ae964a727",
+            "e8cdb184-ada5-4e6c-aa1b-e11539eb140c",
+            "f877843c-6d09-44b2-a102-bca33da455a6"
+          ]
+        },
+        {
+          "safetyFp": "59fed3da13781bec",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a1affa1-4011-463e-a837-a541abb956c8",
+            "6ce47601-f66b-4b35-9d43-7c02b7868157",
+            "be68383e-a9f7-4bab-8565-f059f71c966c",
+            "e74de2a6-ef01-48c8-98cb-af96f70b8c11"
+          ]
+        },
+        {
+          "safetyFp": "d7bb88dddc8a79bb",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4e777e50-1d6d-41b4-aa0a-9533722a3b99",
+            "c1a010cc-b4a2-4116-b6f6-49bd4e39b9e4",
+            "da41a053-1a94-48d4-bf06-bd380ade7823",
+            "f4d9ded4-54eb-4091-bdf8-2f3852effb07"
+          ]
+        },
+        {
+          "safetyFp": "a4fb4068e6dc72db",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12150f2b-07af-4035-a996-58a436ec89d8",
+            "237dfaf8-2cb4-46ca-9727-467c9c7fa3b3",
+            "4f52db38-5453-4165-bbd5-7fe682f6990d",
+            "7abba1cf-f57e-4232-9f28-ca5e1189966f"
+          ]
+        },
+        {
+          "safetyFp": "45a8851ef2fb4518",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "16eca874-47ce-49d0-8762-9a85c350686e",
+            "5eac72e9-f814-4b27-a67e-2b2126424d5a",
+            "ecbdf81a-a163-4072-b4cc-da0ae51e03b3"
+          ]
+        },
+        {
+          "safetyFp": "091def188845f436",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "36611204-1ce2-4e59-8b33-5b0e36cdcd58",
+            "68690690-621d-4629-a607-d0ef8b006694",
+            "c0c73c7b-2d70-4385-acc2-29f7f2f97467"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:트리메부틴말레산염|100밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "ing": "트리메부틴말레산염",
+      "strength": "100밀리그램",
+      "form": "정",
+      "easyMasters": 61,
+      "subgroupCount": 11,
+      "subgroups": [
+        {
+          "safetyFp": "af2066c0db98aeca",
+          "T": 12,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0d46a8db-6d4e-4a5f-bbbb-d458dc546784",
+            "45f980aa-1611-40fd-9060-22c9a2330047",
+            "62fb0d9c-87be-427a-86b6-288c5b9ebcfe",
+            "7887c046-ac71-4e86-8668-47222d8276be",
+            "7deab5b2-c40b-449d-8b42-fdf23751b11c",
+            "818c62f3-7e63-48a4-acee-469b8eac627c",
+            "826db44d-1690-471c-a8b9-50e9923b5d4a",
+            "854e82bf-6473-4e8e-85b1-643d9d51857c",
+            "9714a765-e87c-4c12-9072-4e665d145b1f",
+            "b23c33a6-f391-4348-9374-d4b77c84c43b",
+            "cb668520-86cf-4e2d-ac00-1aceaaf118c5",
+            "ff91f7ad-1547-4c9d-bba5-3aa623f8eaa0"
+          ]
+        },
+        {
+          "safetyFp": "1a2ad900abab40b9",
+          "T": 11,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "13bb06e7-baed-411c-bf62-2b0ecf523472",
+            "23364626-3b8b-457a-a69c-23fc36f1c42d",
+            "47056c77-96a4-483e-8c24-4724e6f556a4",
+            "52491ffe-c5d0-4d93-9830-890476f7510a",
+            "58ca8244-a5d4-4382-af35-411a7acb4323",
+            "7877c0eb-d6c7-486f-a216-963aa612e4e4",
+            "985ebff9-cbd6-4803-a100-129006ebfa4d",
+            "b74ca121-d322-47d6-b00a-9ca39916f2c2",
+            "c561b235-ecdf-40cd-9417-2e78563b38cb",
+            "e77a35e6-a20f-4716-9ab4-15f47a5f2f8c",
+            "e81497e8-2698-46e0-a540-d742ad6c6b8b"
+          ]
+        },
+        {
+          "safetyFp": "99b588004fcd6ade",
+          "T": 9,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "23cfe27e-3fa5-4ec1-b56b-ee861f745eaf",
+            "31528988-7448-4322-b65d-336819080061",
+            "3e33a9f1-6148-41da-b3f7-b4b392433f35",
+            "4e4bd48f-88b9-4e93-b47e-f10976bc01e3",
+            "55fd1024-8ecd-43e0-ba44-a736467d0920",
+            "68dbc98f-ae43-45db-bb36-c4b6f3adb004",
+            "b54398a4-5dff-49d2-b25e-72c5657acd74",
+            "c4b183c7-17c4-467a-90cf-bf47f3ab6f88",
+            "d1357e21-d74b-4548-8b50-76f75b6fe937"
+          ]
+        },
+        {
+          "safetyFp": "281b10e3363694de",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0daa06f2-61c1-4749-bf9c-3fcedb4702fa",
+            "18af9d27-4841-426f-9e8c-38652a776413",
+            "1e451ca2-bb6b-40e7-8fd1-5ffab628c213",
+            "29a173f3-111e-4186-98dc-9a1c4086701c",
+            "7b698fa3-6425-4bba-aa69-b2f747274837",
+            "bdc6915c-852f-40bc-95d9-4edd563995f5",
+            "ea92e34f-c25b-4924-afae-b2f08a18568f"
+          ]
+        },
+        {
+          "safetyFp": "67fc51d766697249",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "00db0582-eff2-4595-a208-b3863806646b",
+            "66a77226-9e2f-4c4f-b8f7-006ca5ec794a",
+            "f11ccf19-50f3-4001-b1e1-ea6a12f1bfc9",
+            "f1925dea-c81a-4b4a-8ae8-0655b3d373fa"
+          ]
+        },
+        {
+          "safetyFp": "bed768635945c599",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "10c6bb65-bc06-4ac7-b63f-5a03edfbc5b9",
+            "a49c51d1-d900-4e97-91b1-a43d8b67a353",
+            "cd91df90-5c07-4eaf-9e08-4cc9c124e92b",
+            "e3584966-8d2c-4ab3-acd3-bbaf781f789b"
+          ]
+        },
+        {
+          "safetyFp": "3f71194710f3e0c8",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12109681-1b42-4376-9c42-1e512590163b",
+            "8f0d16eb-68cc-4fcc-8329-01be52d2a642",
+            "a14bc855-a672-4d58-9e18-ce700949e333",
+            "d023b7aa-e60a-43bd-b24b-1ab05e5390d5"
+          ]
+        },
+        {
+          "safetyFp": "5ca435ce3ec4ec46",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0ffe1adc-ca4c-4a6e-b335-842cf94edeab",
+            "6b802cc9-2028-4e09-b353-51203884748c",
+            "b3bec9c7-2675-4771-8826-11297f4c9499"
+          ]
+        },
+        {
+          "safetyFp": "ac1f2e474869c8cd",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "47e3aad0-3bdb-4407-a964-4b3b9ea25046",
+            "4d7ef285-095f-4963-b1c6-df9e13f302df",
+            "ea5a0b84-2777-4904-81e8-0259379c5928"
+          ]
+        },
+        {
+          "safetyFp": "5125c2bc55cc6dbc",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5756c316-f669-4149-89b0-79873351070c",
+            "6b2e8bf6-6094-4ac7-97b9-68e60f24ac19"
+          ]
+        },
+        {
+          "safetyFp": "8bc527f5f4cedbbd",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "47e6342c-cf99-496c-8fba-adfdb53983d1",
+            "978ae2a4-d23f-4820-8ed0-0e597956d4de"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:이부프로펜|200밀리그램|연질캡슐|oral",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "ing": "이부프로펜",
+      "strength": "200밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 39,
+      "subgroupCount": 12,
+      "subgroups": [
+        {
+          "safetyFp": "64c19fe75542344d",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0b1edfff-d395-42f2-b544-fc220841e6ee",
+            "2f40a98b-df4c-4212-aeda-93d26a0a1bd9",
+            "560f1ab2-9820-4f7f-a100-99f3671e095f",
+            "7a85159f-2a22-49b2-b1cb-4a1a4e6cd3db",
+            "89c8c006-16fe-4836-882b-922c3c2610f0",
+            "c85e64cf-f349-411e-8613-132b249ed838",
+            "d3095016-1bee-40f2-8618-7556095f414a"
+          ]
+        },
+        {
+          "safetyFp": "76440b3214463e1a",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a566ba0-82c9-44aa-b272-33a723dd404f",
+            "1f59ce9c-1f43-4023-ae7c-19e9123ef8ea",
+            "2661f387-6c52-4745-812e-7c639e595418",
+            "8efe50db-31f0-467d-bd08-f844422f79c3"
+          ]
+        },
+        {
+          "safetyFp": "196954eec48a1d02",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "612cc734-9a4b-4e1d-841d-fcc32f249cb5",
+            "d9271475-0462-4693-abdf-4308097858ee",
+            "d9dca439-bc30-489c-b526-aecc8375cc30",
+            "f51c64a2-6058-43fd-bf73-a6876a0036bd"
+          ]
+        },
+        {
+          "safetyFp": "cc561b40146f01e7",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2c4c6320-ea3b-4c3e-b499-026f291a7617",
+            "686b9211-5299-4cc3-902d-d5ebfbb7c8e9",
+            "c1594035-203b-48b4-bd0e-1353df1e6073",
+            "e72c54e4-97ce-4595-944d-56fe0a1db5b9"
+          ]
+        },
+        {
+          "safetyFp": "97c40df123d7f1ac",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3bed0b0a-7fdf-4fe9-81e0-6342baf464ee",
+            "5f1bf318-2cda-4913-bb5e-8d8f75f5419e",
+            "e13639e9-e592-431f-a8b9-f5bb0e629b14",
+            "eb7fc731-b4ba-49e4-a153-3c16f7d95636"
+          ]
+        },
+        {
+          "safetyFp": "ecb36a46ae9ace1e",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3cd61b75-5c32-4c47-9d45-01d2d41648bf",
+            "6be66d0b-7585-4f52-9ea7-76fa1def3456",
+            "bf02d78a-eb0a-4db9-9fdc-530cc271af1e"
+          ]
+        },
+        {
+          "safetyFp": "f750ee47cedde162",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "32782207-f9e1-4154-a2f0-e8a0774e04f5",
+            "eb0e8e7b-36ec-47c9-8d71-26c4fddabbc8",
+            "f339b696-d6af-4bdd-a62b-f49a0260f2b5"
+          ]
+        },
+        {
+          "safetyFp": "28198b508f750d23",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "9a6a8b3a-b61d-45c2-83bf-ba04143451a2",
+            "be8a4470-9931-4722-a628-7157f2de153f"
+          ]
+        },
+        {
+          "safetyFp": "35359482a3d6c899",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1030388d-419c-4877-a189-8f2cf7b73358",
+            "4503eb58-348a-465c-b411-9ff2d8850af6"
+          ]
+        },
+        {
+          "safetyFp": "76496d408df9c431",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1f9e2cf4-748c-47c2-bb3b-0b278f3a8334",
+            "74fb94de-fdcd-4c62-8fca-81de9edc5544"
+          ]
+        },
+        {
+          "safetyFp": "bf2861a48acefe21",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "15a26a15-3e8d-4387-8a8a-e640bff2bab3",
+            "f8e05c0c-b08c-4090-8883-bf3222bbc6e1"
+          ]
+        },
+        {
+          "safetyFp": "f39434cf5fa44e53",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "645af195-58bb-4615-b151-01160375f980",
+            "c17ecf45-4a6e-4103-a4d6-086427952bde"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:바실루스리케니포르미스균|250밀리그램|캡슐|oral",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "ing": "바실루스리케니포르미스균",
+      "strength": "250밀리그램",
+      "form": "캡슐",
+      "easyMasters": 32,
+      "subgroupCount": 7,
+      "subgroups": [
+        {
+          "safetyFp": "93a8092acb495088",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6ac29462-50b5-4953-bbf3-226321cc4291",
+            "8b4d2a22-ed7d-43d6-a295-cbe0b77ef7ca",
+            "a49d92df-059e-4f0a-ade8-fa030fdff7ab",
+            "ab82ce0a-cc76-43d8-b47d-5ffec20a9490",
+            "d23fe1e8-55f1-4c09-a455-246281da862d",
+            "d30c6631-8bb5-40e9-a69e-37346a7582a0"
+          ]
+        },
+        {
+          "safetyFp": "e0d5debacf8eb9da",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "33f98e6a-8926-47fc-ad31-9d44b0952e46",
+            "7d6e555e-3d94-47b8-b9a2-a63e0f215102",
+            "7f7688cb-1780-4fa1-9f27-8afcf00963cf",
+            "b0776c99-ec5b-49e3-acd3-052c71503939",
+            "e3d759c3-2f3d-402b-9a51-66de9b49d17b",
+            "f5d45327-aa7a-40f7-bd24-8e43b4bce6ba"
+          ]
+        },
+        {
+          "safetyFp": "3471b9745f0547a6",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1430d894-ff80-45f2-a331-4ef2649d53b0",
+            "16c7a383-96e2-47ab-aaae-ab7161131f97",
+            "34b677e4-882d-4444-8d76-5e2476c2cb06",
+            "417fa0af-39b4-4b52-ad1b-f97f9c66c14f",
+            "c1d89517-4b6a-442e-9bdf-feadaead11b2"
+          ]
+        },
+        {
+          "safetyFp": "82e6a6631ad58093",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3b614244-1ae5-4d44-b8e5-2a7db928bf9b",
+            "5ff9e543-96f6-4cae-953d-e67efade06cf",
+            "897dfcf6-6cbf-4165-a70b-64adb37ceafe",
+            "bb872ae1-0eab-41bb-9a8b-2c74181c3177",
+            "fef17305-f1c0-46bb-9a54-abe5ae2d3b18"
+          ]
+        },
+        {
+          "safetyFp": "c05e829ba770f222",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1838f202-3e65-4011-9019-3d22f52c5d62",
+            "50d0991f-b688-4e4e-b99b-9d5ff95bc560",
+            "7847270f-ed4f-4572-bb31-62bf265ff85a",
+            "d910c24b-7c40-48a2-b7cf-745679657e8d"
+          ]
+        },
+        {
+          "safetyFp": "c85bbf2ad4e971d8",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3c13059f-2440-4aaf-ae39-75f75d76c3ac",
+            "a4a3a0e7-4f8e-43ed-afea-53a4987ea618",
+            "eaf14ae7-8d82-49ed-a9ad-9a89fce1b196"
+          ]
+        },
+        {
+          "safetyFp": "7417584d39ed88fe",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "d725db35-c4d1-485c-a11f-2d45677f713b",
+            "dd6175f0-5abf-497e-b79d-18ef7c547050",
+            "ee721406-96cf-47c0-bb3e-144d245e32b9"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:클로닉신리시네이트|125밀리그램|정|oral",
+      "groupKey": "클로닉신리시네이트|125밀리그램|정",
+      "ing": "클로닉신리시네이트",
+      "strength": "125밀리그램",
+      "form": "정",
+      "easyMasters": 25,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "620fa22b08df9b0d",
+          "T": 20,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "00af8365-0851-411d-9c34-f160988dc031",
+            "066de9ab-9f0d-4b12-8038-d9205b72cc2e",
+            "1151a83f-6ddd-4efe-b402-cefc415791e6",
+            "20c256f0-220f-44f6-8b96-f28b42a7281f",
+            "37d923f3-cb0d-4aef-8c42-dab21af76063",
+            "46d2eddc-0818-48d3-bbf7-7f259b3833d3",
+            "61702b78-7164-4a42-8545-ff152ebb000d",
+            "66cc32cd-f72f-4265-a242-ebde879e0948",
+            "6bdad241-f815-4455-938a-833584cd24da",
+            "708d046f-e5b1-4fec-a21a-b555bfd34caf",
+            "95a4f0ce-2766-407f-8a0d-9159d896cf98",
+            "96a34f84-959e-4223-a76e-dcf64fc8a8d0",
+            "a7bfffca-4e71-4ba1-acf7-11273f54bed5",
+            "caaa9b81-0286-4df3-bf35-789e57df5d08",
+            "cbb15b01-9646-4224-83c3-439b94c6fe54",
+            "e06d5274-bada-463c-8454-debaac47142f",
+            "e3dc15f6-a1c1-4cd0-ab7b-3e6bf740a035",
+            "eb21a4dd-d22c-4e9e-b7ae-2e22f24a2090",
+            "f552ae70-7275-4fd6-a3ec-420056171693",
+            "fcbde015-3bf1-46e5-b9a3-9e6472e5a651"
+          ]
+        },
+        {
+          "safetyFp": "7130bb560ab4f942",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0dba1e54-7440-4e44-ace9-6afb79ab2c57",
+            "1ee103a8-c9d6-4fb1-910c-68bd82dfe7a8",
+            "78b01097-fd3f-48c7-ad70-9fd2d6a1bd36",
+            "daa28c0a-5f6d-4ffd-834a-2d0eed02beb5",
+            "e566ab36-3587-49f4-a782-6d18c51026ee"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:펙소페나딘염산염|120밀리그램|정|oral",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "ing": "펙소페나딘염산염",
+      "strength": "120밀리그램",
+      "form": "정",
+      "easyMasters": 29,
+      "subgroupCount": 8,
+      "subgroups": [
+        {
+          "safetyFp": "548624cb0959a55e",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "004846f0-2d72-402a-b53b-070da950a9fa",
+            "47eddfa5-8c86-4c02-8a49-4a94f734f94e",
+            "5ef35aeb-3331-4879-8237-bef0a405fbeb",
+            "a40b4774-1f4b-4257-add2-08d883e42472",
+            "fb8ab742-e650-4eda-8af0-f9d919aeff53"
+          ]
+        },
+        {
+          "safetyFp": "342888e0806a95c7",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "62662539-2187-4e19-8532-8667a280542c",
+            "873662ee-b796-4659-9cde-3475f64f0b66",
+            "ab3a97cf-ab9d-4be1-bbb4-c2afed86efaf",
+            "bd6d7e3b-067a-4325-8066-7bf5b37b7a82",
+            "e4343200-b84f-43a7-8810-08786a8c6ca1"
+          ]
+        },
+        {
+          "safetyFp": "2f318ff7d7ad1095",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2c67c53a-daee-4d21-830b-2679fbfa6ee9",
+            "7c3764ab-871f-4c23-974c-efb8d1d7622e",
+            "81b00b49-a899-4521-b6c5-411a9b96e641",
+            "ad64c6f4-7201-4a46-a04a-b666ffdc389e",
+            "aea3df10-7442-4a46-bcd1-b2f03979ad6e"
+          ]
+        },
+        {
+          "safetyFp": "e5addac2c49668ad",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4f022fb1-51c7-4718-a6cc-ff4a1d197cfc",
+            "6d24a3d1-1281-4968-8a85-331fd2982c1d",
+            "76ec30d5-7af2-42ed-88ec-94015823617d",
+            "b8aa79eb-25a0-4542-bb32-9ef2cf394cb4"
+          ]
+        },
+        {
+          "safetyFp": "d5df80b3da7acf6b",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "29df15a2-a750-40f1-b48d-78f1f3c612a2",
+            "d1cdebda-8c94-4f14-aec6-ddc91c4b57c1",
+            "ea2dfeee-fd2e-43a7-a941-81a045da5ba1"
+          ]
+        },
+        {
+          "safetyFp": "e3b53055edb6cc22",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7c815e17-ccee-433c-8411-94578f344260",
+            "d88fd752-9d75-4af6-a54b-c57ad74d2ae0",
+            "f9c495f9-8ec4-4188-9941-535e82ac4b06"
+          ]
+        },
+        {
+          "safetyFp": "9e2531477eb37832",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "8ff3c6bc-1e07-487b-bd5f-f78dd67b975e",
+            "abcc3e77-5f92-45b4-bf01-4df7c1743320"
+          ]
+        },
+        {
+          "safetyFp": "1a04b4adf4bf56e0",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4a92e2f5-7755-4d1c-b9e1-2d696f0b8565",
+            "8299d7af-04b4-4475-ba2c-8e7af262476d"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:엘카르니틴|330밀리그램|정|oral",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "ing": "엘카르니틴",
+      "strength": "330밀리그램",
+      "form": "정",
+      "easyMasters": 26,
+      "subgroupCount": 10,
+      "subgroups": [
+        {
+          "safetyFp": "3df38abbfd9a3648",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1e80616e-4f06-4c3d-af99-d3fa83db4570",
+            "30803a19-4cde-40cf-a1dd-a2f69eb48148",
+            "3593a20c-44f8-467a-ad60-7ff0bd7ceb59",
+            "5c8905eb-c68a-4c5b-87ff-ef42ff9aa0e4"
+          ]
+        },
+        {
+          "safetyFp": "d3f8f7f5b47946c7",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1cbc9dfb-abf5-4eef-ac5a-48965e77ecbe",
+            "26e83a2c-8afa-447e-8036-8a9d0a7b2473",
+            "39f39839-fde0-4ee8-8b22-cad316fdc1f6",
+            "f312faa7-88e4-417a-9e3c-ca56620f19df"
+          ]
+        },
+        {
+          "safetyFp": "82d510a5e815d4c9",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "19526370-9991-408a-a191-c2dcda550b44",
+            "5fa5aaec-2c3a-49fd-93fc-225fbbf6077c",
+            "c6d417e0-a20e-47c7-8b0f-c7f60a335580"
+          ]
+        },
+        {
+          "safetyFp": "08f64eed21d54af3",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a21d0b9-1918-40f3-9e18-0b156755bea3",
+            "6430b9c0-f826-4396-a874-cda8ba80f732",
+            "e2f8e11d-bd8c-4902-af0b-b935c24a1426"
+          ]
+        },
+        {
+          "safetyFp": "eff694cf1af78f44",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "b249cd1e-01d9-4e7d-8d98-319d204b45e9",
+            "e1666549-7eb0-44fe-aa0e-d944ddc47c91"
+          ]
+        },
+        {
+          "safetyFp": "2821131c54a0c2f8",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "00c350a7-f5a4-4809-916a-42f356636bd0",
+            "85cec221-5429-400f-b466-df12c08d7d1c"
+          ]
+        },
+        {
+          "safetyFp": "a786b093c1216b1e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1542a26f-bb13-4fbb-b8ec-161c75a4400f",
+            "a61d134c-e596-42b3-8018-c315de79d74f"
+          ]
+        },
+        {
+          "safetyFp": "4024861707a8cf8a",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "befa8f7a-45f1-45b1-a29f-d13a5ebd1936",
+            "dc8295c3-5964-4a81-8ec9-ef26353e18f3"
+          ]
+        },
+        {
+          "safetyFp": "109a9d9b1a847333",
+          "T": 2,
+          "sourceComplete": false,
+          "hasEfficacy": false,
+          "hasUsage": false,
+          "hasCaution": true,
+          "cls": "HOLD_SOURCE_INCOMPLETE",
+          "master_ids": [
+            "28c34571-37e2-41c3-b8d1-dd9094f95fba",
+            "a5ac8ba6-0afc-471c-8028-5bfb3269649a"
+          ]
+        },
+        {
+          "safetyFp": "4d5023f37607599e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "072da727-d83a-4f02-aee9-e58ecdf4f09d",
+            "18f1d7e9-1986-4912-9fb6-31401abcd508"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:이부프로펜|400밀리그램|연질캡슐|oral",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "ing": "이부프로펜",
+      "strength": "400밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 24,
+      "subgroupCount": 11,
+      "subgroups": [
+        {
+          "safetyFp": "5e2f26e21e181fdf",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "07a51e85-664f-49c1-91c3-937a77f8f464",
+            "62374493-e3a0-4ac1-8a9b-e6a103a33664",
+            "a1e98ef9-161c-4856-a469-38f2201945af",
+            "eb2d981c-8fa3-4de0-922b-23750489ca79"
+          ]
+        },
+        {
+          "safetyFp": "dd93b9215db9a863",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "090139d8-5459-4504-a777-2df03deabaa3",
+            "41839365-4922-450a-a0b2-cc9e0413a5e1"
+          ]
+        },
+        {
+          "safetyFp": "909bc35a7eef3638",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "8665257c-7a17-4718-a4c1-41cacea34eef",
+            "881736af-4573-4efc-ba5f-99c20eae9fb4"
+          ]
+        },
+        {
+          "safetyFp": "05ec893c634dfdfd",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12717373-4f66-4649-beda-803c191046b0",
+            "75084b59-81b5-4747-8bc4-d0ecdb7f7757"
+          ]
+        },
+        {
+          "safetyFp": "879c0bd18cfaa3ff",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2410ac93-b9a3-4565-8e4e-99f9ae212387",
+            "7da16e6d-463d-4836-b008-b46ee8cbdd35"
+          ]
+        },
+        {
+          "safetyFp": "da9b98ecc856c54f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "c2ea4f40-855a-4366-8a7c-08bee543934d",
+            "e5599b90-7d0c-4733-9bff-a2c9c9b96642"
+          ]
+        },
+        {
+          "safetyFp": "f97ef9ccfbc66b8b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "9681525a-9e46-483c-8f4f-9f89a2acd61c",
+            "fda90b1e-0577-4e94-ba30-8709c10dd51c"
+          ]
+        },
+        {
+          "safetyFp": "d9be0d0f5c773340",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5e3be641-5a41-4483-86a3-5959e4a6aba4",
+            "c7b613a3-b333-40ec-944e-693f76a8a20a"
+          ]
+        },
+        {
+          "safetyFp": "05f4850ed56be04d",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "237780b5-dc00-4c4a-80e6-7f10b10121ad",
+            "78a02e7d-9a3a-4230-8709-336542e42928"
+          ]
+        },
+        {
+          "safetyFp": "68d4ca1b48a76541",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5e9693ec-85c1-459d-9129-cf4a5b3f9a7c",
+            "eb044926-cc69-47d2-be9a-f9b098ed3d32"
+          ]
+        },
+        {
+          "safetyFp": "15e0e5b630405162",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "72b5f81f-aa99-404b-a5a9-e23b74455501",
+            "f7fc9b39-3d5a-4067-a06c-223ab2b28555"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:세티리진염산염|10밀리그램|연질캡슐|oral",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "ing": "세티리진염산염",
+      "strength": "10밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 19,
+      "subgroupCount": 9,
+      "subgroups": [
+        {
+          "safetyFp": "6331acb23a01df21",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "186abcd4-93d4-4196-9cfd-1f87fdc19802",
+            "2283925a-ef12-4c29-ad49-cbe796b3f4b5",
+            "383e41ef-f1e0-4772-b45c-2cf971f64f25"
+          ]
+        },
+        {
+          "safetyFp": "17c5d428eb158d4f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4e1ebd3f-12e7-4b2d-96ce-e98874f13493",
+            "c8581f77-cc67-4a3c-8828-465806d28819"
+          ]
+        },
+        {
+          "safetyFp": "d605689d5fd9ea3f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "94d4ae5b-3205-46f3-9f6a-59128d1eaf51",
+            "c4a010d6-cf4e-4df1-86dd-6cdf760c9782"
+          ]
+        },
+        {
+          "safetyFp": "374205afe6cb9878",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3932b0af-7be9-43a0-ad58-97025dadb7bb",
+            "4cf1935a-7b19-4abe-b46e-1b37909e286d"
+          ]
+        },
+        {
+          "safetyFp": "c9c500f119982e53",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "597c4ecb-c768-42a5-b118-918382c13f49",
+            "86cd0524-dc9a-4228-aa23-5f83beef3d1b"
+          ]
+        },
+        {
+          "safetyFp": "ce05f0fb2b4616dd",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "39389ad6-ff8b-4509-8bf7-5b6b186982bb",
+            "94799404-045a-497e-9131-7316ed64a6d8"
+          ]
+        },
+        {
+          "safetyFp": "4bce0f1df379d467",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2743267b-4182-4f5b-befd-b840a088a7d6",
+            "9ccbf61a-f42b-4f8e-bf1c-129c7fa24a6a"
+          ]
+        },
+        {
+          "safetyFp": "4680e03bc7c59233",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "486ac650-0907-41dc-8e14-7d91ebf2dae3",
+            "c17de848-461e-430d-8500-ef3e0c42c69b"
+          ]
+        },
+        {
+          "safetyFp": "d1d8f2ce00e772c8",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "dc9c2515-1494-4600-ae4b-294628d797ec",
+            "f9c9c596-4135-4c2d-8149-8c7beb55c3ae"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:알파칼시돌|0.5마이크로그램|연질캡슐|oral",
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "ing": "알파칼시돌",
+      "strength": "0.5마이크로그램",
+      "form": "연질캡슐",
+      "easyMasters": 17,
+      "subgroupCount": 3,
+      "subgroups": [
+        {
+          "safetyFp": "8903739732775906",
+          "T": 9,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2197ee37-b87c-49e9-8e27-bbbffddf6d1b",
+            "2e9d75d3-001a-4205-9fcb-c7ca2aeaca75",
+            "31e0969d-0ca9-433b-add8-a02d1d78c3c3",
+            "3d68b624-d3da-4cb3-9571-0f6d12ea6315",
+            "3ddafa2c-8fab-4679-801a-08e17655d9ac",
+            "7e077db4-8d6a-4ba3-851d-b4c6a86526f1",
+            "7fea47c8-93dd-4dbb-b986-bf670090ad84",
+            "bdcee2f3-44c6-4499-b886-1a6a464666ab",
+            "ca82a4ac-c922-4fab-8601-aa5345bc313a"
+          ]
+        },
+        {
+          "safetyFp": "5cb7d1aabe41cbde",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2a80c422-6f9c-4ef7-9ca5-e0ff79ac264a",
+            "613621e8-81b5-433a-8a8b-2ee33fc89f81",
+            "99afb09f-0b32-4dd4-8aa9-8e9c39146597",
+            "f7aa7240-462f-4bc1-afd7-a5b805f55e74"
+          ]
+        },
+        {
+          "safetyFp": "93088a29cab5dd76",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+            "4dd50cbf-6bde-4a4a-97b5-6d7548fe1d96",
+            "6c059fc7-2d4a-44a3-ad93-03c71b67730d",
+            "8e32ad9c-7a15-47a3-88c3-ee6afd8ac6d0"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:트리메부틴말레산염|200밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "ing": "트리메부틴말레산염",
+      "strength": "200밀리그램",
+      "form": "정",
+      "easyMasters": 26,
+      "subgroupCount": 7,
+      "subgroups": [
+        {
+          "safetyFp": "b443ac71a546e540",
+          "T": 9,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12852913-84b7-434b-a2a3-36ca7468674a",
+            "174a15fb-3232-4f6c-8d22-200b09c1db4e",
+            "359e01c0-ae8c-475c-8b2f-1a337d5eb6c4",
+            "461f4601-5394-460c-9d9f-c3ad368a68f0",
+            "b1dfdf64-b5ff-401c-8037-e0ca1bb06276",
+            "b486cee9-a93d-4e96-98df-5f0be6d5d403",
+            "e0d3a844-187f-4dbb-931f-85be971b42a4",
+            "e4e2ec56-5b47-4f24-9ae1-12bc4ac261d0",
+            "f23b381b-4913-46f7-965b-14e12f8b718e"
+          ]
+        },
+        {
+          "safetyFp": "e640d79278ee8fd7",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7187c31b-1b8d-45ea-a1eb-49ef4679fd68",
+            "9de7ea85-51a1-4f03-90dc-bb46ffd13ceb",
+            "a5b7d5c0-4766-4480-abd0-53a83eec400a",
+            "b6e04bb3-3bd0-4e3f-9b15-aa8dcfb9adc9",
+            "d99073db-e76f-4299-9127-6c76b25c8036",
+            "f222c3c0-6270-402b-962d-e5267a811e9d",
+            "f2b60053-537e-4da6-8060-9ecc822d9c2d"
+          ]
+        },
+        {
+          "safetyFp": "dfa414b1530f12ce",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12e22feb-0982-4c0b-bd33-c7687ff2a770",
+            "215c60a1-e32c-4908-a444-085cc21ce299"
+          ]
+        },
+        {
+          "safetyFp": "cf7f3536eceddcda",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2c92b683-c1aa-474a-a614-6f2164b20b04",
+            "b323139c-5569-443b-b2ca-f43cd8a8e31c"
+          ]
+        },
+        {
+          "safetyFp": "0ebc586c64f27985",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "717899db-0961-4c3a-85e3-40eb356deac8",
+            "d8491157-16bb-4c1e-854e-ed1dc3b2063d"
+          ]
+        },
+        {
+          "safetyFp": "da200d65248ea621",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "a689f5ca-5525-47ff-9f77-44d1a477a805",
+            "f7866ddc-0a47-4921-adba-d98bbd2d1996"
+          ]
+        },
+        {
+          "safetyFp": "18464f4d5a4bbcb3",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0f633053-4a91-42cb-ae69-08e80371730d",
+            "a6090b09-a057-4d0e-8057-594bbe0745ed"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:트리메부틴말레산염|150밀리그램|정|oral",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "ing": "트리메부틴말레산염",
+      "strength": "150밀리그램",
+      "form": "정",
+      "easyMasters": 21,
+      "subgroupCount": 6,
+      "subgroups": [
+        {
+          "safetyFp": "784980c038ffc622",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "047c359b-c27d-4b67-9efc-7abccbcd5eb7",
+            "0eeb814d-68be-4178-962f-9dd9248fd0b6",
+            "61e973f6-f8e4-4311-8608-297c33605231",
+            "678cfb72-cf14-406b-bbb4-eccfeff0850d",
+            "a0300367-cd72-49ac-bd07-df1a0991340f",
+            "aca1ec3b-16ae-4ae0-a9c8-2ff232493506"
+          ]
+        },
+        {
+          "safetyFp": "8c8385e0c3079451",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3e75fcd0-e69d-4bfa-8cad-66f399df81c4",
+            "4b668225-e207-4bd4-b149-c8c5b31f9f6e",
+            "da8be808-37f3-4fb6-8463-05dfd7d4a5c0",
+            "e3d42c8f-8eff-4be9-a4ae-921f46912a34"
+          ]
+        },
+        {
+          "safetyFp": "a4e50e4a207f33a3",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "54ef7392-9dfe-46de-ac96-9a401e3b72f0",
+            "7f0141ea-3d56-4db1-aa54-9833e7e7fb6e",
+            "87eb32ec-4b70-4c32-8c88-64ae58ebfc58"
+          ]
+        },
+        {
+          "safetyFp": "8d85dd31bcbeebdf",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2afdb54f-d438-4c69-b51b-7117d624d668",
+            "af080458-c4ad-4341-88f7-17ecbec8812e",
+            "baf4eb98-809e-4024-a9e8-ebc12bca1c0f"
+          ]
+        },
+        {
+          "safetyFp": "c8cf0baeeb8a32fc",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "70fad15b-77e4-4fd7-a079-41bd6bcb885c",
+            "8b543755-80db-4882-a0ae-46adcbfa3322",
+            "af2941f3-f0f5-401c-b0f7-e79f285cdb5c"
+          ]
+        },
+        {
+          "safetyFp": "12342b0fa4c03b0e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "76994693-8183-43ec-b253-8010b547fb5b",
+            "e906d6f7-c932-4543-ab33-3259f57c35f9"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:로페라미드염산염|2밀리그램|캡슐|oral",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "ing": "로페라미드염산염",
+      "strength": "2밀리그램",
+      "form": "캡슐",
+      "easyMasters": 14,
+      "subgroupCount": 5,
+      "subgroups": [
+        {
+          "safetyFp": "902fc5b5319ed454",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "224d1953-1331-4427-b122-11062d2c08eb",
+            "879ce3a8-41e4-4314-bced-eaa6ec1d055c",
+            "897b5b82-3736-4e28-9973-5006de6cf9ac",
+            "e99937fa-aab8-4f76-ba0b-86806ac7fcd3",
+            "feb4c76d-a8b1-467d-ab3b-9080e20b9c56"
+          ]
+        },
+        {
+          "safetyFp": "5d7a59e846cfaee1",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "687b79a1-bce2-4f20-bb54-df272c6fe721",
+            "7f45f3b1-36d1-4609-afc8-9a33c6a187be",
+            "f91c4cd0-cea5-41fc-911e-337fed8eb623"
+          ]
+        },
+        {
+          "safetyFp": "7e6593d7633cb83f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2f5117a6-c282-48ff-8caf-d052944693fe",
+            "3e94fccc-96a6-41e9-8007-6e6928088093"
+          ]
+        },
+        {
+          "safetyFp": "9c4d176d83c65b39",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "62e2a7f1-d36f-4d18-8b24-4c75f568be9d",
+            "bbd9bb44-a908-41d4-9247-f61a50a4f0b6"
+          ]
+        },
+        {
+          "safetyFp": "4df80852910a6b4e",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0835f940-e8fe-4c38-ae24-6a5752f9ef51",
+            "26bed9c9-7222-4230-904f-9ce37e4b6ff3"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:니푸록사지드|200밀리그램|캡슐|oral",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "ing": "니푸록사지드",
+      "strength": "200밀리그램",
+      "form": "캡슐",
+      "easyMasters": 12,
+      "subgroupCount": 3,
+      "subgroups": [
+        {
+          "safetyFp": "11ec34143e1eddb8",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "18783f29-2d80-449b-9907-568b902e5993",
+            "703ae46a-aac9-4bd3-8569-252028c61324",
+            "8b55cf6c-67c3-47a0-8ddb-bf65a0df1d6a",
+            "91fb9021-ab67-4397-8d9f-ab2c7e8a0e24",
+            "a65e116c-ba4d-4108-8d6f-a185fe5bf209",
+            "e253da3c-5904-420c-afd3-d697c65b231f"
+          ]
+        },
+        {
+          "safetyFp": "a1b42d0bd4cc9c57",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2b38358e-e8e4-4c80-b18c-652f5e76153c",
+            "73a41958-5dc7-4f68-ab05-5c56bf7e1228",
+            "a569f2e5-1d0c-49e8-b491-345efe77ca00",
+            "c6f17627-3741-4f92-9cac-33ce716f205b"
+          ]
+        },
+        {
+          "safetyFp": "4130f92476145435",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "f3e4298f-186d-4f58-85d3-f60635e5935b",
+            "f902ec65-6355-415c-a19d-2045dd9185c2"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:독시라민숙신산염|25밀리그램|정|oral",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "ing": "독시라민숙신산염",
+      "strength": "25밀리그램",
+      "form": "정",
+      "easyMasters": 14,
+      "subgroupCount": 6,
+      "subgroups": [
+        {
+          "safetyFp": "7ec149cc8167314a",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "78643a9b-74e3-48fc-9133-adae38953544",
+            "c71a5848-cb96-4db1-8e2c-0f4787c87460",
+            "e1d682ed-11b1-4474-ba04-3261b6ab4c06"
+          ]
+        },
+        {
+          "safetyFp": "8a718888234358c9",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0d61b1fd-3e7e-484a-809a-c993809861f6",
+            "52b4ebff-f83f-47bf-82a1-b711d6ac4d3c",
+            "f5f1774c-9d88-46c3-82da-c0323c7cc441"
+          ]
+        },
+        {
+          "safetyFp": "c0737c7fea122f08",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "78925b63-9d52-4f98-be5a-eaef01bac591",
+            "d21e8501-ff53-43ec-9df8-39d1bd209d67"
+          ]
+        },
+        {
+          "safetyFp": "ea59632321c2907a",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "97797f7c-58ed-413f-a095-eb8981e2f2fc",
+            "b5d16af2-28a3-4779-b4f5-a230ee920c0a"
+          ]
+        },
+        {
+          "safetyFp": "bfd9db19c6c0783d",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01c154a5-9a1f-4ec4-bf82-a5a9a9f0f9ab",
+            "2d4af7f2-0feb-44f6-afdf-ec027f4212f0"
+          ]
+        },
+        {
+          "safetyFp": "f3188bf094f2c158",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "32f871f7-c85d-4556-b072-c005606389fe",
+            "6fa3d365-4f81-4de6-bcc0-39c8b8195387"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:탄산수소나트륨|500밀리그램|정|oral",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "ing": "탄산수소나트륨",
+      "strength": "500밀리그램",
+      "form": "정",
+      "easyMasters": 11,
+      "subgroupCount": 4,
+      "subgroups": [
+        {
+          "safetyFp": "a9081cef1848822a",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6353433d-28da-4313-aff9-bfb2522850e1",
+            "adc96db8-7ffa-4155-8900-333807314d26",
+            "f3c5023f-0533-46c6-be7f-eea9b76f705b"
+          ]
+        },
+        {
+          "safetyFp": "dd3c6bc39630fb21",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "65461a50-d837-4014-b51b-28046f45640d",
+            "943373ba-28fd-4be9-b258-163ea0ca5fe3",
+            "f7b53b9d-d323-4201-81d1-de19445d70a5"
+          ]
+        },
+        {
+          "safetyFp": "a9499ae312376500",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1a02fba5-2986-4b65-8f64-c6f0e959634c",
+            "26025f55-8d9b-46c6-9b9b-8efe090553b5",
+            "5312415e-b304-4afa-a7c3-cf6756e28c64"
+          ]
+        },
+        {
+          "safetyFp": "0951fd7c4948a015",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0a516990-431a-491b-92b8-d5f06b7c8736",
+            "7c22ce32-53af-430b-8755-8cc7dcfe78c9"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:디펜히드라민염산염|50밀리그램|연질캡슐|oral",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "ing": "디펜히드라민염산염",
+      "strength": "50밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 11,
+      "subgroupCount": 5,
+      "subgroups": [
+        {
+          "safetyFp": "4278b391441ef68a",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "83a294c4-fd41-4bcb-bbb6-3775169ed2a0",
+            "8742d2b7-bc01-4cf1-bd8b-823ebf205d5d",
+            "94cc51c8-492a-4a2a-badc-68d4d081e448"
+          ]
+        },
+        {
+          "safetyFp": "edef21809453a469",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5bb1d00c-e065-456e-8d80-8f761bd86801",
+            "a34972f7-35f0-409e-b93f-f9088c632e26"
+          ]
+        },
+        {
+          "safetyFp": "65130d5d7ee91d9f",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "79940cc6-738b-4af1-9d32-0f19814d0c34",
+            "b8490e05-5483-470a-a47b-33978467a2e1"
+          ]
+        },
+        {
+          "safetyFp": "c32bbfd9d9a4671b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "8d775369-6470-47c7-a026-82e08761c4b5",
+            "d7aa8e84-9e31-4611-9920-a84d2bc84363"
+          ]
+        },
+        {
+          "safetyFp": "6e04e11a1101cd59",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3cce72bd-accb-4400-8fd1-caad536cc423",
+            "617d442f-637a-400e-b765-318d5b1ed77a"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:덱스판테놀|100밀리그램|정|oral",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "ing": "덱스판테놀",
+      "strength": "100밀리그램",
+      "form": "정",
+      "easyMasters": 12,
+      "subgroupCount": 4,
+      "subgroups": [
+        {
+          "safetyFp": "3ec5588b0b973a66",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "02e5dd5f-75c1-4598-a088-8269b988b020",
+            "6d34d5c0-c1b4-4e04-960b-c5894bc95f35",
+            "7a8f8561-f155-4dd4-ae69-0b7eccd86f48",
+            "c2939c1b-eda5-4ce0-8792-182250eeb39a"
+          ]
+        },
+        {
+          "safetyFp": "e92e8182e7776ef8",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "38fd4385-275d-46d0-902d-2236de80af65",
+            "9471a93b-67a3-4135-a99e-4ad83860e075",
+            "f6a6bf58-8b9e-42d3-ad45-4cc76b40e32e",
+            "f717d67a-5162-4f8b-a3db-544f0cafc112"
+          ]
+        },
+        {
+          "safetyFp": "ffb834acdb5524bc",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "12cbb97d-8675-4d51-9974-c78955201556",
+            "78c7f7b1-e2f7-47cd-8499-19513107d5af"
+          ]
+        },
+        {
+          "safetyFp": "fb0ac3a481ef17ac",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5952600a-9ddb-41c9-87da-48d3dc62ed8d",
+            "d8ea554a-bf0d-4c11-99ce-20bf9dd7afe0"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:폴산|1밀리그램|정|oral",
+      "groupKey": "폴산|1밀리그램|정",
+      "ing": "폴산",
+      "strength": "1밀리그램",
+      "form": "정",
+      "easyMasters": 9,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "7e5234e792e81243",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3e053caa-aae4-4430-a0b6-77e54b73a195",
+            "50c9fee1-ebcf-4936-9949-dc86990df01f",
+            "51315054-1837-4a74-9eda-0f83387cd303",
+            "6783227f-5e45-48b4-a27e-4d6dc8b872e9",
+            "68632d74-da12-4bc3-93be-b7daae5d913d",
+            "893d3163-f7bc-4f3b-8ee1-27c38f37ae27",
+            "c37aed9f-8922-425a-93b9-5734be050a10"
+          ]
+        },
+        {
+          "safetyFp": "43e8a2a2600c6ff5",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "6af72220-e55c-462d-ae16-3b11073646fc",
+            "dce3bdef-fda4-4224-9f06-77019db10ac5"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:이부프로펜|200밀리그램|정|oral",
+      "groupKey": "이부프로펜|200밀리그램|정",
+      "ing": "이부프로펜",
+      "strength": "200밀리그램",
+      "form": "정",
+      "easyMasters": 9,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "c0ac6b9b3ba47923",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "5239d173-e75e-433d-8466-83bd92708180",
+            "984f334e-32c8-4275-9fb0-ad22282354c2",
+            "a6cf9dc0-01a1-4c9c-9396-cac095cb758f",
+            "bf60072c-bba1-4e8d-9b5a-b77ce56ad578",
+            "deef4db8-ec02-44d2-a9e4-d4a9b2313a2b"
+          ]
+        },
+        {
+          "safetyFp": "8a09bf39fedbcc81",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "009d75f9-953a-4b06-896f-7a30820b6074",
+            "0430092f-8ae5-4653-9c37-33fc795843c1",
+            "1bb6b9ad-173c-4bf3-943b-c61eebed6a6f",
+            "34a8b330-26ba-4583-9ed4-b2d1ce77f97a"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:브로멜라인|45밀리그램|정|oral",
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "ing": "브로멜라인",
+      "strength": "45밀리그램",
+      "form": "정",
+      "easyMasters": 8,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "65b33fe7a3c53846",
+          "T": 5,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0ad2abf2-31a7-4570-b731-a0b60886d469",
+            "0f4accb0-53b5-4654-8d7e-e785468f5c74",
+            "34861cbb-dcc2-4b1e-a8d4-c10740c3056e",
+            "55aa3a94-eb7f-4ba6-8cb3-29584ed69cbc",
+            "a1b0758e-583b-4eeb-91af-981fe756e4f7"
+          ]
+        },
+        {
+          "safetyFp": "256d28d631b618df",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "34add51f-93bf-4ea8-9c69-557dcb76cbac",
+            "397f775f-5ed1-4f9d-8739-68e1adfa8992",
+            "e2ab8e2b-3c53-414d-be0a-3b69aeb4aa9a"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:시트룰린말산염|500밀리그램|정|oral",
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "ing": "시트룰린말산염",
+      "strength": "500밀리그램",
+      "form": "정",
+      "easyMasters": 8,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "441cd9beb089844e",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "182c2891-4d7f-49d2-8e16-43a0307ad5aa",
+            "35c522ae-6766-4d9f-9f5a-98ed79654bc8",
+            "438fcc32-a805-40f6-9f78-6f2bc1139a23",
+            "77173143-e1a7-4505-a147-aa8796220d7b"
+          ]
+        },
+        {
+          "safetyFp": "e918af0820f86722",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01398127-5ffb-4d85-8e1b-b0111e33be6e",
+            "1f59e52c-0bd7-4911-ae12-854d5eef1e2c",
+            "63fdd0c8-6f3e-433d-a12c-00c671a4412b",
+            "a69f0590-7287-4329-bcba-0b3979502c61"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:비오틴|5밀리그램|정|oral",
+      "groupKey": "비오틴|5밀리그램|정",
+      "ing": "비오틴",
+      "strength": "5밀리그램",
+      "form": "정",
+      "easyMasters": 13,
+      "subgroupCount": 4,
+      "subgroups": [
+        {
+          "safetyFp": "b3a62e7e17e88136",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "065c20ee-e32c-443a-8ef6-b733d87ae6d2",
+            "266f98d4-9230-4183-b70b-bce12a3b395a",
+            "4042dba0-2b4c-4181-8258-e1f1447df6b5",
+            "581eadd1-45a5-4a1a-b5f1-0b93f6057860",
+            "7b4ab94b-cd67-481c-b374-7f1e2a3154bd",
+            "ce9562b4-f366-4307-bf9b-f047e9daffc0"
+          ]
+        },
+        {
+          "safetyFp": "4990184c8433cb34",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "45325322-11da-4ecf-a5d4-e641059bcff9",
+            "61046ef9-2f98-4417-9a55-3ae6ec63d37d",
+            "749744ea-47ec-4c36-9a3f-6cd911f97d64"
+          ]
+        },
+        {
+          "safetyFp": "36578a22ae4ae32c",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1918031d-400d-400b-a917-71ee449ee014",
+            "97f840df-9545-4888-8db0-26d9f9ec0050"
+          ]
+        },
+        {
+          "safetyFp": "054c3b34b5613318",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "50478a2d-fa6f-4cd8-9f97-a7c72be4d1d6",
+            "6d2cad72-2b73-4909-b634-ba7bd56a1fdb"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:수산화마그네슘|500밀리그램|정|oral",
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "ing": "수산화마그네슘",
+      "strength": "500밀리그램",
+      "form": "정",
+      "easyMasters": 7,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "47b61841f0d337dc",
+          "T": 7,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2be1ca7c-07d4-410d-a8ef-3e82fa31535e",
+            "431b31fe-f389-4800-9c54-2607fe585a4c",
+            "5297ee7e-2089-440c-b079-e6178e433085",
+            "6351ae13-8687-4712-8c58-821af40348fc",
+            "a4adc65c-717b-442e-99c4-31e9c496c09c",
+            "c43d7263-2504-4515-8e48-b195f9ea6f19",
+            "f6d8039b-0859-4dd1-a669-d97aaa5cc75a"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:아세트아미노펜|325밀리그램|연질캡슐|oral",
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "ing": "아세트아미노펜",
+      "strength": "325밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 6,
+      "subgroupCount": 3,
+      "subgroups": [
+        {
+          "safetyFp": "4c4041035190746b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "88b1a623-9e1a-4c43-be4f-b42d8d3298fc",
+            "f68daf9e-1ee2-45d2-a606-71447381a46d"
+          ]
+        },
+        {
+          "safetyFp": "73bae0990d1e7e37",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "68b37ef4-ab48-4e28-83fb-0e22e7e4b5b4",
+            "d95512d0-0677-41fc-8492-a4531f684733"
+          ]
+        },
+        {
+          "safetyFp": "759b9308b924f1ff",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "404084bb-5ff1-432a-b72f-d853c0a72ed5",
+            "6e68dd7d-822d-4640-8af8-778315b5678d"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:폴리사카리드철착염|326.1밀리그램|캡슐|oral",
+      "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+      "ing": "폴리사카리드철착염",
+      "strength": "326.1밀리그램",
+      "form": "캡슐",
+      "easyMasters": 5,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "5a38772b0e1c4588",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3eedd58b-d3d1-41f7-99d1-541e0f625767",
+            "55e221ff-179b-4013-a75f-36aa19b67712",
+            "ca78551f-9e30-4c81-964c-c1e52c161afc"
+          ]
+        },
+        {
+          "safetyFp": "eab21e27eeee88a0",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "ea87c030-97d0-4acb-aa44-916bbec99510",
+            "f904023e-b99f-4a91-8efd-3e622ed93dfd"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:에르도스테인|300밀리그램|정|oral",
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "ing": "에르도스테인",
+      "strength": "300밀리그램",
+      "form": "정",
+      "easyMasters": 4,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "ed0b9e1c34407e10",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "05c4fd55-cf09-4a10-9bb3-14545ce2e002",
+            "29d35352-9533-4145-b737-a0caf1244c9a",
+            "51967ab7-7c2d-45cb-b0ff-7914a8893fba",
+            "ab03e167-4df9-4ca5-bb6b-0550a6cce9ee"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:알파칼시돌|1마이크로그램|연질캡슐|oral",
+      "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+      "ing": "알파칼시돌",
+      "strength": "1마이크로그램",
+      "form": "연질캡슐",
+      "easyMasters": 4,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "db1eb6591019b19d",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "062ac5ce-c577-4502-84a9-57350847ba92",
+            "21f34f2a-770b-438f-85cd-3af380f51464",
+            "545c0343-a56b-4624-8161-9dc63c3437bc",
+            "5f42343c-96a4-4f8e-a787-59c97227d5bf"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:은행엽건조엑스|80밀리그램|정|oral",
+      "groupKey": "은행엽건조엑스|80밀리그램|정",
+      "ing": "은행엽건조엑스",
+      "strength": "80밀리그램",
+      "form": "정",
+      "easyMasters": 4,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "5125c0035aff0e88",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4b1f2516-cecd-466f-a67e-7139fda12a4a",
+            "76c10252-f159-4d2c-8d2f-3bea041a2e7a",
+            "a21cb66e-f5a7-4f6a-abf4-cd6bf0f545ec",
+            "e272615c-9fdf-409d-8a1a-c51dc034602c"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:사카로마이세스보울라르디균|282.5밀리그램|캡슐|oral",
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "ing": "사카로마이세스보울라르디균",
+      "strength": "282.5밀리그램",
+      "form": "캡슐",
+      "easyMasters": 4,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "e57b3f957bcd72de",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "2f2e4bf0-db79-49de-9899-34bcd87dd2fd",
+            "7b524fdd-fb8f-4804-a5cd-da67a6400e9d",
+            "9159d6f0-3abf-40b0-965d-95b969dbee20",
+            "d12f5bad-0513-41f7-9457-606174aa2fa4"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:L-시스틴|500밀리그램|연질캡슐|oral",
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "ing": "L-시스틴",
+      "strength": "500밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 4,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "0d6f587265a0924b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "023fadab-866c-4d8f-a860-8b96b44db2f6",
+            "e353ef1e-3c51-40ad-8d93-1db5377c16ab"
+          ]
+        },
+        {
+          "safetyFp": "e9a23526e985be52",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "64238487-50a1-4732-80b1-99487fe7fd15",
+            "ae73815d-6806-48f1-b6dd-33da9338ba23"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:니자티딘|75밀리그램|정|oral",
+      "groupKey": "니자티딘|75밀리그램|정",
+      "ing": "니자티딘",
+      "strength": "75밀리그램",
+      "form": "정",
+      "easyMasters": 3,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "4c4aebadf5222d98",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "3b034fb4-d6c3-4c5c-9799-b7a4d3785788",
+            "b8e1b003-3973-4b4b-a430-ba60d0001517",
+            "c2cb402a-94fd-40a7-abf4-a8a79c94315e"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:포도엽건조엑스|180밀리그램|캡슐|oral",
+      "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+      "ing": "포도엽건조엑스",
+      "strength": "180밀리그램",
+      "form": "캡슐",
+      "easyMasters": 3,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "c518c91e1f0d2fcc",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "0bf2b6d0-91b2-4c4b-8f53-61e31cb84d22",
+            "6fc135f2-8cbc-44dc-a6dc-355f7db6775f",
+            "c00dd4eb-6c74-454d-9ce4-32c58f995ef3"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:로라타딘|10밀리그램|정|oral",
+      "groupKey": "로라타딘|10밀리그램|정",
+      "ing": "로라타딘",
+      "strength": "10밀리그램",
+      "form": "정",
+      "easyMasters": 3,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "cb637d38e753aecb",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "7ad63fdf-f6ce-430c-905b-2524f42a8b0c",
+            "f1e1bcbd-3a79-4cf9-9eb6-e31110b00d90",
+            "f22fe18d-ded9-4d65-906d-ddd5ec6080ca"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:플루벤다졸|500밀리그램|정|oral",
+      "groupKey": "플루벤다졸|500밀리그램|정",
+      "ing": "플루벤다졸",
+      "strength": "500밀리그램",
+      "form": "정",
+      "easyMasters": 3,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "eea353c3969009e9",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "8c8cc17a-59c1-46f8-a27b-a0781bc6848e",
+            "adb541b6-8b89-4e56-8eec-625ca361719c",
+            "c0df1493-6049-4067-bb16-2724cd377f32"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:디오스민|300밀리그램|캡슐|oral",
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "ing": "디오스민",
+      "strength": "300밀리그램",
+      "form": "캡슐",
+      "easyMasters": 7,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "f0a444e291562f70",
+          "T": 4,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "292cb136-fa8c-400c-990c-ab445f847ee4",
+            "3ec08c2e-b5b6-412a-9a88-7c68d73c70f6",
+            "bdafd74d-4618-4067-aa27-b60524e6ad1c",
+            "e4718326-c1c1-400f-8ce6-52a4e28c5490"
+          ]
+        },
+        {
+          "safetyFp": "54cfe21fa45efdd0",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "1451cfe1-ace5-4937-adc5-c54c2e341535",
+            "207e8e3d-56b5-4890-b82b-5c2fda0efe75",
+            "53145f7c-db7c-4245-871a-ad83e4d67990"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:아세틸시스테인|100밀리그램|캡슐|oral",
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "ing": "아세틸시스테인",
+      "strength": "100밀리그램",
+      "form": "캡슐",
+      "easyMasters": 9,
+      "subgroupCount": 2,
+      "subgroups": [
+        {
+          "safetyFp": "33b55f591ed7eedf",
+          "T": 6,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "01df112b-8750-490e-af48-51f1da3d16aa",
+            "0be0a70e-5fce-41cb-af18-c524611d1aba",
+            "3b43f7cb-1400-47f7-8371-f8190ff699ee",
+            "401fd732-beb3-400d-8463-9a860680da6d",
+            "a8f4acaa-8010-4abe-9c58-35ef5099e2e5",
+            "b3476fb2-6e71-45f5-90c3-3b20579731f3"
+          ]
+        },
+        {
+          "safetyFp": "3d6ebf97a706f7eb",
+          "T": 3,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "031c86a4-4207-44e1-8591-1985ca00b773",
+            "13d6d63f-7518-4185-af12-2e037627710e",
+            "34da6c08-c1c6-4171-bab8-b5c75083f7d8"
+          ]
+        }
+      ]
+    },
+    {
+      "pk": "ing:클로닉신리시네이트|125밀리그램|연질캡슐|oral",
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "ing": "클로닉신리시네이트",
+      "strength": "125밀리그램",
+      "form": "연질캡슐",
+      "easyMasters": 2,
+      "subgroupCount": 1,
+      "subgroups": [
+        {
+          "safetyFp": "3d9107371f67f30b",
+          "T": 2,
+          "sourceComplete": true,
+          "hasEfficacy": true,
+          "hasUsage": true,
+          "hasCaution": true,
+          "cls": "READY_SAFETY_SUBGROUP",
+          "master_ids": [
+            "4085b2b3-0394-4a61-8993-9866b7b56993",
+            "cc7b9f5d-4419-4b20-aa0f-3441f4a5747b"
+          ]
+        }
+      ]
+    }
+  ]
+}
