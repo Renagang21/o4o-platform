@@ -6,7 +6,13 @@
  * - 표준 RichTextEditor(@o4o/content-editor, templateCategory="product", product-detail-860) 재사용.
  * - 저장: 임시저장(draft, submitted_at=null) / 검수요청(needs_review, submitted_at=now).
  * - 공급자는 canonical 을 직접 생성하지 않는다(운영자 검수 큐 경유).
- * - 언어 V1: 한국어(ko) 우선.
+ *
+ * WO-O4O-SUPPLIER-STORE-DESCRIPTION-LANGUAGE-EDITOR-V1: 언어별(ko/en/zh/ja) 작성·검수.
+ * - 지원 언어는 백엔드 계약(ALLOWED_LANG)과 동일한 ko/en/zh/ja 로 한정.
+ * - 각 언어는 **독립 작업행**(shared_product_descriptions STORE+language). listMine 은 master 의 전체
+ *   언어 행을 반환하므로 한 번 조회해 캐시하고 언어별로 필터링한다(백엔드 API 변경 없음).
+ * - 언어 전환 시: 미저장 변경 보호 + 해당 언어 초안 로드(없으면 빈 편집기). 한국어 내용을 다른 언어에
+ *   자동 복사하지 않는다. 저장·검수 요청도 언어별 독립.
  */
 import { useCallback, useEffect, useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
@@ -28,7 +34,15 @@ interface Props {
   onSaved?: () => void;
 }
 
-const LANGUAGE = 'ko';
+// 지원 언어 = 백엔드 계약(ALLOWED_LANG)과 동일. 확대 시 백엔드 계약 변경 필요(본 WO 범위 밖).
+const SUPPORTED_LANGS = ['ko', 'en', 'zh', 'ja'] as const;
+type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+const LANG_LABELS: Record<SupportedLang, string> = { ko: '한국어', en: 'English', zh: '中文', ja: '日本語' };
+const DEFAULT_LANG: SupportedLang = 'ko';
+const normLang = (v: string | null | undefined): SupportedLang => {
+  const l = (v ?? DEFAULT_LANG) as SupportedLang;
+  return SUPPORTED_LANGS.includes(l) ? l : DEFAULT_LANG;
+};
 
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
@@ -53,23 +67,35 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState('');
   const [existing, setExisting] = useState<SupplierStoreDescriptionDraft | null>(null);
+  // 선택 언어 + master 전체 언어 행 캐시(언어 전환은 재조회 없이 캐시에서) + 미저장 변경 플래그.
+  const [language, setLanguage] = useState<SupportedLang>(DEFAULT_LANG);
+  const [rows, setRows] = useState<SupplierStoreDescriptionDraft[]>([]);
+  const [dirty, setDirty] = useState(false);
 
-  // 기존 작업행(draft/needs_review/canonical) 로드 — 한국어 우선.
+  // 특정 언어의 작업행을 캐시에서 찾아 편집기에 로드(없으면 빈 편집기 — 자동 복사 금지).
+  const loadLanguageFrom = useCallback((all: SupplierStoreDescriptionDraft[], lang: SupportedLang) => {
+    const row = all.find((r) => normLang(r.language) === lang) ?? null;
+    setExisting(row);
+    setContent(row?.content || '');
+    setDirty(false);
+  }, []);
+
+  // 열릴 때: master 전체 언어 행 1회 조회 → 캐시 → 기본 언어(ko) 로드.
   useEffect(() => {
     if (!open || !product?.masterId) return;
     let mounted = true;
     setLoading(true);
     setContent('');
     setExisting(null);
+    setRows([]);
+    setLanguage(DEFAULT_LANG);
+    setDirty(false);
     supplierStoreDescriptionApi
       .listMine(product.masterId)
-      .then((rows) => {
+      .then((all) => {
         if (!mounted) return;
-        const ko = rows.find((r) => (r.language ?? 'ko') === LANGUAGE) ?? rows[0] ?? null;
-        if (ko) {
-          setExisting(ko);
-          setContent(ko.content || '');
-        }
+        setRows(all);
+        loadLanguageFrom(all, DEFAULT_LANG);
       })
       .catch(() => {})
       .finally(() => {
@@ -78,7 +104,18 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     return () => {
       mounted = false;
     };
-  }, [open, product?.masterId]);
+  }, [open, product?.masterId, loadLanguageFrom]);
+
+  // 언어 전환: 미저장 변경 보호 → 해당 언어 초안 로드(캐시).
+  const selectLanguage = useCallback((lang: SupportedLang) => {
+    if (lang === language) return;
+    if (saving) return;
+    if (dirty && !window.confirm(`저장하지 않은 변경사항이 있습니다.\n‘${LANG_LABELS[lang]}’ 로 전환하면 현재 편집 내용이 사라집니다. 계속하시겠습니까?`)) {
+      return;
+    }
+    setLanguage(lang);
+    loadLanguageFrom(rows, lang);
+  }, [language, saving, dirty, rows, loadLanguageFrom]);
 
   const editorImageUpload = useCallback(
     async (file: File): Promise<string> => {
@@ -101,25 +138,30 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
       const saved = await supplierStoreDescriptionApi.save({
         offerId: product.id,
         content: trimmed,
-        language: LANGUAGE,
+        language,
         submit,
       });
-      toast.success(submit ? '검수요청이 접수되었습니다' : '임시저장되었습니다');
-      setExisting((prev) =>
-        prev
-          ? { ...prev, id: saved.id, status: saved.status, submittedAt: saved.submittedAt }
-          : {
-              id: saved.id,
-              masterId: saved.masterId,
-              descriptionType: saved.descriptionType,
-              language: saved.language,
-              status: saved.status,
-              summary: null,
-              content: trimmed,
-              submittedAt: saved.submittedAt,
-              updatedAt: new Date().toISOString(),
-            },
-      );
+      toast.success(submit ? `검수요청이 접수되었습니다 (${LANG_LABELS[language]})` : `임시저장되었습니다 (${LANG_LABELS[language]})`);
+      // 저장된 언어 행으로 existing + 캐시(rows) 갱신 — 다른 언어 행은 건드리지 않는다.
+      const savedRow: SupplierStoreDescriptionDraft = {
+        ...(existing ?? {} as SupplierStoreDescriptionDraft),
+        id: saved.id,
+        masterId: saved.masterId,
+        descriptionType: saved.descriptionType,
+        language: saved.language ?? language,
+        status: saved.status,
+        summary: existing?.summary ?? null,
+        content: trimmed,
+        submittedAt: saved.submittedAt,
+        updatedAt: new Date().toISOString(),
+      };
+      setExisting(savedRow);
+      setDirty(false);
+      setRows((prev) => {
+        const idx = prev.findIndex((r) => normLang(r.language) === language);
+        if (idx >= 0) { const next = prev.slice(); next[idx] = savedRow; return next; }
+        return [...prev, savedRow];
+      });
       onSaved?.();
       if (submit) onClose();
     } catch (err) {
@@ -146,7 +188,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
             <h3 className="text-lg font-bold text-slate-900 truncate">{product.name || product.masterName || '(이름 없음)'}</h3>
             <p className="text-xs text-slate-500 font-mono mt-0.5">{product.barcode}</p>
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-xs text-slate-400">매장용(STORE) 설명서 · 한국어</span>
+              <span className="text-xs text-slate-400">매장용(STORE) 설명서 · {LANG_LABELS[language]}</span>
               {statusCfg && (
                 <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${statusCfg.cls}`}>{statusCfg.label}</span>
               )}
@@ -165,6 +207,36 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
             </div>
           ) : (
             <>
+              {/* WO-...-LANGUAGE-EDITOR-V1: 언어 탭 — 언어별 독립 작업행(자동 복사 없음). */}
+              <div className="mb-3">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {SUPPORTED_LANGS.map((l) => {
+                    const row = rows.find((r) => normLang(r.language) === l);
+                    const active = l === language;
+                    const dot = !row ? null
+                      : row.status === 'canonical' ? 'bg-emerald-500'
+                      : (row.status === 'needs_review' || row.status === 'revision_requested') ? 'bg-amber-500'
+                      : 'bg-slate-400';
+                    return (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => selectLanguage(l)}
+                        disabled={saving}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors disabled:opacity-50 ${
+                          active ? 'border-emerald-400 bg-emerald-50 text-emerald-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {LANG_LABELS[l]}
+                        {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} title="작성된 설명서 있음" />}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1.5">
+                  언어별로 <b>독립된 설명서</b>입니다. 한 언어를 저장해도 다른 언어에는 영향이 없으며, 언어마다 따로 검수받습니다. (● = 작성됨)
+                </p>
+              </div>
               {isCanonical && (
                 <div className="mb-3 px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
                   이 설명서는 운영자 검수를 통과해 매장에 노출 중입니다. 수정 후 다시 저장하면 새 초안으로 검수를 받습니다.
@@ -179,7 +251,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
               )}
               <RichTextEditor
                 value={content}
-                onChange={(c) => setContent(c.html)}
+                onChange={(c) => { setContent(c.html); setDirty(true); }}
                 editable={!saving}
                 placeholder="매장 경영자가 고객 응대·QR·태블릿에 활용할 매장용 설명서를 작성하세요"
                 minHeight="360px"
