@@ -317,18 +317,37 @@ export function createStoreTabletRoutes(
 
   /**
    * DELETE /tablets/:id
-   * 태블릿 비활성화 (soft delete)
+   * 태블릿 비활성화 (soft delete = is_active=false)
+   *
+   * WO-O4O-TABLET-DELETE-CONTENT-CASCADE-AND-TERMINOLOGY-CLEANUP-V1:
+   *   태블릿 비활성 시 그 태블릿의 코너 콘텐츠 연결(store_tablet_corner_contents)과
+   *   현재 화면 참조(current_screen_set_id)를 **같은 트랜잭션에서 정리**한다.
+   *   그렇지 않으면 비활성 태블릿에 남은 연결/current 참조가 Screen Set 보관(archive)을
+   *   영구 차단한다(SCREEN_SET_IN_USE / ARCHIVE_BLOCKED_CONNECTED). store_tablets·
+   *   store_tablet_corner_contents 에는 deleted_at 컬럼이 없어(스키마 무변경 원칙) 연결 행은
+   *   기존 수동 연결 해제(DELETE /tablets/:id/screen-sets/:screenSetId)와 동일하게 **DELETE** 한다.
+   *   태블릿 row 자체는 기존과 동일하게 is_active=false 로 남긴다(진열/idle 이력 보존).
    */
   router.delete('/tablets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
       const tabletId = req.params.id;
-      const result = await dataSource.query(
-        `UPDATE store_tablets SET is_active = false
-         WHERE id = $1 AND organization_id = $2`,
-        [tabletId, organizationId],
-      );
+      let affected = 0;
+      await dataSource.transaction(async (m) => {
+        const result = await m.query(
+          `UPDATE store_tablets SET is_active = false, current_screen_set_id = NULL
+           WHERE id = $1 AND organization_id = $2`,
+          [tabletId, organizationId],
+        );
+        affected = Array.isArray(result) ? (result[1] ?? 0) : 0;
+        if (affected === 0) return; // 미존재/타매장 → 밖에서 404
+        // 이 태블릿의 코너 콘텐츠 연결 정리(다른 태블릿 연결은 tablet_id 조건으로 무영향).
+        await m.query(
+          `DELETE FROM store_tablet_corner_contents WHERE tablet_id = $1 AND organization_id = $2`,
+          [tabletId, organizationId],
+        );
+      });
 
-      if (result[1] === 0) {
+      if (affected === 0) {
         res.status(404).json({
           success: false,
           error: 'Tablet not found',

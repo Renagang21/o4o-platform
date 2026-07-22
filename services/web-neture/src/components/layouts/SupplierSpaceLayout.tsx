@@ -84,9 +84,9 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     // WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C:
     //   공급자 소유 Screen Set(canonical 아님) 제작 → 대상 매장 HUB 게시. 매장은 가져가 독립 사본 생성.
-    label: '매장용 타블렛',
+    label: '매장용 태블렛',
     icon: MonitorSmartphone,
-    items: [{ label: '매장용 타블렛 콘텐츠', path: '/supplier/tablet-screen-sets' }],
+    items: [{ label: '매장용 태블렛 콘텐츠', path: '/supplier/tablet-screen-sets' }],
   },
   {
     // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1

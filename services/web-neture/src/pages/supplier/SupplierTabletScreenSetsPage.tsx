@@ -1,9 +1,9 @@
 /**
- * SupplierTabletScreenSetsPage — 공급자 매장용 타블렛 Screen Set 제작·게시
+ * SupplierTabletScreenSetsPage — 공급자 매장용 태블렛 Screen Set 제작·게시
  *
  * WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C
  *
- * 공급자가 매장 배포용 타블렛 Screen Set 원본(origin='supplier')을 제작·수정·미리보기하고,
+ * 공급자가 매장 배포용 태블렛 Screen Set 원본(origin='supplier')을 제작·수정·미리보기하고,
  * 대상 매장 유형(약국/비약국/전체)을 지정해 매장 HUB 에 게시한다. 매장은 이를 가져가 **독립 사본**을
  * 만든다(공급자 원본의 수정·게시 해제·보관은 기존 매장 사본에 영향을 주지 않는다).
  *
@@ -217,10 +217,10 @@ export default function SupplierTabletScreenSetsPage() {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
           <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-600" /> 매장용 타블렛 콘텐츠
+            <Layers className="w-5 h-5 text-indigo-600" /> 매장용 태블렛 콘텐츠
           </h1>
           <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">
-            매장에 제공할 타블렛 화면 세트 원본을 제작하고, 대상 매장 유형을 지정해 매장 HUB 에 게시합니다.
+            매장에 제공할 태블렛 화면 세트 원본을 제작하고, 대상 매장 유형을 지정해 매장 HUB 에 게시합니다.
             매장이 가져가면 <b>매장 소유의 독립 사본</b>이 만들어지며, 이후 원본을 수정·게시 해제해도 매장 사본은 영향을 받지 않습니다.
           </p>
         </div>
@@ -237,7 +237,7 @@ export default function SupplierTabletScreenSetsPage() {
           </div>
         ) : sets.length === 0 ? (
           <div className="text-center py-12 px-4">
-            <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 타블렛 화면 세트를 제작해 주세요.</p>
+            <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 태블렛 화면 세트를 제작해 주세요.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
