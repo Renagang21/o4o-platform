@@ -16,7 +16,18 @@ V1 감사는 "기존 authored 공통 canonical 을 **확장**할 수 없다"를 
 | 2 | 에스톰액\|A16AX\|20그램\|액 | A16AX | 액 | 3 | mfds_drug_otc | ✅ | ✅ |
 | 3 | 디케이정\|A11JC\|339.5밀리그램\|정 | A11JC | 정 | 3 | mfds_drug_otc_nutrition_combo | ✅ | ✅ |
 
-**완료 그룹 3 · 완료 master 9 · KO write 9(교체) · EN write 9(신규).**
+**[Batch 2 추가]**
+
+| # | groupKey | ATC | 제형 | target | source_type | KO | EN |
+|--:|---|---|---|--:|---|:--:|:--:|
+| 4 | 마그온플러스연질캡슐\|A11JC\|250밀리그램\|연질캡슐 | A11JC | 연질캡슐 | 3 | mfds_drug_otc_nutrition_combo | ✅ | ✅ |
+| 5 | 엑세라민에이스정\|A11AA\|50밀리그램\|정 | A11AA | 정 | 3 | mfds_drug_otc_nutrition_combo | ✅ | ✅ |
+| 6 | 쎌레타민정\|A11JC\|100밀리그램\|정 | A11JC | 정 | 3 | mfds_drug_otc_nutrition_combo | ✅ | ✅ |
+| 7 | 헤모글루탑연질캡슐\|B03AE10\|200밀리그램\|연질캡슐 | B03AE10 | 연질캡슐 | 3 | mfds_drug_otc | ✅ | ✅ |
+
+**세션 합계: 완료 그룹 7 · 완료 master 21 · KO write 21(교체) · EN write 21(신규).**
+Batch2 독립검증: 12 target → ko_authored 12 · en 12 · easy_deprecated 12 · easy_still_canon 0 · ko_dup 0.
+Batch2 보존 안전정보 예: 비타민 A 5,000 IU 임신 초기 금기 경고(엑세라민), 대두유·콩·땅콩 과민 금기(마그온·쎌레타민), 철분 6세 이하 과량 중독사망 경고(헤모글루탑) — 전량 원문 강도 그대로 보존.
 
 ## 2. 독립 검증 (runner 자기보고와 별도 SQL)
 
