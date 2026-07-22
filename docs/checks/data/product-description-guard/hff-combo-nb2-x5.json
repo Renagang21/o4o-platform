@@ -1,0 +1,212 @@
+[
+ {
+  "candidateId": "b2-x5-001",
+  "productName": "셀로맥스 모두의에이치",
+  "productNameEn": "셀로맥스 모두의에이치",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031343",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1. 비타민C : ① 결합조직 형성과 기능유지에 필요 ② 철의 흡수에 필요 ③ 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n2. 비오틴 : ①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "[비타민C정제]\n1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2. 비타민 C : 표시량(30 mg/2,300 mg)의 80~150%       \n3. 대장균군 : 음성\n4. 붕해시험 : 60분 이내\n\n[비오틴경질캡슐]\n1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질캡슐\n2. 비오틴 : 표시량(600 μg/2,300 mg)의 80~180%\n3. 대장균군 : 음성\n4. 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1포를(700mg×2정, 450mg×2캡슐) 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "[비타민C정제] 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 [비오틴경질캡슐] 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질캡슐",
+   "storage": "습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "μg",
+    "basisAmount": 2300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 600μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 모두의에이치<small>비오틴 · 비타민 C</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>600μg</b>, 비타민 C <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비오틴 <b>600μg</b>, 비타민 C <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>[비타민C정제] 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 [비오틴경질캡슐] 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질캡슐 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(600μg/2300mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/2300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> [비타민C정제] 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 [비오틴경질캡슐] 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 600μg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로맥스 모두의에이치<small>Biotin · Vitamin C</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>600μg</b> of Biotin, <b>30mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>600μg</b> Biotin, <b>30mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (600μg / 2300mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 2300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> [비타민C정제] 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 [비오틴경질캡슐] 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-x5-002",
+  "productName": "비오틴5000",
+  "productNameEn": "비오틴5000",
+  "manufacturer": "(주)뉴팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017014582",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "- 성상 : 이미, 이취가 없고 고유의 향미가 있는 분말을 함유한 투명한 경질캡슐\n- 비오틴 : 표시량(5,000 ㎍/400 mg)의 80~180%\n- 비타민c : 표시량(30 mg/400 mg)의 80~150%\n- 대장균군 : 음성\n- 붕해도 :20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 섭취량 및 섭취방법을 확인하시고 섭취하여 주십시오.\n- 유통기한이 경과된 제품은 섭취하지 않도록 주의바랍니다.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\n- 알레르기 체질이신 분은 성분을 확인 후 섭취하여 주십시오.\n- 어린이 섭취 시 보호자의 지도, 감독 하에 섭취시키십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 분말을 함유한 투명한 경질캡슐",
+   "storage": "직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5000,
+    "unit": "μg",
+    "basisAmount": 400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 5000μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비오틴5000<small>비오틴 · 비타민 C</small></h1><p class=\"sd-meta\">(주)뉴팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>5000μg</b>, 비타민 C <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비오틴 <b>5000μg</b>, 비타민 C <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 분말을 함유한 투명한 경질캡슐 · (주)뉴팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(5000μg/400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/400mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 5000μg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비오틴5000<small>Biotin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)뉴팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5000μg</b> of Biotin, <b>30mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>5000μg</b> Biotin, <b>30mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)뉴팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (5000μg / 400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 400mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 분말을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-x5-003",
+  "productName": "시크릿 비오틴 플러스",
+  "productNameEn": "시크릿 비오틴 플러스",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021774",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n[비오틴] ①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있는 백색의 제피정제\n②비오틴 : 표시량(1,200㎍/300mg)의 80~180%\n③비타민C : 표시량(30mg/300mg)의 80~150%\n④대장균군 : 음성\n⑤붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "- 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \n- 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 백색의 제피정제",
+   "storage": "①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1200,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 1200μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>시크릿 비오틴 플러스<small>비오틴 · 비타민 C</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>1200μg</b>, 비타민 C <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비오틴 <b>1200μg</b>, 비타민 C <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 백색의 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(1200μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 1200μg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>시크릿 비오틴 플러스<small>Biotin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1200μg</b> of Biotin, <b>30mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1200μg</b> Biotin, <b>30mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (1200μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-x5-004",
+  "productName": "프리미엄 모타민",
+  "productNameEn": "프리미엄 모타민",
+  "manufacturer": "(주)바이오 로제트",
+  "manufacturerEn": null,
+  "statementNo": "20040017015214",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의향미가 있는 흰색의 장방형 코팅정제 \n(2) 비타민C: 표시량(500mg/1000mg)의 80~150% \n(3) 비오틴: 표시량(5,000ug/1000mg)의 80~180% \n(4) 대장균군 : 음성\n(5) 붕해: 적합(60분이내)",
+   "intake": "1일1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "1. 포장이 변형, 팽창, 손상되었거나 내용물이 변질되었을 경우 섭취하지 마십시오.\n2. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n3. 특정 질환이나 알레르기 체질인 경우 섭취 전 반드시 의사와 상담하시기 바랍니다.\n4. 소비기한이 경과된 제품은 섭취하지 마시기 바랍니다.\n5. 과량 섭취하지 않도록 주의하십시오.\n6. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의향미가 있는 흰색의 장방형 코팅정제",
+   "storage": "1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5000,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 5000μg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 모타민<small>비오틴 · 비타민 C</small></h1><p class=\"sd-meta\">(주)바이오 로제트 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>5000μg</b>, 비타민 C <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비오틴 <b>5000μg</b>, 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의향미가 있는 흰색의 장방형 코팅정제 · (주)바이오 로제트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(5000μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의향미가 있는 흰색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 5000μg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 모타민<small>Biotin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)바이오 로제트 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5000μg</b> of Biotin, <b>500mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>5000μg</b> Biotin, <b>500mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)바이오 로제트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (5000μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의향미가 있는 흰색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-x5-005",
+  "productName": "뷰티비타민C1000",
+  "productNameEn": "뷰티비타민C1000",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001242",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 이미이취가 없고 고유의 향미가 있는 황회색의 원형 정제\r\n2) 비타민C : 표시량(1,000mg/4g)의 80~150%\r\n3) 비오틴 : 표시량 (300ug/4g)의 80~180%\r\n4) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정 씹어서 섭취 또는 1일 1회, 1회 2정 씹어서 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "이미이취가 없고 고유의 향미가 있는 연한 노란분홍색의 원형정제",
+   "storage": "직사광선 및 고온 다습한 곳을 피하여 보관하십시오.",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "μg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 300μg</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>뷰티비타민C1000<small>비오틴 · 비타민 C</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>300μg</b>, 비타민 C <b>1000mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비오틴 <b>300μg</b>, 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미이취가 없고 고유의 향미가 있는 연한 노란분홍색의 원형정제 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(300μg/4g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미이취가 없고 고유의 향미가 있는 연한 노란분홍색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 300μg</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>뷰티비타민C1000<small>Biotin · Vitamin C</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300μg</b> of Biotin, <b>1000mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>300μg</b> Biotin, <b>1000mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (300μg / 4g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미이취가 없고 고유의 향미가 있는 연한 노란분홍색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

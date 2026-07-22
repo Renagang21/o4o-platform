@@ -1,0 +1,464 @@
+[
+ {
+  "candidateId": "b2-va-vc-001",
+  "productName": "아이비타민A 파인애플맛",
+  "productNameEn": "아이비타민A 파인애플맛",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006953",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 노란 하양색의 츄어블정제\r\n2) 비타민A : 표시량(700 ㎍RE/1.5 g)의 80~150%\r\n3) 비타민C : 표시량(100 mg/1.5 g)의 80~150%\r\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정(1.5 g)을 씹어서 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취 전 의사와 상담하십시오.\r\n② 특정 성분에 알레르기가 있는 분은 원료명을 확인 후 섭취하십시오.\r\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "노란 하양색의 츄어블정제",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 700,
+    "unit": "μg",
+    "basisAmount": 1.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이비타민A 파인애플맛<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>노란 하양색의 츄어블정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/1.5g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 노란 하양색의 츄어블정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이비타민A 파인애플맛<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>700μg</b> of Vitamin A, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>700μg</b> Vitamin A, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 1.5g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 노란 하양색의 츄어블정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-002",
+  "productName": "야무진초롱",
+  "productNameEn": "야무진초롱",
+  "manufacturer": "(주)바이오 로제트",
+  "manufacturerEn": null,
+  "statementNo": "20040017015173",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 연보라~보라색의 원형 츄어블 정제\n2. 베타카로틴: 표시량 (2mg/2g)의 80~150%\n3. 비타민C: 표시량 (100mg/2g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 2회, 1회 1정을 씹어서 섭취 하십시오.",
+   "caution": "1)섭취 시 섭취량 및 섭취방법을 확인하고 섭취하십시오.\n2)질병을 치료중이거나 알레르기 체질인 경우 의사와 상담 후 섭취여부를 결정하십시오\n3)특이체질,알레르기 체질인 경우에는 개인에 따라 과민반응이 나타낼 수 있으므로 원료를 확인 후 섭취하십시오. \n4)유통기한이 경과된 제품은 섭취하지 마시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연보라~보라색의 원형 츄어블 정제",
+   "storage": "1. 이 제품은 습기에 약해 변색우려가 있으므로, 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오. 2. 개봉 후에는 빨리 섭취하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 2mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>야무진초롱<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)바이오 로제트 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>2mg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 A <b>2mg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연보라~보라색의 원형 츄어블 정제 · (주)바이오 로제트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(2mg/2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연보라~보라색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 1. 이 제품은 습기에 약해 변색우려가 있으므로, 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오. 2. 개봉 후에는 빨리 섭취하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 2mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>야무진초롱<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)바이오 로제트 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2mg</b> of Vitamin A, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>2mg</b> Vitamin A, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)바이오 로제트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (2mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연보라~보라색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 1. 이 제품은 습기에 약해 변색우려가 있으므로, 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오. 2. 개봉 후에는 빨리 섭취하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-003",
+  "productName": "아이비타민A포도맛",
+  "productNameEn": "아이비타민A포도맛",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006958",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 흰 분홍색의 츄어블정제\r\n2) 비타민A : 표시량(700 ㎍RE/ 1.5 g)의 80~150%\r\n3) 비타민C : 표시량(100 mg/1.5 g)의 80~150%\r\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정(1.5 g)을 씹어서 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취 전 의사와 상담하십시오.\r\n② 특정 성분에 알레르기가 있는 분은 원료명을 확인 후 섭취하십시오.\r\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "흰 분홍색의 츄어블정제",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 700,
+    "unit": "μg",
+    "basisAmount": 1.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이비타민A포도맛<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>흰 분홍색의 츄어블정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/1.5g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 흰 분홍색의 츄어블정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이비타민A포도맛<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>700μg</b> of Vitamin A, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>700μg</b> Vitamin A, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 1.5g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 흰 분홍색의 츄어블정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-004",
+  "productName": "밝은 세상 츄어블 에이",
+  "productNameEn": "밝은 세상 츄어블 에이",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "20100019004142",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "① 성 상 : 흰 분홍색의 원형의 츄어블정제로 이미, 이취가\n없다.\n② 대장균군 : 음성\n③ 비타민 C : 표시량 (35mg / 1,000mg) 의 80~150%\n④ 비타민 A : 표시량 (750㎍RE / 1,000mg) 의 80~150%",
+   "intake": "1일 1회, 1회 1정씩 씹어서 섭취",
+   "caution": "① 과량섭취시 부작용이 있을 수 있음.\r\n② 특정원료에 알레르기가 있거나 질병치료 약물투여중인 분은 섭취전 전문가와 상의하십시오.",
+   "dosageForm": "흰 분홍색의 원형의 츄어블정제로 이미, 이취가없다.",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 750,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 750μg</span><span class=\"sd-badge is-solid\">비타민 C 35mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>밝은 세상 츄어블 에이<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>750μg</b>, 비타민 C <b>35mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>750μg</b>, 비타민 C <b>35mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>흰 분홍색의 원형의 츄어블정제로 이미, 이취가없다. · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(750μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(35mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 흰 분홍색의 원형의 츄어블정제로 이미, 이취가없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 750μg</span><span class=\"sd-badge is-solid\">Vitamin C 35mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>밝은 세상 츄어블 에이<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>750μg</b> of Vitamin A, <b>35mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>750μg</b> Vitamin A, <b>35mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (750μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (35mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 흰 분홍색의 원형의 츄어블정제로 이미, 이취가없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-005",
+  "productName": "아이사랑비타민",
+  "productNameEn": "아이사랑비타민",
+  "manufacturer": "고려인삼과학주식회사",
+  "manufacturerEn": null,
+  "statementNo": "20040015039106",
+  "category": "hff",
+  "source": {
+   "mainFunction": "비타민A\r\n1)어두운 곳에서 시각 적응을 위해 필요, 2)피부와 점막을 형성하고 기능을 유지하는데 필요, 3)상피세포의 성장과 발달에 필요\r\n비타민C\r\n1)결합조직 형성과 기능유지에 필요, 2)철의 흡수에 필요, 3)유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 분홍색의 정제품으로 이미.이취가 없다.\r\n2) 비타민A : 184.7㎍RE/ 800mg의 80~150%\r\n3) 비타민C : 16mg/800mg 의 80~150%\r\n4) 대장균군 : 음성\r\n5) 붕해시험 : 적합",
+   "intake": "1일 3회 1회 1정(800mg) 을 녹여서 먹거나 물과함께 섭취하십시오.",
+   "caution": "1)섭취시 정제가 기도에 걸릴수 있으니 주의 하시기 바랍니다.\r\n2)제품의 섭취시 섭취량 및 섭취방법을 확인하고 섭취하여 주십시오.\r\n3)알레르기 체질이신 경우 성분을 확인 하신 후 섭취하십시오",
+   "dosageForm": "분홍색의 정제품",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 유통한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 184.7,
+    "unit": "μg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 184.7μg</span><span class=\"sd-badge is-solid\">비타민 C 16mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>아이사랑비타민<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">고려인삼과학주식회사 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>184.7μg</b>, 비타민 C <b>16mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 A <b>184.7μg</b>, 비타민 C <b>16mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>분홍색의 정제품 · 고려인삼과학주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(184.7μg/800mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(16mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 분홍색의 정제품</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 184.7μg</span><span class=\"sd-badge is-solid\">Vitamin C 16mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>아이사랑비타민<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by 고려인삼과학주식회사 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>184.7μg</b> of Vitamin A, <b>16mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>184.7μg</b> Vitamin A, <b>16mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 고려인삼과학주식회사</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (184.7μg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (16mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 분홍색의 정제품</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-006",
+  "productName": "초롱초롱 어린이 베타카로틴",
+  "productNameEn": "초롱초롱 어린이 베타카로틴",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "20100019004194",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[베타카로틴]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성   상    :  빨간색 점이 있는 연한 노란색의 원형 츄어블 정제로 이미, 이취가 없다.\n2) 베타카로틴 :  표시량 (1.8mg/1,000mg)의 80~150%\n3) 비타민C    :  표시량 (35.0mg/1,000mg)의 80~150%\n4) 대장균군   :  음 성",
+   "intake": "1일 1회, 1회 1정씩 씹어서 섭취",
+   "caution": "① 과량섭취시 부작용이 있을 수 있음\n② 특정원료에 알레르기가 있거나 질병치료 약물투여중인 분은 섭취전 전문가와 상의하십시오.\n[베타카로틴]\n1) 흡연자는 섭취 시 전문가와 상담할 것\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "빨간색 점이 있는 연한 노란색의 원형 츄어블 정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.8,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 1.8mg</span><span class=\"sd-badge is-solid\">비타민 C 35mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>초롱초롱 어린이 베타카로틴<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>1.8mg</b>, 비타민 C <b>35mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>1.8mg</b>, 비타민 C <b>35mg</b></li><li>빨간색 점이 있는 연한 노란색의 원형 츄어블 정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(1.8mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(35mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 빨간색 점이 있는 연한 노란색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 1.8mg</span><span class=\"sd-badge is-solid\">Vitamin C 35mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>초롱초롱 어린이 베타카로틴<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.8mg</b> of Vitamin A, <b>35mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1.8mg</b> Vitamin A, <b>35mg</b> Vitamin C</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (1.8mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (35mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 빨간색 점이 있는 연한 노란색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-007",
+  "productName": "광동 레티놀C",
+  "productNameEn": "광동 레티놀C",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142083",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민A]\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없는 흰색 또는 흰 노란색의 장방형 제피정제\n(2) 비타민C : 표시량(100mg/500mg)의 80 ~ 150%\n(3) 비타민A : 표시량(700㎍ RAE/500mg)의 80 ~ 150%\n(4) 대장균군 : 음성\n(5) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[비타민C]\n(1) 과량 섭취하지 않도록 주의할 것\n(2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n(3)이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없는 흰색 또는 흰 노란색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 700,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>광동 레티놀C<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>700μg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 흰색 또는 흰 노란색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 흰색 또는 흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>광동 레티놀C<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>700μg</b> of Vitamin A, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>700μg</b> Vitamin A, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 흰색 또는 흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-008",
+  "productName": "웨이더아이비타민A",
+  "productNameEn": "웨이더아이비타민A",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006779",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없는 갈색, 노란색, 분홍색 점박이가 있는 미백색 정제\r\n(2) 비타민A : 표시량(540㎍RE/3.0g)의 80.0~150.0%\r\n(3) 비타민C : 표시량(63mg/3.0g)의 80.0~150.0%\r\n(4) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정을 씹어서 섭취.",
+   "caution": "① 특정 성분에 알레르기가 있으신 분은 원재료명을 확인 후 섭취하십시오.\r\n② 임신, 수유부나 의약품을 섭취하시는 분은 본 제품을 드시기 전에 의사와 상담 후 섭취하십시오.",
+   "dosageForm": "갈색, 노란색, 분홍색 점박이가 있는 미백색 정제",
+   "storage": "① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 540,
+    "unit": "μg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 540μg</span><span class=\"sd-badge is-solid\">비타민 C 63mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>웨이더아이비타민A<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>540μg</b>, 비타민 C <b>63mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 A <b>540μg</b>, 비타민 C <b>63mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>갈색, 노란색, 분홍색 점박이가 있는 미백색 정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(540μg/3g)의 80.0~150.0%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(63mg/3g)의 80.0~150.0%</div><div class=\"sd-item\"><b>성상</b> 갈색, 노란색, 분홍색 점박이가 있는 미백색 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 540μg</span><span class=\"sd-badge is-solid\">Vitamin C 63mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>웨이더아이비타민A<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>540μg</b> of Vitamin A, <b>63mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>540μg</b> Vitamin A, <b>63mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (540μg / 3g), 80.0~150.0%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (63mg / 3g), 80.0~150.0%</div><div class=\"sd-item\"><b>Appearance</b> 갈색, 노란색, 분홍색 점박이가 있는 미백색 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-009",
+  "productName": "플러스온 아이비타민",
+  "productNameEn": "플러스온 아이비타민",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "2012001700211",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "(1)성상:노란색의 원형정제로 이미, 이취가 없어야 한다.\r\n(2)비타민C:표시량(35mg/1.0g)의 80~150%\r\n(3)비타민A:표시량(245ug RE/1.0g)의 80~150%\r\n(4)대장균군:음성",
+   "intake": "1일 1회, 1회 1정을 녹이거나 씹어서 섭취하십시오.",
+   "caution": "(1)특정질환, 특이체질, 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 \r\n    있으므로 원료를 확인 후 섭취하십시오.\r\n(2)유통기한을 확인하시기 바라며, 권장섭취량 및 섭취방법을 준수하시기 바랍니다.\r\n(3)어린이가 섭취할때는 보호자의 관리감독하에 주의하여 섭취시켜 주십시오.",
+   "dosageForm": "노란색의 원형정제로 이미,이취가 없어야 한다.",
+   "storage": "(1)고온다습한 곳을 피해 서늘한 곳에 보관하여 주십시오.\r\n(2)개봉후에는 흡습으로 내용물이 일부 변색될 수 있으니 반드시 방습제를 넣은 채로 뚜껑을\r\n   단단히 닫아서 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 245,
+    "unit": "μg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 245μg</span><span class=\"sd-badge is-solid\">비타민 C 35mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>플러스온 아이비타민<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>245μg</b>, 비타민 C <b>35mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>245μg</b>, 비타민 C <b>35mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>노란색의 원형정제로 이미,이취가 없어야 한다. · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(245μg/1g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(35mg/1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 노란색의 원형정제로 이미,이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> (1)고온다습한 곳을 피해 서늘한 곳에 보관하여 주십시오. (2)개봉후에는 흡습으로 내용물이 일부 변색될 수 있으니 반드시 방습제를 넣은 채로 뚜껑을 단단히 닫아서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 245μg</span><span class=\"sd-badge is-solid\">Vitamin C 35mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>플러스온 아이비타민<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>245μg</b> of Vitamin A, <b>35mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>245μg</b> Vitamin A, <b>35mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (245μg / 1g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (35mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 노란색의 원형정제로 이미,이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> (1)고온다습한 곳을 피해 서늘한 곳에 보관하여 주십시오. (2)개봉후에는 흡습으로 내용물이 일부 변색될 수 있으니 반드시 방습제를 넣은 채로 뚜껑을 단단히 닫아서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-010",
+  "productName": "엔셀린 알파",
+  "productNameEn": "엔셀린 알파",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "201200170108",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[베타카로틴]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 진한갈색의 분말을 함유한 투명 경질캡슐\r\n2) 대장균군 : 음성\r\n3) 붕해도 : 20분이내\r\n4) 비타민C : 표시량(72mg/1.6g)의 80~150%\r\n5) 베타카로틴 : 표시량(7.2mg/1.6g)의 80~150%",
+   "intake": "1일 2회,1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신,수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 진한갈색의 분말을 함유한 투명 경질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7.2,
+    "unit": "mg",
+    "basisAmount": 1.6,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 7.2mg</span><span class=\"sd-badge is-solid\">비타민 C 72mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>엔셀린 알파<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>7.2mg</b>, 비타민 C <b>72mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 A <b>7.2mg</b>, 비타민 C <b>72mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 진한갈색의 분말을 함유한 투명 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(7.2mg/1.6g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(72mg/1.6g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 진한갈색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 7.2mg</span><span class=\"sd-badge is-solid\">Vitamin C 72mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>엔셀린 알파<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>7.2mg</b> of Vitamin A, <b>72mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>7.2mg</b> Vitamin A, <b>72mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (7.2mg / 1.6g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (72mg / 1.6g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 진한갈색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-va-vc-011",
+  "productName": "블루베리맛 눈사랑 비타민A & C",
+  "productNameEn": "블루베리맛 눈사랑 비타민A & C",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107494",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "(1)성상: 연보라색의 원형 정제로 이미, 이취가 없음\r\n(2)대장균군: 음성\r\n(3)비타민C: 표시량(500 mg/2,000mg)의 80~150%\r\n(4)비타민A : 표시량(702ugRE/2,000mg)의 80~150%",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 분은 성분을 확인한 후, 섭취하시기 바랍니다.\r\n② 영ㆍ유아, 임신ㆍ수유부나 질환보유자 또는 약물 복용중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "연보라색의 원형 정제로 이미, 이취가 없음",
+   "storage": "①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.\r\n②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오.\r\n③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 702,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A 702μg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>블루베리맛 눈사랑 비타민A &amp; C<small>비타민 A · 비타민 C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 A <b>702μg</b>, 비타민 C <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 A <b>702μg</b>, 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연보라색의 원형 정제로 이미, 이취가 없음 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 A</b> 표시량(702μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 연보라색의 원형 정제로 이미, 이취가 없음</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오. ③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 A · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin A 702μg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>블루베리맛 눈사랑 비타민A &amp; C<small>Vitamin A · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>702μg</b> of Vitamin A, <b>500mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>702μg</b> Vitamin A, <b>500mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin A</b> labelled (702μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 연보라색의 원형 정제로 이미, 이취가 없음</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ①반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오. ③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin A · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

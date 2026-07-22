@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "b2-vc-se-zn-001",
+  "productName": "트러스펙트 리포좀 비타민C",
+  "productNameEn": "트러스펙트 리포좀 비타민C",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997240",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 :  이미, 이취가 없고 고유의 향미가 있는 백색의 분말\n2. 비타민C : 표시량(500mg/2,000mg)의 80~150%\n3. 아연 : 표시량(8.5mg/2,000mg)의 80~150%\n4. 셀렌 : 표시량(55ug/2,000mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 그대로 섭취하거나 물과 함께 섭취하십시오.",
+   "caution": "1.이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2.알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 백색의 분말",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트러스펙트 리포좀 비타민C<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 백색의 분말 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>트러스펙트 리포좀 비타민C<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>500mg</b> Vitamin C, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-002",
+  "productName": "바른 리포좀 비타민C",
+  "productNameEn": "바른 리포좀 비타민C",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997241",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 :  이미, 이취가 없고 고유의 향미가 있는 백색의 분말\n2. 비타민C : 표시량(500mg/2,000mg)의 80~150%\n3. 아연 : 표시량(8.5mg/2,000mg)의 80~150%\n4. 셀렌 : 표시량(55ug/2,000mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 그대로 섭취하거나 물과 함께 섭취하십시오.",
+   "caution": "1.이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2.알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 백색의 분말",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바른 리포좀 비타민C<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 백색의 분말 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>바른 리포좀 비타민C<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>500mg</b> Vitamin C, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-003",
+  "productName": "클린스펙",
+  "productNameEn": "클린스펙",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107605",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요\r\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "(1) 성상: 이미, 이취가 업고 고유의 향미가 있는 녹색의 장원형 코팅정제\r\n(2) 대장균군: 음성\r\n(3) 비타민C: 표시량(30 mg/3,300mg)의 80~150%\r\n(4) 셀렌: 표시량(100 ㎍/3,300mg)의 80~150%\r\n(5) 아연: 표시량(10 mg/3,300mg)의 80~150%\r\n(6) 붕해시험: 적합",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 반응을 보이는 사람의 경우, 섭취 전 성분을 확인하십시오. \r\n② 질환보유자 또는 약물 복용중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "이미, 이취가 업고 고유의 향미가 있는 녹색의 장원형 코팅정제",
+   "storage": "① 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.\r\n② 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 3300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">셀레늄 100μg</span><span class=\"sd-badge is-solid\">아연 10mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>클린스펙<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>30mg</b>, 셀레늄 <b>100μg</b>, 아연 <b>10mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 C <b>30mg</b>, 셀레늄 <b>100μg</b>, 아연 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 업고 고유의 향미가 있는 녹색의 장원형 코팅정제 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/3300mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(100μg/3300mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(10mg/3300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 업고 고유의 향미가 있는 녹색의 장원형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ② 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge is-solid\">Selenium 100μg</span><span class=\"sd-badge is-solid\">Zinc 10mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>클린스펙<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Vitamin C, <b>100μg</b> of Selenium, <b>10mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>30mg</b> Vitamin C, <b>100μg</b> Selenium, <b>10mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 3300mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (100μg / 3300mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (10mg / 3300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 업고 고유의 향미가 있는 녹색의 장원형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. ② 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-004",
+  "productName": "리포좀 비타민C 500mg 플러스",
+  "productNameEn": "리포좀 비타민C 500mg 플러스",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997247",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 :  고유의 향미가 있고, 이미, 이취가 없는 백색의 분말\n2. 비타민C : 표시량(500mg/2,000mg)의 80~150%\n3. 아연 : 표시량(8.5mg/2,000mg)의 80~150%\n4. 셀렌 : 표시량(55ug/2,000mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 그대로 섭취하거나 물과 함께 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n2. 알레르기 체질이신 경우 성분을 확인 후 섭취하시기 바랍니다..",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 백색의 분말",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>리포좀 비타민C 500mg 플러스<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 백색의 분말 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>리포좀 비타민C 500mg 플러스<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>500mg</b> Vitamin C, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-005",
+  "productName": "튼튼 리포좀 비타민 C 아연",
+  "productNameEn": "튼튼 리포좀 비타민 C 아연",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142038",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n[셀렌]\n(1) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없는 하얀색 또는 노랑 하얀색의 분말\n(2) 비타민C : 표시량(250mg/2,500mg)의 80 ~ 150%\n(3) 아연 : 표시량(3㎎/2,500mg)의 80 ~ 150%\n(4) 셀렌 : 표시량(40㎍/2,500mg)의 80 ~ 150%\n(5) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "[비타민C]\n(1) 과량 섭취하지 않도록 주의할 것\n(2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없는 하얀색 또는 노랑 하얀색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 250,
+    "unit": "mg",
+    "basisAmount": 2500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge is-solid\">셀레늄 40μg</span><span class=\"sd-badge is-solid\">아연 3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>튼튼 리포좀 비타민 C 아연<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>250mg</b>, 셀레늄 <b>40μg</b>, 아연 <b>3mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>250mg</b>, 셀레늄 <b>40μg</b>, 아연 <b>3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 하얀색 또는 노랑 하얀색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(40μg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(3mg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 하얀색 또는 노랑 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 250mg</span><span class=\"sd-badge is-solid\">Selenium 40μg</span><span class=\"sd-badge is-solid\">Zinc 3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>튼튼 리포좀 비타민 C 아연<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>250mg</b> of Vitamin C, <b>40μg</b> of Selenium, <b>3mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>250mg</b> Vitamin C, <b>40μg</b> Selenium, <b>3mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (250mg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (40μg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (3mg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 하얀색 또는 노랑 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-006",
+  "productName": "원퀵플러스",
+  "productNameEn": "원퀵플러스",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200083312",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[셀레늄] 유해산소로부터 세포를 보호하는데 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 회색의 하얀색 장방형 제피 정제\n2. 비타민C : 표시량(100mg/1000mg)의 80~150%\n3. 셀레늄 : 표시량(55μg/1000mg)의 80~150%\n4. 아연 : 표시량(8.5mg/1000mg)의 80~150%\n5. 대장균군 : 음성\n6. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정(1정당 500mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민 C]\n과량 섭취하지 않도록 주의할 것\n신장질환이 있는 경우 섭취 전 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 회색의 하얀색 장방형 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>원퀵플러스<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>100mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 C <b>100mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 회색의 하얀색 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 회색의 하얀색 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>원퀵플러스<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>100mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>100mg</b> Vitamin C, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 회색의 하얀색 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-007",
+  "productName": "바른 리포좀 비타민C 제로",
+  "productNameEn": "바른 리포좀 비타민C 제로",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997276",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 :  고유의 향미가 있고, 이미, 이취가 없는 노란하양색의 분말\n2. 비타민C : 표시량(500mg/2,000mg)의 80~150%\n3. 아연 : 표시량(8.5mg/2,000mg)의 80~150%\n4. 셀렌 : 표시량(55ug/2,000mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 그대로 섭취하거나 물과 함께 섭취하십시오.",
+   "caution": "1. 과량 섭취하지 않도록 주의할 것\n2. 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 노란하양색의 분말",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바른 리포좀 비타민C 제로<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 C <b>500mg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 노란하양색의 분말 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 노란하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>바른 리포좀 비타민C 제로<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>500mg</b> Vitamin C, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 노란하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-008",
+  "productName": "필리 비타민 C",
+  "productNameEn": "필리 비타민 C",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351556",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]\n결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 유해산소로부터 세포를 보호하는데 필요\n[셀렌]\n유해산소로부터 세포를 보호하는데 필요\n[아연]\n정상적인 면역기능에 필요 / 정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰노랑색 또는 연노랑색의 장방형 제피 정제\n2. 대장균군 : 음성\n3. 붕해도 : 60분 이내\n4. 비타민C : 표시량(600mg/1200mg)의 80~150%\n5. 셀렌 : 표시량(25μg/1200mg)의 80~150%\n6. 아연 : 표시량(7.5mg/1200mg)의 80~150%",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "1) 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n2) 임산부, 수유부, 특이체질, 알레르기 등의 체질이신 경우 성분을 확인 후 섭취하십시오.\n3) 이상사례 발생 시 즉시 섭취를 중단하시고, 전문가와 상담하십시오.\n4) 전자레인지에 포를 데우지 않도록 주의하십시오.\n5) 개봉 후, 즉시 섭취하시기 바랍니다.\n6) 강력방습제인 실리카겔은 섭취하지마십시오.(실리카겔 투입 시)",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰노랑색 또는 연노랑색의 장방형 제피 정제",
+   "storage": "1. 직사광선과 습한 곳(주방 등)을 피하여 건조한 곳에 보관해 주십시오.   2. 품질을 보호·유지하기 위해 다른 용기로의 이동을 삼가해 주십시오.   3. 어린이 손이 닿지 않는 곳에 보관해 주십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 600,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 600mg</span><span class=\"sd-badge is-solid\">셀레늄 25μg</span><span class=\"sd-badge is-solid\">아연 7.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>필리 비타민 C<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>600mg</b>, 셀레늄 <b>25μg</b>, 아연 <b>7.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 C <b>600mg</b>, 셀레늄 <b>25μg</b>, 아연 <b>7.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰노랑색 또는 연노랑색의 장방형 제피 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(600mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(25μg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(7.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰노랑색 또는 연노랑색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선과 습한 곳(주방 등)을 피하여 건조한 곳에 보관해 주십시오. 2. 품질을 보호·유지하기 위해 다른 용기로의 이동을 삼가해 주십시오. 3. 어린이 손이 닿지 않는 곳에 보관해 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 600mg</span><span class=\"sd-badge is-solid\">Selenium 25μg</span><span class=\"sd-badge is-solid\">Zinc 7.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>필리 비타민 C<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>600mg</b> of Vitamin C, <b>25μg</b> of Selenium, <b>7.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>600mg</b> Vitamin C, <b>25μg</b> Selenium, <b>7.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (600mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (25μg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (7.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰노랑색 또는 연노랑색의 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선과 습한 곳(주방 등)을 피하여 건조한 곳에 보관해 주십시오. 2. 품질을 보호·유지하기 위해 다른 용기로의 이동을 삼가해 주십시오. 3. 어린이 손이 닿지 않는 곳에 보관해 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-se-zn-009",
+  "productName": "트리플 디펜스 비타민C",
+  "productNameEn": "트리플 디펜스 비타민C",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021974",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀레늄(또는 셀렌)] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 노란색의 제피정제\n② 비타민C : 표시량(1,000mg/2,400mg)의 80~150%\n③ 셀렌 : 표시량(16.5㎍/2,400mg)의 80~150%\n④ 아연 : 표시량(2.55mg/2,400mg)의 80~150%\n⑤ 대장균군 : 음성\n⑥ 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 1정 또는 1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 노란색의 제피정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>트리플 디펜스 비타민C<small>비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>1000mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 C <b>1000mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 노란색의 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>트리플 디펜스 비타민C<small>Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000mg</b> of Vitamin C, <b>16.5μg</b> of Selenium, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>1000mg</b> Vitamin C, <b>16.5μg</b> Selenium, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
