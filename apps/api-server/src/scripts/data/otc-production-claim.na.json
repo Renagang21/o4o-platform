@@ -48,7 +48,7 @@
       "track": "NUTRITION_COMBO_EN_ONLY",
       "masters": 8,
       "op": "EN_ONLY",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "칼슘·비타민D|정제(combo)",
@@ -57,7 +57,7 @@
       "track": "NUTRITION_COMBO_EN_ONLY",
       "masters": 317,
       "op": "EN_ONLY",
-      "status": "CLAIMED"
+      "status": "DONE"
     }
   ]
 }
