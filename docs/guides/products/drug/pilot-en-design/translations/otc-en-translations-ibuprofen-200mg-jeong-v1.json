@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "이부프로펜 200mg 정(200mg 연질캡슐과 별개 제형). sibling(source_ref 0168e020) 검토완료 en(md5 3344b8b5d879ab72be4120c736c0df82) 재구성 → target 5. build==live sibling en byte-identical 게이트.",
+  "translations": [
+    {
+      "groupKey": "이부프로펜|200밀리그램|정",
+      "title": "Ibuprofen 200 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, back pain, period pain, arthritis, pain after surgery, headache, toothache, muscle pain, nerve pain and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take one to two tablets (200–400 mg) three to four times a day. Take it after food if your stomach is sensitive, and do not take it together with other anti-inflammatory painkillers.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney disease, heart failure or bronchial asthma; for pain around CABG surgery; or in the last 3 months of pregnancy. Because of the risk of cardiovascular clots and gastrointestinal bleeding, stop taking it and seek advice if you have stomach pain, black stools or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 200 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Fever, headache, toothache, period pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A common anti-inflammatory painkiller tablet"
+      }
+    }
+  ],
+  "summary": null
+}

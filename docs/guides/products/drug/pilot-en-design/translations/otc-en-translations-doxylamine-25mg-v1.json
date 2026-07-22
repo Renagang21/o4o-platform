@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "독시라민숙신산염 25mg 정. sibling(source_ref 0be1a647) 검토완료 en(md5 0811860b47fa41ac250832e88923667c) 재구성 → target 5. build==live sibling en byte-identical 게이트.",
+  "translations": [
+    {
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "title": "Doxylamine Succinate 25 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as an aid for insomnia and for sedation.",
+      "usage": "Adults take one tablet (25 mg) once a day, always 30 minutes before sleep. Do not drink alcohol while taking it, and do not take it for more than 2 weeks without a pharmacist's advice.",
+      "caution": "Do not take this if you have a breathing disorder such as emphysema, chronic bronchitis or asthma; glaucoma; an enlarged prostate; if you are breastfeeding; or for a child aged 15 or under. Talk to a pharmacist before taking it if you are pregnant or may be pregnant. It may cause excessive drowsiness, so take care when driving or operating machinery.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Doxylamine succinate 25 mg",
+        "How it works": "Sedative, helps sleep",
+        "Main symptoms": "Insomnia (aid), sedation",
+        "Who should be careful": "Glaucoma, enlarged prostate, breathing disorder; driving or operating machinery",
+        "Why this one": "A sleep aid for short-term use in occasional sleeplessness"
+      }
+    }
+  ],
+  "summary": null
+}

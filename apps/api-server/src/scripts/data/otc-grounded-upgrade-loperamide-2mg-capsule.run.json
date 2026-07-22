@@ -1,0 +1,147 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01c34c17-60ad-4df4-8298-8a56c045deac",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "로페라미드염산염 2mg 캡슐",
+  "coarseTotal": 19,
+  "target": 5,
+  "excluded": 14,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0835f940-e8fe-4c38-ae24-6a5752f9ef51",
+      "name": "다이어스탑캡슐(로페라미드염산염)",
+      "reason": "비대상(fp f548e455ed299b3c, bridge SSOT)"
+    },
+    {
+      "id": "224d1953-1331-4427-b122-11062d2c08eb",
+      "name": "로파인캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 88ece0d8884b4193, bridge SSOT)"
+    },
+    {
+      "id": "26bed9c9-7222-4230-904f-9ce37e4b6ff3",
+      "name": "다이어스탑캡슐(로페라미드염산염)",
+      "reason": "비대상(fp f548e455ed299b3c, bridge SSOT)"
+    },
+    {
+      "id": "2f5117a6-c282-48ff-8caf-d052944693fe",
+      "name": "로피딘캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 8f883179094ab145, bridge SSOT)"
+    },
+    {
+      "id": "3e94fccc-96a6-41e9-8007-6e6928088093",
+      "name": "로피딘캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 8f883179094ab145, bridge SSOT)"
+    },
+    {
+      "id": "62e2a7f1-d36f-4d18-8b24-4c75f568be9d",
+      "name": "로페리캡슐(로페라미드염산염)",
+      "reason": "비대상(fp c73453a6d663abfa, bridge SSOT)"
+    },
+    {
+      "id": "687b79a1-bce2-4f20-bb54-df272c6fe721",
+      "name": "삼남로페라마이드캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 359188f2c2df8755, bridge SSOT)"
+    },
+    {
+      "id": "7f45f3b1-36d1-4609-afc8-9a33c6a187be",
+      "name": "삼남로페라마이드캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 359188f2c2df8755, bridge SSOT)"
+    },
+    {
+      "id": "879ce3a8-41e4-4314-bced-eaa6ec1d055c",
+      "name": "로파인캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 88ece0d8884b4193, bridge SSOT)"
+    },
+    {
+      "id": "897b5b82-3736-4e28-9973-5006de6cf9ac",
+      "name": "로파인캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 88ece0d8884b4193, bridge SSOT)"
+    },
+    {
+      "id": "bbd9bb44-a908-41d4-9247-f61a50a4f0b6",
+      "name": "로페리캡슐(로페라미드염산염)",
+      "reason": "비대상(fp c73453a6d663abfa, bridge SSOT)"
+    },
+    {
+      "id": "e99937fa-aab8-4f76-ba0b-86806ac7fcd3",
+      "name": "로파인캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 88ece0d8884b4193, bridge SSOT)"
+    },
+    {
+      "id": "f91c4cd0-cea5-41fc-911e-337fed8eb623",
+      "name": "삼남로페라마이드캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 359188f2c2df8755, bridge SSOT)"
+    },
+    {
+      "id": "feb4c76d-a8b1-467d-ab3b-9080e20b9c56",
+      "name": "로파인캡슐(로페라미드염산염)",
+      "reason": "비대상(fp 88ece0d8884b4193, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "01d0af41-9ece-4334-9c47-ec1b72eefeef",
+    "351c92ea-bd36-446a-b0c6-ff216e4db3ad",
+    "43477c43-7774-4b25-8a66-b090c10ac74c",
+    "54fd682d-f377-4d95-b50b-eed3c80d3bab",
+    "82b7ba21-e3ff-4c53-801b-d4695ebf33f7"
+  ],
+  "rollback_master_ids": [
+    "01d0af41-9ece-4334-9c47-ec1b72eefeef",
+    "351c92ea-bd36-446a-b0c6-ff216e4db3ad",
+    "43477c43-7774-4b25-8a66-b090c10ac74c",
+    "54fd682d-f377-4d95-b50b-eed3c80d3bab",
+    "82b7ba21-e3ff-4c53-801b-d4695ebf33f7"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "b6f8ec48477251b1",
+      "n": 5,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "f548e455ed299b3c",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "88ece0d8884b4193",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "8f883179094ab145",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c73453a6d663abfa",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "359188f2c2df8755",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 5,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 5 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

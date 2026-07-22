@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "로페라미드염산염 2mg 캡슐. sibling(source_ref 01c34c17) 검토완료 en(md5 6737b7a6bfcb66b6c23523697b33d2ed) 재구성 → target 5. build==live sibling en byte-identical 게이트.",
+  "translations": [
+    {
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "title": "Loperamide Hydrochloride 2 mg Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease diarrhoea.",
+      "usage": "Adults take two capsules to start, then one more capsule each time they pass a loose stool, without going over the stated daily dose. Replace fluids and salts while taking it. If sudden diarrhoea has not improved within 48 hours, or long-lasting diarrhoea within 10 days, stop taking it and get advice.",
+      "caution": "Do not take this if you have ever reacted to it, for babies under 2, for bacterial diarrhoea with blood in the stool or a high fever, or if you have sudden ulcerative colitis, pseudomembranous colitis, haemorrhagic colitis, a blocked bowel or megacolon, or an inherited condition that prevents you from digesting lactose. Talk to a pharmacist before taking it if you have liver problems, are elderly, are pregnant or breastfeeding, or have HIV/AIDS. If you feel tired, dizzy or sleepy after taking it, take care when driving or operating machinery. If you are taking quinidine (for irregular heartbeat) or ritonavir (for HIV), talk to a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Loperamide hydrochloride 2 mg",
+        "How it works": "Slows down bowel movement (anti-diarrhoeal)",
+        "Main symptoms": "Diarrhoea",
+        "Who should be careful": "Bacterial diarrhoea with blood or fever; blocked bowel; driving and machinery",
+        "Why this one": "An anti-diarrhoeal that stops diarrhoea"
+      }
+    }
+  ],
+  "summary": "Diarrhoea"
+}

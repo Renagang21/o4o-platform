@@ -1,0 +1,176 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "독시라민숙신산염|25밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0be1a647-aadf-4b76-9814-5f9a1d60a321",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "독시라민숙신산염 25mg 정",
+  "coarseTotal": 19,
+  "target": 5,
+  "excluded": 14,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "01c154a5-9a1f-4ec4-bf82-a5a9a9f0f9ab",
+      "name": "자미솔정(독시라민숙신산염)",
+      "reason": "비대상(fp ac94d1b7212059ea, bridge SSOT)"
+    },
+    {
+      "id": "0d61b1fd-3e7e-484a-809a-c993809861f6",
+      "name": "자비론정(독시라민숙신산염)",
+      "reason": "비대상(fp 9bd7fc08a51dd849, bridge SSOT)"
+    },
+    {
+      "id": "2d4af7f2-0feb-44f6-afdf-ec027f4212f0",
+      "name": "자미솔정(독시라민숙신산염)",
+      "reason": "비대상(fp ac94d1b7212059ea, bridge SSOT)"
+    },
+    {
+      "id": "32f871f7-c85d-4556-b072-c005606389fe",
+      "name": "자모다정(독시라민숙신산염)",
+      "reason": "비대상(fp 377367246621d075, bridge SSOT)"
+    },
+    {
+      "id": "52b4ebff-f83f-47bf-82a1-b711d6ac4d3c",
+      "name": "자비론정(독시라민숙신산염)",
+      "reason": "비대상(fp 9bd7fc08a51dd849, bridge SSOT)"
+    },
+    {
+      "id": "6fa3d365-4f81-4de6-bcc0-39c8b8195387",
+      "name": "자모다정(독시라민숙신산염)",
+      "reason": "비대상(fp 377367246621d075, bridge SSOT)"
+    },
+    {
+      "id": "78643a9b-74e3-48fc-9133-adae38953544",
+      "name": "포린피아정(독시라민숙신산염)",
+      "reason": "비대상(fp 495963909785e1ee, bridge SSOT)"
+    },
+    {
+      "id": "78925b63-9d52-4f98-be5a-eaef01bac591",
+      "name": "아론정(독시라민숙신산염)",
+      "reason": "비대상(fp b36281714b5c0823, bridge SSOT)"
+    },
+    {
+      "id": "97797f7c-58ed-413f-a095-eb8981e2f2fc",
+      "name": "자멘쏙정(독시라민숙신산염)",
+      "reason": "비대상(fp 662647a88191231a, bridge SSOT)"
+    },
+    {
+      "id": "b5d16af2-28a3-4779-b4f5-a230ee920c0a",
+      "name": "자멘쏙정(독시라민숙신산염)",
+      "reason": "비대상(fp 662647a88191231a, bridge SSOT)"
+    },
+    {
+      "id": "c71a5848-cb96-4db1-8e2c-0f4787c87460",
+      "name": "포린피아정(독시라민숙신산염)",
+      "reason": "비대상(fp 495963909785e1ee, bridge SSOT)"
+    },
+    {
+      "id": "d21e8501-ff53-43ec-9df8-39d1bd209d67",
+      "name": "아론정(독시라민숙신산염)",
+      "reason": "비대상(fp b36281714b5c0823, bridge SSOT)"
+    },
+    {
+      "id": "e1d682ed-11b1-4474-ba04-3261b6ab4c06",
+      "name": "포린피아정(독시라민숙신산염)",
+      "reason": "비대상(fp 495963909785e1ee, bridge SSOT)"
+    },
+    {
+      "id": "f5f1774c-9d88-46c3-82da-c0323c7cc441",
+      "name": "자비론정(독시라민숙신산염)",
+      "reason": "비대상(fp 9bd7fc08a51dd849, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "93175019-7399-4670-b749-1d7558654f69",
+    "955c3cac-cd9a-4b5a-941c-b2c828588f23",
+    "b5b22431-3b20-4611-96b7-1fd512e1e4cf",
+    "d9eecc5e-e411-4f51-b311-3c10612a90a0",
+    "e9588bbb-8e65-4e48-80ee-a32b6ebde3dd"
+  ],
+  "rollback_master_ids": [
+    "93175019-7399-4670-b749-1d7558654f69",
+    "955c3cac-cd9a-4b5a-941c-b2c828588f23",
+    "b5b22431-3b20-4611-96b7-1fd512e1e4cf",
+    "d9eecc5e-e411-4f51-b311-3c10612a90a0",
+    "e9588bbb-8e65-4e48-80ee-a32b6ebde3dd"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "ac94d1b7212059ea",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9bd7fc08a51dd849",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "377367246621d075",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "495963909785e1ee",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b36281714b5c0823",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b2684c9a7e31a7b2",
+      "n": 5,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "662647a88191231a",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 5,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 5,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 5,
+  "htmlLen": 1563,
+  "contentHash": "f078d194bf33284ad70702e0bedf7fdd",
+  "summary": "독시라민숙신산염 25mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 5,
+      "STEP_B_easy_canonical_demote": 5,
+      "STEP_B_authored_canonical_flip": 5,
+      "total": 15
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 5,
+      "total": 5
+    },
+    "grand_total": 20
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 5",
+    "policy_2A": "audit 2/master = 10 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

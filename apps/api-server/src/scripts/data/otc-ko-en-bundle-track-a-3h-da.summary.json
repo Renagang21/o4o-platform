@@ -1,0 +1,106 @@
+{
+  "wo": "WO-O4O-OTC-KO-EN-BUNDLE-RUNNER-HARDENING-DA-V1",
+  "bundleKey": "track-a-3h-da",
+  "mode": "dry-run",
+  "writeOwner": "agent-da",
+  "groupOrder": [
+    "citrulline-malate-500mg-jeong",
+    "doxylamine-25mg-jeong",
+    "loperamide-2mg-capsule",
+    "ibuprofen-200mg-jeong"
+  ],
+  "groupCount": 4,
+  "dbWrite": 0,
+  "groups": [
+    {
+      "groupKey": "citrulline-malate-500mg-jeong",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 6,
+      "excluded": 8,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 12
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "doxylamine-25mg-jeong",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 5,
+      "excluded": 14,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 10
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "loperamide-2mg-capsule",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 5,
+      "excluded": 14,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 10
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "ibuprofen-200mg-jeong",
+      "writeOwner": "agent-da",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 5,
+      "excluded": 9,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 10
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    }
+  ],
+  "totals": {
+    "koPlan": 0,
+    "koActual": 0,
+    "enPlan": 42,
+    "enActual": 0,
+    "planTotal": 42,
+    "actualTotal": 0
+  },
+  "bundleStatus": "NO_OP",
+  "abortedAt": null,
+  "abortReason": null,
+  "statusCounts": {
+    "ALREADY_COMPLETE": 4
+  }
+}

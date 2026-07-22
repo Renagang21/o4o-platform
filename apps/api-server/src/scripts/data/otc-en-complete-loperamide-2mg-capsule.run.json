@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01c34c17-60ad-4df4-8298-8a56c045deac",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 5,
+  "targetMasters": 5,
+  "anomalies": [],
+  "koCanonical": 5,
+  "existingEnAny": 5,
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "6737b7a6bfcb66b6c23523697b33d2ed",
+      "n": 4
+    }
+  ],
+  "builtLen": 2849,
+  "builtMd5": "6737b7a6bfcb66b6c23523697b33d2ed",
+  "consistencyMatch": true,
+  "summaryField": "Diarrhoea",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_en_canonical_flip": 5,
+    "en_write_total": 10
+  },
+  "enTargetMd5": "6737b7a6bfcb66b6c23523697b33d2ed",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(6737b7a6bfcb66b6c23523697b33d2ed) — write 0, 정상 종료"
+}

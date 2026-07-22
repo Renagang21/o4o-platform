@@ -1,0 +1,131 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "이부프로펜|200밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0168e020-bad2-4263-a94b-3ae96e98f950",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "이부프로펜 200mg 정",
+  "coarseTotal": 14,
+  "target": 5,
+  "excluded": 9,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "009d75f9-953a-4b06-896f-7a30820b6074",
+      "name": "애드빌정(이부프로펜)",
+      "reason": "비대상(fp f79dcb2a034e0f97, bridge SSOT)"
+    },
+    {
+      "id": "0430092f-8ae5-4653-9c37-33fc795843c1",
+      "name": "애드빌정(이부프로펜)",
+      "reason": "비대상(fp f79dcb2a034e0f97, bridge SSOT)"
+    },
+    {
+      "id": "1bb6b9ad-173c-4bf3-943b-c61eebed6a6f",
+      "name": "애드빌정(이부프로펜)",
+      "reason": "비대상(fp f79dcb2a034e0f97, bridge SSOT)"
+    },
+    {
+      "id": "34a8b330-26ba-4583-9ed4-b2d1ce77f97a",
+      "name": "애드빌정(이부프로펜)",
+      "reason": "비대상(fp f79dcb2a034e0f97, bridge SSOT)"
+    },
+    {
+      "id": "5239d173-e75e-433d-8466-83bd92708180",
+      "name": "부루펜정200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 210f9abf0e2c5fda, bridge SSOT)"
+    },
+    {
+      "id": "984f334e-32c8-4275-9fb0-ad22282354c2",
+      "name": "부루펜정200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 210f9abf0e2c5fda, bridge SSOT)"
+    },
+    {
+      "id": "a6cf9dc0-01a1-4c9c-9396-cac095cb758f",
+      "name": "부루펜정200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 210f9abf0e2c5fda, bridge SSOT)"
+    },
+    {
+      "id": "bf60072c-bba1-4e8d-9b5a-b77ce56ad578",
+      "name": "부루펜정200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 210f9abf0e2c5fda, bridge SSOT)"
+    },
+    {
+      "id": "deef4db8-ec02-44d2-a9e4-d4a9b2313a2b",
+      "name": "부루펜정200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 210f9abf0e2c5fda, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "3518e012-aee7-4171-9a3d-386190d326a2",
+    "4cf1d380-3b3c-41c3-96f4-0a2d5c43aa8c",
+    "e5073198-1371-4935-bcc1-719b126fe0b4",
+    "fe7fdb94-546b-4dcb-9592-537a26f2f67b",
+    "fecea4b7-4a9d-4a1f-acc2-2d5b0cbbdea1"
+  ],
+  "rollback_master_ids": [
+    "3518e012-aee7-4171-9a3d-386190d326a2",
+    "4cf1d380-3b3c-41c3-96f4-0a2d5c43aa8c",
+    "e5073198-1371-4935-bcc1-719b126fe0b4",
+    "fe7fdb94-546b-4dcb-9592-537a26f2f67b",
+    "fecea4b7-4a9d-4a1f-acc2-2d5b0cbbdea1"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "f79dcb2a034e0f97",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b4f3651ae36d1387",
+      "n": 5,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "210f9abf0e2c5fda",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 5,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 5,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 5,
+  "htmlLen": 1637,
+  "contentHash": "be243d57524941122c6ba19cf4746629",
+  "summary": "이부프로펜 200mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 5,
+      "STEP_B_easy_canonical_demote": 5,
+      "STEP_B_authored_canonical_flip": 5,
+      "total": 15
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 5,
+      "total": 5
+    },
+    "grand_total": 20
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 5",
+    "policy_2A": "audit 2/master = 10 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

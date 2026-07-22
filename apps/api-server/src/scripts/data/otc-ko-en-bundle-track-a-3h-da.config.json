@@ -1,0 +1,82 @@
+{
+  "_doc": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-DA-V1 (에이전트 다) — 외부 config 전용 bundle. GROUP_REGISTRY·EN_REGISTRY 미수정 실행. 나 inventory READY_SINGLE 4그룹(가/나 registry·config 와 교집합 0). fp/srid=나 감사, sibling en byte-identical 재구성.",
+  "bundleKey": "track-a-3h-da",
+  "writeOwner": "agent-da",
+  "order": ["citrulline-malate-500mg-jeong", "doxylamine-25mg-jeong", "loperamide-2mg-capsule", "ibuprofen-200mg-jeong"],
+  "ko": {
+    "citrulline-malate-500mg-jeong": {
+      "key": "시트룰린말산염|500밀리그램|정",
+      "ingredient": "시트룰린말산염", "dose": "500밀리그램", "formKeyword": "정",
+      "candidate": "12b056c0-f43a-4a9a-8d36-ad87dff0ae09",
+      "targetFp": "66df757d3628ec4d",
+      "excludeFp": ["8a433f917fa6a02f", "fadc625179ba2917"],
+      "expected": 6, "excludedExpected": 8,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-citrulline-malate-500mg-jeong"
+    },
+    "doxylamine-25mg-jeong": {
+      "key": "독시라민숙신산염|25밀리그램|정",
+      "ingredient": "독시라민숙신산염", "dose": "25밀리그램", "formKeyword": "정",
+      "candidate": "0be1a647-aadf-4b76-9814-5f9a1d60a321",
+      "targetFp": "b2684c9a7e31a7b2",
+      "excludeFp": ["495963909785e1ee", "9bd7fc08a51dd849", "377367246621d075", "662647a88191231a", "ac94d1b7212059ea", "b36281714b5c0823"],
+      "expected": 5, "excludedExpected": 14,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-doxylamine-25mg-jeong"
+    },
+    "loperamide-2mg-capsule": {
+      "key": "로페라미드염산염|2밀리그램|캡슐",
+      "ingredient": "로페라미드염산염", "dose": "2밀리그램", "formKeyword": "캡슐",
+      "candidate": "01c34c17-60ad-4df4-8298-8a56c045deac",
+      "targetFp": "b6f8ec48477251b1",
+      "excludeFp": ["88ece0d8884b4193", "359188f2c2df8755", "8f883179094ab145", "c73453a6d663abfa", "f548e455ed299b3c"],
+      "expected": 5, "excludedExpected": 14,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-loperamide-2mg-capsule"
+    },
+    "ibuprofen-200mg-jeong": {
+      "key": "이부프로펜|200밀리그램|정",
+      "ingredient": "이부프로펜", "dose": "200밀리그램", "formKeyword": "정",
+      "candidate": "0168e020-bad2-4263-a94b-3ae96e98f950",
+      "targetFp": "b4f3651ae36d1387",
+      "excludeFp": ["210f9abf0e2c5fda", "f79dcb2a034e0f97"],
+      "expected": 5, "excludedExpected": 9,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-ibuprofen-200mg-jeong"
+    }
+  },
+  "en": {
+    "citrulline-malate-500mg-jeong": {
+      "key": "시트룰린말산염|500밀리그램|정",
+      "candidate": "12b056c0-f43a-4a9a-8d36-ad87dff0ae09",
+      "sourceType": "mfds_drug_otc", "expected": 6,
+      "koRunBase": "otc-grounded-upgrade-citrulline-malate-500mg-jeong",
+      "translationFile": "otc-en-translations-citrulline-malate-500mg-v1.json",
+      "outBase": "otc-en-complete-citrulline-malate-500mg-jeong"
+    },
+    "doxylamine-25mg-jeong": {
+      "key": "독시라민숙신산염|25밀리그램|정",
+      "candidate": "0be1a647-aadf-4b76-9814-5f9a1d60a321",
+      "sourceType": "mfds_drug_otc", "expected": 5,
+      "koRunBase": "otc-grounded-upgrade-doxylamine-25mg-jeong",
+      "translationFile": "otc-en-translations-doxylamine-25mg-v1.json",
+      "outBase": "otc-en-complete-doxylamine-25mg-jeong"
+    },
+    "loperamide-2mg-capsule": {
+      "key": "로페라미드염산염|2밀리그램|캡슐",
+      "candidate": "01c34c17-60ad-4df4-8298-8a56c045deac",
+      "sourceType": "mfds_drug_otc", "expected": 5,
+      "koRunBase": "otc-grounded-upgrade-loperamide-2mg-capsule",
+      "translationFile": "otc-en-translations-loperamide-2mg-v1.json",
+      "outBase": "otc-en-complete-loperamide-2mg-capsule"
+    },
+    "ibuprofen-200mg-jeong": {
+      "key": "이부프로펜|200밀리그램|정",
+      "candidate": "0168e020-bad2-4263-a94b-3ae96e98f950",
+      "sourceType": "mfds_drug_otc", "expected": 5,
+      "koRunBase": "otc-grounded-upgrade-ibuprofen-200mg-jeong",
+      "translationFile": "otc-en-translations-ibuprofen-200mg-jeong-v1.json",
+      "outBase": "otc-en-complete-ibuprofen-200mg-jeong"
+    }
+  }
+}

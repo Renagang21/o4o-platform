@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "시트룰린말산염|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "12b056c0-f43a-4a9a-8d36-ad87dff0ae09",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 6,
+  "targetMasters": 6,
+  "anomalies": [],
+  "koCanonical": 6,
+  "existingEnAny": 6,
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "de38b2533c2b3ea6efc82f6af723a7e4",
+      "n": 16
+    }
+  ],
+  "builtLen": 2308,
+  "builtMd5": "de38b2533c2b3ea6efc82f6af723a7e4",
+  "consistencyMatch": true,
+  "summaryField": "Weakness and tiredness from reduced function",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_en_canonical_flip": 6,
+    "en_write_total": 12
+  },
+  "enTargetMd5": "de38b2533c2b3ea6efc82f6af723a7e4",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(de38b2533c2b3ea6efc82f6af723a7e4) — write 0, 정상 종료"
+}
