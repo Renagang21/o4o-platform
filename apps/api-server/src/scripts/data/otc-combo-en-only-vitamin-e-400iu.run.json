@@ -1,0 +1,38 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비타민E|400IU|연질캡슐",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "03751234-7793-4635-8043-26257b32a3fd",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 7,
+  "anomalies": [],
+  "targetMasters": 7,
+  "target_master_ids": [
+    "1844f28b-a3d0-408f-834f-51ca76db06e4",
+    "28587733-53db-415d-8ac5-a7d41e5d6255",
+    "9b850464-c3bc-4c17-91ef-2b46ae0284ca",
+    "bfd629da-3187-4d43-b539-c58e00f45605",
+    "de2f3262-30e9-4b35-b553-d56070f714bd",
+    "e90a302a-5b4e-4e1b-aa80-ecd18709a3f7",
+    "f3ef1da2-a5a5-4de8-a685-29eec8c43de8"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 7,
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2389,
+  "builtMd5": "faf367388da80b28d528c958c9e349ab",
+  "summaryField": "Vitamin E deficiency and poor peripheral circulation",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_en_canonical_flip": 7,
+    "en_write_total": 14
+  },
+  "enTargetMd5": "faf367388da80b28d528c958c9e349ab",
+  "note": "대상 en 이미 canonical · build byte-identical(faf367388da80b28d528c958c9e349ab) — write 0"
+}

@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo(source_ref 6343c0f5) 비타민E 1000IU 연질캡슐. 단일 성분(토코페롤)·고용량. ko canonical 충실 번역(fresh). fact-0. ko 미변경. ko 주의=100/400IU + 고용량 장기 복용 시 정기 확인.",
+  "translations": [
+    {
+      "groupKey": "비타민E|1000IU|연질캡슐",
+      "title": "Vitamin E 1000 IU Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve vitamin E deficiency, poor peripheral circulation, stiff shoulders and neck around menopause, numbness and coldness in the hands and feet, intermittent claudication, and frostbite.",
+      "usage": "Adults take 50–1,000 IU of vitamin E a day.",
+      "caution": "Do not take this if you are hypersensitive to it, are allergic to soybean oil, soy or peanuts, or are breastfeeding, and avoid high doses during pregnancy. Talk to a pharmacist if you have a tendency to form blood clots, or if you are taking oral anticoagulants, vitamin A, vitamin K or iron supplements, and if you take it at a high dose for a long time, have it checked regularly.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamin E (tocopherol) 1000 IU",
+        "How it works": "Supplies vitamin E",
+        "Main symptoms": "Vitamin E deficiency; poor peripheral circulation; numbness and coldness in the hands and feet",
+        "Who should be careful": "People with a clotting tendency, taking anticoagulants or birth-control pills, or on long-term high-dose use",
+        "Why this one": "A high-dose vitamin E soft capsule"
+      }
+    }
+  ],
+  "summary": "Vitamin E deficiency and poor peripheral circulation"
+}

@@ -1,0 +1,38 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1 (에이전트 나) 자기 전용 EN-only config. 공용 registry 미수정. runner=otc-nutrition-combo-en-only-runner-na.ts --config=<이 파일> --group=<key>. 대상 master_id=source_ref+source_type ko canonical 전체 고정. ko 불변. fresh 번역(sibling 재사용 아님).",
+  "round": "nutrition-combo-en-only-3h-2026-07-22",
+  "en": {
+    "vitamin-e-100iu-softcap": {
+      "key": "비타민E|100IU|연질캡슐",
+      "sourceRef": "cda011db-9d62-4b58-aa56-d5a03bcafa83",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 3,
+      "translationFile": "otc-en-translations-vitamin-e-100iu-na-v1.json",
+      "outBase": "otc-combo-en-only-vitamin-e-100iu"
+    },
+    "vitamin-e-400iu-softcap": {
+      "key": "비타민E|400IU|연질캡슐",
+      "sourceRef": "03751234-7793-4635-8043-26257b32a3fd",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 7,
+      "translationFile": "otc-en-translations-vitamin-e-400iu-na-v1.json",
+      "outBase": "otc-combo-en-only-vitamin-e-400iu"
+    },
+    "vitamin-e-1000iu-softcap": {
+      "key": "비타민E|1000IU|연질캡슐",
+      "sourceRef": "6343c0f5-cfe9-434b-925a-d42ae1cc86d8",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 18,
+      "translationFile": "otc-en-translations-vitamin-e-1000iu-na-v1.json",
+      "outBase": "otc-combo-en-only-vitamin-e-1000iu"
+    },
+    "vitamin-c-1000mg-tablet": {
+      "key": "비타민C|1000mg|정제",
+      "sourceRef": "6f143bbc-ff49-4ffc-9271-42e50cf2e84d",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 25,
+      "translationFile": "otc-en-translations-vitamin-c-1000mg-na-v1.json",
+      "outBase": "otc-combo-en-only-vitamin-c-1000mg"
+    }
+  }
+}

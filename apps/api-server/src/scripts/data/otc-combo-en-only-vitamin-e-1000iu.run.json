@@ -1,0 +1,49 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비타민E|1000IU|연질캡슐",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "6343c0f5-cfe9-434b-925a-d42ae1cc86d8",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 18,
+  "anomalies": [],
+  "targetMasters": 18,
+  "target_master_ids": [
+    "1953859d-2fcc-4d19-9241-2f4c46e7947c",
+    "19b7a30d-f981-49d5-b9b1-97b89694d4ce",
+    "22b518ae-ebe2-41da-9bc1-654d82102afd",
+    "36fd1582-d885-47e5-abc9-9b9d0194a2cc",
+    "3e2eb149-104d-4b52-9274-3fdfedf12a5a",
+    "52920d7e-66a1-4a8e-9b58-91ce81ab8c08",
+    "57124f91-1aff-4f90-9ebd-022344208d15",
+    "593e7d3a-ead4-4abb-ad7a-99e8b8999a0a",
+    "6529ba5f-1fdf-4d42-a5b7-f7987a43cd20",
+    "6ce9d86c-1786-43f4-a218-a0ec38883ee1",
+    "70c8a337-7d58-41bd-a38f-ea8c7fd8f99f",
+    "94effe6c-b9be-4826-88c5-481e99497f7f",
+    "a88e442b-810a-468c-a695-0b463c000158",
+    "aa1aeb38-ed46-4a56-b4e2-f7de8fcb93d1",
+    "ac18f5b9-ab99-4618-a4b5-aa4bcfb952d1",
+    "b0f4c46e-9a87-4e7c-963f-2da4cfb321ee",
+    "e5bd7caa-6b73-4aaa-9f3d-a6f8212cb1f4",
+    "fb44858c-3ca7-47ad-b219-1ef1b064d078"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 18,
+  "existingEnCanonical": 18,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2518,
+  "builtMd5": "03c6d2baba51a3d6dd662134f1e54b49",
+  "summaryField": "Vitamin E deficiency and poor peripheral circulation",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 18,
+    "STEP2_en_canonical_flip": 18,
+    "en_write_total": 36
+  },
+  "enTargetMd5": "03c6d2baba51a3d6dd662134f1e54b49",
+  "note": "대상 en 이미 canonical · build byte-identical(03c6d2baba51a3d6dd662134f1e54b49) — write 0"
+}

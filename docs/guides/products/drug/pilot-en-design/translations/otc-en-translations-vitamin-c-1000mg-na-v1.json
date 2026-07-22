@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "nutrition_combo(source_ref 6f143bbc) 비타민C 1000mg 정제. 단일 성분(아스코르빈산). ko canonical 충실 번역(fresh). fact-0. ko 미변경. ko 원문 요지=효능: 괴혈병 예방·치료·비타민C 보급·모세관출혈·색소침착 / 용법: 성인 1회 500~1,000mg 1일 1회 또는 분할·충분한 물·복용 후 바로 눕지 않음 / 주의: 고수산뇨증·지중해빈혈·통풍·시스틴뇨증·G6PD결핍·신장수산결석 금기; 임신/수유/흡연/음주 상담; 고함량 장기 신장결석 주의.",
+  "translations": [
+    {
+      "groupKey": "비타민C|1000mg|정제",
+      "title": "Vitamin C 1000 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to prevent and treat scurvy, to supply vitamin C during pregnancy and breastfeeding or when your strength is low during and after illness or from physical fatigue, and for capillary bleeding such as bleeding gums or nose and for pigmentation when vitamin C deficiency is suspected.",
+      "usage": "Adults take 500–1,000 mg once a day or in several divided doses, with plenty of water, and do not lie down straight after taking it.",
+      "caution": "Do not take this if you have high urinary oxalate, thalassaemia, gout, cystinuria, G6PD deficiency, or kidney oxalate stones. Talk to a pharmacist if you are pregnant, breastfeeding, smoke, or drink heavily, and be careful about kidney stones with long-term high-dose use.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ascorbic acid (vitamin C) 1000 mg",
+        "How it works": "Supplies vitamin C",
+        "Main symptoms": "Scurvy; suspected vitamin C deficiency; capillary bleeding such as bleeding gums or nose",
+        "Who should be careful": "People with oxalate stones, gout, thalassaemia or G6PD deficiency, or on long-term high-dose use",
+        "Why this one": "A high-dose single-ingredient vitamin C tablet"
+      }
+    }
+  ],
+  "summary": "Scurvy prevention and vitamin C supplementation"
+}

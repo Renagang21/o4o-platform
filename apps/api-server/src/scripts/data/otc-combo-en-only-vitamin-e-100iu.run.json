@@ -1,0 +1,34 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비타민E|100IU|연질캡슐",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "cda011db-9d62-4b58-aa56-d5a03bcafa83",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 3,
+  "anomalies": [],
+  "targetMasters": 3,
+  "target_master_ids": [
+    "3eaeae66-4ce2-4e8d-9170-8a545a1ec3a3",
+    "50dff830-4c39-46aa-896e-774f73214fad",
+    "e4a8c27f-80f3-4af7-809a-3c4e515559f1"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 3,
+  "existingEnCanonical": 3,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2407,
+  "builtMd5": "f264a1d9e7b0b791ea2183e48aedb9fe",
+  "summaryField": "Vitamin E deficiency and poor peripheral circulation",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_en_canonical_flip": 3,
+    "en_write_total": 6
+  },
+  "enTargetMd5": "f264a1d9e7b0b791ea2183e48aedb9fe",
+  "note": "대상 en 이미 canonical · build byte-identical(f264a1d9e7b0b791ea2183e48aedb9fe) — write 0"
+}
