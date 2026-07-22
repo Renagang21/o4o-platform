@@ -1,0 +1,113 @@
+{
+  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2 — 에이전트 가 KO+EN 저작 config. 전량 공식 mfds_easy_drug 원문 근거 재구성(신규 의료사실 0·약화 0·마케팅 0·조성 창작 0). source_ref=uuid(md5(targetFp)) 결정론 앵커. target_master_ids=감사 SSOT(otc-oral-multi-ingredient-combo-audit-ga-v1).",
+  "groups": {
+    "wienstal-a02ax-100mg-jeong": {
+      "key": "위엔스탈정|A02AX|100밀리그램|정",
+      "sourceType": "mfds_drug_otc",
+      "targetFp": "0273b8335509d44c",
+      "target_master_ids": ["65bdcdf8-d7be-46bd-bcb1-0cbf65e5cd7c", "689b001f-1554-4b7f-9248-22e034b157dd", "6ec2789e-8264-4b70-b706-899ef8b54fc5"],
+      "title": "위엔스탈정",
+      "content_json": {
+        "summaryTable": {
+          "분류": "일반의약품",
+          "작용": "위산과다·속쓰림 완화, 소화 촉진 복합 위장약",
+          "주요 증상": "위산과다, 속쓰림, 소화불량, 위부 팽만, 구역·구토, 식욕부진",
+          "선택 포인트": "위산과다와 소화불량 증상을 함께 다스리는 복합 위장약입니다.",
+          "주의 대상": "만 15세 미만, 임신부, 투석 환자, 고혈압·심장·신장 질환자"
+        },
+        "efficacy": "위산과다, 속쓰림, 위부 불쾌감·팽만감, 식체(위체), 구역·구토, 위통, 신트림, 소화불량, 식욕 감퇴(식욕부진), 과식, 소화 촉진에 사용하는 일반의약품입니다.",
+        "usage": "성인은 1회 2정씩, 1일 3회 매 식간(식사와 식사 사이)에 복용합니다.\n정해진 용법·용량을 지키고, 2주 정도 복용해도 증상이 개선되지 않으면 복용을 중지하고 약사와 상의하세요.",
+        "usageLabel": "복용 안내",
+        "caution": "다음 분은 복용하지 마세요: 투석요법을 받는 환자, 만 15세 미만 소아, 임신 중이거나 임신 가능성이 있는 여성, 갈락토오스 불내성·유당분해효소 결핍·포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 환자.\n\n복용 전 약사와 상의하세요: 알레르기 증상(발진·발적·가려움 등) 경험자, 신장·간 장애, 인산염 저하, 고혈압 또는 고령자, 심장·신장 장애, 부종이 있는 환자.\n\n위장 진통·진경제와 함께 복용하지 마세요. 칼륨·감초·글리시리진산 함유제제, 루프계 이뇨제(푸로세미드·에타크린산), 치아지드계 이뇨제와 함께 복용할 때는 약사와 상의하세요.\n\n복용 후 소변량 감소, 얼굴·손발 부종, 혈압 상승, 두통, 무력감·경련, 두근거림, 졸음, 어지러움, 변비, 입마름 등이 나타나면 복용을 중지하고 약사와 상의하세요.",
+        "ingredientSelection": "제품에 따라 성분 구성이 다를 수 있으니, 복용 중인 약이나 지병이 있으면 매장의 약사에게 성분과 함량을 확인하세요.\n증상이 지속되면 매장 내 약사 등 전문가와 상담하세요."
+      },
+      "en": {
+        "groupKey": "위엔스탈정|A02AX|100밀리그램|정",
+        "title": "Wienstal Tablet",
+        "usageLabel": "How to take it",
+        "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort and bloating, food stagnation, nausea and vomiting, stomach pain, sour burping, indigestion, loss of appetite, overeating, and to aid digestion.",
+        "usage": "Adults take 2 tablets at a time, 3 times a day between meals. Keep to the stated dose. If symptoms do not improve after about 2 weeks, stop taking it and consult a pharmacist.",
+        "caution": "Do not take this medicine if you are receiving dialysis, are under 15 years of age, are pregnant or may be pregnant, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you have had allergic symptoms (rash, redness, itching), have kidney or liver impairment or low phosphate, have high blood pressure or are elderly, or have heart or kidney disorders or edema. Do not take it together with gastrointestinal analgesics or antispasmodics. Consult a pharmacist if you take potassium-containing, licorice-containing or glycyrrhizic-acid products, loop diuretics (furosemide, ethacrynic acid), or thiazide diuretics. Stop taking it and consult a pharmacist if you notice reduced urine output, swelling of the face or limbs, raised blood pressure, headache, weakness or cramps, palpitations, drowsiness, dizziness, constipation, or dry mouth.",
+        "summaryTable": {
+          "Category": "Over-the-counter medicine",
+          "How it works": "Combination stomach medicine that relieves excess acid and aids digestion",
+          "Symptoms": "Excess stomach acid, heartburn, indigestion, bloating, nausea and vomiting, poor appetite",
+          "Why this one": "A combination stomach medicine for acid-related and digestive symptoms together",
+          "Who should be careful": "Under 15, pregnancy, dialysis patients, people with high blood pressure or heart/kidney disease"
+        }
+      }
+    },
+    "estom-a16ax-20g-liquid": {
+      "key": "에스톰액|A16AX|20그램|액",
+      "sourceType": "mfds_drug_otc",
+      "targetFp": "01c0f11a99a2bee5",
+      "target_master_ids": ["0d116496-91ce-4a53-b21c-e66547b8fc06", "320d190d-aa74-4e33-a892-3caf64c781e5", "d3289b9c-d32e-4730-8de5-b66873c1309b"],
+      "title": "에스톰액",
+      "content_json": {
+        "summaryTable": {
+          "분류": "일반의약품",
+          "작용": "소화불량·위산과다·묽은 변을 함께 다스리는 복합 소화·제산 액제",
+          "주요 증상": "소화불량, 과식·체함, 구역·구토, 위산과다, 속쓰림, 설사·묽은 변",
+          "선택 포인트": "소화 장애와 위산 관련 증상, 묽은 변을 함께 완화하는 복합 액제입니다.",
+          "주의 대상": "페닐케톤뇨증, 만 3개월 미만 영아, 고혈압·심장·신장 질환자, 나트륨 제한 식이자"
+        },
+        "efficacy": "식욕 감퇴, 위부 팽만감, 소화불량, 과식·체함, 구역·구토, 설사·묽은 변, 위통·복통·산통, 위산과다, 속쓰림에 사용하는 일반의약품입니다.",
+        "usage": "만 15세 이상은 1회 1포, 만 11세 이상~15세 미만은 1회 2/3포, 만 8세 이상~11세 미만은 1회 1/2포, 만 5세 이상~8세 미만은 1회 1/3포, 만 3세 이상~5세 미만은 1회 1/4포, 만 1세 이상~3세 미만은 1회 1/5포씩, 1일 3회 식후에 복용합니다.\n복용 간격은 4시간 이상으로 하고, 어린이는 보호자의 지도·감독하에 복용하세요.",
+        "usageLabel": "복용 안내",
+        "caution": "경고: 페닐케톤뇨증 환자는 복용하지 마세요. 이 약에 함유된 인공감미제 아스파탐은 체내에서 페닐알라닌으로 대사됩니다.\n\n만 3개월 미만의 젖먹이는 복용하지 마세요.\n\n복용 전 약사와 상의하세요: 만 3개월 이상~1세 미만 젖먹이, 임신 중이거나 임신 가능성이 있는 여성, 고혈압 환자, 노인, 심장·신장 장애 환자, 부종 환자, 나트륨 제한 식이를 하는 사람.\n\n복용 후 소변량 감소, 얼굴·손발 부종, 혈압 상승, 두통, 무력감, 사지 경련·마비 등이 나타나면 복용을 중지하고 약사와 상의하세요. 수일~1개월 복용해도 증상이 개선되지 않으면 복용을 중지하고 약사와 상의하세요.",
+        "ingredientSelection": "제품에 따라 성분 구성이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 성분과 함량을 확인하세요.\n증상이 지속되면 매장 내 약사 등 전문가와 상담하세요."
+      },
+      "en": {
+        "groupKey": "에스톰액|A16AX|20그램|액",
+        "title": "Estom Liquid",
+        "usageLabel": "How to take it",
+        "efficacy": "An over-the-counter medicine for loss of appetite, stomach bloating, indigestion, overeating and food stagnation, nausea and vomiting, diarrhea and loose stools, stomach pain, abdominal pain and colic, excess stomach acid, and heartburn.",
+        "usage": "Ages 15 and over take 1 sachet; ages 11 to under 15 take 2/3 sachet; ages 8 to under 11 take 1/2 sachet; ages 5 to under 8 take 1/3 sachet; ages 3 to under 5 take 1/4 sachet; ages 1 to under 3 take 1/5 sachet, 3 times a day after meals. Keep at least 4 hours between doses, and children should take it under the guidance of a guardian.",
+        "caution": "Warning: do not take this medicine if you have phenylketonuria. The artificial sweetener aspartame in this product is metabolized to phenylalanine in the body. Do not give this medicine to infants under 3 months of age. Consult a pharmacist before use if the child is 3 months to under 1 year, if you are pregnant or may be pregnant, or if you have high blood pressure, are elderly, have heart or kidney disorders, have edema, or are on a sodium-restricted diet. Stop taking it and consult a pharmacist if you notice reduced urine output, swelling of the face or limbs, raised blood pressure, headache, weakness, or cramps or paralysis of the limbs. If symptoms do not improve after several days to about a month of use, stop taking it and consult a pharmacist.",
+        "summaryTable": {
+          "Category": "Over-the-counter medicine",
+          "How it works": "Combination digestive and antacid liquid for indigestion, excess acid, and loose stools",
+          "Symptoms": "Indigestion, overeating, nausea and vomiting, excess acid, heartburn, diarrhea and loose stools",
+          "Why this one": "A combination liquid that relieves digestive trouble, acid-related symptoms, and loose stools together",
+          "Who should be careful": "Phenylketonuria, infants under 3 months, people with high blood pressure or heart/kidney disease, sodium-restricted diet"
+        }
+      }
+    },
+    "dke-a11jc-339-5mg-jeong": {
+      "key": "디케이정|A11JC|339.5밀리그램|정",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "targetFp": "068a42c85de1d073",
+      "target_master_ids": ["8db6b92f-80f7-4171-9476-5873f20322fa", "b037345e-6c09-4dfb-9959-a13a49da3e9a", "cbf9fb56-5e49-4820-a80c-7c550f490d76"],
+      "title": "디케이정",
+      "content_json": {
+        "summaryTable": {
+          "분류": "일반의약품",
+          "작용": "비타민 D 보급, 뼈·치아 발육·구루병 예방 복합 영양제",
+          "주요 증상": "비타민 D 보급, 뼈·치아 발육 불량, 구루병 예방",
+          "선택 포인트": "성장기·임신수유기·노년기의 비타민 D 보급과 뼈 건강을 돕는 복합 제제입니다.",
+          "주의 대상": "고칼슘혈증, 신장질환·신장결석, 만 12개월 미만 영아"
+        },
+        "efficacy": "임신·수유기, 발육기, 노년기의 비타민 D 보급과 뼈·치아의 발육 불량, 구루병 예방에 사용하는 일반의약품입니다.",
+        "usage": "만 8세 이상 및 성인은 1회 1정씩, 1일 2회 복용합니다.\n정해진 용법·용량을 지키고, 어린이는 보호자의 지도·감독하에 복용하세요. 1개월 정도 복용해도 증상이 개선되지 않으면 복용을 중지하고 약사와 상의하세요.",
+        "usageLabel": "복용 안내",
+        "caution": "다음 분은 복용하지 마세요: 이 약에 과민증이 있는 환자, 고칼슘혈증 환자, 유육종증·신장질환·신장결석 환자, 심한 신부전 환자, 만 12개월 미만 젖먹이, 갈락토오스 불내성·유당분해효소 결핍·포도당-갈락토오스 흡수장애 등 유전적 문제가 있는 환자.\n\n복용 전 약사와 상의하세요: 만 1세 미만 젖먹이, 임신 중이거나 임신 가능성이 있는 여성 및 수유부, 심장·순환기 장애, 신장 장애, 저단백혈증, 강심배당체를 투여 중인 환자, 담낭 질환, 간 질환, 신장결석 경험자.\n\n인산염·칼슘염 제제, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마세요. 항알도스테론제·트리암테렌과 함께 복용할 때는 약사와 상의하고, 녹차·홍차 등 탄닌이 든 차는 복용 전후로 피하세요.\n\n복용 후 구역·구토, 설사·변비, 저혈압, 얼굴 달아오름, 심박동 불규칙, 피부 발진 등이 나타나면 복용을 중지하고 약사와 상의하세요.",
+        "ingredientSelection": "제품에 따라 칼슘·비타민 D 등 성분 구성과 함량이 다를 수 있으니, 매장의 약사에게 확인하세요.\n증상이나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+      },
+      "en": {
+        "groupKey": "디케이정|A11JC|339.5밀리그램|정",
+        "title": "D-K Tablet",
+        "usageLabel": "How to take it",
+        "efficacy": "An over-the-counter medicine to supplement vitamin D during pregnancy and breastfeeding, growth periods, and old age, and to help with poor development of bones and teeth and to prevent rickets.",
+        "usage": "Ages 8 and over take 1 tablet at a time, 2 times a day. Keep to the stated dose, and children should take it under the guidance of a guardian. If symptoms do not improve after about a month, stop taking it and consult a pharmacist.",
+        "caution": "Do not take this medicine if you are hypersensitive to it, have high blood calcium (hypercalcemia), have sarcoidosis, kidney disease or kidney stones, have severe kidney failure, are an infant under 12 months, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if the child is under 1 year, if you are pregnant or may be pregnant or are breastfeeding, or if you have heart or circulatory disorders, kidney impairment, low blood protein, are taking cardiac glycosides, or have gallbladder disease, liver disease, or a history of kidney stones. Do not take it together with phosphate or calcium products, oral tetracycline antibiotics, or antacids. Consult a pharmacist if you take antialdosterone agents or triamterene, and avoid tannin-containing drinks such as green tea and black tea before and after taking it. Stop taking it and consult a pharmacist if you notice nausea and vomiting, diarrhea or constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash.",
+        "summaryTable": {
+          "Category": "Over-the-counter medicine",
+          "How it works": "Combination supplement for vitamin D, bone and tooth development, and rickets prevention",
+          "Symptoms": "Vitamin D supplementation, poor bone and tooth development, rickets prevention",
+          "Why this one": "A combination product that supports vitamin D supply and bone health in growth, pregnancy/breastfeeding, and old age",
+          "Who should be careful": "Hypercalcemia, kidney disease or kidney stones, infants under 12 months"
+        }
+      }
+    }
+  }
+}

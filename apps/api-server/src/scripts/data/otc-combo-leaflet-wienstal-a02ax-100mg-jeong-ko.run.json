@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "위엔스탈정|A02AX|100밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "2f5a2258-8758-a2ad-13b6-debad4627dcb",
+  "expected": 3,
+  "anomalies": [],
+  "fetched": 3,
+  "easyCanonicalExactly1": 3,
+  "authoredConflict": 0,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1882,
+  "htmlMd5": "9361f27e2289483b5c74484903a19a13",
+  "summary": "위산과다·속쓰림 완화, 소화 촉진 복합 위장약",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "stepA_inserted": 3,
+  "writeActual": {
+    "stepA_inserted": 3,
+    "demoted": 3,
+    "flipped": 3,
+    "audited": 3
+  },
+  "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "deprecatedEasy": 3,
+    "dup": 0
+  }
+}

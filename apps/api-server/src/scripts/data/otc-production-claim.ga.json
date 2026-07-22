@@ -1,10 +1,13 @@
 {
-  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-10H-PRODUCTION-GA-V1 — 에이전트 가(GA) claim. 자기 소유 1개만. path-specific commit. 타 claim/config(na·da) 미접촉. 본 라운드 = 경구 복합성분 일반의약품 전수 감사. 이전 라운드(NUTRITION_COMBO_EN_ONLY 7그룹 DONE)는 git 이력·nutrition_combo CHECK 에 보존.",
+  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2 — 에이전트 가(GA) claim. 자기 소유 1개. path-specific commit. 타 claim(na·da) 미접촉. 경구 복합성분 매장용 설명서 공식 원문 근거 신규 저작(KO 교체 + EN 신규). source_ref=uuid(md5(targetFp)) 결정론 앵커.",
   "schemaVersion": 1,
   "owner": "agent-ga",
-  "round": "oral-multi-ingredient-10h-2026-07-22",
-  "track": "ORAL_MULTI_INGREDIENT",
-  "verdict": "NO_NEW_BATCH",
-  "verdictNote": "경구 복합 fingerprint 클러스터 2,826 그룹/11,439 master 전수 감사 — full-source-fingerprint 안전 확장 가능 그룹 0(authored anchor 와 easy_drug 원문 disjoint). 잔여 전량 신규 저술(복합 효능 합성=신규 의료 판단) 필요 → HOLD. CHECK-O4O-OTC-ORAL-MULTI-INGREDIENT-COMBO-DISCOVERY-AUDIT-GA-V1.md.",
-  "claims": []
+  "round": "oral-multi-ingredient-leaflet-10h-2026-07-22",
+  "track": "ORAL_MULTI_INGREDIENT_STORE_LEAFLET",
+  "verdict": "PRODUCING",
+  "claims": [
+    { "groupKey": "위엔스탈정|A02AX|100밀리그램|정", "targetFp": "0273b8335509d44c", "sourceType": "mfds_drug_otc", "masters": 3, "op": "KO_EN", "status": "DONE" },
+    { "groupKey": "에스톰액|A16AX|20그램|액", "targetFp": "01c0f11a99a2bee5", "sourceType": "mfds_drug_otc", "masters": 3, "op": "KO_EN", "status": "DONE" },
+    { "groupKey": "디케이정|A11JC|339.5밀리그램|정", "targetFp": "068a42c85de1d073", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" }
+  ]
 }

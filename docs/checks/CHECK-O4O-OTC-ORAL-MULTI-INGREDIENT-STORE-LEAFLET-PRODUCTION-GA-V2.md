@@ -1,0 +1,64 @@
+# CHECK-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2
+
+WO: `WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2` · 에이전트 **가(GA)** · 2026-07-22
+
+## 0. 정정 배경 (V1 → V2)
+
+V1 감사는 "기존 authored 공통 canonical 을 **확장**할 수 없다"를 "생산 불가(NO_NEW_BATCH)"로 과잉 방어 해석했다.
+정정(사용자 지시): **공식 `easy_drug` 원문을 근거로 제품별·안전 동질 subgroup별 매장용 설명서를 신규 저작**하면 된다.
+이 설명서는 약사가 있는 매장의 소비자 설명서로, **질병명·증상명·허가 효능을 명확히 표현**하고 매장 내 전문가 상담으로 연결하는 것이 안전 원칙이다. 정보 은폐가 안전이 아니다.
+
+## 1. 결과 (파일럿 3그룹 KO+EN LIVE)
+
+| # | groupKey | ATC | 제형 | target | source_type | KO | EN |
+|--:|---|---|---|--:|---|:--:|:--:|
+| 1 | 위엔스탈정\|A02AX\|100밀리그램\|정 | A02AX | 정 | 3 | mfds_drug_otc | ✅ | ✅ |
+| 2 | 에스톰액\|A16AX\|20그램\|액 | A16AX | 액 | 3 | mfds_drug_otc | ✅ | ✅ |
+| 3 | 디케이정\|A11JC\|339.5밀리그램\|정 | A11JC | 정 | 3 | mfds_drug_otc_nutrition_combo | ✅ | ✅ |
+
+**완료 그룹 3 · 완료 master 9 · KO write 9(교체) · EN write 9(신규).**
+
+## 2. 독립 검증 (runner 자기보고와 별도 SQL)
+
+9 target 기준: `ko_canon_authored=9 · en_canon=9 · easy_deprecated=9 · ko_dup=0 · easy_still_canon=0 · audit_logs(canonical_replaced, V2)=9`.
+→ 교체 정상 · 중복 0 · easy canonical 잔존 0 · 감사로그 완비.
+
+## 3. 파이프라인 (신규 저작 = 확장 아님)
+
+1. **감사 SSOT**: `otc-oral-multi-ingredient-combo-fp-audit-ga.mjs` — 경구 복합 fingerprint 클러스터 2,826, 그중 clean 소규모 균일 후보 **1,587**(3≤size≤8, safety/source/form/route 균일, 전량 pending). target_master_ids = 클러스터 멤버.
+2. **저작**: 공식 easy_drug 원문(효능·효과 / 용법·용량 / 경고 / 사용상 주의사항 / 상호작용 / 이상반응)을 소비자 친화 구조화 필드(efficacy·usage·caution·summaryTable·ingredientSelection)로 재구성. `otc-oral-combo-leaflet-config.ga.json`.
+3. **KO 적재(교체)**: `buildDrugOtcConsumerHtml`(sd-* 계약) → STEP A authored needs_review INSERT → STEP B 단일TX(easy canonical→deprecated / authored→canonical / audit_log). fingerprint 재현 게이트 + easy-canonical-정확히1 + authored 충돌0 + route/form/safety 균일.
+4. **EN 적재(신규)**: `buildDrugOtcEnConsumerHtml` → en needs_review INSERT → flip canonical + ko 불변 사후검증.
+5. **이중게이트**: `--apply` + `OTC_COMBO_LEAFLET_KO_CONFIRM=YES` / `..._EN_CONFIRM=YES`. dry-run 기본. 재실행 ALREADY_COMPLETE no-op. source_ref=uuid(md5(targetFp)) 결정론 앵커.
+
+## 4. 저작 계약 준수 (V2)
+
+| 원칙 | 준수 |
+|---|---|
+| 공식 원문 효능·용법·금기·주의 재구성 | ✅ 전 필드 원문 근거 |
+| 질병명·증상명·허가 효능 명확 표현 | ✅ (위산과다·소화불량·구루병 예방 등 원문 그대로) |
+| 신규 의료사실 추가 | 0 |
+| 효능·금기·주의 강도 약화 | 0 (페닐케톤뇨증 경고·고칼슘혈증 금기 등 보존) |
+| 마케팅 비교·추천·우월성 | 0 |
+| 조성(성분명·함량) 창작 | 0 (성분 미상 → 기능 서술만, 특정 성분 단정 없음) |
+| 매장 내 약사 상담 연결 | ✅ ingredientSelection 하단 |
+
+## 5. 안전·경계
+
+- 예약 combo 계열(`DRUG_OTC_COMBO_FAMILIES`: A06AB52·A06AC51·M03BB53·M09AB52·A02BA53·M01AE51) 및 감기약(cold-combo) 계열 **회피**.
+- 대상 9 master: 기존 authored SPD 0 · draft 0 (사전 확인). easy canonical 정확히 1.
+- 타 에이전트(나·다) claim(nutrition_combo EN-only 16그룹) 과 교집합 0 — 신규 source_ref 앵커.
+- production write = KO 교체 9 + EN 신규 9. canonicalDup 0 · 기존 LIVE drift 0 · target 밖 write 0.
+
+## 6. 산출물
+
+- `apps/api-server/src/scripts/otc-oral-combo-store-leaflet-runner.ga.ts` (KO 교체 + EN 신규 러너, --selftest PASS)
+- `apps/api-server/src/scripts/data/otc-oral-combo-leaflet-config.ga.json` (3그룹 KO+EN 저작)
+- `apps/api-server/src/scripts/otc-oral-multi-ingredient-combo-fp-audit-ga.mjs` (+candidate 산출)
+- `apps/api-server/src/scripts/otc-oral-combo-source-fetch.ga.mjs` (원문 fetch, read-only)
+- `apps/api-server/src/scripts/data/otc-combo-leaflet-*.run.json` (6 실행 manifest)
+- 본 CHECK
+
+## 7. 다음 (계속 생산)
+
+후보 1,587 중 예약계열·감기약 제외, clean 균일 subgroup 부터 연속 저작·적재. 계약 안정 확인됨(3/3 PASS·독립검증 통과).

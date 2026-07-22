@@ -98,7 +98,12 @@ try {
     READY_KO_EXTEND_EN_PENDING: readyKoOnly.length, readyKoOnly_pending: readyKoOnly.reduce((s,g)=>s+g.pending,0),
     HOLD: hold.length, holdReasonCount,
   };
-  writeFileSync('C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/831fdb57-1dfa-46b3-b7a7-789d46db9f18/scratchpad/atc-combo-audit-result.json', JSON.stringify({ summary, ready, readyKoOnly, hold_top: hold.sort((a,b)=>b.size-a.size).slice(0,40) }, null, 1), 'utf8');
+  // candidate pilot subgroups: clean, small, uniform — pending easy-only clusters ready for source-grounded fresh authoring
+  const candidates = out.filter(g => g.size>=3 && g.size<=8 && g.distinctSafety===1 && g.distinctSrc===1 && g.forms.length===1 && g.routes===1 && g.pending===g.size)
+    .sort((a,b)=>a.size-b.size || (a.fp<b.fp?-1:1))
+    .map(g => ({ fp:g.fp, atc:g.atc, strength:g.strength, form:g.form, size:g.size, sample:g.sample, target_ids:g.target_ids }));
+  writeFileSync('C:/Users/sohae/AppData/Local/Temp/claude/c--Users-sohae-o4o-platform/831fdb57-1dfa-46b3-b7a7-789d46db9f18/scratchpad/atc-combo-audit-result.json', JSON.stringify({ summary, candidates_count: candidates.length, candidates: candidates.slice(0,60) }, null, 1), 'utf8');
+  console.log('candidates(3<=size<=8, uniform, all-pending):', candidates.length);
   console.log(JSON.stringify(summary, null, 2));
   console.log('--- READY_SHARED_CANONICAL (top 20) ---');
   for (const g of ready.slice(0,20)) console.log(`fp=${g.fp} atc=${g.atc} ${g.strength}|${g.form} size=${g.size} authKo=${g.authKo} authEn=${g.authEn} pending=${g.pending} | ${g.sample}`);
