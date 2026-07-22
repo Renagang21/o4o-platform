@@ -111,10 +111,13 @@
 - 태블릿(운영 스모크): 목록/상세 텍스트 버튼·이미지 없음 확인. 매장 자체(local) 상품은 규격 미보유 → 이름만(빈 줄 없음) 확인.
 - **O4O 공급자 상품 규격 2행 표출**: (배포 후 운영 스모크 기록 — 아래)
 
-### 8.6 검증
-- typecheck: web-kpa-society 0.
-- (배포/스모크: 아래 기록)
-  - [ ] QR 상품 목록 이미지 없음 + 상품명 버튼형
-  - [ ] QR 상품 선택 → 상세(이미지 없음, 설명 전체 너비, 닫기)
-  - [ ] 태블릿/QR 양쪽 O4O 상품 규격 2행 · 없으면 빈 줄 없음
-  - [ ] 콘텐츠 이미지·QR·대기 미디어 유지, 콘솔/API 오류 없음
+### 8.6 검증 (운영 스모크 완료)
+- typecheck: web-kpa-society 0. 배포: deploy-kpa-society 성공(타 서비스 skip).
+- 운영 스모크 — **실제 `https://kpa-society.co.kr/qr/tablet-corner`(PublicScreenSetViewer)**:
+  - QR 상품 목록 = **이미지/📦 없이** 상품명 + 가격 + "자세히 보기 ›" 텍스트 버튼 ✓
+  - 상품 클릭 → **상품 상세 모달(이미지 없음)**: 상품명/가격/설명(또는 안내)/닫기 ✓
+  - 코너 소개·콘텐츠 카드(썸네일)·QR·footer 유지, 콘솔/API 오류 없음 ✓
+- 태블릿(`/store/commerce/tablet-displays` 미리보기 + `/tablet/{slug}`): 목록·상세 텍스트 버튼·이미지 없음 ✓.
+- **specification 실측(§4)**: 파이프라인(`pm.specification AS specification` → `mapSupplierProduct` → `p.specification && …`)은 코드·배포 검증. **매장 자체(local) 상품은 규격 미보유 → 이름만(빈 줄 없음) 확인** ✓.
+  - O4O **공급자 상품의 규격 2행 화면 표출**은 미확인: 스모크 가능한 테스트 코너의 product_list 8개가 전부 `type: 'local'`(QR public 응답·`/tablet/products` supplier count 0). 공급자 상품이 편성된 코너가 없어 **데이터 부재**로 시각 확인 불가(코드/전달 결함 아님). 공급자 상품 편성 코너 확보 시 규격 2행 자동 표출됨(전달 경로 정상).
+  - 상품명과 specification은 두 줄 분리 렌더(문자열 병합 없음) — 코드 확인 ✓.
