@@ -1,0 +1,263 @@
+{
+  "slug": "nc2-vc-zn",
+  "createdMasters": [
+    "2b27d955-1ea6-4288-af4f-7c4f867fd5f4",
+    "a0731d66-11ff-40ac-aa7c-e03febde06a6",
+    "c12094e1-a670-4b5a-9d3b-d1a0e925200c",
+    "a6ad995b-651d-4e68-9ffd-1f23b39d1e39",
+    "c76033c3-56bf-434c-a96d-7d8bfa7541fb",
+    "809581fc-3343-40dd-a045-4dcac5c33ba1",
+    "e5b2e42b-17e7-4e2e-acbc-fc47fc7fbf39",
+    "02006135-2ffd-4854-ba73-263f6223283e",
+    "dbde4a68-7470-4592-9b81-43d3d1000089",
+    "dcea46f0-2a6a-447d-af1f-fa9f48583678",
+    "9dd4bbae-96d0-4006-b359-7ecc95ec0459",
+    "7f0fdfef-33b0-45e9-9364-23a5b87b2f2e",
+    "fedb0c1d-2871-4ebd-9fdd-f187ec6019ab",
+    "51bed288-3e63-4f92-aa96-c0c13a3df5ed",
+    "a81bb6b7-78dc-4537-915b-a7fe1b148875",
+    "2122b60c-891e-4d77-954c-396b668eea7d",
+    "346445f7-d6bc-40ad-8c1b-3bfd72f4713b",
+    "66cfd43c-193a-47d7-9f56-86f1879ba02b",
+    "254be7bf-7ca5-430a-badf-6b0cc01bb62b",
+    "97a68af8-f59a-4470-991d-46dc41328c26",
+    "c3707280-56cb-43a2-8906-03333e8a2b9d",
+    "4da27e34-4d81-451b-82da-9f68f7425bf5",
+    "fc1e43ff-26f3-4610-b498-a87abf545c17",
+    "46ea12b6-7a14-4374-b1cd-3ed6a289c04e",
+    "e35a3181-919d-4a79-b11d-369d50cf8198",
+    "f8a5c575-3784-4431-8227-68f8d373fca2",
+    "f87715c7-67d4-40a2-8783-9da37a020797",
+    "4181950a-74ff-40b5-b025-640bee2115a9"
+  ],
+  "createdSpd": [
+    "9e303a7a-19fe-479a-ba7f-5e35e8673edb",
+    "e1ad1874-ae1a-4882-b2e8-497bd35f3c6d",
+    "a07e2da7-6e90-4a14-852a-ecdf94bcbf2a",
+    "1b306ed2-6af6-411e-8f9e-9c9eae0703ac",
+    "f6c0d05e-cd0f-4491-91b2-4bfbc20b3e7c",
+    "65d756cf-59f8-4606-8ed4-48eba0ceb4fa",
+    "c74177c7-5ef1-4ec4-a126-7837e0299b38",
+    "d4ec364c-48b2-47f6-a19d-5dc970179b4a",
+    "c9748e9c-51c2-43d0-bd12-1e24020a4038",
+    "bdc8c151-c5b4-4964-a8ad-99119339992a",
+    "a35a74aa-19c7-4c28-8a9b-74594f157685",
+    "bcc977b1-d788-4716-9ff3-8f7fa4ffa243",
+    "d5d55ac8-4961-4f49-afbb-83df37df9db1",
+    "6bc4f5a7-a405-4be6-9815-158859621065",
+    "9015dca2-9c25-4c87-b928-91407bf71063",
+    "6c3cee47-5f9c-4a3d-85f9-415b0cf24c40",
+    "9fd577f1-9781-4827-993b-26fd51ddae1e",
+    "88d03e89-4d38-499f-b6be-981799aa6885",
+    "1d881827-0a59-4165-8493-cba693343598",
+    "06733556-6a67-4021-b88d-a710e2d10be7",
+    "763a384c-4dfa-43bd-8df2-002d65b1bef1",
+    "3e7f26d0-26ac-4711-ba7d-32b84ddc7e7d",
+    "0ac6247f-0bbe-4c3d-b61e-b904114f0ee8",
+    "8b6ff01c-30b7-409e-a19c-0ccd916b74f2",
+    "f18c4188-8360-4bba-b57e-7839726a0bd1",
+    "5dfbd06f-8b55-4d56-8470-2b27cd8cebfb",
+    "fd947be4-81d9-4946-8f53-2a77dbc1d6f6",
+    "ea57bde8-0f94-4032-b3a9-a052a35349ef",
+    "6b5a4a45-2da3-4654-acd2-a6599684b332",
+    "1ffbfa05-18f7-4e05-a9c9-7a979f73cf9c",
+    "3fc3b1cd-7055-4ba6-8264-0a16b633eaa6",
+    "cf6c056d-e7f4-471f-8ec6-6b35583374ef",
+    "427b9a09-14d1-4e62-bd88-200ebc084dd5",
+    "32b357d3-b4f0-4511-b8c5-5e0bb1ab0fd4",
+    "89e110d2-418a-43a7-8359-48fa416e2aaf",
+    "ff5d6beb-e893-493a-ae09-1a865dea266a",
+    "2cac807c-1d2b-440d-a88f-60f294928e32",
+    "a59e4d64-d1b6-4cc3-a9fe-102a43045ec6",
+    "04cf2a9a-6ace-474b-894b-46689ef0de2d",
+    "6c8fa70f-3df1-4770-8ecc-449209bdbdbd",
+    "d033d0b8-dcad-4e70-8568-45d6e5541b0a",
+    "acb38bb3-d870-4332-b3a6-2a54df4e3d92",
+    "27e7cbd3-ad4b-4350-b74e-d9087bce1d84",
+    "461be27f-4b71-4011-82c2-f5919a422066",
+    "b51b9b92-f281-4645-a78e-b08de8c4eb5a",
+    "6ab04883-9fc1-4cc2-ba78-d373885f0c08",
+    "63554eff-9bc3-442b-a7ca-9c5a42a9f082",
+    "a11c6394-2494-4961-8db4-eaa61b0807dd",
+    "89803022-32fa-49a3-b75a-102b2017cb87",
+    "c2f25b5d-26f6-437f-8aac-cd5d330c8c75",
+    "cdb181a5-d619-4c93-be05-99896f371ea3",
+    "17f42b6f-face-4d92-b26f-b94499e4d9ba",
+    "c3dca5c6-265b-4c56-a035-f08a24565a0d",
+    "3f781225-a929-4bc7-ae16-857e0c1d4b4f",
+    "2cc49821-6919-48c8-9bb0-c510fa385670",
+    "095c465b-da07-4460-8633-43a7605d9d2f"
+  ],
+  "candIds": [
+    "0447ad73-0605-4112-8154-12bf0ac730e3",
+    "06b13d2c-8510-4e71-986f-29f757fae4ae",
+    "0f132d72-c444-45ac-9138-c840f21f3ae5",
+    "15777eb1-8d64-4623-8095-accda7decb87",
+    "211b750d-970d-4969-acef-4803b9147874",
+    "2be3f4d1-d90f-4555-a412-cffda9f096b8",
+    "2e1e8bfd-f725-46c5-b590-256543000720",
+    "32802cdf-9116-4777-b903-93b7055f207c",
+    "42bf2cab-a87e-4447-88bf-67d738ef5cf1",
+    "49ceb028-bdc3-4f67-8dda-9de3f217fd57",
+    "4c26905e-3ca4-4c07-97be-a17a4a0f4579",
+    "60f48bec-1960-433f-a725-e8007c3fd863",
+    "63dfab4c-a90d-490e-a6fd-d570933cd940",
+    "66ff3300-b2c1-4d73-a8e2-88303030487f",
+    "6ceaccba-8dc2-4960-b362-57148f8bd9b3",
+    "710f9777-634e-48f9-9e67-dd5f29d20ab2",
+    "71768be5-65c4-4061-96c8-a089886b6baf",
+    "81f2e22c-e603-41bc-ba17-e20dbcbe9901",
+    "89314c87-f4ca-4b6f-8ca3-c3a2fb5b0709",
+    "95f977a3-7a00-43e1-b699-d9a3e5b32507",
+    "983e7197-0a12-42e6-a63c-516ae699cfe3",
+    "9966e059-c867-4a6d-b89b-a68e98b1e1ab",
+    "9c006c37-80d4-4a08-8366-45768f377345",
+    "9c58e143-e803-4da2-be1d-cfac427ac69e",
+    "a14152fb-dbb3-4a6b-be79-10041278a024",
+    "a20f69dd-69bc-4bab-8795-6a1cb887f001",
+    "d1785a15-db99-45c7-8335-cd156ca4d581",
+    "ee5e348a-c399-4cfc-ab1c-065a3479bb65"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "0447ad73-0605-4112-8154-12bf0ac730e3",
+      "stmt": "20040017062172",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "06b13d2c-8510-4e71-986f-29f757fae4ae",
+      "stmt": "20220011370360",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "0f132d72-c444-45ac-9138-c840f21f3ae5",
+      "stmt": "20040017062165",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "15777eb1-8d64-4623-8095-accda7decb87",
+      "stmt": "200400200023066",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "211b750d-970d-4969-acef-4803b9147874",
+      "stmt": "200400200142056",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "2be3f4d1-d90f-4555-a412-cffda9f096b8",
+      "stmt": "201900142832",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "2e1e8bfd-f725-46c5-b590-256543000720",
+      "stmt": "200400200141580",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "32802cdf-9116-4777-b903-93b7055f207c",
+      "stmt": "20040017062163",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "42bf2cab-a87e-4447-88bf-67d738ef5cf1",
+      "stmt": "20040017062148",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "49ceb028-bdc3-4f67-8dda-9de3f217fd57",
+      "stmt": "20040017062140",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "4c26905e-3ca4-4c07-97be-a17a4a0f4579",
+      "stmt": "20120017002212",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "60f48bec-1960-433f-a725-e8007c3fd863",
+      "stmt": "20040017062126",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "63dfab4c-a90d-490e-a6fd-d570933cd940",
+      "stmt": "20040017062154",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "66ff3300-b2c1-4d73-a8e2-88303030487f",
+      "stmt": "20190009105415",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "6ceaccba-8dc2-4960-b362-57148f8bd9b3",
+      "stmt": "20040017038185",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "710f9777-634e-48f9-9e67-dd5f29d20ab2",
+      "stmt": "20220020002126",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "71768be5-65c4-4061-96c8-a089886b6baf",
+      "stmt": "20040020038164",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "81f2e22c-e603-41bc-ba17-e20dbcbe9901",
+      "stmt": "200400200201345",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "89314c87-f4ca-4b6f-8ca3-c3a2fb5b0709",
+      "stmt": "2018001246667",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "95f977a3-7a00-43e1-b699-d9a3e5b32507",
+      "stmt": "20040020071340",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "983e7197-0a12-42e6-a63c-516ae699cfe3",
+      "stmt": "20220011370439",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9966e059-c867-4a6d-b89b-a68e98b1e1ab",
+      "stmt": "202100108174",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9c006c37-80d4-4a08-8366-45768f377345",
+      "stmt": "20040020001273",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9c58e143-e803-4da2-be1d-cfac427ac69e",
+      "stmt": "20190016024129",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a14152fb-dbb3-4a6b-be79-10041278a024",
+      "stmt": "2022002000220",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a20f69dd-69bc-4bab-8795-6a1cb887f001",
+      "stmt": "2019000910539",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d1785a15-db99-45c7-8335-cd156ca4d581",
+      "stmt": "20040017015338",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "ee5e348a-c399-4cfc-ab1c-065a3479bb65",
+      "stmt": "202500123717",
+      "prev_status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+[
+ {
+  "candidateId": "nc2b-cu-zn-001",
+  "productName": "면역기능앤굿아연",
+  "productNameEn": "면역기능앤굿아연",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071220",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 파랑색의 점박이를 포함한 흰 파랑색의 장방형 제피정제\n2. 대장균군 : 적합(음성)\n3. 아연 : 표시량(30 mg/500 mg)의 80~150%\n4. 구리 : 표시량(2 mg/500 mg)의 80~150%\n5. 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오",
+   "caution": "특이체질 및 알레르기 체질이신 분은 성분을 확인한 후 섭취하시기 바랍니다.\n질환 보유자 또는 약물 복용 중이신 분은 섭취 전에 의사, 약사 등 전문가와 상담하십시오.\n용기 내 방습제는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 파랑색의 점박이를 포함한 흰 파랑색의 장방형 제피정제",
+   "storage": "직사광선 및 고온〮다습한 곳을 피해 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 2mg</span><span class=\"sd-badge is-solid\">아연 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>면역기능앤굿아연<small>구리 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>2mg</b>, 아연 <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>2mg</b>, 아연 <b>30mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 파랑색의 점박이를 포함한 흰 파랑색의 장방형 제피정제 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(2mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(30mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 파랑색의 점박이를 포함한 흰 파랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온〮다습한 곳을 피해 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 2mg</span><span class=\"sd-badge is-solid\">Zinc 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>면역기능앤굿아연<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2mg</b> of Copper, <b>30mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2mg</b> Copper, <b>30mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (2mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (30mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 파랑색의 점박이를 포함한 흰 파랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온〮다습한 곳을 피해 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-002",
+  "productName": "이뮨케어 아연플러스",
+  "productNameEn": "이뮨케어 아연플러스",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915154",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n(1) 철의 운반과 이용에 필요\n(2) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 흰파랑색의 장방형 정제 \n2. 아연 : 표시량(35mg/980mg)의 80~150% \n3. 구리 : 표시량(2mg/980mg)의 80~150% \n4. 대장균군 : 음성\n5. 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취 하십시오.",
+   "caution": "1. 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오.\n2. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n3. 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n4. 이상 사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰파랑색의 장방형 정제",
+   "storage": "1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2,
+    "unit": "mg",
+    "basisAmount": 980,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 2mg</span><span class=\"sd-badge is-solid\">아연 35mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>이뮨케어 아연플러스<small>구리 · 아연</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>2mg</b>, 아연 <b>35mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>2mg</b>, 아연 <b>35mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰파랑색의 장방형 정제 · (주)팜투팜2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(2mg/980mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(35mg/980mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰파랑색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 2mg</span><span class=\"sd-badge is-solid\">Zinc 35mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>이뮨케어 아연플러스<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2mg</b> of Copper, <b>35mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2mg</b> Copper, <b>35mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (2mg / 980mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (35mg / 980mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰파랑색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2. 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3. 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-003",
+  "productName": "앨로프리",
+  "productNameEn": "앨로프리",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006753",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\r\n[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없는 밝은 회황색의 분말을 내용물로 한 백색의 경질캡슐제\r\n(2) 아연 : 표시량(4.2mg/0.31392g)의 80.0~150.0%\r\n(3) 구리 : 표시량(0.5mg/0.31392g)의 80.0~150.0%\r\n(4) 대장균군 : 음성\r\n(5) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(0.31392g)을 충분한 물과 함께 섭취.",
+   "caution": "① 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n   ② 제품의 성분을 확인하고 기타 제품 관련 사항은 소비자 상담실로 문의하십시오.",
+   "dosageForm": "밝은 회황색의 분말을 내용물로 한 백색의 경질캡슐제",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.5,
+    "unit": "mg",
+    "basisAmount": 0.31392,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.5mg</span><span class=\"sd-badge is-solid\">아연 4.2mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>앨로프리<small>구리 · 아연</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.5mg</b>, 아연 <b>4.2mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>0.5mg</b>, 아연 <b>4.2mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>밝은 회황색의 분말을 내용물로 한 백색의 경질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.5mg/0.31392g)의 80.0~150.0%</div><div class=\"sd-item\"><b>아연</b> 표시량(4.2mg/0.31392g)의 80.0~150.0%</div><div class=\"sd-item\"><b>성상</b> 밝은 회황색의 분말을 내용물로 한 백색의 경질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.5mg</span><span class=\"sd-badge is-solid\">Zinc 4.2mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>앨로프리<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.5mg</b> of Copper, <b>4.2mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>0.5mg</b> Copper, <b>4.2mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.5mg / 0.31392g), 80.0~150.0%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4.2mg / 0.31392g), 80.0~150.0%</div><div class=\"sd-item\"><b>Appearance</b> 밝은 회황색의 분말을 내용물로 한 백색의 경질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-004",
+  "productName": "미라클캡슐",
+  "productNameEn": "미라클캡슐",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "20110020099308",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐\n2. 아연 : 표시량(2.55mg/1,800mg)의 80~150%\n3. 구리 : 표시량(9.2mg/1,800mg)의 80~150%\n4. 대장균군 : 음성\n5. 붕해 : 20분 이내",
+   "intake": "1일 3회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 9.2,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 9.2mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>미라클캡슐<small>구리 · 아연</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>9.2mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 구리 <b>9.2mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐 · 주식회사 아리너스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(9.2mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 9.2mg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>미라클캡슐<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>9.2mg</b> of Copper, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>9.2mg</b> Copper, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (9.2mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-005",
+  "productName": "씨놀 뉴보낙스 프리미엄",
+  "productNameEn": "씨놀 뉴보낙스 프리미엄",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701065",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1)아연: ①정상적인 면역기능에 필요 ②정상적인 세포분열에 필요\n2)구리: ①철의 운반과 이용에 필요 ②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 갈색의 투명한 경질캡슐\n2) 아연 : 표시량(8.5 mg/800 mg)의 80~150%\n3) 구리 : 표시량(0.8 mg/800 mg)의 80~150%\n4) 대장균군 : 음성\n5) 붕해시험 : 적합(20분 이내)",
+   "intake": "1일 2회, 1회 1캡슐(400mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1)섭취 후 이상증상이 생길 경우 섭취를 중단하시고, 전문의 또는 소비자상담실로 문의 하시기 바랍니다.\n2)섭취량 및 섭취방법을 확인 후 섭취하시고 섭취 시 캡슐이 기도에 걸릴 수 있으니 주의 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 갈색의 투명한 경질캡슐",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.8,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.8mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>씨놀 뉴보낙스 프리미엄<small>구리 · 아연</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.8mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 구리 <b>0.8mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 갈색의 투명한 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.8mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년까지</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.8mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>씨놀 뉴보낙스 프리미엄<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.8mg</b> of Copper, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 capsule): <b>0.8mg</b> Copper, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.8mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년까지</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-006",
+  "productName": "면역엔 아연 플러스",
+  "productNameEn": "면역엔 아연 플러스",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20120017002172",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 광택이 없는 밝은 흰색의 장방형 제피정제\n2. 아연 함량 : 표시량(30 mg/700 mg)의  80~150%\n3. 구리 함량 : 표시량(2 mg/700 mg)의 80~150%\n4. 붕해도 : 60분 이내\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 유통기한을 확인하시기 바라며, 권장섭취량 및 섭취방법을 준수하시기 바랍니다.\n2) 특정질환, 특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n3) 어린이가 섭취 할 때는 보호자의 관리 감독 하에 주의하여 섭취시켜 주십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 광택이 없는 밝은 흰색의 장방형 제피정제",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2,
+    "unit": "mg",
+    "basisAmount": 700,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 2mg</span><span class=\"sd-badge is-solid\">아연 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>면역엔 아연 플러스<small>구리 · 아연</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>2mg</b>, 아연 <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>2mg</b>, 아연 <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 광택이 없는 밝은 흰색의 장방형 제피정제 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(2mg/700mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(30mg/700mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 광택이 없는 밝은 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 2mg</span><span class=\"sd-badge is-solid\">Zinc 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>면역엔 아연 플러스<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2mg</b> of Copper, <b>30mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2mg</b> Copper, <b>30mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (2mg / 700mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (30mg / 700mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 광택이 없는 밝은 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-cu-zn-007",
+  "productName": "미라클캡슐G",
+  "productNameEn": "미라클캡슐G",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "20110020099310",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐\n2. 아연 : 표시량(2.55mg/1,800mg)의 80 ~ 150%\n3. 구리 : 표시량(9.2mg/1,800mg)의 80 ~150%\n4. 대장균군 : 음성\n5. 붕해 : 20분 이내",
+   "intake": "1일 3회, 1회 1캡슐을 충분한 물과 함께 섭취하세요",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시길 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 9.2,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 9.2mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>미라클캡슐G<small>구리 · 아연</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>9.2mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 구리 <b>9.2mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐 · 주식회사 아리너스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(9.2mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 9.2mg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>미라클캡슐G<small>Copper · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>9.2mg</b> of Copper, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>9.2mg</b> Copper, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed for the transport and utilisation of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (9.2mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 내용물을 함유한 연한 노란색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

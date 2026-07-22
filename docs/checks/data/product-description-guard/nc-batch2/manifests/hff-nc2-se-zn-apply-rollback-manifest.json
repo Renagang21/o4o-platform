@@ -1,0 +1,65 @@
+{
+  "slug": "nc2-se-zn",
+  "createdMasters": [
+    "7313c254-455d-4de0-91ca-19e8f1eaa126",
+    "c733856c-849d-4187-b350-6a17ef473cd6",
+    "36e5cb54-c820-4c8b-bff0-78db32f82041",
+    "0ad04bf8-7c51-4ff5-bc82-0bee96360427",
+    "0341aa80-adc3-4eaa-9aa6-fed0ed0a713b",
+    "df610bd1-0814-4334-85d2-a57bc666119a"
+  ],
+  "createdSpd": [
+    "426d92dd-a30f-4597-bcf1-8f89d5b2a671",
+    "2f6c7fbc-a896-4f84-b106-27c202fe5ec2",
+    "7229235e-2eb6-44d2-88c2-92d881438f5d",
+    "9b4881ae-ffdd-4775-9784-c6581c03064c",
+    "3c62282b-088b-452c-9205-2393e9968346",
+    "af391fbf-382b-4799-be02-26f5bb2794a1",
+    "159ec446-3a8f-4ec7-a980-79a2e551f5d2",
+    "2ea51700-6bf6-4a5c-85c7-77d7ae068104",
+    "3f7d3f61-39fe-4e2b-a85c-2df572ca37df",
+    "b80b4ff3-d137-406f-9dd6-b3112adda9e9",
+    "da63eb9c-6a85-4367-94f1-3e9111fcf5e6",
+    "17b318fc-6171-46a0-a319-82a90ad893cd"
+  ],
+  "candIds": [
+    "1307de16-6aed-425e-8348-05ed325a98fe",
+    "85a789e9-9a3c-47b1-8481-0d9173f397dd",
+    "badf0fb8-693a-41ad-8919-3848f00dd9d2",
+    "c83c19d3-c91e-4e09-93fc-334405f05c78",
+    "d648abb0-a704-4341-b880-fa303f7c1ec8",
+    "d6a7ed90-8407-4f7e-9af5-31f273b07485"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "1307de16-6aed-425e-8348-05ed325a98fe",
+      "stmt": "200400200023291",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "85a789e9-9a3c-47b1-8481-0d9173f397dd",
+      "stmt": "2020000997257",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "badf0fb8-693a-41ad-8919-3848f00dd9d2",
+      "stmt": "20190009483303",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c83c19d3-c91e-4e09-93fc-334405f05c78",
+      "stmt": "20100019004645",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d648abb0-a704-4341-b880-fa303f7c1ec8",
+      "stmt": "20040016034167",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d6a7ed90-8407-4f7e-9af5-31f273b07485",
+      "stmt": "2004002004084",
+      "prev_status": "pending"
+    }
+  ]
+}

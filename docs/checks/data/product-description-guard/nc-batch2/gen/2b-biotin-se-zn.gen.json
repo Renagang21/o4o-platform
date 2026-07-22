@@ -1,0 +1,254 @@
+[
+ {
+  "candidateId": "nc2b-biotin-se-zn-001",
+  "productName": "제너럴밸런스 비오틴",
+  "productNameEn": "제너럴밸런스 비오틴",
+  "manufacturer": "제너럴바이오 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "2013001930417",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미 , 이취가 없는 흐린 노란색의 장방형 코팅정제\n(2) 비오틴 : 표시량 (900㎍ / 500mg)의 80~180%\n(3) 셀레늄 : 표시량 (55㎍ / 500mg)의 80~150%\n(4) 아연 : 표시량 (3mg / 500mg)의 80~150%\n(5) 대장균군 : 음성\n(6) 붕해시험 : 적합 (60분 이내)",
+   "intake": "1일 1회 , 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미 , 이취가 없는 흐린 노란색의 장방형 코팅정제",
+   "storage": "직사광선을 피하고 서늘하고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 900,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 900μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>제너럴밸런스 비오틴<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">제너럴바이오 주식회사 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>900μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>3mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비오틴 <b>900μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 , 이취가 없는 흐린 노란색의 장방형 코팅정제 · 제너럴바이오 주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(900μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(3mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 , 이취가 없는 흐린 노란색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘하고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 900μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>제너럴밸런스 비오틴<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 제너럴바이오 주식회사 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>900μg</b> of Biotin, <b>55μg</b> of Selenium, <b>3mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>900μg</b> Biotin, <b>55μg</b> Selenium, <b>3mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 제너럴바이오 주식회사</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (900μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (3mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 , 이취가 없는 흐린 노란색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘하고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-biotin-se-zn-002",
+  "productName": "뉴트리 비오틴 셀렌 아연",
+  "productNameEn": "뉴트리 비오틴 셀렌 아연",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352861",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비오틴]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[아연]\n정상적인 면역기능에 필요\n정상적인 세포분열에 필요\n\n[셀레늄(또는 셀렌)]\n유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 황회색의 장방형 제피 정제\n2. 대장균군: 음성\n3. 붕해도: 60분 이내\n4. 셀레늄(또는 셀렌): 표시량(55μg/1200mg)의 80~150%\n5. 아연: 표시량(8.5mg/1200mg)의 80~150%\n6. 비오틴: 표시량(1000μg/1200mg)의 80~180%",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[비오틴]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 황회색의 장방형 제피 정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 1000μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리 비오틴 셀렌 아연<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>1000μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비오틴 <b>1000μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 황회색의 장방형 제피 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(1000μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 황회색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 1000μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리 비오틴 셀렌 아연<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000μg</b> of Biotin, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1000μg</b> Biotin, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (1000μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 황회색의 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-biotin-se-zn-003",
+  "productName": "건강백세효모",
+  "productNameEn": "건강백세효모",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107705",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상: 이미, 이취가 없고 고유의 향미가 있는 연갈색의 원형정제\n2. 비오틴: 표시량(30 ㎍/2,500 mg)의 80~180%\n3. 아연: 표시량(4 mg/2,500 mg)의 80~150%\n4. 셀레늄(또는 셀렌): 표시량(55 ㎍/2,500 mg)의 80~150%\n5. 대장균군: 적합",
+   "intake": "1일 2회, 1회 5정을 씹어서 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연갈색의 원형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "μg",
+    "basisAmount": 2500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 5,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 30μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 4mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>건강백세효모<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>30μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>4mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(5정) 섭취로 비오틴 <b>30μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>4mg</b></li><li>이미, 이취가 없고 고유의 향미가 있는 연갈색의 원형 정제 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(30μg/2500mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(4mg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연갈색의 원형 정제</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 30μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 4mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>건강백세효모<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 5 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30μg</b> of Biotin, <b>55μg</b> of Selenium, <b>4mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (5 tablets): <b>30μg</b> Biotin, <b>55μg</b> Selenium, <b>4mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (30μg / 2500mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4mg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연갈색의 원형 정제</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-biotin-se-zn-004",
+  "productName": "가득채운 비오틴",
+  "productNameEn": "가득채운 비오틴",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041147",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 코팅정제\n2) 대장균군 : 음성\n3) 붕해도 : 60분 이내\n4) 비오틴: 표시량(5000㎍/600mg)의 80~180%\n5) 아연 : 표시량(8.5mg/600mg)의 80~150%\n6) 셀렌 : 표시량(55㎍/600mg)의 80~150%",
+   "intake": "1일 1회, 1회 1정씩 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[비오틴]\n1)이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 코팅정제",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일부터 24 개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5000,
+    "unit": "μg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 5000μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>가득채운 비오틴<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>5000μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비오틴 <b>5000μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 코팅정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(5000μg/600mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/600mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24 개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 5000μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>가득채운 비오틴<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5000μg</b> of Biotin, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>5000μg</b> Biotin, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (5000μg / 600mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24 개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-biotin-se-zn-005",
+  "productName": "프리미엄 비오틴 플러스",
+  "productNameEn": "프리미엄 비오틴 플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106415",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비오틴] ①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀레늄(셀렌)] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미,이취가 없는 백색의 코팅정제\n② 비오틴 : 표시량(900㎍/1,000㎎)의 80 ~180%\n③ 아연 : 표시량(8.5mg/1,000㎎)의 80~150%\n④ 셀레늄 : 표시량(55㎍/1,000㎎)의 80~150%\n⑤ 대장균군 : 음성\n⑥ 붕해도 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 특정 또는 특이체질이신 경우 원료의 성분을 확인 후 섭취하십시오.\n③ 동봉된 방습제를 섭취하지 않도록 주의하십시오.\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 백색의 코팅정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 900,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 900μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 비오틴 플러스<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>900μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비오틴 <b>900μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 백색의 코팅정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(900μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 900μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 비오틴 플러스<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>900μg</b> of Biotin, <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>900μg</b> Biotin, <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (900μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-biotin-se-zn-006",
+  "productName": "면역영양밸런스 (IMMUNITY NUTRITION BALANCE)",
+  "productNameEn": "면역영양밸런스 (IMMUNITY NUTRITION BALANCE)",
+  "manufacturer": "(주)허브큐어",
+  "manufacturerEn": null,
+  "statementNo": "20040015162450",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말\n(2) 비오틴 : 표시량(500ug/10,000mg)의 80~180%\n(3) 셀레늄 : 표시량(55ug/10.000mg)의 80~150%\n(4) 아연 : 표시량(10mg/10.000mg)의 80~150%\n(5) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "μg",
+    "basisAmount": 10000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 500μg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 10mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>면역영양밸런스 (IMMUNITY NUTRITION BALANCE)<small>비오틴 · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>500μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>10mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비오틴 <b>500μg</b>, 셀레늄 <b>55μg</b>, 아연 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말 · (주)허브큐어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(500μg/10000mg)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/10mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(10mg/10mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 500μg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 10mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>면역영양밸런스 (IMMUNITY NUTRITION BALANCE)<small>Biotin · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)허브큐어 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500μg</b> of Biotin, <b>55μg</b> of Selenium, <b>10mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>500μg</b> Biotin, <b>55μg</b> Selenium, <b>10mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)허브큐어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (500μg / 10000mg), 80~180%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 10mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (10mg / 10mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

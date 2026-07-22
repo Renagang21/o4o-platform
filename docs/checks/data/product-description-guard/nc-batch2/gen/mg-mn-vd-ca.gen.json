@@ -1,0 +1,464 @@
+[
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-001",
+  "productName": "뼈&치아 솔루션",
+  "productNameEn": "뼈&치아 솔루션",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082639",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 투명 장방형 제피 정제\n2. 칼슘 : 표시량(210mg/2100mg)의 80~150%\n3. 마그네슘 : 표시량(105mg/2100mg)의 80~150%\n4. 망간 : 표시량(3mg/2100mg)의 80~150%\n5. 비타민D : 표시량(6ug/2100mg)의 80~180%\n6. 대장균군 : 음성\n7. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 3정(1정당 700 mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 투명 장방형 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 105,
+    "unit": "mg",
+    "basisAmount": 2100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 105mg</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 D 6μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈&amp;치아 솔루션<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>105mg</b>, 망간 <b>3mg</b>, 비타민 D <b>6μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 마그네슘 <b>105mg</b>, 망간 <b>3mg</b>, 비타민 D <b>6μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 투명 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(105mg/2100mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(3mg/2100mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(6μg/2100mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/2100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 투명 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 105mg</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin D 6μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뼈&amp;치아 솔루션<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>105mg</b> of Magnesium, <b>3mg</b> of Manganese, <b>6μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 tablets): <b>105mg</b> Magnesium, <b>3mg</b> Manganese, <b>6μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (105mg / 2100mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 2100mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (6μg / 2100mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 2100mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 하얀색의 투명 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-002",
+  "productName": "칼슘마그네슘D",
+  "productNameEn": "칼슘마그네슘D",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "202000099723",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 D] ①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요 ③골다공증발생 위험 감소에 도움을 줌\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없으며 고유의 향미를 지닌 백색의 장방형 제피정제\n2) 비타민D : 표시량 (6.4ug/1,600mg)의  80~180%\n3) 칼슘 : 표시량 (282mg/1,600mg)의  80~150%\n4) 마그네슘 : 표시량 (141mg/1,600mg)의  80~150%\n5) 망간 : 표시량 (1.4mg/1,600mg)의  80~150%\n6) 대장균군 : 음성\n7) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없으며 고유의 향미를 지닌 백색의 장방형 제피정제",
+   "storage": "실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 141,
+    "unit": "mg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 141mg</span><span class=\"sd-badge is-solid\">망간 1.4mg</span><span class=\"sd-badge is-solid\">비타민 D 6.4μg</span><span class=\"sd-badge is-solid\">칼슘 282mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>칼슘마그네슘D<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>141mg</b>, 망간 <b>1.4mg</b>, 비타민 D <b>6.4μg</b>, 칼슘 <b>282mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 마그네슘 <b>141mg</b>, 망간 <b>1.4mg</b>, 비타민 D <b>6.4μg</b>, 칼슘 <b>282mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없으며 고유의 향미를 지닌 백색의 장방형 제피정제 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>신경과 근육 기능 유지에 필요</li><li>뼈와 치아 형성에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(141mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(1.4mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(6.4μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(282mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없으며 고유의 향미를 지닌 백색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 141mg</span><span class=\"sd-badge is-solid\">Manganese 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin D 6.4μg</span><span class=\"sd-badge is-solid\">Calcium 282mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>칼슘마그네슘D<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>141mg</b> of Magnesium, <b>1.4mg</b> of Manganese, <b>6.4μg</b> of Vitamin D, <b>282mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>141mg</b> Magnesium, <b>1.4mg</b> Manganese, <b>6.4μg</b> Vitamin D, <b>282mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for the formation of bones and teeth</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (141mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (1.4mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (6.4μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (282mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없으며 고유의 향미를 지닌 백색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-003",
+  "productName": "비타칼슘N뉴랜드",
+  "productNameEn": "비타칼슘N뉴랜드",
+  "manufacturer": "(주)웰레스트",
+  "manufacturerEn": null,
+  "statementNo": "20230029284158",
+  "category": "hff",
+  "source": {
+   "mainFunction": "칼슘 (1) 뼈와 치아 형성에 필요 (2) 신경과 근육 기능 유지에 필요 (3) 정상적인 혈액응고에 필요 (4) 골다공증발생 위험 감소에 도움을 줌\n\n마그네슘 (1) 에너지 이용에 필요 (2) 신경과 근육 기능 유지에 필요\n\n비타민D (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요(3) 골다공증발생 위험 감소에 도움을 줌\n\n망간 (1) 뼈 형성에 필요 (2) 에너지 이용에 필요 (3) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "성상 : 이미, 이취가 없고 고유의 향미가 있는 점박이가 있는 하양색의 장방형 제피정제\n칼슘 : 표시량(330 mg/2000mg)의 80~150%\n마그네슘 : 표시량(165mg/2000mg)의 80~150%\n비타민 D : 표시량(20ug/2000mg)의 80~180%\n망간 : 표시량(4mg/2000mg)의 80~150%\n대장균군 : 음성\n붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 점박이가 있는 하양색의 장방형 제피정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 165,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 165mg</span><span class=\"sd-badge is-solid\">망간 4mg</span><span class=\"sd-badge is-solid\">비타민 D 20μg</span><span class=\"sd-badge is-solid\">칼슘 330mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비타칼슘N뉴랜드<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)웰레스트 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>165mg</b>, 망간 <b>4mg</b>, 비타민 D <b>20μg</b>, 칼슘 <b>330mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 마그네슘 <b>165mg</b>, 망간 <b>4mg</b>, 비타민 D <b>20μg</b>, 칼슘 <b>330mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 점박이가 있는 하양색의 장방형 제피정제 · (주)웰레스트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(165mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(4mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(20μg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(330mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 점박이가 있는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 165mg</span><span class=\"sd-badge is-solid\">Manganese 4mg</span><span class=\"sd-badge is-solid\">Vitamin D 20μg</span><span class=\"sd-badge is-solid\">Calcium 330mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비타칼슘N뉴랜드<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)웰레스트 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>165mg</b> of Magnesium, <b>4mg</b> of Manganese, <b>20μg</b> of Vitamin D, <b>330mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>165mg</b> Magnesium, <b>4mg</b> Manganese, <b>20μg</b> Vitamin D, <b>330mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)웰레스트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (165mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (4mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (20μg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (330mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 점박이가 있는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-004",
+  "productName": "튼튼 칼슘마그네슘D",
+  "productNameEn": "튼튼 칼슘마그네슘D",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082364",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 회분홍색 캐릭터 정제\n2. 칼슘 : 표시량(210mg/2400mg)의 80~150%\n3. 마그네슘 : 표시량(100mg/2400mg)의 80~150%\n4. 비타민D : 표시량(10ug/2400mg)의 80~180%\n5. 망간 : 표시량(1mg/2400mg)의 80~150%\n6. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 씹어서 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 회분홍색 캐릭터 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 100,
+    "unit": "mg",
+    "basisAmount": 2400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 100mg</span><span class=\"sd-badge is-solid\">망간 1mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>튼튼 칼슘마그네슘D<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>100mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 마그네슘 <b>100mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 회분홍색 캐릭터 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(100mg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(1mg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/2400mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/2400mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 회분홍색 캐릭터 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 100mg</span><span class=\"sd-badge is-solid\">Manganese 1mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>튼튼 칼슘마그네슘D<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>100mg</b> of Magnesium, <b>1mg</b> of Manganese, <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>100mg</b> Magnesium, <b>1mg</b> Manganese, <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (100mg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (1mg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 2400mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 2400mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 회분홍색 캐릭터 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-005",
+  "productName": "키즈비타칼슘마그네슘",
+  "productNameEn": "키즈비타칼슘마그네슘",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031765",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1)칼슘 : ①-뼈와 치아 형성에 필요 ②-신경과 근육 기능 유지에 필요 ③-정상적인 혈액응고에 필요 ④-골다공증발생 위험 감소에 도움을 줌  \n2)마그네슘 : ①-에너지 이용에 필요 ②-신경과 근육 기능 유지에 필요 \n3)비타민 D : ①-칼슘과 인이 흡수되고 이용되는데 필요 ②-뼈의 형성과 유지에 필요 ③-골다공증발생 위험 감소에 도움을 줌\n4)망간 : ①-뼈 형성에 필요 ②-에너지 이용에 필요 ③-유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 동물 모양의 츄어블 정제\n2. 비타민 D : 표시량(10 ug/3,000 mg)의 80~180%\n3. 칼슘 : 표시량(300 mg/3,000 mg)의 80~150%\n4. 마그네슘 : 표시량(150 mg/3,000 mg)의 80~150%\n5. 망간 : 표시량(0.9 mg/3,000 mg)의 80~150%\n6. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 씹어서 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 흡습의 우려가 있으니 개봉한 제품은 바로 섭취하십시오.\n- 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n- 어린이가 정제를 그냥 삼킬 경우 목에 걸릴 수도 있으니, 그냥 삼키지 않도록 보호자의 주의가 필요합니다.\n- 정제를 삼킬 경우 목에 걸릴 수 있으므로 천천히 녹이거나 씹어서 드십시오.\n- 용기 안의 방습제는 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 동물 모양의 츄어블 정제",
+   "storage": "-습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다. -흡습의 우려가 있으므로 물기가 묻은 손이나 습한 상태에서 정제를 만지지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 150,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 150mg</span><span class=\"sd-badge is-solid\">망간 0.9mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>키즈비타칼슘마그네슘<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>150mg</b>, 망간 <b>0.9mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 마그네슘 <b>150mg</b>, 망간 <b>0.9mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 동물 모양의 츄어블 정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(150mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(0.9mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(300mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 동물 모양의 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> -습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다. -흡습의 우려가 있으므로 물기가 묻은 손이나 습한 상태에서 정제를 만지지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 150mg</span><span class=\"sd-badge is-solid\">Manganese 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 300mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>키즈비타칼슘마그네슘<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>150mg</b> of Magnesium, <b>0.9mg</b> of Manganese, <b>10μg</b> of Vitamin D, <b>300mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>150mg</b> Magnesium, <b>0.9mg</b> Manganese, <b>10μg</b> Vitamin D, <b>300mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (150mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (0.9mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (300mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 동물 모양의 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> -습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다. -흡습의 우려가 있으므로 물기가 묻은 손이나 습한 상태에서 정제를 만지지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-006",
+  "productName": "이온스칼맥D",
+  "productNameEn": "이온스칼맥D",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370275",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 뼈와 치아 형성에 필요\n(2) 신경과 근육 기능 유지에 필요\n(3) 정상적인 혈액응고에 필요\n(4) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 에너지 이용에 필요\n(2) 신경과 근육 기능 유지에 필요\n\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 뼈 형성에 필요\n(2) 에너지 이용에 필요\n(3) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 백색의 장방형 제피정제\n2) 마그네슘 : 표시량(105mg / 1,600mg)의 80~150%\n3) 망간 : 표시량(3 mg / 1,600mg)의 80~150%\n4) 비타민D : 표시량(25 ug / 1,600mg)의 80~180%\n5) 칼슘 : 표시량(210 mg / 1,600mg)의 80~150%\n6) 붕해 : 60분이내\n7) 납 : 3.0 이하\n8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 백색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 105,
+    "unit": "mg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 105mg</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 D 25μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>이온스칼맥D<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>105mg</b>, 망간 <b>3mg</b>, 비타민 D <b>25μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>105mg</b>, 망간 <b>3mg</b>, 비타민 D <b>25μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 백색의 장방형 제피정제 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(105mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(3mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(25μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 105mg</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin D 25μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>이온스칼맥D<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>105mg</b> of Magnesium, <b>3mg</b> of Manganese, <b>25μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>105mg</b> Magnesium, <b>3mg</b> Manganese, <b>25μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (105mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (25μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 백색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-007",
+  "productName": "베어헬스 칼슘 마그네슘 비타민D",
+  "productNameEn": "베어헬스 칼슘 마그네슘 비타민D",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023589",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.\n3) 마그네슘 : 에너지 이용에 필요, 신경과 근육 기능 유지에 필요.\n4) 망간 : 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제\n2) 비타민D : 표시량(10ug/3750mg)의 80~180%\n3) 칼슘 : 표시량(700mg/3750mg)의 80~150%\n4) 마그네슘 : 표시량(233mg/3750mg)의 80~150%\n5) 망간 : 표시량(1mg/3750mg)의 80~150%\n6) 대장균군 : 음성\n7) 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 3정을 충분한 물과 함께 섭취하십시오. 1일 3회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.  \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오. \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 233,
+    "unit": "mg",
+    "basisAmount": 3750,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 233mg</span><span class=\"sd-badge is-solid\">망간 1mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 700mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>베어헬스 칼슘 마그네슘 비타민D<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>233mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>700mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 마그네슘 <b>233mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>700mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(233mg/3750mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(1mg/3750mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3750mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(700mg/3750mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 233mg</span><span class=\"sd-badge is-solid\">Manganese 1mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 700mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>베어헬스 칼슘 마그네슘 비타민D<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>233mg</b> of Magnesium, <b>1mg</b> of Manganese, <b>10μg</b> of Vitamin D, <b>700mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 tablets): <b>233mg</b> Magnesium, <b>1mg</b> Manganese, <b>10μg</b> Vitamin D, <b>700mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (233mg / 3750mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (1mg / 3750mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3750mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (700mg / 3750mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-008",
+  "productName": "닥터에스더 칼마그 D3 프리미엄",
+  "productNameEn": "닥터에스더 칼마그 D3 프리미엄",
+  "manufacturer": "주식회사 바이오360",
+  "manufacturerEn": null,
+  "statementNo": "2020001620227",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 뼈와 치아 형성에 필요\n(2) 신경과 근육 기능 유지에 필요\n(3) 정상적인 혈액응고에 필요\n(4) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 에너지 이용에 필요\n(2) 신경과 근육 기능 유지에 필요\n\n(1) 뼈 형성에 필요\n(2) 에너지 이용에 필요\n(3) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형의 제피정제\n2. 비타민D : 표시량 (10 ug / 4,050 mg) 의 80~180%\n3. 칼슘 : 표시량 (700 mg / 4,050 mg) 의 80~150%\n4. 마그네슘 : 표시량 (233 mg / 4,050 mg) 의 80~150%\n5. 망간 : 표시량 (1 mg/ 4,050 mg) 의 80~150%\n6. 대장균군 : 음성\n7. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 3정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형의 제피정제",
+   "storage": "실온/ (1) 직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관하십시오. (2) 영·유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 233,
+    "unit": "mg",
+    "basisAmount": 4050,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 233mg</span><span class=\"sd-badge is-solid\">망간 1mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 700mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에스더 칼마그 D3 프리미엄<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 바이오360 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>233mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>700mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 마그네슘 <b>233mg</b>, 망간 <b>1mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>700mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형의 제피정제 · 주식회사 바이오360 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(233mg/4050mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(1mg/4050mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/4050mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(700mg/4050mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ (1) 직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관하십시오. (2) 영·유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 233mg</span><span class=\"sd-badge is-solid\">Manganese 1mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 700mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에스더 칼마그 D3 프리미엄<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 바이오360 · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>233mg</b> of Magnesium, <b>1mg</b> of Manganese, <b>10μg</b> of Vitamin D, <b>700mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 tablets): <b>233mg</b> Magnesium, <b>1mg</b> Manganese, <b>10μg</b> Vitamin D, <b>700mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 바이오360</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (233mg / 4050mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (1mg / 4050mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 4050mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (700mg / 4050mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ (1) 직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관하십시오. (2) 영·유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-009",
+  "productName": "데일리베스트 맥스칼",
+  "productNameEn": "데일리베스트 맥스칼",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20120017002173",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미･이취가 없는 밝은 하양색의 광택이 없는 장방형 코팅정제\n2. 칼슘 함량 : 표시량(550 mg/3 g)의  80~150%\n3. 마그네슘 함량 : 표시량(275 mg/3 g)의 80~150%\n4. 망간 함량 : 표시량(2.6 mg/3 g)의 80~150%\n5. 비타민D 함량 : 표시량(9 ㎍/3 g)의 80~180%\n6. 붕해도 : 60분 이내\n7. 대장균군 : 음성\n8. 납(mg/kg) : 3.0 이하",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특정질환, 특이체질, 알레르기 체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n 2) 어린이가 섭취 할 때는 보호자의 관리 감독 하에 주의하여 섭취시켜 주십시오.\n 3) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n 4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n 5) 용기 안의 방습제는 드시지마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미･이취가 없는 밝은 하양색의 광택이 없는 장방형 코팅정제",
+   "storage": "직사광선을 피하고 흡습으로 인해 정제 색상이 변할 수 있으므로 습기가 적고, 건조하고 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24 개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 275,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 275mg</span><span class=\"sd-badge is-solid\">망간 2.6mg</span><span class=\"sd-badge is-solid\">비타민 D 9μg</span><span class=\"sd-badge is-solid\">칼슘 550mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>데일리베스트 맥스칼<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>275mg</b>, 망간 <b>2.6mg</b>, 비타민 D <b>9μg</b>, 칼슘 <b>550mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 마그네슘 <b>275mg</b>, 망간 <b>2.6mg</b>, 비타민 D <b>9μg</b>, 칼슘 <b>550mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미･이취가 없는 밝은 하양색의 광택이 없는 장방형 코팅정제 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(275mg/3g)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(2.6mg/3g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(9μg/3g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(550mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미･이취가 없는 밝은 하양색의 광택이 없는 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24 개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 흡습으로 인해 정제 색상이 변할 수 있으므로 습기가 적고, 건조하고 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 275mg</span><span class=\"sd-badge is-solid\">Manganese 2.6mg</span><span class=\"sd-badge is-solid\">Vitamin D 9μg</span><span class=\"sd-badge is-solid\">Calcium 550mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>데일리베스트 맥스칼<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>275mg</b> of Magnesium, <b>2.6mg</b> of Manganese, <b>9μg</b> of Vitamin D, <b>550mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>275mg</b> Magnesium, <b>2.6mg</b> Manganese, <b>9μg</b> Vitamin D, <b>550mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for bone formation</li><li>Needed for energy utilisation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (275mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (2.6mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (9μg / 3g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (550mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미･이취가 없는 밝은 하양색의 광택이 없는 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 흡습으로 인해 정제 색상이 변할 수 있으므로 습기가 적고, 건조하고 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-010",
+  "productName": "본칼슘앤마그네슘",
+  "productNameEn": "본칼슘앤마그네슘",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020510",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 백색의 장방형 코팅정제\n② 망간 : 3 mg / 1.2 g (표시량의 80-150%)\n③ 마그네슘 : 120 mg / 1.2 g (표시량의 80-150%)\n④ 비타민D : 5 ㎍ / 1.2 g (표시량의 80-180%)\n⑤ 칼슘 : 240 mg / 1.2 g (표시량의 80-150%)\n⑥ 붕해시험 : 60분 이내\n⑦ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정씩 음용수와 함께 섭취",
+   "caution": "* 비타민D\n① 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n② 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 백색의 장방형 코팅정제",
+   "storage": "직사광선을 피하여 서늘하고 건조한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 120,
+    "unit": "mg",
+    "basisAmount": 1.2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 120mg</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 240mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>본칼슘앤마그네슘<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>120mg</b>, 망간 <b>3mg</b>, 비타민 D <b>5μg</b>, 칼슘 <b>240mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>120mg</b>, 망간 <b>3mg</b>, 비타민 D <b>5μg</b>, 칼슘 <b>240mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 백색의 장방형 코팅정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(120mg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(3mg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/1.2g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(240mg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 백색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘하고 건조한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 120mg</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 240mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>본칼슘앤마그네슘<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>120mg</b> of Magnesium, <b>3mg</b> of Manganese, <b>5μg</b> of Vitamin D, <b>240mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>120mg</b> Magnesium, <b>3mg</b> Manganese, <b>5μg</b> Vitamin D, <b>240mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (120mg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 1.2g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (240mg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 백색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘하고 건조한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-mg-mn-vd-ca-011",
+  "productName": "이든 멀티 칼슘&마그네슘",
+  "productNameEn": "이든 멀티 칼슘&마그네슘",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211348",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘] ①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n[마그네슘] ①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n[망간] ①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 밝은 회황색의 분말\n②칼슘 : 표시량(640 mg/6,000 mg)의 80~150%\n③마그네슘 : 표시량(94.5 mg/6,000 mg) 80~150%\n④망간 : 표시량(3 mg/6,000 mg)의 80~150%\n⑤비타민D : 표시량(10 ㎍/6,000 mg)의 80~180%\n⑥대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포(3000 mg)를 충분한 양의 물과 함께 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 밝은 회황색의 분말",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 94.5,
+    "unit": "mg",
+    "basisAmount": 6000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 94.5mg</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 640mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>이든 멀티 칼슘&amp;마그네슘<small>마그네슘 · 망간 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>94.5mg</b>, 망간 <b>3mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>640mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 마그네슘 <b>94.5mg</b>, 망간 <b>3mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>640mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 밝은 회황색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>신경과 근육 기능 유지에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>뼈 형성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(94.5mg/6000mg)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(3mg/6000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/6000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(640mg/6000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 망간 · 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 94.5mg</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 640mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>이든 멀티 칼슘&amp;마그네슘<small>Magnesium · Manganese · Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>94.5mg</b> of Magnesium, <b>3mg</b> of Manganese, <b>10μg</b> of Vitamin D, <b>640mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>94.5mg</b> Magnesium, <b>3mg</b> Manganese, <b>10μg</b> Vitamin D, <b>640mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for energy utilisation</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed for bone formation</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (94.5mg / 6000mg), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 6000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 6000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (640mg / 6000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Manganese · Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

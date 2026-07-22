@@ -1,0 +1,1262 @@
+[
+ {
+  "candidateId": "nc2-vd-ca-001",
+  "productName": "키노피오 쑥쑥튼튼 칼슘젤리",
+  "productNameEn": "키노피오 쑥쑥튼튼 칼슘젤리",
+  "manufacturer": "케이지랩 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "20040017038310",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 뼈와 치아 형성에 필요\n(2) 신경과 근육 기능 유지에 필요\n(3) 정상적인 혈액응고에 필요\n(4) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의젤리\n2. 칼슘 : 표시량(210mg/20g)의 80~150% \n3. 비타민D : 표시량(10ug/20g)의 80~180%\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n제품 개봉 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.\n제품의 보관상태 및 원료 성분에 의해 약간의 색상 차이 및 물성의 변화가 있을 수 있으나 품질에는 이상이 없습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의젤리",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하십시오. 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>키노피오 쑥쑥튼튼 칼슘젤리<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">케이지랩 주식회사 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노랑색의젤리 · 케이지랩 주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관하십시오. 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>키노피오 쑥쑥튼튼 칼슘젤리<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 케이지랩 주식회사 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 케이지랩 주식회사</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관하십시오. 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-002",
+  "productName": "키즈 츄어블 칼슘",
+  "productNameEn": "키즈 츄어블 칼슘",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200081389",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\r\n[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰 노란색 캐릭터 정제\n2. 칼슘 : 표시량(320mg/2500mg)의 80~150%\n3. 비타민D : 표시량(3ug/2500mg)의 80~180%\n4. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정(1정당 1250mg)을 씹어서 섭취하십시오",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n원료를 확인하시고, 섭취 전 전문가와 상담하십시오.\n섭취 시 보호자의 관리·감독하에 주의하여 섭취시켜 주십시오. \n제품의 품질유지를 위해 동봉된 강력방습제인 실리카겔(SILICA GEL)은 식용이 아니므로 절대 먹지 마십시오.\n[비타민D] 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰 노란색 캐릭터 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오.3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 개봉 상태로 장시간 방치하거나 다른 용기에 보관할 경우 인습 등 여러 원인으로 인해 반점이 생길 수 있으므로 보관 시 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "μg",
+    "basisAmount": 2500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 3μg</span><span class=\"sd-badge is-solid\">칼슘 320mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>키즈 츄어블 칼슘<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>3μg</b>, 칼슘 <b>320mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 D <b>3μg</b>, 칼슘 <b>320mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰 노란색 캐릭터 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(3μg/2500mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(320mg/2500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰 노란색 캐릭터 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오.3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 개봉 상태로 장시간 방치하거나 다른 용기에 보관할 경우 인습 등 여러 원인으로 인해 반점이 생길 수 있으므로 보관 시 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 3μg</span><span class=\"sd-badge is-solid\">Calcium 320mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>키즈 츄어블 칼슘<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3μg</b> of Vitamin D, <b>320mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>3μg</b> Vitamin D, <b>320mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (3μg / 2500mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (320mg / 2500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흰 노란색 캐릭터 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오.3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 개봉 상태로 장시간 방치하거나 다른 용기에 보관할 경우 인습 등 여러 원인으로 인해 반점이 생길 수 있으므로 보관 시 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-003",
+  "productName": "글로벌비겐 리케어칼슘",
+  "productNameEn": "글로벌비겐 리케어칼슘",
+  "manufacturer": "포항바이오파크",
+  "manufacturerEn": null,
+  "statementNo": "2010001801831",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\r\n\r\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미･이취가 없는 연한 회색의 장방형 코팅 정제\n2. 칼슘(표시량 : 210mg / 2,000mg) 80~150%\n3. 비타민D(표시량 : 3㎍ / 2,000mg) 80~180%\n4. 대장균군 : 음성\n5. 붕해시험 : (코팅정제 / 60분이내)",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취",
+   "caution": "[비타민D]\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미･이취가 없는 연한 회색의 장방형 코팅 정제",
+   "storage": "제조일로부터 24개월",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 3μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>글로벌비겐 리케어칼슘<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">포항바이오파크 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>3μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 D <b>3μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미･이취가 없는 연한 회색의 장방형 코팅 정제 · 포항바이오파크 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(3μg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미･이취가 없는 연한 회색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 제조일로부터 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 3μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>글로벌비겐 리케어칼슘<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 포항바이오파크 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>3μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 포항바이오파크</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (3μg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미･이취가 없는 연한 회색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 제조일로부터 24개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-004",
+  "productName": "웰키커(well-kicker)어린이칼슘앤비타민D",
+  "productNameEn": "웰키커(well-kicker)어린이칼슘앤비타민D",
+  "manufacturer": "디에이치팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040015102172",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미.이취가 없는 연한 갈색의 정제\n2) 비타민D : 표시량(5ug/3,000mg)의 80~180%\n3) 칼슘 : 표시량(210mg/3,000mg)의 80~150%\n4) 대장균군 : 음성\n5) 납(mg/kg) : 3.0이하",
+   "intake": "1일 2회, 1회 1정씩 천천히 씹어서 섭취",
+   "caution": "- 특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하시기 바랍니다.\n-고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n-이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없는 연한 갈색의 정제",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>웰키커(well-kicker)어린이칼슘앤비타민D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">디에이치팜(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 연한 갈색의 정제 · 디에이치팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/3000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 연한 갈색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>웰키커(well-kicker)어린이칼슘앤비타민D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 디에이치팜(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 디에이치팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 3000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 연한 갈색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-005",
+  "productName": "번개맨 튼튼용사 칼슘스틱젤리",
+  "productNameEn": "번개맨 튼튼용사 칼슘스틱젤리",
+  "manufacturer": "주식회사 네추럴웨이 포천 제2공장",
+  "manufacturerEn": null,
+  "statementNo": "20190004553261",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민D]\n①칼슘과 인이 흡수되고 이용되는데 필요\n②뼈의 형성과 유지에 필요\n③골다공증발생 위험 감소에 도움을 줌\n\n[칼슘]\n①뼈와 치아 형성에 필요\n②신경과 근육 기능 유지에 필요\n③정상적인 혈액응고에 필요\n④골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 연보라색 젤리\n2. 비타민D : 5μg/20g 표시량의 80~180% \n3. 칼슘 : 245mg/20g 표시량의 80~150% \n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하시기 바랍니다.",
+   "caution": "고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연보라색 젤리",
+   "storage": "실온(1~35℃)",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 245mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>번개맨 튼튼용사 칼슘스틱젤리<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 포천 제2공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>245mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>245mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연보라색 젤리 · 주식회사 네추럴웨이 포천 제2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(245mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연보라색 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 실온(1~35℃)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 245mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>번개맨 튼튼용사 칼슘스틱젤리<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 포천 제2공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>245mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>5μg</b> Vitamin D, <b>245mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이 포천 제2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (245mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연보라색 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 실온(1~35℃)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-006",
+  "productName": "비타본",
+  "productNameEn": "비타본",
+  "manufacturer": "인성제약(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020019437",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\r\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상: 이미, 이취가 없고 고유의 향미가 있는 백색의 장방형 정제\n2) 칼슘 함량: 표시량 210mg/1.1g의 80 ~ 150%\n3) 비타민D 함량 : 표시량 3.5 ㎍/1.1g의 80~180%\n4) 대장균군: 음성",
+   "intake": "1일 1회, 1회 2정씩 씹어서 섭취",
+   "caution": "알레르기등 특이 체질의 경우에는 성분을 확인 하신 후 섭취한다.\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 백색의 장방형 정제",
+   "storage": "직사광선을 피하여 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.5,
+    "unit": "μg",
+    "basisAmount": 1.1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 3.5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타본<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">인성제약(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>3.5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 D <b>3.5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 백색의 장방형 정제 · 인성제약(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(3.5μg/1.1g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/1.1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 3.5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타본<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 인성제약(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3.5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>3.5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 인성제약(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (3.5μg / 1.1g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 1.1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-007",
+  "productName": "칼슘플러스비타민D",
+  "productNameEn": "칼슘플러스비타민D",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020002304",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌 \n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1)성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 장방형 제피정제\n2)칼슘 : 표시량(135mg/606mg)의 80~150%\n3)비타민D : 표시량(1.25ug/606mg)의 80~180%\n4) 대장균군 : 음성\n5) 붕해시험 : 60분 이내",
+   "intake": "1일 3회 1회 1정씩 물과 함께 섭취하십시오",
+   "caution": "정이 목에 걸릴 수도 있으니 반드시 물과 함께 섭취하십시오. \n섭취시 위장장애, 소화불량의 증상이 있을 경우 또는 개인에 따라 이상증상이 생길 경우 섭취를 중단하시고, 제품에 이상이 있을 경우 섭취를 금하여 주십시오.\n수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\n어린이 손에 닿지 않는 곳에 보관하십시오.\n특정 성분에 알레르기 체질이신 분은 원료 성분 확인 후 제품을 섭취해 주시기 바랍니다.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 장방형 제피정제",
+   "storage": "뚜껑을 닫고 건냉소에 보관하십시오. 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.25,
+    "unit": "μg",
+    "basisAmount": 606,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 1.25μg</span><span class=\"sd-badge is-solid\">칼슘 135mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>칼슘플러스비타민D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>1.25μg</b>, 칼슘 <b>135mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 D <b>1.25μg</b>, 칼슘 <b>135mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 장방형 제피정제 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(1.25μg/606mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(135mg/606mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터2년</div><div class=\"sd-item\"><b>보관</b> 뚜껑을 닫고 건냉소에 보관하십시오. 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 1.25μg</span><span class=\"sd-badge is-solid\">Calcium 135mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>칼슘플러스비타민D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.25μg</b> of Vitamin D, <b>135mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>1.25μg</b> Vitamin D, <b>135mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (1.25μg / 606mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (135mg / 606mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터2년</div><div class=\"sd-item\"><b>Storage</b> 뚜껑을 닫고 건냉소에 보관하십시오. 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-008",
+  "productName": "뽀로로 키움대장 칼슘구미",
+  "productNameEn": "뽀로로 키움대장 칼슘구미",
+  "manufacturer": "(주)에스디푸드",
+  "manufacturerEn": null,
+  "statementNo": "2018000723477",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민D]\n1. 칼슘과 인이 흡수되고 이용되는데 필요\n2. 뼈의 형성과 유지에 필요\n3. 골다공증발생 위험 감소에 도움을 줌\n[칼슘]\n1. 뼈와 치아 형성에 필요\n2. 신경과 근육 기능 유지에 필요\n3. 정상적인 혈액응고에 필요\n4. 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리\n2. 칼슘 : 표시량(210mg/39.6g)의 80~150%\n3. 비타민 D : 표시량(10μg/39.6g)의 80~180%\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 12구미(39.6g)를 씹어서 섭취 하십시오.",
+   "caution": "1. 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n2. 특이체질, 알레르기 체질인 경우에 원료명을 확인 후 섭취하십시오.\n3. 유아, 어린이는 섭취 시 목에 걸릴 수 있으니 보호자의 주의가 필요합니다.\n4. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n5. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리",
+   "storage": "1. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하는 것을 권장합니다.2. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.",
+   "shelfLife": "제조일로부터 18개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 39.6,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 12,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뽀로로 키움대장 칼슘구미<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)에스디푸드 제조 · 1일 1회 12구미</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(12구미) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리 · (주)에스디푸드 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 12구미</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/39.6g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/39.6g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 1. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하는 것을 권장합니다.2. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뽀로로 키움대장 칼슘구미<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)에스디푸드 · Once a day · 12 gummys</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (12 gummys): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스디푸드</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">12 gummys per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 39.6g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 39.6g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>Storage</b> 1. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하는 것을 권장합니다.2. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-009",
+  "productName": "인제KEY(키)칼슘골드플러스",
+  "productNameEn": "인제KEY(키)칼슘골드플러스",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083512",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\r\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 연보라색의 장방형 제피정제\n(2) 칼슘 : 표시량(420mg/2800mg)의 80~150%\n(3) 비타민 D : 표시량(10μg/2800mg)의 80~180%\n(4) 납(mg/kg): 3.0 이하\n(5) 대장균군 : 음성\n(6) 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정씩 씹어서 드시거나 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 연보라색의 장방형 제피정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 2800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 420mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>인제KEY(키)칼슘골드플러스<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>420mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>420mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 연보라색의 장방형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/2800mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(420mg/2800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 연보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 420mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>인제KEY(키)칼슘골드플러스<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>420mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>10μg</b> Vitamin D, <b>420mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 2800mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (420mg / 2800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 연보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-010",
+  "productName": "더칼슘디키즈젤리플러스",
+  "productNameEn": "더칼슘디키즈젤리플러스",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022892",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(10ug/20g)의 80~180%\n3) 칼슘 : 표시량(210mg/20g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.    \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더칼슘디키즈젤리플러스<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>더칼슘디키즈젤리플러스<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-011",
+  "productName": "파파쑥쑥 비타민D칼슘+",
+  "productNameEn": "파파쑥쑥 비타민D칼슘+",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020579",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 코코아색 분말\n② 비타민D : 10㎍/4g (표시량의 80-180%)\n③ 칼슘 : 210mg/4g (표시량의 80-150%)\n④ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포씩 섭취",
+   "caution": "① 과량 섭취시 부작용이 있을 수 있으며, 특정 원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오.\n② 제품을 개봉할 때 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.\n③ 유통기한이 경과된 제품은 섭취하지 마십시오.",
+   "dosageForm": "연한 코코아색 분말",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>파파쑥쑥 비타민D칼슘+<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연한 코코아색 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/4g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 연한 코코아색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>파파쑥쑥 비타민D칼슘+<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 4g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 연한 코코아색 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-012",
+  "productName": "칼슘젤리 샤인머스켓맛",
+  "productNameEn": "칼슘젤리 샤인머스켓맛",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023223",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(5ug/20g)의 80~180%\n3) 칼슘 : 표시량(210mg/20g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>칼슘젤리 샤인머스켓맛<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>칼슘젤리 샤인머스켓맛<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-013",
+  "productName": "하이키드 칼슘 츄어블",
+  "productNameEn": "하이키드 칼슘 츄어블",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20120017002202",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘] ①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 광택이 없고 흰색과 회색의 점박이가 있는 밝은 회황색의 원형 정제\n2. 칼슘 : 표시량(350 mg/6.4 g)의 80~150%\n3. 비타민D : 표시량(5 ug/6.4 g)의 80~180%\n4. 대장균군 : 음성\n5. 납(mg/kg) : 3.0 이하",
+   "intake": "1일 2회, 1회 2정을 입안에서 녹이거나 씹어서 섭취하십시오.",
+   "caution": "1. 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n2. 특정질환, 특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n3. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n4. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 위험이 있으니 주의하시기 바랍니다.\n5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n6. 어린이가 섭취할 때는 보호자의 관리 감독하에 주의하여 섭취시켜 주십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 광택이 없고 흰색과 회색의 점박이가 있는 밝은 회황색의 원형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 6.4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 350mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>하이키드 칼슘 츄어블<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>350mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>350mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 광택이 없고 흰색과 회색의 점박이가 있는 밝은 회황색의 원형 정제 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/6.4g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(350mg/6.4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 광택이 없고 흰색과 회색의 점박이가 있는 밝은 회황색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 350mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>하이키드 칼슘 츄어블<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>350mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>5μg</b> Vitamin D, <b>350mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 6.4g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (350mg / 6.4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 광택이 없고 흰색과 회색의 점박이가 있는 밝은 회황색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-014",
+  "productName": "의사가 만든 근거기반 칼슘 비타민D",
+  "productNameEn": "의사가 만든 근거기반 칼슘 비타민D",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022577",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌. \n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제\n2) 비타민D : 표시량(12.5ug/1350mg)의 80~180%\n3) 칼슘 : 표시량(350mg/1350mg)의 80~150%\n4) 대장균군 : 음성\n5) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오 \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 12.5,
+    "unit": "μg",
+    "basisAmount": 1350,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 12.5μg</span><span class=\"sd-badge is-solid\">칼슘 350mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>의사가 만든 근거기반 칼슘 비타민D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>12.5μg</b>, 칼슘 <b>350mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 D <b>12.5μg</b>, 칼슘 <b>350mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(12.5μg/1350mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(350mg/1350mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 12.5μg</span><span class=\"sd-badge is-solid\">Calcium 350mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>의사가 만든 근거기반 칼슘 비타민D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>12.5μg</b> of Vitamin D, <b>350mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>12.5μg</b> Vitamin D, <b>350mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (12.5μg / 1350mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (350mg / 1350mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-015",
+  "productName": "올키칼슘젤리",
+  "productNameEn": "올키칼슘젤리",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022351",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(5ug/20g)의 80~180%\n3) 칼슘 : 표시량(210mg/20g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로취급 시 주의하십시오\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월."
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>올키칼슘젤리<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>올키칼슘젤리<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-016",
+  "productName": "스마타민 구연산칼슘D",
+  "productNameEn": "스마타민 구연산칼슘D",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023967",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제\n2) 비타민D : 표시량(10ug/1080mg)의 80~180%\n3) 칼슘 : 표시량(210mg/1080mg)의 80~150%\n4) 대장균군 : 음성\n5) 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오. \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 1080,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>스마타민 구연산칼슘D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/1080mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/1080mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>스마타민 구연산칼슘D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 1080mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 1080mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-017",
+  "productName": "칼슘비타민",
+  "productNameEn": "칼슘비타민",
+  "manufacturer": "(주)마임",
+  "manufacturerEn": null,
+  "statementNo": "2004001701119",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요 ③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미를 가지는 주황색의 장방형 제피정제\n② 칼슘 : ② 칼슘 : 700.0mg / 3,000mg (표시량의 80~150%)\n③ 비타민 D : 7.0㎍/ 3,000mg (표시량의 80~180%)\n④ 대장균군 : 음성\n⑤ 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "- 본 제품의 섭취량은 성인 기준으로 표시되어 있으며, 특정 성분에 알레르기가 있으신 경우 성분을 확인하신 후 섭취하십시오.\n- 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의바랍니다.\n- 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미를 가지는 주황색의 장방형 제피정제",
+   "storage": "직사광선을 피하여 습기가 없는 서늘한 곳에 보관하여 주시고 특히, 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.제품 개봉 후에는 인습되지 않도록 밀봉하여 보관하십시오.영, 유아 및 어린이의 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7,
+    "unit": "μg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 7μg</span><span class=\"sd-badge is-solid\">칼슘 700mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>칼슘비타민<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)마임 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>7μg</b>, 칼슘 <b>700mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 D <b>7μg</b>, 칼슘 <b>700mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미를 가지는 주황색의 장방형 제피정제 · (주)마임 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(7μg/3000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(700mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미를 가지는 주황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 습기가 없는 서늘한 곳에 보관하여 주시고 특히, 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.제품 개봉 후에는 인습되지 않도록 밀봉하여 보관하십시오.영, 유아 및 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 7μg</span><span class=\"sd-badge is-solid\">Calcium 700mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>칼슘비타민<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)마임 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>7μg</b> of Vitamin D, <b>700mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>7μg</b> Vitamin D, <b>700mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)마임</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (7μg / 3000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (700mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미를 가지는 주황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 습기가 없는 서늘한 곳에 보관하여 주시고 특히, 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.제품 개봉 후에는 인습되지 않도록 밀봉하여 보관하십시오.영, 유아 및 어린이의 손에 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-018",
+  "productName": "락티브 키즈 칼슘D 튼튼젤리",
+  "productNameEn": "락티브 키즈 칼슘D 튼튼젤리",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061519",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘] ①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 스틱형 젤리\n2) 칼슘 : 표시량(210mg/20g) 의 80~150%\n3) 비타민D : 표시량(20ug/20g) 의 80~180%\n4) 대장균군 : 음성",
+   "intake": "1일 1회 , 1회 1포를 씹어서 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 스틱형 젤리",
+   "storage": "1) 제품은 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관 유통하여야 한다.2) 제품은 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 20μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>락티브 키즈 칼슘D 튼튼젤리<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>20μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>20μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 스틱형 젤리 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(20μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 스틱형 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 1) 제품은 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관 유통하여야 한다.2) 제품은 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 20μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>락티브 키즈 칼슘D 튼튼젤리<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>20μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (20μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 스틱형 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 1) 제품은 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관 유통하여야 한다.2) 제품은 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-019",
+  "productName": "셀로키즈 칼슘쥬라구미",
+  "productNameEn": "셀로키즈 칼슘쥬라구미",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352856",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 D]\n칼슘과 인이 흡수되고 이용되는데 필요\n뼈의 형성과 유지에 필요\n골다공증발생 위험 감소에 도움을 줌\n\n[칼슘]\n뼈와 치아 형성에 필요\n신경과 근육 기능 유지에 필요\n정상적인 혈액응고에 필요\n골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리\n2.칼슘 : 표시량(210mg/9g)의 80~150%\n3.비타민 D : 표시량(5μg/9g)의 80~180%\n4.대장균군 : 음성",
+   "intake": "1일 1회, 1회 3구미를 씹어서 섭취하십시오.",
+   "caution": "[비타민 D]\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n 1) 특이체질, 알레르기 체질의 경우, 개인에 따라 과민반응을 나타낼 수 있으므로 원료 확인 후 섭취하십시오.\n 2) 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\n 3) 만성질환이 있거나 현재 질병치료 및 약물복용 중이신 분은 전문가와 반드시 상의 후 섭취하십시오.\n 4) 유아, 어린이는 섭취 시 목에 걸릴 수 있으니 보호자의 주의가 필요합니다.\n 5) 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n 6) 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\n 7) 섭취 전에 소비기한을 확인 후 섭취하십시오. 또한 소비기한이 경과한 제품은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리",
+   "storage": "실온보관 / 1) 제품이 고온에 약하니 직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오. 2) 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오. 3) 빛이나 열에 의하여 색상이 변할 수 있으나 품질에는 문제가 되지 않으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 9,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로키즈 칼슘쥬라구미<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 3구미</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3구미) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3구미</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/9g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/9g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1) 제품이 고온에 약하니 직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오. 2) 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>셀로키즈 칼슘쥬라구미<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 3 gummys</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 gummys): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 gummys per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 9g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 9g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1) 제품이 고온에 약하니 직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오. 2) 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-020",
+  "productName": "키즈텐칼슘업리뉴얼",
+  "productNameEn": "키즈텐칼슘업리뉴얼",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200022850",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(5ug/20g)의 80~180%\n3) 칼슘 : 표시량(210mg/20g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.    \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월."
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 20,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>키즈텐칼슘업리뉴얼<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/20g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/20g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>키즈텐칼슘업리뉴얼<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 20g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 20g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월.</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-021",
+  "productName": "칼슘&비타민D 꾸미",
+  "productNameEn": "칼슘&비타민D 꾸미",
+  "manufacturer": "서주푸드(주)2공장",
+  "manufacturerEn": null,
+  "statementNo": "201900142831",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 뼈와 치아 형성에 필요\n(2) 신경과 근육 기능 유지에 필요\n(3) 정상적인 혈액응고에 필요\n(4) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며, 분홍색을 띄는 곰모양 젤리\n2) 칼슘 : 표시량 (210mg/7.5g)의 80~150% \n3) 비타민 D : 표시량(10ug/7.5g)의 80~180%\n4) 대장균군 : 음성",
+   "intake": "1일 ３회, 1회 1개를 씹어서 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며, 분홍색을 띄는 곰모양 젤리",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 7.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>칼슘&amp;비타민D 꾸미<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">서주푸드(주)2공장 제조 · 1일 3회 1개</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1개) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며, 분홍색을 띄는 곰모양 젤리 · 서주푸드(주)2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1개</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/7.5g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/7.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며, 분홍색을 띄는 곰모양 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>칼슘&amp;비타민D 꾸미<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 서주푸드(주)2공장 · 3 times a day · 1 gummy</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 gummy): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 서주푸드(주)2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 gummy per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 7.5g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 7.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며, 분홍색을 띄는 곰모양 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-022",
+  "productName": "뼈속까지꽉칼슘&비타민D",
+  "productNameEn": "뼈속까지꽉칼슘&비타민D",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001334",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말\n2. 칼슘 : 표시량(300mg/2.4g)의 80~150%\n3. 비타민D : 표시량(10ug/2.4g)의 80~180%\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하세요.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말",
+   "storage": "직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 2.4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈속까지꽉칼슘&amp;비타민D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/2.4g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(300mg/2.4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 300mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뼈속까지꽉칼슘&amp;비타민D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>300mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>300mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 2.4g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (300mg / 2.4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-023",
+  "productName": "웰키즈칼슘",
+  "productNameEn": "웰키즈칼슘",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200031053",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1)칼슘:(가) 뼈와 치아 형성에 필요\n     　  (나) 신경과 근육 기능 유지에 필요\n       　(다) 정상적인 혈액응고에 필요\n       　(라) 골다공증발생 위험 감소에 도움을 줌 \n2)비타민D :(가) 칼슘과 인이 흡수되고 이용되는데 필요\n　　　　　(나) 뼈의 형성과 유지에 필요\n　　　　　(다) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍색 점박이가 있는 흰 노란색의 원형 츄어블 정제\n2. 비타민 D : 표시량(10 μg/3,600 mg) 80~180%\n3. 칼슘 : 표시량(300 mg/3,600 mg) 80~150%\n4. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정씩 씹어서 섭취하십시오.",
+   "caution": "1. 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n2. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍색 점박이가 있는 흰 노란색의 원형 츄어블 정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 3600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 300mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>웰키즈칼슘<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍색 점박이가 있는 흰 노란색의 원형 츄어블 정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3600mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(300mg/3600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍색 점박이가 있는 흰 노란색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 300mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>웰키즈칼슘<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 콜마비앤에이치(주)음성공장 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>300mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>10μg</b> Vitamin D, <b>300mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 콜마비앤에이치(주)음성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3600mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (300mg / 3600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍색 점박이가 있는 흰 노란색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-024",
+  "productName": "닥터에디션 키즈 젤리쑥쑥",
+  "productNameEn": "닥터에디션 키즈 젤리쑥쑥",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023288",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌 \n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(10ug/15g)의 80~180%\n3) 칼슘 : 표시량(210mg/15g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(15g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에디션 키즈 젤리쑥쑥<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/15g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/15g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에디션 키즈 젤리쑥쑥<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 15g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 15g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-025",
+  "productName": "뼈건강 비타민D&칼슘",
+  "productNameEn": "뼈건강 비타민D&칼슘",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104205",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "- 성상 : 이미 이취가 없고 고유의 향미가 있는 회색의 분말\n- 대장균군 : 음성\n- 비타민D : 10 μg/3000 mg(표시량의 80-180%)\n- 칼슘 : 210 mg/3000 mg(표시량의 80-150%)",
+   "intake": "1일 1회, 1회 1포를 섭취",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미 이취가 없고 고유의 향미가 있는 회색의 분말",
+   "storage": "",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈건강 비타민D&amp;칼슘<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미 이취가 없고 고유의 향미가 있는 회색의 분말 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3000mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미 이취가 없고 고유의 향미가 있는 회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뼈건강 비타민D&amp;칼슘<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3000mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미 이취가 없고 고유의 향미가 있는 회색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-026",
+  "productName": "뼈로가는 온가족 칼슘D3스틱",
+  "productNameEn": "뼈로가는 온가족 칼슘D3스틱",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104146",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 칼슘: 350mg/3,500mg(80~150%)\n2. 비타민D: 10ug/3,500mg(80~180%)\n3. 성상: 이미, 이취가 없고 고유의 향미가 있는 회백색의 분말\n4. 대장균군: 음성",
+   "intake": "1일 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회백색의 분말",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 3500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 350mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈로가는 온가족 칼슘D3스틱<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 칼슘 <b>350mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>10μg</b>, 칼슘 <b>350mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회백색의 분말 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3500mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(350mg/3500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회백색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Calcium 350mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뼈로가는 온가족 칼슘D3스틱<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>350mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>10μg</b> Vitamin D, <b>350mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3500mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (350mg / 3500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회백색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-027",
+  "productName": "칼슘앤비타민D",
+  "productNameEn": "칼슘앤비타민D",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001286",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 노란하얀색의 미세분말\n2. 칼슘 : 표시량(420mg/4.8g)의 80~150%\n3. 비타민D : 표시량(5ug/4.8g)의 80~180%\n4. 납(mg/kg) : 3.0 이하\n5. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포 또는 1일 1회, 1회 2포를 식사 후에 드십시오.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "이미 이취가 없고 고유의 향미가 있는 노란하얀색의 미세분말",
+   "storage": "직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 4.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 420mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>칼슘앤비타민D<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>420mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>420mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미 이취가 없고 고유의 향미가 있는 노란하얀색의 미세분말 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/4.8g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(420mg/4.8g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미 이취가 없고 고유의 향미가 있는 노란하얀색의 미세분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 420mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>칼슘앤비타민D<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>420mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>5μg</b> Vitamin D, <b>420mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 4.8g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (420mg / 4.8g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미 이취가 없고 고유의 향미가 있는 노란하얀색의 미세분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고, 서늘한 곳에 보관하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-028",
+  "productName": "바디시그널 뼈 건강",
+  "productNameEn": "바디시그널 뼈 건강",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104188",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 적합하여야 한다. 이미, 이취가 없고 고유의 향미가 있는 연한 회색의 타원형 제피정제\n2. 붕해 : 60분 이내 적합\n3. 대장균군 : 음성\n4. 비타민D : 3 ug/1,600 mg (표시량의 80~180 %)\n5. 칼슘 : 280 mg/1,600 mg (표시량의 80~150 %)",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 회색의 타원형 제피정제",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "μg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 3μg</span><span class=\"sd-badge is-solid\">칼슘 280mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바디시그널 뼈 건강<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>3μg</b>, 칼슘 <b>280mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 D <b>3μg</b>, 칼슘 <b>280mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 회색의 타원형 제피정제 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(3μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(280mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 3μg</span><span class=\"sd-badge is-solid\">Calcium 280mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>바디시그널 뼈 건강<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3μg</b> of Vitamin D, <b>280mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>3μg</b> Vitamin D, <b>280mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (3μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (280mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 회색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-029",
+  "productName": "칼슘골드D플러스",
+  "productNameEn": "칼슘골드D플러스",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083710",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\r\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 백색의 삼각형정제\r\n(2) 칼슘 : 표시량(230 ㎎/1,300 ㎎)의 80~150%\r\n(3) 비타민 D : 표시량(5 ㎍/1,300 ㎎)의 80~180%\r\n(4) 대장균군 : 음성\r\n(5) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 백색의 삼각형정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 1300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 230mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>칼슘골드D플러스<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>230mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>230mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 백색의 삼각형정제 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/1300mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(230mg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 삼각형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 230mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>칼슘골드D플러스<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>230mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>5μg</b> Vitamin D, <b>230mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 1300mg), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (230mg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 백색의 삼각형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-vd-ca-030",
+  "productName": "몸애수호 키즈칼슘젤리",
+  "productNameEn": "몸애수호 키즈칼슘젤리",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023265",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌 \n2) 칼슘 : 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리\n2) 비타민D : 표시량(5ug/15g)의 80~180%\n3) 칼슘 : 표시량(210mg/15g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(15g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">칼슘 210mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>몸애수호 키즈칼슘젤리<small>비타민 D · 칼슘</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 D <b>5μg</b>, 칼슘 <b>210mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/15g)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(210mg/15g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 칼슘 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Calcium 210mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>몸애수호 키즈칼슘젤리<small>Vitamin D · Calcium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>210mg</b> of Calcium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>5μg</b> Vitamin D, <b>210mg</b> Calcium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Calcium</b><ul class=\"sd-why\"><li>Recognised as helping reduce the risk of developing osteoporosis</li><li>Needed for the formation of bones and teeth</li><li>Needed to help maintain normal nerve and muscle function</li><li>Needed for normal blood clotting</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 15g), 80~180%</div><div class=\"sd-item\"><b>Calcium</b> labelled (210mg / 15g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Calcium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

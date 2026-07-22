@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "nc2b-b12-zn-001",
+  "productName": "vitalize 비타민 B12 500",
+  "productNameEn": "vitalize 비타민 B12 500",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "2017286000713",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연] \n① 정상적인 면역 기능에 필요 ② 정상적인 세포분열에 필요\n\n[비타민B12] \n① 정상적인 엽산 대사에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 자주색의 점박이를 포함한 흰분홍색의 장방형 제피정제\n② 아연 : 표시량(8.5mg/300mg)의 80~150%\n③ 비타민B12 : 표시량(500㎍/300mg)의 80~180%\n④ 대장균군 : 음성\n⑤ 붕해시험 : 적합 (60분 이내)",
+   "intake": "1일 1회, 1회 1정(300mg)을 물과 함께 섭취하십시오",
+   "caution": "[비타민B12] \n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 자주색의 점박이를 포함한 흰분홍색의 장방형 제피정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 500μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>vitalize 비타민 B12 500<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>500μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>500μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 자주색의 점박이를 포함한 흰분홍색의 장방형 제피정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역 기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(500μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자주색의 점박이를 포함한 흰분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 500μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>vitalize 비타민 B12 500<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500μg</b> of Vitamin B12, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>500μg</b> Vitamin B12, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (500μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자주색의 점박이를 포함한 흰분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ② 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-002",
+  "productName": "OIC PREMIUM 엔:오365",
+  "productNameEn": "OIC PREMIUM 엔:오365",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071235",
+  "category": "hff",
+  "source": {
+   "mainFunction": "아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n\n비타민B12 : (1)정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(20분 이내)\n4. 아연 : 표시량(2.55 mg/1,200 mg)의 80~150%\n5. 비타민B12 : 표시량(0.72 μg/1,200 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>OIC PREMIUM 엔:오365<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>OIC PREMIUM 엔:오365<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-003",
+  "productName": "BIO N:O V PLUS",
+  "productNameEn": "BIO N:O V PLUS",
+  "manufacturer": "(주)팜투팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "20180003915153",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n(1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐 \n(2) 아연 : 표시량(2.55mg/1,200mg)의 80~150%\n(3) 비타민B12 : 표시량(0.72μg/1,200mg)의 80~180%\n(4) 대장균군 : 음성\n(5) 붕해시험 : 20분 이내",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐",
+   "storage": "1) 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2) 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3) 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>BIO N:O V PLUS<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)팜투팜2공장 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐 · (주)팜투팜2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2) 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3) 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>BIO N:O V PLUS<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)팜투팜2공장 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)팜투팜2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오. 2) 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다. 3) 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-004",
+  "productName": "뉴엔.오.케어골드",
+  "productNameEn": "뉴엔.오.케어골드",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071278",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n(1) 정상적인 엽산 대사에 필요\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회갈색의 장방형 코팅정제\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(60분 이내)\n4. 아연 : 표시량(2.55 mg/1,500 mg)의 80~150%\n5. 비타민B12 : 표시량(0.72 ㎍/1,500 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회갈색의 장방형 코팅정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>뉴엔.오.케어골드<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회갈색의 장방형 코팅정제 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회갈색의 장방형 코팅정제</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>뉴엔.오.케어골드<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회갈색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-005",
+  "productName": "탑엔:오울트라",
+  "productNameEn": "탑엔:오울트라",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071325",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n(1) 정상적인 엽산 대사에 필요\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 황회색의 내용물을 함유한 투명한 경질캡슐\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(20분 이내)\n4. 아연 : 표시량(2.55 mg/1,200 mg)의 80~150%\n5. 비타민B12 : 표시량(0.72 ㎍/1,200 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 황회색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>탑엔:오울트라<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 황회색의 내용물을 함유한 투명한 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 황회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>탑엔:오울트라<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 황회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-006",
+  "productName": "아이엠 밸런스",
+  "productNameEn": "아이엠 밸런스",
+  "manufacturer": "(주)생명과학",
+  "manufacturerEn": null,
+  "statementNo": "20040020038147",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①정상적인 엽산 대사에 필요",
+   "baseStandard": "① 성상: 고유의 향미가 있고 이미 이취가 없는 주황색의 분말이 들어있는 연한 붉은색의 불투명 경질캡슐\n② 아연: 표시량 (30mg/960mg)의 80~150%\n③ 비타민B12: 표시량 (1,000μg/960mg)의 80~180%\n④ 대장균군: 음성\n⑤ 붕해도: 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "제품개봉이나 섭취 시 포장재에 의해 상처를 입을 수 있어 주의가 필요함.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미 이취가 없는 주황색의 분말이 들어있는 연한 붉은색의 불투명 경질캡슐",
+   "storage": "직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 960,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 1000μg</span><span class=\"sd-badge is-solid\">아연 30mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>아이엠 밸런스<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>1000μg</b>, 아연 <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 비타민 B12 <b>1000μg</b>, 아연 <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 이취가 없는 주황색의 분말이 들어있는 연한 붉은색의 불투명 경질캡슐 · (주)생명과학 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(1000μg/960mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(30mg/960mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 이취가 없는 주황색의 분말이 들어있는 연한 붉은색의 불투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 1000μg</span><span class=\"sd-badge is-solid\">Zinc 30mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>아이엠 밸런스<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)생명과학 · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000μg</b> of Vitamin B12, <b>30mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 capsule): <b>1000μg</b> Vitamin B12, <b>30mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)생명과학</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (1000μg / 960mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (30mg / 960mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 이취가 없는 주황색의 분말이 들어있는 연한 붉은색의 불투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-007",
+  "productName": "바이오엔:오브이플러스",
+  "productNameEn": "바이오엔:오브이플러스",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071275",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[비타민B12]\n(1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(20분 이내)\n4. 아연 : 표시량(2.55 mg/1,200 mg)의 80~150%\n5. 비타민B12 : 표시량(0.72 ㎍/1,200 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>바이오엔:오브이플러스<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>바이오엔:오브이플러스<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2b-b12-zn-008",
+  "productName": "엔:오보감",
+  "productNameEn": "엔:오보감",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071242",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n(1) 정상적인 엽산 대사에 필요\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐\n2. 대장균군 : 적합(음성)\n3. 붕해시험 : 적합(20분 이내)\n4. 아연 : 표시량(2.55 mg/1,200 mg)의 80~150%\n5. 비타민B12 : 표시량(0.72㎍/1,200 mg)의 80~180%",
+   "intake": "1일 3회, 1회 1캡슐 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>엔:오보감<small>비타민 B12 · 아연</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1캡슐) 섭취로 비타민 B12 <b>0.72μg</b>, 아연 <b>2.55mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>엔:오보감<small>Vitamin B12 · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 capsule): <b>0.72μg</b> Vitamin B12, <b>2.55mg</b> Zinc</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈회색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,254 @@
+[
+ {
+  "candidateId": "nc2-se-zn-001",
+  "productName": "닥터에디션 키즈 젤리뮨",
+  "productNameEn": "닥터에디션 키즈 젤리뮨",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023291",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 아연 : 정상적인 면역기능에 필요, 정상적인 세포분열에 필요. \n2) 셀렌 : 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 반투명한 고체상을 포함한 탁한 노란 연두색의 젤리\n2) 아연 : 표시량(8mg/15g) 80~150%\n3) 셀렌 : 표시량(25ug/15g)의 80~150%\n4) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(15g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 반투명한 고체상을 포함한 탁한 노란 연두색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "μg",
+    "basisAmount": 15,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 25μg</span><span class=\"sd-badge is-solid\">아연 8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에디션 키즈 젤리뮨<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>25μg</b>, 아연 <b>8mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 셀레늄 <b>25μg</b>, 아연 <b>8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 반투명한 고체상을 포함한 탁한 노란 연두색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(25μg/15g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8mg/15g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 반투명한 고체상을 포함한 탁한 노란 연두색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 25μg</span><span class=\"sd-badge is-solid\">Zinc 8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에디션 키즈 젤리뮨<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>25μg</b> of Selenium, <b>8mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>25μg</b> Selenium, <b>8mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (25μg / 15g), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8mg / 15g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 반투명한 고체상을 포함한 탁한 노란 연두색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-se-zn-002",
+  "productName": "아연 셀렌",
+  "productNameEn": "아연 셀렌",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997257",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연] 정상적인 면역기능에 필요,  정상적인 세포분열에 필요\n[셀렌] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 정제\n2. 아연 : 표시량(12.75mg /600mg)의 80~150%\n3. 셀레늄 : 표시량(200ug /600mg)의 80~150%\n4. 대장균군 : 음성\n5. 붕해시험 : 적합(30분 이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n2. 알레르기 체질이신 경우 성분을 확인 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge is-solid\">아연 12.75mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아연 셀렌<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>200μg</b>, 아연 <b>12.75mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b>, 아연 <b>12.75mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 정제 · (주)파마피아 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/600mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(12.75mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge is-solid\">Zinc 12.75mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아연 셀렌<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>200μg</b> of Selenium, <b>12.75mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>200μg</b> Selenium, <b>12.75mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (12.75mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-se-zn-003",
+  "productName": "팜스 슈퍼 바이오 이뮨칸 (Pharm’s Super Bio Immune Khan)",
+  "productNameEn": "팜스 슈퍼 바이오 이뮨칸 (Pharm’s Super Bio Immune Khan)",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483303",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①유해산소로부터 세포를 보호하는데 필요\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 적회색의 내용물을 함유한 광택이 있는 회보라색의 경질캡슐\n2. 붕해 : 20분이내\n3. 셀렌 : 표시량(16.5ug / 1000mg)의 80~150%\n4. 아연 : 표시량(2.55mg / 1000mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취 하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적회색의 내용물을 함유한 광택이 있는 회보라색의 경질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>팜스 슈퍼 바이오 이뮨칸 (Pharm’s Super Bio Immune Khan)<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 적회색의 내용물을 함유한 광택이 있는 회보라색의 경질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 적회색의 내용물을 함유한 광택이 있는 회보라색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>팜스 슈퍼 바이오 이뮨칸 (Pharm’s Super Bio Immune Khan)<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 우리바이오(주) · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>16.5μg</b> of Selenium, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 capsule): <b>16.5μg</b> Selenium, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 우리바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 적회색의 내용물을 함유한 광택이 있는 회보라색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-se-zn-004",
+  "productName": "인빅터스1316 골드",
+  "productNameEn": "인빅터스1316 골드",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "20100019004645",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀레늄(또는 셀렌)] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 흰 노란색의 분말로 이미, 이취가 없다.\n2) 대장균군 : 음성\n3) 아연 : 표시량(8.5mg/2,000mg)의 80~150%\n4) 셀렌 : 표시량(55ug/2,000mg)의 80~150%",
+   "intake": "1일 2회, 1회 1포를 물과 함께 섭취",
+   "caution": "① 과량섭취 시 부작용이 있을 수 있음.\n② 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n③ 유통기한이 경과된 제품은 섭취하지 마십시오.",
+   "dosageForm": "흰 노란색의 분말로 이미, 이취가 없다.",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>인빅터스1316 골드<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 셀레늄 <b>55μg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>흰 노란색의 분말로 이미, 이취가 없다. · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 흰 노란색의 분말로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>인빅터스1316 골드<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>55μg</b> of Selenium, <b>8.5mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>55μg</b> Selenium, <b>8.5mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 흰 노란색의 분말로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-se-zn-005",
+  "productName": "닥터린 아연셀렌",
+  "productNameEn": "닥터린 아연셀렌",
+  "manufacturer": "주식회사 다움",
+  "manufacturerEn": null,
+  "statementNo": "20040016034167",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미·이취가 없는 회황색의 장방형 정제\n아연 : 표시량(12.75mg/800mg) 80~150%\n셀렌 : 표시량(200μg/800mg) 80~150%\n대장균군 : 음성\n붕해시험 : 적합(30분이내)",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 회황색의 장방형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온보관 하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 200μg</span><span class=\"sd-badge is-solid\">아연 12.75mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터린 아연셀렌<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">주식회사 다움 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>200μg</b>, 아연 <b>12.75mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 셀레늄 <b>200μg</b>, 아연 <b>12.75mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 회황색의 장방형 정제 · 주식회사 다움 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(200μg/800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(12.75mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온보관 하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 200μg</span><span class=\"sd-badge is-solid\">Zinc 12.75mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터린 아연셀렌<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 주식회사 다움 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>200μg</b> of Selenium, <b>12.75mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>200μg</b> Selenium, <b>12.75mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 다움</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (200μg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (12.75mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 회황색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온보관 하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "nc2-se-zn-006",
+  "productName": "메가론지",
+  "productNameEn": "메가론지",
+  "manufacturer": "(주)한국파비스알엔디",
+  "manufacturerEn": null,
+  "statementNo": "2004002004084",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요\r\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상:고유의 향미가 있고 이미,이취가 없는 진한 노란색의 분말이 든 불투명한 흰색의 탄력성 경질캡슐\n2. 셀렌:표시량(36.00ug/1800mg)의 80~150%\n3. 아연:표시량(5.78mg/1800mg)의 80~150%\n4. 대장균군:음성\n5. 붕해시험:20분이내",
+   "intake": "1일 3회, 1회 2캡슐 씩 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.                                           \r\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\r\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \r\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 진한 노란색의 분말이 든 불투명한 흰색의 탄력성 경질캡슐",
+   "storage": "직사광선이 들지 않는 서늘한 곳에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "μg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 36μg</span><span class=\"sd-badge is-solid\">아연 5.78mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>메가론지<small>셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)한국파비스알엔디 제조 · 1일 3회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>36μg</b>, 아연 <b>5.78mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2캡슐) 섭취로 셀레늄 <b>36μg</b>, 아연 <b>5.78mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 진한 노란색의 분말이 든 불투명한 흰색의 탄력성 경질캡슐 · (주)한국파비스알엔디 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(36μg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(5.78mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 진한 노란색의 분말이 든 불투명한 흰색의 탄력성 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선이 들지 않는 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 36μg</span><span class=\"sd-badge is-solid\">Zinc 5.78mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>메가론지<small>Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)한국파비스알엔디 · 3 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36μg</b> of Selenium, <b>5.78mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 capsules): <b>36μg</b> Selenium, <b>5.78mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국파비스알엔디</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (36μg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (5.78mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 진한 노란색의 분말이 든 불투명한 흰색의 탄력성 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선이 들지 않는 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
