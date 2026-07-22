@@ -1,0 +1,237 @@
+[
+ {
+  "statementNo": "2020001201673",
+  "ingredient": "바나바잎추출물",
+  "slug": "banaba"
+ },
+ {
+  "statementNo": "20160012278105",
+  "ingredient": "바나바잎추출물",
+  "slug": "banaba"
+ },
+ {
+  "statementNo": "20100018018133",
+  "ingredient": "바나바잎추출물",
+  "slug": "banaba"
+ },
+ {
+  "statementNo": "20040020028295",
+  "ingredient": "히알루론산",
+  "slug": "hyaluronic-acid"
+ },
+ {
+  "statementNo": "200600200081404",
+  "ingredient": "헤마토코쿠스추출물",
+  "slug": "haematococcus"
+ },
+ {
+  "statementNo": "20140020012149",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "201000190041465",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20200016052361",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "201200190071069",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "201000190041349",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "200400200073100",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20040017106465",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20140020012125",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20140020012123",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "201000190041339",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "200400200073331",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20140020012120",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "200400200073015",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "200400170211552",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20040017106108",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20040017106450",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "2020001620240",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20140020012118",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "201000190041501",
+  "ingredient": "뮤코다당단백",
+  "slug": "mucopolysaccharide-protein"
+ },
+ {
+  "statementNo": "20040020028305",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "20040015100115",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "20040015100131",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "20040015100116",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "2006001510972",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "20040015100134",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "2004001510092",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "2004002003156",
+  "ingredient": "인삼",
+  "slug": "korean-ginseng"
+ },
+ {
+  "statementNo": "20040017106243",
+  "ingredient": "키토산",
+  "slug": "chitosan"
+ },
+ {
+  "statementNo": "20040020046464",
+  "ingredient": "키토산",
+  "slug": "chitosan"
+ },
+ {
+  "statementNo": "20190009483416",
+  "ingredient": "키토산",
+  "slug": "chitosan"
+ },
+ {
+  "statementNo": "20040020020315",
+  "ingredient": "키토산",
+  "slug": "chitosan"
+ },
+ {
+  "statementNo": "20040017021506",
+  "ingredient": "키토산",
+  "slug": "chitosan"
+ },
+ {
+  "statementNo": "20040017106267",
+  "ingredient": "알로에전잎",
+  "slug": "aloe-whole-leaf"
+ },
+ {
+  "statementNo": "20040020028369",
+  "ingredient": "알로에전잎",
+  "slug": "aloe-whole-leaf"
+ },
+ {
+  "statementNo": "200400200082827",
+  "ingredient": "홍국",
+  "slug": "red-yeast-rice"
+ },
+ {
+  "statementNo": "200400170061148",
+  "ingredient": "홍국",
+  "slug": "red-yeast-rice"
+ },
+ {
+  "statementNo": "20100018018108",
+  "ingredient": "홍국",
+  "slug": "red-yeast-rice"
+ },
+ {
+  "statementNo": "200400200141022",
+  "ingredient": "홍국",
+  "slug": "red-yeast-rice"
+ },
+ {
+  "statementNo": "20040015110535",
+  "ingredient": "로즈힙",
+  "slug": "rosehip"
+ },
+ {
+  "statementNo": "200400170211089",
+  "ingredient": "로즈힙",
+  "slug": "rosehip"
+ },
+ {
+  "statementNo": "200400170211257",
+  "ingredient": "로즈힙",
+  "slug": "rosehip"
+ },
+ {
+  "statementNo": "20040017006270",
+  "ingredient": "키토올리고당",
+  "slug": "chitooligosaccharide"
+ }
+]

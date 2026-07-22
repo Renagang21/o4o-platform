@@ -1,0 +1,147 @@
+{
+ "wo": "MAX-POOL-FINAL-INTEGRATION-B-V1",
+ "generated": "2026-07-22",
+ "shardAxis": "FNV-1a(String(STTEMNT_NO).trim())%3",
+ "agents": {
+  "0": "A",
+  "1": "B",
+  "2": "C"
+ },
+ "finalReadyTotal": 134,
+ "shardCounts": {
+  "0": 43,
+  "1": 47,
+  "2": 44
+ },
+ "readyEqualsShardSum": true,
+ "coordOverlapWithinSf": 0,
+ "byIngredient": {
+  "바나바잎추출물": {
+   "slug": "banaba",
+   "ready": 5,
+   "shard": {
+    "0": 1,
+    "1": 3,
+    "2": 1
+   }
+  },
+  "히알루론산": {
+   "slug": "hyaluronic-acid",
+   "ready": 2,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 0
+   }
+  },
+  "쏘팔메토열매추출물": {
+   "slug": "saw-palmetto",
+   "ready": 0,
+   "shard": {
+    "0": 0,
+    "1": 0,
+    "2": 0
+   }
+  },
+  "포스파티딜세린": {
+   "slug": "phosphatidylserine",
+   "ready": 0,
+   "shard": {
+    "0": 0,
+    "1": 0,
+    "2": 0
+   }
+  },
+  "헤마토코쿠스추출물": {
+   "slug": "haematococcus",
+   "ready": 3,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+   }
+  },
+  "뮤코다당단백": {
+   "slug": "mucopolysaccharide-protein",
+   "ready": 54,
+   "shard": {
+    "0": 24,
+    "1": 19,
+    "2": 11
+   }
+  },
+  "인삼": {
+   "slug": "korean-ginseng",
+   "ready": 28,
+   "shard": {
+    "0": 7,
+    "1": 8,
+    "2": 13
+   }
+  },
+  "키토산": {
+   "slug": "chitosan",
+   "ready": 12,
+   "shard": {
+    "0": 2,
+    "1": 5,
+    "2": 5
+   }
+  },
+  "알로에전잎": {
+   "slug": "aloe-whole-leaf",
+   "ready": 10,
+   "shard": {
+    "0": 3,
+    "1": 2,
+    "2": 5
+   }
+  },
+  "홍국": {
+   "slug": "red-yeast-rice",
+   "ready": 9,
+   "shard": {
+    "0": 2,
+    "1": 4,
+    "2": 3
+   }
+  },
+  "로즈힙": {
+   "slug": "rosehip",
+   "ready": 8,
+   "shard": {
+    "0": 2,
+    "1": 3,
+    "2": 3
+   }
+  },
+  "키토올리고당": {
+   "slug": "chitooligosaccharide",
+   "ready": 3,
+   "shard": {
+    "0": 0,
+    "1": 1,
+    "2": 2
+   }
+  }
+ },
+ "expectedDbWrite": 536,
+ "decomposition": {
+  "A_211": {
+   "SF_MINE": 82,
+   "REGISTERED_nutrientTrack": 111,
+   "CANDIDATE_NEW_pending": 17,
+   "OWN_홍삼": 1
+  },
+  "C_481": {
+   "REGISTERED_nutrientTrack": 363,
+   "OWN_홍삼": 70,
+   "CANDIDATE_NEW": 26,
+   "SF_MINE_overlap": 12,
+   "PROB": 10
+  },
+  "C_coordOverlapWithB": 11
+ },
+ "note": "authoritative clean new-sf = my 12 SF_INGREDIENTS sf-select(EN-validated, pure-single dedup). REGISTERED→nutrient/combo track(별도). CANDIDATE_NEW/PROB/홍삼→별도트랙.",
+ "roundPlan": "134는 단일 라운드 수용(300~800 권장 상한 내). shard별 A43/B47/C44."
+}
