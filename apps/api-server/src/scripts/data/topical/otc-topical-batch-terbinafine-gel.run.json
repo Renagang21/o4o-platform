@@ -1,0 +1,41 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "테르비나핀",
+ "form": "겔",
+ "slugbase": "terbinafine-gel",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "794b04e30419ae57",
+   "n": 9
+  },
+  {
+   "fp": "fed733d743dfa1d4",
+   "n": 9
+  },
+  {
+   "fp": "09205c15d3c4c018",
+   "n": 3
+  },
+  {
+   "fp": "791cb36b9013aff5",
+   "n": 2
+  },
+  {
+   "fp": "e00ff500cdeb6b78",
+   "n": 2
+  },
+  {
+   "fp": "29cfbf5138474da4",
+   "n": 1
+  },
+  {
+   "fp": "7eea5046b861c460",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 27,
+ "koWrite": 108,
+ "enWrite": 54
+}

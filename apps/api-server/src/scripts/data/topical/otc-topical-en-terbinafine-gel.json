@@ -1,0 +1,18 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-STORE-LEAFLET-PRODUCTION-DA-V2",
+ "slug": "terbinafine-gel",
+ "note": "KO(원문 grounded) 기준 번역. 질환명·효능 명확 표시. 마케팅 필드 0. 약사 상담 안내 포함.",
+ "translation": {
+  "groupKey": "테르비나핀염산염|1%|크림",
+  "title": "Terbinafine Hydrochloride Gel",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for fungal skin infections caused by dermatophytes — athlete's foot (tinea pedis), jock itch (tinea cruris), and ringworm of the body (tinea corporis) — as well as tinea versicolor (pityriasis versicolor) caused by Malassezia (Pityrosporum) orbiculare, and cutaneous candidiasis.",
+  "usage": "Apply to the affected area once or twice a day. Treatment period by condition: athlete's foot (tinea pedis) once a day for 1 week; the interdigital (between-toe) type twice a day for 1 week; the plantar (sole) type twice a day for 2 weeks; ringworm of the body and jock itch for 1 to 2 weeks; cutaneous candidiasis for 1 to 2 weeks; tinea versicolor for 2 weeks.",
+  "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant or may be pregnant or are breastfeeding, or in children. Do not use an occlusive dressing or wrapping unless directed by a doctor. If you have candidiasis, do not use acidic soap. This medicine is for external use only. Do not use it in the eyes, on the cornea or conjunctiva; if it accidentally gets into the eyes it may cause irritation and, rarely, worsen a latent fungal infection, so rinse thoroughly with plenty of water. Do not apply it to the nails, scalp, around the mouth, or the genital area. If your symptoms do not improve after the treatment period, consult a doctor or pharmacist. Stop use and consult a doctor or pharmacist if you notice adverse reactions such as hypersensitivity with rash, excessive irritation, hives, redness, rash, erythema, itching, a stinging sensation, local contact dermatitis, skin peeling, scabbing, abnormal pigmentation, sharp pain, or a burning sensation. If you have any questions or notice any problems while using it, consult a pharmacist or other expert at the store.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Terbinafine hydrochloride",
+   "Form": "Gel"
+  }
+ }
+}

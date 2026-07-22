@@ -1,0 +1,173 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "피록시캄",
+ "form": "겔",
+ "slugbase": "piroxicam-gel",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "9abda8c230bd8761",
+   "n": 7
+  },
+  {
+   "fp": "74f2ab75e2780d53",
+   "n": 7
+  },
+  {
+   "fp": "41a8c434212ed5fb",
+   "n": 3
+  },
+  {
+   "fp": "5db1ec159469150b",
+   "n": 3
+  },
+  {
+   "fp": "a99c1c789c094a80",
+   "n": 2
+  },
+  {
+   "fp": "d3107a9bb8073240",
+   "n": 2
+  },
+  {
+   "fp": "6885552c1103373c",
+   "n": 2
+  },
+  {
+   "fp": "ccf7351f7dc0bd17",
+   "n": 2
+  },
+  {
+   "fp": "b908bd0c8f0ac0bb",
+   "n": 2
+  },
+  {
+   "fp": "4282afcf7b8cef6d",
+   "n": 2
+  },
+  {
+   "fp": "003d9042df0e0ea5",
+   "n": 2
+  },
+  {
+   "fp": "be4a70e99b58b7b2",
+   "n": 2
+  },
+  {
+   "fp": "39e853aae7c868c3",
+   "n": 1
+  },
+  {
+   "fp": "944e52a74c25e8f7",
+   "n": 1
+  },
+  {
+   "fp": "965a9d64ebbded6a",
+   "n": 1
+  },
+  {
+   "fp": "ff6908b34d62018e",
+   "n": 1
+  },
+  {
+   "fp": "dc2caab0dfc8e4ee",
+   "n": 1
+  },
+  {
+   "fp": "e1b6db46fc22e6b5",
+   "n": 1
+  },
+  {
+   "fp": "9d9cc775fc180e8a",
+   "n": 1
+  },
+  {
+   "fp": "d341ce67de6698ca",
+   "n": 1
+  },
+  {
+   "fp": "7b1663dafb0863aa",
+   "n": 1
+  },
+  {
+   "fp": "15ab3abd7c6e8e2d",
+   "n": 1
+  },
+  {
+   "fp": "05e3982e6cbd4442",
+   "n": 1
+  },
+  {
+   "fp": "6d5829327b515827",
+   "n": 1
+  },
+  {
+   "fp": "a08afced225a5540",
+   "n": 1
+  },
+  {
+   "fp": "cf35cf82f55915ff",
+   "n": 1
+  },
+  {
+   "fp": "f6e2745ef648b3a1",
+   "n": 1
+  },
+  {
+   "fp": "524a1bb63a7971f5",
+   "n": 1
+  },
+  {
+   "fp": "6669ad64caa38787",
+   "n": 1
+  },
+  {
+   "fp": "b9571ae25944a318",
+   "n": 1
+  },
+  {
+   "fp": "725660beeedd2348",
+   "n": 1
+  },
+  {
+   "fp": "048991abf9232f9a",
+   "n": 1
+  },
+  {
+   "fp": "48875d2c68ccdcb0",
+   "n": 1
+  },
+  {
+   "fp": "0d02582a7d8a226d",
+   "n": 1
+  },
+  {
+   "fp": "e5a602e1fdd1c19c",
+   "n": 1
+  },
+  {
+   "fp": "98a9fc3ee77c8c54",
+   "n": 1
+  },
+  {
+   "fp": "3a7c0ef90f22c9d7",
+   "n": 1
+  },
+  {
+   "fp": "6057bdc06ad5f1d9",
+   "n": 1
+  },
+  {
+   "fp": "957bcfb9dc330f72",
+   "n": 1
+  },
+  {
+   "fp": "87dd6e41858a51bb",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 64,
+ "koWrite": 256,
+ "enWrite": 128
+}

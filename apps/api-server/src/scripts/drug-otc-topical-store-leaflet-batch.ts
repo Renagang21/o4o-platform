@@ -108,7 +108,7 @@ async function main(): Promise<void> {
   try {
     const coarse: Row[] = await ds.query(`SELECT pm.id::text id, pm.name, pm.specification spec, es.content, es.id::text "easyId"
       FROM product_masters pm JOIN LATERAL (SELECT id, content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type=$3 AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
-      WHERE pm.name LIKE '%('||$1||'%)' AND pm.name LIKE '%'||$2||'%'
+      WHERE pm.name LIKE '%('||$1||'%)' AND pm.name LIKE '%'||$2||'%' AND pm.name NOT LIKE '%수출%'
         AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions a WHERE a.master_id=pm.id AND a.source_type IN ('mfds_drug_otc','nutrition_combo','o4o_drug_otc_topical') AND a.description_type='STORE' AND a.status='canonical' AND a.deleted_at IS NULL)
       ORDER BY pm.id`, [INGREDIENT, FORM, EASY]);
     const withFp = coarse.map((r) => ({ ...r, ...fingerprintOf(r.name, r.spec, r.content) }));

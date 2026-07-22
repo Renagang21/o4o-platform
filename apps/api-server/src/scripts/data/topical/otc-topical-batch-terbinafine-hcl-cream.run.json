@@ -1,0 +1,57 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "염산테르비나핀",
+ "form": "크림",
+ "slugbase": "terbinafine-hcl-cream",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "2434bd93cba5620d",
+   "n": 3
+  },
+  {
+   "fp": "a93d4a6ad7a2163e",
+   "n": 2
+  },
+  {
+   "fp": "8b6191df6210bcd8",
+   "n": 1
+  },
+  {
+   "fp": "b1b3fa9886b5db3a",
+   "n": 1
+  },
+  {
+   "fp": "6b9a3733b752c805",
+   "n": 1
+  },
+  {
+   "fp": "1bfc1600d5ed6908",
+   "n": 1
+  },
+  {
+   "fp": "0d24f051ed0dc846",
+   "n": 1
+  },
+  {
+   "fp": "b0fdfc1094579b42",
+   "n": 1
+  },
+  {
+   "fp": "6c6554f1465148e1",
+   "n": 1
+  },
+  {
+   "fp": "413fb2abc36a7397",
+   "n": 1
+  },
+  {
+   "fp": "611265920fefb9bd",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 14,
+ "koWrite": 56,
+ "enWrite": 28
+}
