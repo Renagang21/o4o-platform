@@ -1,0 +1,18 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1 — 에이전트 나 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선.",
+  "schemaVersion": 1,
+  "owner": "agent-na",
+  "round": "nutrition-combo-en-only-3h-2026-07-22",
+  "track": "NUTRITION_COMBO_EN_ONLY",
+  "claims": [
+    {
+      "groupKey": "비타민E|100IU|연질캡슐",
+      "sourceRef": "cda011db-9d62-4b58-aa56-d5a03bcafa83",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 3,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
+    }
+  ]
+}
