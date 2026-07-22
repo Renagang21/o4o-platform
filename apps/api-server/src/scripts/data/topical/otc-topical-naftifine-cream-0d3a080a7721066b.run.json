@@ -1,0 +1,42 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-STORE-LEAFLET-PRODUCTION-DA-V2",
+ "mode": "APPLY",
+ "slug": "naftifine-cream-0d3a080a7721066b",
+ "targetFp": "0d3a080a7721066b",
+ "status": "APPLIED",
+ "anomalies": [],
+ "coarseTotal": 21,
+ "target": 8,
+ "routeSet": [
+  "topical"
+ ],
+ "formSet": [
+  "크림"
+ ],
+ "koMissing": 0,
+ "koDistinctMd5": 1,
+ "enMd5": "8e2ceace4c73ca7cfec2542cd7d2363b",
+ "enMissing": [],
+ "writePlan": {
+  "ko": 32,
+  "en": 16,
+  "total": 48
+ },
+ "writeActual": {
+  "koIns": 8,
+  "enIns": 8,
+  "demoted": 8,
+  "flippedKo": 8,
+  "flippedEn": 8,
+  "audited": 8,
+  "total": 40
+ },
+ "post": {
+  "koCanonical1": 8,
+  "enCanonical1": 8,
+  "deprecatedEasy": 8,
+  "dup": 0,
+  "koAuthored": 8
+ },
+ "postVerifyPass": true
+}

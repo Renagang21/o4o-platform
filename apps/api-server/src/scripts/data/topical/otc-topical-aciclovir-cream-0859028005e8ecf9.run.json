@@ -1,0 +1,42 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-STORE-LEAFLET-PRODUCTION-DA-V2",
+ "mode": "APPLY",
+ "slug": "aciclovir-cream-0859028005e8ecf9",
+ "targetFp": "0859028005e8ecf9",
+ "status": "APPLIED",
+ "anomalies": [],
+ "coarseTotal": 28,
+ "target": 6,
+ "routeSet": [
+  "topical"
+ ],
+ "formSet": [
+  "크림"
+ ],
+ "koMissing": 0,
+ "koDistinctMd5": 1,
+ "enMd5": "6903743ff97bd508f9a7a68e88138a87",
+ "enMissing": [],
+ "writePlan": {
+  "ko": 24,
+  "en": 12,
+  "total": 36
+ },
+ "writeActual": {
+  "koIns": 6,
+  "enIns": 6,
+  "demoted": 6,
+  "flippedKo": 6,
+  "flippedEn": 6,
+  "audited": 6,
+  "total": 30
+ },
+ "post": {
+  "koCanonical1": 6,
+  "enCanonical1": 6,
+  "deprecatedEasy": 6,
+  "dup": 0,
+  "koAuthored": 6
+ },
+ "postVerifyPass": true
+}

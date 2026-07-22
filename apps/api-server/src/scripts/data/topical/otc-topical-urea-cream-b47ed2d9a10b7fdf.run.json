@@ -1,0 +1,42 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-STORE-LEAFLET-PRODUCTION-DA-V2",
+ "mode": "APPLY",
+ "slug": "urea-cream-b47ed2d9a10b7fdf",
+ "targetFp": "b47ed2d9a10b7fdf",
+ "status": "APPLIED",
+ "anomalies": [],
+ "coarseTotal": 20,
+ "target": 6,
+ "routeSet": [
+  "topical"
+ ],
+ "formSet": [
+  "크림"
+ ],
+ "koMissing": 0,
+ "koDistinctMd5": 1,
+ "enMd5": "c798410ec6e72babc169644a8fecb1bb",
+ "enMissing": [],
+ "writePlan": {
+  "ko": 24,
+  "en": 12,
+  "total": 36
+ },
+ "writeActual": {
+  "koIns": 6,
+  "enIns": 6,
+  "demoted": 6,
+  "flippedKo": 6,
+  "flippedEn": 6,
+  "audited": 6,
+  "total": 30
+ },
+ "post": {
+  "koCanonical1": 6,
+  "enCanonical1": 6,
+  "deprecatedEasy": 6,
+  "dup": 0,
+  "koAuthored": 6
+ },
+ "postVerifyPass": true
+}

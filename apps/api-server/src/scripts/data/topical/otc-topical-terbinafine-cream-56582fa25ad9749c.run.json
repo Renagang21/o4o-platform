@@ -1,0 +1,42 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-STORE-LEAFLET-PRODUCTION-DA-V2",
+ "mode": "APPLY",
+ "slug": "terbinafine-cream-56582fa25ad9749c",
+ "targetFp": "56582fa25ad9749c",
+ "status": "APPLIED",
+ "anomalies": [],
+ "coarseTotal": 90,
+ "target": 10,
+ "routeSet": [
+  "topical"
+ ],
+ "formSet": [
+  "크림"
+ ],
+ "koMissing": 0,
+ "koDistinctMd5": 1,
+ "enMd5": "17e6ca864ab9c033cad306be583d949b",
+ "enMissing": [],
+ "writePlan": {
+  "ko": 40,
+  "en": 20,
+  "total": 60
+ },
+ "writeActual": {
+  "koIns": 10,
+  "enIns": 10,
+  "demoted": 10,
+  "flippedKo": 10,
+  "flippedEn": 10,
+  "audited": 10,
+  "total": 50
+ },
+ "post": {
+  "koCanonical1": 10,
+  "enCanonical1": 10,
+  "deprecatedEasy": 10,
+  "dup": 0,
+  "koAuthored": 10
+ },
+ "postVerifyPass": true
+}
