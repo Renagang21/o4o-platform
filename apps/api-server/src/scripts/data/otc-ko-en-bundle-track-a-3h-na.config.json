@@ -1,0 +1,28 @@
+{
+  "_doc": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-NA-V1 (에이전트 나) 자기 전용 외부 batch config. 공용 GROUP_REGISTRY·EN_REGISTRY 미수정. ko: grounded-upgrade runner --config. en: 비오틴은 무sibling → fresh 번역(별도 fresh-persist 스크립트, byte-identical 게이트 대신 TEST-LOG+구조 게이트). byte-identical 후보(시트룰린 등)는 가/다가 선점 완료.",
+  "bundleKey": "track-a-3h-na",
+  "writeOwner": "agent-na",
+  "order": ["na-biotin-5mg"],
+  "ko": {
+    "na-biotin-5mg": {
+      "key": "비오틴|5밀리그램|정",
+      "ingredient": "비오틴", "dose": "5밀리그램", "formKeyword": "정",
+      "candidate": "27768939-4d85-45e6-9868-e6efe3ccd114",
+      "targetFp": "458af310d5beda5f",
+      "excludeFp": ["6d9ab561f87a4bec", "3c6725da892942f7"],
+      "expected": 8, "excludedExpected": 5,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-biotin-5mg-jeong"
+    }
+  },
+  "en": {
+    "na-biotin-5mg": {
+      "key": "비오틴|5밀리그램|정",
+      "candidate": "27768939-4d85-45e6-9868-e6efe3ccd114",
+      "sourceType": "mfds_drug_otc", "expected": 8,
+      "koRunBase": "otc-grounded-upgrade-biotin-5mg-jeong",
+      "translationFile": "otc-en-translations-biotin-5mg-na-v1.json",
+      "outBase": "otc-en-complete-biotin-5mg-jeong"
+    }
+  }
+}

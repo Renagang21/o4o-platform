@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "시트룰린말산염|500밀리그램|정: 동일 source_ref 12b056c0-f43a-4a9a-8d36-ad87dff0ae09 out-of-scope 검토완료 en canonical(md5 de38b2533c2b3ea6efc82f6af723a7e4) 빌더 역매핑 복원. build == live byte-identical → 새 medical fact 0. en-complete runner 가 게이트로 재증명.",
+  "translations": [
+    {
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "title": "Citrulline Malate 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as a supportive treatment for functional weakness.",
+      "usage": "Adults take two tablets three times a day. Children 6 or older take two tablets twice a day. Do not take it for more than 4 weeks.",
+      "caution": "Do not give this to a child under 6. Talk to a pharmacist before taking it if you are pregnant or breastfeeding, or have ever reacted to Yellow No. 203 or Yellow No. 5. If there is no improvement after about a month, stop taking it.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Citrulline malate 500 mg",
+        "How it works": "Supports treatment for functional weakness",
+        "Main symptoms": "Weakness and tiredness from reduced function",
+        "Who should be careful": "Under 6; do not take for more than 4 weeks",
+        "Why this one": "A preparation used to support treatment for functional weakness"
+      }
+    }
+  ],
+  "summary": "Weakness and tiredness from reduced function"
+}

@@ -1,0 +1,46 @@
+{
+  "wo": "WO-O4O-OTC-KO-EN-BUNDLE-RUNNER-HARDENING-DA-V1",
+  "bundleKey": "track-a-3h-na",
+  "mode": "APPLY",
+  "writeOwner": "agent-na",
+  "groupOrder": [
+    "na-citrulline-500"
+  ],
+  "groupCount": 1,
+  "dbWrite": 0,
+  "groups": [
+    {
+      "groupKey": "na-citrulline-500",
+      "writeOwner": "agent-na",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 6,
+      "excluded": 8,
+      "otherFp": 0,
+      "koWritePlan": null,
+      "koWriteActual": null,
+      "enWritePlan": {
+        "total": 12
+      },
+      "enWriteActual": null,
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    }
+  ],
+  "totals": {
+    "koPlan": 0,
+    "koActual": 0,
+    "enPlan": 12,
+    "enActual": 0,
+    "planTotal": 12,
+    "actualTotal": 0
+  },
+  "bundleStatus": "NO_OP",
+  "abortedAt": null,
+  "abortReason": null,
+  "statusCounts": {
+    "ALREADY_COMPLETE": 1
+  }
+}

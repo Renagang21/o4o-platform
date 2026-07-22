@@ -1,0 +1,104 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "시트룰린말산염|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "12b056c0-f43a-4a9a-8d36-ad87dff0ae09",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "시트룰린말산염 500mg 정",
+  "coarseTotal": 14,
+  "target": 6,
+  "excluded": 8,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "01398127-5ffb-4d85-8e1b-b0111e33be6e",
+      "name": "리차지아정(시트룰린말산염)",
+      "reason": "비대상(fp 8a433f917fa6a02f, bridge SSOT)"
+    },
+    {
+      "id": "182c2891-4d7f-49d2-8e16-43a0307ad5aa",
+      "name": "액티몰스정(시트룰린말산염)",
+      "reason": "비대상(fp fadc625179ba2917, bridge SSOT)"
+    },
+    {
+      "id": "1f59e52c-0bd7-4911-ae12-854d5eef1e2c",
+      "name": "리차지아정(시트룰린말산염)",
+      "reason": "비대상(fp 8a433f917fa6a02f, bridge SSOT)"
+    },
+    {
+      "id": "35c522ae-6766-4d9f-9f5a-98ed79654bc8",
+      "name": "액티몰스정(시트룰린말산염)",
+      "reason": "비대상(fp fadc625179ba2917, bridge SSOT)"
+    },
+    {
+      "id": "438fcc32-a805-40f6-9f78-6f2bc1139a23",
+      "name": "액티몰스정(시트룰린말산염)",
+      "reason": "비대상(fp fadc625179ba2917, bridge SSOT)"
+    },
+    {
+      "id": "63fdd0c8-6f3e-433d-a12c-00c671a4412b",
+      "name": "리차지아정(시트룰린말산염)",
+      "reason": "비대상(fp 8a433f917fa6a02f, bridge SSOT)"
+    },
+    {
+      "id": "77173143-e1a7-4505-a147-aa8796220d7b",
+      "name": "액티몰스정(시트룰린말산염)",
+      "reason": "비대상(fp fadc625179ba2917, bridge SSOT)"
+    },
+    {
+      "id": "a69f0590-7287-4329-bcba-0b3979502c61",
+      "name": "리차지아정(시트룰린말산염)",
+      "reason": "비대상(fp 8a433f917fa6a02f, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "0f4f3b74-33f9-4c1e-9cad-21cc2000eea1",
+    "3c1b74a5-94de-40ae-8fa2-0f0f94a89556",
+    "430d3a36-f4b9-4e6f-9324-5412d9e5af04",
+    "46dcf082-5d24-42ed-b82a-eb87141c9bde",
+    "92b7d472-bae9-47d2-8ae9-ce1b3894b2c8",
+    "b143fd61-4f95-49f8-b3fb-e6c12b5e6f7a"
+  ],
+  "rollback_master_ids": [
+    "0f4f3b74-33f9-4c1e-9cad-21cc2000eea1",
+    "3c1b74a5-94de-40ae-8fa2-0f0f94a89556",
+    "430d3a36-f4b9-4e6f-9324-5412d9e5af04",
+    "46dcf082-5d24-42ed-b82a-eb87141c9bde",
+    "92b7d472-bae9-47d2-8ae9-ce1b3894b2c8",
+    "b143fd61-4f95-49f8-b3fb-e6c12b5e6f7a"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "8a433f917fa6a02f",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "66df757d3628ec4d",
+      "n": 6,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "fadc625179ba2917",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 6,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 6 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}
