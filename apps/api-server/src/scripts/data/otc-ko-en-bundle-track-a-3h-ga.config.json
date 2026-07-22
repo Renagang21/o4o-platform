@@ -1,0 +1,118 @@
+{
+  "_doc": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1 (에이전트 가) 외부 batch config. runner registry .ts 미수정. translationFile=v1 공용(read-only, build==live out en byte-identical 사전검증). bundle --config=<이 파일> --apply.",
+  "bundleKey": "track-a-3h-ga",
+  "writeOwner": "agent-ga",
+  "order": [
+    "ga-은행엽건조엑스-80mg-정",
+    "ga-세티리진염산염-10mg-연질캡슐",
+    "ga-포도엽건조엑스-180mg-캡슐",
+    "ga-탄산수소나트륨-500mg-정"
+  ],
+  "ko": {
+    "ga-은행엽건조엑스-80mg-정": {
+      "key": "은행엽건조엑스|80밀리그램|정",
+      "ingredient": "은행엽건조엑스",
+      "dose": "80밀리그램",
+      "formKeyword": "정",
+      "candidate": "018897db-5315-45d1-b973-9dc3df8587e7",
+      "targetFp": "398cbe43456451db",
+      "excludeFp": "c6cfb68cc1255618",
+      "expected": 6,
+      "excludedExpected": 4,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-ga3h-은행엽건조엑스-80mg-정"
+    },
+    "ga-세티리진염산염-10mg-연질캡슐": {
+      "key": "세티리진염산염|10밀리그램|연질캡슐",
+      "ingredient": "세티리진염산염",
+      "dose": "10밀리그램",
+      "formKeyword": "연질캡슐",
+      "candidate": "125302c3-5ba6-427e-85fe-c532a3147cae",
+      "targetFp": "777135140dbdd1d3",
+      "excludeFp": [
+        "088881b8fba65a70",
+        "1222518d71417f36",
+        "25d700d0e3926425",
+        "3852f289610853e0",
+        "6fee9648b723dab7",
+        "9057a9cc1be729f0",
+        "ccde694331529178",
+        "e2b2f7d81c76e7f7",
+        "fa8cb6db62bd0b3c"
+      ],
+      "expected": 4,
+      "excludedExpected": 19,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-ga3h-세티리진염산염-10mg-연질캡슐"
+    },
+    "ga-포도엽건조엑스-180mg-캡슐": {
+      "key": "포도엽건조엑스|180밀리그램|캡슐",
+      "ingredient": "포도엽건조엑스",
+      "dose": "180밀리그램",
+      "formKeyword": "캡슐",
+      "candidate": "0736bb94-e8e1-414e-9387-2950ca90bc20",
+      "targetFp": "b461802e5a1b7cb8",
+      "excludeFp": "96911042c71a2d28",
+      "expected": 4,
+      "excludedExpected": 3,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-ga3h-포도엽건조엑스-180mg-캡슐"
+    },
+    "ga-탄산수소나트륨-500mg-정": {
+      "key": "탄산수소나트륨|500밀리그램|정",
+      "ingredient": "탄산수소나트륨",
+      "dose": "500밀리그램",
+      "formKeyword": "정",
+      "candidate": "22efa097-46a9-45c1-85fe-0067d8bc9d4b",
+      "targetFp": "ff9d4a8ace54fd78",
+      "excludeFp": [
+        "039b25aee00af323",
+        "6544da4e3f03845f",
+        "aed88c4a0344ed54",
+        "ee9c4bb803154dc5"
+      ],
+      "expected": 3,
+      "excludedExpected": 11,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-ga3h-탄산수소나트륨-500mg-정"
+    }
+  },
+  "en": {
+    "ga-은행엽건조엑스-80mg-정": {
+      "key": "은행엽건조엑스|80밀리그램|정",
+      "candidate": "018897db-5315-45d1-b973-9dc3df8587e7",
+      "sourceType": "mfds_drug_otc",
+      "expected": 6,
+      "koRunBase": "otc-grounded-upgrade-ga3h-은행엽건조엑스-80mg-정",
+      "translationFile": "otc-en-translations-herbal-v1.json",
+      "outBase": "otc-en-complete-ga3h-은행엽건조엑스-80mg-정"
+    },
+    "ga-세티리진염산염-10mg-연질캡슐": {
+      "key": "세티리진염산염|10밀리그램|연질캡슐",
+      "candidate": "125302c3-5ba6-427e-85fe-c532a3147cae",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-ga3h-세티리진염산염-10mg-연질캡슐",
+      "translationFile": "otc-en-translations-v1.json",
+      "outBase": "otc-en-complete-ga3h-세티리진염산염-10mg-연질캡슐"
+    },
+    "ga-포도엽건조엑스-180mg-캡슐": {
+      "key": "포도엽건조엑스|180밀리그램|캡슐",
+      "candidate": "0736bb94-e8e1-414e-9387-2950ca90bc20",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-ga3h-포도엽건조엑스-180mg-캡슐",
+      "translationFile": "otc-en-translations-herbal-v1.json",
+      "outBase": "otc-en-complete-ga3h-포도엽건조엑스-180mg-캡슐"
+    },
+    "ga-탄산수소나트륨-500mg-정": {
+      "key": "탄산수소나트륨|500밀리그램|정",
+      "candidate": "22efa097-46a9-45c1-85fe-0067d8bc9d4b",
+      "sourceType": "mfds_drug_otc",
+      "expected": 3,
+      "koRunBase": "otc-grounded-upgrade-ga3h-탄산수소나트륨-500mg-정",
+      "translationFile": "otc-en-translations-v1.json",
+      "outBase": "otc-en-complete-ga3h-탄산수소나트륨-500mg-정"
+    }
+  }
+}

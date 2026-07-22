@@ -1,0 +1,306 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1",
+  "readOnly": true,
+  "dbWrite": 0,
+  "doneCount": 36,
+  "extraExcluded": [
+    "이부프로펜아르기닌|368.9밀리그램|정",
+    "알파칼시돌|1마이크로그램|연질캡슐"
+  ],
+  "evaluated": 19,
+  "readyFile": 4,
+  "picked": [
+    {
+      "alias": "ga-은행엽건조엑스-80mg-정",
+      "groupKey": "은행엽건조엑스|80밀리그램|정",
+      "target": 6,
+      "exclude": 4,
+      "candidate": "018897db-5315-45d1-b973-9dc3df8587e7",
+      "예상write": {
+        "ko_4T": 24,
+        "en_2T": 12,
+        "total_6T": 36
+      }
+    },
+    {
+      "alias": "ga-세티리진염산염-10mg-연질캡슐",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "target": 4,
+      "exclude": 19,
+      "candidate": "125302c3-5ba6-427e-85fe-c532a3147cae",
+      "예상write": {
+        "ko_4T": 16,
+        "en_2T": 8,
+        "total_6T": 24
+      }
+    },
+    {
+      "alias": "ga-포도엽건조엑스-180mg-캡슐",
+      "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+      "target": 4,
+      "exclude": 3,
+      "candidate": "0736bb94-e8e1-414e-9387-2950ca90bc20",
+      "예상write": {
+        "ko_4T": 16,
+        "en_2T": 8,
+        "total_6T": 24
+      }
+    },
+    {
+      "alias": "ga-탄산수소나트륨-500mg-정",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "target": 3,
+      "exclude": 11,
+      "candidate": "22efa097-46a9-45c1-85fe-0067d8bc9d4b",
+      "예상write": {
+        "ko_4T": 12,
+        "en_2T": 6,
+        "total_6T": 18
+      }
+    }
+  ],
+  "pickedTotalWrite": 102,
+  "candidates": [
+    {
+      "groupKey": "비오틴|5밀리그램|정",
+      "target": 8,
+      "bridge_n": 6,
+      "exclude": 11,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "fp 재현 불일치 8!=6",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "target": 6,
+      "bridge_n": 6,
+      "exclude": 8,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "easy1 0/6",
+        "ko충돌 6",
+        "en선존재 6"
+      ],
+      "enSib": 16,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "은행엽건조엑스|80밀리그램|정",
+      "target": 6,
+      "bridge_n": 6,
+      "exclude": 4,
+      "verdict": "READY_FILE",
+      "reasons": [],
+      "enSib": 203,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "target": 5,
+      "bridge_n": 5,
+      "exclude": 14,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "easy1 0/5",
+        "ko충돌 5",
+        "en선존재 5"
+      ],
+      "enSib": 13,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "target": 5,
+      "bridge_n": 5,
+      "exclude": 14,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "easy1 0/5",
+        "ko충돌 5",
+        "en선존재 5"
+      ],
+      "enSib": 4,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|정",
+      "target": 5,
+      "bridge_n": 5,
+      "exclude": 9,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "easy1 0/5",
+        "ko충돌 5",
+        "en선존재 5"
+      ],
+      "enSib": 24,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "토코페롤아세테이트|100밀리그램|연질캡슐",
+      "target": 5,
+      "bridge_n": 5,
+      "exclude": 0,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "authored draft 없음",
+        "easy1 0/5",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "target": 14,
+      "bridge_n": 5,
+      "exclude": 15,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "fp 재현 불일치 14!=5"
+      ],
+      "enSib": 34,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 4,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "v1 번역 build!=out(역구성 필요)"
+      ],
+      "enSib": 4,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 11,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "v1 번역 build!=out(역구성 필요)"
+      ],
+      "enSib": 16,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 19,
+      "verdict": "READY_FILE",
+      "reasons": [],
+      "enSib": 6,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 24,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "v1 번역 build!=out(역구성 필요)"
+      ],
+      "enSib": 8,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 3,
+      "verdict": "READY_FILE",
+      "reasons": [],
+      "enSib": 96,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "플루벤다졸|500밀리그램|정",
+      "target": 4,
+      "bridge_n": 4,
+      "exclude": 3,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "v1 번역 build!=out(역구성 필요)"
+      ],
+      "enSib": 7,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "target": 3,
+      "bridge_n": 3,
+      "exclude": 11,
+      "verdict": "READY_FILE",
+      "reasons": [],
+      "enSib": 8,
+      "enFileReady": true
+    },
+    {
+      "groupKey": "아스코르브산97%과립|1000밀리그램|과립/산",
+      "target": 0,
+      "bridge_n": 2,
+      "exclude": 0,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "authored draft 없음",
+        "target 0",
+        "fp 재현 불일치 0!=2",
+        "동질성 실패",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "수출용|500밀리그램|연질캡슐",
+      "target": 1,
+      "bridge_n": 1,
+      "exclude": 1,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "authored draft 없음",
+        "easy1 0/1",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "수출용|50밀리그램|연질캡슐",
+      "target": 1,
+      "bridge_n": 1,
+      "exclude": 1,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "authored draft 없음",
+        "easy1 0/1",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    },
+    {
+      "groupKey": "수출용|50밀리그램|정",
+      "target": 1,
+      "bridge_n": 1,
+      "exclude": 0,
+      "verdict": "EXCLUDED",
+      "reasons": [
+        "authored draft 없음",
+        "easy1 0/1",
+        "EN sibling 부재/비균일"
+      ],
+      "enSib": null,
+      "enFileReady": false
+    }
+  ]
+}

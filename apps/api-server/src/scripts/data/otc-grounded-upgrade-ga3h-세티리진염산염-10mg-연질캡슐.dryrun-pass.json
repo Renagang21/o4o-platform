@@ -1,0 +1,214 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "125302c3-5ba6-427e-85fe-c532a3147cae",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "세티리진염산염 10mg 연질캡슐",
+  "coarseTotal": 23,
+  "target": 4,
+  "excluded": 19,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "186abcd4-93d4-4196-9cfd-1f87fdc19802",
+      "name": "알지엔스피드연질캡슐10밀리그램(세티리진염산염)",
+      "reason": "비대상(fp fa8cb6db62bd0b3c, bridge SSOT)"
+    },
+    {
+      "id": "2283925a-ef12-4c29-ad49-cbe796b3f4b5",
+      "name": "알지엔스피드연질캡슐10밀리그램(세티리진염산염)",
+      "reason": "비대상(fp fa8cb6db62bd0b3c, bridge SSOT)"
+    },
+    {
+      "id": "2743267b-4182-4f5b-befd-b840a088a7d6",
+      "name": "아르텍연질캡슐10mg(세티리진염산염)",
+      "reason": "비대상(fp 1222518d71417f36, bridge SSOT)"
+    },
+    {
+      "id": "383e41ef-f1e0-4772-b45c-2cf971f64f25",
+      "name": "알지엔스피드연질캡슐10밀리그램(세티리진염산염)",
+      "reason": "비대상(fp fa8cb6db62bd0b3c, bridge SSOT)"
+    },
+    {
+      "id": "3932b0af-7be9-43a0-ad58-97025dadb7bb",
+      "name": "플로리진연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 088881b8fba65a70, bridge SSOT)"
+    },
+    {
+      "id": "39389ad6-ff8b-4509-8bf7-5b6b186982bb",
+      "name": "알러샷연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp ccde694331529178, bridge SSOT)"
+    },
+    {
+      "id": "486ac650-0907-41dc-8e14-7d91ebf2dae3",
+      "name": "아르쿨연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 25d700d0e3926425, bridge SSOT)"
+    },
+    {
+      "id": "4cf1935a-7b19-4abe-b46e-1b37909e286d",
+      "name": "플로리진연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 088881b8fba65a70, bridge SSOT)"
+    },
+    {
+      "id": "4e1ebd3f-12e7-4b2d-96ce-e98874f13493",
+      "name": "제일알지싹세티연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 9057a9cc1be729f0, bridge SSOT)"
+    },
+    {
+      "id": "597c4ecb-c768-42a5-b118-918382c13f49",
+      "name": "시로제노연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 3852f289610853e0, bridge SSOT)"
+    },
+    {
+      "id": "86cd0524-dc9a-4228-aa23-5f83beef3d1b",
+      "name": "시로제노연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 3852f289610853e0, bridge SSOT)"
+    },
+    {
+      "id": "94799404-045a-497e-9131-7316ed64a6d8",
+      "name": "알러샷연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp ccde694331529178, bridge SSOT)"
+    },
+    {
+      "id": "94d4ae5b-3205-46f3-9f6a-59128d1eaf51",
+      "name": "세노바퀵연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp e2b2f7d81c76e7f7, bridge SSOT)"
+    },
+    {
+      "id": "9ccbf61a-f42b-4f8e-bf1c-129c7fa24a6a",
+      "name": "아르텍연질캡슐10mg(세티리진염산염)",
+      "reason": "비대상(fp 1222518d71417f36, bridge SSOT)"
+    },
+    {
+      "id": "c17de848-461e-430d-8500-ef3e0c42c69b",
+      "name": "아르쿨연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 25d700d0e3926425, bridge SSOT)"
+    },
+    {
+      "id": "c4a010d6-cf4e-4df1-86dd-6cdf760c9782",
+      "name": "세노바퀵연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp e2b2f7d81c76e7f7, bridge SSOT)"
+    },
+    {
+      "id": "c8581f77-cc67-4a3c-8828-465806d28819",
+      "name": "제일알지싹세티연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 9057a9cc1be729f0, bridge SSOT)"
+    },
+    {
+      "id": "dc9c2515-1494-4600-ae4b-294628d797ec",
+      "name": "알레르텍연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 6fee9648b723dab7, bridge SSOT)"
+    },
+    {
+      "id": "f9c9c596-4135-4c2d-8149-8c7beb55c3ae",
+      "name": "알레르텍연질캡슐(세티리진염산염)",
+      "reason": "비대상(fp 6fee9648b723dab7, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "1a58dc8a-93f4-40fb-9807-8e8328a9f109",
+    "29d60ecf-bc38-4473-bdb6-4e9de3aa69d8",
+    "7dda55e5-cfd5-4961-a6f4-6c2008fe0ba7",
+    "ac2e8fa8-f693-402b-bd16-11b1670c683c"
+  ],
+  "rollback_master_ids": [
+    "1a58dc8a-93f4-40fb-9807-8e8328a9f109",
+    "29d60ecf-bc38-4473-bdb6-4e9de3aa69d8",
+    "7dda55e5-cfd5-4961-a6f4-6c2008fe0ba7",
+    "ac2e8fa8-f693-402b-bd16-11b1670c683c"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "fa8cb6db62bd0b3c",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "777135140dbdd1d3",
+      "n": 4,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "1222518d71417f36",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "088881b8fba65a70",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ccde694331529178",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "25d700d0e3926425",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "9057a9cc1be729f0",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "3852f289610853e0",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e2b2f7d81c76e7f7",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6fee9648b723dab7",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 4,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 4,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 4,
+  "htmlLen": 1635,
+  "contentHash": "468d639a98646b6871f1ef375e8451df",
+  "summary": "세티리진염산염 10mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 4,
+      "STEP_B_easy_canonical_demote": 4,
+      "STEP_B_authored_canonical_flip": 4,
+      "total": 12
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 4,
+      "total": 4
+    },
+    "grand_total": 16
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 4",
+    "policy_2A": "audit 2/master = 8 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "은행엽건조엑스|80밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "018897db-5315-45d1-b973-9dc3df8587e7",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 6,
+  "targetMasters": 6,
+  "anomalies": [],
+  "koCanonical": 6,
+  "existingEnAny": 6,
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "5e32af7ad934d2e69a4385e1bef7f978",
+      "n": 203
+    }
+  ],
+  "builtLen": 3050,
+  "builtMd5": "5e32af7ad934d2e69a4385e1bef7f978",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_en_canonical_flip": 6,
+    "en_write_total": 12
+  },
+  "enTargetMd5": "5e32af7ad934d2e69a4385e1bef7f978",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(5e32af7ad934d2e69a4385e1bef7f978) — write 0, 정상 종료"
+}

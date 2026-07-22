@@ -1,0 +1,79 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "은행엽건조엑스|80밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "018897db-5315-45d1-b973-9dc3df8587e7",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "은행엽건조엑스 80mg 정",
+  "coarseTotal": 10,
+  "target": 6,
+  "excluded": 4,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "4b1f2516-cecd-466f-a67e-7139fda12a4a",
+      "name": "써큐로민정80밀리그램(은행엽건조엑스)",
+      "reason": "비대상(fp c6cfb68cc1255618, bridge SSOT)"
+    },
+    {
+      "id": "76c10252-f159-4d2c-8d2f-3bea041a2e7a",
+      "name": "써큐로민정80밀리그램(은행엽건조엑스)",
+      "reason": "비대상(fp c6cfb68cc1255618, bridge SSOT)"
+    },
+    {
+      "id": "a21cb66e-f5a7-4f6a-abf4-cd6bf0f545ec",
+      "name": "써큐로민정80밀리그램(은행엽건조엑스)",
+      "reason": "비대상(fp c6cfb68cc1255618, bridge SSOT)"
+    },
+    {
+      "id": "e272615c-9fdf-409d-8a1a-c51dc034602c",
+      "name": "써큐로민정80밀리그램(은행엽건조엑스)",
+      "reason": "비대상(fp c6cfb68cc1255618, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "34bf9dbc-435b-4fb4-9e2f-44b9fb832971",
+    "433d947f-3920-4720-921c-487a43da2357",
+    "7318e42a-606a-4dca-ac1a-30996ea8734d",
+    "efba959a-7ed4-4cd5-ae79-d41f450ee26a",
+    "f6658f2c-2d5a-4703-b7d2-d2e22770ed29",
+    "f79ba0bb-d1c0-4acb-8085-13c20a526332"
+  ],
+  "rollback_master_ids": [
+    "34bf9dbc-435b-4fb4-9e2f-44b9fb832971",
+    "433d947f-3920-4720-921c-487a43da2357",
+    "7318e42a-606a-4dca-ac1a-30996ea8734d",
+    "efba959a-7ed4-4cd5-ae79-d41f450ee26a",
+    "f6658f2c-2d5a-4703-b7d2-d2e22770ed29",
+    "f79ba0bb-d1c0-4acb-8085-13c20a526332"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "398cbe43456451db",
+      "n": 6,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "c6cfb68cc1255618",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 6,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 6 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

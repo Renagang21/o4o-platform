@@ -1,0 +1,123 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "탄산수소나트륨|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "22efa097-46a9-45c1-85fe-0067d8bc9d4b",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "탄산수소나트륨 500mg 정",
+  "coarseTotal": 14,
+  "target": 3,
+  "excluded": 11,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0a516990-431a-491b-92b8-d5f06b7c8736",
+      "name": "바이캅정(탄산수소나트륨)",
+      "reason": "비대상(fp 039b25aee00af323, bridge SSOT)"
+    },
+    {
+      "id": "1a02fba5-2986-4b65-8f64-c6f0e959634c",
+      "name": "발란시드정(탄산수소나트륨)",
+      "reason": "비대상(fp aed88c4a0344ed54, bridge SSOT)"
+    },
+    {
+      "id": "26025f55-8d9b-46c6-9b9b-8efe090553b5",
+      "name": "발란시드정(탄산수소나트륨)",
+      "reason": "비대상(fp aed88c4a0344ed54, bridge SSOT)"
+    },
+    {
+      "id": "5312415e-b304-4afa-a7c3-cf6756e28c64",
+      "name": "발란시드정(탄산수소나트륨)",
+      "reason": "비대상(fp aed88c4a0344ed54, bridge SSOT)"
+    },
+    {
+      "id": "6353433d-28da-4313-aff9-bfb2522850e1",
+      "name": "마이속정(탄산수소나트륨)",
+      "reason": "비대상(fp 6544da4e3f03845f, bridge SSOT)"
+    },
+    {
+      "id": "65461a50-d837-4014-b51b-28046f45640d",
+      "name": "타스나정(탄산수소나트륨)",
+      "reason": "비대상(fp ee9c4bb803154dc5, bridge SSOT)"
+    },
+    {
+      "id": "7c22ce32-53af-430b-8755-8cc7dcfe78c9",
+      "name": "바이캅정(탄산수소나트륨)",
+      "reason": "비대상(fp 039b25aee00af323, bridge SSOT)"
+    },
+    {
+      "id": "943373ba-28fd-4be9-b258-163ea0ca5fe3",
+      "name": "타스나정(탄산수소나트륨)",
+      "reason": "비대상(fp ee9c4bb803154dc5, bridge SSOT)"
+    },
+    {
+      "id": "adc96db8-7ffa-4155-8900-333807314d26",
+      "name": "마이속정(탄산수소나트륨)",
+      "reason": "비대상(fp 6544da4e3f03845f, bridge SSOT)"
+    },
+    {
+      "id": "f3c5023f-0533-46c6-be7f-eea9b76f705b",
+      "name": "마이속정(탄산수소나트륨)",
+      "reason": "비대상(fp 6544da4e3f03845f, bridge SSOT)"
+    },
+    {
+      "id": "f7b53b9d-d323-4201-81d1-de19445d70a5",
+      "name": "타스나정(탄산수소나트륨)",
+      "reason": "비대상(fp ee9c4bb803154dc5, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "08cc94b0-2b1c-4291-a22f-19a3714fff30",
+    "1f9efd40-24c6-401d-83f9-e72baf544023",
+    "87aab577-194b-48eb-b606-c0ae68df0c29"
+  ],
+  "rollback_master_ids": [
+    "08cc94b0-2b1c-4291-a22f-19a3714fff30",
+    "1f9efd40-24c6-401d-83f9-e72baf544023",
+    "87aab577-194b-48eb-b606-c0ae68df0c29"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "ff9d4a8ace54fd78",
+      "n": 3,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "039b25aee00af323",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "aed88c4a0344ed54",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6544da4e3f03845f",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ee9c4bb803154dc5",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 3,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 3 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

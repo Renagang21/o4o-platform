@@ -1,0 +1,94 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0736bb94-e8e1-414e-9387-2950ca90bc20",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "포도엽건조엑스 180mg 캡슐",
+  "coarseTotal": 7,
+  "target": 4,
+  "excluded": 3,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0bf2b6d0-91b2-4c4b-8f53-61e31cb84d22",
+      "name": "안페라캡슐(포도엽건조엑스)",
+      "reason": "비대상(fp 96911042c71a2d28, bridge SSOT)"
+    },
+    {
+      "id": "6fc135f2-8cbc-44dc-a6dc-355f7db6775f",
+      "name": "안페라캡슐(포도엽건조엑스)",
+      "reason": "비대상(fp 96911042c71a2d28, bridge SSOT)"
+    },
+    {
+      "id": "c00dd4eb-6c74-454d-9ce4-32c58f995ef3",
+      "name": "안페라캡슐(포도엽건조엑스)",
+      "reason": "비대상(fp 96911042c71a2d28, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "36d5aa00-2f5f-4049-85c4-576ce9f5cb40",
+    "38eff8ad-b6b9-464b-85fe-aa53af5807d1",
+    "5f0ceda9-8565-427d-8323-bf0a3feb5b4c",
+    "a9d39ea6-012c-4280-a891-b1db8807feec"
+  ],
+  "rollback_master_ids": [
+    "36d5aa00-2f5f-4049-85c4-576ce9f5cb40",
+    "38eff8ad-b6b9-464b-85fe-aa53af5807d1",
+    "5f0ceda9-8565-427d-8323-bf0a3feb5b4c",
+    "a9d39ea6-012c-4280-a891-b1db8807feec"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "96911042c71a2d28",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "b461802e5a1b7cb8",
+      "n": 4,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 4,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 4,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 4,
+  "htmlLen": 1569,
+  "contentHash": "70382e05e0595ceaa88c214af748c3d2",
+  "summary": "포도엽건조엑스 180mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 4,
+      "STEP_B_easy_canonical_demote": 4,
+      "STEP_B_authored_canonical_flip": 4,
+      "total": 12
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 4,
+      "total": 4
+    },
+    "grand_total": 16
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 4",
+    "policy_2A": "audit 2/master = 8 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "탄산수소나트륨|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "22efa097-46a9-45c1-85fe-0067d8bc9d4b",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 3,
+  "targetMasters": 3,
+  "anomalies": [],
+  "koCanonical": 3,
+  "existingEnAny": 3,
+  "existingEnCanonical": 3,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "fbf84af8390aa8e3b0981565a7fe7fe7",
+      "n": 8
+    }
+  ],
+  "builtLen": 2695,
+  "builtMd5": "fbf84af8390aa8e3b0981565a7fe7fe7",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_en_canonical_flip": 3,
+    "en_write_total": 6
+  },
+  "enTargetMd5": "fbf84af8390aa8e3b0981565a7fe7fe7",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(fbf84af8390aa8e3b0981565a7fe7fe7) — write 0, 정상 종료"
+}

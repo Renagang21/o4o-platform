@@ -1,0 +1,154 @@
+{
+  "wo": "WO-O4O-OTC-KO-EN-BUNDLE-RUNNER-HARDENING-DA-V1",
+  "bundleKey": "track-a-3h-ga",
+  "mode": "APPLY",
+  "writeOwner": "agent-ga",
+  "groupOrder": [
+    "ga-은행엽건조엑스-80mg-정",
+    "ga-세티리진염산염-10mg-연질캡슐",
+    "ga-포도엽건조엑스-180mg-캡슐",
+    "ga-탄산수소나트륨-500mg-정"
+  ],
+  "groupCount": 4,
+  "dbWrite": 1,
+  "groups": [
+    {
+      "groupKey": "ga-은행엽건조엑스-80mg-정",
+      "writeOwner": "agent-ga",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 6,
+      "excluded": 4,
+      "otherFp": 0,
+      "koWritePlan": {
+        "spd": 18,
+        "audit": 6,
+        "total": 24
+      },
+      "koWriteActual": {
+        "spd": 18,
+        "audit": 6,
+        "total": 24
+      },
+      "enWritePlan": {
+        "total": 12
+      },
+      "enWriteActual": {
+        "persist": 6,
+        "flip": 6,
+        "total": 12
+      },
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "ga-세티리진염산염-10mg-연질캡슐",
+      "writeOwner": "agent-ga",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 4,
+      "excluded": 19,
+      "otherFp": 0,
+      "koWritePlan": {
+        "spd": 12,
+        "audit": 4,
+        "total": 16
+      },
+      "koWriteActual": {
+        "spd": 12,
+        "audit": 4,
+        "total": 16
+      },
+      "enWritePlan": {
+        "total": 8
+      },
+      "enWriteActual": {
+        "persist": 4,
+        "flip": 4,
+        "total": 8
+      },
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "ga-포도엽건조엑스-180mg-캡슐",
+      "writeOwner": "agent-ga",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 4,
+      "excluded": 3,
+      "otherFp": 0,
+      "koWritePlan": {
+        "spd": 12,
+        "audit": 4,
+        "total": 16
+      },
+      "koWriteActual": {
+        "spd": 12,
+        "audit": 4,
+        "total": 16
+      },
+      "enWritePlan": {
+        "total": 8
+      },
+      "enWriteActual": {
+        "persist": 4,
+        "flip": 4,
+        "total": 8
+      },
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    },
+    {
+      "groupKey": "ga-탄산수소나트륨-500mg-정",
+      "writeOwner": "agent-ga",
+      "koStatus": "ALREADY_UPGRADED",
+      "enStatus": "ALREADY_COMPLETE",
+      "status": "ALREADY_COMPLETE",
+      "target": 3,
+      "excluded": 11,
+      "otherFp": 0,
+      "koWritePlan": {
+        "spd": 9,
+        "audit": 3,
+        "total": 12
+      },
+      "koWriteActual": {
+        "spd": 9,
+        "audit": 3,
+        "total": 12
+      },
+      "enWritePlan": {
+        "total": 6
+      },
+      "enWriteActual": {
+        "persist": 3,
+        "flip": 3,
+        "total": 6
+      },
+      "disposition": null,
+      "reason": null,
+      "anomalies": []
+    }
+  ],
+  "totals": {
+    "koPlan": 68,
+    "koActual": 68,
+    "enPlan": 34,
+    "enActual": 34,
+    "planTotal": 102,
+    "actualTotal": 102
+  },
+  "bundleStatus": "COMPLETED",
+  "abortedAt": null,
+  "abortReason": null,
+  "statusCounts": {
+    "ALREADY_COMPLETE": 4
+  }
+}
