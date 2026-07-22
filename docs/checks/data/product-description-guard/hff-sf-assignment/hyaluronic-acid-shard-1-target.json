@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "18e7dafd-1497-45df-9eb9-e2e5062e5042",
+  "productName": "아쿠아뷰티",
+  "productNameEn": "아쿠아뷰티",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020305",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산(제2008-37호)]피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급)",
+   "baseStandard": "성상 : 이미, 이취가 없고 고유의 향미를 가진 미황색의 내용물을 함유한 밝은 노란색의 투명연질캡슐\r\n히알루론산 : 표시량(120mg/1000mg)의 80~120%\r\n    납    : 5.0이하(mg/kg)\r\n카드뮴 : 2.0이하(mg/kg)\r\n총수은 : 2.0이하(mg/kg)\r\n총비소 : 2.0이하(mg/kg)\r\n대장균군 : 음성\r\n붕해  : 20분이하",
+   "intake": "1일 2회, 1회 1캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "[히알루론산(제2008-37호)]①임산부와 수유기 여성은 섭취를 피하는 것이 좋습니다.②알레르기 및 특이체질, 질병치료 중인 사람은 섭취를 피하는 것이 좋습니다.\r\n① 본 제품은 섭취자의 신체 상태에 따라 반응에 차이가 있을수 있습니다.\r\n② 유통기한이 경과된 제품은 섭취하지 마시기 바랍니다.\r\n③ 제품 개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의 하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미를 가진 미황색의 내용물를 함유한 밝은 노란색의 투명연질캡슐",
+   "storage": "직사광선을 피하여 습기가 적은 서늘한 곳에 보관하여 주십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>아쿠아뷰티<small>히알루론산</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미를 가진 미황색의 내용물을 함유한 밝은 노란색의 투명연질캡슐 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급)</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미를 가진 미황색의 내용물을 함유한 밝은 노란색의 투명연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 습기가 적은 서늘한 곳에 보관하여 주십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>아쿠아뷰티<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미를 가진 미황색의 내용물을 함유한 밝은 노란색의 투명연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 습기가 적은 서늘한 곳에 보관하여 주십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "20fe7940-3542-41d7-8248-5300b43c3e1f",
+  "productName": "히알루론산",
+  "productNameEn": "히알루론산",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052400",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] ① 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제\n② 히알루론산 : 표시량(120mg / 900mg)의 80 ~ 120%\n③ 납(mg/kg) : 2.0 이하\n④ 카드뮴(mg/kg) : 0.5 이하\n⑤ 수은(mg/kg) : 0.5 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 60분이내",
+   "intake": "1일 2회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>히알루론산<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · 2 times a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "2ba6004b-ea0a-475d-ac98-175e8bfc8224",
+  "productName": "RU HYROTHIONE",
+  "productNameEn": "RU HYROTHIONE",
+  "manufacturer": "주식회사  에이치엔웨이",
+  "manufacturerEn": null,
+  "statementNo": "2018001231066",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미.이취가 없는 흰색의 장방형 정제\n히알루론산 : 표시량(150mg/1000mg)의 80~120%\n납(mg/kg) : 2.0 이하\n카드뮴(mg/kg) : 0.5 이하\n수은(mg/kg) : 0.5 이하\n비소(mg/kg) : 1.0 이하\n붕해시험 : 30분 이내 \n대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정 (1000mg)을 물과 함께 섭취하십시오.",
+   "caution": "제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n영유아 및 임산부는 제품을 드시기 전 의사와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없는 흰색의 장방형 정제",
+   "storage": "직사광선을 피하는 건조하고 서늘한 곳에 보관ㆍ유통, 어린이의 손에 닿지 않도록 주의하시기 바립니다.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>RU HYROTHIONE<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사  에이치엔웨이 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 흰색의 장방형 정제 · 주식회사  에이치엔웨이 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 흰색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하는 건조하고 서늘한 곳에 보관ㆍ유통, 어린이의 손에 닿지 않도록 주의하시기 바립니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>RU HYROTHIONE<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사  에이치엔웨이 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사  에이치엔웨이</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 흰색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하는 건조하고 서늘한 곳에 보관ㆍ유통, 어린이의 손에 닿지 않도록 주의하시기 바립니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "336c5ff3-a60f-47e2-b88c-9f8066f59304",
+  "productName": "히알루론산 스킨",
+  "productNameEn": "히알루론산 스킨",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351927",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 점도가 있는 내용물을 함유한 분홍색의 장방형 연질캡슐\n2. 히알루론산 : 표시량(120mg/700mg)의 80~120%  \n3. 납(mg/kg) : 2.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 붕해시험 : 20분이내\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 점도가 있는 내용물을 함유한 분홍색의 장방형 연질캡슐",
+   "storage": "실온/ 1) 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>히알루론산 스킨<small>히알루론산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 점도가 있는 내용물을 함유한 분홍색의 장방형 연질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 점도가 있는 내용물을 함유한 분홍색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>히알루론산 스킨<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 점도가 있는 내용물을 함유한 분홍색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1) 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2) 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "49a9c103-22c5-442e-aa29-6def72cfd5fa",
+  "productName": "데이셀 프리미엄 퓨어 히알루론산",
+  "productNameEn": "데이셀 프리미엄 퓨어 히알루론산",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832324",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산]\n피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 회황색 또는 흐린 황갈색의 내용물을 함유한 노란색의 타원형 연질캡슐\n(2) 히알루론산 : 표시량(130 mg/1,200 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 2.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 회황색 또는 흐린 황갈색의 내용물을 함유한 노란색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>데이셀 프리미엄 퓨어 히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 회황색 또는 흐린 황갈색의 내용물을 함유한 노란색의 타원형 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 회황색 또는 흐린 황갈색의 내용물을 함유한 노란색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>데이셀 프리미엄 퓨어 히알루론산<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 회황색 또는 흐린 황갈색의 내용물을 함유한 노란색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "576689c8-8ade-4f0d-8486-6fd21bc0d5e8",
+  "productName": "세이헬스 히알루론산",
+  "productNameEn": "세이헬스 히알루론산",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061188",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산]\n피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이를 함유한 하얀색의 장방형 제피정제\n2) 히알루론산 : 표시량 (120mg/650mg)의 80~120%\n3) 납(mg/kg) : 2.0이하\n4) 카드뮴(mg/kg) : 0.5이하\n5) 수은(mg/kg) : 0.5이하\n6) 비소(mg/kg) : 1.0이하\n7) 붕해 : 60분 이내\n8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이를 함유한 하얀색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>세이헬스 히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이를 함유한 하얀색의 장방형 제피정제 · (주)알피바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이를 함유한 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>세이헬스 히알루론산<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이를 함유한 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "758459ae-1610-455c-a2b6-8f2b5790c771",
+  "productName": "세러비 뷰티업",
+  "productNameEn": "세러비 뷰티업",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "2011002009924",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산(제2008-37호)]피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급)\r\n피부보습에 도움을 줄 수 있음(생리활성등급 2등급)\r\n피부보습에 도움을 줄 수 있음(생리활성등급 2등급)",
+   "baseStandard": "1) 성상: 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함\r\n2) 히알루론산 : 표시량(120mg/900mg) 80~120%\r\n3) 대장균군 : 음성\r\n4) 붕해시험 : 적합\r\n5) 중금속\r\n  납(mg/kg):5.0이하\r\n  카드뮴(mg/kg):2.0이하\r\n  총수은(mg/kg):2.0이하\r\n  총비소(mg/kg):2.0이하",
+   "intake": "1일 2회, 1회 1정씩 섭취하십시오.",
+   "caution": "[히알루론산(제2008-37호)]①임산부와 수유기 여성은 섭취를 피하는 것이 좋습니다.②알레르기 및 특이체질, 질병치료 중인 사람은 섭취를 피하는 것이 좋습니다.\r\n- 알레르기 및 특이체질, 질병을 치료중인 사람은 섭취를 피하시는 것이 좋습니다.\r\n - 임산부와 수유기 여성은 섭취를 피하시는 것이 좋습니다.\r\n - 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.",
+   "dosageForm": "이미. 이취가 없고 고유의 향미가 있는 분홍색의 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.\r\n고온다습한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>세러비 뷰티업<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미, 이취가 없어야 함 · 주식회사 아리너스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급) 피부보습에 도움을 줄 수 있음(생리활성등급 2등급) 피부보습에 도움을 줄 수 있음(생리활성등급 2등급)</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>세러비 뷰티업<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 2 times a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "9981f8f5-d5f5-4cd6-85e6-4876c01abc25",
+  "productName": "헬퓨 히알루론산",
+  "productNameEn": "헬퓨 히알루론산",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007729",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 연한 청록색의 타원형 연질캡슐\n2. 히알루론산 : 표시량(120mg/500mg)의 80~120%\n3. 납(mg/kg) : 2.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 적합 (캡슐 : 20분 이내 붕해)",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 연한 청록색의 타원형 연질캡슐",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>헬퓨 히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 연한 청록색의 타원형 연질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 연한 청록색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>헬퓨 히알루론산<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 연한 청록색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "9bb52ca3-b5de-44bb-a3bc-7f140d99fd32",
+  "productName": "Dr.LB AQUA-IN PLUS+",
+  "productNameEn": "Dr.LB AQUA-IN PLUS+",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832182",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산]\n피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미·이취가 없는 흐린 노란색 또는 회황색의 내용물을 \n함유한 하얀색의 타원형 연질캡슐\n(2) 히알루론산 : 표시량(120 mg/1,200 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 2.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흐린 노란색 또는 회황색의 내용물을 함유한 하얀색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>Dr.LB AQUA-IN PLUS+<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흐린 노란색 또는 회황색의 내용물을 함유한 하얀색의 타원형 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흐린 노란색 또는 회황색의 내용물을 함유한 하얀색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>Dr.LB AQUA-IN PLUS+<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흐린 노란색 또는 회황색의 내용물을 함유한 하얀색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "b16a8c8d-3e99-409e-ad3e-571918dae493",
+  "productName": "My moisture 마이 모이스쳐",
+  "productNameEn": "My moisture 마이 모이스쳐",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007492",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 원형 츄어블 정제\n2. 히알루론산 : 표시량(120 mg/6,000 mg)의 80~120%\n3. 납(mg/kg) : 2.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg)：0.5 이하\n6. 비소(mg/kg) :1.0 이하\n7. 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1포(2정)를 입안에서 녹이거나 씹어서 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 원형 츄어블 정제",
+   "storage": "- 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>My moisture 마이 모이스쳐<small>히알루론산</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 3회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 원형 츄어블 정제 · (주)한풍네이처팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> - 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>My moisture 마이 모이스쳐<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · 3 times a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>3 times a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> - 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "b4d9ce0f-5a51-4407-9ec2-6f26fb339e1c",
+  "productName": "히알루론산",
+  "productNameEn": "히알루론산",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104239",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 이미, 이취가 없는 흰색의 장방형 제피 정제\n2. 붕해 : 60분 이내 적합\n3. 대장균군 : 음성\n4. 히알루론산 : 120 mg/700 mg(표시량의 80~120 %)\n5. 납 : 2.0이하\n6. 카드뮴: 0.5이하\n7. 수은: 0.5이하\n8. 비소: 1.0이하",
+   "intake": "1일 1회, 1회 2정을 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없는 흰색의 장방형 제피 정제",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 흰색의 장방형 제피 정제 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 흰색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>히알루론산<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 흰색의 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "cf022b17-7256-4832-af24-264e610e3c60",
+  "productName": "아쿠아 에이드",
+  "productNameEn": "아쿠아 에이드",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "manufacturerEn": null,
+  "statementNo": "200400200072923",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 햐양색 분말\n2) 히알루론산 : 표시량의 80~120% ( 표시량 : 120mg / 10g )\n3) 납(mg/kg) : 2.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(10g)를 물(500ml)에 타서 섭취하시기 바랍니다.",
+   "caution": "- 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n- 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 햐양색 분말",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아쿠아 에이드<small>히알루론산</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 햐양색 분말 · (주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 햐양색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아쿠아 에이드<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by (주)한국씨엔에스팜 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국씨엔에스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with skin moisturisation</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 햐양색 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

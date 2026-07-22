@@ -9,10 +9,12 @@ import { SF_INGREDIENTS } from './hff-sf-registry.js';
 import { composeSf, type SfSeed } from './hff-sf-compose.js';
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
-const ING = arg('ingredient'); const DIR = arg('dir');
+const ING = arg('ingredient'); const DIR = arg('dir'); const SHARD = arg('shard');
 if (!ING || !SF_INGREDIENTS[ING]) throw new Error('--ingredient 필요'); if (!DIR) throw new Error('--dir 필요');
 const ing = SF_INGREDIENTS[ING];
-const ready = JSON.parse(fs.readFileSync(path.join(DIR, `${ing.slug}-ready.json`), 'utf8')) as SfSeed[];
+const allReady = JSON.parse(fs.readFileSync(path.join(DIR, `${ing.slug}-ready.json`), 'utf8')) as Array<SfSeed & { shard: number }>;
+const ready: SfSeed[] = SHARD !== '' ? allReady.filter((r) => r.shard === parseInt(SHARD, 10)) : allReady;
+const outSuffix = SHARD !== '' ? `-shard-${SHARD}-target` : '-target';
 const target: unknown[] = []; const reviewLater: Array<{ statementNo: string; reason: string }> = [];
 let pass = 0, review = 0, blocked = 0, composeErr = 0; const reviewRules: Record<string, number> = {};
 for (const seed of ready) {
@@ -27,7 +29,7 @@ for (const seed of ready) {
   if (r.overallStatus === 'REVIEW_REQUIRED') { review++; for (const f of r.findings.filter((f) => f.status === 'REVIEW_REQUIRED')) reviewRules[f.ruleId] = (reviewRules[f.ruleId] ?? 0) + 1; reviewLater.push({ statementNo: seed.statementNo, reason: `REVIEW:${r.findings.filter((f) => f.status === 'REVIEW_REQUIRED').map((f) => f.ruleId).join(',')}` }); continue; }
   pass++; target.push(gi);
 }
-fs.writeFileSync(path.join(DIR, `${ing.slug}-target.json`), JSON.stringify(target, null, 1));
+fs.writeFileSync(path.join(DIR, `${ing.slug}${outSuffix}.json`), JSON.stringify(target, null, 1));
 console.log('JSON_SF_GEN_BEGIN');
-console.log(JSON.stringify({ ingredient: ing.key, ready: ready.length, PASS: pass, REVIEW: review, BLOCKED: blocked, composeErr, reviewRules }, null, 2));
+console.log(JSON.stringify({ ingredient: ing.key, shard: SHARD || 'all', ready: ready.length, PASS: pass, REVIEW: review, BLOCKED: blocked, composeErr, reviewRules }, null, 2));
 console.log('JSON_SF_GEN_END');
