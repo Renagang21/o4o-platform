@@ -1,0 +1,212 @@
+[
+ {
+  "candidateId": "sh1-g26-001",
+  "productName": "더쎈 마그네슘 440",
+  "productNameEn": "더쎈 마그네슘 440",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141730",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘] ①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n[비타민B12] 정상적인 엽산 대사에 필요\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 제피 정제\n2. 마그네슘 : 표시량(440 mg/1,200 mg)의 80~150%\n3. 비타민B12 : 표시량(2.4 ㎍/1,200 mg)의 80~180%\n4. 비타민B6 : 표시량(1.5 mg/1,200 mg)의 80~150%\n5. 비타민B1 : 표시량(1.2 mg/1,200 mg)의 80~180%\n6. 대장균군 : 음성\n7. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[비타민B12/비타민B1]\n①이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 440,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 440mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더쎈 마그네슘 440<small>마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(440mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 440mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>더쎈 마그네슘 440<small>Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>440mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>2.4μg</b> of Vitamin B12, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>440mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>2.4μg</b> Vitamin B12, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (440mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g26-002",
+  "productName": "솔가 마그네슘 위드 트리플 B (Magnesium with Triple B)",
+  "productNameEn": "솔가 마그네슘 위드 트리플 B (Magnesium with Triple B)",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352315",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘]\n①에너지 이용에 필요\n②신경과 근육 기능 유지에 필요\n\n[비타민B1]\n탄수화물과 에너지 대사에 필요\n\n[비타민B6]\n①단백질 및 아미노산 이용에 필요\n②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색 장방형 제피정제\n2. 마그네슘: 표시량(315mg/1200mg)의 80~150%\n3. 비타민B1 : 표시량(3.6mg/1200mg)의 80~180%\n4. 비타민B6 : 표시량(4.5mg/1200mg)의 80~150%\n5. 비타민 B12 : 표시량(7.2μg/1200mg)의 80~180%\n6. 붕해도 : 60분 이내\n7. 대장균군: 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n1) 임산부, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n2) 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\n3) 섭취량 및 섭취 방법을 확인한 후 섭취하십시오.\n4) 섭취 전에 소비기한을 확인 후 섭취하십시오. 또한 소비기한이 경과한 제품은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색 장방형 제피정제",
+   "storage": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2) 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 3.6mg</span><span class=\"sd-badge is-solid\">비타민 B12 7.2μg</span><span class=\"sd-badge is-solid\">비타민 B6 4.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>솔가 마그네슘 위드 트리플 B (Magnesium with Triple B)<small>마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>3.6mg</b>, 비타민 B12 <b>7.2μg</b>, 비타민 B6 <b>4.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>3.6mg</b>, 비타민 B12 <b>7.2μg</b>, 비타민 B6 <b>4.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색 장방형 제피정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(3.6mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(7.2μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(4.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2) 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 3.6mg</span><span class=\"sd-badge is-solid\">Vitamin B12 7.2μg</span><span class=\"sd-badge is-solid\">Vitamin B6 4.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>솔가 마그네슘 위드 트리플 B (Magnesium with Triple B)<small>Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>3.6mg</b> of Vitamin B1, <b>7.2μg</b> of Vitamin B12, <b>4.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>315mg</b> Magnesium, <b>3.6mg</b> Vitamin B1, <b>7.2μg</b> Vitamin B12, <b>4.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (3.6mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (7.2μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (4.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2) 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g26-003",
+  "productName": "더쎈 마그네슘 440",
+  "productNameEn": "더쎈 마그네슘 440",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211855",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘] (1) 에너지 이용에 필요, (2) 신경과 근육 기능 유지에 필요\n[비타민B12] (1) 정상적인 엽산 대사에 필요\n[비타민B6] (1) 단백질 및 아미노산 이용에 필요, (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제\n(2)마그네슘 : 표시량(440 mg/1,200 mg)의 80~150%\n(3)비타민B1 : 표시량(1.2 mg/1,200 mg)의 80~180%\n(4)비타민B6 : 표시량(1.5 mg/1,200 mg)의 80~150%\n(5)비타민B12 : 표시량(2.4 μg/1,200 mg)의 80~180%\n(6)붕해시험 : 60분 이내\n(7)대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(2) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제",
+   "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 440,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 440mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더쎈 마그네슘 440<small>마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(440mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 440mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>더쎈 마그네슘 440<small>Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>440mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>2.4μg</b> of Vitamin B12, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>440mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>2.4μg</b> Vitamin B12, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (440mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g26-004",
+  "productName": "더쎈 마그네슘 440",
+  "productNameEn": "더쎈 마그네슘 440",
+  "manufacturer": "(주)웰레스트",
+  "manufacturerEn": null,
+  "statementNo": "2023002928429",
+  "category": "hff",
+  "source": {
+   "mainFunction": "마그네슘 ① 에너지 이용에 필요 ② 신경과 근육 기능 유지에 필요\n비타민 B12 ① 정상적인 엽산 대사에 필요.\n비타민 B6 ① 단백질 및 아미노산 이용에 필요. ② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.\n비타민 B1 ① 탄수화물과 에너지 대사에 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제\n2) 마그네슘 : 표시량(440 mg/1,200mg)의 80~150%\n3) 비타민 B12 : 표시량(2.4 ug/1,200mg)의 80~180%\n4) 비타민 B6 : 표시량(1.5 mg/1,200mg)의 80~150%\n5) 비타민 B1 : 표시량(1.2 mg/1,200mg)의 80~180%\n6) 대장균군 : 음성\n7) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n2) 실리카겔은 섭취하지 마십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제",
+   "storage": "직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 440,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 440mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더쎈 마그네슘 440<small>마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6</small></h1><p class=\"sd-meta\">(주)웰레스트 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>440mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>1.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · (주)웰레스트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(440mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 440mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>더쎈 마그네슘 440<small>Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by (주)웰레스트 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>440mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>2.4μg</b> of Vitamin B12, <b>1.5mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>440mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>2.4μg</b> Vitamin B12, <b>1.5mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)웰레스트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (440mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g26-005",
+  "productName": "뉴트리파마 트리플 파워 마그네슘",
+  "productNameEn": "뉴트리파마 트리플 파워 마그네슘",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021617",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n[비타민B1]①탄수화물과 에너지 대사에 필요\n\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B12]①정상적인 엽산 대사에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 제피정제\n②비타민B1 : 표시량(1.2mg/850mg)의 80 ~ 180% \n③비타민B6 : 표시량(50mg/850mg)의 80 ~ 150%\n④비타민B12 : 표시량(2.4㎍/850mg)의 80 ~ 180%\n⑤마그네슘 : 표시량(250mg/850mg)의 80 ~ 150%\n⑥대장균군 : 음성\n⑦붕해시험 : 물 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "- 알레르기 체질이신 경우 원료 성분을 확인 후 섭취하십시오.\n- 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n- 이상사례 발생시 섭취를 중단하고 전문가와 상담 할 것\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 제피정제",
+   "storage": "① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 250,
+    "unit": "mg",
+    "basisAmount": 850,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 250mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">비타민 B6 50mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트리파마 트리플 파워 마그네슘<small>마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>250mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>50mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>250mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B12 <b>2.4μg</b>, 비타민 B6 <b>50mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(250mg/850mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/850mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/850mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(50mg/850mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B12 · 비타민 B6 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 250mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Vitamin B6 50mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트리파마 트리플 파워 마그네슘<small>Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>250mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>2.4μg</b> of Vitamin B12, <b>50mg</b> of Vitamin B6 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>250mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>2.4μg</b> Vitamin B12, <b>50mg</b> Vitamin B6</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (250mg / 850mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (50mg / 850mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B12 · Vitamin B6 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

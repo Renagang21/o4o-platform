@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "sh1-g69-001",
+  "productName": "마이타민",
+  "productNameEn": "마이타민",
+  "manufacturer": "주식회사 아리너스",
+  "manufacturerEn": null,
+  "statementNo": "20110020099134",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1]탄수화물과 에너지 대사에 필요\n[비타민B2]체내 에너지 생성에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요\n②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[나이아신]체내 에너지 생성에 필요\n[판토텐산]지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[아연]①정상적인 면역기능에 필요\n②정상적인 세포분열에 필요",
+   "baseStandard": "1)성상 : 이미. 이취가 없는 노란색의 겔\n2)비타민B1 :  표시량(1.2mg/40g)의 80~180%\n3)비타민B2 :  표시량(1.5mg/40g)의 80~180%\n4)나이아신 :  표시량(15mg/40g)의 80~150%\n5)판토텐산 : 표시량(5mg/40g)의 80~180%\n6)비타민B6 :  표시량(1.5mg/40g)의 80~150%\n7)아연 : 표시량(2.8mg/40g)의 80~180%\n8)대장균군 :음성",
+   "intake": "1일 2회,  1회당 20g을 섭취한다.",
+   "caution": "",
+   "dosageForm": "이미. 이취가 없는 노란색의 겔",
+   "storage": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 15,
+    "unit": "mg",
+    "basisAmount": 40,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": null,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 15mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.5mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">아연 2.8mg</span><span class=\"sd-badge is-solid\">판토텐산 5mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>마이타민<small>나이아신 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 아연 · 판토텐산</small></h1><p class=\"sd-meta\">주식회사 아리너스 제조 · 1일 2회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>15mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.5mg</b>, 비타민 B6 <b>1.5mg</b>, 아연 <b>2.8mg</b>, 판토텐산 <b>5mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회 섭취로 나이아신 <b>15mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.5mg</b>, 비타민 B6 <b>1.5mg</b>, 아연 <b>2.8mg</b>, 판토텐산 <b>5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미. 이취가 없는 노란색의 겔 · 주식회사 아리너스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(15mg/40g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/40g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.5mg/40g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/40g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.8mg/40g)의 80~180%</div><div class=\"sd-item\"><b>판토텐산</b> 표시량(5mg/40g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미. 이취가 없는 노란색의 겔</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터2년</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 아연 · 판토텐산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 15mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Zinc 2.8mg</span><span class=\"sd-badge is-solid\">Pantothenic acid 5mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>마이타민<small>Niacin · Vitamin B1 · Vitamin B2 · Vitamin B6 · Zinc · Pantothenic acid</small></h1><p class=\"sd-meta\">Made by 주식회사 아리너스 · 2 times a day</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>15mg</b> of Niacin, <b>1.2mg</b> of Vitamin B1, <b>1.5mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>2.8mg</b> of Zinc, <b>5mg</b> of Pantothenic acid as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day: <b>15mg</b> Niacin, <b>1.2mg</b> Vitamin B1, <b>1.5mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>2.8mg</b> Zinc, <b>5mg</b> Pantothenic acid</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 아리너스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Pantothenic acid</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (15mg / 40g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.5mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 40g), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.8mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (5mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미. 이취가 없는 노란색의 겔</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터2년</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin B1 · Vitamin B2 · Vitamin B6 · Zinc · Pantothenic acid together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

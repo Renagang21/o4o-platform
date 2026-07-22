@@ -1,0 +1,86 @@
+[
+ {
+  "candidateId": "sh1-g62-001",
+  "productName": "팝핑 프리미엄비타C",
+  "productNameEn": "팝핑 프리미엄비타C",
+  "manufacturer": "일양약품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017068239",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] \n(가) 결합조직 형성과 기능유지에 필요\n(나) 철의 흡수에 필요\n(다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B2] 체내 에너지 생성에 필요 \n[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 입자성이 있는 분말\n2) 비타민D : 표시량(5 μg/ 2g)의 80~180% \n3) 비타민B2 : 표시량(0.7 mg/ 2g)의 80~180%\n4) 비타민C : 표시량(250 mg/ 2g)의 80~150%\n5) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 입안에서 녹여 섭취하십시오.",
+   "caution": "1. 과량 섭취하지 않도록 주의하십시오.\n2. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.\n3. 어린이가 섭취할 때는 보호자의 관리 감독하에 주의하여 섭취시켜 주십시오.\n4. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n5. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n6. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n7. 흡습의 우려가 있으니 개봉한 제품은 바로 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 입자성이 있는 분말",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.7,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>팝핑 프리미엄비타C<small>비타민 B2 · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">일양약품(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>0.7mg</b>, 비타민 C <b>250mg</b>, 비타민 D <b>5μg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>0.7mg</b>, 비타민 C <b>250mg</b>, 비타민 D <b>5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 입자성이 있는 분말 · 일양약품(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/2g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin C 250mg</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>팝핑 프리미엄비타C<small>Vitamin B2 · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 일양약품(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.7mg</b> of Vitamin B2, <b>250mg</b> of Vitamin C, <b>5μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.7mg</b> Vitamin B2, <b>250mg</b> Vitamin C, <b>5μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 일양약품(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (250mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 2g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g62-002",
+  "productName": "트리밀데이즈 톡톡C 비타팝스틱",
+  "productNameEn": "트리밀데이즈 톡톡C 비타팝스틱",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141931",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B2] 체내 에너지 생성에 필요\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요 ③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란색의 분말\n2. 비타민C: 표시량(250 mg/2 g)의 80~150%\n3. 비타민B2: 표시량(0.7 mg/2 g)의 80~180%\n4. 비타민D: 표시량(5 μg/2 g)의 80~180%\n5. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "[비타민B2] \n1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D]\n2. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.7,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트리밀데이즈 톡톡C 비타팝스틱<small>비타민 B2 · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>0.7mg</b>, 비타민 C <b>250mg</b>, 비타민 D <b>5μg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>0.7mg</b>, 비타민 C <b>250mg</b>, 비타민 D <b>5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/2g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin C 250mg</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>트리밀데이즈 톡톡C 비타팝스틱<small>Vitamin B2 · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.7mg</b> of Vitamin B2, <b>250mg</b> of Vitamin C, <b>5μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.7mg</b> Vitamin B2, <b>250mg</b> Vitamin C, <b>5μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (250mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 2g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

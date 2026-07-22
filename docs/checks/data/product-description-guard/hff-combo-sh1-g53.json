@@ -1,0 +1,128 @@
+[
+ {
+  "candidateId": "sh1-g53-001",
+  "productName": "자녀사랑 멀티비타민-O(오렌지맛)",
+  "productNameEn": "자녀사랑 멀티비타민-O(오렌지맛)",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020144",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n①유해산소로부터 세포를 보호하는데 필요\r\n①체내 에너지 생성에 필요\r\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n①체내 에너지 생성에 필요\r\n①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요",
+   "baseStandard": "1.성상: 연한 미황색을 띤 원형의 정제\n2.비타민A: 300ugRE/12g의 80~150%\n3. 비타민B2: 0.7mg/12g의 80~180%\n4. 나이아신: 7.5mg/12g의 80~150%\n5. 비타민C: 600mg/12g의 80~150%\n6. 비타민D: 2.5ug/12g의 80~180%\n7. 비타민E: 8ma-TE/12g의 80~150%\n8.대장균군: 음성",
+   "intake": "1일 3회 1회2정씩 씹어서 섭취",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n② 제품을 개봉할 때 혹 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.",
+   "dosageForm": "연한미황색을 띤 원형의 정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7.5,
+    "unit": "mg",
+    "basisAmount": 12,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 7.5mg</span><span class=\"sd-badge is-solid\">비타민 A 300μg</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 C 600mg</span><span class=\"sd-badge is-solid\">비타민 D 2.5μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>자녀사랑 멀티비타민-O(오렌지맛)<small>나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연한미황색을 띤 원형의 정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(7.5mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(300μg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/12g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(600mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(2.5μg/12g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 7.5mg</span><span class=\"sd-badge is-solid\">Vitamin A 300μg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin C 600mg</span><span class=\"sd-badge is-solid\">Vitamin D 2.5μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>자녀사랑 멀티비타민-O(오렌지맛)<small>Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>7.5mg</b> of Niacin, <b>300μg</b> of Vitamin A, <b>0.7mg</b> of Vitamin B2, <b>600mg</b> of Vitamin C, <b>2.5μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 tablets): <b>7.5mg</b> Niacin, <b>300μg</b> Vitamin A, <b>0.7mg</b> Vitamin B2, <b>600mg</b> Vitamin C, <b>2.5μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (7.5mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (300μg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 12g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (600mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (2.5μg / 12g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g53-002",
+  "productName": "자녀사랑 멀티비타민-S(딸기맛)",
+  "productNameEn": "자녀사랑 멀티비타민-S(딸기맛)",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020143",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n①유해산소로부터 세포를 보호하는데 필요\r\n①체내 에너지 생성에 필요\r\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n①체내 에너지 생성에 필요\r\n①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요",
+   "baseStandard": "1.성상: 연한 미황색을 띤 원형의 정제\n2.비타민A: 300ugRE/12g의 80~150%\n3. 비타민B2: 0.7mg/12g의 80~180%\n4. 나이아신: 7.5mg/12g의 80~150%\n5. 비타민C: 600mg/12g의 80~150%\n6. 비타민D: 2.5ug/12g의 80~180%\n7. 비타민E: 8ma-TE/12g의 80~150%\n8.대장균군: 음성",
+   "intake": "1일 3회 1회2정씩 씹어서 섭취",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n② 제품을 개봉할 때 혹 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.",
+   "dosageForm": "연한미황색을 띤 원형의 정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7.5,
+    "unit": "mg",
+    "basisAmount": 12,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 7.5mg</span><span class=\"sd-badge is-solid\">비타민 A 300μg</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 C 600mg</span><span class=\"sd-badge is-solid\">비타민 D 2.5μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>자녀사랑 멀티비타민-S(딸기맛)<small>나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연한미황색을 띤 원형의 정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(7.5mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(300μg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/12g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(600mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(2.5μg/12g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 7.5mg</span><span class=\"sd-badge is-solid\">Vitamin A 300μg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin C 600mg</span><span class=\"sd-badge is-solid\">Vitamin D 2.5μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>자녀사랑 멀티비타민-S(딸기맛)<small>Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>7.5mg</b> of Niacin, <b>300μg</b> of Vitamin A, <b>0.7mg</b> of Vitamin B2, <b>600mg</b> of Vitamin C, <b>2.5μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 tablets): <b>7.5mg</b> Niacin, <b>300μg</b> Vitamin A, <b>0.7mg</b> Vitamin B2, <b>600mg</b> Vitamin C, <b>2.5μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (7.5mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (300μg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 12g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (600mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (2.5μg / 12g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g53-003",
+  "productName": "자녀사랑멀티비타민-G(포도맛)",
+  "productNameEn": "자녀사랑멀티비타민-G(포도맛)",
+  "manufacturer": "엠에스바이오텍(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020020142",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n①유해산소로부터 세포를 보호하는데 필요\r\n①체내 에너지 생성에 필요\r\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\r\n①체내 에너지 생성에 필요\r\n①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요",
+   "baseStandard": "1.성상: 연한 미황색을 띤 원형의 정제\n2.비타민A: 300ugRE/12g의 80~150%\n3. 비타민B2: 0.7mg/12g의 80~180%\n4. 나이아신: 7.5mg/12g의 80~150%\n5. 비타민C: 600mg/12g의 80~150%\n6. 비타민D: 2.5ug/12g의 80~180%\n7. 비타민E: 8ma-TE/12g의 80~150%\n8.대장균군: 음성",
+   "intake": "1일 3회 1회2정씩 씹어서 섭취",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n② 제품을 개봉할 때 혹 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.",
+   "dosageForm": "연한미황색을 띤 원형의 정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 7.5,
+    "unit": "mg",
+    "basisAmount": 12,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 7.5mg</span><span class=\"sd-badge is-solid\">비타민 A 300μg</span><span class=\"sd-badge is-solid\">비타민 B2 0.7mg</span><span class=\"sd-badge is-solid\">비타민 C 600mg</span><span class=\"sd-badge is-solid\">비타민 D 2.5μg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>자녀사랑멀티비타민-G(포도맛)<small>나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 나이아신 <b>7.5mg</b>, 비타민 A <b>300μg</b>, 비타민 B2 <b>0.7mg</b>, 비타민 C <b>600mg</b>, 비타민 D <b>2.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연한미황색을 띤 원형의 정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(7.5mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(300μg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.7mg/12g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(600mg/12g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(2.5μg/12g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 A · 비타민 B2 · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 7.5mg</span><span class=\"sd-badge is-solid\">Vitamin A 300μg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.7mg</span><span class=\"sd-badge is-solid\">Vitamin C 600mg</span><span class=\"sd-badge is-solid\">Vitamin D 2.5μg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>자녀사랑멀티비타민-G(포도맛)<small>Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 엠에스바이오텍(주) · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>7.5mg</b> of Niacin, <b>300μg</b> of Vitamin A, <b>0.7mg</b> of Vitamin B2, <b>600mg</b> of Vitamin C, <b>2.5μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 tablets): <b>7.5mg</b> Niacin, <b>300μg</b> Vitamin A, <b>0.7mg</b> Vitamin B2, <b>600mg</b> Vitamin C, <b>2.5μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엠에스바이오텍(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (7.5mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (300μg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.7mg / 12g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (600mg / 12g), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (2.5μg / 12g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 연한미황색을 띤 원형의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin A · Vitamin B2 · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

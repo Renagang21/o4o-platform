@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "sh1-g5-001",
+  "productName": "올바른 마그네슘 비타민B",
+  "productNameEn": "올바른 마그네슘 비타민B",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211441",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘] ①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n[셀렌] ①유해산소로부터 세포를 보호하는데 필요\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] ①탄수화물과 에너지 대사에 필요\n[비타민B2] ①체내 에너지 생성에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 분홍빛 하양색 장방형 제피정제\n②마그네슘 : 표시량(315 mg/ 800mg)의 80~150%\n③셀렌 : 표시량(55 μg/800 mg)의 80~150%\n④비타민B6 : 표시량(1.5 mg/800 mg)의 80~150%\n⑤비타민B1 : 표시량(1.2 mg/800 mg)의 80~180%\n⑥비타민B2 : 표시량(1.4 mg/800 mg)의 80~180%\n⑦대장균군 : 음성\n⑧붕해도 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 분홍빛 하양색 장방형 제피정제",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>올바른 마그네슘 비타민B<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 분홍빛 하양색 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 분홍빛 하양색 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오 ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>올바른 마그네슘 비타민B<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>315mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 분홍빛 하양색 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오 ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-002",
+  "productName": "마그네슘 에너지 부스트",
+  "productNameEn": "마그네슘 에너지 부스트",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104318",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 에너지 이용에 필요 (2) 신경과 근육 기능 유지에 필요\n(1) 유해산소로부터 세포를 보호하는데 필요\n(1) 단백질 및 아미노산 이용에 필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n(1) 탄수화물과 에너지 대사에 필요\n(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 타원형 제피정제\n2.붕해 : 물을 시험액으로 60분 이내 적합\n3.대장균군 : 음성\n4.마그네슘 : 표시량(378 mg / 1,300 mg)의 80~150%\n5.셀렌 : 표시량(55 µg / 1,300 mg)의 80~150%\n6.비타민 B6 : 표시량(1.5 mg / 1,300 mg)의 80~150%\n7.비타민 B1 : 표시량(1.2 mg / 1,300 mg)의 80~180%\n8.비타민 B2 : 표시량(1.4 mg / 1,300 mg)의 80~180%",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 타원형 제피정제",
+   "storage": "실온보관 (1~35℃)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 378,
+    "unit": "mg",
+    "basisAmount": 1300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 378mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘 에너지 부스트<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>378mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>378mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 타원형 제피정제 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(378mg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1300mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1300mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 (1~35℃)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 378mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘 에너지 부스트<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>378mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>378mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (378mg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1300mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1300mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 (1~35℃)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-003",
+  "productName": "마그네슘315액티브콤플렉스",
+  "productNameEn": "마그네슘315액티브콤플렉스",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141413",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘] ① 에너지 이용에 필요 ② 신경과 근육 기능 유지에 필요\n[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B6] ① 단백질 및 아미노산 이용에 필요 ② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B2] 체내 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 회연두색의 장방형 제피정제\n② 마그네슘 : 표시량(315 mg/900 mg)의 80~150%\n③ 셀레늄(또는 셀렌) : 표시량(55 ㎍/900 mg)의 80~150%\n④ 비타민B1 : 표시량(1.2 mg/900 mg)의 80~180%\n⑤ 비타민B6 : 표시량(1.2 mg/900 mg)의 80~150%\n⑥ 비타민B2 : 표시량(1.2 mg/900 mg)의 80~180%\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[비타민B1/비타민B2]\n② 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 회연두색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 900,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.2mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘315액티브콤플렉스<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.2mg</b>, 비타민 B6 <b>1.2mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.2mg</b>, 비타민 B6 <b>1.2mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 밝은 회연두색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.2mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.2mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/900mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 밝은 회연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.2mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘315액티브콤플렉스<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.2mg</b> of Vitamin B2, <b>1.2mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>315mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.2mg</b> Vitamin B2, <b>1.2mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.2mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.2mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 밝은 회연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-004",
+  "productName": "마그네슘350플러스",
+  "productNameEn": "마그네슘350플러스",
+  "manufacturer": "(주)웰레스트",
+  "manufacturerEn": null,
+  "statementNo": "2023002928447",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 마그네슘 ① 에너지 이용에 필요 ② 신경과 근육 기능 유지에 필요\n2) 비타민B1 ① 탄수화물과 에너지 대사에 필요\n3) 비타민B2 ① 체내 에너지 생성에 필요\n4) 비타민B6 ① 단백질 및 아미노산 이용에 필요 ② 혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요\n5) 셀레늄 ① 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 분홍빛 하얀색의 장방형 정제\n마그네슘 : 표시량(350 mg/ 900mg)의 80~150%\n비타민B1 : 표시량(1.2 mg/ 900mg)의 80~180%\n비타민B2 : 표시량(1.4 mg/ 900mg)의 80~180%\n비타민B6 : 표시량(1.5 mg/ 900mg)의 80~150%\n셀레늄 : 표시량(55 μg/ 900mg)의 80~150%\n대장균군 : 음성\n붕해시험 : 30분 이내",
+   "intake": "1일 1회, 1회, 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n2) 실리카겔은 섭취하지 마십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 손발 따끔거림 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 분홍빛 하얀색의 장방형 정제",
+   "storage": "직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 350,
+    "unit": "mg",
+    "basisAmount": 900,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 350mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘350플러스<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">(주)웰레스트 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 분홍빛 하얀색의 장방형 정제 · (주)웰레스트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는 데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(350mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/900mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 분홍빛 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 350mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘350플러스<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by (주)웰레스트 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>350mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>350mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)웰레스트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (350mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 분홍빛 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-005",
+  "productName": "마그네슘350",
+  "productNameEn": "마그네슘350",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "200400151101085",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 정제\n2. 마그네슘 : 표시량(350㎎/900㎎)의 80~150%\n3. 셀레늄 : 표시량(55㎍/900㎎)의 80~150%\n4. 비타민B1 : 표시량(1.2㎎/900㎎)의 80~180%\n5. 비타민B2 : 표시량(1.4㎎/900㎎)의 80~180%\n6. 비타민B6 : 표시량(1.5㎎/900㎎)의 80~150%\n7. 붕해 : 적합(30분 이내)\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 350,
+    "unit": "mg",
+    "basisAmount": 900,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 350mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘350<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(350mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/900mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 350mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘350<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>350mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>350mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (350mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-006",
+  "productName": "마그네슘05",
+  "productNameEn": "마그네슘05",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083948",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 연노랑색의 타원형 정제.\n(2) 마그네슘 : 표시량(315mg/800mg)의 80~150%\n(3) 셀렌 :표시량(55㎍/800mg)의 80~150%\n(4) 비타민B1 : 표시량(1.2mg/800mg)의 80~180%\n(5) 비타민B2 : 표시량(1.4mg/800mg)의 80~180%\n(6) 비타민B6 : 표시량(1.5mg/800mg)의 80~150%\n(7) 대장균군 : 음성\n(8) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[비타민B1]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민B2]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n[비타민B6]\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연노랑색의 타원형 정제.",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘05<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연노랑색의 타원형 정제. · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/800mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연노랑색의 타원형 정제.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘05<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>315mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연노랑색의 타원형 정제.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-007",
+  "productName": "마그네슘350플러스",
+  "productNameEn": "마그네슘350플러스",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110971",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 주황색 점박이를 포함한 노랑 하양색의 장방형 정제\n2. 마그네슘 : 표시량(350㎎/900㎎)의 80~150%\n3. 셀레늄 : 표시량(55㎍/900㎎)의 80~150%\n4. 비타민B1 : 표시량(1.2㎎/900㎎)의 80~180%\n5. 비타민B2 : 표시량(1.4㎎/900㎎)의 80~180%\n6. 비타민B6 : 표시량(1.5㎎/900㎎)의 80~150%\n7. 붕해 : 적합(30분 이내)\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 주황색 점박이를 포함한 노랑 하양색의 장방형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 350,
+    "unit": "mg",
+    "basisAmount": 900,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 350mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마그네슘350플러스<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>350mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 주황색 점박이를 포함한 노랑 하양색의 장방형 정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(350mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/900mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/900mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/900mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 주황색 점박이를 포함한 노랑 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 350mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마그네슘350플러스<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>350mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>350mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (350mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 900mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 900mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 주황색 점박이를 포함한 노랑 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-008",
+  "productName": "파워 스피드 마그네슘 315",
+  "productNameEn": "파워 스피드 마그네슘 315",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007891",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마그네슘] 에너지 이용에 필요 / 신경과 근육 기능 유지에 필요\n[셀렌] 유해산소로부터 세포를 보호하는데 필요\n[비타민B6] 단백질 및 아미노산 이용에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제\n2. 마그네슘 : 표시량(315mg/850mg)의 80~150%\n3. 셀렌 : 표시량(55μg/850mg)의 80~150%\n4. 비타민B6 : 표시량(1.5mg/850mg)의 80~150%\n5. 비타민B1 : 표시량(1.2mg/850mg)의 80~180%\n6. 비타민B2 : 표시량(1.4mg/850mg)의 80~180%\n7. 대장균군 : 음성 \n8. 붕해 : 적합 (제피정제 : 60분 이내 붕해)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 850,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>파워 스피드 마그네슘 315<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/850mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/850mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/850mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/850mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/850mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>파워 스피드 마그네슘 315<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>315mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 850mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 850mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 850mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 850mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g5-009",
+  "productName": "먼슬리레시피 마그네슘",
+  "productNameEn": "먼슬리레시피 마그네슘",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023259",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민B1 : 탄수화물과 에너지 대사에 필요.\n2) 비타민B2 : 체내 에너지 생성에 필요.\n3) 비타민B6 : 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.\n4) 마그네슘 : 에너지 이용에 필요, 신경과 근육 기능 유지에 필요.\n5) 셀렌 : 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 젤리\n2) 비타민B1 : 표시량(1.2mg/40g)의 80~180%\n3) 비타민B2 : 표시량(1.4mg/40g)의 80~180%\n4) 비타민B6 : 표시량(1.5mg/40g)의 80~150%\n5) 마그네슘 : 표시량(315mg/40g)의 80~150%\n6) 셀렌 : 표시량(55ug/40g)의 80~150%\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2포(40g)를 씹어서 섭취하십시오. 1일 2회, 1회 1포(20g)를 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.  \n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오. \n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취 하십시오. \n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있고, 개봉 시 내용물이 흘러나올 수 있으므로 취급 시 주의하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 젤리",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 315,
+    "unit": "mg",
+    "basisAmount": 40,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 315mg</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>먼슬리레시피 마그네슘<small>마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 2포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2포) 섭취로 마그네슘 <b>315mg</b>, 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 셀레늄 <b>55μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 젤리 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2포</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(315mg/40g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/40g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/40g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/40g)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/40g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 마그네슘 · 비타민 B1 · 비타민 B2 · 비타민 B6 · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Magnesium 315mg</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>먼슬리레시피 마그네슘<small>Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 2 sachets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>315mg</b> of Magnesium, <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>55μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 sachets): <b>315mg</b> Magnesium, <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>55μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 sachets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Magnesium</b> labelled (315mg / 40g), 80~150%</div><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 40g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 40g), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 40g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 적갈색의 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Magnesium · Vitamin B1 · Vitamin B2 · Vitamin B6 · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

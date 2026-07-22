@@ -1,0 +1,86 @@
+[
+ {
+  "candidateId": "sh1-g27-001",
+  "productName": "생그린 셀렌 비타민C 프리미엄",
+  "productNameEn": "생그린 셀렌 비타민C 프리미엄",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "200400151101160",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰분홍색의 장방형 제피정제\n2. 비타민B1 : 표시량(0.72㎎/4,800㎎)의 80~180%\n3. 비타민B2 : 표시량(0.84㎎/4,800㎎)의 80~180%\n4. 비타민B6 : 표시량(0.9㎎/4,800㎎)의 80~150%\n5. 비타민C : 표시량(336㎎/4,800㎎)의 80~150%\n6. 아연 : 표시량(5.1㎎/4,800㎎)의 80~150%\n7. 셀레늄 : 표시량(41㎍/4,800㎎)의 80~150%\n8. 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2정을 씹어서 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰분홍색의 장방형 제피정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "mg",
+    "basisAmount": 4800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.72mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.84mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.9mg</span><span class=\"sd-badge is-solid\">비타민 C 336mg</span><span class=\"sd-badge is-solid\">셀레늄 41μg</span><span class=\"sd-badge is-solid\">아연 5.1mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>생그린 셀렌 비타민C 프리미엄<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 3회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>0.84mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>336mg</b>, 셀레늄 <b>41μg</b>, 아연 <b>5.1mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2정) 섭취로 비타민 B1 <b>0.72mg</b>, 비타민 B2 <b>0.84mg</b>, 비타민 B6 <b>0.9mg</b>, 비타민 C <b>336mg</b>, 셀레늄 <b>41μg</b>, 아연 <b>5.1mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰분홍색의 장방형 제피정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.72mg/4800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.84mg/4800mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.9mg/4800mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(336mg/4800mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(41μg/4800mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(5.1mg/4800mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.72mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.84mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin C 336mg</span><span class=\"sd-badge is-solid\">Selenium 41μg</span><span class=\"sd-badge is-solid\">Zinc 5.1mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>생그린 셀렌 비타민C 프리미엄<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · 3 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72mg</b> of Vitamin B1, <b>0.84mg</b> of Vitamin B2, <b>0.9mg</b> of Vitamin B6, <b>336mg</b> of Vitamin C, <b>41μg</b> of Selenium, <b>5.1mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 tablets): <b>0.72mg</b> Vitamin B1, <b>0.84mg</b> Vitamin B2, <b>0.9mg</b> Vitamin B6, <b>336mg</b> Vitamin C, <b>41μg</b> Selenium, <b>5.1mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.72mg / 4800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.84mg / 4800mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.9mg / 4800mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (336mg / 4800mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (41μg / 4800mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (5.1mg / 4800mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g27-002",
+  "productName": "고려원스마트키즈프리미엄골드",
+  "productNameEn": "고려원스마트키즈프리미엄골드",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028265",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1]①탄수화물과 에너지 대사에 필요\r\n[비타민B2]①체내 에너지 생성에 필요\r\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요\r\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상: 아이보리색의 정제\r\n2. 비타민B1: 1.5mg/1,250mg의 80~180%\r\n3. 비타민B2: 1.8mg/1,250mg의 80~180%\r\n4. 비타민B6: 2.2mg/1,250mg의 80~150%\r\n5. 비타민C: 125mg/1,250mg의 80~150%\r\n6. 셀레늄: 75㎍/1,250mg의 80~150%\r\n7. 아연: 10mg/1,250mg의 80~150%\r\n8. 대장균군: 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "-특이체질,알러지체질인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를\r\n확인하신 후 섭취하십시오.\r\n-유통기한이 경과된 제품은 섭취하지 마십시오.",
+   "dosageForm": "아이보리색의 정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.5,
+    "unit": "mg",
+    "basisAmount": 1250,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.5mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.8mg</span><span class=\"sd-badge is-solid\">비타민 B6 2.2mg</span><span class=\"sd-badge is-solid\">비타민 C 125mg</span><span class=\"sd-badge is-solid\">셀레늄 75μg</span><span class=\"sd-badge is-solid\">아연 10mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>고려원스마트키즈프리미엄골드<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.5mg</b>, 비타민 B2 <b>1.8mg</b>, 비타민 B6 <b>2.2mg</b>, 비타민 C <b>125mg</b>, 셀레늄 <b>75μg</b>, 아연 <b>10mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B1 <b>1.5mg</b>, 비타민 B2 <b>1.8mg</b>, 비타민 B6 <b>2.2mg</b>, 비타민 C <b>125mg</b>, 셀레늄 <b>75μg</b>, 아연 <b>10mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>아이보리색의 정제 · (주)유니쎌팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.5mg/1250mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.8mg/1250mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(2.2mg/1250mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(125mg/1250mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(75μg/1250mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(10mg/1250mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 아이보리색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.8mg</span><span class=\"sd-badge is-solid\">Vitamin B6 2.2mg</span><span class=\"sd-badge is-solid\">Vitamin C 125mg</span><span class=\"sd-badge is-solid\">Selenium 75μg</span><span class=\"sd-badge is-solid\">Zinc 10mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>고려원스마트키즈프리미엄골드<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.5mg</b> of Vitamin B1, <b>1.8mg</b> of Vitamin B2, <b>2.2mg</b> of Vitamin B6, <b>125mg</b> of Vitamin C, <b>75μg</b> of Selenium, <b>10mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1.5mg</b> Vitamin B1, <b>1.8mg</b> Vitamin B2, <b>2.2mg</b> Vitamin B6, <b>125mg</b> Vitamin C, <b>75μg</b> Selenium, <b>10mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.5mg / 1250mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.8mg / 1250mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (2.2mg / 1250mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (125mg / 1250mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (75μg / 1250mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (10mg / 1250mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 아이보리색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

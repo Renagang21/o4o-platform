@@ -1,0 +1,128 @@
+[
+ {
+  "candidateId": "sh1-g57-001",
+  "productName": "액티폴릭 키즈",
+  "productNameEn": "액티폴릭 키즈",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370388",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말\n2) 비타민B1 : 표시량(3.6 mg / 2,000 mg)의 80~180%\n3) 비타민B2 : 표시량(4.2 mg / 2,000 mg)의 80~180%\n4) 비타민B6 : 표시량(4.5 mg / 2,000 mg)의 80~150%\n5) 비타민C : 표시량(100 mg / 2,000 mg)의 80~150%\n6) 엽산 : 표시량(680 μgDFE / 2,000 mg)의 80~150%\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 섭취",
+   "caution": "1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n2) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것  \n3) 과량 섭취하지 않도록 주의할 것\n4) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말",
+   "storage": "실온/직사광선을 피하여 건조하고 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.6,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 3.6mg</span><span class=\"sd-badge is-solid\">비타민 B2 4.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 4.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">엽산 680μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>액티폴릭 키즈<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(3.6mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(4.2mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(4.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(680μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 3.6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 4.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 4.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Folate 680μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>액티폴릭 키즈<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3.6mg</b> of Vitamin B1, <b>4.2mg</b> of Vitamin B2, <b>4.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C, <b>680μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>3.6mg</b> Vitamin B1, <b>4.2mg</b> Vitamin B2, <b>4.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C, <b>680μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed to help maintain normal blood homocysteine levels</li><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (3.6mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (4.2mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (4.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Folate</b> labelled (680μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g57-002",
+  "productName": "액티바이타믹스",
+  "productNameEn": "액티바이타믹스",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007476",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B1] 탄수화물과 에너지 대사에 필요 \n[비타민B2] 체내 에너지 생성에 필요\n[비타민B6] 단백질 및 아미노산 이용에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민C] 결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 \n[엽산] 세포와 혈액생성에 필요 / 태아 신경관의 정상 발달에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란분홍색의 분말\n2. 비타민B1 : 표시량(3.6 mg/2,000 mg)의 80~180% \n3. 비타민B2 : 표시량(4.2 mg/2,000 mg)의 80~180% \n4. 비타민B6 : 표시량(4.5 mg/2,000 mg)의 80~150%\n5. 비타민C  : 표시량(100 mg/2,000 mg)의 80~150%\n6. 엽산  : 표시량(680 ㎍DFE/2,000 mg)의 80~150%\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n- 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란분홍색의 분말",
+   "storage": "- 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.6,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 3.6mg</span><span class=\"sd-badge is-solid\">비타민 B2 4.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 4.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">엽산 680μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>액티바이타믹스<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란분홍색의 분말 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(3.6mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(4.2mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(4.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(680μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> - 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 3.6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 4.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 4.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Folate 680μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>액티바이타믹스<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3.6mg</b> of Vitamin B1, <b>4.2mg</b> of Vitamin B2, <b>4.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C, <b>680μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>3.6mg</b> Vitamin B1, <b>4.2mg</b> Vitamin B2, <b>4.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C, <b>680μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed to help maintain normal blood homocysteine levels</li><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (3.6mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (4.2mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (4.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Folate</b> labelled (680μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> - 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. - 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "sh1-g57-003",
+  "productName": "액티바이타 비타민믹스",
+  "productNameEn": "액티바이타 비타민믹스",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370348",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말\n2) 비타민B1 : 표시량(3.6 mg / 2,000 mg)의 80~180%\n3) 비타민B2 : 표시량(4.2 mg / 2,000 mg)의 80~180%\n4) 비타민B6 : 표시량(4.5 mg / 2,000 mg)의 80~150%\n5) 비타민C : 표시량(100 mg / 2,000 mg)의 80~150%\n6) 엽산 : 표시량(680 μgDFE / 2,000 mg)의 80~150%\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 섭취",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말",
+   "storage": "실온/직사광선을 피하여 건조하고 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.6,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 3.6mg</span><span class=\"sd-badge is-solid\">비타민 B2 4.2mg</span><span class=\"sd-badge is-solid\">비타민 B6 4.5mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">엽산 680μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>액티바이타 비타민믹스<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B1 <b>3.6mg</b>, 비타민 B2 <b>4.2mg</b>, 비타민 B6 <b>4.5mg</b>, 비타민 C <b>100mg</b>, 엽산 <b>680μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(3.6mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(4.2mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(4.5mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(680μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 C · 엽산 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 3.6mg</span><span class=\"sd-badge is-solid\">Vitamin B2 4.2mg</span><span class=\"sd-badge is-solid\">Vitamin B6 4.5mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Folate 680μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>액티바이타 비타민믹스<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3.6mg</b> of Vitamin B1, <b>4.2mg</b> of Vitamin B2, <b>4.5mg</b> of Vitamin B6, <b>100mg</b> of Vitamin C, <b>680μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>3.6mg</b> Vitamin B1, <b>4.2mg</b> Vitamin B2, <b>4.5mg</b> Vitamin B6, <b>100mg</b> Vitamin C, <b>680μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed to help maintain normal blood homocysteine levels</li><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (3.6mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (4.2mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (4.5mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Folate</b> labelled (680μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/직사광선을 피하여 건조하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin C · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
