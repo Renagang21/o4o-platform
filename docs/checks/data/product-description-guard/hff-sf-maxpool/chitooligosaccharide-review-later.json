@@ -1,0 +1,32 @@
+[
+ {
+  "statementNo": "2004001516288",
+  "productName": "미로키토올리고당",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "2004001703719",
+  "productName": "키토올리고당분말(에이치)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2004001508131",
+  "productName": "화진키토올리고당골드",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040017021316",
+  "productName": "뉴랜드 키토올리고당",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "200400170374",
+  "productName": "키토올리고당",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2004001703718",
+  "productName": "키토올리고당파코스",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ }
+]

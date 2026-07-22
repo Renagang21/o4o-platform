@@ -1,0 +1,696 @@
+[
+ {
+  "statementNo": "2004001602079",
+  "candidateId": "00a31fe3-6ea3-4f6d-ba1b-059aa3538f0a",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼분말캅셀",
+  "manufacturer": "(주)케이지앤에프",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미를 지닌 담황색 내용물이 투명한 경질캡슐\r\n② 진세노사이드 Rg1과 Rb1의 합 : 표시량(3.6mg/600mg)의 80% 이상\r\n③ 붕해도 : 20분이내어야 한다.\r\n④ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐씩 물과 함께 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미를 지닌 담황색 내용물이 든 투명한 경질캅셀",
+   "shelfLife": "제조일로부터 2년",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관, 유통하십시오.",
+   "caution": "[인삼제품]\n(가) 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "2004001801161",
+  "candidateId": "12ac5480-f95d-4f10-a2e3-252cbc35f78f",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "고려태극인삼분말",
+  "manufacturer": "풍기인삼농협",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 색택과 향미를 가지며 이미,이취가 없는 회황색의 분말\n2.최종제품 : 진세노사이드 Rb1및 Rg1의 합 :표시량(4.4mg/4g)의 80%이상\n3.대장균군 : 음성",
+   "intake": "1일 2회, 1회 2g을 충분한 양의 음용수와 함께 섭취",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미,이취가 없는 회황색의 분말",
+   "shelfLife": "제조일로부터 3년까지",
+   "storage": "실온, / 직사광선을 피하여 서늘한 곳에 보관한다.",
+   "caution": "특정질환, 특이체질 및 알러지 체질의 경우 성분을 확인 후 섭취하십시오.\r\n개봉 후에는 이물질이 들어가지 않도록 잘 밀봉해서 보관하십시오.\r\n의약품(당뇨치료제, 혈액항응고제) 복용시 섭취에 주의하세요"
+  }
+ },
+ {
+  "statementNo": "201400200232",
+  "candidateId": "2ece1663-f774-4e30-974c-ef0ebd1daa43",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "고려태극삼분말",
+  "manufacturer": "주식회사 진산사이언스",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1)성상: 백색의 가루로서 고유의 색택과 향미를 가지며, 이미·이취가 없어야 함.\n2)진세노사이드 Rg1 과 Rb1의 합 \n   (가) 최종제품: 표시량(2.0mg/g)의 80% 이상\n   (나) 원료성: 표시량(2.0mg/g) 이상\n3) 대장균군: 음성",
+   "intake": "분말 1스푼(2g)을 1일 2회 섭취한다",
+   "dosageForm": "백색의 가루로서 고유의 색택과 향미를 가지며, 이미·이취가 없어야 함.",
+   "shelfLife": "제조일로부터 36개월 까지",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하십시오.",
+   "caution": "의약품(당뇨치료제, 혈액항응고제)복용시 섭취에 주의하십시오."
+  }
+ },
+ {
+  "statementNo": "20040016020111",
+  "candidateId": "3202d794-3607-4a08-8081-b5abd71dedad",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "학표고려인삼차",
+  "manufacturer": "(주)케이지앤에프",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 색택과 향미를 가지며 이미ㆍ이취가 없어야 함\r\n2) 진세노사이드 Rg1과 Rb1의 합 : 표시량(7.5mg/15g)의 80% 이상\r\n3) 대장균군 : 음성",
+   "intake": "1일 5회 1회 1포(3g)을 냉.온수에 녹여 기호에 따라 설탕이나 꿀을 첨가하여 섭취",
+   "dosageForm": "옅은 갈색을 띠며 인삼맛과 향을 가진 과립 형태",
+   "shelfLife": "제조일로부터 3년",
+   "storage": "직사광선을 피하고 건조하고 서늘한 곳에 보관(실온보관)",
+   "caution": "① 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단한다.\r\n② 섭취 전 제품에 이상이 있는 경우 섭취를 금한다.\r\n③ 의약품(당뇨치료제, 혈액항응고제)복용 시 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "20040020028300",
+  "candidateId": "32edb2a8-6f82-4e51-b592-d82bc296d87f",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "고려진생골드캡슐",
+  "manufacturer": "(주)유니쎌팜",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미 이취가 없는 갈색의 내용물을 함유한 어두운회갈색의 장방형 연질캡슐\n2. 진세노사이드 Rg1과 Rb1의 합 : 표시량(3.0mg/3.32g)의 80% 이상\n3. 대장균군 : 음성\n4. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미 이취가 없는 갈색의 내용물을 함유한 어두운회갈색의 장방형 연질캡슐",
+   "shelfLife": "36개월",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상)한 곳에 두시면 젤라틴 피막이 변형될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다",
+   "caution": "(가)당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20040020028305",
+  "candidateId": "3345e87c-0f8a-4955-b6a7-d456b4973f1e",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼분말캅셀",
+  "manufacturer": "(주)유니쎌팜",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 담황색의 내용물이 든 투명한 경질캅셀\r\n2. 진세노사이드 Rg1과 Rb1의 합 : 4.8mg/1.2g의 80%이상\r\n3. 대장균군 : 음성\r\n4. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 2캅셀을 물과 함께 섭취하십시오.",
+   "dosageForm": "담황색의 내용물이 든 투명한 경질캅셀",
+   "shelfLife": "24개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n특이체질 및 알러지 체질의 경우 제품성분을 확인하신 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "2006001510942",
+  "candidateId": "3da8a68a-9357-460b-8d49-bd21c5f5e1d1",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼분말캅셀",
+  "manufacturer": "(주)삼진GNF",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색에 내용물을 함유한 투명한 장방형의 경질캡슐\n2) 진세노사이드 Rg1과 Rb1 합 : 표시량 (4.8mg / 1.2g)의 80%이상 \n3) 대장균군: 음성(-) \n4) 붕해도 : 20분내  붕해",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취한다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색에 내용물을 함유한 투명한 장방형의 경질캡슐",
+   "shelfLife": "36개월",
+   "storage": "직사광선을 피하고 건, 냉암소에 보관한다.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "2011002012111",
+  "candidateId": "49811c16-d04d-4c0c-98d0-4da62d5db67a",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼분말",
+  "manufacturer": "주식회사 케이바이오",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "성상 : 고유의 색택과 향미를 가진 미백색의 분말\r\n진세노사이드Rg1과Rb1의 합이: 원료성- 표시량(4.0mg/g)이상\r\n                                최종제품-표시량(8.0mg/2g)  의 80% 이상이어야 한다.\r\n대장균군 : 음성",
+   "intake": "1일 3회, 1회 섭취시 1스픈(2g) 섭취.",
+   "dosageForm": "고유의 색택과 향미를 가진 미백색의 분말",
+   "shelfLife": "제조일로24개월",
+   "storage": "직사광선을 피하여 건 냉암소에서 보관한다",
+   "caution": "- 알레르기 체질이신 경우 성분을 확인하신 후 섭취여부를 결정하세요.\r\n- 제품의 개봉 또는 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\r\n- 개인의 신체 상태에 따라서 이상 증상이 생길 경우 섭취를 중단하세요.\r\n- 의약품(당뇨치료제,혈액항응고제)복용시에는 섭취에 주의 하세요."
+  }
+ },
+ {
+  "statementNo": "20040015100142",
+  "candidateId": "523dcb4c-ad58-4502-8ad8-1db0972c7790",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "진스트 15 고려인삼정 (GINST 15 KOREAN GINSENG TABLET)",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미, 이취가 없고 고유의 향미가 있는 흐린 황갈색을 지닌 볼록한 원형 모양의 정제\r\n  (시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량(3.75 ㎎/2.5 g)의 80 % 이상\r\n  (시험방법: 건강기능식품공전 3-55 진세노사이드)\r\n⑶ 대장균군: 음성\r\n  (시험방법: 식품공전 제10. 일반시험법 3.8 대장균)\r\n⑷ 붕해시험: 적합\r\n  (시험방법: 건강기능식품공전 제4. 2-1 붕해시험법 4.2.1 정제제품)",
+   "intake": "1일 2회, 1회 5정을 물과 함께 섭취하십시오",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 흐린 황갈색을 지닌 볼록한 원형 모양의 정제",
+   "shelfLife": "2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하십시오.\r\n⑶ 유통기한이 경과된 제품은 절대 섭취하지 마십시오.\r\n⑷ 알레르기 및 특이체질이신 분은 반드시 원료명을 확인한 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "20040015100121",
+  "candidateId": "5849806e-0e0b-40bb-950f-1e8c0c9af5bf",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "진스트 고려인삼정 타블렛",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미, 이취가 없는 회백색을 지닌 볼록한 원형 모양의 정제\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량의 80 % 이상(표시량 3.75 ㎎/2.5 g)\r\n(시험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rb1과 Rg1)\r\n⑶ 대장균군: 음성\r\n(시험방법: 식품공전 제10. 일반시험법 3.8 대장균)\r\n⑷ 붕해시험: 적합\r\n(건강기능식품공전 Ⅲ.2.1 붕해시험법 4.2.1 정제제품)",
+   "intake": "1일 2회, 1회 5정을 물과 함께 섭취하십시오",
+   "dosageForm": "이미, 이취가 없는 회백색을 지닌 볼록한 원형 모양의 정제",
+   "shelfLife": "제조일부터 2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하십시오.\r\n⑶ 유통기한이 경과된 제품은 절대 섭취하지 마십시오.\r\n⑷ 알레르기 및 특이체질이신 분은 반드시 원료명을 확인한 후 섭취하십시오"
+  }
+ },
+ {
+  "statementNo": "20040020028294",
+  "candidateId": "5b16ac1d-7456-4126-9b25-ec0fa30ca868",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼정캅셀골드",
+  "manufacturer": "(주)유니쎌팜",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 명적색의 연질캅셀\n2. 진세노사이드 Rg1,Rb1의 합 : 3.2mg/2g의 80% 이상 \n3. 대장균군 : 음성\n4. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 2캅셀을 물과 함께 섭취하십시오.",
+   "dosageForm": "명적색의 연질캅셀",
+   "shelfLife": "24개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n특이체질 및 알러지체질의 경우 제품성분을 확인하신 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "20040015039164",
+  "candidateId": "5d32d84d-c631-4fb0-bb77-8c1d05dc5354",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "수익강고려태극삼캡슐",
+  "manufacturer": "고려인삼과학주식회사",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]1.면역력 증진에 도움을 줄 수 있음.\r\n               2.피로개선에 도움을 줄 수 있음.",
+   "baseStandard": "1.성상 :갈색의 내용물을 함유한 투명한 경질갭슐제품으로 이미,이취가 없어야 한다.\r\n2.진세노사이드 Rg1과 Rb1의 합: 표시량(20mg/g)의  80% 이상.\r\n3.대장균군:음성\r\n4.붕해도:건강기능식품공전 III.2. 붕해도 시험의 캅셀제품 시험법에 따라 20분내에 붕해.",
+   "intake": "1일2회, 1회 2캅셀(250mg/1캅셀)식전 또는 식후에 섭취하십시오.",
+   "dosageForm": "갈색의 내용물을 함유한 투명한 경질갭슐제품으로 이미,이취가 없어야 한다.\r\n\r\n갈색의 내용물을 함유한 뚜명한 경질캡슐제품으로 이미,이취가 없어야 함",
+   "shelfLife": "제조일로부터36개월",
+   "storage": "직사광선을 피하여 서늘항 곳에 보관.유통.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "20040015100118",
+  "candidateId": "717877a1-59be-484c-867d-83b5225ce3d0",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "천활력삼",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "가. 성상: 이미, 이취가 없는 암갈색의 연질캡슐\r\n     (시험방법: 육안 검사를 실시하여 성상 변화 여부 확인)\r\n  나. 진세노사이드 Rg1 및 Rb1 의 합: 표시량의 80 % 이상(표시량: 6 ㎎ / 2.2 g)\r\n     (시험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rg1 및 Rb1)\r\n  다. 붕해도: 물로써 20분 이내\r\n     (실험방법: 건강기능식품공전 Ⅲ.2.1 붕해시험법)\r\n  라. 대장균군: 음성\r\n     (시험방법: 식품공전 제10. 일반시험법 3.8 대장균)",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취",
+   "dosageForm": "이미, 이취가 없는 암갈색의 연질캡슐",
+   "shelfLife": "제조일부터 2년",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관(실온)",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "20040015094118",
+  "candidateId": "773606af-baab-48da-b8dd-cf3162b3d451",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼차",
+  "manufacturer": "(주)화인내츄럴",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유한 색택과 향미를 가지며 이미·이취가 없어야 함.\r\n② 진세노사이드 Rg1 과 Rb1의 합 : 최종제품 - 표시량(4.05mg/9g)의 80%이상\r\n③ 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1포(3g)을 온수나 냉수에 넣어 잘 저은 후 음용함.",
+   "dosageForm": "연한갈색의 과립으로 이미, 이취가 없어야 한다.",
+   "shelfLife": "제조일로부터3년",
+   "storage": "직사광선을 피하여 서늘한곳에 보관, 유통",
+   "caution": "당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400170211735",
+  "candidateId": "773af2c1-ed9d-46b8-8644-45a6fbf96313",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "고려태극인삼정캡슐플래타늄",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "면역력 증진･피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function and improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼] 면역력 증진･피로개선에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 흑갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐\n②진세노사이드 Rg1과 Rb1의 합 : 표시량(3.0mg/1,600mg)의 80% 이상\n③붕해시험 : 20분 이내\n④대장균군 : 음성",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흑갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐",
+   "shelfLife": "제조일로부터 36월",
+   "storage": "실온/①제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.②제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "2004001703853",
+  "candidateId": "85ba2d01-930e-4566-be39-af3e55a8f534",
+  "shard": 0,
+  "ingredientKey": "인삼",
+  "productName": "Zengo",
+  "manufacturer": "케이지랩 주식회사",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "성상: 인삼 고유의 향미를 가지며, 이미, 이취가 없는 미황색의 과립제품\r\n진세노사이드Rb1+Rg1의 합: 표시량 9mg/9g의 80% 이상 \r\n대장균 군: 음성",
+   "intake": "1일 3회, 1회 1포를 그대로 드시거나 냉, 온수에 희석하여 드십시오.",
+   "dosageForm": "인삼 고유의 향미를 가지며, 이미, 이취가 없는 미황색의 과립제품",
+   "shelfLife": "제조일로부터 36개월",
+   "storage": "습기와 직사광선을 피하여 서늘한 곳에 보관 하십시오.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n알러지등 특이체질인 경우 제품성분을 확인 한 후 섭취여부를 결정하여야함. \r\n제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의.."
+  }
+ },
+ {
+  "statementNo": "20040015100115",
+  "candidateId": "8a65b266-c5a9-4a5f-80a8-eb5144744a74",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "진사겔",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미와 이취가 없는 황갈색 내용물이 든 녹색과 연녹색의 불투명 연질캡슐\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량(9 ㎎/1.2 g)의 80 % 이상\r\n(시험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rb1과 Rg1)\r\n⑶ 대장균군: 음성(시험방법: 식품공전 제10. 일반시험법 3.8 대장균)\r\n⑷ 붕해시험: 적합\r\n(건강기능식품공전 Ⅲ.2.1 붕해시험법 4.2.4 캡슐제품)",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "dosageForm": "이미와 이취가 없는 황갈색 내용물이 든 녹색과 연녹색의 불투명 연질캡슐",
+   "shelfLife": "제조일부터 2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.\r\n⑶ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하십시오.\r\n⑷ 유통기한이 경과된 제품은 절대 섭취하지 마십시오"
+  }
+ },
+ {
+  "statementNo": "20040015100131",
+  "candidateId": "8d43865f-5258-4e4b-a8db-e21b3bd1ae0b",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼분말 프리미엄",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미와 이취가 없는 미황색의 분말\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량(24 ㎎/6 g)의 80% 이상\r\n(시험방법: 건강기능식품공전 제4. 3-55 진세노사이드)\r\n⑶ 대장균군: 음성\r\n(시험방법: 식품공전 제9. 일반시험법 3.7 대장균군)",
+   "intake": "내장된 스푼을 사용하여 1일 2회, 1회 3g(2스푼)를 적정량의 온수 또는 냉수에 타서 감미료나 꿀 등을 기호에 맞게 넣어 잘 저어서 드십시오",
+   "dosageForm": "이미와 이취가 없는 미황색의 분말",
+   "shelfLife": "2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 알레르기 체질이신 분은 섭취 전에 원료명을 반드시 확인하시기 바랍니다.\r\n⑶ 유통기한이 경과된 제품은 섭취하지 마십시오.\r\n⑷ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하시기 바랍니다"
+  }
+ },
+ {
+  "statementNo": "20040015100116",
+  "candidateId": "93dc1406-ff63-4591-bd1c-2a4dc252890d",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "진생이골드",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미와 이취가 없는 황갈색 내용물이 든 녹색과 연녹색의 불투명 연질캡슐\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량(4.9 ㎎/1.5 g)의 80 % 이상\r\n(시험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rb1과 Rg1)\r\n⑶ 대장균군: 음성(시험방법: 식품공전 제10. 일반시험법 3.8 대장균)\r\n⑷ 붕해시험: 적합\r\n(건강기능식품공전 Ⅲ.2.1 붕해시험법 4.2.4 캡슐제품)",
+   "intake": "1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "dosageForm": "이미와 이취가 없는 황갈색 내용물이 든 짙은 갈색의 불투명 연질캡슐",
+   "shelfLife": "제조일부터 2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.\r\n⑶ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하십시오.\r\n⑷ 유통기한이 경과된 제품은 절대 섭취하지 마십시오"
+  }
+ },
+ {
+  "statementNo": "2004001510066",
+  "candidateId": "97476714-b978-4e7a-bcd3-747c378ecc15",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼차",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진･피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function and improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]면역력 증진･피로개선에 도움을 줄 수 있음",
+   "baseStandard": "가. 성상 : 고유의 향미가 있고 이미･이취가 없는 회황색 과립형 제품  \n나. 진세노사이드 Rb1과 Rg1의 합 : 표시량(9.0 ㎎/9g)의 80 ~ 150%\n다. 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1포씩 섭취하십시오. 물에 타서 섭취하거나 기호에 따라 벌꿀 또는 감미료 등을 넣어 섭취",
+   "dosageForm": "고유의 향미가 있고 이미･이취가 없는 회황색 과립형 제품",
+   "shelfLife": "제조일로부터 3년까지",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "(가) 당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의\n(나) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "2006001510972",
+  "candidateId": "a3378bea-1ccf-4438-8ce1-4c178aaeb8f7",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "고려태극인삼분말",
+  "manufacturer": "(주)삼진GNF",
+  "functionsKo": [
+   "면역력 증진･피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function and improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼] 면역력 증진･피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말\n2) 진세노사이드 Rg1 과 Rb1의 합 : 표시량 9 mg/3 g 의 80% 이상\n3) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 1스푼(1 g)을 동봉된 스푼으로 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 회황색의 분말",
+   "shelfLife": "제조일로부터 36개월까지",
+   "storage": "직사광선을 피하고 서늘한 곳에서 보관하십시오.",
+   "caution": "①당뇨치료제 및 혈액항응고제 복용 시 섭취에 주의하십시오.\n②알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n③이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오."
+  }
+ },
+ {
+  "statementNo": "20040015100134",
+  "candidateId": "aa250244-7735-4cd6-adab-5c2ee77eea79",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "활력삼 프리미엄",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 갈색 내용물을 함유한 오발모양의 적갈색 연질캡슐\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1 및 Rb1 의 합: 표시량의 80 % 이상(표시량: 3.3 ㎎ / 2.2 g)\r\n(시험방법: 건강기능식품공전 제4. 3-55 진세노사이드)\r\n⑶ 대장균군: 음성\r\n(시험방법: 식품공전 제9. 일반시험법 3.7 대장균군)\r\n⑷ 붕해도: 물로써 20분 이내\r\n     (실험방법: 건강기능식품공전 제4.2.1 붕해시험법)",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취",
+   "dosageForm": "갈색 내용물을 함유한 오발모양의 적갈색 연질캡슐",
+   "shelfLife": "제조일부터 2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 알레르기 체질이신 분은 섭취 전에 원료명을 반드시 확인하시기 바랍니다.\r\n⑶ 유통기한이 경과된 제품은 섭취하지 마십시오.\r\n⑷ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하시기 바랍니다"
+  }
+ },
+ {
+  "statementNo": "20040020028338",
+  "candidateId": "b69cf332-4f08-4789-88cd-8c5d68d475b8",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천일고려태극인삼정캅셀",
+  "manufacturer": "(주)유니쎌팜",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 갈색과 미황색의 투톤을 지닌 연질캡슐\r\n2. 진세노사이드 Rg1과 Rb1의 합 : 2mg/1.2g의 80% 이상\r\n3. 대장균군 : 음성\r\n4. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "갈색과 미황색의 투톤을 지닌 연질캡슐",
+   "shelfLife": "36개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n알러지 및 특이체질이신분은 제품성분을 확인하시고 섭취하시길 바랍니다."
+  }
+ },
+ {
+  "statementNo": "2004001510092",
+  "candidateId": "c6f3f606-e458-4d73-af2b-67f86a8b020f",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "활력삼 캡슐",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력증진에도움을줄수있음",
+   "피로개선에도움을줄수있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력증진에도움을줄수있음②피로개선에도움을줄수있음",
+   "baseStandard": "⑴ 성상: 적갈색의 내용물을 함유한 암갈색의 연질캡슐 제품으로 이미, 이취가 없다.\r\n     (시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n  ⑵ 진세노사이드 Rg1과 Rb1 의 합: 표시량(3.0 ㎎/2 g)의 80 % 이상\r\n     (시험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rb1과 Rg1)\r\n  ⑶ 대장균군: 음성(시험방법: 식품공전 제10. 일반시험법 3.8 대장균)\r\n  ⑷ 붕해도: 적합, 물을 시험액으로 20분이내 붕해\r\n     (시험방법: 시험방법: 건강기능식품공전 Ⅲ.2.1 붕해시험법 4.2.4 캡슐제품)",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취",
+   "dosageForm": "적갈색의 내용물을 함유한 암갈색의 연질캡슐 제품으로 이미, 이취가 없다.",
+   "shelfLife": "제조일부터 24개월",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 포장지를 뜯거나 마개를 열 때 손을 다칠 수 있으니 조심  \r\n⑶ 알레르기 체질이신 경우 성분을 확인 한 후 섭취여부를 정하여야 함"
+  }
+ },
+ {
+  "statementNo": "2004002003156",
+  "candidateId": "ccd5860a-abbf-4890-8e66-45b86c77dc5c",
+  "shard": 1,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼분말",
+  "manufacturer": "대동고려삼(주)",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 미백색의분말제품\r\n2. 진세노사이드 Rg1과 Rb1의 합\r\n  *최종제품 : 표시량(5mg/g)의 80%이상\r\n  *원료성제품 : 표시량(5mg/g)의 이상\r\n3. 대장균군 : 음성",
+   "intake": "동봉된 스푼을 이용하여 1일 3회, 한스푼(1g상당)을 온수 또는 냉수와 함께 섭취",
+   "dosageForm": "미백색의 분말제품",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n① 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하신 후 섭취하십시오.\r\n② 유통기한 경과 또는 내용물의 손상이나 변형시에는 섭취하지 마십시오.\r\n③ 의약품(당뇨치료제,혈액응고제) 복용 시 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "2004001602092",
+  "candidateId": "db04ed7e-b957-45af-8163-f322a95114a8",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼차파워",
+  "manufacturer": "(주)케이지앤에프",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 옅은 갈색을 띠며 인삼맛과 향을 가진 과립\r\n② 진세노사이드 Rg1과 Rb1의 합: 표시량(3.75mg/15g)의 80% 이상\r\n③ 대장균군 : 음성",
+   "intake": "1일 5회 1회 1포(3g)을 냉.온수에 타서 기호에 따라 설탕이나 꿀을 첨가해서 섭취",
+   "dosageForm": "옅은 갈색을 띠며 인삼맛과 향을 가지는 과립",
+   "shelfLife": "제조일로부터 3년",
+   "storage": "직사광선을 피하고 건조하고 서늘한 곳에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n① 개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단한다.\r\n② 섭취 전 제품에 이상이 있는 경우 섭취를 금한다."
+  }
+ },
+ {
+  "statementNo": "20040015100130",
+  "candidateId": "dd559bb2-d00f-4426-b726-00c5025f38da",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "천태극삼분말",
+  "manufacturer": "(주)일화",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "⑴ 성상: 이미와 이취가 없는 미황색의 분말\r\n(시험방법: 관능검사를 실시하여 성상 변화 여부 확인)\r\n⑵ 진세노사이드 Rg1과 Rb1의 합: 표시량(21.6 ㎎/6 g)의 80% 이상\r\n(시험방법: 건강기능식품공전 제4. 3-55 진세노사이드)\r\n⑶ 대장균군: 음성\r\n(시험방법: 식품공전 제9. 일반시험법 3.7 대장균군)",
+   "intake": "내장된 스푼을 사용하여 1일 2회, 1회 3 g(2스푼)를 적정량의 온수 또는 냉수에 타서 감미료나 꿀 등을 기호에 맞게 넣어 잘 저어서 드십시오.",
+   "dosageForm": "이미와 이취가 없는 미황색의 분말",
+   "shelfLife": "제조일부터 2년",
+   "storage": "습기와 직사광선을 피하여 서늘한 장소에 보관",
+   "caution": "[인삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의\r\n⑵ 알레르기 체질이신 분은 섭취 전에 원료명을 반드시 확인하시기 바랍니다.\r\n⑶ 유통기한이 경과된 제품은 섭취하지 마십시오.\r\n⑷ 제품 개봉 또는 섭취 시 포장재에 의한 상처 주의하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "2004002003167",
+  "candidateId": "f77c2a7c-d2d1-44e1-9fe9-fb9802aa13bf",
+  "shard": 2,
+  "ingredientKey": "인삼",
+  "productName": "고려인삼성분캡슐",
+  "manufacturer": "대동고려삼(주)",
+  "functionsKo": [
+   "면역력 증진에 도움을 줄 수 있음",
+   "피로개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with supporting immune function",
+   "May help with improving fatigue"
+  ],
+  "source": {
+   "mainFunction": "[인삼제품]①면역력 증진에 도움을 줄 수 있음 ②피로개선에 도움을 줄 수 있음",
+   "baseStandard": "성상 :흑갈색의 연질캅셀\r\n진세노사이드 Rg1, Rb1의 합 : 표시량 (1.74mg/1.66g)의 80%이상\r\n대장균군 : 음성\r\n붕해도 : 20분이내",
+   "intake": "1일 2회, 1회당 2캡슐 물 또는 차와 함께 섭취",
+   "dosageForm": "흑갈색의 연질캅셀",
+   "shelfLife": "36개월",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통",
+   "caution": "의약품(당뇨치료제,혈액응고제)복용 시 섭취에 주의"
+  }
+ }
+]

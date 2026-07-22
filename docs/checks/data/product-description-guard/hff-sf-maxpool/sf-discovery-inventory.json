@@ -1,0 +1,755 @@
+{
+ "scanned": 41261,
+ "sfRegistered": [
+  "바나바잎추출물",
+  "히알루론산",
+  "쏘팔메토열매추출물",
+  "포스파티딜세린",
+  "헤마토코쿠스추출물"
+ ],
+ "groupsFound": 57,
+ "totalEnHitProducible": 200,
+ "ranked": [
+  {
+   "label": "뮤코다당·단백",
+   "count": 51,
+   "enHitProducible": 51,
+   "servingPass": 51,
+   "shard": {
+    "0": 23,
+    "1": 19,
+    "2": 9
+   },
+   "repFn": "관절 및 연골건강에 도움을 줄 수 있음",
+   "repFnEn": "May help with joint and cartilage health"
+  },
+  {
+   "label": "인삼",
+   "count": 55,
+   "enHitProducible": 29,
+   "servingPass": 53,
+   "shard": {
+    "0": 18,
+    "1": 14,
+    "2": 23
+   },
+   "repFn": "면역력 증진에 도움을 줄 수 있음",
+   "repFnEn": "May help with supporting immune function"
+  },
+  {
+   "label": "오메가-3지방산함유유지",
+   "count": 44,
+   "enHitProducible": 16,
+   "servingPass": 42,
+   "shard": {
+    "0": 14,
+    "1": 16,
+    "2": 14
+   },
+   "repFn": "혈중 중성지질 개선",
+   "repFnEn": null
+  },
+  {
+   "label": "키토산",
+   "count": 15,
+   "enHitProducible": 12,
+   "servingPass": 15,
+   "shard": {
+    "0": 2,
+    "1": 7,
+    "2": 6
+   },
+   "repFn": "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "repFnEn": "May help with improving blood cholesterol"
+  },
+  {
+   "label": "알로에전잎",
+   "count": 11,
+   "enHitProducible": 10,
+   "servingPass": 11,
+   "shard": {
+    "0": 3,
+    "1": 3,
+    "2": 5
+   },
+   "repFn": "배변활동 원활에 도움을 줄 수 있음",
+   "repFnEn": "May help with smooth bowel movements"
+  },
+  {
+   "label": "오비엑스Ob-X",
+   "count": 10,
+   "enHitProducible": 10,
+   "servingPass": 10,
+   "shard": {
+    "0": 2,
+    "1": 6,
+    "2": 2
+   },
+   "repFn": "체지방 감소에 도움을 줄 수 있음 (기타기능II)",
+   "repFnEn": "May help with body-fat reduction"
+  },
+  {
+   "label": "홍국",
+   "count": 11,
+   "enHitProducible": 9,
+   "servingPass": 11,
+   "shard": {
+    "0": 2,
+    "1": 6,
+    "2": 3
+   },
+   "repFn": "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "repFnEn": "May help with improving blood cholesterol"
+  },
+  {
+   "label": "콜레우스포스콜리",
+   "count": 9,
+   "enHitProducible": 9,
+   "servingPass": 9,
+   "shard": {
+    "0": 5,
+    "1": 0,
+    "2": 4
+   },
+   "repFn": "체지방 감소에 도움을 줄 수 있음",
+   "repFnEn": "May help with body-fat reduction"
+  },
+  {
+   "label": "로즈힙",
+   "count": 8,
+   "enHitProducible": 7,
+   "servingPass": 8,
+   "shard": {
+    "0": 3,
+    "1": 2,
+    "2": 3
+   },
+   "repFn": "관절 및 연골건강에 도움을 줄 수 있음",
+   "repFnEn": "May help with joint and cartilage health"
+  },
+  {
+   "label": "알콕시글리세롤함유상어간유",
+   "count": 8,
+   "enHitProducible": 7,
+   "servingPass": 7,
+   "shard": {
+    "0": 2,
+    "1": 5,
+    "2": 1
+   },
+   "repFn": "면역력 증진에 도움을 줄 수 있음",
+   "repFnEn": "May help with supporting immune function"
+  },
+  {
+   "label": "키토올리고당",
+   "count": 9,
+   "enHitProducible": 6,
+   "servingPass": 6,
+   "shard": {
+    "0": 2,
+    "1": 4,
+    "2": 3
+   },
+   "repFn": "체지방 감소에 도움을 줄 수 있음",
+   "repFnEn": "May help with body-fat reduction"
+  },
+  {
+   "label": "돌외잎주정",
+   "count": 6,
+   "enHitProducible": 5,
+   "servingPass": 5,
+   "shard": {
+    "0": 4,
+    "1": 0,
+    "2": 2
+   },
+   "repFn": "체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "repFnEn": "May help with body-fat reduction"
+  },
+  {
+   "label": "레시틴",
+   "count": 9,
+   "enHitProducible": 4,
+   "servingPass": 9,
+   "shard": {
+    "0": 5,
+    "1": 3,
+    "2": 1
+   },
+   "repFn": "콜레스테롤 개선",
+   "repFnEn": null
+  },
+  {
+   "label": "토마토",
+   "count": 5,
+   "enHitProducible": 4,
+   "servingPass": 5,
+   "shard": {
+    "0": 2,
+    "1": 1,
+    "2": 2
+   },
+   "repFn": "항산화에 도움을 줄 수 있음",
+   "repFnEn": "May help with antioxidant activity"
+  },
+  {
+   "label": "레몬밤추출물",
+   "count": 4,
+   "enHitProducible": 4,
+   "servingPass": 4,
+   "shard": {
+    "0": 1,
+    "1": 0,
+    "2": 3
+   },
+   "repFn": "체지방 감소에 도움을 줄 수 있음",
+   "repFnEn": "May help with body-fat reduction"
+  },
+  {
+   "label": "피니톨",
+   "count": 4,
+   "enHitProducible": 3,
+   "servingPass": 4,
+   "shard": {
+    "0": 0,
+    "1": 2,
+    "2": 2
+   },
+   "repFn": "간 건강에 도움을 줄 수 있음",
+   "repFnEn": "May help with liver health"
+  },
+  {
+   "label": "동결건조누에",
+   "count": 3,
+   "enHitProducible": 3,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+   },
+   "repFn": "혈당조절에 도움을 줄 수 있음",
+   "repFnEn": "May help with blood sugar regulation"
+  },
+  {
+   "label": "스피루리나",
+   "count": 16,
+   "enHitProducible": 2,
+   "servingPass": 16,
+   "shard": {
+    "0": 6,
+    "1": 4,
+    "2": 6
+   },
+   "repFn": "피부건강에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "클로렐라",
+   "count": 9,
+   "enHitProducible": 2,
+   "servingPass": 9,
+   "shard": {
+    "0": 3,
+    "1": 4,
+    "2": 2
+   },
+   "repFn": "피부건강에 도움",
+   "repFnEn": null
+  },
+  {
+   "label": "스쿠알렌",
+   "count": 5,
+   "enHitProducible": 2,
+   "servingPass": 5,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 3
+   },
+   "repFn": "항산화에 도움을 줄 수 있음",
+   "repFnEn": "May help with antioxidant activity"
+  },
+  {
+   "label": "마늘",
+   "count": 4,
+   "enHitProducible": 2,
+   "servingPass": 2,
+   "shard": {
+    "0": 2,
+    "1": 1,
+    "2": 1
+   },
+   "repFn": "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "repFnEn": "May help with improving blood cholesterol"
+  },
+  {
+   "label": "천마등복합추출물HX106",
+   "count": 3,
+   "enHitProducible": 2,
+   "servingPass": 3,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+   },
+   "repFn": "기억력 개선에 도움을 줄 수 있음",
+   "repFnEn": "May help with memory improvement"
+  },
+  {
+   "label": "홍삼",
+   "count": 144,
+   "enHitProducible": 1,
+   "servingPass": 135,
+   "shard": {
+    "0": 41,
+    "1": 56,
+    "2": 47
+   },
+   "repFn": "면역력 증진에 도움을 줄 수 있음",
+   "repFnEn": "May help with supporting immune function"
+  },
+  {
+   "label": "단백질",
+   "count": 59,
+   "enHitProducible": 0,
+   "servingPass": 55,
+   "shard": {
+    "0": 23,
+    "1": 20,
+    "2": 16
+   },
+   "repFn": "체액, 산-염기의 균형 유지에 필요",
+   "repFnEn": null
+  },
+  {
+   "label": "칼륨",
+   "count": 36,
+   "enHitProducible": 0,
+   "servingPass": 36,
+   "shard": {
+    "0": 11,
+    "1": 15,
+    "2": 10
+   },
+   "repFn": "",
+   "repFnEn": null
+  },
+  {
+   "label": "공액리놀레산",
+   "count": 24,
+   "enHitProducible": 0,
+   "servingPass": 22,
+   "shard": {
+    "0": 11,
+    "1": 6,
+    "2": 7
+   },
+   "repFn": "과체중인 성인의 체지방 감소에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "크레아틴",
+   "count": 24,
+   "enHitProducible": 0,
+   "servingPass": 24,
+   "shard": {
+    "0": 9,
+    "1": 5,
+    "2": 10
+   },
+   "repFn": "근력 운동 시에 운동수행능력 향상에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "필수지방산",
+   "count": 18,
+   "enHitProducible": 0,
+   "servingPass": 17,
+   "shard": {
+    "0": 6,
+    "1": 4,
+    "2": 8
+   },
+   "repFn": "",
+   "repFnEn": null
+  },
+  {
+   "label": "홍경천",
+   "count": 13,
+   "enHitProducible": 0,
+   "servingPass": 10,
+   "shard": {
+    "0": 4,
+    "1": 5,
+    "2": 4
+   },
+   "repFn": "스트레스로 인한 피로 개선에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "회화나무열매",
+   "count": 13,
+   "enHitProducible": 0,
+   "servingPass": 13,
+   "shard": {
+    "0": 4,
+    "1": 3,
+    "2": 6
+   },
+   "repFn": "갱년기 여성의 건강에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "베타글루칸",
+   "count": 11,
+   "enHitProducible": 0,
+   "servingPass": 11,
+   "shard": {
+    "0": 3,
+    "1": 4,
+    "2": 4
+   },
+   "repFn": "(국문) 면역기능 증진에 도움을 줄 수 있음 (영문) May help to improve immune function",
+   "repFnEn": null
+  },
+  {
+   "label": "파크랜크랜베리",
+   "count": 10,
+   "enHitProducible": 0,
+   "servingPass": 10,
+   "shard": {
+    "0": 4,
+    "1": 3,
+    "2": 3
+   },
+   "repFn": "요로의 유해균 흡착 억제로 요로건강에 도움을 줄 수 있음 (생리활성기능 2등급)",
+   "repFnEn": null
+  },
+  {
+   "label": "감태",
+   "count": 10,
+   "enHitProducible": 0,
+   "servingPass": 10,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 7
+   },
+   "repFn": "수면의 질 개선에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "저분자콜라겐펩타이드",
+   "count": 8,
+   "enHitProducible": 0,
+   "servingPass": 8,
+   "shard": {
+    "0": 4,
+    "1": 1,
+    "2": 3
+   },
+   "repFn": "피부 보습에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "빌베리",
+   "count": 8,
+   "enHitProducible": 0,
+   "servingPass": 8,
+   "shard": {
+    "0": 3,
+    "1": 4,
+    "2": 1
+   },
+   "repFn": "눈의 피로 개선에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "스페인감초",
+   "count": 7,
+   "enHitProducible": 0,
+   "servingPass": 7,
+   "shard": {
+    "0": 3,
+    "1": 2,
+    "2": 2
+   },
+   "repFn": "(국문) 위 점막 내 헬리코박터균(Helicobacter pylori) 증식을 억제하고 위 점막을 보호하여 위 건강에 도움을 줄 수 있음 (영문) May help to stomach health by protecting gastric mucosa and inhibiting proliferation of Helicobacter pylori in gastric mucosa",
+   "repFnEn": null
+  },
+  {
+   "label": "인동덩굴꽃봉오리추출물그린세라-F",
+   "count": 7,
+   "enHitProducible": 0,
+   "servingPass": 7,
+   "shard": {
+    "0": 3,
+    "1": 3,
+    "2": 1
+   },
+   "repFn": "(국문) 위 점막을 보호하여 위 건강에 도움을 줄 수 있음 (영문) May help to maintain healthy stomach by protecting gastric mucosa",
+   "repFnEn": null
+  },
+  {
+   "label": "표고버섯균사체AHCC2008-78호",
+   "count": 6,
+   "enHitProducible": 0,
+   "servingPass": 6,
+   "shard": {
+    "0": 3,
+    "1": 1,
+    "2": 2
+   },
+   "repFn": "“면역기능 증진에 도움을 줄 수 있습니다” (기타기능II)",
+   "repFnEn": null
+  },
+  {
+   "label": "나토균배양",
+   "count": 6,
+   "enHitProducible": 0,
+   "servingPass": 6,
+   "shard": {
+    "0": 1,
+    "1": 2,
+    "2": 3
+   },
+   "repFn": "(국문) -혈압이 높은 사람에게 도움을 줄 수 있음 -혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음 (영문) -May help to improve high blood pressure -May help to improve blood circulation through inhibition of platelet aggregation",
+   "repFnEn": null
+  },
+  {
+   "label": "호박씨추출물등복합물",
+   "count": 6,
+   "enHitProducible": 0,
+   "servingPass": 6,
+   "shard": {
+    "0": 3,
+    "1": 1,
+    "2": 2
+   },
+   "repFn": "(국문) 방광의 배뇨기능 개선에 도움을 줄 수 있음 (영문) May help to improve bladder control",
+   "repFnEn": null
+  },
+  {
+   "label": "대두이소플라본",
+   "count": 6,
+   "enHitProducible": 0,
+   "servingPass": 6,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 3
+   },
+   "repFn": "뼈 건강에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "알로에겔",
+   "count": 5,
+   "enHitProducible": 0,
+   "servingPass": 5,
+   "shard": {
+    "0": 2,
+    "1": 2,
+    "2": 1
+   },
+   "repFn": "피부건강에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "헛개나무과병",
+   "count": 5,
+   "enHitProducible": 0,
+   "servingPass": 5,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 3
+   },
+   "repFn": "알콜성손상으로부터간을보호하는데도움을줄수있음(생리활성기능2등급)",
+   "repFnEn": null
+  },
+  {
+   "label": "미역등복합추출물잔티젠",
+   "count": 4,
+   "enHitProducible": 0,
+   "servingPass": 4,
+   "shard": {
+    "0": 0,
+    "1": 2,
+    "2": 2
+   },
+   "repFn": "(국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat",
+   "repFnEn": null
+  },
+  {
+   "label": "유단백가수분해물락티움",
+   "count": 4,
+   "enHitProducible": 0,
+   "servingPass": 4,
+   "shard": {
+    "0": 2,
+    "1": 0,
+    "2": 2
+   },
+   "repFn": "(국문) 수면의 질 개선에 도움을 줄 수 있음 (영문) May help to improve sleep quality",
+   "repFnEn": null
+  },
+  {
+   "label": "크레아틴2007-13",
+   "count": 4,
+   "enHitProducible": 0,
+   "servingPass": 4,
+   "shard": {
+    "0": 2,
+    "1": 2,
+    "2": 0
+   },
+   "repFn": "근력 운동 시에 운동수행능력 향상에 도움을 줄 수 있음(기타기능II)",
+   "repFnEn": null
+  },
+  {
+   "label": "HK나토배양물",
+   "count": 4,
+   "enHitProducible": 0,
+   "servingPass": 4,
+   "shard": {
+    "0": 1,
+    "1": 2,
+    "2": 1
+   },
+   "repFn": "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하여, 혈액흐름을 원활히 하는데 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "꾸지뽕잎",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+   },
+   "repFn": "(국문) 위 불편감 개선에 도움을 줄 수 있음 (영문) May help to reduce stomach discomfort",
+   "repFnEn": null
+  },
+  {
+   "label": "초록입홍합추출오일복합물",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 1,
+    "2": 2
+   },
+   "repFn": "관절건강에 도움이 될 수 있습니다(기타기능Ⅱ)",
+   "repFnEn": null
+  },
+  {
+   "label": "기능성내용",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+   },
+   "repFn": "혈중 콜레스테롤 수치 개선에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "솔잎증류",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+   },
+   "repFn": "건강한 혈당의 유지에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "엽록소함유식물",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 1,
+    "1": 1,
+    "2": 1
+   },
+   "repFn": "피부건강에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "아티초크",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 2,
+    "2": 1
+   },
+   "repFn": "“담즙분비를 촉진하여 지방 소화에 도움을 줄 수 있음(기타기능 II)”",
+   "repFnEn": null
+  },
+  {
+   "label": "폴리코사놀-사탕수수왁스알코올2006-4",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 3,
+    "2": 0
+   },
+   "repFn": "혈중 콜레스테롤 수치 개선에 도움을 줄 수 있음",
+   "repFnEn": null
+  },
+  {
+   "label": "석류",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 0,
+    "1": 1,
+    "2": 2
+   },
+   "repFn": "“갱년기 여성의 건강에 도움을 줄 수 있음(기타Ⅱ)”",
+   "repFnEn": null
+  },
+  {
+   "label": "구아바잎추출물등복합물BENDU381",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 2,
+    "1": 0,
+    "2": 1
+   },
+   "repFn": "과민반응에 의한 코 상태(코 가려움, 재채기, 콧물) 개선에 도움을 줄 수 있음(기타기능 II)",
+   "repFnEn": null
+  },
+  {
+   "label": "영지버섯자실체추출물",
+   "count": 3,
+   "enHitProducible": 0,
+   "servingPass": 3,
+   "shard": {
+    "0": 2,
+    "1": 0,
+    "2": 1
+   },
+   "repFn": "혈행개선 혈행개선혈행개선",
+   "repFnEn": null
+  }
+ ]
+}

@@ -1,0 +1,282 @@
+[
+ {
+  "statementNo": "20040020006960",
+  "candidateId": "11807b76-a2f0-4987-a819-6e100936e878",
+  "shard": 2,
+  "ingredientKey": "키토산",
+  "productName": "팻 블락(Fat Block)",
+  "manufacturer": "(주)서흥",
+  "functionsKo": [
+   "체지방 감소에 도움을 줄 수 있음",
+   "혈중콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with body-fat reduction",
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산]\r\n①체지방 감소에 도움을 줄 수 있음\r\n②혈중콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 밝은 회황색의 제피정제\r\n2) 키토산 : 표시량(3 g/4.5 g)의 80~120%\r\n3) 납(mg/kg) : 3.0 이하\r\n4) 카드뮴(mg/kg) : 1.0 이하\r\n5) 총수은(mg/kg) : 1.0 이하\r\n6) 대장균군 : 음성\r\n7) 붕해 : 60분 이내",
+   "intake": "1일 3회, 1회 2정(1.5 g)을 물과 함께 섭취하십시오.",
+   "dosageForm": "밝은 회황색의 제피정제",
+   "shelfLife": "제조일부터 24개월",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "caution": "[키토산]게 또는 새우에 알레르기가 있는 사람은 섭취에 주의(게 또는 새우를 원재료로 사용한 경우에 한함)\r\n① 임산부와 수유부는 섭취 전 의사와 상담이 필요합니다. \r\n② 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "20040020046430",
+  "candidateId": "136f3530-1e18-4b93-9f6e-c6fda661cec4",
+  "shard": 2,
+  "ingredientKey": "키토산",
+  "productName": "자사미 키토산",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산 제품]①혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 적갈색의 경질캡슐\r\n2) 키토산 : 1일 2회, 1회 4캡슐 섭취 시 표시량(1,200mg/2,000mg)의 80~120% 이어야 한다.\r\n3) 납(mg/kg) : 3.0 이하\r\n4) 카드뮴(mg/kg) : 1.0 이하\r\n5) 총수은(mg/kg) : 1.0 이하\r\n6) 붕해시험 : 20분 이내\r\n7) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 4캡슐을 물과 함께 섭취한다.",
+   "dosageForm": "적갈색의 경질캡슐",
+   "shelfLife": "제조일로부터 2년",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "caution": "[키토산 제품]갑각류(게, 새우 등)에 알레르기를 나타내는 사람은 섭취에 주의\r\n① 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.\r\n② 어린이의 경우는 목에 걸릴 우려가 있으니 보호자의 관리하에 섭취하시기 바랍니다.\r\n③ 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "20040017106243",
+  "candidateId": "350d2f5a-4149-4eea-b365-c8b329f8c468",
+  "shard": 1,
+  "ingredientKey": "키토산",
+  "productName": "에이펙셀키토산",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산 제품]①혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상: 이미, 이취가 없고 고유의 향미가 있는 미황색의 경질캅셀\r\n2) 키토산: 표시량(1200mg/2220mg)의 80~120%\r\n3) 납(mg/kg): 3.0 이하\r\n4)카드뮴(mg/kg):1.0 이하\r\n5)총수은(mg/kg):1.0 이하\r\n6) 대장균군: 음성\r\n7) 붕해도: 건강기능식품Ⅲ.2.1 붕해시험법 캅셀제품 시험법에 따라 20분 내에 붕해",
+   "intake": "1일 2회, 1회 4캅셀(1110mg)씩 물과 함께 섭취하십시오.",
+   "dosageForm": "미황색의 경질캅셀",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "caution": "[키토산 제품]갑각류(게, 새우 등)에 알레르기를 나타내는 사람은 섭취에 주의\r\n1) 섭취량 및 섭취방법을 준수하십시오.\r\n2) 유통기한이 경과된 제품은 섭취하지 마십시오.\r\n3) 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "200400200141942",
+  "candidateId": "5706e86d-ad1e-4ff7-8fe2-017b0900da48",
+  "shard": 2,
+  "ingredientKey": "키토산",
+  "productName": "동국α키토산",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산] ①혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰 노랑의 내용물을 함유한 투명한 갈색 경질캡슐\n2. 키토산 : 표시량(1,200 mg/2,400 mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.3 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 대장균군 : 음성\n7. 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 3캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰 노랑의 내용물을 함유한 투명한 갈색 경질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[키토산]\n1. 어린이, 임산부 및 수유부는 섭취를 피할 것\n2. 게 또는 새우에 알레르기가 있는 사람은 섭취에 주의(게 또는 새우를 원재료로 사용한 경우에 한함)\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20040020046464",
+  "candidateId": "7691cbc5-2502-4e4f-a54f-e7a542af5f3f",
+  "shard": 1,
+  "ingredientKey": "키토산",
+  "productName": "도둑다이어트 데이타임(Day Time Thief)",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음, 체지방감소에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산 제품]혈중 콜레스테롤 개선에 도움을 줄 수 있음, 체지방감소에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 미황색 정제\r\n2) 키토산 : 표시량(3,000.0mg/5,100mg)의 80~120% 이어야 한다. \r\n3) 납(mg/kg) : 3.0 이하\r\n4) 카드뮴(mg/kg) : 1.0 이하\r\n5) 총수은(mg/kg) : 1.0 이하\r\n6) 붕해시험 : 30분 이내\r\n7) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 3정을 물과 함께 섭취한다",
+   "dosageForm": "미황색 정제",
+   "shelfLife": "24개월",
+   "storage": "직사광선을 받지 않는 실온에 보관합니다.",
+   "caution": "1. 알레르기나 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\r\n2. 어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 하에 섭취하시기 바랍니다.\r\n3. 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "20190009483416",
+  "candidateId": "80ce716a-545f-4a02-8a3a-e293f4640d0c",
+  "shard": 1,
+  "ingredientKey": "키토산",
+  "productName": "프라임 키토파워",
+  "manufacturer": "우리바이오(주)",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산]\n혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 내용물을 함유한 적갈색의 경질캡슐\n2. 키토산/키토올리고당 : 표시량(1,200mg/2,400mg)의 80~120%\n3. 납(mg/kg) : 3.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 대장균군 : 음성\n7. 붕해 : 20분이내",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 내용물을 함유한 적갈색의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "실온 및 실온유통",
+   "caution": "[키토산]\n게 또는 새우에 알레르기가 있는 사람은 섭취에 주의(게 또는 새우를 원재료로 사용한 경우에 한함)"
+  }
+ },
+ {
+  "statementNo": "20040020020315",
+  "candidateId": "8fc0e457-67c8-42e8-bc9c-4a5b82e052d9",
+  "shard": 1,
+  "ingredientKey": "키토산",
+  "productName": "키토산비엠",
+  "manufacturer": "엠에스바이오텍(주)",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산 제품]①혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "성상 : 고유의 색택을 지니며 이미 이취가 없다.\r\n납    : 3.0이하(mg/kg)\r\n카드뮴 : 0.1이하(mg/kg)\r\n총수은 : 0.1이하(mg/kg)\r\n대장균군 : 음성\r\n붕해  : 30분이내\r\n키토산 : 1.2g/1.8g의 80%이상~120%이하",
+   "intake": "1일 1회, 1회 9정씩 음용수와 함께 섭취하십시오.",
+   "dosageForm": "미황색 원형의 정제",
+   "shelfLife": "제조일로 부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "caution": "[키토산 제품]갑각류(게, 새우 등)에 알레르기를 나타내는 사람은 섭취에 주의\r\n① 알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\r\n② 제품을 개봉할 때 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의 하십시오."
+  }
+ },
+ {
+  "statementNo": "200400200141360",
+  "candidateId": "9ecc5948-2f1e-4821-9fb0-3152e1395132",
+  "shard": 0,
+  "ingredientKey": "키토산",
+  "productName": "게슬림",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선·체지방 감소에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol and body-fat reduction"
+  ],
+  "source": {
+   "mainFunction": "[키토산] 혈중 콜레스테롤 개선·체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 흰 노랑색의 장방형 제피정제\n② 키토산 : 표시량(3 g/5.2 g)의 80~120%\n③ 납(mg/kg) : 3.0 이하\n④ 카드뮴(mg/kg) : 1.0 이하\n⑤ 수은(mg/kg) : 1.0 이하\n⑥ 대장균군 : 음성\n⑦ 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취하십시오",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰 노랑색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[키토산]\n② 게 또는 새우에 알레르기가 있는 사람은 섭취에 주의(게 또는 새우를 원재료로 사용한 경우에 한함)"
+  }
+ },
+ {
+  "statementNo": "20040016037312",
+  "candidateId": "e373768c-8bc6-4e83-9a4c-32f7f5dea1e0",
+  "shard": 2,
+  "ingredientKey": "키토산",
+  "productName": "키토산 파워7",
+  "manufacturer": "아미코젠(주)문산제2공장",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산] ① 혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 내용물을 함유한 투명색의 경질캡슐\n2) 키토산 : 표시량(1,200mg/4,050mg)의 80~120%\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.3 이하\n5) 수은(mg/kg) : 1.0 이하\n6) 대장균군: 음성\n7) 붕해시험 : 적합 (20분 이내)",
+   "intake": "1일 3회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 내용물을 함유한 투명색의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피해 실온에 보관하십시오. ② 어린이의 손에 닿지 않는 곳에 보관하십시오",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 게 또는 새우에 알레르기가 있는 사람은 섭취에 주의(게 또는 새우를 원재료로 사용한 경우에 한함)\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20040017021506",
+  "candidateId": "e48f8864-328c-47ba-b2a0-f54eec44cd73",
+  "shard": 1,
+  "ingredientKey": "키토산",
+  "productName": "힙스다이어트키토산3000",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "체지방감소에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol",
+   "May help with body-fat reduction"
+  ],
+  "source": {
+   "mainFunction": "[키토산 제품]①혈중 콜레스테롤 개선에 도움을 줄 수 있음. ②체지방감소에 도움을 줄 수 있음",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 노랑 하양색의 장방형 제피정제\n(2)키토산 : 표시량(3,000 ㎎/4,000 ㎎)의 80~120%\n(3)납(mg/kg) : 1.0 이하\n(4)카드뮴(mg/kg) : 0.3 이하\n(5)수은(mg/kg): 1.0 이하\n(6)대장균군 : 음성\n(7)붕해시험 : 적합(60분 이내)",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노랑 하양색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "1. 고온다습, 직사광선을 피하고 서늘한 곳에 보관한다.\r\n2. 어린이 손에 닿지 않는 곳에 보관한다.",
+   "caution": "-어린이 임산부 및 수유부는 섭취를 피할 것\n-게 또는 새우에 알레르기가 있는 사람은 섭취에 주의\n   (게 또는 새우를 원재료로 사용한 경우에 한함)\n-이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400200141415",
+  "candidateId": "fa7f6442-6101-4816-a9ad-f12ad79989e1",
+  "shard": 0,
+  "ingredientKey": "키토산",
+  "productName": "헬시 청",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol"
+  ],
+  "source": {
+   "mainFunction": "[키토산] 혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없으며 갈색 점박이가 있는 흰 노랑색의 장방형 제피정제\n② 키토산 : 표시량(1.2 g/3,000 mg)의 80~120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 0.3 이하\n⑤ 수은(mg/kg) : 1.0 이하\n⑥ 대장균군 : 음성\n⑦ 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 3정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 갈색 점박이가 있는 흰 노랑색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[키토산]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 게 또는 새우에 알레르기가 있는 사람은 섭취에 주의\n(게 또는 새우를 원재료로 사용한 경우에 한함)\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "2020001605284",
+  "candidateId": "fc608630-5baf-4b3c-ad71-e9af0a7fcd1a",
+  "shard": 2,
+  "ingredientKey": "키토산",
+  "productName": "닥터S레드",
+  "manufacturer": "주식회사 상상바이오",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선·체지방 감소에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol and body-fat reduction"
+  ],
+  "source": {
+   "mainFunction": "[키토산]혈중 콜레스테롤 개선·체지방 감소에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말 함유한 흰색의 경질캡슐\n② 키토산 : 표시량(3.2g/4.440mg)의 80 ~ 120%\n③ 납(mg/kg) : 3.0 이하\n④ 카드뮴(mg/kg) : 1.0 이하\n⑤ 수은(mg/kg) : 1.0 이하\n⑥ 대장균군 : 음성\n⑦ 붕해시험 : 적합 (20분 이내)",
+   "intake": "1일 2회, 1회 6캡슐, 총4.44g을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말 함유한 흰색의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "[키토산]① 게 또는 새우에 알레르기가 있는 사람은 섭취에 주의하십시오.\n② 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.. \n③ 섭취량 및 섭취방법을 확인하시고 충분한 물과 함께 섭취하십시오.\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오\n⑤ 특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원재료를 확인한  후 섭취하십시오."
+  }
+ }
+]

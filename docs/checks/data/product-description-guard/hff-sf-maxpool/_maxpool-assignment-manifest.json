@@ -1,0 +1,96 @@
+{
+ "generated": "2026-07-22",
+ "wo": "MAX-POOL-INTEGRATION-B-V1",
+ "shardAxis": "FNV-1a(String(STTEMNT_NO).trim())%3",
+ "agents": {
+  "0": "A",
+  "1": "B",
+  "2": "C"
+ },
+ "note": "신규 7원료(기존 5원료는 79 LIVE 완료). 각 shard 파일 직접주입 → hff-sf-generate → hff-sf-apply.",
+ "ingredients": {
+  "뮤코다당·단백": {
+   "slug": "mucopolysaccharide-protein",
+   "function": "관절연골",
+   "status": "READY",
+   "readyByShard": {
+    "0": 24,
+    "1": 19,
+    "2": 11
+   },
+   "total": 54
+  },
+  "인삼": {
+   "slug": "korean-ginseng",
+   "function": "면역/피로",
+   "status": "READY",
+   "readyByShard": {
+    "0": 7,
+    "1": 8,
+    "2": 13
+   },
+   "total": 28
+  },
+  "키토산": {
+   "slug": "chitosan",
+   "function": "혈중콜레스테롤",
+   "status": "READY",
+   "readyByShard": {
+    "0": 2,
+    "1": 5,
+    "2": 5
+   },
+   "total": 12
+  },
+  "알로에 전잎": {
+   "slug": "aloe-whole-leaf",
+   "function": "배변",
+   "status": "READY",
+   "readyByShard": {
+    "0": 3,
+    "1": 2,
+    "2": 5
+   },
+   "total": 10
+  },
+  "홍국": {
+   "slug": "red-yeast-rice",
+   "function": "혈중콜레스테롤",
+   "status": "READY",
+   "readyByShard": {
+    "0": 2,
+    "1": 4,
+    "2": 3
+   },
+   "total": 9
+  },
+  "로즈힙": {
+   "slug": "rosehip",
+   "function": "관절연골",
+   "status": "READY",
+   "readyByShard": {
+    "0": 2,
+    "1": 3,
+    "2": 3
+   },
+   "total": 8
+  },
+  "키토올리고당": {
+   "slug": "chitooligosaccharide",
+   "function": "체지방",
+   "status": "READY",
+   "readyByShard": {
+    "0": 0,
+    "1": 1,
+    "2": 2
+   },
+   "total": 3
+  }
+ },
+ "shardTotals": {
+  "0": 40,
+  "1": 42,
+  "2": 42
+ },
+ "grandReadyTotal": 124
+}

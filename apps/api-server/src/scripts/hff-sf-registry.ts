@@ -25,6 +25,15 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
     fnNormalize: (ko) => ko.replace(/전립선\s*건강의\s*유지/g, '전립선 건강 유지'), statusHint: 'READY' },
   '포스파티딜세린': { key: '포스파티딜세린', slug: 'phosphatidylserine', displayKo: '포스파티딜세린', displayEn: 'Phosphatidylserine', labelRe: /포스파티딜세린/, statusHint: 'PENDING' },
   '헤마토코쿠스추출물': { key: '헤마토코쿠스추출물', slug: 'haematococcus', displayKo: '헤마토코쿠스추출물', displayEn: 'Haematococcus extract', labelRe: /헤마토코쿠스|아스타잔틴/i, indicatorRe: /아스타잔틴/, statusHint: 'PENDING' },
+  // ── MAX-POOL 통합(WO-...-MAX-POOL-INTEGRATION): 발굴 EN-HIT 원료. displayEn=표준 영문명 정적 lookup(§3), 기능성 EN=mapFunctionEn grounded.
+  //    labelRe 는 브래킷 원료 유일식별(교차귀속 방지). 실제 EN 완전성은 resolveFunctions 가 제품별 검증 → 미충족 REVIEW_LATER.
+  '뮤코다당단백': { key: '뮤코다당단백', slug: 'mucopolysaccharide-protein', displayKo: '뮤코다당·단백', displayEn: 'Mucopolysaccharide-protein', labelRe: /뮤코다당/, statusHint: 'READY' },
+  '인삼': { key: '인삼', slug: 'korean-ginseng', displayKo: '인삼', displayEn: 'Korean ginseng', labelRe: /(?<![홍흑산수])인삼/, statusHint: 'READY' },
+  '키토산': { key: '키토산', slug: 'chitosan', displayKo: '키토산', displayEn: 'Chitosan', labelRe: /키토산/, statusHint: 'READY' },
+  '알로에전잎': { key: '알로에전잎', slug: 'aloe-whole-leaf', displayKo: '알로에 전잎', displayEn: 'Aloe whole leaf', labelRe: /알로에\s*전잎/, statusHint: 'READY' },
+  '홍국': { key: '홍국', slug: 'red-yeast-rice', displayKo: '홍국', displayEn: 'Red yeast rice', labelRe: /홍국/, statusHint: 'READY' },
+  '로즈힙': { key: '로즈힙', slug: 'rosehip', displayKo: '로즈힙', displayEn: 'Rosehip', labelRe: /로즈힙/, statusHint: 'READY' },
+  '키토올리고당': { key: '키토올리고당', slug: 'chitooligosaccharide', displayKo: '키토올리고당', displayEn: 'Chitooligosaccharide', labelRe: /키토올리고/, statusHint: 'READY' },
 };
 
 /** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/·(중점) 구분. */
