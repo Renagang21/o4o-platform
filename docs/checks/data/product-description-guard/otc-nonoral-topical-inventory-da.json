@@ -1,0 +1,274 @@
+{
+ "wo": "WO-O4O-OTC-NONORAL-TOPICAL-10H-PRODUCTION-DA-V1",
+ "agent": "da",
+ "readOnly": true,
+ "dbWrite": 0,
+ "scope": "NON_ORAL 피부 외용제 독립 트랙 조사 — 생산 전 대표 계약 검증(read-only)",
+ "poolBasis": "product_masters w/ mfds_easy_drug STORE ko canonical AND no mfds_drug_otc STORE canonical(미생산). name 기반 route/form 분류.",
+ "bridgeTopicalGroups": 1857,
+ "bridgeTopicalMasters": 4365,
+ "classification": {
+  "크림": 1052,
+  "연고": 305,
+  "겔": 715,
+  "로션": 103,
+  "외용액": 117,
+  "스프레이": 170,
+  "첩부제_patch": 1517,
+  "기타외용": 0,
+  "점막_mucosal_EXCL": 103,
+  "안이비_EXCL": 976,
+  "좌제질_EXCL": 80,
+  "경구_oral": 11309,
+  "unknown_EXCL": 2026
+ },
+ "inScope_skinTopical_masters": 2462,
+ "inScope_forms": {
+  "크림": 1052,
+  "겔": 715,
+  "연고": 305,
+  "스프레이": 170,
+  "외용액": 117,
+  "로션": 103
+ },
+ "holdPatch_masters": 1517,
+ "excluded": {
+  "점막_mucosal": 103,
+  "안이비_ophthalmic_otic_nasal_inhalation": 976,
+  "좌제질_rectal_vaginal": 80,
+  "unknown_route": 2026,
+  "oral_out_of_scope": 11309
+ },
+ "representativeAudit": [
+  {
+   "label": "single_cream",
+   "found": true,
+   "name": "테르나졸크림(염산테르비나핀)",
+   "spec": "없음 / 0",
+   "len": 982,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": true,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": true,
+    "밀봉붕대": true,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "single_ointment",
+   "found": true,
+   "name": "리도킨연고5%(리도카인)",
+   "spec": "없음 / 0",
+   "len": 740,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": false,
+    "기간": false,
+    "밀봉붕대": false,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "gel",
+   "found": true,
+   "name": "피캄스겔(피록시캄)",
+   "spec": "없음 / 0",
+   "len": 893,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": false,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": false,
+    "밀봉붕대": true,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "external_solution",
+   "found": true,
+   "name": "유클리어톡외용액(살리실산)",
+   "spec": "40밀리리터 / 0",
+   "len": 731,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": true,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": false,
+    "밀봉붕대": false,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "spray",
+   "found": true,
+   "name": "코마키텐나잘스프레이",
+   "spec": "20밀리리터 / 1 / 개 / 병",
+   "len": 1169,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": false,
+    "입점막회피": false,
+    "도포횟수": true,
+    "기간": true,
+    "밀봉붕대": false,
+    "환부적용": false,
+    "복용표현_oral": true
+   }
+  },
+  {
+   "label": "lotion",
+   "found": true,
+   "name": "코디케어로션2.5%(히드로코르티손)",
+   "spec": "없음 / 0",
+   "len": 1038,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": true,
+    "밀봉붕대": true,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "multi_ingredient",
+   "found": true,
+   "name": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrength,HydrocortisoneCream)",
+   "spec": "57그램 / 1 / 개 / 튜브",
+   "len": 972,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": true,
+    "밀봉붕대": true,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "patch",
+   "found": true,
+   "name": "동의고카타플라스마(수출명:coolrunning)",
+   "spec": "14그램 / 0",
+   "len": 644,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": true,
+    "눈회피": false,
+    "입점막회피": false,
+    "도포횟수": true,
+    "기간": false,
+    "밀봉붕대": false,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "mucosal_risk",
+   "found": true,
+   "name": "래반포르테주입크림",
+   "spec": "2그램 / 1 / 개 / 튜브",
+   "len": 829,
+   "axes": {
+    "효능": true,
+    "용법": true,
+    "주의": true,
+    "이상반응": true,
+    "저장": true,
+    "외용전용": false,
+    "눈회피": true,
+    "입점막회피": true,
+    "도포횟수": true,
+    "기간": false,
+    "밀봉붕대": false,
+    "환부적용": true,
+    "복용표현_oral": false
+   }
+  },
+  {
+   "label": "gel_topical2",
+   "found": false
+  }
+ ],
+ "contractSpec": {
+  "sourceSections_consistent": "효능·효과 / 용법·용량 / 사용상 주의사항 / 이상반응 / 저장방법 — 9/9 대표 전부 존재(결정적 추출 가능)",
+  "blocker_editorialFields": "승인된 sd-* 디자인의 summaryTable(작용/선택포인트, How it works/Why this one)은 공식 원문에 없음 → 생성 시 WO의 신규문구·마케팅 금지 위반",
+  "blocker_noAuthoredDrafts": "topical authored draft 0건(oral 95건 전부 경구). 승격(grounded-upgrade) 대상 없음",
+  "blocker_routeAmbiguity": "name 기반 topical 버킷에 나잘스프레이 등 점막·비강 혼입(복용표현 검출) → 제품별 route/점막 스크리닝 필수",
+  "blocker_axisVariance": "외용전용/도포횟수/기간 마커가 제품별 불균일 → fingerprint 그룹 내 HOLD_FREQUENCY/DURATION/APPLICATION_SITE_VARIANCE 다수 예상",
+  "blocker_authoringInvariant": "의약품 소비자 콘텐츠 = 외부 LLM 초안 자동생성 금지 · 공식 원문 grounding · DB 반영은 승인·이중게이트 후(콘텐츠 문서 체계 불변원칙)",
+  "requiredForProduction": "(1) grounded topical 결정적 composer(원문→sd-*, 경구표현 0) (2) 작용/선택포인트 editorial 필드 정책 확정(원문 파생 or 디자인 예외) (3) 제품별 route/점막 스크리너 (4) topical EN builder(apply/spread/spray verbs, GUIDE V0.5/GLOSSARY V0.2) (5) 승인·이중게이트 apply"
+ },
+ "stateCounts": {
+  "READY_TOPICAL_SINGLE": 0,
+  "READY_TOPICAL_MULTI": 0,
+  "READY_EXTERNAL_SOLUTION": 0,
+  "READY_TOPICAL_SPRAY": 0,
+  "READY_SPLIT_SUBGROUP": 0,
+  "READY_PRODUCT_SPECIFIC": 0,
+  "HOLD_CONTRACT_UNDEFINED_skinTopical": 2462,
+  "HOLD_PATCH": 1517,
+  "HOLD_MUCOSAL": 103,
+  "EXCLUDED_nonSkin": 3082,
+  "COMPLETED": 0
+ },
+ "productionNow": 0,
+ "claimIntersection": {
+  "ga": "NUTRITION_COMBO_EN_ONLY(무교집합)",
+  "na": "NUTRITION_COMBO_EN_ONLY(무교집합)",
+  "da_prev": "NUTRITION_COMBO_EN_ONLY 진셀몬(별개 트랙, 미접촉)"
+ }
+}
