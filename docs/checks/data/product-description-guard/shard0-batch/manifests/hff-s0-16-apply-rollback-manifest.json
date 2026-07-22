@@ -1,0 +1,48 @@
+{
+  "slug": "s0-16",
+  "createdMasters": [
+    "c6da7e01-9903-44a6-b228-e59be3853f40",
+    "3b34ca0a-41c9-49ab-b1e9-4734ecfd32e4",
+    "eb9e7e8e-c33b-4ff6-af35-a26c18d23acc",
+    "b2291791-5c90-4015-bb1f-4cc5e7f5b333"
+  ],
+  "createdSpd": [
+    "b456d975-3043-4f25-a367-f0d42d4d7b8b",
+    "e3763eb6-8882-4598-9cfb-71685a17994b",
+    "d62da614-b7de-4ad0-bb6f-dea3d29b4b3a",
+    "c65b1dde-a76c-422e-9daf-e7d2a2b781fe",
+    "89a62a7c-6f1a-49fa-bc48-4b5e2da6cfb4",
+    "fcf0c31f-0a79-486c-a8d4-46326a7192fa",
+    "4991edac-d5f7-41cd-92bb-4271c1519370",
+    "1d20be8c-7151-4c39-b692-dfb8ca1cc11f"
+  ],
+  "candIds": [
+    "77cb6690-1e68-4743-b888-509d4e427669",
+    "3b42618e-137f-4e2c-a70c-459c7ca1e196",
+    "d933cf3b-e7c9-4056-bac9-251c2a17b0fa",
+    "50bae50b-d054-4ffe-a52b-46f6de68a83a"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "77cb6690-1e68-4743-b888-509d4e427669",
+      "stmt": "201000190041542",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "3b42618e-137f-4e2c-a70c-459c7ca1e196",
+      "stmt": "20040017106313",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d933cf3b-e7c9-4056-bac9-251c2a17b0fa",
+      "stmt": "201000190041037",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "50bae50b-d054-4ffe-a52b-46f6de68a83a",
+      "stmt": "201000190041344",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

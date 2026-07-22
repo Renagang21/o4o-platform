@@ -1,0 +1,66 @@
+{
+  "slug": "s0-9",
+  "createdMasters": [
+    "639321a7-0218-4fce-90e7-32c55da9afdb",
+    "be7d83a6-3837-4e96-9cb6-21f21a4671ad",
+    "651a4a3c-1a54-4bd6-9d38-eb90c2b647fe",
+    "a83bb632-b9c4-4444-8d96-431aedfb2821",
+    "451292d1-b3c6-4233-9e36-dd8000534186",
+    "681f02af-d52f-4be0-8148-a5d79dc6e1e3"
+  ],
+  "createdSpd": [
+    "e506dfca-1cfb-46da-88c1-6b513a1ae79b",
+    "1feccc8a-ed6b-40b6-9550-030c246a297a",
+    "84c5ae70-90bf-4e62-8127-a0fa37d11435",
+    "19f9f4ad-45f2-4932-a758-d5de59325bf5",
+    "73607f7f-3e34-46c8-bb50-6013c04ba95e",
+    "6d8ff4af-3324-4f91-8593-84589be7e5bd",
+    "f66dbe4f-6d1d-47c1-8606-8008d4dbfc75",
+    "d8bd00ea-7ab1-4b7c-bcdf-2d3158f14020",
+    "d72a2742-9f57-4f83-b930-3ebf4ed560d0",
+    "fb7bd1fd-7309-4b1a-93d8-d9f540e6fd64",
+    "614683be-996b-47fe-9734-22b1aa5cd06b",
+    "9a12430d-ad2e-4945-a94f-86c92de894fe"
+  ],
+  "candIds": [
+    "82597366-a533-4ddf-a66b-bf17ef3e2aa9",
+    "a4357a8a-b93d-4bba-8659-0b2935918762",
+    "5b0d25df-7fad-478f-96d5-f2368c0da784",
+    "70e8e253-d829-4584-b2e7-fc8dd7163644",
+    "9b9687c6-eb2e-48c0-a056-e0a524cd9070",
+    "b0cc2b9b-9b23-4c19-98af-e7fd39a6aa63"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "82597366-a533-4ddf-a66b-bf17ef3e2aa9",
+      "stmt": "200400170211707",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a4357a8a-b93d-4bba-8659-0b2935918762",
+      "stmt": "200400200022838",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "5b0d25df-7fad-478f-96d5-f2368c0da784",
+      "stmt": "200400200023556",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "70e8e253-d829-4584-b2e7-fc8dd7163644",
+      "stmt": "2022001899310",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9b9687c6-eb2e-48c0-a056-e0a524cd9070",
+      "stmt": "200400200022793",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b0cc2b9b-9b23-4c19-98af-e7fd39a6aa63",
+      "stmt": "2023000462461",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

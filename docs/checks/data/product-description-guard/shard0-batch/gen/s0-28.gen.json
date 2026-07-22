@@ -1,0 +1,212 @@
+[
+ {
+  "candidateId": "s0-28-001",
+  "productName": "메가 큐 프리미엄(Mega-Q Premium)",
+  "productNameEn": "메가 큐 프리미엄(Mega-Q Premium)",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "201200170106",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]①정상적인 엽산 대사에 필요\n[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐\n2) 대장균군 : 음성\n3) 붕해도 : 20분이내\n4) 비타민B12 : 표시량(96㎍/2.160g)의 80~180%\n5) 비오틴 : 표시량(162㎍/2.160g)의 80~180%",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 162,
+    "unit": "μg",
+    "basisAmount": 2.16,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 162μg</span><span class=\"sd-badge is-solid\">비타민 B12 96μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메가 큐 프리미엄(Mega-Q Premium)<small>비오틴 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>162μg</b>, 비타민 B12 <b>96μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 비오틴 <b>162μg</b>, 비타민 B12 <b>96μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(162μg/2.16g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(96μg/2.16g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 162μg</span><span class=\"sd-badge is-solid\">Vitamin B12 96μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메가 큐 프리미엄(Mega-Q Premium)<small>Biotin · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>162μg</b> of Biotin, <b>96μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (3 capsules): <b>162μg</b> Biotin, <b>96μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (162μg / 2.16g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (96μg / 2.16g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "s0-28-002",
+  "productName": "비오틴 밸런스",
+  "productNameEn": "비오틴 밸런스",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211383",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비오틴] (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B12] (1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말\n②비오틴 : 표시량(3,000 ㎍/2,000 mg)의 80 ~ 180%\n③비타민B12 : 표시량(240 ㎍/2,000 mg)의 80 ~ 180%\n④대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 또는 물에 타서 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3000,
+    "unit": "μg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 3000μg</span><span class=\"sd-badge is-solid\">비타민 B12 240μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비오틴 밸런스<small>비오틴 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>3000μg</b>, 비타민 B12 <b>240μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비오틴 <b>3000μg</b>, 비타민 B12 <b>240μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(3000μg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(240μg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 3000μg</span><span class=\"sd-badge is-solid\">Vitamin B12 240μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비오틴 밸런스<small>Biotin · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3000μg</b> of Biotin, <b>240μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>3000μg</b> Biotin, <b>240μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (3000μg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (240μg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하양색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "s0-28-003",
+  "productName": "희낙",
+  "productNameEn": "희낙",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701038",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 엽산 대사에 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1)성상: 이미, 이취가 없고 고유의 향미가 있는 갈색의 제피정제\n2)비타민B12: 표시량 140㎍/3200mg의 80~180%  \n3)비오틴: 표시량 200㎍/3200mg의 80~180%\n4)대장균군 : 음성\n5)붕해도: 60분이내",
+   "intake": "1일2회, 1회 2정(1,600mg)을 충분한 물 또는 기호음료와 함께 섭취하십시오.",
+   "caution": "1) 섭취량 및 섭취방법을 준수하십시오\n2) 유통기한이 경과된 제품은 섭취하지 마십시오\n3) 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 제피정제",
+   "storage": "직사광선 및 고온을 피하여 서늘한 곳에 보관, 유통하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 200,
+    "unit": "μg",
+    "basisAmount": 3200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 200μg</span><span class=\"sd-badge is-solid\">비타민 B12 140μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>희낙<small>비오틴 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>200μg</b>, 비타민 B12 <b>140μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비오틴 <b>200μg</b>, 비타민 B12 <b>140μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 갈색의 제피정제 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(200μg/3200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(140μg/3200mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온을 피하여 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 200μg</span><span class=\"sd-badge is-solid\">Vitamin B12 140μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>희낙<small>Biotin · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>200μg</b> of Biotin, <b>140μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>200μg</b> Biotin, <b>140μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (200μg / 3200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (140μg / 3200mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온을 피하여 서늘한 곳에 보관, 유통하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "s0-28-004",
+  "productName": "넥시놀(Nexinol)",
+  "productNameEn": "넥시놀(Nexinol)",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701019",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]①정상적인 엽산 대사에 필요\n[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1) 성상 :고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 포함한 투명한 경질캅셀\n2) 대장균군 : 음성\n3) 붕해도 : 20분이내\n4) 비타민B12 : 표시량(48㎍/1,080g)의 80~180%\n5) 비오틴 : 표시량(81㎍/1,080g)의 80~180%",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 포함한 투명한 경질캅셀",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 81,
+    "unit": "μg",
+    "basisAmount": 1080,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 81μg</span><span class=\"sd-badge is-solid\">비타민 B12 48μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>넥시놀(Nexinol)<small>비오틴 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>81μg</b>, 비타민 B12 <b>48μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 비오틴 <b>81μg</b>, 비타민 B12 <b>48μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 포함한 투명한 경질캅셀 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(81μg/1080g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(48μg/1080g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 포함한 투명한 경질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 81μg</span><span class=\"sd-badge is-solid\">Vitamin B12 48μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>넥시놀(Nexinol)<small>Biotin · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>81μg</b> of Biotin, <b>48μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (3 capsules): <b>81μg</b> Biotin, <b>48μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (81μg / 1080g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (48μg / 1080g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회색의 내용물을 포함한 투명한 경질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "s0-28-005",
+  "productName": "메르비타",
+  "productNameEn": "메르비타",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701037",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 엽산 대사에 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1)성상: 이미, 이취가 없고 고유의 향미가 있는 회색 분말을 함유한 갈색의 투명한 경질캡슐\n2)비타민B12: 표시량 (96㎍/2.160g)의 80~180%  \n3)비오틴: 표시량 (162㎍/2.160g)의 80~180%\n4)대장균군 : 음성\n5)붕해도: 20분이내",
+   "intake": "1일 2회, 1회 3캡슐을 충분한 물 또는 기호음료와 함께 섭취하십시오.",
+   "caution": "1) 섭취량 및 섭취방법을 준수하십시오.\n2) 유통기한이 경과된 제품은 섭취하지 마십시오.\n3) 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 회색 분말을 함유한 갈색의 투명한 경질캡슐",
+   "storage": "고온 다습한곳과 직사광선을 피하여 서늘한곡에 보관하시고 어린이의 손이 닿지않는곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 162,
+    "unit": "μg",
+    "basisAmount": 2.16,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비오틴 162μg</span><span class=\"sd-badge is-solid\">비타민 B12 96μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메르비타<small>비오틴 · 비타민 B12</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비오틴 <b>162μg</b>, 비타민 B12 <b>96μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 비오틴 <b>162μg</b>, 비타민 B12 <b>96μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 회색 분말을 함유한 갈색의 투명한 경질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비오틴</b> 표시량(162μg/2.16g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B12</b> 표시량(96μg/2.16g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 회색 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온 다습한곳과 직사광선을 피하여 서늘한곡에 보관하시고 어린이의 손이 닿지않는곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비오틴 · 비타민 B12 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Biotin 162μg</span><span class=\"sd-badge is-solid\">Vitamin B12 96μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메르비타<small>Biotin · Vitamin B12</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>162μg</b> of Biotin, <b>96μg</b> of Vitamin B12 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (3 capsules): <b>162μg</b> Biotin, <b>96μg</b> Vitamin B12</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Biotin</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Biotin</b> labelled (162μg / 2.16g), 80~180%</div><div class=\"sd-item\"><b>Vitamin B12</b> labelled (96μg / 2.16g), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 회색 분말을 함유한 갈색의 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온 다습한곳과 직사광선을 피하여 서늘한곡에 보관하시고 어린이의 손이 닿지않는곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Biotin · Vitamin B12 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,57 @@
+{
+  "slug": "s0-32",
+  "createdMasters": [
+    "b33e87f7-80ae-46b5-8349-6b8345647613",
+    "bb11feae-46c3-4110-9f06-4512c3e41a8b",
+    "f081586c-c0d7-4804-8499-a56913fd358b",
+    "36d76927-dddb-4a04-9b05-16facf7ac799",
+    "57e2274e-aa3d-4c35-9e12-a828f1bc635b"
+  ],
+  "createdSpd": [
+    "803abe8f-cd59-4b4b-a8e1-afdabc2849f1",
+    "d8effbf1-c02d-4650-bf4e-5954f56e87ab",
+    "1f001880-9015-4cb1-9b29-fb2ba51a877d",
+    "8f3b4793-0535-4659-9820-46cceefdcc2e",
+    "b1b0b551-806e-4d7a-8629-cfebbc7d477f",
+    "b9d64b7c-eed5-4768-b71e-bc74d1706ba8",
+    "1e736dc0-2866-48f1-b56a-20a25da631ae",
+    "c381892e-59d5-4444-98b8-451a9c9cd0e0",
+    "a198eb74-1028-4cfa-8022-62705e802514",
+    "1f7186a4-a260-4c49-ac8a-7559345ed876"
+  ],
+  "candIds": [
+    "6ac4bcb4-7c80-497d-b2a6-1117ecf6eecb",
+    "de44df00-97ed-4303-9575-0ce8d582fcf6",
+    "b721ef1a-5022-4db5-9de2-a67db5750388",
+    "d9873b29-b18a-4145-9451-c7f22aa84b31",
+    "94648486-dbed-4c0f-a1c5-78813273ec82"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "6ac4bcb4-7c80-497d-b2a6-1117ecf6eecb",
+      "stmt": "200700170351349",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "de44df00-97ed-4303-9575-0ce8d582fcf6",
+      "stmt": "2018000723465",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b721ef1a-5022-4db5-9de2-a67db5750388",
+      "stmt": "2018000723445",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d9873b29-b18a-4145-9451-c7f22aa84b31",
+      "stmt": "2018000723444",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "94648486-dbed-4c0f-a1c5-78813273ec82",
+      "stmt": "20040020006911",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

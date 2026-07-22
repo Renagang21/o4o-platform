@@ -1,0 +1,57 @@
+{
+  "slug": "s0-24",
+  "createdMasters": [
+    "58e9bfc3-c745-41aa-82f8-e1bb80d388e7",
+    "2fe1018a-8def-42d4-b08c-ca1d827003d4",
+    "4be1ebf7-4f52-4e94-9db1-d22ac17b7b40",
+    "910ce0ce-daf7-4694-831b-da35250ca585",
+    "b2149802-deeb-4031-a296-0649e19822b0"
+  ],
+  "createdSpd": [
+    "adaa81ba-b844-4e11-bf97-f78c3b0e7619",
+    "d1e4940b-3265-4159-a687-3db90bda3d45",
+    "356d01a7-d024-432f-bc5c-f67f850650c8",
+    "9ae45078-a12c-4fb3-87de-140ba2eb3f9a",
+    "783ca1db-3f2f-4fc2-8a58-432c2c5fa7e0",
+    "493a61ed-a12f-4ec8-8a07-5d4acd4617ca",
+    "7dd2f115-6153-4078-b49c-413be33143d3",
+    "13fa6adc-9347-41f5-99bf-dc327e3dcb4d",
+    "5b0fbb94-55f5-44a2-bd36-9da2f57b2743",
+    "8f0d2e1b-47c0-4624-a5cb-b61fe20f920d"
+  ],
+  "candIds": [
+    "c059e2fe-1789-4d35-8b36-9e5991dea8cf",
+    "6f4e13b9-de7b-4c41-a9e1-52bbb70a4744",
+    "3db1278f-dc60-483e-bc6b-f367f77d0a02",
+    "20501a70-76d1-4177-8fce-e3557760f475",
+    "0712297f-65b3-4b8e-adff-45857741896a"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "c059e2fe-1789-4d35-8b36-9e5991dea8cf",
+      "stmt": "20160007515100",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "6f4e13b9-de7b-4c41-a9e1-52bbb70a4744",
+      "stmt": "20190009483427",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "3db1278f-dc60-483e-bc6b-f367f77d0a02",
+      "stmt": "201200190071029",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "20501a70-76d1-4177-8fce-e3557760f475",
+      "stmt": "2019000910517",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "0712297f-65b3-4b8e-adff-45857741896a",
+      "stmt": "20040016020232",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

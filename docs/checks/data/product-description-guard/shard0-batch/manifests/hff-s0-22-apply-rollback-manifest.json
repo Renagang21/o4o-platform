@@ -1,0 +1,66 @@
+{
+  "slug": "s0-22",
+  "createdMasters": [
+    "f29d9f3f-c767-4021-b63f-c423e85de63e",
+    "9f348fab-4368-4944-b621-1221c6f68ca0",
+    "f37a9a86-2827-47f6-8625-e07509e31c4e",
+    "2574a2cb-fd4f-4b98-b13c-b76b207c180f",
+    "185cfe5d-5bd5-467d-a53c-40a687a9bc6d",
+    "38478907-0134-4d5d-85a7-3445b41f9b7b"
+  ],
+  "createdSpd": [
+    "eee51075-61b5-49d4-830d-3a2ac9855652",
+    "043ac9bd-4bbc-4edf-b857-86e69e3ef032",
+    "de55eff7-61ef-493b-af40-6726b1b718a1",
+    "b898de09-8292-4ab4-a56c-4b4683359288",
+    "da004b1b-8f80-48c9-bb9c-aaa62596837d",
+    "a87841bb-41a4-4bbf-8f39-c16c9a75c400",
+    "5d35fc15-326d-4d35-97c3-9a79927e1045",
+    "1c2a8d43-8a4e-4084-953d-02e1c1da5bce",
+    "32dca7ab-fbe2-47a9-90a5-811e01b9c01f",
+    "d7acb71a-3b68-4cfa-a35f-52eaef376a25",
+    "9495350b-3ec3-426b-8915-0d6bb3b8c323",
+    "6ed78b6c-0b53-407c-9b1f-d08b3f63a8ed"
+  ],
+  "candIds": [
+    "5105e029-0bc9-4cdd-917e-7749497cb425",
+    "51c3dd63-8785-445c-893f-844fda9f66c4",
+    "33ca383c-6541-44ae-b173-dd98c552558a",
+    "eddefb8a-1395-4e4f-b353-3d37f427dece",
+    "afd5af47-392c-477c-b5a5-f495a79672d3",
+    "9cf46a9e-9b3c-410c-86ca-7cd4065bc904"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "5105e029-0bc9-4cdd-917e-7749497cb425",
+      "stmt": "200400170211484",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "51c3dd63-8785-445c-893f-844fda9f66c4",
+      "stmt": "20040015083463",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "33ca383c-6541-44ae-b173-dd98c552558a",
+      "stmt": "200400170211711",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "eddefb8a-1395-4e4f-b353-3d37f427dece",
+      "stmt": "20040015107463",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "afd5af47-392c-477c-b5a5-f495a79672d3",
+      "stmt": "200400200022425",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9cf46a9e-9b3c-410c-86ca-7cd4065bc904",
+      "stmt": "20120019007756",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

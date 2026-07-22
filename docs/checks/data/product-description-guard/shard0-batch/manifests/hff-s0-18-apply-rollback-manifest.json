@@ -1,0 +1,66 @@
+{
+  "slug": "s0-18",
+  "createdMasters": [
+    "5422ea9d-b594-4b85-a011-3409cc2482ee",
+    "4cdc30fc-48f3-4418-90ac-3374c00761e6",
+    "466c1caf-a14e-4c30-b3c7-40baf4c09379",
+    "31050315-edab-4691-8190-6b44c30fd27f",
+    "53ce7ee7-62c0-442a-ac96-a3bc4f547a98",
+    "5c39344f-c6b1-4716-a456-bf02bbe03522"
+  ],
+  "createdSpd": [
+    "ae6ee007-55b8-48aa-b1cb-0c97ffdfe827",
+    "06cb5ca8-e4f1-4228-acfa-f60e44860297",
+    "b8594b71-3961-434d-b289-94a5ecafb741",
+    "43e495b7-a41e-4058-a204-db2031e1e925",
+    "a308d880-e9da-4ac1-a5c7-fce7c4203d64",
+    "01dd31f6-7583-4865-bd9e-f239592c72b1",
+    "2a7b8aec-46d5-455e-98a4-6723dcaec08f",
+    "32939c25-8edc-4c9a-91e5-0280e12bc66e",
+    "74344b0a-58e4-422d-9a5b-22414acbf55a",
+    "7a5f88f3-a9c3-489d-9aff-c0548551c4ef",
+    "b5eaff09-68d3-43ea-9f7f-7fab0dea9005",
+    "5e085374-c67c-477b-a0e9-cccfc5523676"
+  ],
+  "candIds": [
+    "50e68aa6-565f-4885-b1b8-c8396fd03643",
+    "11e735a6-1cc1-4681-93d0-07cdf3ad9d87",
+    "7aaf5642-6fcd-4a7d-a2a0-dc3bcb75b00d",
+    "7e3a3d63-609f-4144-9df2-7e9682754629",
+    "35b8db16-7f99-438d-b14d-574cfd8b65d0",
+    "9607e12e-5d22-49d9-a305-4fbf1afe9220"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "50e68aa6-565f-4885-b1b8-c8396fd03643",
+      "stmt": "2008001505893",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "11e735a6-1cc1-4681-93d0-07cdf3ad9d87",
+      "stmt": "2008001505895",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7aaf5642-6fcd-4a7d-a2a0-dc3bcb75b00d",
+      "stmt": "20080015058100",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7e3a3d63-609f-4144-9df2-7e9682754629",
+      "stmt": "2008001505894",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "35b8db16-7f99-438d-b14d-574cfd8b65d0",
+      "stmt": "2008001505897",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9607e12e-5d22-49d9-a305-4fbf1afe9220",
+      "stmt": "2008001505896",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}
