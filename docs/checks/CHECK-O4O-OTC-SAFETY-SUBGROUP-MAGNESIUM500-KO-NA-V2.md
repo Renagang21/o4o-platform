@@ -22,17 +22,22 @@ WO: **WO-O4O-OTC-SAFETY-MISMATCH-APPLY-DEMOTE-INSERT-AUDIT-FIX-NA-V2** (에이�
 - **사후검증(하나라도 실패 시 전체 ROLLBACK)**: before easy canonical=7 & authored=0 → after easy deprecated=7 · authored canonical=7 · easy canonical 잔여 0 · audit=7 · canonicalDup(ko·en)=0 · source_ref scope==7 · target 밖 write=0 · EN canonical drift=0 · **writePlan==writeActual**.
 - **재실행 no-op**: 이미 authored canonical & easy deprecated → STEP A insert 0 · STEP B per-master skip · write 0 (ALREADY_COMPLETE_NOOP).
 
-## dry-run 결과 (write 0, 검증됨)
-`status: DRYRUN_PASS` · before `{targetMasters:7, easyCanonical:7, authoredKoCanonical:0, enCanonical:0}` · `writePlan:28` · `reexecNoop:false` · anomalies 0 · html 1861. → 결함 해소 확인(easy 베이스라인 → demote+insert 경로 동작).
+## 2차 정정 (main 파일럿 재실행 검출) — TypeORM UPDATE...RETURNING quirk
+- **결함**: TypeORM `query('UPDATE ... RETURNING id')` 는 `[rowsArray, affectedCount]` 튜플 반환 → `demote.length===2`(행수 아님) 오탐 → `demote 2!=1 → ABORT → ROLLBACK`. `flip` 도 동일(`flip[0]` 은 rows 배열, `flip[0].id` undefined). (INSERT...RETURNING 은 flat → STEP A·audit 정상.)
+- **정정**: `const rows = Array.isArray(res[0]) ? res[0] : res;` 로 demote·flip 결과 정규화. 사후검증 카운트는 DB 재조회라 무영향.
+- **partial-recovery 회계 정정**: STEP A 선커밋(7 needs_review)된 상태 재실행 시 STEP A 멱등 skip(insert 0) → writeActual=21(demote7+flip7+audit7)≠cumulative 28. → `writePlanThisRun = (T−authoredRowBefore) + 3×easyCanonBefore` 도입(fresh 28·recovery 21·noop 0), 사후검증은 `writeActual==writePlanThisRun`. cumulative `writePlan=28` 불변(회계).
+
+## dry-run 결과 (write 0, 검증됨 — 현재 partial-recovery 상태)
+`status: DRYRUN_PASS` · before `{easyCanonical:7, authoredKoCanonical:0, authoredRow:7(선커밋 needs_review 감지), enCanonical:0}` · `writePlan:28`(cumulative) · `writePlanThisRun:21`(recovery) · `reexecNoop:false` · anomalies 0 · html 1861. (RETURNING 정규화는 STEP B write 경로라 dry-run 미검증 → main 재실행으로 확인.)
 
 ## write 회계
-- writePlan = **KO 4T = 28** (stepA insert 7 + easy demote 7 + authored flip 7 + audit 7). EN 은 별도 2T(본 스크립트 범위 밖, 후속).
+- cumulative writePlan = **KO 4T = 28** (stepA insert 7 + easy demote 7 + authored flip 7 + audit 7). 현재 DB=partial-recovery → 재실행 writeActual **21**(stepA 0 재사용 + demote7+flip7+audit7). EN 은 별도 2T(후속).
 
 ## 실행 (main — 자율 write 금지, main 이 apply)
 ```
 DB_PORT=5445 OTC_SAFETY_SUBGROUP_CONFIRM=YES npx tsx src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts --apply
 ```
-기대: `status:APPLIED, dbWrite:28, after{authoredKoCanonical:7, easyDeprecated:7, audit:7, canonicalDupKo/En:0, sourceRefScopeMasters:7, targetOutsideWrite:0, enCanonical:0}`. 재실행 시 `ALREADY_COMPLETE_NOOP, dbWrite:0`.
+기대(현재 partial-recovery): `status:APPLIED, dbWrite:21`(stepA 0 재사용 + demote7+flip7+audit7), `after{authoredKoCanonical:7, easyDeprecated:7, easyCanonicalLeft:0, audit:7, canonicalDupKo/En:0, sourceRefScopeMasters:7, targetOutsideWrite:0, enCanonical:0}`. 이후 재실행 → `ALREADY_COMPLETE_NOOP, dbWrite:0`. (완전 fresh 였다면 dbWrite:28.)
 
 ## 산출물
 - apply 스크립트(정정): `apps/api-server/src/scripts/otc-safety-subgroup-ko-apply-magnesium500.ts`

@@ -91,15 +91,21 @@ async function main(): Promise<void> {
     const noneCanonBefore = slot.filter((r: any) => !r.src).length;
     const otherCanonBefore = slot.filter((r: any) => r.src && r.src !== EASY_SOURCE && !AUTHORED.includes(r.src)).length;
     const enCanonBefore = (await ds.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND language='en' AND deleted_at IS NULL`, [MASTER_IDS]))[0].n;
-    report.before = { targetMasters: slot.length, easyCanonical: easyCanonBefore, authoredKoCanonical: authoredCanonBefore, noneCanonical: noneCanonBefore, otherCanonical: otherCanonBefore, enCanonical: enCanonBefore };
+    // authored row(canonical|needs_review) 보유 master — STEP A 멱등 판정용(partial-recovery: 선커밋된 needs_review 재사용 감지)
+    const authoredRowBefore = (await ds.query(`SELECT count(*)::int n FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.status IN ('canonical','needs_review') AND s.deleted_at IS NULL)`, [MASTER_IDS]))[0].n;
+    report.before = { targetMasters: slot.length, easyCanonical: easyCanonBefore, authoredKoCanonical: authoredCanonBefore, authoredRow: authoredRowBefore, noneCanonical: noneCanonBefore, otherCanonical: otherCanonBefore, enCanonical: enCanonBefore };
     if (slot.length !== T) anomalies.push(`target master ${slot.length}!=${T}`);
     if (noneCanonBefore > 0) anomalies.push(`canonical 없음 ${noneCanonBefore}`);
     if (otherCanonBefore > 0) anomalies.push(`예상밖 canonical source ${otherCanonBefore}`);
 
-    const isNoop = authoredCanonBefore === T;          // 재실행(이미 완료)
-    const isFresh = easyCanonBefore === T && authoredCanonBefore === 0; // 최초 apply
-    if (!isNoop && !isFresh) anomalies.push(`혼재 상태 easy=${easyCanonBefore} authored=${authoredCanonBefore} (fresh/noop 아님)`);
-    report.writePlan = isNoop ? 0 : 4 * T; // stepA insert + demote + flip + audit
+    const isNoop = authoredCanonBefore === T;          // 재실행(이미 완료: authored canonical 7)
+    const isFresh = easyCanonBefore === T && authoredCanonBefore === 0; // 최초 apply or partial-recovery(easy 7 canonical, authored canonical 0)
+    if (!isNoop && !isFresh) anomalies.push(`혼재 상태 easy=${easyCanonBefore} authoredCanon=${authoredCanonBefore} (fresh/noop 아님)`);
+    // writePlan: cumulative(4T=28, 불변, 회계) + this-run(STEP A 멱등 반영 — recovery 는 needs_review 재사용으로 stepA 0)
+    const stepAExpected = T - authoredRowBefore;       // fresh 7 · partial-recovery 0 · noop 0
+    const upgradeExpected = easyCanonBefore;           // demote+flip+audit 대상(현재 canonical=easy): fresh/recovery 7 · noop 0
+    report.writePlan = 4 * T;                          // cumulative 28 (subgroup 라이프사이클 총 write)
+    report.writePlanThisRun = stepAExpected + 3 * upgradeExpected; // fresh 28 · partial-recovery 21 · noop 0
     report.reexecNoop = isNoop;
 
     if (anomalies.length) { report.status = 'ABORT'; console.log(JSON.stringify(report, null, 2)); return; }
@@ -135,11 +141,14 @@ async function main(): Promise<void> {
         if (AUTHORED.includes(cur[0].source_type)) continue; // 이미 authored → no-op(재실행)
         if (cur[0].source_type !== EASY_SOURCE) throw new Error(`master ${mid} canonical source ${cur[0].source_type} 예상밖 → ABORT`);
         const easyId = cur[0].id;
-        const demote = await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical' RETURNING id`, [easyId]);
-        if (demote.length !== 1) throw new Error(`master ${mid} demote ${demote.length}!=1 → ABORT`); demoted++;
-        const flip = await qr.query(`UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND status='needs_review' AND deleted_at IS NULL RETURNING id`, [mid]);
-        const newId = flip[0]?.id;
-        if (flip.length !== 1 || !newId) throw new Error(`master ${mid} flip ${flip.length} → ABORT`); flipped++;
+        // ⚠️ TypeORM quirk: UPDATE...RETURNING → [rowsArray, affectedCount] 튜플. rows 정규화 필수(INSERT...RETURNING 은 flat).
+        const demoteRes = await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical' RETURNING id`, [easyId]);
+        const demoteRows = Array.isArray(demoteRes[0]) ? demoteRes[0] : demoteRes;
+        if (demoteRows.length !== 1) throw new Error(`master ${mid} demote ${demoteRows.length}!=1 → ABORT`); demoted++;
+        const flipRes = await qr.query(`UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND status='needs_review' AND deleted_at IS NULL RETURNING id`, [mid]);
+        const flipRows = Array.isArray(flipRes[0]) ? flipRes[0] : flipRes;
+        const newId = flipRows[0]?.id;
+        if (flipRows.length !== 1 || !newId) throw new Error(`master ${mid} flip ${flipRows.length} → ABORT`); flipped++;
         await qr.query(`INSERT INTO shared_product_description_audit_logs (event_type, description_type, master_id, language, previous_description_id, new_description_id, previous_status, new_status, metadata, performed_at)
            VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb, now())`,
           [mid, easyId, newId, JSON.stringify({ targetMaster: mid, beforeSource: EASY_SOURCE, afterSource: SOURCE_TYPE, previousDemotedTo: 'deprecated', source_ref_id: SOURCE_REF, groupKey: GROUP_KEY, safetyFp: SAFETY_FP, reason: 'safety-subgroup grounded 매장용 설명서 canonical 승격(easy→authored, 원문 보존 재구성)', wo: report.wo })]);
@@ -175,7 +184,7 @@ async function main(): Promise<void> {
       if (outside.n !== 0) fails.push(`targetOutsideWrite=${outside.n}`);
       if (auditN.n !== T) fails.push(`audit=${auditN.n}`);
       if (enCanonAfter !== enCanonBefore) fails.push(`enDrift ${enCanonBefore}->${enCanonAfter}`);
-      if (writeActual !== report.writePlan) fails.push(`writePlan ${report.writePlan}!=actual ${writeActual}`);
+      if (writeActual !== report.writePlanThisRun) fails.push(`writePlanThisRun ${report.writePlanThisRun}!=actual ${writeActual}`);
       if (fails.length) throw new Error(`사후검증 실패 [${fails.join(', ')}] → ROLLBACK`);
       await qr.commitTransaction();
       report.status = 'APPLIED'; report.dbWrite = writeActual;
