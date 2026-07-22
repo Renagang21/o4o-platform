@@ -12,8 +12,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, Plus, Layers, Pencil, Trash2 } from 'lucide-react';
 import type { TabletKioskApi } from '@o4o/tablet-kiosk-core';
-import { TabletContentStepBuilder } from '../../pharmacy/TabletScreenSetManager';
-import { templateLabel } from '../../pharmacy/TabletScreenSetManager';
+import { TabletContentStepBuilder, templateLabel } from '@o4o/tablet-screen-set-editor';
 import type { ScreenSet, ScreenSetDetail } from '../../../api/tabletDisplays';
 import {
   fetchOperatorScreenSets, fetchOperatorScreenSet, removeOperatorScreenSet,

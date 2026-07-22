@@ -21,7 +21,7 @@ import { RowActionMenu } from '@o4o/ui';
 import { defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-TABLET-CORNER-TEMPLATE-LABEL-V1: 현재/연결 콘텐츠의 템플릿을 사용자용 라벨로 표시(같은 소스 재사용).
-import { templateLabel } from './TabletScreenSetManager';
+import { templateLabel } from '@o4o/tablet-screen-set-editor';
 
 // 템플릿 배지(공통) — 내부 template_key 미노출, templateLabel 로 변환.
 function TemplateBadge({ templateKey }: { templateKey?: string | null }) {

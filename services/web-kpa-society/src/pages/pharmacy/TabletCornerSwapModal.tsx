@@ -16,7 +16,7 @@ import {
   fetchCornerContents, fetchScreenSets, applyCurrentScreenSet,
   type CornerContent, type ScreenSet,
 } from '../../api/tabletDisplays';
-import { templateLabel } from './TabletScreenSetManager';
+import { templateLabel } from '@o4o/tablet-screen-set-editor';
 
 type Toast = { type: 'success' | 'error'; message: string; action?: { label: string; onClick: () => void } };
 

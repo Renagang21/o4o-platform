@@ -36,7 +36,7 @@ import {
 import { previewScreenSet } from '../../api/tabletDisplays';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // 라벨 드리프트 방지 — 제작기와 같은 사용자용 템플릿 라벨을 재사용(내부 template_key 미노출).
-import { templateLabel } from './TabletScreenSetManager';
+import { templateLabel } from '@o4o/tablet-screen-set-editor';
 
 /** 신규 제작 대상 4종(legacy idle_touch_video 는 신규 선택·추천 제외 — WO). */
 const TEMPLATE_FILTERS = [

@@ -18,7 +18,7 @@ import type {
   O4oDescriptionSearchResult,
 } from './tabletDisplays';
 import type { TabletScreenResponse } from '@o4o/tablet-kiosk-core';
-import type { ScreenSetBuilderApi } from '../pages/pharmacy/TabletScreenSetManager';
+import type { ScreenSetBuilderApi } from '@o4o/tablet-screen-set-editor';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 // serviceKey='kpa' — KPA 운영자 앱. 다른 서비스는 자기 앱에서 별도 base 를 쓴다.

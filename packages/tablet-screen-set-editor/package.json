@@ -1,0 +1,22 @@
+{
+  "name": "@o4o/tablet-screen-set-editor",
+  "version": "1.0.0",
+  "description": "Shared tablet Screen Set authoring editor (step builder + content_list editor + content picker + kiosk preview wiring). Role-specific API/auth is injected via ScreenSetBuilderApi + contentSources capability. Extracted from the KPA tablet builder (WO-O4O-TABLET-SCREEN-SET-EDITOR-SHARED-EXTRACTION-V2A). Consumers: store/operator/supplier authoring shells.",
+  "type": "module",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "lucide-react": "*",
+    "@o4o/screen-content-core": "workspace:*",
+    "@o4o/tablet-kiosk-core": "workspace:*",
+    "@o4o/content-editor": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

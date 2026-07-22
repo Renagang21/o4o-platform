@@ -3071,6 +3071,31 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/tablet-screen-set-editor:
+    dependencies:
+      '@o4o/content-editor':
+        specifier: workspace:*
+        version: link:../content-editor
+      '@o4o/screen-content-core':
+        specifier: workspace:*
+        version: link:../screen-content-core
+      '@o4o/tablet-kiosk-core':
+        specifier: workspace:*
+        version: link:../tablet-kiosk-core
+      lucide-react:
+        specifier: '*'
+        version: 0.523.0(react@19.2.0)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/types:
     dependencies:
       react:
@@ -3588,6 +3613,9 @@ importers:
       '@o4o/tablet-kiosk-core':
         specifier: workspace:*
         version: link:../../packages/tablet-kiosk-core
+      '@o4o/tablet-screen-set-editor':
+        specifier: workspace:*
+        version: link:../../packages/tablet-screen-set-editor
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types

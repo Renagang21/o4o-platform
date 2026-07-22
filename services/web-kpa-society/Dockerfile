@@ -35,6 +35,7 @@ COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
+COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
 COPY packages/screen-content-core/package.json ./packages/screen-content-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
@@ -74,6 +75,7 @@ COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
+COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 COPY packages/screen-content-core/ ./packages/screen-content-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
