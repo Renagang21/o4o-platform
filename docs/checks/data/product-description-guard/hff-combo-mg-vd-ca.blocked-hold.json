@@ -1,0 +1,56 @@
+[
+ {
+  "statementNo": "2015000802146",
+  "productName": "한국칼슘왕 플러스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "20100019004784",
+  "productName": "퓨어코랄칼슘마그네슘비타민D정",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "2015000802141",
+  "productName": "본킹플러스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "201000190041063",
+  "productName": "셀라메르 칼마디 밸런스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "201000190041475",
+  "productName": "강골담",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "2015000802144",
+  "productName": "8030칼슘플러스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "201500080217",
+  "productName": "한국칼슘왕",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "200400151071121",
+  "productName": "인플본 칼마디",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ },
+ {
+  "statementNo": "201000190041340",
+  "productName": "데일리칼슘마그네슘비타민D",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-BILINGUAL,G-MULTI-BILINGUAL"
+ }
+]
