@@ -40,6 +40,24 @@
       "masters": 25,
       "op": "EN_ONLY",
       "status": "DONE"
+    },
+    {
+      "groupKey": "비오틴|5mg|정제(combo)",
+      "sourceRef": "79a515f0-fb13-4b58-a01b-3f1b524c29f0",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 8,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
+    },
+    {
+      "groupKey": "칼슘·비타민D|정제(combo)",
+      "sourceRef": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 317,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
     }
   ]
 }
