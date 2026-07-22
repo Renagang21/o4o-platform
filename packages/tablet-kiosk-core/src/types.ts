@@ -15,6 +15,9 @@ export interface TabletProduct {
   sale_price?: number;
   images?: Array<{ url: string }>;
   category: string;
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 규격·수량·제형·포장 (ProductMaster.specification).
+  //   텍스트 버튼 2행 및 상세 규격 줄에 사용. 없으면 렌더하지 않음. additive — 미포함 서비스 무영향.
+  specification?: string | null;
   /** Cosmetics 정의에는 필수, KPA 정의에는 부재 — Kiosk UI 자체에서는 미사용 */
   stock_quantity?: number;
   description?: string;

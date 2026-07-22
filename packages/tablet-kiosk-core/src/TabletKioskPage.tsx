@@ -108,6 +108,9 @@ interface DisplayProduct {
   description?: string;
   summary?: string;
   category?: string;
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 규격·수량·제형·포장 (O4O 상품만; 매장 자체 상품은 미보유).
+  specification?: string | null;
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 UI 에서는 이미지를 사용하지 않는다(imageUrl 미참조).
   imageUrl?: string;
   // WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1: 진열 선택 콘텐츠(있으면 상세를 이 콘텐츠로 표시).
   selectedContentTitle?: string | null;
@@ -258,6 +261,7 @@ function mapSupplierProduct(p: TabletProduct): DisplayProduct {
     description: p.description,
     summary: p.short_description,
     category: p.category,
+    specification: p.specification,
     imageUrl: p.images?.[0]?.url,
     selectedContentTitle: p.selectedContentTitle,
     selectedContentHtml: p.selectedContentHtml,
@@ -345,16 +349,8 @@ export interface TabletKioskDisplaySettings {
   idleSlideSeconds?: number;
 }
 
-/**
- * 상품 썸네일 — 로딩 실패/빈 URL 안전 처리(WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8).
- * 미리보기·공개 태블릿·QR 공통. onError 1회로 '이미지 없음' 골격(📦)으로 전환 → 깨진 아이콘/긴 alt/무한 재시도 방지.
- */
-function ProductImage({ src, alt, imgStyle, fallbackSize = 32 }: { src?: string | null; alt: string; imgStyle?: React.CSSProperties; fallbackSize?: number }) {
-  const [failed, setFailed] = useState(false);
-  const usable = typeof src === 'string' && src.trim().length > 0;
-  if (!usable || failed) return <div style={{ fontSize: `${fallbackSize}px`, color: '#cbd5e1' }} aria-label="이미지 없음">📦</div>;
-  return <img src={src as string} alt={alt} style={imgStyle ?? styles.productImg} onError={() => setFailed(true)} />;
-}
+// WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 이미지 컴포넌트(ProductImage) 제거 —
+//   상품 UI 에서는 이미지를 사용하지 않는다(목록/상세 모두 텍스트 버튼형). 대기/코너/콘텐츠/QR 이미지는 별도 경로로 유지.
 
 export function TabletKioskPage({
   api,
@@ -692,24 +688,17 @@ export function TabletKioskPage({
           ) : <span aria-hidden style={{ width: 1 }} />}
         </div>
 
-        {/* 본문 2단: 왼쪽 이미지(≈40%) · 오른쪽 정보(≈60%).
-            inline 스타일만 쓰는 패키지라 media query 대신 flexWrap + flexBasis 로 반응형 —
-            넓은 태블릿에선 좌우 2단, 좁은 폭(모바일)에선 자동으로 세로 적층된다. */}
+        {/* WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 이미지 2단 구조 제거 → 단일 열.
+            상품명 · 규격 · 가격 · 언어선택 · 상세설명 · 안내 순으로 전체 너비 사용. */}
         <div style={styles.detailBody}>
-          {/* 왼쪽: 상품 이미지 + 분류 배지 */}
-          <div style={styles.detailImageCol}>
-            <div style={styles.detailImageBox}>
-              {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8: 상세 이미지도 로딩 실패 시 '이미지 없음' 골격. */}
-              <ProductImage src={selectedProduct.imageUrl} alt={selectedProduct.name} imgStyle={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' as const }} fallbackSize={64} />
-            </div>
-            {selectedProduct.category && (
-              <span style={styles.categoryBadge}>{selectedProduct.category}</span>
-            )}
-          </div>
-
-          {/* 오른쪽: 상품명 · 가격 · 설명 · 안내 */}
           <div style={styles.detailInfoCol}>
             <h2 style={styles.detailName}>{selectedProduct.name}</h2>
+            {selectedProduct.specification && (
+              <p style={styles.detailSpec}>{selectedProduct.specification}</p>
+            )}
+            {selectedProduct.category && (
+              <span style={{ ...styles.categoryBadge, alignSelf: 'flex-start', margin: '0 0 12px' }}>{selectedProduct.category}</span>
+            )}
             {displaySettings?.showPrice !== false && (
               <p style={styles.detailPrice}>{productPriceText(selectedProduct)}</p>
             )}
@@ -963,12 +952,17 @@ export function TabletKioskPage({
           // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 실제 상품 대신 중립 골격.
           //   템플릿별 배치(grid/gridFocus)는 유지 → 5 템플릿 배치 차이는 그대로 확인 가능.
           <div style={isProductFocus ? styles.gridFocus : styles.grid} aria-hidden>
+            {/* WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 이미지형 골격 제거 →
+                실제 공개 화면과 동일한 텍스트 버튼형(상품명 · 규격 · 선택 표시) 골격. */}
             {(isProductFocus ? [0, 1, 2] : [0, 1, 2, 3]).map((i) => (
               <div key={i} style={styles.skeletonCard}>
-                <div style={isProductFocus ? styles.skeletonThumbFocus : styles.skeletonThumb}>상품 영역</div>
                 <div style={styles.skeletonInfo}>
-                  <div style={styles.skeletonLine} />
-                  <div style={{ ...styles.skeletonLine, width: '50%' }} />
+                  <div style={{ ...styles.skeletonLine, width: '70%', height: '14px' }} />
+                  <div style={{ ...styles.skeletonLine, width: '45%' }} />
+                  <div style={styles.skeletonFooter}>
+                    <div style={{ ...styles.skeletonLine, width: '30%' }} />
+                    <div style={{ ...styles.skeletonLine, width: '22%' }} />
+                  </div>
                 </div>
               </div>
             ))}
@@ -1001,18 +995,19 @@ export function TabletKioskPage({
                 onClick={() => { setBrowseIndex(idx); dispatch({ type: 'SELECT_PRODUCT', product: p }); }}
                 style={highlighted ? { ...styles.productCard, outline: '3px solid #14b8a6', outlineOffset: '2px', transform: 'scale(1.02)' } : styles.productCard}
               >
-                <div style={isProductFocus ? styles.productImgAreaFocus : styles.productImgArea}>
-                  {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §8:
-                      로딩 실패/잘못된 URL 은 깨진 이미지 아이콘+긴 alt 대신 '이미지 없음' 골격(📦)으로 대체. */}
-                  <ProductImage src={p.imageUrl} alt={p.name} />
-                </div>
+                {/* WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 이미지/📦 fallback 제거 —
+                    상품명 + 규격(specification) + (가격) 텍스트 버튼. 카드 전체가 선택 버튼. */}
                 <div style={styles.productInfo}>
                   <span style={styles.productName}>{p.name}</span>
-                  {displaySettings?.showPrice !== false && (
-                    <span style={styles.productPrice}>
-                      {productPriceText(p)}
-                    </span>
+                  {p.specification && (
+                    <span style={styles.productSpec}>{p.specification}</span>
                   )}
+                  <div style={styles.productCardFooter}>
+                    {displaySettings?.showPrice !== false ? (
+                      <span style={styles.productPrice}>{productPriceText(p)}</span>
+                    ) : <span aria-hidden />}
+                    <span style={styles.productMore}>자세히 보기 ›</span>
+                  </div>
                 </div>
                 {p.type === 'local' && (
                   <div style={styles.localBadge}>자체</div>
@@ -1459,37 +1454,44 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     transition: 'border-color 0.15s, transform 0.1s',
   },
-  productImgArea: {
-    height: '140px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-  },
-  // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-APPLY-V1: product_focus 는 이미지 영역을 더 크게(상품 강조).
-  productImgAreaFocus: {
-    height: '200px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-  },
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상품 UI 는 이미지를 쓰지 않음(productImgArea/Focus 제거).
+  //   productImg 는 content_list 카드 썸네일(콘텐츠 이미지)용으로 유지.
   productImg: {
     maxHeight: '100%',
     maxWidth: '100%',
     objectFit: 'contain' as const,
   },
   productInfo: {
-    padding: '10px 12px',
+    padding: '16px 18px',
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '4px',
+    gap: '6px',
+    minHeight: '84px',
+    justifyContent: 'center',
   },
   productName: {
-    fontSize: '14px',
+    fontSize: '16px',
+    fontWeight: 700,
+    color: '#0f172a',
+    lineHeight: 1.35,
+    wordBreak: 'keep-all' as const,
+  },
+  productSpec: {
+    fontSize: '13px',
+    color: '#64748b',
+    lineHeight: 1.4,
+  },
+  productCardFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    marginTop: '2px',
+  },
+  productMore: {
+    fontSize: '13px',
     fontWeight: 600,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    color: '#14b8a6',
     whiteSpace: 'nowrap' as const,
   },
   productPrice: {
@@ -1515,37 +1517,28 @@ const styles: Record<string, React.CSSProperties> = {
     border: '2px dashed #e2e8f0',
     overflow: 'hidden',
   },
-  skeletonThumb: {
-    height: '140px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f1f5f9',
-    color: '#94a3b8',
-    fontSize: '13px',
-    fontWeight: 600,
-  },
-  skeletonThumbFocus: {
-    height: '200px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f1f5f9',
-    color: '#94a3b8',
-    fontSize: '13px',
-    fontWeight: 600,
-  },
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 이미지형 골격(skeletonThumb/Focus) 제거 →
+  //   텍스트 버튼형 골격(상품명 · 규격 · 선택 표시)만 사용.
   skeletonInfo: {
-    padding: '12px',
+    padding: '16px 18px',
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '8px',
+    minHeight: '84px',
+    justifyContent: 'center',
   },
   skeletonLine: {
     height: '10px',
     width: '80%',
     borderRadius: '4px',
     backgroundColor: '#e2e8f0',
+  },
+  skeletonFooter: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '8px',
+    marginTop: '2px',
   },
   // Detail view
   detailImageArea: {
@@ -1634,29 +1627,11 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     boxSizing: 'border-box',
   },
-  detailImageCol: {
-    flex: '1 1 300px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  detailImageBox: {
-    width: '100%',
-    aspectRatio: '4 / 3',
-    maxHeight: '420px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f8fafc',
-    borderRadius: '16px',
-    border: '1px solid #eef2f7',
-    padding: '16px',
-    boxSizing: 'border-box',
-  },
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 상세 이미지 열(detailImageCol/Box) 제거 → 단일 열.
   detailInfoCol: {
-    flex: '2 1 360px',
+    flex: '1 1 100%',
     minWidth: 0,
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -1666,6 +1641,13 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#0f172a',
     lineHeight: 1.3,
     margin: '0 0 6px',
+    wordBreak: 'keep-all',
+  },
+  detailSpec: {
+    fontSize: '16px',
+    color: '#475569',
+    lineHeight: 1.5,
+    margin: '0 0 12px',
     wordBreak: 'keep-all',
   },
   detailPrice: {

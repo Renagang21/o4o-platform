@@ -470,6 +470,8 @@ export async function queryTabletVisibleProducts(
       `SELECT DISTINCT ON (spo.id)
          spo.id, pm.name AS name,
          '' AS sku, pm.brand_name AS category,
+         -- WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 규격·수량·제형·포장 (텍스트 버튼 2행). additive, migration 불필요.
+         pm.specification AS specification,
          spo.price_general AS price, NULL::int AS sale_price,
          '[]'::jsonb AS images,
          CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,

@@ -21,6 +21,8 @@ export interface TabletProduct {
   images?: Array<{ url: string }>;
   category: string;
   stock_quantity: number;
+  // WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 규격·수량·제형·포장 (passthrough from public tablet API).
+  specification?: string | null;
   description?: string;
   short_description?: string;
   channel_price?: number;
