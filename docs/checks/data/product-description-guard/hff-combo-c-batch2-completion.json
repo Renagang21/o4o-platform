@@ -1,0 +1,101 @@
+{
+ "wo": "Agent C — 완결형 생산 2차 배치 (관절·눈·항산화·기능성 복합)",
+ "start": "2026-07-22 12:09:11 +0900",
+ "end": "2026-07-22 13:05:44 +0900",
+ "elapsedMin": 56,
+ "mode": "조사→KO/EN 설명서→디자인→DB canonical 완결. 단일패스 harvester + race-tolerant apply.",
+ "domain": "기능성앵커(MSM·글루코사민·옥타코사놀·Q10·밀크씨슬·프로폴리스) 전량 + 비앵커 shard2/3(md5%3==2)",
+ "harvester": {
+  "tool": "hff-combo-c-harvest.ts",
+  "pass": "단일 코퍼스 스캔 8s",
+  "driftValidation": "batch-1 9그룹 대비 eligible 카운트 9/9 OK, drift 0",
+  "signatures": 738,
+  "totalEligible": 2962,
+  "totalFresh": 1710
+ },
+ "reservation": {
+  "file": "hff-completion-reservations/agent-c-batch2.json",
+  "claimed": 812,
+  "pushedEarly": "efdf1c2e8"
+ },
+ "funnel": {
+  "chosenGroups": 344,
+  "freshPool": 812,
+  "dbDedup0": true,
+  "generate": {
+   "written": 802,
+   "autoHold": 10,
+   "reviewLater": 0
+  },
+  "hiddenAudit": {
+   "H1": 16,
+   "H3": 0
+  },
+  "reviewLater": 35,
+  "readyBeforeRace": 767
+ },
+ "concurrencyCollision": {
+  "skippedAlreadyPromoted": 159,
+  "byOtherAgentTags": [
+   "nc2-*(AgentA batch2)",
+   "nc2b-*",
+   "combo-sh1-g*(shard1 agent)"
+  ],
+  "handledBy": "--skip-promoted (트랜잭션내 제외, abort 회피)",
+  "note": "예약 파일 push(12:16) 이전 타 에이전트 선점 추정. 내 apply 가드가 정상 차단, DB 무결성 유지."
+ },
+ "hiddenAuditDetail": {
+  "H1_16excluded": {
+   "비타민E": 13,
+   "비타민B2": 2,
+   "나이아신": 1
+  },
+  "rootCause": "Ndigit+mga-TE 무공백 등 파서 gap(normalizeSpecText \bmg 경계 미스) → 비타민E spec 미포착 → 불완전 signature. 개별 16건 REVIEW_LATER, 파서 수정은 별도 WO 권고.",
+  "H3": 0
+ },
+ "reviewLater": {
+  "count": 35,
+  "breakdown": {
+   "PRE-SRC-BASIS-UNVERIFIABLE-003": 15,
+   "Q-TRUNCATED-PARTIAL-005": 3,
+   "HIDDEN_INGREDIENT_H1": 15,
+   "PRE-SRC-BASIS-UNVERIFIABLE-003,D-CLAIM-GROUNDED-002": 2
+  }
+ },
+ "write": {
+  "committed": 608,
+  "product_masters": 608,
+  "product_candidates_update": 608,
+  "spd_ko": 608,
+  "spd_en": 608,
+  "total": 2432
+ },
+ "dryRun": {
+  "postVerifyPass": true
+ },
+ "apply": {
+  "result": "COMMIT 완료",
+  "skipped": 159,
+  "inTxnPostVerify": {
+   "masters": 608,
+   "spdKo": 608,
+   "spdEn": 608,
+   "canonicalDup": 0,
+   "candidatesLinked": 608,
+   "spdRefLinked": 1216
+  }
+ },
+ "independentVerify": {
+  "masters": 608,
+  "spdKo": 608,
+  "spdEn": 608,
+  "canonicalDup": 0,
+  "candidatesLinked": 608,
+  "sourceHff": 1216,
+  "pass": true
+ },
+ "comboLiveFinalSSOT": 2421,
+ "throughputPerHour": 651,
+ "codeChanges": "hff-nutrient-store-canonical-apply.ts +--skip-promoted(기본off, race-tolerant) · hff-combo-c-categorize +Q-TRUNCATED-PARTIAL-005/+exclude · 신규 harvester/pool-hidden-audit/tag-probe",
+ "rollbackManifest": "scratchpad manifests/hff-combo-c-batch2-apply-rollback-manifest.json (masters 608·spd 1216·skipped 159)"
+}

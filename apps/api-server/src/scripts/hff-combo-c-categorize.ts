@@ -16,7 +16,9 @@ import type { GuardProductInput } from '../modules/content-guard/product-descrip
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const GENS = arg('gens').split(',').filter(Boolean); const DIR = arg('dir'); const OUT = arg('out'); const REVIEW_OUT = arg('review');
-const REVIEW_LATER_RULES = new Set(['PRE-SRC-BASIS-UNVERIFIABLE-003']);
+const REVIEW_LATER_RULES = new Set(['PRE-SRC-BASIS-UNVERIFIABLE-003', 'Q-TRUNCATED-PARTIAL-005']);
+// 은닉 원료 등으로 사전 제외할 statementNo (H1 감사 결과 등)
+const EXCLUDE = new Set<string>(arg('exclude') && fs.existsSync(arg('exclude')) ? (JSON.parse(fs.readFileSync(arg('exclude'), 'utf8')) as string[]) : []);
 
 const ready: GuardProductInput[] = [];
 const reviewLater: Array<{ statementNo: string; productName: string; group: string; rules: string[] }> = [];
@@ -25,6 +27,8 @@ let blocked = 0; const ruleTally: Record<string, number> = {};
 for (const g of GENS) {
   const items: GuardProductInput[] = JSON.parse(fs.readFileSync(path.join(DIR, `${g}.gen.json`), 'utf8'));
   for (const it of items) {
+    const stmt0 = String((it as unknown as { statementNo: string }).statementNo).trim();
+    if (EXCLUDE.has(stmt0)) { reviewLater.push({ statementNo: stmt0, productName: it.productName, group: g, rules: ['HIDDEN_INGREDIENT_H1'] }); continue; }
     const r = runGuard(it, { phase: 'all' });
     const reviewRules = [...new Set(r.findings.filter((f) => f.status === 'REVIEW_REQUIRED').map((f) => f.ruleId))];
     const blk = r.findings.filter((f) => f.status === 'BLOCKED');

@@ -33,8 +33,11 @@ fs.mkdirSync(SP, { recursive: true });
 
 async function main(): Promise<void> {
   if (APPLY && !CONFIRM) throw new Error('APPLY_BLOCKED: --apply 는 HFF_NUTRIENT_APPLY_CONFIRM=YES 필요');
-  const items = JSON.parse(fs.readFileSync(TARGET, 'utf8')) as GuardProductInput[];
-  const EXPECT = items.length;
+  let items = JSON.parse(fs.readFileSync(TARGET, 'utf8')) as GuardProductInput[];
+  // --skip-promoted: 동시 생산 레이스에서 이미 승격/마스터 존재하는 candidate 를 배치 전체 abort 대신
+  // 워킹셋에서 제외하고 나머지만 적재(기본 off = 기존 abort 동작 불변). 제외분은 skippedStmts 로 보고.
+  const SKIP_PROMOTED = process.argv.includes('--skip-promoted');
+  let EXPECT = items.length;
   if (EXPECT === 0) throw new Error('대상 0');
 
   let blocked = 0, review = 0, missDraft = 0, missGround = 0;
@@ -47,10 +50,11 @@ async function main(): Promise<void> {
     if (!g?.declaredAmount || !g?.serving) missGround++;
   }
   if (blocked || missDraft || missGround) throw new Error(`GUARD_FAIL blocked=${blocked} draft=${missDraft} ground=${missGround}`);
-  const koN = items.filter((it) => it.drafts?.ko?.trim()).length;
-  const enN = items.filter((it) => it.drafts?.en?.trim()).length;
-  const stmts = items.map((it) => String((it as unknown as { statementNo: string }).statementNo).trim());
+  let koN = items.filter((it) => it.drafts?.ko?.trim()).length;
+  let enN = items.filter((it) => it.drafts?.en?.trim()).length;
+  let stmts = items.map((it) => String((it as unknown as { statementNo: string }).statementNo).trim());
   if (new Set(stmts).size !== EXPECT) throw new Error(`신고번호 중복(파일): 유일 ${new Set(stmts).size}/${EXPECT}`);
+  const skippedStmts: string[] = [];
 
   // 타임아웃 env override(기본 120000 불변) — 프로덕션 DB 고부하(동시 product_candidates 전량 스캔) 시
   // preload SELECT 가 120s 초과하는 경우에만 상향. 락 보유 구간은 UPDATE 이후로 짧아 read 타임아웃 상향은 안전.
@@ -70,16 +74,31 @@ async function main(): Promise<void> {
     const alreadyPromoted = cands.filter((c) => c.matched != null);
     checks['#2 candidateMatch'] = `${cands.length} (missing ${missing.length}, ambiguous ${ambiguous.length})`;
     checks['#3 사전승격'] = alreadyPromoted.length;
-    if (missing.length) throw new Error(`CANDIDATE_MISSING ${missing.length}: ${missing.slice(0, 3)}`);
+    if (missing.length && !SKIP_PROMOTED) throw new Error(`CANDIDATE_MISSING ${missing.length}: ${missing.slice(0, 3)}`);
     if (ambiguous.length) throw new Error(`CANDIDATE_AMBIGUOUS ${ambiguous.length}`);
-    if (alreadyPromoted.length) throw new Error(`ALREADY_PROMOTED ${alreadyPromoted.length}`);
+    if (alreadyPromoted.length && !SKIP_PROMOTED) throw new Error(`ALREADY_PROMOTED ${alreadyPromoted.length}`);
 
-    const dup: Array<{ p: string }> = await qr.query(`SELECT mfds_permit_number AS p FROM product_masters WHERE mfds_permit_number = ANY($1)`, [stmts]);
-    checks['#4 masterDup'] = dup.length;
-    if (dup.length) throw new Error(`MASTER_EXISTS ${dup.length}: ${dup.slice(0, 3).map((x) => x.p)}`);
-    const spdDup: Array<{ c: number }> = await qr.query(`SELECT count(*)::int c FROM shared_product_descriptions s JOIN product_masters m ON m.id=s.master_id WHERE m.mfds_permit_number = ANY($1) AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL`, [stmts]);
-    checks['#5 canonicalSpdDup'] = spdDup[0].c;
-    if (spdDup[0].c) throw new Error(`STORE_CANONICAL_SPD_EXISTS ${spdDup[0].c}`);
+    const dupRows: Array<{ p: string }> = await qr.query(`SELECT mfds_permit_number AS p FROM product_masters WHERE mfds_permit_number = ANY($1)`, [stmts]);
+    checks['#4 masterDup'] = dupRows.length;
+    if (dupRows.length && !SKIP_PROMOTED) throw new Error(`MASTER_EXISTS ${dupRows.length}: ${dupRows.slice(0, 3).map((x) => x.p)}`);
+    const spdPermits: Array<{ p: string }> = await qr.query(`SELECT DISTINCT m.mfds_permit_number AS p FROM shared_product_descriptions s JOIN product_masters m ON m.id=s.master_id WHERE m.mfds_permit_number = ANY($1) AND s.description_type='STORE' AND s.status='canonical' AND s.deleted_at IS NULL`, [stmts]);
+    checks['#5 canonicalSpdDup'] = spdPermits.length;
+    if (spdPermits.length && !SKIP_PROMOTED) throw new Error(`STORE_CANONICAL_SPD_EXISTS ${spdPermits.length}`);
+
+    if (SKIP_PROMOTED) {
+      // 승격/마스터/SPD 존재 stmt 를 워킹셋에서 제외하고 파생값 재계산
+      const skip = new Set<string>([...alreadyPromoted.map((c) => c.stmt), ...dupRows.map((r) => r.p), ...spdPermits.map((r) => r.p), ...missing]);
+      if (skip.size) {
+        items = items.filter((it) => !skip.has(String((it as unknown as { statementNo: string }).statementNo).trim()));
+        skippedStmts.push(...skip);
+        EXPECT = items.length;
+        koN = items.filter((it) => it.drafts?.ko?.trim()).length;
+        enN = items.filter((it) => it.drafts?.en?.trim()).length;
+        stmts = items.map((it) => String((it as unknown as { statementNo: string }).statementNo).trim());
+      }
+      checks['#3b skipped'] = skippedStmts.length;
+      if (EXPECT === 0) throw new Error('SKIP 후 대상 0 (전량 승격됨)');
+    }
     checks['#6 ko/en'] = `ko ${koN} · en ${enN}`; checks['#7 BLOCKED'] = blocked;
 
     const ids: string[] = [], names: string[] = [], makers: string[] = [], permits: string[] = [];
@@ -117,10 +136,10 @@ async function main(): Promise<void> {
     v.spdRefLinked = (await qr.query(`SELECT count(*)::int c FROM shared_product_descriptions WHERE master_id = ANY($1) AND source_ref_id = ANY($2)`, [ids, candIds]))[0].c;
     const pass = v.masters === EXPECT && v.spdKo === EXPECT && v.spdEn === EXPECT && v.canonicalDup === 0 && v.candidatesLinked === EXPECT && v.spdRefLinked === EXPECT * 2;
 
-    const report = { mode: APPLY ? 'apply' : 'dry-run(exec+rollback)', slug: SLUG, target: EXPECT, review, preloadChecks: checks, expectedWrites: { product_masters: EXPECT, product_candidates_update: EXPECT, shared_product_descriptions: EXPECT * 2, total: EXPECT * 4 }, sampleSanitize: sample, postVerify: v, postVerifyPass: pass } as Record<string, unknown>;
+    const report = { mode: APPLY ? 'apply' : 'dry-run(exec+rollback)', slug: SLUG, target: EXPECT, review, skipped: skippedStmts.length, preloadChecks: checks, expectedWrites: { product_masters: EXPECT, product_candidates_update: EXPECT, shared_product_descriptions: EXPECT * 2, total: EXPECT * 4 }, sampleSanitize: sample, postVerify: v, postVerifyPass: pass } as Record<string, unknown>;
     if (!pass) { await qr.rollbackTransaction(); report.result = 'POST_VERIFY_FAIL → ROLLBACK'; console.log('JSON_REPORT_BEGIN'); console.log(JSON.stringify(report, null, 2)); console.log('JSON_REPORT_END'); process.exit(2); }
     if (!APPLY) { await qr.rollbackTransaction(); report.result = 'DRY-RUN OK → ROLLBACK (DB write 0)'; console.log('JSON_REPORT_BEGIN'); console.log(JSON.stringify(report, null, 2)); console.log('JSON_REPORT_END'); return; }
-    fs.writeFileSync(`${SP}/hff-${SLUG}-apply-rollback-manifest.json`, JSON.stringify({ slug: SLUG, createdMasters: ids, createdSpd: spdIds, candIds, snapshot }, null, 2));
+    fs.writeFileSync(`${SP}/hff-${SLUG}-apply-rollback-manifest.json`, JSON.stringify({ slug: SLUG, createdMasters: ids, createdSpd: spdIds, candIds, snapshot, skippedStmts }, null, 2));
     await qr.commitTransaction(); report.result = 'COMMIT 완료';
     console.log('JSON_REPORT_BEGIN'); console.log(JSON.stringify(report, null, 2)); console.log('JSON_REPORT_END');
   } catch (e) { try { await qr.rollbackTransaction(); } catch { /* noop */ } throw e; } finally { await qr.release(); await ds.destroy(); }
