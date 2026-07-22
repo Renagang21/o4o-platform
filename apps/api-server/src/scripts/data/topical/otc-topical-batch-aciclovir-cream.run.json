@@ -1,0 +1,77 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "아시클로버",
+ "form": "크림",
+ "slugbase": "aciclovir-cream",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "9fd70551d09e18e0",
+   "n": 4
+  },
+  {
+   "fp": "c0742c178257e979",
+   "n": 2
+  },
+  {
+   "fp": "0486a7c1c7ab1358",
+   "n": 2
+  },
+  {
+   "fp": "edaeb1503ad7458c",
+   "n": 2
+  },
+  {
+   "fp": "49dbf804e86908e7",
+   "n": 1
+  },
+  {
+   "fp": "000fd4eac1f0b570",
+   "n": 1
+  },
+  {
+   "fp": "19159dc0a5731040",
+   "n": 1
+  },
+  {
+   "fp": "cee2e600c5a46976",
+   "n": 1
+  },
+  {
+   "fp": "b99b9733ce53e0d1",
+   "n": 1
+  },
+  {
+   "fp": "816b9861e664034e",
+   "n": 1
+  },
+  {
+   "fp": "7d8e21a9697a2fa8",
+   "n": 1
+  },
+  {
+   "fp": "3f4c6f120312079d",
+   "n": 1
+  },
+  {
+   "fp": "adf7ee08e56369b6",
+   "n": 1
+  },
+  {
+   "fp": "a9c0c57c8fb7ef2b",
+   "n": 1
+  },
+  {
+   "fp": "0d9833c2ae93ab90",
+   "n": 1
+  },
+  {
+   "fp": "6a2ddb5d386b13f2",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 22,
+ "koWrite": 88,
+ "enWrite": 44
+}

@@ -1,0 +1,283 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "테르비나핀",
+ "form": "크림",
+ "slugbase": "tb",
+ "mode": "dry-run",
+ "producedFps": [
+  {
+   "fp": "49d1769176bbe03a",
+   "n": 5,
+   "dryRun": true
+  },
+  {
+   "fp": "fd4d7dd31f875731",
+   "n": 4,
+   "dryRun": true
+  },
+  {
+   "fp": "fe4d35c776124eb2",
+   "n": 4,
+   "dryRun": true
+  },
+  {
+   "fp": "38aff02f2304dd90",
+   "n": 3,
+   "dryRun": true
+  },
+  {
+   "fp": "269238fef61ce0a7",
+   "n": 3,
+   "dryRun": true
+  },
+  {
+   "fp": "96b5681790a44e54",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "9653333b546003eb",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "ff6092369858a7e5",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "de37ac739025d009",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "5552d02f6c5a8313",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "b6606aababc9f840",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "260c282f5edbb138",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "d9028c36af28931e",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "48c2392fdc06dcc5",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "5286b1c5c11fa282",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "59ec0673d6c4d3f3",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "24343f18d0eacb29",
+   "n": 2,
+   "dryRun": true
+  },
+  {
+   "fp": "7b090dd56c6d3d40",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "54c98162a59fc8f6",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "643ce91b6036020b",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "7f72166752d13cbd",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "ccac367de692de2d",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "6a34512e68f6567a",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "abbc408841e3628c",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "a1527845f37076ca",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "a38016ac47f7c108",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "89ddaa3fd2890383",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "14d56246a98cd61a",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "7f87559b7b4599aa",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "b156f7e56a704811",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "5e27676db40374b7",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "e013c6604cf7c7b8",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "e426d2041b783ef0",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "d5d392b35b6a18ef",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "187d3319319f96d5",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "bcc8ea9932eb2cc6",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "2344d89fe2e9c952",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "e6164fb56d434d43",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "69345d8bae2af2c5",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "f469743dce4a0917",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "f8f827f17b5b2ac8",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "cd6073adcd05a3cf",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "1b99c6f2f57c2d2c",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "5282a0b6df6b0795",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "a5071a1f9d40dbd1",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "b347cb76fd4e5973",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "58b6b92b5867ca94",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "8bfb379569070df2",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "3515978ec53e88c1",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "d865b94920b14063",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "eec2393c97c23e6e",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "3001a87371f2e58b",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "51e4ad151176df44",
+   "n": 1,
+   "dryRun": true
+  },
+  {
+   "fp": "a55e7d2dfd61f9ac",
+   "n": 1,
+   "dryRun": true
+  }
+ ],
+ "heldFps": [],
+ "masters": 0,
+ "koWrite": 0,
+ "enWrite": 0
+}

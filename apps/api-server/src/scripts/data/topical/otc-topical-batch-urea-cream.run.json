@@ -1,0 +1,57 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "우레아",
+ "form": "크림",
+ "slugbase": "urea-cream",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "2bb958c3ef99abf3",
+   "n": 2
+  },
+  {
+   "fp": "67b428201f83394e",
+   "n": 2
+  },
+  {
+   "fp": "c7e356f23a0fa463",
+   "n": 2
+  },
+  {
+   "fp": "8e6c59929249de90",
+   "n": 1
+  },
+  {
+   "fp": "78707dae7d9b53cd",
+   "n": 1
+  },
+  {
+   "fp": "be4d0e853db34690",
+   "n": 1
+  },
+  {
+   "fp": "412c67a5089a888e",
+   "n": 1
+  },
+  {
+   "fp": "ec62af08cd2baa5b",
+   "n": 1
+  },
+  {
+   "fp": "9f1b85dfee2c6f97",
+   "n": 1
+  },
+  {
+   "fp": "00bb6fa34f375af2",
+   "n": 1
+  },
+  {
+   "fp": "335dd7243553761e",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 14,
+ "koWrite": 56,
+ "enWrite": 28
+}

@@ -1,0 +1,29 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "나프티핀",
+ "form": "크림",
+ "slugbase": "naftifine-cream",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c13fadf6fc0c3ef3",
+   "n": 2
+  },
+  {
+   "fp": "ea73350b84873b5d",
+   "n": 2
+  },
+  {
+   "fp": "9f7aee33427dde6e",
+   "n": 1
+  },
+  {
+   "fp": "fe460e359409f616",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}
