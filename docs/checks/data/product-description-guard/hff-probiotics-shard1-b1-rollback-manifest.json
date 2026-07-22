@@ -1,0 +1,793 @@
+{
+  "tag": "batch:probiotics-solid-shard1-b1",
+  "createdMasters": [
+    "6b466ba4-4d23-4b2f-988b-dfcd9d4535ad",
+    "a197c482-6bc4-4faf-9e8e-46b689ff97c0",
+    "7b2fae21-a57d-4981-9794-8eebbcdaf09d",
+    "00a865e9-59ec-484a-bd8e-509d61d97840",
+    "49814e17-fdce-4989-a536-5f0c6fb91fc8",
+    "196b0844-5930-4f56-8a48-90b57b1dc9b4",
+    "48c0bd66-509d-4319-8b93-cfffec75561e",
+    "3e29aa75-edd4-4e5b-b980-8cdb6ef16b29",
+    "d048ea63-a5e6-4297-a72b-ce35afc8a136",
+    "a595fa23-8753-4f13-8643-8248ff45f610",
+    "27c20a73-aecb-4f7f-82f6-754c96c0d7f3",
+    "ec7368d0-4968-4d43-8581-8c867391e006",
+    "5bdb5a75-129c-489b-9648-18780773c2a7",
+    "56c9d04e-9ee3-47c2-b530-4c997815839f",
+    "f28d97d3-54cb-4ba8-9dbe-d267460f33db",
+    "64a735a0-962d-4913-8d20-f6ded7d6827a",
+    "c00a5b29-ba37-4699-b01f-913d64c8dba6",
+    "247f4083-03b5-4691-88ff-df3803562479",
+    "6037d4be-5239-4e32-841b-0773e317fd00",
+    "7b77752a-94b1-4f43-bdff-f35ca359fcf9",
+    "092ae386-128a-43af-a2a5-bcad0d3a9488",
+    "f50a4a8a-f408-4de9-805e-25d27d8f3e6e",
+    "24afcd36-de18-462b-a884-c5d20bcced9f",
+    "dff9955d-85d3-435e-9da7-370938684e3e",
+    "79c5f717-0c38-4507-afad-580c88322331",
+    "0c2c6118-0ee8-4bc5-b239-97142d40ea8d",
+    "939a765c-6e4b-44b4-9094-8aa444b62792",
+    "915a5838-258c-4e31-8430-bd310c5f1e81",
+    "037657e1-2b0c-4419-ac4d-f2c5c8d55016",
+    "f20a40dc-c7d0-4837-b58f-1c8f7abcb573",
+    "afd2e0b8-5820-4e17-bb77-819a66061856",
+    "6a5a70ee-6c90-4832-9841-203be9fb7456",
+    "97d79d76-8c44-4a5e-bc61-739b3295a97e",
+    "68c70f27-c30e-42ef-825b-40d68c73249d",
+    "3b291d4d-806a-464e-b683-1b009837c53d",
+    "7de52d65-9257-4238-a970-d8fb7be5ffb2",
+    "a6f62962-9404-48f2-973c-4beeb35d22de",
+    "ff6416df-1ff8-45ec-95f7-8679763cf0d9",
+    "073c2f37-6389-4e01-8247-4012d664b52e",
+    "99c26155-7eb1-48cd-846f-a702575fa0b9",
+    "318c8730-72f7-402e-9d82-a5df5b6dc648",
+    "51b2ced0-1d0e-4646-89cb-5934014caa45",
+    "276aeee0-abc0-48f7-b73c-0857c8b0d1a3",
+    "5079af05-58aa-4a7b-bcde-73c952d88596",
+    "b780931c-359e-46cd-992f-987456ecf2bd",
+    "cfa96407-35fe-487c-a4b2-ac89b0009c2d",
+    "f6aa1a6b-813a-48d2-af29-d834760c5b5b",
+    "754aa9b8-d62e-42ef-944f-848acd8fb57a",
+    "27326777-62cf-4ee0-8244-c00de8832de4",
+    "522220d8-566a-40d2-b456-63a0a2883e62",
+    "75d04f21-848a-49f6-8edc-b9aac2cb67ab",
+    "be8cb90b-f5d8-4cd8-8745-08b0ce7916c8"
+  ],
+  "createdSpd": [
+    "3d50341a-a394-42d2-8815-bb015bc930d5",
+    "1a009ba0-a5fe-46f0-aa03-0cebf9991946",
+    "e91b5785-9f8a-45bb-b34e-665d672babd9",
+    "22f706f4-2a03-47de-acee-ace727c7d92c",
+    "e218379d-6178-4faf-977e-1f31d9e69ff9",
+    "4d310297-7e87-4497-b2dd-f8d7633701cc",
+    "f527908e-7ec4-445d-b6fd-78e8abb4ec71",
+    "e9b360c2-9e39-46ee-b3af-ee3a0d7b5c53",
+    "ae3848d3-0e7c-4ad0-b231-68d066b8d02a",
+    "f5100749-0d5c-40ff-968b-a71e4c5ff858",
+    "db8c2ae7-e69b-4ef6-8f62-4d882d5e5084",
+    "82c2fad2-39ab-4931-bf05-9ef3de1f60bf",
+    "439589ef-0e32-4ad7-aa16-44448a17c581",
+    "866b0a11-12f5-4b0d-a83c-9db45d1f7e28",
+    "c4cc5dad-f819-4131-bc1c-0567f0a2dd20",
+    "ede60a9e-8b93-485b-8a96-9e7291be1ee1",
+    "435092d6-9b8b-4418-a962-9198242de95f",
+    "baaf7dbe-a026-45c1-bf04-5dff41f35618",
+    "6fb62d2a-2293-403a-a1db-a140e2a3e85b",
+    "a8dea918-b68b-46e3-b3b5-a8058311a6c4",
+    "51802568-dfbb-475f-9d66-9487cb19a9f8",
+    "d8addc0d-72ad-4566-8bb0-ccc23e28d06d",
+    "056a5ed2-6002-4154-9498-90a2024495ca",
+    "4ed0809f-98cf-4b59-ae70-3c489cf90e29",
+    "a68ccc7e-7d43-46e0-82ee-9e6512d5e5be",
+    "23cb4e2c-5c5e-4910-920c-db05d6c0558e",
+    "dfb35148-2a39-48dd-a3f4-1747851d7943",
+    "b640d972-8f56-4666-ad76-3506a7c46853",
+    "4e1c4a01-ff88-4126-b0dc-750be1dbfcf7",
+    "e198c52c-ede0-4dbc-9f22-097b5d5f881c",
+    "24b85c6a-07c6-417c-8dcd-e5f90acdf2ba",
+    "6f59ae70-a2ce-44eb-8132-99b5a62a141e",
+    "148ac512-12ca-4013-8aac-886e60584825",
+    "e97bb140-3842-46ae-bb98-4468f441f651",
+    "a0e47d2d-42c3-4f98-90c9-4b358935b503",
+    "cc0710b0-7d7e-4980-bae2-86ab013ce3f4",
+    "b3a5d1a0-44e6-4720-b325-e768d71e0d5d",
+    "0f5751b9-017a-4773-82b1-743ce21687df",
+    "a8c82ae7-deb4-4c3f-bc0d-cbe1f112d57e",
+    "78f975fd-1891-44aa-b517-977f2f942e11",
+    "a4aff9bc-4cc2-4396-adc2-1c6be6e0d68f",
+    "b8b4b8f2-3a4e-4333-b133-7de85f8cccd2",
+    "9d92fecd-8eed-4e64-b2db-fcb4cd0f1997",
+    "e6212fb9-1626-4563-aa3d-2e030c370b8d",
+    "f47692e1-74f9-4c17-86e6-725d24f00a48",
+    "adba10c2-911d-4d61-ba80-e7e08e6b92e4",
+    "281954eb-0a66-4316-a56e-39552d4d04bf",
+    "96c365cc-25ed-489c-b51a-285c9cca6d3f",
+    "6ad55ecf-5c2e-4d6a-8561-d047d5dffe5a",
+    "773a42df-4bba-48f7-99ea-e442084d015a",
+    "847f8144-8596-4ab4-a373-ccf7138ecf4a",
+    "0833e1e0-9204-4023-b671-dd1f269085c2",
+    "b95a4f33-4a54-4f36-b085-b38df099e89e",
+    "621cee09-7afb-48e4-9302-ec48c673fc24",
+    "091a0904-fc2a-4e43-af40-d36426c70c69",
+    "8852aad5-6b3a-4cc8-aa8e-0f10606981c8",
+    "e188a639-f324-414d-9006-ee62a85645ae",
+    "9735c722-0344-4a7f-96fb-faae24da3546",
+    "2cc93759-b4d9-4f3f-a03b-03ee74545eed",
+    "93bdb81c-1258-4663-8995-2d3500fd71e1",
+    "81f9b3d1-1c9e-487e-936b-2919f9f5ed9a",
+    "f7bb7f70-3d98-47bc-ad39-e1927e3a183b",
+    "3739e1c5-03b3-4470-b428-46b1d347d5fa",
+    "fbeefa63-b56f-405f-93d2-8c6539bc9851",
+    "af5c07d1-396e-4813-9446-740c39c31aaf",
+    "620c2f96-b160-4aba-9f25-6f38e86461a0",
+    "fe2e5a02-7aa8-4ee5-b0e4-258f48b1808c",
+    "c284a6ae-bd10-4b91-9cbf-4db40c9b06f0",
+    "162e85e5-22a8-4ebe-968d-ecdad0598bd0",
+    "8e6e0585-c282-41f9-91eb-27071f5cb8c9",
+    "8f6578a3-5423-40c5-9b69-972d8b2b7118",
+    "3314ba4f-8259-46f8-a6ec-9d7f20a2afa0",
+    "42570f16-75ac-4f90-8e06-86433a618e37",
+    "b905f0cb-6651-4c61-afca-922e78d7e1af",
+    "59c12dc8-fc8f-4bf5-9aad-1ab7bfdaade3",
+    "a07d559f-7101-4c0b-8985-85eff4890b4c",
+    "b9636c6c-4080-496b-beff-340ee1b57b71",
+    "189f81b2-7bc3-497c-98ed-36fe48764b05",
+    "5b353bb1-0404-416b-9eda-9446e376d5eb",
+    "b33c96aa-db38-4f84-8391-456cfbc424c7",
+    "3425a71b-44ff-4f61-bc5f-7faaf7ecbb94",
+    "788f690e-6585-4b7c-8535-e7a471eeca89",
+    "8d396aad-a232-4519-9c69-351967e46e26",
+    "2bb1fb61-2f0f-46f1-ad14-bba68878b924",
+    "98fbb00d-f368-4780-90f5-8dc100a2b208",
+    "8c31a23c-c5e9-4ee3-a656-3de874344c05",
+    "ce9f1297-3bdf-4ba1-a1d3-80dd11767dec",
+    "eeee60b7-d9aa-4938-903c-b94ab65a8920",
+    "bdaf4d9a-f746-48df-82e8-591abfa1dcb1",
+    "0dfac605-e0fb-4b00-b662-2cce733fc266",
+    "7296f630-0794-4719-af67-bcdcea03def6",
+    "3abc3fe8-4558-4710-88f9-5cbc03c8702b",
+    "3d2325cd-fab7-49a5-8236-ab7dc7fe65d0",
+    "d6dfa53b-ce53-45c7-9383-07672c7b6209",
+    "ccee4293-72d9-4fb0-bde1-77c06a048689",
+    "b8dd335c-6974-4c4e-bb81-1bdeea9b2e99",
+    "32803690-2193-4bdb-9489-e170e800e059",
+    "05597ff6-3ab6-42e4-8413-e98c7b78f22e",
+    "279cfa37-cd3c-40ff-b2dd-4a751df0330a",
+    "1c4470e3-5bc0-4951-8a6f-3dd0f2b9a9e3",
+    "c6b643a9-4df1-4edf-94c7-dfe01d6d0985",
+    "4085ec06-523f-4ca9-ac3f-a4eda25757cd",
+    "f1769ae1-9830-457c-bf71-b1dc1d79a403",
+    "b0465502-5ccd-418f-ab93-dbacf7804b3e"
+  ],
+  "candIds": [
+    "05c9627b-b03c-45c3-83d5-8c9510af8b61",
+    "0bcb7c86-d0e7-4e23-9bb7-9cb09a4bbb72",
+    "0f59989d-45c5-49a7-abe1-6651f3cb0b47",
+    "1a7d9065-7fc1-4c81-94e7-269949805838",
+    "23b13608-8d79-45b7-9122-c56daa92e5c1",
+    "24516fc0-ea81-47c7-a733-fa5ecfa36f08",
+    "2e4daf78-63c8-4c4e-8b70-c0d2ee20aca4",
+    "2f465144-7374-4a5b-be53-9b2eee5b768f",
+    "3123788a-1d71-4cf8-9da0-f0c5547c6c86",
+    "322dd75c-b7df-42bc-9386-f6899a61978e",
+    "329fba1c-5768-40c9-b877-393f6de65c97",
+    "36a10a16-3768-4412-86d7-5724241bee75",
+    "37d47948-6bb9-4663-8255-feec5ab3b5e5",
+    "45334449-490c-458c-97fd-c8edd33a4341",
+    "50f9388b-2ed0-41f4-ba0b-004122e0dcd5",
+    "57ba6263-fb74-4a7a-82db-4d30bd747eca",
+    "5caf6cc8-9090-471d-bb10-865333324e14",
+    "5d2c46c6-22a8-4ead-bc52-009008167758",
+    "5ddf90e1-f98c-4691-887b-bd0f726a46ba",
+    "61478024-1c0c-490a-96ee-1e2b30b66151",
+    "785cb7b5-e847-4e04-b34c-25720f837e2e",
+    "7a258827-bceb-4238-b391-e72ba2804e8f",
+    "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf",
+    "7c7540f1-04e0-4a15-861a-c4a1db1b188c",
+    "7edd7fa2-ccd5-490e-b63f-1a81e2e12274",
+    "82062539-5f25-4db5-b534-8c271bdec2ce",
+    "827670c3-51ec-4a6c-ba8b-df7006ea5c06",
+    "82fe2193-8325-4dc5-a40b-1cabe9cb6939",
+    "85ce52b7-6d75-4f61-a284-1ae07285000d",
+    "87abb6db-2ff9-4435-ba1d-35be970853f8",
+    "89b50cf7-5174-4b45-969b-f2c59edae7a6",
+    "8c02a58e-45f9-4688-acd1-27f20905f651",
+    "8df1c09c-1f04-4007-b92f-afc18533528b",
+    "8e47068b-2945-4061-b9b8-d26b1f5de663",
+    "915ddac8-0aab-41c1-8b93-e56e76b484af",
+    "9911d28a-4eb8-46f6-985d-f0f5129447a0",
+    "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+    "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+    "b44d95c7-2528-4458-9d25-6cf27cd29e66",
+    "b8fd8ef4-dc0a-413b-8151-6fe1d5266141",
+    "bc062b94-c452-40d4-8b2e-5c9104f32b11",
+    "bc1a46dc-7f74-4827-aa1c-de0dc633714a",
+    "c3995493-78e3-4bd7-b1a6-38e07e2eea8a",
+    "c4da71b2-9d82-4d00-9710-3015a28e8ced",
+    "d02839db-ff86-465f-a42d-d5bb92096c2d",
+    "da49ad13-512c-47af-9f89-bbd804aa4d49",
+    "e18923dc-c0ef-48de-966c-6c60b29d6815",
+    "e3af4b16-11d6-47e2-b382-3be94eb1ec75",
+    "f6d2ce51-00ce-4209-93f2-26910bc15090",
+    "f877369c-de3e-4c51-bbe1-e9aeaf53fe2d",
+    "f87dd221-7acf-4b61-aaa5-9031c9fa853e",
+    "ff84d472-be1c-4e51-99cd-47c3f2acc00c"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "05c9627b-b03c-45c3-83d5-8c9510af8b61",
+      "stmt": "20040020006946",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "0bcb7c86-d0e7-4e23-9bb7-9cb09a4bbb72",
+      "stmt": "20140017002215",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "0f59989d-45c5-49a7-abe1-6651f3cb0b47",
+      "stmt": "20172880236167",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "1a7d9065-7fc1-4c81-94e7-269949805838",
+      "stmt": "2006001510971",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "23b13608-8d79-45b7-9122-c56daa92e5c1",
+      "stmt": "20040020041471",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "24516fc0-ea81-47c7-a733-fa5ecfa36f08",
+      "stmt": "200700170352946",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "2e4daf78-63c8-4c4e-8b70-c0d2ee20aca4",
+      "stmt": "2012001900790",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "2f465144-7374-4a5b-be53-9b2eee5b768f",
+      "stmt": "200400200021571",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "3123788a-1d71-4cf8-9da0-f0c5547c6c86",
+      "stmt": "20040020041380",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "322dd75c-b7df-42bc-9386-f6899a61978e",
+      "stmt": "20040017021453",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "329fba1c-5768-40c9-b877-393f6de65c97",
+      "stmt": "20190009483426",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "36a10a16-3768-4412-86d7-5724241bee75",
+      "stmt": "200700170351693",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "37d47948-6bb9-4663-8255-feec5ab3b5e5",
+      "stmt": "2004001706274",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "45334449-490c-458c-97fd-c8edd33a4341",
+      "stmt": "2011001701921",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "50f9388b-2ed0-41f4-ba0b-004122e0dcd5",
+      "stmt": "20040020028323",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "57ba6263-fb74-4a7a-82db-4d30bd747eca",
+      "stmt": "200700170352375",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "5caf6cc8-9090-471d-bb10-865333324e14",
+      "stmt": "2014001711631",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "5d2c46c6-22a8-4ead-bc52-009008167758",
+      "stmt": "2009002002020",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "5ddf90e1-f98c-4691-887b-bd0f726a46ba",
+      "stmt": "20040017021943",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "61478024-1c0c-490a-96ee-1e2b30b66151",
+      "stmt": "20040020046644",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "785cb7b5-e847-4e04-b34c-25720f837e2e",
+      "stmt": "20040015107535",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7a258827-bceb-4238-b391-e72ba2804e8f",
+      "stmt": "200700170352862",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf",
+      "stmt": "200700170352997",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7c7540f1-04e0-4a15-861a-c4a1db1b188c",
+      "stmt": "20040015104167",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7edd7fa2-ccd5-490e-b63f-1a81e2e12274",
+      "stmt": "200700170351593",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "82062539-5f25-4db5-b534-8c271bdec2ce",
+      "stmt": "2016000600754",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "827670c3-51ec-4a6c-ba8b-df7006ea5c06",
+      "stmt": "2024001757513",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "82fe2193-8325-4dc5-a40b-1cabe9cb6939",
+      "stmt": "20040020016600",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "85ce52b7-6d75-4f61-a284-1ae07285000d",
+      "stmt": "2011001701927",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "87abb6db-2ff9-4435-ba1d-35be970853f8",
+      "stmt": "200700170351334",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "89b50cf7-5174-4b45-969b-f2c59edae7a6",
+      "stmt": "20040020020419",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8c02a58e-45f9-4688-acd1-27f20905f651",
+      "stmt": "202200092431",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8df1c09c-1f04-4007-b92f-afc18533528b",
+      "stmt": "20040017021961",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8e47068b-2945-4061-b9b8-d26b1f5de663",
+      "stmt": "2012001900739",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "915ddac8-0aab-41c1-8b93-e56e76b484af",
+      "stmt": "20040020038132",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9911d28a-4eb8-46f6-985d-f0f5129447a0",
+      "stmt": "200700170353232",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+      "stmt": "2009001702357",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+      "stmt": "200700170352520",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b44d95c7-2528-4458-9d25-6cf27cd29e66",
+      "stmt": "200400200071155",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b8fd8ef4-dc0a-413b-8151-6fe1d5266141",
+      "stmt": "200400170171174",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "bc062b94-c452-40d4-8b2e-5c9104f32b11",
+      "stmt": "20040017021836",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "bc1a46dc-7f74-4827-aa1c-de0dc633714a",
+      "stmt": "20120019007115",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c3995493-78e3-4bd7-b1a6-38e07e2eea8a",
+      "stmt": "20140017002642",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c4da71b2-9d82-4d00-9710-3015a28e8ced",
+      "stmt": "20140017002586",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d02839db-ff86-465f-a42d-d5bb92096c2d",
+      "stmt": "200400170171153",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "da49ad13-512c-47af-9f89-bbd804aa4d49",
+      "stmt": "2009001702322",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "e18923dc-c0ef-48de-966c-6c60b29d6815",
+      "stmt": "20040015102189",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "e3af4b16-11d6-47e2-b382-3be94eb1ec75",
+      "stmt": "2011001701922",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "f6d2ce51-00ce-4209-93f2-26910bc15090",
+      "stmt": "20040015102191",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "f877369c-de3e-4c51-bbe1-e9aeaf53fe2d",
+      "stmt": "2012001900789",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "f87dd221-7acf-4b61-aaa5-9031c9fa853e",
+      "stmt": "20140017002624",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "ff84d472-be1c-4e51-99cd-47c3f2acc00c",
+      "stmt": "20040017014600",
+      "prev_status": "pending"
+    }
+  ],
+  "outcomes": [
+    {
+      "stmt": "20040020006946",
+      "name": "키즈 알포 프로바이오틱스 빠앙",
+      "masterId": "6b466ba4-4d23-4b2f-988b-dfcd9d4535ad",
+      "candidateId": "05c9627b-b03c-45c3-83d5-8c9510af8b61"
+    },
+    {
+      "stmt": "20140017002215",
+      "name": "16.8 밸런스 프로바이오틱스(Balance Probiotics) (Dietary Supplement Product) (Bomi Brand)",
+      "masterId": "a197c482-6bc4-4faf-9e8e-46b689ff97c0",
+      "candidateId": "0bcb7c86-d0e7-4e23-9bb7-9cb09a4bbb72"
+    },
+    {
+      "stmt": "20172880236167",
+      "name": "어린이 생 유산균 키즈 포뮬러 튼튼",
+      "masterId": "7b2fae21-a57d-4981-9794-8eebbcdaf09d",
+      "candidateId": "0f59989d-45c5-49a7-abe1-6651f3cb0b47"
+    },
+    {
+      "stmt": "2006001510971",
+      "name": "해피데이 프로바이오틱스",
+      "masterId": "00a865e9-59ec-484a-bd8e-509d61d97840",
+      "candidateId": "1a7d9065-7fc1-4c81-94e7-269949805838"
+    },
+    {
+      "stmt": "20040020041471",
+      "name": "네이처드림 W 프로바이오틱스",
+      "masterId": "49814e17-fdce-4989-a536-5f0c6fb91fc8",
+      "candidateId": "23b13608-8d79-45b7-9122-c56daa92e5c1"
+    },
+    {
+      "stmt": "200700170352946",
+      "name": "이퓨니드 리스펙타 질유산균",
+      "masterId": "196b0844-5930-4f56-8a48-90b57b1dc9b4",
+      "candidateId": "24516fc0-ea81-47c7-a733-fa5ecfa36f08"
+    },
+    {
+      "stmt": "2012001900790",
+      "name": "액티브프로바이오골드",
+      "masterId": "48c0bd66-509d-4319-8b93-cfffec75561e",
+      "candidateId": "2e4daf78-63c8-4c4e-8b70-c0d2ee20aca4"
+    },
+    {
+      "stmt": "200400200021571",
+      "name": "프로바이오틱스",
+      "masterId": "3e29aa75-edd4-4e5b-b980-8cdb6ef16b29",
+      "candidateId": "2f465144-7374-4a5b-be53-9b2eee5b768f"
+    },
+    {
+      "stmt": "20040020041380",
+      "name": "프로바이오틱스 알파",
+      "masterId": "d048ea63-a5e6-4297-a72b-ce35afc8a136",
+      "candidateId": "3123788a-1d71-4cf8-9da0-f0c5547c6c86"
+    },
+    {
+      "stmt": "20040017021453",
+      "name": "지앤엠 프로바이오틱스",
+      "masterId": "a595fa23-8753-4f13-8643-8248ff45f610",
+      "candidateId": "322dd75c-b7df-42bc-9386-f6899a61978e"
+    },
+    {
+      "stmt": "20190009483426",
+      "name": "이지 프로바이오틱스 P17",
+      "masterId": "27c20a73-aecb-4f7f-82f6-754c96c0d7f3",
+      "candidateId": "329fba1c-5768-40c9-b877-393f6de65c97"
+    },
+    {
+      "stmt": "200700170351693",
+      "name": "活性益生菌粉(활성유산균분말)",
+      "masterId": "ec7368d0-4968-4d43-8581-8c867391e006",
+      "candidateId": "36a10a16-3768-4412-86d7-5724241bee75"
+    },
+    {
+      "stmt": "2004001706274",
+      "name": "동아 프로바이오틱스",
+      "masterId": "5bdb5a75-129c-489b-9648-18780773c2a7",
+      "candidateId": "37d47948-6bb9-4663-8255-feec5ab3b5e5"
+    },
+    {
+      "stmt": "2011001701921",
+      "name": "락피더스 아이",
+      "masterId": "56c9d04e-9ee3-47c2-b530-4c997815839f",
+      "candidateId": "45334449-490c-458c-97fd-c8edd33a4341"
+    },
+    {
+      "stmt": "20040020028323",
+      "name": "HANIL PROBIOTICS capsule",
+      "masterId": "f28d97d3-54cb-4ba8-9dbe-d267460f33db",
+      "candidateId": "50f9388b-2ed0-41f4-ba0b-004122e0dcd5"
+    },
+    {
+      "stmt": "200700170352375",
+      "name": "세븐(Seven)",
+      "masterId": "64a735a0-962d-4913-8d20-f6ded7d6827a",
+      "candidateId": "57ba6263-fb74-4a7a-82db-4d30bd747eca"
+    },
+    {
+      "stmt": "2014001711631",
+      "name": "스노우 글로우 프로바이오틱스",
+      "masterId": "c00a5b29-ba37-4699-b01f-913d64c8dba6",
+      "candidateId": "5caf6cc8-9090-471d-bb10-865333324e14"
+    },
+    {
+      "stmt": "2009002002020",
+      "name": "슈퍼자임",
+      "masterId": "247f4083-03b5-4691-88ff-df3803562479",
+      "candidateId": "5d2c46c6-22a8-4ead-bc52-009008167758"
+    },
+    {
+      "stmt": "20040017021943",
+      "name": "빌드락 비피 플러스",
+      "masterId": "6037d4be-5239-4e32-841b-0773e317fd00",
+      "candidateId": "5ddf90e1-f98c-4691-887b-bd0f726a46ba"
+    },
+    {
+      "stmt": "20040020046644",
+      "name": "프리미엄 퍼펙트 생 바이오틱스",
+      "masterId": "7b77752a-94b1-4f43-bdff-f35ca359fcf9",
+      "candidateId": "61478024-1c0c-490a-96ee-1e2b30b66151"
+    },
+    {
+      "stmt": "20040015107535",
+      "name": "장 건강에 도움을 줄 수 있는 프로그램",
+      "masterId": "092ae386-128a-43af-a2a5-bcad0d3a9488",
+      "candidateId": "785cb7b5-e847-4e04-b34c-25720f837e2e"
+    },
+    {
+      "stmt": "200700170352862",
+      "name": "운동부스터 유한 생유산균 스틱",
+      "masterId": "f50a4a8a-f408-4de9-805e-25d27d8f3e6e",
+      "candidateId": "7a258827-bceb-4238-b391-e72ba2804e8f"
+    },
+    {
+      "stmt": "200700170352997",
+      "name": "마이올랑스 유산균(Myolance Probiotics)",
+      "masterId": "24afcd36-de18-462b-a884-c5d20bcced9f",
+      "candidateId": "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf"
+    },
+    {
+      "stmt": "20040015104167",
+      "name": "이너메이크-Ⅱ 프로바이오틱스",
+      "masterId": "dff9955d-85d3-435e-9da7-370938684e3e",
+      "candidateId": "7c7540f1-04e0-4a15-861a-c4a1db1b188c"
+    },
+    {
+      "stmt": "200700170351593",
+      "name": "포뉴 100억 패밀리 프로바이오틱스 유산균",
+      "masterId": "79c5f717-0c38-4507-afad-580c88322331",
+      "candidateId": "7edd7fa2-ccd5-490e-b63f-1a81e2e12274"
+    },
+    {
+      "stmt": "2016000600754",
+      "name": "밸런스 3.0",
+      "masterId": "0c2c6118-0ee8-4bc5-b239-97142d40ea8d",
+      "candidateId": "82062539-5f25-4db5-b534-8c271bdec2ce"
+    },
+    {
+      "stmt": "2024001757513",
+      "name": "덴마크유산균 퍼스트락",
+      "masterId": "939a765c-6e4b-44b4-9094-8aa444b62792",
+      "candidateId": "827670c3-51ec-4a6c-ba8b-df7006ea5c06"
+    },
+    {
+      "stmt": "20040020016600",
+      "name": "장을위한생유산균19",
+      "masterId": "915a5838-258c-4e31-8430-bd310c5f1e81",
+      "candidateId": "82fe2193-8325-4dc5-a40b-1cabe9cb6939"
+    },
+    {
+      "stmt": "2011001701927",
+      "name": "수피아 락토랑",
+      "masterId": "037657e1-2b0c-4419-ac4d-f2c5c8d55016",
+      "candidateId": "85ce52b7-6d75-4f61-a284-1ae07285000d"
+    },
+    {
+      "stmt": "200700170351334",
+      "name": "락피더스",
+      "masterId": "f20a40dc-c7d0-4837-b58f-1c8f7abcb573",
+      "candidateId": "87abb6db-2ff9-4435-ba1d-35be970853f8"
+    },
+    {
+      "stmt": "20040020020419",
+      "name": "락토베베유산균",
+      "masterId": "afd2e0b8-5820-4e17-bb77-819a66061856",
+      "candidateId": "89b50cf7-5174-4b45-969b-f2c59edae7a6"
+    },
+    {
+      "stmt": "202200092431",
+      "name": "마이락토 쾌변",
+      "masterId": "6a5a70ee-6c90-4832-9841-203be9fb7456",
+      "candidateId": "8c02a58e-45f9-4688-acd1-27f20905f651"
+    },
+    {
+      "stmt": "20040017021961",
+      "name": "이지아이생유산균",
+      "masterId": "97d79d76-8c44-4a5e-bc61-739b3295a97e",
+      "candidateId": "8df1c09c-1f04-4007-b92f-afc18533528b"
+    },
+    {
+      "stmt": "2012001900739",
+      "name": "1일 1유산균",
+      "masterId": "68c70f27-c30e-42ef-825b-40d68c73249d",
+      "candidateId": "8e47068b-2945-4061-b9b8-d26b1f5de663"
+    },
+    {
+      "stmt": "20040020038132",
+      "name": "장건강 혼합유산균",
+      "masterId": "3b291d4d-806a-464e-b683-1b009837c53d",
+      "candidateId": "915ddac8-0aab-41c1-8b93-e56e76b484af"
+    },
+    {
+      "stmt": "200700170353232",
+      "name": "바이오스타임 컴포트 프로바이오틱스 포 칠드런",
+      "masterId": "7de52d65-9257-4238-a970-d8fb7be5ffb2",
+      "candidateId": "9911d28a-4eb8-46f6-985d-f0f5129447a0"
+    },
+    {
+      "stmt": "2009001702357",
+      "name": "유렉스 프로바이오틱스 (Urex Plus Vcap-5)",
+      "masterId": "a6f62962-9404-48f2-973c-4beeb35d22de",
+      "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98"
+    },
+    {
+      "stmt": "200700170352520",
+      "name": "맨 TWK10 100억 캡슐",
+      "masterId": "ff6416df-1ff8-45ec-95f7-8679763cf0d9",
+      "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9"
+    },
+    {
+      "stmt": "200400200071155",
+      "name": "프로바이오텍",
+      "masterId": "073c2f37-6389-4e01-8247-4012d664b52e",
+      "candidateId": "b44d95c7-2528-4458-9d25-6cf27cd29e66"
+    },
+    {
+      "stmt": "200400170171174",
+      "name": "바이옴 플러스 프로바이오틱스 에센셜",
+      "masterId": "99c26155-7eb1-48cd-846f-a702575fa0b9",
+      "candidateId": "b8fd8ef4-dc0a-413b-8151-6fe1d5266141"
+    },
+    {
+      "stmt": "20040017021836",
+      "name": "비지엔젤 아이유산균",
+      "masterId": "318c8730-72f7-402e-9d82-a5df5b6dc648",
+      "candidateId": "bc062b94-c452-40d4-8b2e-5c9104f32b11"
+    },
+    {
+      "stmt": "20120019007115",
+      "name": "슈퍼 신(syn)바이오틱스 마이크로바이옴 프로바이오틱스 17",
+      "masterId": "51b2ced0-1d0e-4646-89cb-5934014caa45",
+      "candidateId": "bc1a46dc-7f74-4827-aa1c-de0dc633714a"
+    },
+    {
+      "stmt": "20140017002642",
+      "name": "거메이징 부스트 유산균(Gumazing Probiotics + Boost Sachets)",
+      "masterId": "276aeee0-abc0-48f7-b73c-0857c8b0d1a3",
+      "candidateId": "c3995493-78e3-4bd7-b1a6-38e07e2eea8a"
+    },
+    {
+      "stmt": "20140017002586",
+      "name": "뉴오리진 프로바이오틱스 100억",
+      "masterId": "5079af05-58aa-4a7b-bcde-73c952d88596",
+      "candidateId": "c4da71b2-9d82-4d00-9710-3015a28e8ced"
+    },
+    {
+      "stmt": "200400170171153",
+      "name": "앙팡 츄어블 유산균",
+      "masterId": "b780931c-359e-46cd-992f-987456ecf2bd",
+      "candidateId": "d02839db-ff86-465f-a42d-d5bb92096c2d"
+    },
+    {
+      "stmt": "2009001702322",
+      "name": "프로바이오틱스BG (Probio-Tec BG-VCap-4.9)",
+      "masterId": "cfa96407-35fe-487c-a4b2-ac89b0009c2d",
+      "candidateId": "da49ad13-512c-47af-9f89-bbd804aa4d49"
+    },
+    {
+      "stmt": "20040015102189",
+      "name": "셀시스 락토바이오 02",
+      "masterId": "f6aa1a6b-813a-48d2-af29-d834760c5b5b",
+      "candidateId": "e18923dc-c0ef-48de-966c-6c60b29d6815"
+    },
+    {
+      "stmt": "2011001701922",
+      "name": "키즈 프로바이오틱스 1305",
+      "masterId": "754aa9b8-d62e-42ef-944f-848acd8fb57a",
+      "candidateId": "e3af4b16-11d6-47e2-b382-3be94eb1ec75"
+    },
+    {
+      "stmt": "20040015102191",
+      "name": "셀시스 락토바이오 03",
+      "masterId": "27326777-62cf-4ee0-8244-c00de8832de4",
+      "candidateId": "f6d2ce51-00ce-4209-93f2-26910bc15090"
+    },
+    {
+      "stmt": "2012001900789",
+      "name": "금단미인 우리유산균",
+      "masterId": "522220d8-566a-40d2-b456-63a0a2883e62",
+      "candidateId": "f877369c-de3e-4c51-bbe1-e9aeaf53fe2d"
+    },
+    {
+      "stmt": "20140017002624",
+      "name": "보성 장챙김 퓨어옴 PUREOME",
+      "masterId": "75d04f21-848a-49f6-8edc-b9aac2cb67ab",
+      "candidateId": "f87dd221-7acf-4b61-aaa5-9031c9fa853e"
+    },
+    {
+      "stmt": "20040017014600",
+      "name": "비비톡톡 유산균",
+      "masterId": "be8cb90b-f5d8-4cd8-8745-08b0ce7916c8",
+      "candidateId": "ff84d472-be1c-4e51-99cd-47c3f2acc00c"
+    }
+  ]
+}

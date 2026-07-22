@@ -1,0 +1,584 @@
+[
+ {
+  "statementNo": "20140017002677",
+  "productName": "일동 10종 유산균 혼합분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002173",
+  "productName": "사노피(SANOFI) 10종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002224",
+  "productName": "일동 5종 혼합유산균 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002352",
+  "productName": "프리미엄 7종 복합코팅유산균-3000 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017755",
+  "productName": "Golden LAB",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002452",
+  "productName": "일동 7종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002454",
+  "productName": "바이오락트(BIOLACT) 3종 혼합분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017923",
+  "productName": "7종 혼합유산균12211",
+  "reason": "CFU_ABSENT,SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002663",
+  "productName": "5종 혼합유산균 SC",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2004001510457",
+  "productName": "불멸의유산균",
+  "reason": "BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2004001705998",
+  "productName": "엔테락장용코팅 혼합유산균 6종",
+  "reason": "SERVING_ABSENT,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002614",
+  "productName": "코어바이옴 트리플",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2014001700295",
+  "productName": "홍이장군 키즈랩 7종유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002621",
+  "productName": "보성휴먼 8종 코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "200400170211825",
+  "productName": "11종 혼합유산균(PSRHS-002)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017859",
+  "productName": "Triactiv tablet",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002203",
+  "productName": "제이피엘934(JPL934)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2016000600740",
+  "productName": "유거스(Youguth) 그린에너지 업(UP)",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040015110295",
+  "productName": "해피짱쵸이락포르테",
+  "reason": "CFU_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002108",
+  "productName": "7종 프리미엄 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017766",
+  "productName": "Probiotic Active Phital",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017059202",
+  "productName": "닥터트루 프리미엄 베이비 분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2016000600716",
+  "productName": "엘알티 씨케이디비019 (LRT CKDB019)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002504",
+  "productName": "일동 5종 프리미엄 유산균 K",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017059213",
+  "productName": "엘.람노서스 쥐쥐 350비(L.rhamnosus GG 350B)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040020020340",
+  "productName": "DK(디케이)119유산균",
+  "reason": "BASIS_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017059152",
+  "productName": "유산균혼합분말12 미누",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2005002000527",
+  "productName": "락토피SP",
+  "reason": "BASIS_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002593",
+  "productName": "하이락토 더블 액션 혼합분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017059201",
+  "productName": "닥터트루 프리미엄 키즈 분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002206",
+  "productName": "일동 6종 혼합유산균 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017749",
+  "productName": "Floradicol comfort",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002604",
+  "productName": "일동후디스 9종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017877",
+  "productName": "Lactobex Ukraine",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002272",
+  "productName": "키즈 7종 유산균 알(R)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017783",
+  "productName": "Liprolac",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "201600060078",
+  "productName": "엘피씨 씨케이디비005 (LPC CKDB005)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002515",
+  "productName": "알피(RP) 6종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002395",
+  "productName": "모유유래 복합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2014001700260",
+  "productName": "7종 혼합유산균분말V2",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002460",
+  "productName": "일동 7종 유산균 블렌드 비(B)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2014001700290",
+  "productName": "7종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002349",
+  "productName": "일동바이오사이언스 10종 복합코팅유산균(400B)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002485",
+  "productName": "메타케어 7종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2014001700235",
+  "productName": "프리미엄 10종 복합코팅유산균 3000-S",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017779",
+  "productName": "Biovine Relief",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002170",
+  "productName": "10종 복합코팅유산균 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002364",
+  "productName": "일동 프리미엄 11종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2014001700244",
+  "productName": "아이디 비제이씨 바이오믹스 7 분말",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2005002000557",
+  "productName": "락토피 프로믹스(Lactopy Promix)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002354",
+  "productName": "프리미엄 10종 복합코팅유산균-3000 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002342",
+  "productName": "10종 혼합유산균 250B",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002310",
+  "productName": "그라스 15종 혼합유산균 (GRAS 15 Probiotics Blend)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "200400170211547",
+  "productName": "덴프스 유산균이야기 다이어트",
+  "reason": "CFU_ABNORMAL",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040020020306",
+  "productName": "발효도라지유산균",
+  "reason": "BASIS_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20070017035675",
+  "productName": "뉴장안에화제",
+  "reason": "CFU_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017059160",
+  "productName": "베이비 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002491",
+  "productName": "에이치엠 5종 혼합유산균 비(B)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "200700170352971",
+  "productName": "제타바이오 감마4",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002114",
+  "productName": "9종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2004001705957",
+  "productName": "이에프 400B(EF-400B)",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20070017035765",
+  "productName": "드시모네 키즈 블루베리향",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002208",
+  "productName": "일동키즈복합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2004001706773",
+  "productName": "락티플랜티바실러스플란타룸",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "201100160062",
+  "productName": "유산균발효다시마추출물",
+  "reason": "CFU_ABSENT,SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2004001704645",
+  "productName": "디펜시아(DEFENCIA) 혼합유산균",
+  "reason": "CFU_ABSENT,BASIS_PARSE_FAILED",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017756",
+  "productName": "LACTOBEX",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017860",
+  "productName": "Duolac 7.1F",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017760",
+  "productName": "Unimex Yam Yam stick",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20040017017874",
+  "productName": "릴루스(Rillus)",
+  "reason": "CFU_ABSENT",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002644",
+  "productName": "일동 6종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "20140017002671",
+  "productName": "패밀리 6종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK",
+  "stage": "select"
+ },
+ {
+  "statementNo": "2016000600767",
+  "productName": "마미래디 유산균",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2005002000534",
+  "productName": "락토피 SP 캡슐",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200400170061686",
+  "productName": "엘레씬",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2005002000545",
+  "productName": "셀티바 프로바이오틱스 포(FOR) 스킨",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2005002000551",
+  "productName": "프로바이오 피부엔진",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040017059163",
+  "productName": "락토필엔테로",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040020020368",
+  "productName": "어린이유산균",
+  "reason": "BLOCKED:Q-TRUNCATED-002",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2005002000554",
+  "productName": "이너엔 마이크로바이옴 트리플 생 유산균",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170352797",
+  "productName": "듀얼소닉 뷰티루틴 피부유산균",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040017106373",
+  "productName": "착한 생유산균",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040017059149",
+  "productName": "닥터에스 유산균 19(닥터S 유산균 19)",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20120019007106",
+  "productName": "비피락토골드캡슐",
+  "reason": "REVIEW:D-CLAIM-GROUNDED-002,D-CLAIM-GROUNDED-002",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040017059165",
+  "productName": "프로바이오틱스 우먼",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170352210",
+  "productName": "Kids Garden® AntiAller Pro Probiotics Powder",
+  "reason": "REVIEW:E-NAME-CLAIM-OUTOFSCOPE-003",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170351921",
+  "productName": "프로바이오 피부 면역 유산균 분말",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20150010018134",
+  "productName": "리멤버핏 인지력",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170352009",
+  "productName": "스킨프로바이오틱스",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170352491",
+  "productName": "hy 프로바이오틱스 스킨",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170352136",
+  "productName": "드시모네 프라임",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170353174",
+  "productName": "당큐락 이지",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2009002002025",
+  "productName": "청인해우골드",
+  "reason": "BLOCKED:H-COUNT-MISMATCH-001",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170353208",
+  "productName": "헬시부트 올데이 블룸",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "200700170351973",
+  "productName": "루솔 굿케어 피부유산균",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "20040020071442",
+  "productName": "CROTENA PROBIOTICS(태국용)",
+  "reason": "REVIEW:B-SPEC-MINMAX-003,B-SPEC-MINMAX-003,B-SPEC-MINMAX-003,B-SPEC-MINMAX-003",
+  "stage": "generate"
+ },
+ {
+  "statementNo": "2018001231060",
+  "productName": "메디타민 퓨어 레이디 프로바이오틱스",
+  "reason": "COMPOSE_FN_NONSTANDARD",
+  "stage": "generate"
+ }
+]
