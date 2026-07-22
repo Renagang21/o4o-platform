@@ -58,6 +58,24 @@
       "masters": 317,
       "op": "EN_ONLY",
       "status": "DONE"
+    },
+    {
+      "groupKey": "마그네슘·비타민B6|470mg급|정제(combo)",
+      "sourceRef": "91d2a67d-669c-418d-840a-e065e311acc1",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 16,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
+    },
+    {
+      "groupKey": "비타민B1·B2·B6·C|복합|정제(combo)",
+      "sourceRef": "db7c085e-d233-499c-bb99-56f2e9efcd58",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 60,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
     }
   ]
 }
