@@ -1,0 +1,22 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-INTERACTION-2H-NA-V1 (에이전트 나) 자기 전용 config. 마그신·레날비타 2그룹 한정. 공용 registry 미수정. runner=otc-nutrition-combo-en-only-runner-na.ts --config=<이 파일> --group=<key>. 상호작용 ko 열거 병렬 그대로 번역·ko 불변.",
+  "round": "nutrition-combo-interaction-2h-2026-07-22",
+  "en": {
+    "magnesium-b6-combo": {
+      "key": "마그네슘·비타민B6|470mg급|정제(combo)",
+      "sourceRef": "91d2a67d-669c-418d-840a-e065e311acc1",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 16,
+      "translationFile": "otc-en-translations-magnesium-b6-combo-na-v1.json",
+      "outBase": "otc-combo-en-only-magnesium-b6"
+    },
+    "renal-vita-b-c-combo": {
+      "key": "비타민B1·B2·B6·C|복합|정제(combo)",
+      "sourceRef": "db7c085e-d233-499c-bb99-56f2e9efcd58",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 60,
+      "translationFile": "otc-en-translations-renal-vita-b-c-combo-na-v1.json",
+      "outBase": "otc-combo-en-only-renal-vita-b-c"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-INTERACTION-2H-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "마그신 = nutrition_combo(source_ref 91d2a67d) 마그네슘·비타민B6 정제 470mg급. ko canonical 충실 번역(fresh). 상호작용은 ko 열거(인산염·칼슘염·테트라사이클린계·제산제·레보도파)를 병렬 항목 그대로 번역 — 통합·기전 설명·위험도 재판단 없음. 금기/상담 강도 보존. fact-0. ko 미변경.",
+  "translations": [
+    {
+      "groupKey": "마그네슘·비타민B6|470mg급|정제(combo)",
+      "title": "Magnesium and Vitamin B6 Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamin B6 when your strength is low during pregnancy, breastfeeding, or during and after illness, and for muscle cramps caused by magnesium deficiency.",
+      "usage": "Adults take two tablets three times a day, with plenty of water during meals.",
+      "caution": "Do not take this if you are hypersensitive to it, have severe kidney failure, or are a baby under 12 months old. Talk to a pharmacist if you have a heart, circulatory or kidney disorder, low blood protein, are pregnant, or are hypersensitive to Yellow No. 4 or Yellow No. 5 colouring. Do not take it together with phosphates, calcium salts, tetracycline antibiotics, antacids or levodopa.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Magnesium and vitamin B6 (about 470 mg)",
+        "How it works": "Supplies magnesium and vitamin B6",
+        "Main symptoms": "Muscle cramps caused by magnesium deficiency",
+        "Who should be careful": "People with severe kidney failure or circulatory or kidney disorders",
+        "Why this one": "A magnesium and vitamin B6 tablet"
+      }
+    }
+  ],
+  "summary": "Muscle cramps from magnesium deficiency and vitamin B6 supply"
+}

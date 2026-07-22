@@ -1,0 +1,47 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "마그네슘·비타민B6|470mg급|정제(combo)",
+  "writeOwner": {
+    "kind": "nutrition_combo_source_ref",
+    "value": "91d2a67d-669c-418d-840a-e065e311acc1",
+    "sourceType": "mfds_drug_otc_nutrition_combo"
+  },
+  "expected": 16,
+  "anomalies": [],
+  "targetMasters": 16,
+  "target_master_ids": [
+    "0ae05d13-ec5f-44c0-8929-749f652133b6",
+    "1263bf52-fa45-4e45-864d-e73fd063a7d4",
+    "148fc714-9fdb-4d0c-b8da-3424a3368ca4",
+    "2d9035c5-fa8f-4d28-934c-279be4daabe4",
+    "4631a0dd-c4e7-4bce-83df-91072e2db9d7",
+    "474ce958-9704-455d-884f-a09a2175094e",
+    "578187ae-9053-462d-9373-c322959b124a",
+    "624dbd66-18c5-4c72-aa39-ee74006bccf6",
+    "6ef725bd-9327-4842-9352-964f2739da45",
+    "a570f0d2-e2bf-4633-a77a-412217efe816",
+    "af026fb3-106d-42b4-a2d1-ec261497a2ef",
+    "b4607900-d5a0-4f2d-a0bf-0ddd80da02a1",
+    "eb225fab-5733-4c34-8ab9-4ebd797f36a3",
+    "eb8f63cd-2db5-4455-83f6-8bae0c8eb37b",
+    "f015468d-f963-41f5-8185-5c6b9f77c416",
+    "fafe8ca2-dd46-4476-afad-8525f6ff35d2"
+  ],
+  "koFingerprintKinds": 1,
+  "koCanonicalBefore": 16,
+  "existingEnCanonical": 16,
+  "existingEnNeedsReview": 0,
+  "builtLen": 2501,
+  "builtMd5": "fb38d1cce685a881dae14b8050bd3618",
+  "summaryField": "Muscle cramps from magnesium deficiency and vitamin B6 supply",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 16,
+    "STEP2_en_canonical_flip": 16,
+    "en_write_total": 32
+  },
+  "enTargetMd5": "fb38d1cce685a881dae14b8050bd3618",
+  "note": "대상 en 이미 canonical · build byte-identical(fb38d1cce685a881dae14b8050bd3618) — write 0"
+}

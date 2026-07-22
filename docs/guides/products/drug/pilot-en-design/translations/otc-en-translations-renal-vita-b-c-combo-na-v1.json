@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-INTERACTION-2H-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "레날비타 = nutrition_combo(source_ref db7c085e) 비타민 B1·B2·B6·C 복합 정제. ko canonical 충실 번역(fresh). ko 효능 문장 그대로(성분별 분해·합성 없음). 상호작용(레보도파)·금기/상담 ko 열거 그대로 병렬 번역 — 통합·기전·위험도 재판단 없음. fact-0. ko 미변경.",
+  "translations": [
+    {
+      "groupKey": "비타민B1·B2·B6·C|복합|정제(combo)",
+      "title": "Vitamin B1, B2, B6 and C Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins B1, B2, B6 and C when you are physically tired or your strength is low, for neuralgia, muscle pain and joint pain, for angular cheilitis, cheilitis, mouth sores and glossitis, for beriberi and eye fatigue, to relieve pigmentation, and to help prevent bleeding gums and nose.",
+      "usage": "Children aged 8 years and over and adults take one tablet twice a day, in the morning and evening.",
+      "caution": "Do not take this if you are hypersensitive to it or are a baby under 3 months old. Talk to a pharmacist if you have gout, kidney stones or folate deficiency, or are hypersensitive to Yellow No. 5 colouring. Do not take it together with levodopa.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins B1, B2, B6 and C",
+        "How it works": "Supplies B-group vitamins and vitamin C",
+        "Main symptoms": "Physical fatigue and mouth sores",
+        "Who should be careful": "People with gout or kidney stones, or taking levodopa",
+        "Why this one": "A B-group and vitamin C combination tablet"
+      }
+    }
+  ],
+  "summary": "Physical fatigue and mouth sores (vitamin B and C supply)"
+}
