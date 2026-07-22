@@ -404,6 +404,11 @@ const ForumManagementPage = lazy(() =>
 const ForumDeleteRequestsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumDeleteRequestsPage }))
 );
+// WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
+const ForumDeletePage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ForumDeletePage }))
+);
+const ForumDeletedManagementPage = lazy(() => import('./pages/admin/ForumDeletedManagementPage'));
 const ForumAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumAnalyticsPage }))
 );
@@ -990,6 +995,8 @@ function App() {
               <Route path="/admin/applications" element={<Navigate to="/operator/applications" replace />} />
               <Route path="/admin/community" element={<ForumManagementPage />} />
               <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+              {/* WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: 삭제된 포럼(복구/완전삭제/삭제이력) — admin 전용 */}
+              <Route path="/admin/forum-deleted" element={<ForumDeletedManagementPage />} />
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /admin/supply 제거 */}
               <Route path="/admin/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
@@ -1098,7 +1105,10 @@ function App() {
               <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/operator/applications" element={<RegistrationRequestsPage />} />
               <Route path="/operator/community" element={<ForumManagementPage />} />
-              <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+              {/* WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: '포럼 삭제' 2-탭 (삭제 요청 + 직접 삭제) */}
+              <Route path="/operator/forum-delete" element={<ForumDeletePage />} />
+              {/* legacy alias — 기존 링크 보존 */}
+              <Route path="/operator/forum-delete-requests" element={<ForumDeletePage />} />
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: 제거된 메뉴 redirect */}
               <Route path="/operator/supply" element={<Navigate to="/operator/all-registered-products" replace />} />

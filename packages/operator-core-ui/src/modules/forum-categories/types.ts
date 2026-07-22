@@ -54,4 +54,16 @@ export interface OperatorForumCategoriesPageProps {
   client: ForumCategoriesClient;
   /** DataTable tableId (서비스별 고유, 기본 'operator-forum-categories') */
   tableId?: string;
+  /**
+   * true 시 완전 삭제(hardDelete) 관련 UI(행 액션·일괄 버튼·모달)를 노출하지 않는다.
+   * WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1:
+   *   Neture Operator 는 soft delete(비활성화)만 사용하고 완전 삭제는 Admin 전용.
+   *   기본값 false — 기존 소비처(KPA/GP/KCos) 동작 불변.
+   */
+  disableHardDelete?: boolean;
+  /**
+   * true 이고 게시글이 있는 포럼을 비활성화할 때, 확인 모달에서 포럼명 재입력을 요구한다.
+   * 기본값 false — 기존 소비처 동작 불변.
+   */
+  requireNameConfirmForNonEmpty?: boolean;
 }

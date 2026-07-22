@@ -39,6 +39,31 @@ import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
 import logger from '../../utils/logger.js';
+import { ActionLogService } from '@o4o/action-log-core';
+import { purgeForumAndDependents } from '../../services/forum/forumHardDelete.js';
+
+/**
+ * WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
+ * 삭제/복구 감사 로그를 공통 action_logs (@o4o/action-log-core) 에 남긴다.
+ * 실패해도 주 업무를 롤백하지 않는다(감사 실패는 경고 로깅만).
+ */
+let _actionLog: ActionLogService | null = null;
+function actionLog(): ActionLogService {
+  if (!_actionLog) _actionLog = new ActionLogService(AppDataSource);
+  return _actionLog;
+}
+async function safeAudit(
+  serviceCode: string,
+  userId: string | null,
+  actionKey: string,
+  meta: Record<string, any>,
+): Promise<void> {
+  try {
+    await actionLog().logSuccess(serviceCode, userId, actionKey, { meta });
+  } catch (err: any) {
+    logger.warn(`[forum-audit] failed to record ${actionKey}: ${err?.message || err}`);
+  }
+}
 
 /**
  * Service catalog code → RBAC ServiceKey mapping.
@@ -330,6 +355,7 @@ router.post('/delete-requests/:id/approve', async (req: Request, res: Response):
       return;
     }
 
+    const beforeStatus = forum.status;
     forum.status = 'archived';
     forum.metadata = {
       ...meta,
@@ -341,6 +367,18 @@ router.post('/delete-requests/:id/approve', async (req: Request, res: Response):
     };
 
     const updated = await requestRepo().save(forum);
+    await safeAudit(serviceCode, userId ?? null, 'forum.delete_request.approve', {
+      forumId: forum.id,
+      forumName: forum.name,
+      serviceCode,
+      action: 'delete_request_approve',
+      reason: reviewComment?.trim() || null,
+      actorUserId: userId ?? null,
+      actorRoles: (req as AuthRequest).user?.roles ?? [],
+      requestedBy: meta.deleteRequestedBy ?? null,
+      beforeStatus,
+      afterStatus: 'archived',
+    });
     res.json({ success: true, data: updated });
   } catch (error: any) {
     logger.error('Error approving forum delete request:', error);
@@ -682,6 +720,19 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
       { status: PostStatus.ARCHIVED },
     );
     logger.info(`Forum ${forum.id} deactivated by operator ${userId} (reason: ${reason.trim()}, posts archived: ${updateResult.affected ?? 0})`);
+    await safeAudit(serviceCode, userId ?? null, 'forum.operator.soft_delete', {
+      forumId: forum.id,
+      forumName: forum.name,
+      serviceCode,
+      action: 'operator_soft_delete',
+      reason: reason.trim(),
+      actorUserId: userId ?? null,
+      actorRoles: (req as AuthRequest).user?.roles ?? [],
+      requestedBy: null,
+      beforeStatus: 'completed',
+      afterStatus: 'archived',
+      affectedCounts: { postsArchived: updateResult.affected ?? 0 },
+    });
     res.json({ success: true, data: { id: forum.id, isActive: false } });
   } catch (error: any) {
     logger.error('Error deactivating forum:', error);
@@ -832,18 +883,30 @@ router.delete('/categories/:id/hard', async (req: Request, res: Response): Promi
         });
         return;
       }
-
-      // 고아 게시글만 남은 경우 → 자동 정리 후 진행
-      const deletedPosts = await postRepo().delete({ forumId: req.params.id });
-      logger.info(`Forum ${forum.id} (${forum.name}): 고아 게시글 ${deletedPosts.affected ?? 0}건 자동 정리 (operator: ${userId})`);
+      // 고아 게시글만 남은 경우 → purge 에서 좋아요/알림/댓글/게시글까지 자동 정리
     }
 
-    // 멤버십 cascade 삭제 (owner 포함) → FK 위반 방지
-    const deletedMembers = await memberRepo().delete({ forumCategoryId: req.params.id });
-    logger.info(`Forum ${forum.id} (${forum.name}) hard deleted by operator ${userId} (reason: ${reason.trim()}, members removed: ${deletedMembers.affected ?? 0})`);
-    await requestRepo().remove(forum);
+    // WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1:
+    // 공유 purge 함수로 종속 데이터(게시글/댓글/좋아요/알림/멤버십)까지 트랜잭션 정리 후 포럼 제거.
+    const forumName = forum.name;
+    const beforeStatus = forum.status;
+    const counts = await AppDataSource.transaction((manager) => purgeForumAndDependents(manager, forum));
+    logger.info(`Forum ${req.params.id} (${forumName}) hard deleted by operator ${userId} (reason: ${reason.trim()}, counts: ${JSON.stringify(counts)})`);
+    await safeAudit(serviceCode, userId ?? null, 'forum.operator.hard_delete', {
+      forumId: req.params.id,
+      forumName,
+      serviceCode,
+      action: 'operator_hard_delete',
+      reason: reason.trim(),
+      actorUserId: userId ?? null,
+      actorRoles: (req as AuthRequest).user?.roles ?? [],
+      requestedBy: null,
+      beforeStatus,
+      afterStatus: 'deleted',
+      affectedCounts: counts,
+    });
 
-    res.json({ success: true, data: { id: req.params.id, name: forum.name, hardDeleted: true } });
+    res.json({ success: true, data: { id: req.params.id, name: forumName, hardDeleted: true, affectedCounts: counts } });
   } catch (error: any) {
     logger.error('Error hard deleting forum:', error);
     res.status(500).json({ success: false, error: error.message });

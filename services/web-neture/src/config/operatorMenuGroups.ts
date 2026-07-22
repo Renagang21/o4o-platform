@@ -84,7 +84,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: signage 그룹 제거 (Neture signage 미대상)
   forum: [
     { label: '포럼 신청', path: '/operator/community' },
-    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
+    // WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1:
+    //   '삭제 요청' → '포럼 삭제' (삭제 요청 + 포럼 직접 삭제 2-탭). 완전 삭제는 admin 전용.
+    { label: '포럼 삭제', path: '/operator/forum-delete' },
+    { label: '삭제된 포럼', path: '/admin/forum-deleted', adminOnly: true },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   analytics: [
@@ -174,6 +177,8 @@ export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuIte
     ],
     content: [
       { label: '커뮤니티 광고', path: '/admin/community-admin' },
+      // WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: 삭제된 포럼(복구/완전삭제/삭제이력)
+      { label: '삭제된 포럼', path: '/admin/forum-deleted' },
     ],
     analytics: [
       { label: 'AI 관리', path: '/admin/ai-admin' },

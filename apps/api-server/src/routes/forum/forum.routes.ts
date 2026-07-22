@@ -12,6 +12,7 @@ import aiRoutes from './forum.ai.routes.js';
 import recommendationRoutes from './forum.recommendation.routes.js';
 import categoryRequestRoutes from './forum-category-request.routes.js';
 import operatorForumRoutes from './operator-forum.routes.js';
+import adminForumRoutes from './admin-forum.routes.js';
 
 const router: Router = Router();
 const postController = new ForumPostController();
@@ -181,5 +182,11 @@ router.use('/category-requests', categoryRequestRoutes);
 // Common forum operator API (serviceCode-scoped, operator role required)
 // ============================================================================
 router.use('/operator', operatorForumRoutes);
+
+// ============================================================================
+// Admin Routes — WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
+// 삭제된 포럼 관리 (복구 / 완전 삭제 / 삭제 이력) — admin 권한 필수 (serviceCode-scoped)
+// ============================================================================
+router.use('/admin', adminForumRoutes);
 
 export default router;

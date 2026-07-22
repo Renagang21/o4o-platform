@@ -66,6 +66,8 @@ const CATEGORY_ACTION_ICONS: Record<string, ReactNode> = {
 export function OperatorForumCategoriesPage({
   client,
   tableId = 'operator-forum-categories',
+  disableHardDelete = false,
+  requireNameConfirmForNonEmpty = false,
 }: OperatorForumCategoriesPageProps) {
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [isCatsLoading, setIsCatsLoading] = useState(true);
@@ -73,7 +75,12 @@ export function OperatorForumCategoriesPage({
   const [catStatusFilter, setCatStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [deactivateTarget, setDeactivateTarget] = useState<CategoryData | null>(null);
   const [deactivateReason, setDeactivateReason] = useState('');
+  const [deactivateNameConfirm, setDeactivateNameConfirm] = useState('');
   const [isDeactivating, setIsDeactivating] = useState(false);
+
+  // 게시글 있는 포럼 비활성화 시 포럼명 재입력 요구 여부
+  const needsNameConfirm = requireNameConfirmForNonEmpty && !!deactivateTarget && deactivateTarget.postCount > 0;
+  const nameConfirmOk = !needsNameConfirm || deactivateNameConfirm.trim() === deactivateTarget?.name;
 
   const [selectedCatIds, setSelectedCatIds] = useState<Set<string>>(new Set());
 
@@ -110,7 +117,7 @@ export function OperatorForumCategoriesPage({
   };
 
   const handleDirectDeactivate = async () => {
-    if (!deactivateTarget || !deactivateReason.trim()) return;
+    if (!deactivateTarget || !deactivateReason.trim() || !nameConfirmOk) return;
     setIsDeactivating(true);
     try {
       const result = await client.directDeactivate(deactivateTarget.id, {
@@ -120,6 +127,7 @@ export function OperatorForumCategoriesPage({
         toast.success(`'${deactivateTarget.name}' 포럼이 비활성화되었습니다`);
         setDeactivateTarget(null);
         setDeactivateReason('');
+        setDeactivateNameConfirm('');
         loadCategories();
       } else {
         toast.error(result.error || '비활성화 실패');
@@ -413,11 +421,11 @@ export function OperatorForumCategoriesPage({
           actions={buildRowActions(forumCategoryPolicy, row, {
             editTags: () => openTagEditModal(row),
             activate: () => handleActivate(row),
-            deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); },
+            deactivate: () => { setDeactivateTarget(row); setDeactivateReason(''); setDeactivateNameConfirm(''); },
             hardDelete: () => openHardDeleteModal(row),
           }, {
             icons: CATEGORY_ACTION_ICONS,
-          })}
+          }).filter((a) => !disableHardDelete || a.key !== 'hardDelete')}
         />
       ),
     },
@@ -504,7 +512,7 @@ export function OperatorForumCategoriesPage({
             variant: 'danger' as const,
             icon: <AlertOctagon size={14} />,
             loading: batch.loading,
-            visible: selectedInactiveCount > 0,
+            visible: !disableHardDelete && selectedInactiveCount > 0,
             group: 'danger',
           },
         ]}
@@ -587,7 +595,7 @@ export function OperatorForumCategoriesPage({
       {/* ── 비활성화 확인 모달 ── */}
       {deactivateTarget && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); }} />
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); }} />
           <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
@@ -627,17 +635,32 @@ export function OperatorForumCategoriesPage({
                   className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-400 resize-none text-sm"
                 />
               </div>
+
+              {needsNameConfirm && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                    확인을 위해 포럼명 <span className="font-semibold text-slate-900">{deactivateTarget?.name}</span> 을(를) 입력하세요 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={deactivateNameConfirm}
+                    onChange={(e) => setDeactivateNameConfirm(e.target.value)}
+                    placeholder="포럼명 입력"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  />
+                </div>
+              )}
             </div>
             <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
               <button
-                onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); }}
+                onClick={() => { setDeactivateTarget(null); setDeactivateReason(''); setDeactivateNameConfirm(''); }}
                 className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 취소
               </button>
               <button
                 onClick={handleDirectDeactivate}
-                disabled={!deactivateReason.trim() || isDeactivating}
+                disabled={!deactivateReason.trim() || !nameConfirmOk || isDeactivating}
                 className="px-6 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
               >
                 {isDeactivating ? (

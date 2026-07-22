@@ -887,6 +887,80 @@ export const forumOperatorApi = {
     const res = await api.post(`${OPERATOR_BASE}/delete-requests/batch-reject?${SVC}`, { ids, reviewComment });
     return res.data;
   },
+
+  // ── 포럼 직접 삭제(soft) — WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
+  //    ForumCategoriesClient 어댑터. Neture Operator 는 soft delete 만 사용(disableHardDelete).
+  getCategories: async () => {
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/categories?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: [], count: 0 };
+    }
+  },
+  updateCategory: async (id: string, data: { name?: string; description?: string; tags?: string[] }) => {
+    const res = await api.patch(`${OPERATOR_BASE}/categories/${id}?${SVC}`, data);
+    return res.data;
+  },
+  directDeactivate: async (id: string, data: { reason: string }) => {
+    const res = await api.post(`${OPERATOR_BASE}/categories/${id}/deactivate?${SVC}`, data);
+    return res.data;
+  },
+  activate: async (id: string) => {
+    const res = await api.post(`${OPERATOR_BASE}/categories/${id}/activate?${SVC}`, {});
+    return res.data;
+  },
+  // 아래 두 메서드는 ForumCategoriesClient 인터페이스 충족용 — Neture Operator UI 는
+  // disableHardDelete 로 완전 삭제를 노출하지 않으므로 실제 호출되지 않는다.
+  getDeleteCheck: async (id: string) => {
+    const res = await api.get(`${OPERATOR_BASE}/categories/${id}/delete-check?${SVC}`);
+    return res.data;
+  },
+  hardDelete: async (id: string, data: { reason: string }) => {
+    const res = await api.delete(`${OPERATOR_BASE}/categories/${id}/hard?${SVC}`, { data });
+    return res.data;
+  },
+};
+
+// ============================================================================
+// Admin Forum API — WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1
+// 삭제된 포럼 관리 (복구 / 완전 삭제 / 삭제 이력) — admin 전용 /api/v1/forum/admin/*
+// Neture Admin 화면은 공통 operator hard-delete 가 아닌 본 admin 전용 API 만 호출한다.
+// ============================================================================
+
+const ADMIN_BASE = '/forum/admin';
+
+export const forumAdminApi = {
+  getDeletedForums: async () => {
+    try {
+      const res = await api.get(`${ADMIN_BASE}/forums/deleted?${SVC}`);
+      return res.data;
+    } catch (error: any) {
+      return { success: false, data: [], count: 0, error: error?.response?.data?.error };
+    }
+  },
+  getHardDeleteCheck: async (id: string) => {
+    const res = await api.get(`${ADMIN_BASE}/forums/${id}/hard-delete-check?${SVC}`);
+    return res.data;
+  },
+  restore: async (id: string) => {
+    const res = await api.post(`${ADMIN_BASE}/forums/${id}/restore?${SVC}`, {});
+    return res.data;
+  },
+  hardDelete: async (id: string, data: { reason: string }) => {
+    const res = await api.delete(`${ADMIN_BASE}/forums/${id}/hard?${SVC}`, { data });
+    return res.data;
+  },
+  getAuditLogs: async (limit?: number) => {
+    try {
+      const query = new URLSearchParams({ serviceCode: 'neture' });
+      if (limit) query.set('limit', String(limit));
+      const res = await api.get(`${ADMIN_BASE}/audit-logs?${query}`);
+      return res.data;
+    } catch {
+      return { success: true, data: [], count: 0 };
+    }
+  },
 };
 
 // ============================================================================

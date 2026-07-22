@@ -8,6 +8,8 @@ export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
+// WO-O4O-NETURE-FORUM-DELETE-OPERATOR-AND-ADMIN-SEPARATION-V1: 삭제 요청 + 포럼 직접 삭제 2-탭
+export { default as ForumDeletePage } from './ForumDeletePage';
 // WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 export { default as ForumAnalyticsPage } from './ForumAnalyticsPage';
 // WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: SupplyDashboardPage 제거 (미완성 기능)
