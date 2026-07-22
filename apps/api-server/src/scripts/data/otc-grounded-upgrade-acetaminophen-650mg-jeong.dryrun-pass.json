@@ -1,0 +1,510 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "아세트아미노펜|650밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "05690081-c79e-456f-a8ec-5e1a3f4fd1de",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "아세트아미노펜 650mg 정",
+  "coarseTotal": 78,
+  "target": 7,
+  "excluded": 71,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0119f5ef-4bed-4787-affc-8dec3d89bc72",
+      "name": "타이레펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e82822a33cae05de, bridge SSOT)"
+    },
+    {
+      "id": "01cf5946-5804-4e21-9db7-bee978c9555a",
+      "name": "이알펜8시간서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "0304ac7e-16ee-4c98-8fc4-d86fe94ed370",
+      "name": "아세트엠8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp ceab671080350fd8, bridge SSOT)"
+    },
+    {
+      "id": "0420f964-edbf-4ce7-a815-cc197292bb13",
+      "name": "티메롤8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 94302adb23a6c322, bridge SSOT)"
+    },
+    {
+      "id": "08a96621-047c-47e9-9527-2b0fccfb70cc",
+      "name": "타이리콜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0ce9b94fc509b2da, bridge SSOT)"
+    },
+    {
+      "id": "098843fc-452e-46c5-831e-4b5fd47c159f",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "0fda6bda-f895-44c3-9507-6c1a5912b4a0",
+      "name": "아세트엠8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp ceab671080350fd8, bridge SSOT)"
+    },
+    {
+      "id": "10cd53c7-427f-495a-b113-03a26e792e41",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "147bc028-ad70-4571-80e1-e61bdbbb26f2",
+      "name": "트리스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 35ee305c68b34c53, bridge SSOT)"
+    },
+    {
+      "id": "1bc31f1b-d6e2-42e1-82d3-813d215ca8ae",
+      "name": "펜잘8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "1cf404cb-697e-460b-9471-92c1efd43d3c",
+      "name": "아세트엠8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp ceab671080350fd8, bridge SSOT)"
+    },
+    {
+      "id": "21f8ae4c-92ba-4f0e-86e8-830bddc137b8",
+      "name": "티메롤8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 94302adb23a6c322, bridge SSOT)"
+    },
+    {
+      "id": "23b37987-3e90-42a0-8932-fea65c3d2654",
+      "name": "타이몰8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e74a3b1422b1d0da, bridge SSOT)"
+    },
+    {
+      "id": "2508af59-a945-43c7-85b0-a513f62b0f08",
+      "name": "세타펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp d1450c9e6615d868, bridge SSOT)"
+    },
+    {
+      "id": "346717b2-7e4c-4366-a9cb-8180260b260a",
+      "name": "타이몰8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e74a3b1422b1d0da, bridge SSOT)"
+    },
+    {
+      "id": "358e3b00-38f8-45a3-a5e4-71641adbc681",
+      "name": "아니스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 7bc95f9c91498045, bridge SSOT)"
+    },
+    {
+      "id": "37b88e40-ea56-4e73-bba4-ddb4fbcd7340",
+      "name": "아니스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 7bc95f9c91498045, bridge SSOT)"
+    },
+    {
+      "id": "382e1ea1-bb86-4b5e-be06-42260dafd06b",
+      "name": "타이레펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e82822a33cae05de, bridge SSOT)"
+    },
+    {
+      "id": "3b9c75b6-d3e3-4641-8880-bf37de938c6a",
+      "name": "펜잘8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "3ee792ce-45b2-4043-9b10-0ba7aa5236f2",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "3fd2cb12-c7de-479a-bf16-16b0cee70604",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "40c403a1-f6da-4e98-bb49-33cbc020c90c",
+      "name": "세타펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp d1450c9e6615d868, bridge SSOT)"
+    },
+    {
+      "id": "484e8e81-cae4-46ce-88b7-29526d5ef6e0",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "4a816615-e28f-417c-9bad-921585177260",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "4ec3b4d8-671a-4c3a-90ea-f4f1c137276b",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "5309c607-760e-4eb7-8bc8-2c06b809e131",
+      "name": "티메롤8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 94302adb23a6c322, bridge SSOT)"
+    },
+    {
+      "id": "54ea2cd4-f19a-4ff7-b61a-1abf4196a9c5",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "56d11e93-0aef-44f2-a72f-00c66945eb9b",
+      "name": "티메롤8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 94302adb23a6c322, bridge SSOT)"
+    },
+    {
+      "id": "5907b07c-2bd8-42e0-99a2-af1411a7cc79",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    },
+    {
+      "id": "615b5898-6651-43e1-b2ae-26e6071b6e5f",
+      "name": "세타펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp d1450c9e6615d868, bridge SSOT)"
+    },
+    {
+      "id": "6299f6b4-9c31-4b5d-b676-1fc480fd98bc",
+      "name": "펜잘8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "653e616a-320e-41b2-902a-5c2e82c69a4f",
+      "name": "타이레펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e82822a33cae05de, bridge SSOT)"
+    },
+    {
+      "id": "669520e7-89ea-46f0-b220-d7f61d2f8674",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "671a2c0e-9136-4db6-9617-8602a3662d1e",
+      "name": "아니스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 7bc95f9c91498045, bridge SSOT)"
+    },
+    {
+      "id": "6f856ffb-3da8-4258-a62d-9d67e4ed7eeb",
+      "name": "세토펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0c0ee073a7189199, bridge SSOT)"
+    },
+    {
+      "id": "6fa0f21c-9d29-4e59-a486-e9fe0aa49375",
+      "name": "트라몰8시간서방정650밀리그람(아세트아미노펜)",
+      "reason": "비대상(fp cda6119c4c3016b9, bridge SSOT)"
+    },
+    {
+      "id": "7019489e-5fb8-4429-84c9-1b91bf2254c3",
+      "name": "타미스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 40e3ba26080d8d16, bridge SSOT)"
+    },
+    {
+      "id": "72e357eb-dce8-4ec3-9692-55eb04110e51",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    },
+    {
+      "id": "74c7cb4a-aa36-46fc-9972-fdba12287efe",
+      "name": "타미스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 40e3ba26080d8d16, bridge SSOT)"
+    },
+    {
+      "id": "7e14e999-a25e-480f-a3e7-eab8f8ea8645",
+      "name": "타세놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 88cec29cdde489f9, bridge SSOT)"
+    },
+    {
+      "id": "80534de2-d3fa-4d1b-862e-0cb5b5959757",
+      "name": "트라몰8시간서방정650밀리그람(아세트아미노펜)",
+      "reason": "비대상(fp cda6119c4c3016b9, bridge SSOT)"
+    },
+    {
+      "id": "82b32376-8287-442c-b769-59d6db068a8d",
+      "name": "아니스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 7bc95f9c91498045, bridge SSOT)"
+    },
+    {
+      "id": "8420ea2c-e5fc-43c9-aae5-6d4f07c8f1ec",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    },
+    {
+      "id": "87f30dca-7598-4d34-bb88-cd470256fd78",
+      "name": "타이레펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e82822a33cae05de, bridge SSOT)"
+    },
+    {
+      "id": "8af2f1e1-8dbc-4bf1-8aa8-a0845d05ec27",
+      "name": "이알펜8시간서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "8c4c4b42-3ef0-44d0-947c-90e1e534256d",
+      "name": "트리스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 35ee305c68b34c53, bridge SSOT)"
+    },
+    {
+      "id": "8ddb29f3-0f71-488e-aceb-a41e8c2dacc0",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "929440a3-0fcc-4431-a067-a92d0c69466c",
+      "name": "트리스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 35ee305c68b34c53, bridge SSOT)"
+    },
+    {
+      "id": "93807d9c-f42a-4b04-a88e-294cc660a376",
+      "name": "트라몰8시간서방정650밀리그람(아세트아미노펜)",
+      "reason": "비대상(fp cda6119c4c3016b9, bridge SSOT)"
+    },
+    {
+      "id": "947ed451-df49-49e2-a1aa-e732fa69dad3",
+      "name": "세타펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp d1450c9e6615d868, bridge SSOT)"
+    },
+    {
+      "id": "995622ca-2a2a-44ec-b376-e10a719c5b23",
+      "name": "세토펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0c0ee073a7189199, bridge SSOT)"
+    },
+    {
+      "id": "9fbe3894-66e1-4d80-b2f0-ecce77cd8c98",
+      "name": "타이리콜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0ce9b94fc509b2da, bridge SSOT)"
+    },
+    {
+      "id": "9fe6b6f8-2103-4936-b3c4-b1aea119c15a",
+      "name": "트라몰8시간서방정650밀리그람(아세트아미노펜)",
+      "reason": "비대상(fp cda6119c4c3016b9, bridge SSOT)"
+    },
+    {
+      "id": "a2b4226d-a707-44fc-b475-e364e6b8a48c",
+      "name": "아니스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 7bc95f9c91498045, bridge SSOT)"
+    },
+    {
+      "id": "a36aa3d5-881c-4019-8c8d-d30b5e510e09",
+      "name": "트라몰8시간서방정650밀리그람(아세트아미노펜)",
+      "reason": "비대상(fp cda6119c4c3016b9, bridge SSOT)"
+    },
+    {
+      "id": "a7419cf7-dc5a-4e4d-9811-ac9dcea7f8cf",
+      "name": "펜잘8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "b5490c22-d5b8-4ac8-acb9-aaad2a05c305",
+      "name": "펜잘8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "b6be14e9-ae7d-4b44-b0cb-81209e4d3779",
+      "name": "타이리콜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0ce9b94fc509b2da, bridge SSOT)"
+    },
+    {
+      "id": "b74684f5-547b-46b7-9531-5501999f2fc0",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "b8d4ec14-7b27-410c-a3c8-dfe9c5e211ce",
+      "name": "타이몰8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e74a3b1422b1d0da, bridge SSOT)"
+    },
+    {
+      "id": "c0e82bd2-7b5b-4ad4-b7ad-39cb963e6286",
+      "name": "써스펜8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp 181da256b1d2607a, bridge SSOT)"
+    },
+    {
+      "id": "cbc1a1ff-7aa4-4927-98db-1bc9e06e45a6",
+      "name": "세토펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0c0ee073a7189199, bridge SSOT)"
+    },
+    {
+      "id": "d6d5dbe8-08b5-4000-90e9-767e3c1c613a",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    },
+    {
+      "id": "deb86a7c-c60b-4265-a765-c1e3e98f879a",
+      "name": "타미스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 40e3ba26080d8d16, bridge SSOT)"
+    },
+    {
+      "id": "e2ee5850-a418-4432-8f58-e25e09f92a0f",
+      "name": "타이리콜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0ce9b94fc509b2da, bridge SSOT)"
+    },
+    {
+      "id": "e4bbd22a-fc90-48c8-9fd3-85222c538068",
+      "name": "이알펜8시간서방정(아세트아미노펜)",
+      "reason": "비대상(fp 56a4640ff10cf2d6, bridge SSOT)"
+    },
+    {
+      "id": "e6a9dac7-a6a6-4b5f-9725-10a39f72bb52",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    },
+    {
+      "id": "eab9890c-a0aa-4cd1-85f0-4c51cf5081c5",
+      "name": "트리스펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 35ee305c68b34c53, bridge SSOT)"
+    },
+    {
+      "id": "ecf40e66-780e-4f19-a73b-2ec0ef71a5b0",
+      "name": "타이몰8시간이알서방정650밀리그램(아세트아미노펜)",
+      "reason": "비대상(fp e74a3b1422b1d0da, bridge SSOT)"
+    },
+    {
+      "id": "f0b3e4e1-5246-4d30-b619-251f2c579df2",
+      "name": "세토펜8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 0c0ee073a7189199, bridge SSOT)"
+    },
+    {
+      "id": "f0c45653-2908-464c-9a9a-e6f0489847c4",
+      "name": "타이레놀8시간이알서방정(아세트아미노펜)",
+      "reason": "비대상(fp 6b510e608f5450ac, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "15d4f040-df60-4424-b77b-b7844114de4e",
+    "5c11677e-957f-49f6-bf08-f74cf111e0b0",
+    "605c70cd-7486-4515-864c-1ede13c3858e",
+    "bde0b450-b511-4d7a-95e7-fe9f3f4801b7",
+    "d8ec0e47-2beb-4b47-9b91-4504b36a018b",
+    "e39ef511-4c64-468f-b25e-c71e69faa220",
+    "f78e9340-5651-4ce8-9541-f5a7957ec01c"
+  ],
+  "rollback_master_ids": [
+    "15d4f040-df60-4424-b77b-b7844114de4e",
+    "5c11677e-957f-49f6-bf08-f74cf111e0b0",
+    "605c70cd-7486-4515-864c-1ede13c3858e",
+    "bde0b450-b511-4d7a-95e7-fe9f3f4801b7",
+    "d8ec0e47-2beb-4b47-9b91-4504b36a018b",
+    "e39ef511-4c64-468f-b25e-c71e69faa220",
+    "f78e9340-5651-4ce8-9541-f5a7957ec01c"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "e82822a33cae05de",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "56a4640ff10cf2d6",
+      "n": 8,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ceab671080350fd8",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "94302adb23a6c322",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0ce9b94fc509b2da",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "181da256b1d2607a",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "88cec29cdde489f9",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "35ee305c68b34c53",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "bdc125f5b4cd5c39",
+      "n": 7,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "e74a3b1422b1d0da",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "d1450c9e6615d868",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "7bc95f9c91498045",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6b510e608f5450ac",
+      "n": 6,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "0c0ee073a7189199",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "cda6119c4c3016b9",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "40e3ba26080d8d16",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 7,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 7,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 7,
+  "htmlLen": 1773,
+  "contentHash": "2a84da8e034014c13ebc7bf3870c4ebd",
+  "summary": "아세트아미노펜 650mg (서방정)",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 7,
+      "STEP_B_easy_canonical_demote": 7,
+      "STEP_B_authored_canonical_flip": 7,
+      "total": 21
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 7,
+      "total": 7
+    },
+    "grand_total": 28
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 7",
+    "policy_2A": "audit 2/master = 14 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

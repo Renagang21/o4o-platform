@@ -1,0 +1,104 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "브로멜라인|45밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "11b41481-c75c-4447-bf25-8c064bff838d",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "브로멜라인 45mg 정",
+  "coarseTotal": 14,
+  "target": 6,
+  "excluded": 8,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0ad2abf2-31a7-4570-b731-a0b60886d469",
+      "name": "브로마장용정45밀리그램(브로멜라인)",
+      "reason": "비대상(fp 386c06e43cd041df, bridge SSOT)"
+    },
+    {
+      "id": "0f4accb0-53b5-4654-8d7e-e785468f5c74",
+      "name": "브로마장용정45밀리그램(브로멜라인)",
+      "reason": "비대상(fp 386c06e43cd041df, bridge SSOT)"
+    },
+    {
+      "id": "34861cbb-dcc2-4b1e-a8d4-c10740c3056e",
+      "name": "브로마장용정45밀리그램(브로멜라인)",
+      "reason": "비대상(fp 386c06e43cd041df, bridge SSOT)"
+    },
+    {
+      "id": "34add51f-93bf-4ea8-9c69-557dcb76cbac",
+      "name": "벨라제정45mg(브로멜라인)",
+      "reason": "비대상(fp 1abb4a923dcd63cf, bridge SSOT)"
+    },
+    {
+      "id": "397f775f-5ed1-4f9d-8739-68e1adfa8992",
+      "name": "벨라제정45mg(브로멜라인)",
+      "reason": "비대상(fp 1abb4a923dcd63cf, bridge SSOT)"
+    },
+    {
+      "id": "55aa3a94-eb7f-4ba6-8cb3-29584ed69cbc",
+      "name": "플랜라인정45밀리그램(브로멜라인)",
+      "reason": "비대상(fp 386c06e43cd041df, bridge SSOT)"
+    },
+    {
+      "id": "a1b0758e-583b-4eeb-91af-981fe756e4f7",
+      "name": "플랜라인정45밀리그램(브로멜라인)",
+      "reason": "비대상(fp 386c06e43cd041df, bridge SSOT)"
+    },
+    {
+      "id": "e2ab8e2b-3c53-414d-be0a-3b69aeb4aa9a",
+      "name": "벨라제정45mg(브로멜라인)",
+      "reason": "비대상(fp 1abb4a923dcd63cf, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "35dc46a4-1a9b-4448-a928-a85184c4f14f",
+    "3c57e9b6-fb7a-4242-88c8-b1573296d992",
+    "6894ccad-5de2-4dff-9027-0ab60c279396",
+    "8c24ccd5-35c9-45af-8cda-469ea61d3e6f",
+    "9c450abd-8a89-4fcc-aba5-ef2eaf878254",
+    "b0a77afa-fdc4-4efe-8b67-bd1e35e7af90"
+  ],
+  "rollback_master_ids": [
+    "35dc46a4-1a9b-4448-a928-a85184c4f14f",
+    "3c57e9b6-fb7a-4242-88c8-b1573296d992",
+    "6894ccad-5de2-4dff-9027-0ab60c279396",
+    "8c24ccd5-35c9-45af-8cda-469ea61d3e6f",
+    "9c450abd-8a89-4fcc-aba5-ef2eaf878254",
+    "b0a77afa-fdc4-4efe-8b67-bd1e35e7af90"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "386c06e43cd041df",
+      "n": 5,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "1abb4a923dcd63cf",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "6c44c0a0c81e392f",
+      "n": 6,
+      "ssot": "그대로확장"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 6,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 6 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

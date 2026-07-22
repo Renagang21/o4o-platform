@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "브로멜라인 45mg 정 EN 번역 1건(브로멜라인 100mg 정 완료본과 별개 함량). grounded ko canonical(source_ref 11b41481) 충실 번역. 동일 약물 out-of-scope 9 master 의 live en canonical(md5 3f4b48f679fb35b90e5a504d38a896ca)을 재현하는 검증본(otc-en-translations-v1.json verbatim) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "one to two tablets (45–90 mg) three times a day · 식전 30분 · 물과 함께 — ko 용량·횟수·복용시점 보존(값 불변)",
+    "연령": "12세 미만 금지 — ko 연령 경계 보존",
+    "금기": "Do not take this if …(중증 혈액응고장애·중증 간/신·항응고제/항혈소판제 병용·임부/수유부·12세 미만·유당분해 유전질환) — 강도 보존",
+    "주의": "테트라사이클린 등 항생제 병용·알레르기 기왕력 시 약사 상담 · 작용기전 불명확 → 명확한 이유 없이 복용 금지 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 3f4b48f6 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "title": "Bromelain 45 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to ease inflammation that comes with swelling, and swelling after injury or surgery.",
+      "usage": "Adults and children 12 or older take one to two tablets (45–90 mg) three times a day, with water, 30 minutes before meals. As how it works is not fully understood, do not take it without a clear reason.",
+      "caution": "Do not take this if you have a severe blood clotting disorder, severe liver or kidney disease, if you are taking anticoagulants or antiplatelet medicines, if you are pregnant or breastfeeding, if you are under 12, or if you have an inherited condition that prevents you from digesting lactose. Talk to a pharmacist before taking it if you are taking antibiotics such as tetracycline, or have had an allergic reaction before.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Bromelain 45 mg",
+        "How it works": "Anti-inflammatory enzyme (eases swelling)",
+        "Main symptoms": "Inflammation with swelling; swelling after injury or surgery",
+        "Who should be careful": "Blood clotting disorders; taking anticoagulants; pregnancy",
+        "Why this one": "An enzyme treatment that eases inflammatory swelling (lower strength)"
+      }
+    }
+  ],
+  "summary": "Inflammation with swelling; swelling after injury or surgery"
+}

@@ -626,6 +626,55 @@ const GROUP_REGISTRY: Record<string, GroupUpgradeConfig> = {
     authoredSource: 'mfds_drug_otc',
     outBase: 'otc-grounded-upgrade-arginine-tidiacicate-200mg-softcap',
   },
+  // ── WO-O4O-OTC-TRACK-A-1H-PRODUCTION-GA-V1 (에이전트 가) ──  감사 산출: data/otc-next-batch-audit-v2.json
+  'acetaminophen-650mg-jeong': {
+    key: '아세트아미노펜|650밀리그램|정',
+    ingredient: '아세트아미노펜',
+    dose: '650밀리그램',
+    formKeyword: '정',
+    candidate: '05690081-c79e-456f-a8ec-5e1a3f4fd1de',
+    targetFp: 'bdc125f5b4cd5c39',
+    excludeFp: [
+      '0c0ee073a7189199', '0ce9b94fc509b2da', '181da256b1d2607a', '35ee305c68b34c53',
+      '40e3ba26080d8d16', '56a4640ff10cf2d6', '6b510e608f5450ac', '7bc95f9c91498045',
+      '88cec29cdde489f9', '94302adb23a6c322', 'cda6119c4c3016b9', 'ceab671080350fd8',
+      'd1450c9e6615d868', 'e74a3b1422b1d0da', 'e82822a33cae05de',
+    ], // 비대상 15 fp = 71 (coarse 78 = 7 + 71)
+    expected: 7,
+    excludedExpected: 71,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-acetaminophen-650mg-jeong',
+  },
+  'ibuprofen-200mg-softcap': {
+    key: '이부프로펜|200밀리그램|연질캡슐',
+    ingredient: '이부프로펜',
+    dose: '200밀리그램',
+    formKeyword: '연질캡슐',
+    candidate: '0203e1b4-7237-4641-b2b5-a918867b3514',
+    targetFp: 'f8d2054ae6613aa8',
+    excludeFp: [
+      '2067dfbd6ac7b039', '31be18c5a7eac6d3', '378687eedb3734d9', '4bf59a87b8d27b06',
+      '52d06a22d258cd1d', '53c5b8a9f32f4fa9', '5ff0704493106e8c', '822cbd0b6dedea1d',
+      'a53767f97bdcfc3e', 'e113f9c3db859f77', 'f2212aa1e83f84d5', 'f33613744290cd22',
+    ], // 비대상 12 fp = 39 (coarse 46 = 7 + 39)
+    expected: 7,
+    excludedExpected: 39,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-ibuprofen-200mg-softcap',
+  },
+  'bromelain-45mg-jeong': {
+    key: '브로멜라인|45밀리그램|정',
+    ingredient: '브로멜라인',
+    dose: '45밀리그램',
+    formKeyword: '정',
+    candidate: '11b41481-c75c-4447-bf25-8c064bff838d',
+    targetFp: '6c44c0a0c81e392f',
+    excludeFp: ['1abb4a923dcd63cf', '386c06e43cd041df'], // 비대상 2 fp = 8 (coarse 14 = 6 + 8)
+    expected: 6,
+    excludedExpected: 8,
+    authoredSource: 'mfds_drug_otc',
+    outBase: 'otc-grounded-upgrade-bromelain-45mg-jeong',
+  },
 };
 
 // ── (하드닝 4) target/exclude/other·교집합 게이트 공통화 ──────────────────────

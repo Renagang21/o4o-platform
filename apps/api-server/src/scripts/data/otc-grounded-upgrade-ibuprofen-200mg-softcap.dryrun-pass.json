@@ -1,0 +1,335 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0203e1b4-7237-4641-b2b5-a918867b3514",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "이부프로펜 200mg 연질캡슐",
+  "coarseTotal": 46,
+  "target": 7,
+  "excluded": 39,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "0b1edfff-d395-42f2-b544-fc220841e6ee",
+      "name": "트리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "1030388d-419c-4877-a189-8f2cf7b73358",
+      "name": "팜페인이부연질캡슐(이부프로펜)",
+      "reason": "비대상(fp e113f9c3db859f77, bridge SSOT)"
+    },
+    {
+      "id": "15a26a15-3e8d-4387-8a8a-e640bff2bab3",
+      "name": "알코펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f2212aa1e83f84d5, bridge SSOT)"
+    },
+    {
+      "id": "1a566ba0-82c9-44aa-b272-33a723dd404f",
+      "name": "이지엔6애니연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f33613744290cd22, bridge SSOT)"
+    },
+    {
+      "id": "1f59ce9c-1f43-4023-ae7c-19e9123ef8ea",
+      "name": "이지엔6애니연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f33613744290cd22, bridge SSOT)"
+    },
+    {
+      "id": "1f9e2cf4-748c-47c2-bb3b-0b278f3a8334",
+      "name": "이브원큐에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 822cbd0b6dedea1d, bridge SSOT)"
+    },
+    {
+      "id": "2661f387-6c52-4745-812e-7c639e595418",
+      "name": "이지엔6애니연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f33613744290cd22, bridge SSOT)"
+    },
+    {
+      "id": "2c4c6320-ea3b-4c3e-b499-026f291a7617",
+      "name": "리도펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a53767f97bdcfc3e, bridge SSOT)"
+    },
+    {
+      "id": "2f40a98b-df4c-4212-aeda-93d26a0a1bd9",
+      "name": "디큐펜프로연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "32782207-f9e1-4154-a2f0-e8a0774e04f5",
+      "name": "에스빌이부연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 5ff0704493106e8c, bridge SSOT)"
+    },
+    {
+      "id": "3bed0b0a-7fdf-4fe9-81e0-6342baf464ee",
+      "name": "스피드펜연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 2067dfbd6ac7b039, bridge SSOT)"
+    },
+    {
+      "id": "3cd61b75-5c32-4c47-9d45-01d2d41648bf",
+      "name": "이부뉴펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 52d06a22d258cd1d, bridge SSOT)"
+    },
+    {
+      "id": "4503eb58-348a-465c-b411-9ff2d8850af6",
+      "name": "팜페인이부연질캡슐(이부프로펜)",
+      "reason": "비대상(fp e113f9c3db859f77, bridge SSOT)"
+    },
+    {
+      "id": "560f1ab2-9820-4f7f-a100-99f3671e095f",
+      "name": "트리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "5f1bf318-2cda-4913-bb5e-8d8f75f5419e",
+      "name": "스피드펜연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 2067dfbd6ac7b039, bridge SSOT)"
+    },
+    {
+      "id": "612cc734-9a4b-4e1d-841d-fcc32f249cb5",
+      "name": "프리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 4bf59a87b8d27b06, bridge SSOT)"
+    },
+    {
+      "id": "645af195-58bb-4615-b151-01160375f980",
+      "name": "펜프리연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 31be18c5a7eac6d3, bridge SSOT)"
+    },
+    {
+      "id": "686b9211-5299-4cc3-902d-d5ebfbb7c8e9",
+      "name": "리도펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a53767f97bdcfc3e, bridge SSOT)"
+    },
+    {
+      "id": "6be66d0b-7585-4f52-9ea7-76fa1def3456",
+      "name": "이부뉴펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 52d06a22d258cd1d, bridge SSOT)"
+    },
+    {
+      "id": "74fb94de-fdcd-4c62-8fca-81de9edc5544",
+      "name": "이브원큐에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 822cbd0b6dedea1d, bridge SSOT)"
+    },
+    {
+      "id": "7a85159f-2a22-49b2-b1cb-4a1a4e6cd3db",
+      "name": "브레핀에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "89c8c006-16fe-4836-882b-922c3c2610f0",
+      "name": "디큐펜프로연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "8efe50db-31f0-467d-bd08-f844422f79c3",
+      "name": "이지엔6애니연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f33613744290cd22, bridge SSOT)"
+    },
+    {
+      "id": "9a6a8b3a-b61d-45c2-83bf-ba04143451a2",
+      "name": "이브원큐연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 378687eedb3734d9, bridge SSOT)"
+    },
+    {
+      "id": "be8a4470-9931-4722-a628-7157f2de153f",
+      "name": "이브원큐연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 378687eedb3734d9, bridge SSOT)"
+    },
+    {
+      "id": "bf02d78a-eb0a-4db9-9fdc-530cc271af1e",
+      "name": "이부뉴펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 52d06a22d258cd1d, bridge SSOT)"
+    },
+    {
+      "id": "c1594035-203b-48b4-bd0e-1353df1e6073",
+      "name": "리도펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a53767f97bdcfc3e, bridge SSOT)"
+    },
+    {
+      "id": "c17ecf45-4a6e-4103-a4d6-086427952bde",
+      "name": "펜프리연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 31be18c5a7eac6d3, bridge SSOT)"
+    },
+    {
+      "id": "c85e64cf-f349-411e-8613-132b249ed838",
+      "name": "브레핀에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "d3095016-1bee-40f2-8618-7556095f414a",
+      "name": "하이스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 53c5b8a9f32f4fa9, bridge SSOT)"
+    },
+    {
+      "id": "d9271475-0462-4693-abdf-4308097858ee",
+      "name": "프리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 4bf59a87b8d27b06, bridge SSOT)"
+    },
+    {
+      "id": "d9dca439-bc30-489c-b526-aecc8375cc30",
+      "name": "프리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 4bf59a87b8d27b06, bridge SSOT)"
+    },
+    {
+      "id": "e13639e9-e592-431f-a8b9-f5bb0e629b14",
+      "name": "스피드펜연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 2067dfbd6ac7b039, bridge SSOT)"
+    },
+    {
+      "id": "e72c54e4-97ce-4595-944d-56fe0a1db5b9",
+      "name": "리도펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a53767f97bdcfc3e, bridge SSOT)"
+    },
+    {
+      "id": "eb0e8e7b-36ec-47c9-8d71-26c4fddabbc8",
+      "name": "에스빌이부연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 5ff0704493106e8c, bridge SSOT)"
+    },
+    {
+      "id": "eb7fc731-b4ba-49e4-a153-3c16f7d95636",
+      "name": "스피드펜연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 2067dfbd6ac7b039, bridge SSOT)"
+    },
+    {
+      "id": "f339b696-d6af-4bdd-a62b-f49a0260f2b5",
+      "name": "에스빌이부연질캡슐200밀리그램(이부프로펜)",
+      "reason": "비대상(fp 5ff0704493106e8c, bridge SSOT)"
+    },
+    {
+      "id": "f51c64a2-6058-43fd-bf73-a6876a0036bd",
+      "name": "프리스펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 4bf59a87b8d27b06, bridge SSOT)"
+    },
+    {
+      "id": "f8e05c0c-b08c-4090-8883-bf3222bbc6e1",
+      "name": "알코펜연질캡슐(이부프로펜)",
+      "reason": "비대상(fp f2212aa1e83f84d5, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "13febfd7-05c6-41e1-9373-b60a0e3677d2",
+    "2c8c107c-1ccd-40ab-9638-4b7cc45b76cd",
+    "31761ab2-1ab9-4d18-b462-db09d7032d17",
+    "3a42ae59-f015-4e9c-bb85-719f3bfe0218",
+    "65e14525-9831-4307-80c0-27cf782f46d8",
+    "9fb8f385-c08c-4e40-a1a4-f5e7a304f9f6",
+    "cc675d43-d7eb-4f7d-a968-3565ba1cb9c0"
+  ],
+  "rollback_master_ids": [
+    "13febfd7-05c6-41e1-9373-b60a0e3677d2",
+    "2c8c107c-1ccd-40ab-9638-4b7cc45b76cd",
+    "31761ab2-1ab9-4d18-b462-db09d7032d17",
+    "3a42ae59-f015-4e9c-bb85-719f3bfe0218",
+    "65e14525-9831-4307-80c0-27cf782f46d8",
+    "9fb8f385-c08c-4e40-a1a4-f5e7a304f9f6",
+    "cc675d43-d7eb-4f7d-a968-3565ba1cb9c0"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "53c5b8a9f32f4fa9",
+      "n": 7,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "e113f9c3db859f77",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f8d2054ae6613aa8",
+      "n": 7,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "f2212aa1e83f84d5",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f33613744290cd22",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "822cbd0b6dedea1d",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a53767f97bdcfc3e",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "5ff0704493106e8c",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "2067dfbd6ac7b039",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "52d06a22d258cd1d",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "4bf59a87b8d27b06",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "31be18c5a7eac6d3",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "378687eedb3734d9",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 7,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 7,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 7,
+  "htmlLen": 1708,
+  "contentHash": "9fcad5bb74d5ad5969d54a43fb0a5e6d",
+  "summary": "이부프로펜 200mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 7,
+      "STEP_B_easy_canonical_demote": 7,
+      "STEP_B_authored_canonical_flip": 7,
+      "total": 21
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 7,
+      "total": 7
+    },
+    "grand_total": 28
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 7",
+    "policy_2A": "audit 2/master = 14 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

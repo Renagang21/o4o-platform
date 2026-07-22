@@ -350,6 +350,31 @@ const EN_REGISTRY: Record<string, EnCompleteConfig> = {
     translationFile: 'otc-en-translations-arginine-tidiacicate-200mg-v1.json',
     outBase: 'otc-en-complete-arginine-tidiacicate-200mg',
   },
+  // ── WO-O4O-OTC-TRACK-A-1H-PRODUCTION-GA-V1 (에이전트 가) ──  이부프로펜은 표준 번역파일 부재→live out en 역구성(diff 0)
+  'acetaminophen-650mg-jeong': {
+    key: '아세트아미노펜|650밀리그램|정',
+    candidate: '05690081-c79e-456f-a8ec-5e1a3f4fd1de',
+    sourceType: 'mfds_drug_otc', expected: 7,
+    koRunBase: 'otc-grounded-upgrade-acetaminophen-650mg-jeong',
+    translationFile: 'otc-en-translations-acetaminophen-650mg-v1.json',
+    outBase: 'otc-en-complete-acetaminophen-650mg',
+  },
+  'ibuprofen-200mg-softcap': {
+    key: '이부프로펜|200밀리그램|연질캡슐',
+    candidate: '0203e1b4-7237-4641-b2b5-a918867b3514',
+    sourceType: 'mfds_drug_otc', expected: 7,
+    koRunBase: 'otc-grounded-upgrade-ibuprofen-200mg-softcap',
+    translationFile: 'otc-en-translations-ibuprofen-200mg-v1.json',
+    outBase: 'otc-en-complete-ibuprofen-200mg',
+  },
+  'bromelain-45mg-jeong': {
+    key: '브로멜라인|45밀리그램|정',
+    candidate: '11b41481-c75c-4447-bf25-8c064bff838d',
+    sourceType: 'mfds_drug_otc', expected: 6,
+    koRunBase: 'otc-grounded-upgrade-bromelain-45mg-jeong',
+    translationFile: 'otc-en-translations-bromelain-45mg-v1.json',
+    outBase: 'otc-en-complete-bromelain-45mg',
+  },
 };
 
 async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): Promise<Record<string, unknown>> {

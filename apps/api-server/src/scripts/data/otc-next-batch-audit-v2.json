@@ -3,191 +3,8 @@
   "readOnly": true,
   "dbWrite": 0,
   "basis": "bridge full-content fingerprint (fingerprintOf 정본) — groupKey별 dominant fp 대표, target fp 하위 그룹만",
-  "excludedDoneGroupKeys": 27,
+  "excludedDoneGroupKeys": 30,
   "candidates": [
-    {
-      "groupKey": "니푸록사지드|200밀리그램|캡슐",
-      "pharmKey": "ing:니푸록사지드|200밀리그램|캡슐|oral",
-      "targetFp": "0a755506d14ebefe",
-      "sample": "에세푸릴캡슐(니푸록사지드)",
-      "atc": "A07AX03",
-      "route": "oral",
-      "bridge_n": 7,
-      "coarseTotal": 19,
-      "target": 7,
-      "exclude": 12,
-      "other": 0,
-      "excludeFps": [
-        "628e1eabd4f25d34",
-        "9915014661de4a10",
-        "bad1fc09d46f260c"
-      ],
-      "excludeFpCount": 3,
-      "candidate": "05c733cd-5c5e-4a09-9e3c-4f4d470d2a10",
-      "easyCanonicalExactly1": 7,
-      "koAuthoredConflict": 0,
-      "koAuthoredNeedsReview": 0,
-      "enCanonicalInTarget": 0,
-      "enNeedsReviewInTarget": 0,
-      "homogeneity": {
-        "dose": [
-          "200밀리그램"
-        ],
-        "form": [
-          "캡슐"
-        ],
-        "route": [
-          "oral"
-        ]
-      },
-      "sourceRefScope": {
-        "koCanonicalSharing": 11,
-        "outOfScopeMasters": 11
-      },
-      "reviewedEnSibling": {
-        "md5": "07211b8e7879af6e731de5485b952711",
-        "summary": "Sudden bacterial diarrhoea",
-        "n": 11,
-        "uniform": true
-      },
-      "enStrategy": "reuse(out en byte-identical 재구성)",
-      "예상write": {
-        "ko_4T": 28,
-        "en_2T": 14,
-        "total_6T": 42,
-        "breakdown": {
-          "ko_nr_INSERT": 7,
-          "easy_demote": 7,
-          "authored_flip": 7,
-          "audit": 7,
-          "en_nr_INSERT": 7,
-          "en_flip": 7
-        }
-      },
-      "target_master_ids": "[7 ids]",
-      "verdict": "READY",
-      "excludeReasons": []
-    },
-    {
-      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
-      "pharmKey": "ing:사카로마이세스보울라르디균|282.5밀리그램|캡슐|oral",
-      "targetFp": "ba82fd1299f5d730",
-      "sample": "바이메드캡슐(사카로마이세스보울라르디균)",
-      "atc": "A07FA02",
-      "route": "oral",
-      "bridge_n": 7,
-      "coarseTotal": 11,
-      "target": 7,
-      "exclude": 4,
-      "other": 0,
-      "excludeFps": [
-        "d91a692d447d8808"
-      ],
-      "excludeFpCount": 1,
-      "candidate": "16f0c2ef-44eb-4629-a82c-e7fc69511b94",
-      "easyCanonicalExactly1": 7,
-      "koAuthoredConflict": 0,
-      "koAuthoredNeedsReview": 0,
-      "enCanonicalInTarget": 0,
-      "enNeedsReviewInTarget": 0,
-      "homogeneity": {
-        "dose": [
-          "282.5밀리그램"
-        ],
-        "form": [
-          "캡슐"
-        ],
-        "route": [
-          "oral"
-        ]
-      },
-      "sourceRefScope": {
-        "koCanonicalSharing": 5,
-        "outOfScopeMasters": 5
-      },
-      "reviewedEnSibling": {
-        "md5": "7574cc9aff8b329662f329125a8532a7",
-        "summary": "Upset gut balance from antibiotics, constipation, loose stools, bloating",
-        "n": 5,
-        "uniform": true
-      },
-      "enStrategy": "reuse(out en byte-identical 재구성)",
-      "예상write": {
-        "ko_4T": 28,
-        "en_2T": 14,
-        "total_6T": 42,
-        "breakdown": {
-          "ko_nr_INSERT": 7,
-          "easy_demote": 7,
-          "authored_flip": 7,
-          "audit": 7,
-          "en_nr_INSERT": 7,
-          "en_flip": 7
-        }
-      },
-      "target_master_ids": "[7 ids]",
-      "verdict": "READY",
-      "excludeReasons": []
-    },
-    {
-      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
-      "pharmKey": "ing:아르기닌티디아시케이트|200밀리그램|연질캡슐|oral",
-      "targetFp": "509aaaf470ce860f",
-      "sample": "헬민200연질캡슐(아르기닌티디아시케이트)",
-      "atc": "A05BA07",
-      "route": "oral",
-      "bridge_n": 7,
-      "coarseTotal": 7,
-      "target": 7,
-      "exclude": 0,
-      "other": 0,
-      "excludeFps": [],
-      "excludeFpCount": 0,
-      "candidate": "20d395df-0846-428a-b5e1-684cb9e08fb6",
-      "easyCanonicalExactly1": 7,
-      "koAuthoredConflict": 0,
-      "koAuthoredNeedsReview": 0,
-      "enCanonicalInTarget": 0,
-      "enNeedsReviewInTarget": 0,
-      "homogeneity": {
-        "dose": [
-          "200밀리그램"
-        ],
-        "form": [
-          "연질캡슐"
-        ],
-        "route": [
-          "oral"
-        ]
-      },
-      "sourceRefScope": {
-        "koCanonicalSharing": 10,
-        "outOfScopeMasters": 10
-      },
-      "reviewedEnSibling": {
-        "md5": "063d7188951c61bc185e4ff40ea9df0d",
-        "summary": null,
-        "n": 10,
-        "uniform": true
-      },
-      "enStrategy": "reuse(out en byte-identical 재구성)",
-      "예상write": {
-        "ko_4T": 28,
-        "en_2T": 14,
-        "total_6T": 42,
-        "breakdown": {
-          "ko_nr_INSERT": 7,
-          "easy_demote": 7,
-          "authored_flip": 7,
-          "audit": 7,
-          "en_nr_INSERT": 7,
-          "en_flip": 7
-        }
-      },
-      "target_master_ids": "[7 ids]",
-      "verdict": "READY",
-      "excludeReasons": []
-    },
     {
       "groupKey": "아세트아미노펜|650밀리그램|정",
       "pharmKey": "ing:아세트아미노펜|650밀리그램|정|oral",
@@ -396,103 +213,221 @@
       "target_master_ids": "[6 ids]",
       "verdict": "READY",
       "excludeReasons": []
-    }
-  ],
-  "picked": [
+    },
     {
-      "groupKey": "니푸록사지드|200밀리그램|캡슐",
-      "targetFp": "0a755506d14ebefe",
-      "candidate": "05c733cd-5c5e-4a09-9e3c-4f4d470d2a10",
-      "target": 7,
-      "exclude": 12,
+      "groupKey": "비오틴|5밀리그램|정",
+      "pharmKey": "ing:비오틴|5밀리그램|정|oral",
+      "targetFp": "458af310d5beda5f",
+      "sample": "이든비오틴정5밀리그램(비오틴)",
+      "atc": "A11HA05",
+      "route": "oral",
+      "bridge_n": 6,
+      "coarseTotal": 19,
+      "target": 8,
+      "exclude": 11,
+      "other": 0,
       "excludeFps": [
-        "628e1eabd4f25d34",
-        "9915014661de4a10",
-        "bad1fc09d46f260c"
+        "3c6725da892942f7",
+        "6d9ab561f87a4bec"
       ],
-      "enStrategy": "reuse(out en byte-identical 재구성)",
-      "reviewedEnSibling": {
-        "md5": "07211b8e7879af6e731de5485b952711",
-        "summary": "Sudden bacterial diarrhoea",
-        "n": 11,
-        "uniform": true
+      "excludeFpCount": 2,
+      "candidate": "27768939-4d85-45e6-9868-e6efe3ccd114",
+      "easyCanonicalExactly1": 8,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "5밀리그램"
+        ],
+        "form": [
+          "정"
+        ],
+        "route": [
+          "oral"
+        ]
       },
+      "sourceRefScope": {
+        "koCanonicalSharing": 0,
+        "outOfScopeMasters": 0
+      },
+      "reviewedEnSibling": null,
+      "enStrategy": "ko canonical 충실 번역(신규)",
       "예상write": {
-        "ko_4T": 28,
-        "en_2T": 14,
-        "total_6T": 42,
+        "ko_4T": 32,
+        "en_2T": 16,
+        "total_6T": 48,
         "breakdown": {
-          "ko_nr_INSERT": 7,
-          "easy_demote": 7,
-          "authored_flip": 7,
-          "audit": 7,
-          "en_nr_INSERT": 7,
-          "en_flip": 7
+          "ko_nr_INSERT": 8,
+          "easy_demote": 8,
+          "authored_flip": 8,
+          "audit": 8,
+          "en_nr_INSERT": 8,
+          "en_flip": 8
         }
       },
-      "target_master_ids": [
-        "58c4b4f8-a922-4e1e-9c68-288e0bfda4db",
-        "66bfe7e2-1de1-4c58-bfb4-3c50d79bccba",
-        "68e51c74-650e-4e08-94d9-b6e57e90b13a",
-        "842bdd4e-7317-4e01-ad34-241bbf62f8bc",
-        "9798ee61-e1ce-404d-a987-2da54f18f5ee",
-        "c97a6d80-f1e2-4a0b-910f-c04c504a91fe",
-        "f03b992f-dcc5-426a-a243-6bea931507c0"
+      "target_master_ids": "[8 ids]",
+      "verdict": "EXCLUDED",
+      "excludeReasons": [
+        "fp 재현 불일치(target 8 !== bridge 6)"
       ]
     },
     {
-      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
-      "targetFp": "ba82fd1299f5d730",
-      "candidate": "16f0c2ef-44eb-4629-a82c-e7fc69511b94",
-      "target": 7,
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "pharmKey": "ing:시트룰린말산염|500밀리그램|정|oral",
+      "targetFp": "66df757d3628ec4d",
+      "sample": "시너지아정(시트룰린말산염)",
+      "atc": "A16AA",
+      "route": "oral",
+      "bridge_n": 6,
+      "coarseTotal": 14,
+      "target": 6,
+      "exclude": 8,
+      "other": 0,
+      "excludeFps": [
+        "8a433f917fa6a02f",
+        "fadc625179ba2917"
+      ],
+      "excludeFpCount": 2,
+      "candidate": "12b056c0-f43a-4a9a-8d36-ad87dff0ae09",
+      "easyCanonicalExactly1": 6,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "500밀리그램"
+        ],
+        "form": [
+          "정"
+        ],
+        "route": [
+          "oral"
+        ]
+      },
+      "sourceRefScope": {
+        "koCanonicalSharing": 16,
+        "outOfScopeMasters": 16
+      },
+      "reviewedEnSibling": {
+        "md5": "de38b2533c2b3ea6efc82f6af723a7e4",
+        "summary": "Weakness and tiredness from reduced function",
+        "n": 16,
+        "uniform": true
+      },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 24,
+        "en_2T": 12,
+        "total_6T": 36,
+        "breakdown": {
+          "ko_nr_INSERT": 6,
+          "easy_demote": 6,
+          "authored_flip": 6,
+          "audit": 6,
+          "en_nr_INSERT": 6,
+          "en_flip": 6
+        }
+      },
+      "target_master_ids": "[6 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    },
+    {
+      "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+      "pharmKey": "ing:알파칼시돌|1마이크로그램|연질캡슐|oral",
+      "targetFp": "7c9fbdf7fb512fb4",
+      "sample": "아시돌연질캡슐1마이크로그램(알파칼시돌)",
+      "atc": "A11CC03",
+      "route": "oral",
+      "bridge_n": 6,
+      "coarseTotal": 10,
+      "target": 6,
       "exclude": 4,
+      "other": 0,
       "excludeFps": [
-        "d91a692d447d8808"
+        "a6ff82eb02321cda"
       ],
-      "enStrategy": "reuse(out en byte-identical 재구성)",
-      "reviewedEnSibling": {
-        "md5": "7574cc9aff8b329662f329125a8532a7",
-        "summary": "Upset gut balance from antibiotics, constipation, loose stools, bloating",
-        "n": 5,
-        "uniform": true
+      "excludeFpCount": 1,
+      "candidate": "06a1eed0-e249-402a-a4f0-e234d1f952ed",
+      "easyCanonicalExactly1": 6,
+      "koAuthoredConflict": 0,
+      "koAuthoredNeedsReview": 0,
+      "enCanonicalInTarget": 0,
+      "enNeedsReviewInTarget": 0,
+      "homogeneity": {
+        "dose": [
+          "1마이크로그램"
+        ],
+        "form": [
+          "연질캡슐"
+        ],
+        "route": [
+          "oral"
+        ]
       },
-      "예상write": {
-        "ko_4T": 28,
-        "en_2T": 14,
-        "total_6T": 42,
-        "breakdown": {
-          "ko_nr_INSERT": 7,
-          "easy_demote": 7,
-          "authored_flip": 7,
-          "audit": 7,
-          "en_nr_INSERT": 7,
-          "en_flip": 7
-        }
+      "sourceRefScope": {
+        "koCanonicalSharing": 10,
+        "outOfScopeMasters": 10
       },
-      "target_master_ids": [
-        "17bdc2d4-9a28-4f80-9a8d-9646aadd21f3",
-        "3a11c560-adde-48c0-a4f2-b96d639b1c88",
-        "3c94d0a6-ac7b-4c69-b0a3-d3613eb00eae",
-        "94338f56-a4a8-4679-b6d8-102dd4dd8065",
-        "b9194ba5-afba-4b06-be00-1a1f2617cc9e",
-        "bbdd53b0-99dd-4742-ae2d-0e7c3980c772",
-        "efe21b3c-96c5-4238-bbaa-e6d5c2982c44"
-      ]
-    },
-    {
-      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
-      "targetFp": "509aaaf470ce860f",
-      "candidate": "20d395df-0846-428a-b5e1-684cb9e08fb6",
-      "target": 7,
-      "exclude": 0,
-      "excludeFps": [],
-      "enStrategy": "reuse(out en byte-identical 재구성)",
       "reviewedEnSibling": {
-        "md5": "063d7188951c61bc185e4ff40ea9df0d",
+        "md5": "0948bfa5ac8d3f895b7cfb038bfb63f0",
         "summary": null,
         "n": 10,
         "uniform": true
       },
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "예상write": {
+        "ko_4T": 24,
+        "en_2T": 12,
+        "total_6T": 36,
+        "breakdown": {
+          "ko_nr_INSERT": 6,
+          "easy_demote": 6,
+          "authored_flip": 6,
+          "audit": 6,
+          "en_nr_INSERT": 6,
+          "en_flip": 6
+        }
+      },
+      "target_master_ids": "[6 ids]",
+      "verdict": "READY",
+      "excludeReasons": []
+    }
+  ],
+  "picked": [
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "targetFp": "bdc125f5b4cd5c39",
+      "candidate": "05690081-c79e-456f-a8ec-5e1a3f4fd1de",
+      "target": 7,
+      "exclude": 71,
+      "excludeFps": [
+        "0c0ee073a7189199",
+        "0ce9b94fc509b2da",
+        "181da256b1d2607a",
+        "35ee305c68b34c53",
+        "40e3ba26080d8d16",
+        "56a4640ff10cf2d6",
+        "6b510e608f5450ac",
+        "7bc95f9c91498045",
+        "88cec29cdde489f9",
+        "94302adb23a6c322",
+        "cda6119c4c3016b9",
+        "ceab671080350fd8",
+        "d1450c9e6615d868",
+        "e74a3b1422b1d0da",
+        "e82822a33cae05de"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "abe0e62f59ad11a97a22b455ba1a9810",
+        "summary": "Fever, headache, toothache, muscle pain, back pain, period pain, joint pain",
+        "n": 13,
+        "uniform": true
+      },
       "예상write": {
         "ko_4T": 28,
         "en_2T": 14,
@@ -507,19 +442,108 @@
         }
       },
       "target_master_ids": [
-        "1e0824ad-491f-438e-95b0-3d9545d8fbfe",
-        "42a902e4-e0d5-469b-9e65-9eca6e9b8294",
-        "4547f2c7-08db-4fdf-8034-8ffa21070999",
-        "5c39007e-81a4-4a8f-b3be-d709a137d3dd",
-        "5cfbecb6-626b-4240-86ed-ef192731a5d0",
-        "9e942430-a40b-45ce-a0f5-3eb75d4406de",
-        "b9ebe05a-020c-4ee1-be6c-2c59bca20a24"
+        "15d4f040-df60-4424-b77b-b7844114de4e",
+        "5c11677e-957f-49f6-bf08-f74cf111e0b0",
+        "605c70cd-7486-4515-864c-1ede13c3858e",
+        "bde0b450-b511-4d7a-95e7-fe9f3f4801b7",
+        "d8ec0e47-2beb-4b47-9b91-4504b36a018b",
+        "e39ef511-4c64-468f-b25e-c71e69faa220",
+        "f78e9340-5651-4ce8-9541-f5a7957ec01c"
+      ]
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "targetFp": "f8d2054ae6613aa8",
+      "candidate": "0203e1b4-7237-4641-b2b5-a918867b3514",
+      "target": 7,
+      "exclude": 39,
+      "excludeFps": [
+        "2067dfbd6ac7b039",
+        "31be18c5a7eac6d3",
+        "378687eedb3734d9",
+        "4bf59a87b8d27b06",
+        "52d06a22d258cd1d",
+        "53c5b8a9f32f4fa9",
+        "5ff0704493106e8c",
+        "822cbd0b6dedea1d",
+        "a53767f97bdcfc3e",
+        "e113f9c3db859f77",
+        "f2212aa1e83f84d5",
+        "f33613744290cd22"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "b35a8780ff0c5a3860fbe078681e49e7",
+        "summary": null,
+        "n": 7,
+        "uniform": true
+      },
+      "예상write": {
+        "ko_4T": 28,
+        "en_2T": 14,
+        "total_6T": 42,
+        "breakdown": {
+          "ko_nr_INSERT": 7,
+          "easy_demote": 7,
+          "authored_flip": 7,
+          "audit": 7,
+          "en_nr_INSERT": 7,
+          "en_flip": 7
+        }
+      },
+      "target_master_ids": [
+        "13febfd7-05c6-41e1-9373-b60a0e3677d2",
+        "2c8c107c-1ccd-40ab-9638-4b7cc45b76cd",
+        "31761ab2-1ab9-4d18-b462-db09d7032d17",
+        "3a42ae59-f015-4e9c-bb85-719f3bfe0218",
+        "65e14525-9831-4307-80c0-27cf782f46d8",
+        "9fb8f385-c08c-4e40-a1a4-f5e7a304f9f6",
+        "cc675d43-d7eb-4f7d-a968-3565ba1cb9c0"
+      ]
+    },
+    {
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "targetFp": "6c44c0a0c81e392f",
+      "candidate": "11b41481-c75c-4447-bf25-8c064bff838d",
+      "target": 6,
+      "exclude": 8,
+      "excludeFps": [
+        "1abb4a923dcd63cf",
+        "386c06e43cd041df"
+      ],
+      "enStrategy": "reuse(out en byte-identical 재구성)",
+      "reviewedEnSibling": {
+        "md5": "3f4b48f679fb35b90e5a504d38a896ca",
+        "summary": "Inflammation with swelling; swelling after injury or surgery",
+        "n": 9,
+        "uniform": true
+      },
+      "예상write": {
+        "ko_4T": 24,
+        "en_2T": 12,
+        "total_6T": 36,
+        "breakdown": {
+          "ko_nr_INSERT": 6,
+          "easy_demote": 6,
+          "authored_flip": 6,
+          "audit": 6,
+          "en_nr_INSERT": 6,
+          "en_flip": 6
+        }
+      },
+      "target_master_ids": [
+        "35dc46a4-1a9b-4448-a928-a85184c4f14f",
+        "3c57e9b6-fb7a-4242-88c8-b1573296d992",
+        "6894ccad-5de2-4dff-9027-0ab60c279396",
+        "8c24ccd5-35c9-45af-8cda-469ea61d3e6f",
+        "9c450abd-8a89-4fcc-aba5-ef2eaf878254",
+        "b0a77afa-fdc4-4efe-8b67-bd1e35e7af90"
       ]
     }
   ],
   "summary": {
     "evaluated": 6,
-    "READY": 6,
+    "READY": 5,
     "picked": 3
   }
 }

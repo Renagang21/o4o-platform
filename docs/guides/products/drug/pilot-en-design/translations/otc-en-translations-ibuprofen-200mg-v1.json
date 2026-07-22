@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "이부프로펜 200mg 연질캡슐 EN 번역 1건. grounded ko canonical(source_ref 0203e1b4) 충실 번역. 동일 약물 out-of-scope 7 master 의 live en canonical(md5 b35a8780ff0c5a3860fbe078681e49e7)을 재현하는 검증본. 표준 번역 파일에 entry 부재 → live out en HTML 에서 DrugOtcEnTranslation 필드를 역구성해 buildDrugOtcEnConsumerHtml 산출이 live out en 과 byte-identical(diff 0) 임을 확인, 검토완료 EN 재사용으로 새 medical fact 0 증명. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "경증~중등도 통증/감기: one to two capsules (200–400 mg) three to four times a day · 편두통: 1~2캡슐, 24시간 2캡슐 초과 금지 · 위 민감 시 식후 — ko 용량·횟수·상한 보존(값 불변)",
+    "연령": "임신 말기 3개월 금지 — ko 임신 시기 경계 보존",
+    "금기": "Do not take this if …(과민·아스피린/NSAID 과민·위장관 궤양/출혈·중증 간/신·심부전·기관지천식·CABG 통증·임신 말기 3개월) — 강도 보존",
+    "주의": "심혈관 혈전·위장관 출혈 위험 → 조절되지 않는 고혈압·허혈성 심질환 시 고용량(1일 2,400 mg) 회피·약사 확인 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 b35a8780 byte-identical 재현(diff 0)"
+  },
+  "translations": [
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "title": "Ibuprofen 200 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, back pain, period pain, arthritis, headache, migraine, toothache, muscle pain, nerve pain and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take one to two capsules (200–400 mg) three to four times a day. For migraine, take one to two capsules but no more than two capsules in 24 hours. Take it after food if your stomach is sensitive.",
+      "caution": "Do not take this if you have ever reacted to this medicine, to aspirin or to other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney disease, heart failure or bronchial asthma; for pain around CABG surgery; or in the last 3 months of pregnancy. Because of the risk of cardiovascular clots and gastrointestinal bleeding, if you have uncontrolled high blood pressure or ischemic heart disease, avoid high doses (2,400 mg a day) and check with a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 200 mg",
+        "How it works": "Lowers fever, relieves pain and inflammation",
+        "Main symptoms": "Fever, headache, migraine, toothache, period pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A soft-capsule anti-inflammatory painkiller for faster dissolution"
+      }
+    }
+  ],
+  "summary": null
+}

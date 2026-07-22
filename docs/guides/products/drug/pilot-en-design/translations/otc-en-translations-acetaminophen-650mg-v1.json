@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "아세트아미노펜 650mg 정(서방정) EN 번역 1건. grounded ko canonical(source_ref 05690081) 충실 번역. 동일 약물 out-of-scope 13 master 의 live en canonical(md5 abe0e62f59ad11a97a22b455ba1a9810)을 재현하는 검증본(otc-en-translations-v1.json verbatim) — build == live out en byte-identical 로 새 medical fact 0 증명. 배치 전용 파일.",
+  "testLog": {
+    "수치·용법": "two tablets every 8 hours · 24시간 6정 초과 금지 · 서방정 통째 복용(분쇄·저작 금지) · 아세트아미노펜 함유 감기약/진통제 병용 금지 · 음주 시 1일 4,000 mg 초과 금지 — ko 용량·간격·상한 보존(값 불변)",
+    "연령": "12세 미만 금지 — ko 연령 경계 보존",
+    "금기": "Do not take this if …(과민·소화성궤양·중증 혈액질환·중증 간/신·중증 심부전·아스피린 천식·12세 미만) — 강도 보존",
+    "주의": "임부/수유부·고령 상담 · 발진/수포 등 과민반응 시 즉시 중단 · 발열 3일/통증 10일 초과 시 상담 — 강도 보존",
+    "판정": "ko canonical 4필드 대조 일치 · ko 에 없는 fact 0 · consistency md5 abe0e62f 재현"
+  },
+  "translations": [
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "title": "Acetaminophen 650 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to reduce fever and to ease pain from a cold, headache, toothache, muscle pain, back pain, period pain and joint pain.",
+      "usage": "Adults and children 12 or older take two tablets every 8 hours. Do not take more than six tablets in 24 hours. This is a slow-release tablet, so swallow it whole — do not crush or chew it. Do not take it together with other cold or pain medicines that contain acetaminophen.",
+      "caution": "Do not take this if you have ever reacted to it, if you have a peptic ulcer, a severe blood disorder, severe liver or kidney problems, severe heart failure, aspirin-induced asthma, or if you are under 12. If you are pregnant or breastfeeding, or are elderly, talk to a pharmacist before taking it. If you drink alcohol regularly there is a risk of liver damage, so get advice, and do not take more than 4,000 mg a day. If a rash, blisters or other signs of a hypersensitivity reaction appear after taking it, stop immediately and talk to a pharmacist or doctor. Talk to a pharmacist or doctor if a fever lasts more than 3 days or pain more than 10 days.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Acetaminophen 650 mg (slow-release tablet)",
+        "How it works": "Reduces fever and pain",
+        "Main symptoms": "Fever, headache, toothache, muscle pain, back pain, period pain, joint pain",
+        "Who should be careful": "Liver disease; alcohol; do not exceed 4,000 mg a day",
+        "Why this one": "A slow-release fever and pain reliever for longer-lasting effect"
+      }
+    }
+  ],
+  "summary": "Fever, headache, toothache, muscle pain, back pain, period pain, joint pain"
+}
