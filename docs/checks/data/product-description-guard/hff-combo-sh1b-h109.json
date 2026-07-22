@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "sh1b-h109-001",
+  "productName": "아세로라비타민C",
+  "productNameEn": "아세로라비타민C",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023663",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 비타민C : 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.\n2) 구리 : 철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요.\n3) 셀렌 : 유해산소로부터 세포를 보호하는데 필요.\n4) 망간 : 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말\n2) 비타민C : 표시량(100mg/2g)의 80~150%\n3) 구리 : 표시량(0.24mg/2g)의 80~150%\n4) 셀렌 : 표시량(16.5ug/2g)의 80~150%\n5) 망간 : 표시량(0.9mg/2g)의 80~150%\n6) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 직접 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.24,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.24mg</span><span class=\"sd-badge is-solid\">망간 0.9mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아세로라비타민C<small>구리 · 망간 · 비타민 C · 셀레늄</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.24mg</b>, 망간 <b>0.9mg</b>, 비타민 C <b>100mg</b>, 셀레늄 <b>16.5μg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 구리 <b>0.24mg</b>, 망간 <b>0.9mg</b>, 비타민 C <b>100mg</b>, 셀레늄 <b>16.5μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>철의 운반과 이용에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">그대로 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.24mg/2g)의 80~150%</div><div class=\"sd-item\"><b>망간</b> 표시량(0.9mg/2g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2g)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 망간 · 비타민 C · 셀레늄 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.24mg</span><span class=\"sd-badge is-solid\">Manganese 0.9mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아세로라비타민C<small>Copper · Manganese · Vitamin C · Selenium</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.24mg</b> of Copper, <b>0.9mg</b> of Manganese, <b>100mg</b> of Vitamin C, <b>16.5μg</b> of Selenium as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.24mg</b> Copper, <b>0.9mg</b> Manganese, <b>100mg</b> Vitamin C, <b>16.5μg</b> Selenium</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for the transport and utilisation of iron</li></ul></li><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for bone formation</li><li>Needed for energy utilisation</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Take as is</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.24mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Manganese</b> labelled (0.9mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Manganese · Vitamin C · Selenium together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "sh1b-h84-001",
+  "productName": "엽산철분",
+  "productNameEn": "엽산철분",
+  "manufacturer": "주식회사 다움",
+  "manufacturerEn": null,
+  "statementNo": "20040016034111",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①정상적인 엽산 대사에 필요\n\n①체내 산소운반과 혈액생성에 필요②에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미 · 이취가 없는 흐린 하양색의 장방형 정제\n2. 비타민B12 함량 : 2.6μg/1,500mg의 80~180%\n3. 엽산 함량 : 600μg/1,500mg의 80~150%\n4. 철분 함량 : 24mg/1,500mg의 80~150% \n5. 대장균군 : 음성\n6. 붕해 : 적합",
+   "intake": "1일 3회, 1회 1정씩, 물과 함께 섭취",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다. 특히, 6세 이하는 과량섭취하지 않도록 주의하십시오. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미 · 이취가 없는 흐린 하양색의 장방형 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.6,
+    "unit": "μg",
+    "basisAmount": 1500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.6μg</span><span class=\"sd-badge is-solid\">엽산 600μg</span><span class=\"sd-badge is-solid\">철 24mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>엽산철분<small>비타민 B12 · 엽산 · 철</small></h1><p class=\"sd-meta\">주식회사 다움 제조 · 1일 3회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.6μg</b>, 엽산 <b>600μg</b>, 철 <b>24mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(1정) 섭취로 비타민 B12 <b>2.6μg</b>, 엽산 <b>600μg</b>, 철 <b>24mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 · 이취가 없는 흐린 하양색의 장방형 정제 · 주식회사 다움 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>철</b><ul class=\"sd-why\"><li>체내 산소운반과 혈액생성에 필요</li><li>에너지 생성에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.6μg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(600μg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>철</b> 표시량(24mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 · 이취가 없는 흐린 하양색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 · 철 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.6μg</span><span class=\"sd-badge is-solid\">Folate 600μg</span><span class=\"sd-badge is-solid\">Iron 24mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>엽산철분<small>Vitamin B12 · Folate · Iron</small></h1><p class=\"sd-meta\">Made by 주식회사 다움 · 3 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.6μg</b> of Vitamin B12, <b>600μg</b> of Folate, <b>24mg</b> of Iron as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (1 tablet): <b>2.6μg</b> Vitamin B12, <b>600μg</b> Folate, <b>24mg</b> Iron</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 다움</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Iron</b><ul class=\"sd-why\"><li>Needed for oxygen transport and blood formation in the body</li><li>Needed for energy production</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.6μg / 1500mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (600μg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Iron</b> labelled (24mg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 · 이취가 없는 흐린 하양색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate · Iron together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

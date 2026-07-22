@@ -28,4 +28,18 @@
 - WO 목표 500~800 대비 **174** — 정비 이전에 nc 세션이 shard-1 고수율 signature 를 이미 선점(select taken-exclusion 에서 대량 제외 관찰: 상위 vc-vd-zn 34 전량 taken 등). 현 shard-1 순가용 상한이 낮음.
 - 이후 재선점은 taken-exclusion 으로 원천 차단 → **정비 후 신규 생산은 항상 충돌 0**. 남은 shard-1 저수율 signature 및 향후 유입 후보로 누적 가능.
 
+## 4. Round 2 (signature 100-259)
+
+- select --shard 1 --exclude-taken → 순가용 75그룹 **94건**. generate READY 94·REVIEW_LATER 0.
+- dry-run 75그룹 PASS 예상=실측 376 → apply 75/75 COMMIT · **ALREADY_PROMOTED 0** · canonicalDup 0.
+- slug `combo-sh1b-*`. 독립검증: combo-sh1*(round1+2) masters **268** · canonicalDup **0**.
+
+## 5. shard-1 누적 및 실측
+
+- **shard-1 완결형 누적 268건**(round1 174 + round2 94) · **전 배치 충돌 0**.
+- 시간(정비 포함): 정비 T0 12:09 → round2 완료 ~14:01 ≈ **1h52m · 268건**(정비 ~11분 + 생산 ~1h40m).
+- 실효 처리량: 병목이 **select 도구의 비인덱스 JSONB ILIKE 전수 스캔**(조합당 5~18초, 대량 signature 순차 → 누적 큼). generate/apply 는 빠름.
+  - **개선 후보**: select 서버사이드 prefilter 를 GIN 인덱스(raw_payload jsonb) 또는 shard-plan 이 산출한 statementNo 목록 직접 주입으로 대체하면 select 시간 대폭 단축 가능. taken-exclusion 은 이미 재선점 0.
+- **500 미달 원인**: 정비 이전에 병렬 nc 세션이 shard-1 고수율 signature 를 이미 선점(taken-exclusion 이 상위 조합 대량 제외). shard-1 순가용 상한 자체가 낮았음. 정비 후 신규 생산은 항상 충돌 0.
+
 *정비 후 생산 · apply 사용자 승인 · 독립검증 read-only · path-specific commit.*
