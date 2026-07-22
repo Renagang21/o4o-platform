@@ -1,0 +1,75 @@
+{
+  "slug": "s1-6",
+  "createdMasters": [
+    "2e31323e-2908-4f21-ac41-03accb328cdf",
+    "e1fb8d16-92d7-4ca9-8933-b37729409379",
+    "54ff36e1-614d-4edd-82be-78dd4bc6da5c",
+    "a60d3497-dea0-4ef5-81d0-c9d8ad80306b",
+    "0bb6980b-b0e8-4518-8c1a-1f593883bf84",
+    "4fe5b65d-fd7a-4929-86d9-3caf64bb530e",
+    "df375f24-6f1e-4fe2-89dc-56a3d0234df0"
+  ],
+  "createdSpd": [
+    "f6375aa4-c095-4703-9b19-18314eaa726e",
+    "e86c54d4-82c2-4115-9283-d24178c7603a",
+    "c7599d1c-e7e2-495a-b22c-10af9c486e5e",
+    "93a14b75-8740-4f45-981d-bf80e02a4d39",
+    "7a969b3e-6e22-4f23-94c2-cfa508ef384b",
+    "387ff834-45e1-43c1-8a4f-21ba99d6126d",
+    "566ec839-03f9-4dca-8566-3ae463cf55ea",
+    "49f3cb8f-7c58-489c-9439-43b9d09363e8",
+    "4dccda52-9b25-4071-8f25-9da90db0fe31",
+    "4345570d-c991-4281-b5e9-e77f5f830118",
+    "6d5f0441-03e0-48ae-80f3-90f96eaa100e",
+    "4a71bf45-2bc7-45c4-b774-ec758d03f388",
+    "9f751774-b8a7-4f6a-9009-52820d118902",
+    "b9886034-e48d-4440-b9db-fd63646dac05"
+  ],
+  "candIds": [
+    "84243dbb-e7b2-4b31-b9e5-49818dac36e7",
+    "204f85a4-60f1-4590-92dc-0361196552bd",
+    "eb316e93-6bdc-4ed2-b385-11c328e4720f",
+    "4b1274eb-6309-430d-9bd0-6a1ae5d1c612",
+    "4f0eb00a-a855-4580-a0f4-64f13b7eeb5d",
+    "4c8b0bad-c8a2-4962-8979-3660c4c6a278",
+    "b85eb755-9aa3-4466-a9bc-64c38722865b"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "84243dbb-e7b2-4b31-b9e5-49818dac36e7",
+      "stmt": "20190016024133",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "204f85a4-60f1-4590-92dc-0361196552bd",
+      "stmt": "200400200083405",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "eb316e93-6bdc-4ed2-b385-11c328e4720f",
+      "stmt": "200400200083146",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "4b1274eb-6309-430d-9bd0-6a1ae5d1c612",
+      "stmt": "20172880193302",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "4f0eb00a-a855-4580-a0f4-64f13b7eeb5d",
+      "stmt": "20040017068255",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "4c8b0bad-c8a2-4962-8979-3660c4c6a278",
+      "stmt": "20040015104316",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b85eb755-9aa3-4466-a9bc-64c38722865b",
+      "stmt": "20172880193255",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}
