@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "플루벤다졸|500밀리그램|정 EN 역구성 — live out en(md5 89ef4238750a20445daaaff79f984f61, 7건) 을 buildDrugOtcEnConsumerHtml 역함수로 복원, 재빌드 byte-identical(diff 0) 검증. 검토완료 EN 재사용·새 fact 0.",
+  "translations": [
+    {
+      "groupKey": "플루벤다졸|500밀리그램|정",
+      "title": "Flubendazole 500 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to treat roundworm, pinworm, whipworm and hookworm infections, and mixed infections of these.",
+      "usage": "Adults and children take one tablet (500 mg) as a single dose.",
+      "caution": "Do not take this if you have ever reacted to this medicine or if you are pregnant. If you are an infant under 1 year of age, a woman who may be pregnant, or breastfeeding, talk to a pharmacist before taking it. Because pinworm is easily re-transmitted within a family, it is best to treat the family together.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Flubendazole 500 mg",
+        "How it works": "Antiparasitic that treats worm infections",
+        "Main symptoms": "Roundworm, pinworm, whipworm and hookworm infection",
+        "Who should be careful": "Pregnancy, infants under 1 year",
+        "Why this one": "A single-dose deworming medicine"
+      }
+    }
+  ],
+  "summary": null
+}

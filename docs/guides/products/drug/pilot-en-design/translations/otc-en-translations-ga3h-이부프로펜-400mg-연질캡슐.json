@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "이부프로펜|400밀리그램|연질캡슐 EN 역구성 — live out en(md5 93bdb3ac6b9b38cfcc7d890817d6d73c, 8건) 을 buildDrugOtcEnConsumerHtml 역함수로 복원, 재빌드 byte-identical(diff 0) 검증. 검토완료 EN 재사용·새 fact 0.",
+  "translations": [
+    {
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "title": "Ibuprofen 400 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used for fever and pain from a cold, low back pain, menstrual pain, arthritis, pain after surgery, headache, migraine, toothache, muscle pain, neuralgia and soft-tissue injury.",
+      "usage": "For mild to moderate pain and colds, adults take half to one capsule (200–400 mg) three to four times a day. For migraine, take half to one capsule, without exceeding 400 mg in 24 hours. Do not exceed the recommended dose.",
+      "caution": "Do not take this if you have ever reacted to this medicine, aspirin or other anti-inflammatory painkillers; if you have a gastrointestinal ulcer or bleeding, severe liver or kidney impairment, heart failure, high blood pressure or bronchial asthma; for pain around CABG surgery; or during the last three months of pregnancy. Because there is a risk of cardiovascular clots and gastrointestinal bleeding, stop taking it and seek advice if you have stomach pain, black stools or difficulty breathing.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Ibuprofen 400 mg",
+        "How it works": "Reduces fever, pain and inflammation",
+        "Main symptoms": "Fever, headache, migraine, toothache, menstrual pain, muscle pain, joint pain",
+        "Who should be careful": "Stomach problems, cardiovascular or kidney disease, late pregnancy",
+        "Why this one": "A high-strength soft-capsule anti-inflammatory painkiller"
+      }
+    }
+  ],
+  "summary": null
+}

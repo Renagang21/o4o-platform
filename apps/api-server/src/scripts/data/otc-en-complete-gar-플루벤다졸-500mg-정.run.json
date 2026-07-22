@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "플루벤다졸|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0edb60a6-884b-43c5-b285-6de48db71bb2",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 4,
+  "targetMasters": 4,
+  "anomalies": [],
+  "koCanonical": 4,
+  "existingEnAny": 4,
+  "existingEnCanonical": 4,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "89ef4238750a20445daaaff79f984f61",
+      "n": 7
+    }
+  ],
+  "builtLen": 2277,
+  "builtMd5": "89ef4238750a20445daaaff79f984f61",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_en_canonical_flip": 4,
+    "en_write_total": 8
+  },
+  "enTargetMd5": "89ef4238750a20445daaaff79f984f61",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(89ef4238750a20445daaaff79f984f61) — write 0, 정상 종료"
+}

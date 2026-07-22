@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "L-시스틴|500밀리그램|연질캡슐 EN 역구성 — live out en(md5 3f1485a982861fffaa1faf6811b5b916, 4건) 을 buildDrugOtcEnConsumerHtml 역함수로 복원, 재빌드 byte-identical(diff 0) 검증. 검토완료 EN 재사용·새 fact 0.",
+  "translations": [
+    {
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "title": "L-Cystine 500 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used as adjunctive treatment for eczema and acne, and for disorders of keratin areas where the nails and hair split easily.",
+      "usage": "Take two to four capsules (1,000–2,000 mg) a day for 10 to 20 days out of a month.",
+      "caution": "Do not take this if you have severe kidney impairment or hepatic coma, if you are a child aged 6 or under, if you have cystinuria, or if you are hypersensitive to soybean oil, soy or peanut. If you have kidney stones or a disorder of fat metabolism, talk to a pharmacist before taking it, and stop if there is no improvement after a month.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "L-cystine 500 mg",
+        "How it works": "Supplies an amino acid for skin and hair",
+        "Main symptoms": "Eczema and acne; disorders of keratin areas where nails and hair split",
+        "Who should be careful": "Soy or peanut hypersensitivity, kidney stones",
+        "Why this one": "An amino acid preparation involved in skin and hair"
+      }
+    }
+  ],
+  "summary": null
+}

@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01a08a82-92c6-4436-889e-4409bb0e0b47",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 4,
+  "targetMasters": 4,
+  "anomalies": [],
+  "koCanonical": 4,
+  "existingEnAny": 4,
+  "existingEnCanonical": 4,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "93bdb3ac6b9b38cfcc7d890817d6d73c",
+      "n": 8
+    }
+  ],
+  "builtLen": 2787,
+  "builtMd5": "93bdb3ac6b9b38cfcc7d890817d6d73c",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_en_canonical_flip": 4,
+    "en_write_total": 8
+  },
+  "enTargetMd5": "93bdb3ac6b9b38cfcc7d890817d6d73c",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(93bdb3ac6b9b38cfcc7d890817d6d73c) — write 0, 정상 종료"
+}

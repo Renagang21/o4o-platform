@@ -1,0 +1,70 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "플루벤다졸|500밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0edb60a6-884b-43c5-b285-6de48db71bb2",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "플루벤다졸 500mg 정",
+  "coarseTotal": 7,
+  "target": 4,
+  "excluded": 3,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "8c8cc17a-59c1-46f8-a27b-a0781bc6848e",
+      "name": "젤콤정(플루벤다졸)",
+      "reason": "비대상(fp 10a0730121cc7fdb, bridge SSOT)"
+    },
+    {
+      "id": "adb541b6-8b89-4e56-8eec-625ca361719c",
+      "name": "젤콤정(플루벤다졸)",
+      "reason": "비대상(fp 10a0730121cc7fdb, bridge SSOT)"
+    },
+    {
+      "id": "c0df1493-6049-4067-bb16-2724cd377f32",
+      "name": "젤콤정(플루벤다졸)",
+      "reason": "비대상(fp 10a0730121cc7fdb, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "0924bd02-74a7-447c-89b1-87e4b8cddfb8",
+    "5f844374-8ecc-44d4-b062-d3ae724e877f",
+    "b73c0c44-ef73-433c-a872-5aeb2c102785",
+    "fdbe4db8-9b46-43b9-a70e-1194e1b48491"
+  ],
+  "rollback_master_ids": [
+    "0924bd02-74a7-447c-89b1-87e4b8cddfb8",
+    "5f844374-8ecc-44d4-b062-d3ae724e877f",
+    "b73c0c44-ef73-433c-a872-5aeb2c102785",
+    "fdbe4db8-9b46-43b9-a70e-1194e1b48491"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "5c99c907440d0684",
+      "n": 4,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "10a0730121cc7fdb",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 4,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 4 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

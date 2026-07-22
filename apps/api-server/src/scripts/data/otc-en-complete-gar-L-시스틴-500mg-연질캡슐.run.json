@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "1167c6d5-0cfd-4594-b15d-20f51e72521b",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 4,
+  "targetMasters": 4,
+  "anomalies": [],
+  "koCanonical": 4,
+  "existingEnAny": 4,
+  "existingEnCanonical": 4,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "3f1485a982861fffaa1faf6811b5b916",
+      "n": 4
+    }
+  ],
+  "builtLen": 2403,
+  "builtMd5": "3f1485a982861fffaa1faf6811b5b916",
+  "consistencyMatch": true,
+  "summaryField": null,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_en_canonical_flip": 4,
+    "en_write_total": 8
+  },
+  "enTargetMd5": "3f1485a982861fffaa1faf6811b5b916",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(3f1485a982861fffaa1faf6811b5b916) — write 0, 정상 종료"
+}

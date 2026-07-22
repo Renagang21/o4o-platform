@@ -1,0 +1,124 @@
+{
+  "_doc": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1 (에이전트 가) EN 역구성 배치 config. runner .ts 미수정. translationFile=역구성 배치파일(build==live out en byte-identical).",
+  "bundleKey": "track-a-3h-ga-r",
+  "writeOwner": "agent-ga",
+  "order": [
+    "gar-L-시스틴-500mg-연질캡슐",
+    "gar-디펜히드라민염산염-50mg-연질캡슐",
+    "gar-이부프로펜-400mg-연질캡슐",
+    "gar-플루벤다졸-500mg-정"
+  ],
+  "ko": {
+    "gar-L-시스틴-500mg-연질캡슐": {
+      "key": "L-시스틴|500밀리그램|연질캡슐",
+      "ingredient": "L-시스틴",
+      "dose": "500밀리그램",
+      "formKeyword": "연질캡슐",
+      "candidate": "1167c6d5-0cfd-4594-b15d-20f51e72521b",
+      "targetFp": "1b228cf0737f68be",
+      "excludeFp": [
+        "aa514947fed96208",
+        "e5da2097e6073090"
+      ],
+      "expected": 4,
+      "excludedExpected": 4,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-gar-L-시스틴-500mg-연질캡슐"
+    },
+    "gar-디펜히드라민염산염-50mg-연질캡슐": {
+      "key": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "ingredient": "디펜히드라민염산염",
+      "dose": "50밀리그램",
+      "formKeyword": "연질캡슐",
+      "candidate": "0dc02d49-6919-4120-b6d0-540c40050f42",
+      "targetFp": "f5ccf53ac8f3fccf",
+      "excludeFp": [
+        "335c931a2811b8db",
+        "4d87fffc7cf55f6b",
+        "62c4505490eae601",
+        "b4a97266780cdf97",
+        "d0d2877461d0384f"
+      ],
+      "expected": 4,
+      "excludedExpected": 11,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-gar-디펜히드라민염산염-50mg-연질캡슐"
+    },
+    "gar-이부프로펜-400mg-연질캡슐": {
+      "key": "이부프로펜|400밀리그램|연질캡슐",
+      "ingredient": "이부프로펜",
+      "dose": "400밀리그램",
+      "formKeyword": "연질캡슐",
+      "candidate": "01a08a82-92c6-4436-889e-4409bb0e0b47",
+      "targetFp": "c5e9a0fcbb3cd24a",
+      "excludeFp": [
+        "0a68a67bf0356d8b",
+        "43b88b7080384ddc",
+        "54774793cf333238",
+        "57c0c72b48d2ac11",
+        "5dda00c75162b553",
+        "92650bef774bc082",
+        "a176898bd3129508",
+        "a6ad7c391c35831a",
+        "ad134271e5af7d32",
+        "c51ad52262998c21",
+        "c7c0171e10311c1f"
+      ],
+      "expected": 4,
+      "excludedExpected": 24,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-gar-이부프로펜-400mg-연질캡슐"
+    },
+    "gar-플루벤다졸-500mg-정": {
+      "key": "플루벤다졸|500밀리그램|정",
+      "ingredient": "플루벤다졸",
+      "dose": "500밀리그램",
+      "formKeyword": "정",
+      "candidate": "0edb60a6-884b-43c5-b285-6de48db71bb2",
+      "targetFp": "5c99c907440d0684",
+      "excludeFp": "10a0730121cc7fdb",
+      "expected": 4,
+      "excludedExpected": 3,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-gar-플루벤다졸-500mg-정"
+    }
+  },
+  "en": {
+    "gar-L-시스틴-500mg-연질캡슐": {
+      "key": "L-시스틴|500밀리그램|연질캡슐",
+      "candidate": "1167c6d5-0cfd-4594-b15d-20f51e72521b",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-gar-L-시스틴-500mg-연질캡슐",
+      "translationFile": "otc-en-translations-ga3h-L-시스틴-500mg-연질캡슐.json",
+      "outBase": "otc-en-complete-gar-L-시스틴-500mg-연질캡슐"
+    },
+    "gar-디펜히드라민염산염-50mg-연질캡슐": {
+      "key": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "candidate": "0dc02d49-6919-4120-b6d0-540c40050f42",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-gar-디펜히드라민염산염-50mg-연질캡슐",
+      "translationFile": "otc-en-translations-ga3h-디펜히드라민염산염-50mg-연질캡슐.json",
+      "outBase": "otc-en-complete-gar-디펜히드라민염산염-50mg-연질캡슐"
+    },
+    "gar-이부프로펜-400mg-연질캡슐": {
+      "key": "이부프로펜|400밀리그램|연질캡슐",
+      "candidate": "01a08a82-92c6-4436-889e-4409bb0e0b47",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-gar-이부프로펜-400mg-연질캡슐",
+      "translationFile": "otc-en-translations-ga3h-이부프로펜-400mg-연질캡슐.json",
+      "outBase": "otc-en-complete-gar-이부프로펜-400mg-연질캡슐"
+    },
+    "gar-플루벤다졸-500mg-정": {
+      "key": "플루벤다졸|500밀리그램|정",
+      "candidate": "0edb60a6-884b-43c5-b285-6de48db71bb2",
+      "sourceType": "mfds_drug_otc",
+      "expected": 4,
+      "koRunBase": "otc-grounded-upgrade-gar-플루벤다졸-500mg-정",
+      "translationFile": "otc-en-translations-ga3h-플루벤다졸-500mg-정.json",
+      "outBase": "otc-en-complete-gar-플루벤다졸-500mg-정"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "PASS",
+  "dbWrite": 0,
+  "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "1167c6d5-0cfd-4594-b15d-20f51e72521b",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "L-시스틴 500mg 연질캡슐",
+  "coarseTotal": 8,
+  "target": 4,
+  "excluded": 4,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "023fadab-866c-4d8f-a860-8b96b44db2f6",
+      "name": "기노엘연질캡슐(L-시스틴)",
+      "reason": "비대상(fp aa514947fed96208, bridge SSOT)"
+    },
+    {
+      "id": "64238487-50a1-4732-80b1-99487fe7fd15",
+      "name": "더마그램연질캡슐(L-시스틴)",
+      "reason": "비대상(fp e5da2097e6073090, bridge SSOT)"
+    },
+    {
+      "id": "ae73815d-6806-48f1-b6dd-33da9338ba23",
+      "name": "더마그램연질캡슐(L-시스틴)",
+      "reason": "비대상(fp e5da2097e6073090, bridge SSOT)"
+    },
+    {
+      "id": "e353ef1e-3c51-40ad-8d93-1db5377c16ab",
+      "name": "기노엘연질캡슐(L-시스틴)",
+      "reason": "비대상(fp aa514947fed96208, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "1d5c0fba-1d12-43c3-99ed-3f2643b21eee",
+    "a1473fe3-f34f-424e-98f1-1a058bf11a74",
+    "db9f12ef-640b-4729-ae1e-9e281dff09fc",
+    "e6a08b34-2c4d-4ca0-8422-b3f7625b7831"
+  ],
+  "rollback_master_ids": [
+    "1d5c0fba-1d12-43c3-99ed-3f2643b21eee",
+    "a1473fe3-f34f-424e-98f1-1a058bf11a74",
+    "db9f12ef-640b-4729-ae1e-9e281dff09fc",
+    "e6a08b34-2c4d-4ca0-8422-b3f7625b7831"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "aa514947fed96208",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "1b228cf0737f68be",
+      "n": 4,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "e5da2097e6073090",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 0,
+    "easyCanonMasters": 4,
+    "noneCanonMasters": 0
+  },
+  "easyCanonicalExactly1": 4,
+  "authoredCanonicalConflict": 0,
+  "existingAuthoredNeedsReview": 0,
+  "easyCanonicalTotal": 4,
+  "htmlLen": 1559,
+  "contentHash": "bf5a3ecc28ecc3f2ec936f0d9e0d71e4",
+  "summary": "L-시스틴 500mg",
+  "writePlan": {
+    "spd": {
+      "STEP_A_authored_needs_review_INSERT": 4,
+      "STEP_B_easy_canonical_demote": 4,
+      "STEP_B_authored_canonical_flip": 4,
+      "total": 12
+    },
+    "audit": {
+      "canonical_replaced_INSERT": 4,
+      "total": 4
+    },
+    "grand_total": 16
+  },
+  "auditCountFlag": {
+    "entity_model": "SharedProductDescriptionAuditLog canonical_replaced = 1행/교체(previous_description_id+new_description_id 동시) → 4",
+    "policy_2A": "audit 2/master = 8 (demote 1 + flip 1)",
+    "status": "불일치 — 엔티티는 1행/교체 설계. dry-run 은 엔티티 기준으로 산정."
+  }
+}

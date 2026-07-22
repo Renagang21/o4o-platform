@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "디펜히드라민염산염|50밀리그램|연질캡슐 EN 역구성 — live out en(md5 3c79b941b0f8ab7d8cfee1633cc0b752, 16건) 을 buildDrugOtcEnConsumerHtml 역함수로 복원, 재빌드 byte-identical(diff 0) 검증. 검토완료 EN 재사용·새 fact 0.",
+  "translations": [
+    {
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "title": "Diphenhydramine Hydrochloride 50 mg Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to relieve occasional sleeplessness.",
+      "usage": "Adults take one capsule once a day before bed. If it makes you too drowsy, you can reduce it to 25 mg. Do not take it continuously or long-term, and do not drink alcohol while taking it.",
+      "caution": "Do not take this if you have breathing difficulty from an asthma attack, emphysema or chronic bronchitis; glaucoma; urination problems such as an enlarged prostate; a seizure disorder; if you are breastfeeding; if you are under 15; or if you have ongoing sleeplessness or have been diagnosed with insomnia. If you feel drowsy or sluggish the next day, do not drive or operate machinery. If it does not help after 2–3 doses, stop taking it and seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Diphenhydramine hydrochloride 50 mg",
+        "How it works": "Sedative, helps sleep",
+        "Main symptoms": "Occasional sleeplessness",
+        "Who should be careful": "Glaucoma, enlarged prostate, breathing difficulty; driving or operating machinery",
+        "Why this one": "A sleep aid for short-term use in occasional sleeplessness"
+      }
+    }
+  ],
+  "summary": null
+}

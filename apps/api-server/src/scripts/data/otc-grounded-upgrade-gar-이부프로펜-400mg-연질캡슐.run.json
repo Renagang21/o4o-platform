@@ -1,0 +1,225 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "01a08a82-92c6-4436-889e-4409bb0e0b47",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "이부프로펜 400mg 연질캡슐",
+  "coarseTotal": 28,
+  "target": 4,
+  "excluded": 24,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "07a51e85-664f-49c1-91c3-937a77f8f464",
+      "name": "이부로엔에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 5dda00c75162b553, bridge SSOT)"
+    },
+    {
+      "id": "090139d8-5459-4504-a777-2df03deabaa3",
+      "name": "이브400원큐에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 43b88b7080384ddc, bridge SSOT)"
+    },
+    {
+      "id": "12717373-4f66-4649-beda-803c191046b0",
+      "name": "페인엔젤이부연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a6ad7c391c35831a, bridge SSOT)"
+    },
+    {
+      "id": "237780b5-dc00-4c4a-80e6-7f10b10121ad",
+      "name": "이부로엔연질캡슐(이부프로펜)",
+      "reason": "비대상(fp c7c0171e10311c1f, bridge SSOT)"
+    },
+    {
+      "id": "2410ac93-b9a3-4565-8e4e-99f9ae212387",
+      "name": "미가펜후레쉬연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 54774793cf333238, bridge SSOT)"
+    },
+    {
+      "id": "41839365-4922-450a-a0b2-cc9e0413a5e1",
+      "name": "이브400원큐에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 43b88b7080384ddc, bridge SSOT)"
+    },
+    {
+      "id": "5e3be641-5a41-4483-86a3-5959e4a6aba4",
+      "name": "다펜-큐연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 92650bef774bc082, bridge SSOT)"
+    },
+    {
+      "id": "5e9693ec-85c1-459d-9129-cf4a5b3f9a7c",
+      "name": "타세놀이부연질캡슐400밀리그램(이부프로펜)",
+      "reason": "비대상(fp 57c0c72b48d2ac11, bridge SSOT)"
+    },
+    {
+      "id": "62374493-e3a0-4ac1-8a9b-e6a103a33664",
+      "name": "이부로엔에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 5dda00c75162b553, bridge SSOT)"
+    },
+    {
+      "id": "72b5f81f-aa99-404b-a5a9-e23b74455501",
+      "name": "이부콜벤연질캡슐400밀리그램(이부프로펜)",
+      "reason": "비대상(fp a176898bd3129508, bridge SSOT)"
+    },
+    {
+      "id": "75084b59-81b5-4747-8bc4-d0ecdb7f7757",
+      "name": "페인엔젤이부연질캡슐(이부프로펜)",
+      "reason": "비대상(fp a6ad7c391c35831a, bridge SSOT)"
+    },
+    {
+      "id": "78a02e7d-9a3a-4230-8709-336542e42928",
+      "name": "이부로엔연질캡슐(이부프로펜)",
+      "reason": "비대상(fp c7c0171e10311c1f, bridge SSOT)"
+    },
+    {
+      "id": "7da16e6d-463d-4836-b008-b46ee8cbdd35",
+      "name": "미가펜후레쉬연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 54774793cf333238, bridge SSOT)"
+    },
+    {
+      "id": "8665257c-7a17-4718-a4c1-41cacea34eef",
+      "name": "엘씨펜연질캡슐400mg(이부프로펜)",
+      "reason": "비대상(fp c51ad52262998c21, bridge SSOT)"
+    },
+    {
+      "id": "881736af-4573-4efc-ba5f-99c20eae9fb4",
+      "name": "엘씨펜연질캡슐400mg(이부프로펜)",
+      "reason": "비대상(fp c51ad52262998c21, bridge SSOT)"
+    },
+    {
+      "id": "9681525a-9e46-483c-8f4f-9f89a2acd61c",
+      "name": "루피엔연질캡슐(이부프로펜)",
+      "reason": "비대상(fp ad134271e5af7d32, bridge SSOT)"
+    },
+    {
+      "id": "a1e98ef9-161c-4856-a469-38f2201945af",
+      "name": "이부로엔에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 5dda00c75162b553, bridge SSOT)"
+    },
+    {
+      "id": "c2ea4f40-855a-4366-8a7c-08bee543934d",
+      "name": "마이펜이부400연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 0a68a67bf0356d8b, bridge SSOT)"
+    },
+    {
+      "id": "c7b613a3-b333-40ec-944e-693f76a8a20a",
+      "name": "다펜-큐연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 92650bef774bc082, bridge SSOT)"
+    },
+    {
+      "id": "e5599b90-7d0c-4733-9bff-a2c9c9b96642",
+      "name": "마이펜이부400연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 0a68a67bf0356d8b, bridge SSOT)"
+    },
+    {
+      "id": "eb044926-cc69-47d2-be9a-f9b098ed3d32",
+      "name": "타세놀이부연질캡슐400밀리그램(이부프로펜)",
+      "reason": "비대상(fp 57c0c72b48d2ac11, bridge SSOT)"
+    },
+    {
+      "id": "eb2d981c-8fa3-4de0-922b-23750489ca79",
+      "name": "이부로엔에스연질캡슐(이부프로펜)",
+      "reason": "비대상(fp 5dda00c75162b553, bridge SSOT)"
+    },
+    {
+      "id": "f7fc9b39-3d5a-4067-a06c-223ab2b28555",
+      "name": "이부콜벤연질캡슐400밀리그램(이부프로펜)",
+      "reason": "비대상(fp a176898bd3129508, bridge SSOT)"
+    },
+    {
+      "id": "fda90b1e-0577-4e94-ba30-8709c10dd51c",
+      "name": "루피엔연질캡슐(이부프로펜)",
+      "reason": "비대상(fp ad134271e5af7d32, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "b9c650f3-c67d-40c5-ba31-2ef497912070",
+    "bb5c3b2a-3340-4745-b24e-48c73b8f67b0",
+    "de7562b2-0760-4810-92d1-5091b835b03b",
+    "e815b908-1c42-43fb-b200-ce0030cdbba0"
+  ],
+  "rollback_master_ids": [
+    "b9c650f3-c67d-40c5-ba31-2ef497912070",
+    "bb5c3b2a-3340-4745-b24e-48c73b8f67b0",
+    "de7562b2-0760-4810-92d1-5091b835b03b",
+    "e815b908-1c42-43fb-b200-ce0030cdbba0"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "5dda00c75162b553",
+      "n": 4,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "43b88b7080384ddc",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a6ad7c391c35831a",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c7c0171e10311c1f",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "54774793cf333238",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "92650bef774bc082",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "57c0c72b48d2ac11",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "a176898bd3129508",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c51ad52262998c21",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "ad134271e5af7d32",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "c5e9a0fcbb3cd24a",
+      "n": 4,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "0a68a67bf0356d8b",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 4,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 4 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

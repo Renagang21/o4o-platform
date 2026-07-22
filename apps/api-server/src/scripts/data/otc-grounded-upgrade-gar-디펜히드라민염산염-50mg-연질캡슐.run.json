@@ -1,0 +1,130 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1",
+  "mode": "dry-run",
+  "status": "ALREADY_UPGRADED",
+  "dbWrite": 0,
+  "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "0dc02d49-6919-4120-b6d0-540c40050f42",
+    "authoredSource": "mfds_drug_otc",
+    "performedBy": null,
+    "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-RUNNER-HARDENING-DA-V1"
+  },
+  "policy": "89379627d Option A",
+  "anomalies": [],
+  "draftTitle": "디펜히드라민염산염 50mg 연질캡슐",
+  "coarseTotal": 15,
+  "target": 4,
+  "excluded": 11,
+  "otherFp": 0,
+  "excludedDetail": [
+    {
+      "id": "3cce72bd-accb-4400-8fd1-caad536cc423",
+      "name": "쿨드림연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp b4a97266780cdf97, bridge SSOT)"
+    },
+    {
+      "id": "5bb1d00c-e065-456e-8d80-8f761bd86801",
+      "name": "딥슬링연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 4d87fffc7cf55f6b, bridge SSOT)"
+    },
+    {
+      "id": "617d442f-637a-400e-b765-318d5b1ed77a",
+      "name": "쿨드림연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp b4a97266780cdf97, bridge SSOT)"
+    },
+    {
+      "id": "79940cc6-738b-4af1-9d32-0f19814d0c34",
+      "name": "드림굿연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 62c4505490eae601, bridge SSOT)"
+    },
+    {
+      "id": "83a294c4-fd41-4bcb-bbb6-3775169ed2a0",
+      "name": "디펙타민연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 335c931a2811b8db, bridge SSOT)"
+    },
+    {
+      "id": "8742d2b7-bc01-4cf1-bd8b-823ebf205d5d",
+      "name": "디펙타민연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 335c931a2811b8db, bridge SSOT)"
+    },
+    {
+      "id": "8d775369-6470-47c7-a026-82e08761c4b5",
+      "name": "제로민연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp d0d2877461d0384f, bridge SSOT)"
+    },
+    {
+      "id": "94cc51c8-492a-4a2a-badc-68d4d081e448",
+      "name": "디펙타민연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 335c931a2811b8db, bridge SSOT)"
+    },
+    {
+      "id": "a34972f7-35f0-409e-b93f-f9088c632e26",
+      "name": "딥슬링연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 4d87fffc7cf55f6b, bridge SSOT)"
+    },
+    {
+      "id": "b8490e05-5483-470a-a47b-33978467a2e1",
+      "name": "드림굿연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp 62c4505490eae601, bridge SSOT)"
+    },
+    {
+      "id": "d7aa8e84-9e31-4611-9920-a84d2bc84363",
+      "name": "제로민연질캡슐(디펜히드라민염산염)",
+      "reason": "비대상(fp d0d2877461d0384f, bridge SSOT)"
+    }
+  ],
+  "target_master_ids": [
+    "409a89b2-6a07-44f9-852d-84c5f35afbd5",
+    "80de1ef0-b65f-4677-9fae-499b2f611646",
+    "d014de99-0343-453a-b6dd-9b3dcfb09ebf",
+    "f77719fe-375d-4cf8-b45c-6c9d510e72db"
+  ],
+  "rollback_master_ids": [
+    "409a89b2-6a07-44f9-852d-84c5f35afbd5",
+    "80de1ef0-b65f-4677-9fae-499b2f611646",
+    "d014de99-0343-453a-b6dd-9b3dcfb09ebf",
+    "f77719fe-375d-4cf8-b45c-6c9d510e72db"
+  ],
+  "targetExcludeIntersection": 0,
+  "fpDistribution": [
+    {
+      "fp": "b4a97266780cdf97",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "f5ccf53ac8f3fccf",
+      "n": 4,
+      "ssot": "그대로확장"
+    },
+    {
+      "fp": "4d87fffc7cf55f6b",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "62c4505490eae601",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "335c931a2811b8db",
+      "n": 3,
+      "ssot": "비대상(exclude)"
+    },
+    {
+      "fp": "d0d2877461d0384f",
+      "n": 2,
+      "ssot": "비대상(exclude)"
+    }
+  ],
+  "nonOralNames": [],
+  "upgradeState": {
+    "authoredCanonMasters": 4,
+    "easyCanonMasters": 0,
+    "noneCanonMasters": 0
+  },
+  "note": "target 4 전부 authored canonical (mfds_drug_otc) — 이미 승격됨. write 0, 정상 종료."
+}

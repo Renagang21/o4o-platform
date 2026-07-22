@@ -46,5 +46,33 @@ bundle status = **COMPLETED**, writeActual == writePlan **102** (봉투 초과 0
 
 **(배치 1 시점 결론)**: 은행엽 80mg 정 · 세티리진 10mg 연질캡슐 · 포도엽 180mg 캡슐 · 탄산수소나트륨 500mg 정 **ko/en canonical LIVE** (17 master, write 102). 후속 배치는 아래 §5 에 추가.
 
-## 5. 후속 배치
-(진행 시 이 절에 추가 기록)
+## 5. 배치 2 — EN 역구성 (덜 경쟁된 후보)
+
+표준 번역파일에 build==live out en byte-identical entry 가 없는 "역구성 필요" 후보를,
+`buildDrugOtcEnConsumerHtml` **역함수 파서**([`drug-otc-track-a-3h-reconstruct.ts`](../../apps/api-server/src/scripts/drug-otc-track-a-3h-reconstruct.ts))로
+live out en HTML → DrugOtcEnTranslation 복원 → 재빌드 byte-identical(diff 0) 검증 후 배치 전용 번역파일 자동 생성.
+
+| 그룹 | T | exclude | other | ko (4T) | en (2T) | en md5(=live out en) |
+|---|:-:|:-:|:-:|:-:|:-:|---|
+| L-시스틴 500mg 연질캡슐 | 4 | 4 | 0 | 16 | 8 | `3f1485a9` |
+| 디펜히드라민염산염 50mg 연질캡슐 | 4 | 11 | 0 | 16 | 8 | `3c79b941` |
+| 이부프로펜 400mg 연질캡슐 | 4 | 24 | 0 | 16 | 8 | `93bdb3ac` |
+| 플루벤다졸 500mg 정 | 4 | 3 | 0 | 16 | 8 | `89ef4238` |
+| **합계** | **16** | 42 | 0 | **64** | **32** | — |
+
+bundle status = **COMPLETED**, writeActual == plan **96**, other 0.
+독립검증: 전 그룹 ko 4/4/4 · en 4 canonical uniform · ko/en 1:1=4 · dup 0 · 제외 42 authored/en 0(대상 밖 write 0). 재실행 ALREADY.
+역구성 = 형식 변환 재현(검토완료 EN 재사용) — build==live out en byte-identical 게이트로 ko 에 없는 fact 0.
+
+---
+
+## 종합
+
+| 배치 | 그룹 | master | ko write | en write | 합 |
+|---|:-:|:-:|:-:|:-:|:-:|
+| 1 (file-ready) | 4 | 17 | 68 | 34 | 102 |
+| 2 (역구성) | 4 | 16 | 64 | 32 | 96 |
+| **누적** | **8** | **33** | **132** | **66** | **198** |
+
+전 그룹 other 0 · 교집합 0 · canonical duplicate 0 · 대상 밖 write 0 · ko/en 1:1 · en byte-identical(새 fact 0) · 재실행 no-op.
+runner registry .ts 미수정(외부 config 병합). 공통 DB·스키마 장애 0. 경쟁 그룹은 재감사 자동 회피 + bundle 멱등으로 double-write 0.
