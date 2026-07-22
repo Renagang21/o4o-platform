@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-TRACK-A-1H-PRODUCTION-NA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "에르도스테인 300mg 정 Track A 최초 파일럿의 유일 en 결손(target 26). 동일 source_ref_id 03e0af9d 의 out-of-scope 9건이 이미 en canonical(md5 2b7c07261d89e55c17a53fe80ff57d79)로 LIVE 이고, 그 ko 는 target 26 ko 와 byte-identical(md5 459f20efdf5c52b550d2806c5acbe7ac, 동일 약물). 본 번역은 그 검토완료 en 을 빌더 계약 역매핑으로 복원한 것으로 새 medical fact 0. 빌드 결과가 live out en 과 byte-identical 임을 en-complete runner 가 게이트로 증명한다(consistencyMatch).",
+  "translations": [
+    {
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "title": "Erdosteine 300 mg Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to thin mucus and help you cough it up in sudden and long-lasting breathing problems.",
+      "usage": "Adults take one tablet (300 mg) two to three times a day. For sudden breathing problems, do not take it for more than 10 days in a row.",
+      "caution": "Do not take this if you have ever reacted to it, if you have cirrhosis of the liver, cystathionine synthase deficiency, a peptic ulcer, or severe kidney problems. Talk to a pharmacist before taking it if you have mild to moderate liver problems, or are pregnant or breastfeeding, and get advice before taking it with other cough or phlegm medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Erdosteine 300 mg",
+        "How it works": "Thins mucus and helps you cough it up",
+        "Main symptoms": "Thick phlegm in sudden and long-lasting breathing problems",
+        "Who should be careful": "Peptic ulcer; severe kidney problems; cirrhosis of the liver",
+        "Why this one": "A mucus-thinning treatment that helps clear phlegm (tablet)"
+      }
+    }
+  ],
+  "summary": "Thick phlegm in sudden and long-lasting breathing problems"
+}

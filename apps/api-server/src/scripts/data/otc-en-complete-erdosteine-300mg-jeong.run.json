@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-BACILLUS-LICHENIFORMIS-250MG-EN-COMPLETE-DA-V1",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "에르도스테인|300밀리그램|정",
+  "writeOwner": {
+    "kind": "authored_source_ref_id",
+    "value": "03e0af9d-5236-460a-86d4-1af8b0c00c61",
+    "sourceType": "mfds_drug_otc"
+  },
+  "expected": 26,
+  "targetMasters": 26,
+  "anomalies": [],
+  "koCanonical": 26,
+  "existingEnAny": 26,
+  "existingEnCanonical": 26,
+  "existingEnNeedsReview": 0,
+  "referenceEn": [
+    {
+      "md5": "2b7c07261d89e55c17a53fe80ff57d79",
+      "n": 9
+    }
+  ],
+  "builtLen": 2443,
+  "builtMd5": "2b7c07261d89e55c17a53fe80ff57d79",
+  "consistencyMatch": true,
+  "summaryField": "Thick phlegm in sudden and long-lasting breathing problems",
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 26,
+    "STEP2_en_canonical_flip": 26,
+    "en_write_total": 52
+  },
+  "enTargetMd5": "2b7c07261d89e55c17a53fe80ff57d79",
+  "note": "대상 en 이미 canonical · 내용 build byte-identical(2b7c07261d89e55c17a53fe80ff57d79) — write 0, 정상 종료"
+}
