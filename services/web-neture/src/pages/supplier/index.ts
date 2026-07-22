@@ -18,3 +18,5 @@ export { default as SupplierTrialEditPage } from './SupplierTrialEditPage';
 export { default as SupplierCsvImportPage } from './SupplierCsvImportPage';
 export { default as MyForumDashboardPage } from './MyForumDashboardPage';
 export { default as RequestCategoryPage } from './RequestCategoryPage';
+// WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C
+export { default as SupplierTabletScreenSetsPage } from './SupplierTabletScreenSetsPage';

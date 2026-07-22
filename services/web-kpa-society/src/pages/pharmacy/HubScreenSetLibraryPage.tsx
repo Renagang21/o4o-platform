@@ -1,27 +1,28 @@
 /**
- * HubScreenSetLibraryPage — 매장 HUB 타블렛 화면(운영자 원본) 진열 + 내 타블렛 콘텐츠로 가져오기
+ * HubScreenSetLibraryPage — 매장 HUB 타블렛 화면(운영자·공급자 제공) 진열 + 내 타블렛 콘텐츠로 가져오기
  *
- * WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1
+ * WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (운영자 제공)
+ * WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C           (공급자 제공 섹션 추가)
  *
- * 운영자가 제작한 Screen Set 원본(origin='operator', status='operator_template')을 보고,
- * "내 타블렛 콘텐츠로 가져오기" 로 **매장 소유 독립 사본**을 만든다(가져오기=사본 불변식).
+ * 운영자/공급자가 제작한 Screen Set 원본을 보고, "내 타블렛 콘텐츠로 가져오기" 로 **매장 소유 독립 사본**을
+ * 만든다(가져오기=사본 불변식). 공급자 제공은 별도 소스 탭으로 구분하며, 공급자명·게시 대상(매장 유형)이
+ * 추가로 표시된다. 매장 유형·의약품 정책 검사는 모두 서버(V2b)가 수행하며, 프론트는 서버 결과를 신뢰한다.
  *
- * 데이터 흐름:
- *   - 목록: listOperatorTemplates({ q, templateKey })   — /store/screen-set-hub/templates
- *   - 상세: getOperatorTemplate(id)                     — blocks 포함(미리보기 입력)
- *   - 미리보기: previewScreenSet({ templateKey, blocks }) — 기존 draft preview 재사용(내 매장 기준)
- *   - 가져오기: importOperatorTemplate(id)              — 매장 사본 INSERT(트랜잭션, 새 ID)
+ * 데이터 흐름(소스별):
+ *   운영자: listOperatorTemplates / getOperatorTemplate / importOperatorTemplate  — /store/screen-set-hub/templates
+ *   공급자: listSupplierTemplates / getSupplierTemplate / importSupplierTemplate  — /store/screen-set-hub/supplier-templates
+ *   미리보기(공통): previewScreenSet({ templateKey, blocks }) — 기존 draft preview 재사용(내 매장 기준)
  *
- * 복사 후 매장 사본은 운영자 원본의 수정·보관·삭제와 무관하다(FK·동기화 없음).
+ * 복사 후 매장 사본은 원본의 수정·보관·삭제와 무관하다(FK·동기화 없음).
  * 가져오기만 하고 코너에는 자동 적용하지 않는다 — 적용은 '코너별 운영'.
- * 운영자 원본에는 공개 URL·QR 이 없다(미리보기는 인증된 매장 화면에서만).
+ * 원본에는 공개 URL·QR 이 없다(미리보기는 인증된 매장 화면에서만).
  *
  * 권한: store_owner (HubGuard + backend withStoreAuth).
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MonitorSmartphone, Download, X, Search } from 'lucide-react';
+import { MonitorSmartphone, Download, X, Search, Store, Truck } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -30,9 +31,14 @@ import {
   listOperatorTemplates,
   getOperatorTemplate,
   importOperatorTemplate,
+  listSupplierTemplates,
+  getSupplierTemplate,
+  importSupplierTemplate,
   type OperatorTemplateListItem,
-  type OperatorTemplateDetail,
+  type SupplierTemplateListItem,
+  type SupplierHubTargetStoreType,
 } from '../../api/storeScreenSetHub';
+import type { ScreenBlock } from '../../api/tabletDisplays';
 import { previewScreenSet } from '../../api/tabletDisplays';
 import { getStoreSlug } from '../../api/pharmacyInfo';
 // 라벨 드리프트 방지 — 제작기와 같은 사용자용 템플릿 라벨을 재사용(내부 template_key 미노출).
@@ -47,9 +53,30 @@ const TEMPLATE_FILTERS = [
   { key: 'product_grid_qr', label: '제품 진열형' },
 ];
 
+type SourceTab = 'operator' | 'supplier';
+
+function targetLabel(t: SupplierHubTargetStoreType): string {
+  if (t === 'pharmacy') return '약국';
+  if (t === 'non_pharmacy') return '비약국';
+  return '전체 매장';
+}
+
+/** 상세/미리보기 패널 공통 상태(소스 무관). */
+interface DetailState {
+  source: SourceTab;
+  id: string;
+  name: string;
+  templateKey: string;
+  blocks: ScreenBlock[];
+  supplierName?: string | null;
+  hubTargetStoreType?: SupplierHubTargetStoreType;
+}
+
 export function HubScreenSetLibraryPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<OperatorTemplateListItem[]>([]);
+  const [source, setSource] = useState<SourceTab>('operator');
+  const [operatorItems, setOperatorItems] = useState<OperatorTemplateListItem[]>([]);
+  const [supplierItems, setSupplierItems] = useState<SupplierTemplateListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState('');
@@ -57,7 +84,7 @@ export function HubScreenSetLibraryPage() {
   const [storeSlug, setStoreSlug] = useState<string | null>(null);
 
   // 상세/미리보기 패널
-  const [detail, setDetail] = useState<OperatorTemplateDetail | null>(null);
+  const [detail, setDetail] = useState<DetailState | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [screen, setScreen] = useState<TabletScreenResponse | null>(null);
   const [view, setView] = useState<'tablet' | 'mobile'>('tablet');
@@ -80,48 +107,92 @@ export function HubScreenSetLibraryPage() {
     setIsLoading(true);
     setError(null);
     try {
-      setItems(await listOperatorTemplates({ q: q.trim() || undefined, templateKey: templateFilter || undefined }));
+      const params = { q: q.trim() || undefined, templateKey: templateFilter || undefined };
+      if (source === 'operator') {
+        setOperatorItems(await listOperatorTemplates(params));
+      } else {
+        setSupplierItems(await listSupplierTemplates(params));
+      }
     } catch (e: any) {
-      setError(e?.message || '운영자 타블렛 화면을 불러올 수 없습니다');
+      setError(e?.message || '타블렛 화면을 불러올 수 없습니다');
     } finally {
       setIsLoading(false);
     }
-  }, [q, templateFilter]);
+  }, [q, templateFilter, source]);
 
   useEffect(() => { void loadData(); }, [loadData]);
 
-  // 미리보기: 운영자 원본 blocks → 기존 draft preview(내 매장 기준 렌더)
-  const openDetail = useCallback(async (row: OperatorTemplateListItem) => {
+  // 소스 전환 시 열린 상세를 닫는다(축 혼동 방지).
+  const switchSource = useCallback((next: SourceTab) => {
+    if (next === source) return;
+    setSource(next);
+    setDetail(null);
+    setScreen(null);
+    setImported(null);
+  }, [source]);
+
+  // 미리보기: 원본 blocks → 기존 draft preview(내 매장 기준 렌더)
+  const openDetail = useCallback(async (d: DetailState) => {
     setDetailLoading(true);
     setScreen(null);
     setImported(null);
     setView('tablet');
+    setDetail(d);
     try {
-      const d = await getOperatorTemplate(row.id);
-      setDetail(d);
-      try {
-        setScreen(await previewScreenSet({ templateKey: d.templateKey, blocks: d.blocks }));
-      } catch {
-        // 미리보기 실패해도 상세·가져오기는 가능(안내만).
-        setScreen(null);
-      }
-    } catch (e: any) {
-      toast.error(e?.message || '상세를 불러오지 못했습니다');
-      setDetail(null);
+      setScreen(await previewScreenSet({ templateKey: d.templateKey, blocks: d.blocks }));
+    } catch {
+      // 미리보기 실패해도 상세·가져오기는 가능(안내만).
+      setScreen(null);
     } finally {
       setDetailLoading(false);
     }
   }, []);
 
+  const openOperatorDetail = useCallback(async (row: OperatorTemplateListItem) => {
+    setDetailLoading(true);
+    try {
+      const full = await getOperatorTemplate(row.id);
+      await openDetail({ source: 'operator', id: full.id, name: full.name, templateKey: full.templateKey, blocks: full.blocks });
+    } catch (e: any) {
+      toast.error(e?.message || '상세를 불러오지 못했습니다');
+      setDetail(null);
+      setDetailLoading(false);
+    }
+  }, [openDetail]);
+
+  const openSupplierDetail = useCallback(async (row: SupplierTemplateListItem) => {
+    setDetailLoading(true);
+    try {
+      const full = await getSupplierTemplate(row.id);
+      await openDetail({
+        source: 'supplier', id: full.id, name: full.name, templateKey: full.templateKey, blocks: full.blocks,
+        supplierName: row.supplierName, hubTargetStoreType: full.hubTargetStoreType,
+      });
+    } catch (e: any) {
+      // 비약국 의약품 세트는 403 — 사용자 문구로 구분.
+      const msg = e?.code === 'MEDICATION_PHARMACY_ONLY'
+        ? '의약품이 포함된 콘텐츠는 약국 매장만 열람할 수 있습니다.'
+        : (e?.message || '상세를 불러오지 못했습니다');
+      toast.error(msg);
+      setDetail(null);
+      setDetailLoading(false);
+    }
+  }, [openDetail]);
+
   const handleImport = useCallback(async () => {
     if (!detail || importing) return;
     setImporting(true);
     try {
-      const copy = await importOperatorTemplate(detail.id);
+      const copy = detail.source === 'operator'
+        ? await importOperatorTemplate(detail.id)
+        : await importSupplierTemplate(detail.id);
       setImported({ id: copy.id, name: copy.name });
       toast.success(`“${copy.name}” 을(를) 내 타블렛 콘텐츠로 가져왔습니다.`);
     } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
+      const msg = e?.code === 'MEDICATION_PHARMACY_ONLY'
+        ? '의약품이 포함된 콘텐츠는 약국 매장만 가져올 수 있습니다.'
+        : (e?.message || '가져오기에 실패했습니다');
+      toast.error(msg);
     } finally {
       setImporting(false);
     }
@@ -144,7 +215,7 @@ export function HubScreenSetLibraryPage() {
     fetchScreen: async () => { throw new Error('미리보기 전용'); },
   }), []);
 
-  const columns: ListColumnDef<OperatorTemplateListItem>[] = useMemo(() => [
+  const operatorColumns: ListColumnDef<OperatorTemplateListItem>[] = useMemo(() => [
     {
       key: 'name',
       header: '콘텐츠명',
@@ -165,7 +236,7 @@ export function HubScreenSetLibraryPage() {
       width: '100px',
       render: () => (
         <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-blue-50 border-blue-200 text-blue-700">
-          운영자 자료
+          운영자 제공
         </span>
       ),
     },
@@ -185,17 +256,84 @@ export function HubScreenSetLibraryPage() {
     },
   ], []);
 
+  const supplierColumns: ListColumnDef<SupplierTemplateListItem>[] = useMemo(() => [
+    {
+      key: 'name',
+      header: '콘텐츠명',
+      sortable: true,
+      sortAccessor: (item) => item.name,
+      render: (_v, item) => (
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
+            <MonitorSmartphone className="w-3.5 h-3.5" />
+          </div>
+          <span className="font-medium text-slate-800 text-sm truncate">{item.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급자',
+      width: '140px',
+      render: (_v, item) => <span className="text-xs text-slate-600 truncate">{item.supplierName || '공급자'}</span>,
+    },
+    {
+      key: 'hubTargetStoreType',
+      header: '게시 대상',
+      width: '100px',
+      render: (_v, item) => (
+        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-violet-50 border-violet-200 text-violet-700">
+          {targetLabel(item.hubTargetStoreType)}
+        </span>
+      ),
+    },
+    {
+      key: 'templateKey',
+      header: '템플릿',
+      width: '130px',
+      render: (_v, item) => <span className="text-xs text-slate-600">{templateLabel(item.templateKey)}</span>,
+    },
+    {
+      key: 'updatedAt',
+      header: '수정일',
+      width: '110px',
+      render: (_v, item) => (
+        <span className="text-xs text-slate-500">{new Date(item.updatedAt).toLocaleDateString('ko-KR')}</span>
+      ),
+    },
+  ], []);
+
   return (
     <div className="p-4 md:p-6">
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <MonitorSmartphone className="w-5 h-5 text-indigo-600" />
-          타블렛 화면 (운영자 자료)
+          타블렛 화면 (HUB)
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          운영자가 제작한 타블렛 화면을 내 매장으로 가져올 수 있습니다. 가져오면 <b>내 매장 소유의 사본</b>이 만들어지며,
-          이후 운영자가 원본을 수정·삭제해도 내 콘텐츠는 영향을 받지 않습니다.
+          운영자·공급자가 제작한 타블렛 화면을 내 매장으로 가져올 수 있습니다. 가져오면 <b>내 매장 소유의 사본</b>이 만들어지며,
+          이후 원본을 수정·삭제해도 내 콘텐츠는 영향을 받지 않습니다.
         </p>
+      </div>
+
+      {/* 소스 탭: 운영자 제공 / 공급자 제공 */}
+      <div className="flex items-center gap-1 mb-3 border-b border-slate-200">
+        <button
+          onClick={() => switchSource('operator')}
+          className={`px-3 py-2 text-sm font-semibold inline-flex items-center gap-1.5 border-b-2 -mb-px ${
+            source === 'operator' ? 'border-indigo-500 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Store className="w-4 h-4" /> 운영자 제공
+        </button>
+        <button
+          onClick={() => switchSource('supplier')}
+          className={`px-3 py-2 text-sm font-semibold inline-flex items-center gap-1.5 border-b-2 -mb-px ${
+            source === 'supplier' ? 'border-indigo-500 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Truck className="w-4 h-4" /> 공급자 제공
+        </button>
       </div>
 
       {/* 검색 + 템플릿 필터 */}
@@ -223,15 +361,27 @@ export function HubScreenSetLibraryPage() {
         <div className="mb-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</div>
       )}
 
-      <DataTable<OperatorTemplateListItem>
-        columns={columns}
-        data={items}
-        rowKey="id"
-        loading={isLoading}
-        emptyMessage="아직 운영자가 게시한 타블렛 화면이 없습니다"
-        tableId="store-hub-screen-set"
-        onRowClick={(row) => void openDetail(row)}
-      />
+      {source === 'operator' ? (
+        <DataTable<OperatorTemplateListItem>
+          columns={operatorColumns}
+          data={operatorItems}
+          rowKey="id"
+          loading={isLoading}
+          emptyMessage="아직 운영자가 게시한 타블렛 화면이 없습니다"
+          tableId="store-hub-screen-set-operator"
+          onRowClick={(row) => void openOperatorDetail(row)}
+        />
+      ) : (
+        <DataTable<SupplierTemplateListItem>
+          columns={supplierColumns}
+          data={supplierItems}
+          rowKey="id"
+          loading={isLoading}
+          emptyMessage="아직 내 매장 유형에 게시된 공급자 타블렛 화면이 없습니다"
+          tableId="store-hub-screen-set-supplier"
+          onRowClick={(row) => void openSupplierDetail(row)}
+        />
+      )}
 
       {/* 상세 · 미리보기 · 가져오기 패널 */}
       {detail && (
@@ -242,7 +392,10 @@ export function HubScreenSetLibraryPage() {
               <div className="min-w-0">
                 <div className="text-base font-bold text-slate-800 truncate">{detail.name}</div>
                 <div className="text-xs text-slate-500 mt-0.5">
-                  템플릿 <b>{templateLabel(detail.templateKey)}</b> · 운영자 자료
+                  템플릿 <b>{templateLabel(detail.templateKey)}</b>
+                  {detail.source === 'operator'
+                    ? ' · 운영자 제공'
+                    : ` · 공급자 제공${detail.supplierName ? ` (${detail.supplierName})` : ''} · 대상 ${detail.hubTargetStoreType ? targetLabel(detail.hubTargetStoreType) : '-'}`}
                 </div>
               </div>
               <button onClick={() => setDetail(null)} className="p-1.5 rounded hover:bg-slate-100" aria-label="닫기">
@@ -257,7 +410,8 @@ export function HubScreenSetLibraryPage() {
                   “{imported.name}” 을(를) 내 타블렛 콘텐츠로 가져왔습니다.
                 </div>
                 <p className="text-[12px] text-emerald-900 leading-relaxed">
-                  <b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블릿에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주세요.
+                  매장 소유의 <b>독립 사본</b>이 만들어졌습니다. 이후 원본이 수정·게시 해제되어도 이 사본은 영향을 받지 않습니다.
+                  <br /><b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블릿에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주세요.
                 </p>
                 <button
                   onClick={() => navigate('/store/commerce/tablet-displays')}
@@ -267,14 +421,20 @@ export function HubScreenSetLibraryPage() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => void handleImport()}
-                disabled={importing}
-                className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                {importing ? '가져오는 중…' : '내 타블렛 콘텐츠로 가져오기'}
-              </button>
+              <>
+                <p className="text-[12px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  이 화면을 가져오면 <b>그 시점의 내용을 복사한 매장 소유 독립 사본</b>이 만들어집니다. 가져온 후 수정할 수 있으며,
+                  {detail.source === 'supplier' ? ' 공급자 원본' : ' 운영자 원본'}의 변경 사항은 자동으로 반영되지 않습니다. 가져오기만으로 태블릿에 자동 적용되지 않습니다.
+                </p>
+                <button
+                  onClick={() => void handleImport()}
+                  disabled={importing}
+                  className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  {importing ? '가져오는 중…' : '내 타블렛 콘텐츠로 가져오기'}
+                </button>
+              </>
             )}
 
             {/* 미리보기 */}

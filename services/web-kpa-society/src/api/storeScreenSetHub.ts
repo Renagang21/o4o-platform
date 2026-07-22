@@ -98,3 +98,66 @@ export async function importOperatorTemplate(id: string): Promise<ScreenSet> {
   });
   return res.data;
 }
+
+/* ================================================================
+ * 공급자 제공 Screen Set (WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C)
+ *   backend: /api/v1/store/screen-set-hub/supplier-templates (V2b)
+ *   운영자 제공과 별개 축 — 공급자명·게시 대상(매장 유형)·의약품 약국 전용 가드가 추가된다.
+ *   목록/상세/가져오기 각 단계에서 서버가 매장 유형 적합성·의약품 정책을 재검사한다.
+ *   비적격 매장 유형(약국/비약국 외)·의약품 세트(비약국)는 서버가 제외/차단한다 — 프론트 재필터 없음.
+ * ================================================================ */
+
+export type SupplierHubTargetStoreType = 'pharmacy' | 'non_pharmacy' | 'all';
+
+/** HUB 목록 행 — 공급자 원본(공개 URL·QR 없음). */
+export interface SupplierTemplateListItem {
+  id: string;
+  name: string;
+  supplierId: string;
+  supplierName: string | null;
+  hubTargetStoreType: SupplierHubTargetStoreType;
+  templateKey: string;
+  blockCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** HUB 상세 — 미리보기용 blocks 포함. */
+export interface SupplierTemplateDetail {
+  id: string;
+  name: string;
+  hubTargetStoreType: SupplierHubTargetStoreType;
+  templateKey: string;
+  createdAt: string;
+  updatedAt: string;
+  blocks: ScreenBlock[];
+}
+
+/** 공급자 제공 원본 목록(검색 + 템플릿 필터). 매장 유형 부적격 시 서버가 빈 배열 반환. */
+export async function listSupplierTemplates(params?: { q?: string; templateKey?: string }): Promise<SupplierTemplateListItem[]> {
+  const qs = new URLSearchParams();
+  if (params?.q) qs.set('q', params.q);
+  if (params?.templateKey) qs.set('templateKey', params.templateKey);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  const res = await request<{ success: boolean; data: SupplierTemplateListItem[] }>(`${BASE}/supplier-templates${suffix}`);
+  return res.data ?? [];
+}
+
+/** 공급자 제공 원본 상세 + blocks. 비약국 의약품 세트는 403(MEDICATION_PHARMACY_ONLY). */
+export async function getSupplierTemplate(id: string): Promise<SupplierTemplateDetail> {
+  const res = await request<{ success: boolean; data: SupplierTemplateDetail }>(`${BASE}/supplier-templates/${id}`);
+  return res.data;
+}
+
+/**
+ * 공급자 제공 원본을 매장으로 가져오기 — 매장 소유 **독립 사본**을 만든다.
+ * 원본 FK·자동 동기화 없음(공급자가 원본을 수정·게시 해제해도 사본 불변). 코너 자동 적용 없음.
+ * 반복 가져오기 허용 — 호출마다 새 사본. 비약국 의약품 세트는 403 차단.
+ */
+export async function importSupplierTemplate(id: string): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/supplier-templates/${id}/import`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+  return res.data;
+}

@@ -38,6 +38,10 @@ COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/store-products-ui/package.json ./packages/store-products-ui/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
+# WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C: 공급자 Screen Set 제작기(공유 편집기) 소비.
+COPY packages/screen-content-core/package.json ./packages/screen-content-core/
+COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
+COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -67,6 +71,10 @@ COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/store-products-ui/ ./packages/store-products-ui/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
+# WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C: 공급자 Screen Set 제작기(공유 편집기) 소비.
+COPY packages/screen-content-core/ ./packages/screen-content-core/
+COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
+COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
