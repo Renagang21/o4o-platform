@@ -1,0 +1,322 @@
+[
+ {
+  "statementNo": "20140017002690",
+  "productName": "스킨케어 SKIN CARE",
+  "reason": "CFU_ABNORMAL"
+ },
+ {
+  "statementNo": "20040017017876",
+  "productName": "Oslonka IBS",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "20120019007110",
+  "productName": "일양살아있는프로바이오틱스장용캡슐",
+  "reason": "CFU_PARSE_FAILED"
+ },
+ {
+  "statementNo": "200700170353192",
+  "productName": "제타바이오 감마5",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059159",
+  "productName": "12종혼합유산균-대원성인",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2016000600750",
+  "productName": "엘알 엘디티엠7511 (LR LDTM7511)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017699",
+  "productName": "Duolac Mix 8S",
+  "reason": "CFU_ABSENT,SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "200700170351285",
+  "productName": "비피더스 혼합유산균 키즈",
+  "reason": "CFU_PARSE_FAILED"
+ },
+ {
+  "statementNo": "2016000600777",
+  "productName": "엘에이 케이비엘409 (LA KBL409)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002363",
+  "productName": "유투바이오 베베 7종 유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002689",
+  "productName": "프롬바이오 8종 코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "202000124466",
+  "productName": "17종 생유산균 프로바이오틱스",
+  "reason": "CFU_PARSE_FAILED"
+ },
+ {
+  "statementNo": "20140017002587",
+  "productName": "락토골드 프리미엄 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017762",
+  "productName": "Probiotica Daily Phital",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "20040017017847",
+  "productName": "NBL Probiotic ATP(New)",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "20140017002469",
+  "productName": "락토데이 혼합분말 M",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002623",
+  "productName": "비오베이비 골드 혼합분말",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059221",
+  "productName": "ES 베이직 5종혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059189",
+  "productName": "혼합유산균 디더블유3(DW3)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017891",
+  "productName": "Duolac 3 strain capsule bulk",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "20140017002174",
+  "productName": "뉴트리원 5종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059244",
+  "productName": "5종혼합유산균(SG)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002408",
+  "productName": "7종 코팅 프로바이오틱스 피비(PB)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700226",
+  "productName": "일동 프로바이오틱스-7",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002319",
+  "productName": "일동 프로바이오틱스-7 에프(F)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040020001309",
+  "productName": "파워 장케어",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "2016000600790",
+  "productName": "엘피1 씨케이디비008(에이) (LP1 CKDB008(A))",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017748",
+  "productName": "Floradicol7",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "20140017002193",
+  "productName": "일동 9종 프로바이오틱스 믹스",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002513",
+  "productName": "우리 7종 혼합유산균 에이(A)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059156",
+  "productName": "굿락 19종 혼합유산균-100비(100B)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002450",
+  "productName": "일동 17종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700225",
+  "productName": "일동 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20150010018142",
+  "productName": "19종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002651",
+  "productName": "특허 10종 유산균 블렌드-에프(F)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700246",
+  "productName": "드림리더 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "201400170028",
+  "productName": "브이비(VB) 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002351",
+  "productName": "프리미엄 10종 복합코팅유산균-3000 비(B)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017745",
+  "productName": "ATP-P",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "201600060079",
+  "productName": "엘씨 씨케이디비007 (LC CKDB007)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700214",
+  "productName": "동원 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "200400170211827",
+  "productName": "11종 혼합유산균(PSRHS-001)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017017858",
+  "productName": "Daglig+Born",
+  "reason": "CFU_ABSENT"
+ },
+ {
+  "statementNo": "2016000600774",
+  "productName": "엘에이 씨케이디비018 (LA CKDB018)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002669",
+  "productName": "8종 프로바이오틱스 혼합분말 HP",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002519",
+  "productName": "2종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700241",
+  "productName": "GLPlan (지엘플랜) 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017059132",
+  "productName": "뉴 히게이아5종-300B",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002476",
+  "productName": "락토데이 혼합분말 W",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700237",
+  "productName": "알파 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002652",
+  "productName": "특허 10종 유산균 블렌드",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002453",
+  "productName": "일동 5종 프리미엄 유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2016000600789",
+  "productName": "엘피1 씨케이디비008 (LP1 CKDB008)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002620",
+  "productName": "일동 18종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002111",
+  "productName": "디더블유(DW) 10종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002217",
+  "productName": "알피(RP) 5종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20140017002647",
+  "productName": "일동 특허 3종 혼합유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "20040017031119",
+  "productName": "프로바이오틱스 골드",
+  "reason": "CFU_PARSE_FAILED,BASIS_PARSE_FAILED"
+ },
+ {
+  "statementNo": "2004001705997",
+  "productName": "엔테락 장용코팅 혼합유산균 4종",
+  "reason": "SERVING_ABSENT,BULK"
+ },
+ {
+  "statementNo": "20040017059134",
+  "productName": "17종혼합유산균-알에스 200비(17종혼합유산균-RS 200B)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2016000600713",
+  "productName": "엘에프 씨케이디비012 (LF CKDB012)",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2014001700296",
+  "productName": "도테라 스페셜 블렌드 복합 코팅 유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ },
+ {
+  "statementNo": "2005002000516",
+  "productName": "김치유산균분말",
+  "reason": "BASIS_PARSE_FAILED"
+ },
+ {
+  "statementNo": "20140017002672",
+  "productName": "핑크 4종 복합코팅유산균",
+  "reason": "SERVING_PARSE_FAILED,BULK"
+ }
+]
