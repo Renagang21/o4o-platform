@@ -44,6 +44,10 @@ const normLang = (v: string | null | undefined): SupportedLang => {
   return SUPPORTED_LANGS.includes(l) ? l : DEFAULT_LANG;
 };
 
+// WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 철회 가능한 작업본 상태(백엔드 계약과 동일).
+//   canonical(매장 노출)·hidden·deprecated·candidate 는 철회 불가.
+const WITHDRAWABLE_STATUSES = new Set(['draft', 'needs_review', 'revision_requested']);
+
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
   draft: { label: '임시저장', cls: 'bg-slate-100 text-slate-600' },
   needs_review: { label: '검수 대기', cls: 'bg-amber-50 text-amber-700' },
@@ -71,6 +75,8 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   const [language, setLanguage] = useState<SupportedLang>(DEFAULT_LANG);
   const [rows, setRows] = useState<SupplierStoreDescriptionDraft[]>([]);
   const [dirty, setDirty] = useState(false);
+  // WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 철회 진행 상태.
+  const [withdrawing, setWithdrawing] = useState(false);
 
   // 특정 언어의 작업행을 캐시에서 찾아 편집기에 로드(없으면 빈 편집기 — 자동 복사 금지).
   const loadLanguageFrom = useCallback((all: SupplierStoreDescriptionDraft[], lang: SupportedLang) => {
@@ -172,11 +178,37 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     }
   };
 
+  // WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 현재 언어 작업본 철회(soft delete).
+  //   본인 소유·허용 상태의 작업행이 로드돼 있을 때만 노출. 철회 시 해당 언어 행만 제거(다른 언어·offer·master 무변경).
+  const doWithdraw = async () => {
+    if (!existing || withdrawing || saving) return;
+    if (!window.confirm(`‘${LANG_LABELS[language]}’ 매장용 설명서 작업본을 철회하시겠습니까?\n철회하면 이 작업본이 목록·검수 대기에서 제거됩니다. (매장에 노출 중인 검수 완료 설명서에는 영향이 없습니다.)`)) {
+      return;
+    }
+    setWithdrawing(true);
+    try {
+      await supplierStoreDescriptionApi.withdraw(existing.id);
+      toast.success(`철회되었습니다 (${LANG_LABELS[language]})`);
+      // 캐시에서 해당 언어 행 제거 + 편집기 초기화(빈 상태). 다른 언어 행 무변경.
+      setRows((prev) => prev.filter((r) => normLang(r.language) !== language));
+      setExisting(null);
+      setContent('');
+      setDirty(false);
+      onSaved?.();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '철회 중 오류가 발생했습니다';
+      toast.error(msg);
+    } finally {
+      setWithdrawing(false);
+    }
+  };
+
   if (!open) return null;
 
   const statusCfg = existing ? STATUS_LABEL[existing.status] : null;
   const isCanonical = existing?.status === 'canonical';
   const isRevision = existing?.status === 'revision_requested';
+  const canWithdraw = !!existing && WITHDRAWABLE_STATUSES.has(existing.status);
 
   return (
     <>
@@ -272,18 +304,30 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-2 px-6 py-4 border-t border-slate-200">
-          <p className="text-[11px] text-slate-400">검수요청 후 운영자 검수를 통과하면 매장에 노출됩니다. 공급자가 직접 게시하지 않습니다.</p>
+          <div className="flex items-center gap-3 min-w-0">
+            {/* WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 철회(작업본만, canonical/hidden 미노출). */}
+            {canWithdraw && (
+              <button
+                onClick={doWithdraw}
+                disabled={saving || loading || withdrawing}
+                className="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 shrink-0"
+              >
+                {withdrawing ? '철회 중...' : '철회'}
+              </button>
+            )}
+            <p className="text-[11px] text-slate-400 min-w-0">검수요청 후 운영자 검수를 통과하면 매장에 노출됩니다. 공급자가 직접 게시하지 않습니다.</p>
+          </div>
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => doSave(false)}
-              disabled={saving || loading}
+              disabled={saving || loading || withdrawing}
               className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
             >
               {saving ? '저장 중...' : '임시저장'}
             </button>
             <button
               onClick={() => doSave(true)}
-              disabled={saving || loading}
+              disabled={saving || loading || withdrawing}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               {saving ? '처리 중...' : isRevision ? '다시 검수 요청' : '검수요청'}

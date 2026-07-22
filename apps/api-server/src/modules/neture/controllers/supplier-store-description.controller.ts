@@ -12,9 +12,11 @@
  *   - 임시저장(draft, submitted_at=null) / 검수요청(needs_review, submitted_at=now) 분리
  *
  * mount: /api/v1/neture/supplier/store-descriptions
- *   GET  /?masterId=  — 공급자 본인의 STORE 설명서 작업행 목록(read gate)
- *   POST /            — 저장(임시저장/검수요청). ACTIVE 공급자만(write gate). body:
- *                       { offerId, content, summary?, language?, submit? }
+ *   GET    /?masterId=  — 공급자 본인의 STORE 설명서 작업행 목록(read gate)
+ *   POST   /            — 저장(임시저장/검수요청). ACTIVE 공급자만(write gate). body:
+ *                         { offerId, content, summary?, language?, submit? }
+ *   DELETE /:id         — 철회(soft delete). ACTIVE 공급자만. 본인 소유·draft/needs_review/revision_requested만.
+ *                         (WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1)
  */
 
 import { Router } from 'express';
@@ -126,6 +128,34 @@ export function createSupplierStoreDescriptionController(dataSource: DataSource)
       }
       logger.error('[supplier-store-description] save failed:', error);
       res.status(500).json({ success: false, error: '설명서 저장에 실패했습니다', code: 'STORE_DESC_SAVE_FAILED' });
+    }
+  });
+
+  // DELETE /store-descriptions/:id — 공급자 본인 작업행 철회(soft delete). ACTIVE 공급자만.
+  //   WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 소유권=created_by_supplier_id, 허용 상태=draft/needs_review/revision_requested.
+  //   canonical/hidden/deprecated 는 철회 불가(운영자 승인 이력·공개 설명서 보존). 기존 softDelete 재사용(스키마/직접 DB write 없음).
+  router.delete('/store-descriptions/:id', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const id = typeof req.params.id === 'string' ? req.params.id.trim() : '';
+      if (!id) {
+        res.status(400).json({ success: false, error: '설명서 id가 필요합니다', code: 'ID_REQUIRED' });
+        return;
+      }
+      const result = await service.withdrawSupplierStoreDraft(id, supplierId);
+      if (result.ok) {
+        res.json({ success: true, data: { id: result.id, masterId: result.masterId, language: result.language, withdrawn: true } });
+        return;
+      }
+      if (result.reason === 'forbidden_status') {
+        res.status(409).json({ success: false, error: '검수 완료(매장 노출)·숨김·보관된 설명서는 철회할 수 없습니다', code: 'WITHDRAW_FORBIDDEN_STATUS' });
+        return;
+      }
+      // not_found: 미존재 / 이미 철회 / 타 공급자 소유 — 존재를 은닉하고 404.
+      res.status(404).json({ success: false, error: '철회할 설명서를 찾을 수 없습니다', code: 'STORE_DESC_NOT_FOUND' });
+    } catch (error) {
+      logger.error('[supplier-store-description] withdraw failed:', error);
+      res.status(500).json({ success: false, error: '설명서 철회에 실패했습니다', code: 'STORE_DESC_WITHDRAW_FAILED' });
     }
   });
 

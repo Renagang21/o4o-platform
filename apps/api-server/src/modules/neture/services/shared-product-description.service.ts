@@ -171,6 +171,19 @@ export interface SeedResult {
   };
 }
 
+/**
+ * WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1: 철회 결과(플랫 shape — 판별 유니온 대신 optional 필드).
+ *   ok=true 면 id/masterId/language/status 세팅, ok=false 면 reason(+forbidden 시 status).
+ */
+export interface WithdrawSupplierStoreDraftResult {
+  ok: boolean;
+  reason?: 'not_found' | 'forbidden_status';
+  id?: string;
+  masterId?: string;
+  language?: string | null;
+  status?: SharedProductDescriptionStatus;
+}
+
 export class SharedProductDescriptionService {
   private repo: Repository<SharedProductDescription>;
 
@@ -722,6 +735,39 @@ export class SharedProductDescriptionService {
   /** soft delete */
   async softDelete(id: string): Promise<void> {
     await this.repo.softDelete(id);
+  }
+
+  /**
+   * 공급자 본인 STORE 설명서 작업행 철회(soft delete) — WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1.
+   *   소유권: created_by_supplier_id === supplierId (+ source_type='supplier' AND description_type='STORE').
+   *   허용 상태: draft / needs_review / revision_requested (작업본만).
+   *   차단 상태: canonical / hidden / deprecated / candidate — 운영자 승인 이력·공개(canonical) 설명서 보존.
+   *   기존 softDelete(deleted_at, @DeleteDateColumn) 재사용 — 물리삭제 아님. 철회 행은
+   *   listSupplierStoreDrafts·upsertSupplierStoreDraft·운영자 검수 큐(전부 deleted_at IS NULL)에서 자동 비노출.
+   *   ProductMaster·offer·다른 언어/공급자 행은 건드리지 않는다(단일 id soft-delete).
+   *
+   *   findOne 은 기본적으로 deleted_at IS NULL 행만 반환 → 이미 철회된 행 재철회 시 not_found.
+   */
+  async withdrawSupplierStoreDraft(
+    id: string,
+    supplierId: string,
+  ): Promise<WithdrawSupplierStoreDraftResult> {
+    const WITHDRAWABLE: SharedProductDescriptionStatus[] = ['draft', 'needs_review', 'revision_requested'];
+    const entity = await this.repo.findOne({ where: { id } });
+    // 미존재 / 이미 철회(soft-deleted) / 타 공급자 / 비-STORE / 비-supplier 작업행이면 존재 은닉 → not_found.
+    if (
+      !entity ||
+      entity.descriptionType !== 'STORE' ||
+      entity.sourceType !== 'supplier' ||
+      entity.createdBySupplierId !== supplierId
+    ) {
+      return { ok: false, reason: 'not_found' };
+    }
+    if (!WITHDRAWABLE.includes(entity.status)) {
+      return { ok: false, reason: 'forbidden_status', status: entity.status };
+    }
+    await this.repo.softDelete(id);
+    return { ok: true, id: entity.id, masterId: entity.masterId, language: entity.language, status: entity.status };
   }
 
   // ──────────────────────────────────────────────────────────────────────────

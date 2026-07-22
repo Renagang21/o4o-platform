@@ -65,4 +65,13 @@ export const supplierStoreDescriptionApi = {
     const res = await api.post(BASE, input);
     return res.data?.data;
   },
+
+  /**
+   * 철회(soft delete) — WO-O4O-SUPPLIER-STORE-DESCRIPTION-WITHDRAW-V1.
+   * 본인 소유·draft/needs_review/revision_requested 작업행만. canonical/hidden/deprecated 는 409.
+   */
+  async withdraw(id: string): Promise<{ id: string; masterId: string; language: string | null; withdrawn: boolean }> {
+    const res = await api.delete(`${BASE}/${encodeURIComponent(id)}`);
+    return res.data?.data;
+  },
 };
