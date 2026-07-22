@@ -49,6 +49,13 @@ interface StepOutcome {
   report: any | null;      // 정본 runner report (수집 실패 시 null)
   reportSource: 'stdout' | 'file' | 'none';
   stdoutTail?: string;
+  timedOut?: boolean;      // child timeout 으로 트리 종료됨(연결 정리)
+}
+
+/** report 수집 실패 시 disposition — timeout(그룹 격리 continue) vs 계약 불일치(전체 abort). */
+function noReportDisposition(o: StepOutcome, kindLabel: string): { disposition: Disposition; reason: string } {
+  if (o.timedOut) return { disposition: 'continue', reason: `${kindLabel} child timeout(트리 종료·연결 정리)` };
+  return { disposition: 'abort', reason: `runner 계약 불일치(${kindLabel} report 수집 실패)` };
 }
 
 /** 그룹 1건 실행 결과. */
@@ -140,27 +147,45 @@ function extractRunFile(text: string): string | null {
   return m ? m[1] : null;
 }
 
-const spawnExec: StepExec = ({ kind, groupKey, apply }) => new Promise((resolve) => {
-  const script = kind === 'ko' ? KO_RUNNER : EN_RUNNER;
-  const args = ['tsx', script, `--group=${groupKey}`];
-  if (apply) args.push('--apply');
-  const env = { ...process.env } as Record<string, string>;
-  if (apply) env[kind === 'ko' ? KO_CONFIRM : EN_CONFIRM] = 'YES';
-  const child = spawn('npx', args, { cwd: process.cwd(), env, shell: process.platform === 'win32' });
-  let out = '', err = '';
-  child.stdout.on('data', (d) => { out += d.toString(); });
-  child.stderr.on('data', (d) => { err += d.toString(); });
-  child.on('close', (code) => {
-    const combined = out + '\n' + err;
-    let report = extractJson(out);
-    let source: StepOutcome['reportSource'] = report ? 'stdout' : 'none';
-    if (!report) {
-      const f = extractRunFile(combined);
-      if (f) { try { report = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf8')); source = 'file'; } catch { /* keep null */ } }
-    }
-    resolve({ kind, phase: apply ? 'apply' : 'dry-run', exitCode: code ?? -1, report, reportSource: source, stdoutTail: combined.slice(-1200) });
+/** 자식 프로세스 트리 종료(연결 정리) — 죽은 자식이 DataSource destroy 미도달로 연결 누수하는 것 방지. */
+function killTree(pid: number | undefined): void {
+  if (!pid) return;
+  try {
+    if (process.platform === 'win32') spawn('taskkill', ['/pid', String(pid), '/T', '/F'], { stdio: 'ignore' });
+    else { try { process.kill(-pid, 'SIGKILL'); } catch { try { process.kill(pid, 'SIGKILL'); } catch { /* gone */ } } }
+  } catch { /* best-effort */ }
+}
+
+/** spawn 실행기 factory — 외부 config 전파 + child timeout 트리 종료. (long-run 확장) */
+function makeSpawnExec(opts: { configPath?: string; timeoutMs: number }): StepExec {
+  return ({ kind, groupKey, apply }) => new Promise((resolve) => {
+    const script = kind === 'ko' ? KO_RUNNER : EN_RUNNER;
+    const args = ['tsx', script, `--group=${groupKey}`];
+    if (opts.configPath) args.push(`--config=${opts.configPath}`);
+    if (apply) args.push('--apply');
+    const env = { ...process.env } as Record<string, string>;
+    if (apply) env[kind === 'ko' ? KO_CONFIRM : EN_CONFIRM] = 'YES';
+    // POSIX 는 detached 로 프로세스 그룹 구성(그룹 kill 가능). Windows 는 shell+taskkill /T.
+    const child = spawn('npx', args, { cwd: process.cwd(), env, shell: process.platform === 'win32', detached: process.platform !== 'win32' });
+    let out = '', err = '', timedOut = false, done = false;
+    const timer = setTimeout(() => { timedOut = true; killTree(child.pid); }, opts.timeoutMs);
+    child.stdout.on('data', (d) => { out += d.toString(); });
+    child.stderr.on('data', (d) => { err += d.toString(); });
+    const finish = (code: number | null) => {
+      if (done) return; done = true; clearTimeout(timer);
+      const combined = out + '\n' + err + (timedOut ? '\nCHILD_TIMEOUT tree-killed' : '');
+      let report = extractJson(out);
+      let source: StepOutcome['reportSource'] = report ? 'stdout' : 'none';
+      if (!report && !timedOut) {
+        const f = extractRunFile(combined);
+        if (f) { try { report = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf8')); source = 'file'; } catch { /* keep null */ } }
+      }
+      resolve({ kind, phase: apply ? 'apply' : 'dry-run', exitCode: code ?? -1, report, reportSource: source, stdoutTail: combined.slice(-1200), timedOut });
+    };
+    child.on('close', finish);
+    child.on('error', () => finish(-1));
   });
-});
+}
 
 // ── bundle 실행 ──────────────────────────────────────────────────────────────
 interface BundleConfig { bundleKey: string; writeOwner: string; groups: string[] }
@@ -202,8 +227,10 @@ async function runBundle(cfg: BundleConfig, opts: { apply: boolean; exec: StepEx
     // ── ko: dry-run → (apply) ────────────────────────────────────────────
     const koDry = await opts.exec({ kind: 'ko', groupKey, apply: false });
     if (!koDry.report) {
-      g.status = 'FAILED'; g.disposition = 'abort'; g.reason = 'runner 계약 불일치(ko report 수집 실패)';
-      summary.groups.push(g); summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break;
+      const nr = noReportDisposition(koDry, 'ko'); g.status = 'FAILED'; g.disposition = nr.disposition; g.reason = nr.reason;
+      summary.groups.push(g);
+      if (nr.disposition === 'abort') { summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break; }
+      continue;
     }
     g.target = koDry.report.target ?? null; g.excluded = koDry.report.excluded ?? null; g.otherFp = koDry.report.otherFp ?? null;
     g.anomalies.push(...(koDry.report.anomalies ?? []));
@@ -221,8 +248,10 @@ async function runBundle(cfg: BundleConfig, opts: { apply: boolean; exec: StepEx
     if (opts.apply && koStatus === 'READY') {
       const koApply = await opts.exec({ kind: 'ko', groupKey, apply: true });
       if (!koApply.report) {
-        g.status = 'FAILED'; g.disposition = 'abort'; g.reason = 'runner 계약 불일치(ko apply report 수집 실패)';
-        summary.groups.push(g); summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break;
+        const nr = noReportDisposition(koApply, 'ko apply'); g.status = 'FAILED'; g.disposition = nr.disposition; g.reason = nr.reason;
+        summary.groups.push(g);
+        if (nr.disposition === 'abort') { summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break; }
+        continue;
       }
       koStatus = mapStatus('ko', koApply.report);
       g.koWriteActual = koActual(koApply.report);
@@ -254,8 +283,10 @@ async function runBundle(cfg: BundleConfig, opts: { apply: boolean; exec: StepEx
     // ── en: dry-run → (apply) ────────────────────────────────────────────
     const enDry = await opts.exec({ kind: 'en', groupKey, apply: false });
     if (!enDry.report) {
-      g.status = 'FAILED'; g.disposition = 'abort'; g.reason = 'runner 계약 불일치(en report 수집 실패)';
-      summary.groups.push(g); summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break;
+      const nr = noReportDisposition(enDry, 'en'); g.status = 'FAILED'; g.disposition = nr.disposition; g.reason = nr.reason;
+      summary.groups.push(g);
+      if (nr.disposition === 'abort') { summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break; }
+      continue;
     }
     g.anomalies.push(...(enDry.report.anomalies ?? []));
     g.enWritePlan = enPlan(enDry.report);
@@ -272,8 +303,10 @@ async function runBundle(cfg: BundleConfig, opts: { apply: boolean; exec: StepEx
     if (opts.apply && enStatus === 'READY') {
       const enApply = await opts.exec({ kind: 'en', groupKey, apply: true });
       if (!enApply.report) {
-        g.status = 'FAILED'; g.disposition = 'abort'; g.reason = 'runner 계약 불일치(en apply report 수집 실패)';
-        summary.groups.push(g); summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break;
+        const nr = noReportDisposition(enApply, 'en apply'); g.status = 'FAILED'; g.disposition = nr.disposition; g.reason = nr.reason;
+        summary.groups.push(g);
+        if (nr.disposition === 'abort') { summary.bundleStatus = 'ABORTED'; summary.abortedAt = groupKey; summary.abortReason = g.reason; break; }
+        continue;
       }
       enStatus = mapStatus('en', enApply.report);
       g.enWriteActual = enActual(enApply.report);
@@ -423,8 +456,30 @@ async function selfTest(): Promise<void> {
     eq('S7 continue/fp', classifyFailure('SSOT 미분류 fingerprint 3').disposition, 'continue');
     eq('S7 unknown→abort', classifyFailure('완전히 새로운 알 수 없는 오류').disposition, 'abort');
 
+    // S8. child timeout: 그룹 격리(FAILED continue) — 다음 그룹 진행, bundle 은 계속(PARTIAL)
+    const timeoutFirst: StepExec = async ({ kind, groupKey, apply }) => {
+      if (kind === 'ko' && groupKey === 'a') return { kind, phase: 'dry-run', exitCode: -1, report: null, reportSource: 'none', stdoutTail: 'CHILD_TIMEOUT tree-killed', timedOut: true };
+      return outcome(kind, apply, kind === 'ko' ? koReport({ status: 'ALREADY_UPGRADED' }) : enReportF({ status: 'ALREADY_COMPLETE' }));
+    };
+    const s8 = await runBundle(cfg(G3), { apply: true, exec: timeoutFirst });
+    eq('S8 a=FAILED', s8.groups[0].status, 'FAILED');
+    eq('S8 a disposition continue', s8.groups[0].disposition, 'continue');
+    eq('S8 a reason timeout', /child timeout/.test(s8.groups[0].reason || ''), true);
+    eq('S8 bundle PARTIAL(중단 아님)', s8.bundleStatus, 'PARTIAL');
+    eq('S8 b·c 진행', [s8.groups[1].status, s8.groups[2].status], ['ALREADY_COMPLETE', 'ALREADY_COMPLETE']);
+    // S8b. report-null 이 timeout 아니면 여전히 abort(계약 불일치)
+    const nrAbort: StepExec = async ({ kind, apply }) => ({ kind, phase: apply ? 'apply' : 'dry-run', exitCode: 2, report: null, reportSource: 'none', stdoutTail: 'FATAL unparseable garbage' });
+    const s8b = await runBundle(cfg(G3), { apply: true, exec: nrAbort });
+    eq('S8b abort', s8b.bundleStatus, 'ABORTED');
+    eq('S8b reason 계약', /계약 불일치/.test(s8b.abortReason || ''), true);
+
+    // S9. mock 병렬 실행 — 3 bundle 동시(Promise.all) 결정론·상호 독립
+    const par = await Promise.all([0, 1, 2].map(() => runBundle(cfg(G3), { apply: true, exec: allDone })));
+    eq('S9 병렬 3개 전부 NO_OP', par.map((r) => r.bundleStatus), ['NO_OP', 'NO_OP', 'NO_OP']);
+    eq('S9 병렬 결과 동일(결정론)', JSON.stringify(par[0]), JSON.stringify(par[2]));
+
     if (fails.length) { console.error('SELFTEST FAIL\n  ' + fails.join('\n  ')); process.exit(1); }
-    console.log('SELFTEST PASS (29건) — no-op 집계 · HOLD 후 계속 · 공통장애 중단 · 계약불일치 중단 · write 4T/2T/6T · 결정론 · ko실패시 en미실행 · 실패분류(연결슬롯 포함). DB 미접속·자식프로세스 미기동.');
+    console.log('SELFTEST PASS (36건) — no-op 집계 · HOLD 후 계속 · 공통장애 중단 · 계약불일치 중단 · write 4T/2T/6T · 결정론 · ko실패시 en미실행 · 실패분류(연결슬롯) · child timeout 격리continue · mock 병렬. DB 미접속·자식프로세스 미기동.');
   }
 }
 
@@ -435,18 +490,28 @@ async function main(): Promise<void> {
 
   const bundleArg = (argv.find((a) => a.startsWith('--bundle=')) || '').split('=')[1];
   const groupsArg = (argv.find((a) => a.startsWith('--groups=')) || '').split('=')[1];
+  // (long-run 확장) 외부 batch config JSON: { bundleKey, writeOwner, order:[...], ko:{...}, en:{...} }.
+  //   registry 미수정 실행 — 자식 runner 에도 --config 전파.
+  const configArg = (argv.find((a) => a.startsWith('--config=')) || '').split('=')[1];
+  const timeoutArg = (argv.find((a) => a.startsWith('--timeout=')) || '').split('=')[1];
+  const timeoutMs = Math.max(30, parseInt(timeoutArg || '150', 10)) * 1000; // 자식 단계 timeout, 기본 150s
+
   let cfg: BundleConfig | null = null;
-  if (bundleArg && BUNDLE_REGISTRY[bundleArg]) cfg = BUNDLE_REGISTRY[bundleArg];
+  if (configArg) {
+    const j = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), configArg), 'utf8'));
+    const order: string[] = j.order ?? Object.keys(j.ko ?? j.groups ?? {});
+    cfg = { bundleKey: j.bundleKey || `config-${order.length}g`, writeOwner: j.writeOwner || 'agent-da', groups: order };
+  } else if (bundleArg && BUNDLE_REGISTRY[bundleArg]) cfg = BUNDLE_REGISTRY[bundleArg];
   else if (groupsArg) cfg = { bundleKey: `adhoc-${groupsArg.split(',').length}g`, writeOwner: process.env.DRUG_OTC_BUNDLE_OWNER || 'agent-da', groups: groupsArg.split(',').map((s) => s.trim()).filter(Boolean) };
   if (!cfg || cfg.groups.length === 0) {
-    console.error(`--bundle=<key> 또는 --groups=k1,k2 필요. 등록 bundle: ${Object.keys(BUNDLE_REGISTRY).join(', ')}\n(비DB 검증: --selftest)`);
+    console.error(`--config=<path> | --bundle=<key> | --groups=k1,k2 필요. 등록 bundle: ${Object.keys(BUNDLE_REGISTRY).join(', ')}\n(비DB 검증: --selftest)`);
     process.exit(2);
   }
 
   const apply = argv.includes('--apply') && process.env.DRUG_OTC_BUNDLE_CONFIRM === 'YES';
-  console.log(`[bundle ${apply ? 'APPLY' : 'dry-run'}] ${cfg.bundleKey} · owner=${cfg.writeOwner} · ${cfg.groups.length}그룹 순서: ${cfg.groups.join(' → ')}`);
+  console.log(`[bundle ${apply ? 'APPLY' : 'dry-run'}] ${cfg.bundleKey} · owner=${cfg.writeOwner} · ${cfg.groups.length}그룹 · child timeout ${timeoutMs / 1000}s · 순서: ${cfg.groups.join(' → ')}`);
 
-  const summary = await runBundle(cfg, { apply, exec: spawnExec });
+  const summary = await runBundle(cfg, { apply, exec: makeSpawnExec({ configPath: configArg, timeoutMs }) });
   fs.writeFileSync(path.join(DATA_DIR, `otc-ko-en-bundle-${cfg.bundleKey}.summary.json`), JSON.stringify(summary, null, 2), 'utf8');
   console.log(JSON.stringify(summary, null, 2));
   console.log(`\n[bundle] ${cfg.bundleKey} status=${summary.bundleStatus} · 그룹 ${JSON.stringify(summary.statusCounts)} · write plan ${summary.totals.planTotal} / actual ${summary.totals.actualTotal}`);

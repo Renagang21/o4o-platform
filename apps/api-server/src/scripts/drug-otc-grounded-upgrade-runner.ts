@@ -772,7 +772,7 @@ async function runGroundedUpgrade(cfg: GroupUpgradeConfig, opts: { apply: boolea
   };
 
   const { DataSource } = await import('typeorm');
-  const ds = new DataSource({ type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5442', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 120000 } });
+  const ds = new DataSource({ type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5442', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 120000, max: 2 } });
   await ds.initialize();
 
   try {
@@ -1012,16 +1012,30 @@ function selfTest(): void {
   console.log(`SELFTEST PASS (${8 + 5 + 1}건) — retRows/firstRow · fingerprint 결정성·route/form · classifyByFingerprint 게이트·이상탐지. DB 미접속.`);
 }
 
+/**
+ * (long-run 확장) 외부 batch config JSON 로 GROUP_REGISTRY 미수정 실행 지원.
+ *   `--config=<path>` 의 JSON `.ko`(또는 `.groups`) 맵을 built-in registry 위에 병합(외부 우선).
+ *   fingerprint 산식·승격 정책은 불변 — 그룹 파라미터(candidate/fp/expected 등)만 외부 주입.
+ */
+function loadExternalGroups(configPath: string): Record<string, GroupUpgradeConfig> {
+  const j = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), configPath), 'utf8'));
+  const map = (j.ko ?? j.groups ?? {}) as Record<string, GroupUpgradeConfig>;
+  if (!map || typeof map !== 'object') throw new Error(`config ${configPath}: .ko/.groups 맵 없음`);
+  return map;
+}
+
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   if (argv.includes('--selftest')) { selfTest(); return; }
 
+  const configArg = (argv.find((a) => a.startsWith('--config=')) || '').split('=')[1];
+  const registry = configArg ? { ...GROUP_REGISTRY, ...loadExternalGroups(configArg) } : GROUP_REGISTRY;
   const groupArg = (argv.find((a) => a.startsWith('--group=')) || '').split('=')[1];
-  if (!groupArg || !GROUP_REGISTRY[groupArg]) {
-    console.error(`--group=<key> 필요. 등록된 그룹: ${Object.keys(GROUP_REGISTRY).join(', ')}\n(비DB 검증: --selftest)`);
+  if (!groupArg || !registry[groupArg]) {
+    console.error(`--group=<key> 필요. 등록된 그룹: ${Object.keys(registry).join(', ')}\n(외부 config: --config=<path>, 비DB 검증: --selftest)`);
     process.exit(2);
   }
-  const cfg = GROUP_REGISTRY[groupArg];
+  const cfg = registry[groupArg];
   const apply = argv.includes('--apply') && process.env.DRUG_OTC_GROUNDED_UPGRADE_CONFIRM === 'YES';
   const mode = apply ? 'APPLY' : 'dry-run';
 

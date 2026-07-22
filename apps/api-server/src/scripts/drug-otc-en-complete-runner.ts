@@ -433,7 +433,7 @@ async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): P
   };
 
   const { DataSource } = await import('typeorm');
-  const ds = new DataSource({ type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5442', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 120000 } });
+  const ds = new DataSource({ type: 'postgres', host: process.env.DB_HOST, port: parseInt(process.env.DB_PORT || '5442', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 120000, max: 2 } });
   await ds.initialize();
   try {
     if (masterIds.length !== EXPECTED) report.anomalies.push(`target master ${masterIds.length} !== ${EXPECTED}`);
@@ -571,14 +571,28 @@ async function runEnComplete(cfg: EnCompleteConfig, opts: { apply: boolean }): P
   return report;
 }
 
+/**
+ * (long-run 확장) 외부 batch config JSON 로 EN_REGISTRY 미수정 실행 지원.
+ *   `--config=<path>` 의 JSON `.en`(또는 `.groups`) 맵을 built-in registry 위에 병합(외부 우선).
+ *   번역 스코프 규칙(master_id 정본·byte-identical 게이트)은 불변 — 그룹 파라미터만 외부 주입.
+ */
+function loadExternalEnGroups(configPath: string): Record<string, EnCompleteConfig> {
+  const j = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), configPath), 'utf8'));
+  const map = (j.en ?? j.groups ?? {}) as Record<string, EnCompleteConfig>;
+  if (!map || typeof map !== 'object') throw new Error(`config ${configPath}: .en/.groups 맵 없음`);
+  return map;
+}
+
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
+  const configArg = (argv.find((a) => a.startsWith('--config=')) || '').split('=')[1];
+  const registry = configArg ? { ...EN_REGISTRY, ...loadExternalEnGroups(configArg) } : EN_REGISTRY;
   const groupArg = (argv.find((a) => a.startsWith('--group=')) || '').split('=')[1];
-  if (!groupArg || !EN_REGISTRY[groupArg]) {
-    console.error(`--group=<key> 필요. 등록: ${Object.keys(EN_REGISTRY).join(', ')}`);
+  if (!groupArg || !registry[groupArg]) {
+    console.error(`--group=<key> 필요. 등록: ${Object.keys(registry).join(', ')}\n(외부 config: --config=<path>)`);
     process.exit(2);
   }
-  const cfg = EN_REGISTRY[groupArg];
+  const cfg = registry[groupArg];
   const apply = argv.includes('--apply') && process.env.DRUG_OTC_EN_COMPLETE_CONFIRM === 'YES';
   const report = await runEnComplete(cfg, { apply });
   console.log(JSON.stringify(report, null, 2));

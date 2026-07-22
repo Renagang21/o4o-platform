@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-LONG-RUN-PRODUCTION-READINESS-DA-V1 — 외부 batch config 예시(템플릿). GROUP_REGISTRY·EN_REGISTRY 미수정 실행용. 사용: bundle --config=<이 파일> [--apply] | 개별 runner --group=<key> --config=<이 파일>. order 순서대로 ko→en 완결. ko/en 맵 key 는 groupKey 별칭(레지스트리와 겹치지 않아도 됨). 아래는 이미 완료된 3그룹(재실행 no-op 회귀용) — 실제 신규 배치는 나 감사 fp 값으로 교체.",
+  "bundleKey": "example-completed-regression",
+  "writeOwner": "agent-da",
+  "order": ["ex-trimebutine-100", "ex-bacillus-250", "ex-diosmin-300"],
+  "ko": {
+    "ex-trimebutine-100": {
+      "key": "트리메부틴말레산염|100밀리그램|정",
+      "ingredient": "트리메부틴말레산염", "dose": "100밀리그램", "formKeyword": "정",
+      "candidate": "003beef8-82c4-4897-a176-d0ea8a695699",
+      "targetFp": "7a4aab0b31b1ed19",
+      "excludeFp": ["1ca482b8150f601b", "388fc082fcc5203c", "306ce8c4a6793871", "c9c0d242a5e4a273", "0e81c56580ba2501", "4b629892ee85ba89", "ab9bf22ae1e54918", "4d59ddd48b0e1102", "890ef511d4d823e8", "8567020910ac8454", "f276b94cff37e58f"],
+      "expected": 66, "excludedExpected": 61,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-trimebutine-100mg-jeong"
+    },
+    "ex-bacillus-250": {
+      "key": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "ingredient": "바실루스리케니포르미스균", "dose": "250밀리그램", "formKeyword": "캡슐",
+      "candidate": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+      "targetFp": "13208b062a9c8c79",
+      "excludeFp": ["085e66182ccb8459", "14860d74206f81f7", "7ed92e6bd2891a28", "a024d7fa8eaabc06", "b97a4eb486a66e60", "273d81582c3dcd4e", "8f001c52affcd167"],
+      "expected": 56, "excludedExpected": 32,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-bacillus-liche-250mg-capsule"
+    },
+    "ex-diosmin-300": {
+      "key": "디오스민|300밀리그램|캡슐",
+      "ingredient": "디오스민", "dose": "300밀리그램", "formKeyword": "캡슐",
+      "candidate": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+      "targetFp": "e0a551d8020daa5c",
+      "excludeFp": ["21bd2e89cb9d1b1b", "2c027163aef221c8"],
+      "expected": 38, "excludedExpected": 7,
+      "authoredSource": "mfds_drug_otc",
+      "outBase": "otc-grounded-upgrade-diosmin-300mg-capsule"
+    }
+  },
+  "en": {
+    "ex-trimebutine-100": {
+      "key": "트리메부틴말레산염|100밀리그램|정",
+      "candidate": "003beef8-82c4-4897-a176-d0ea8a695699",
+      "sourceType": "mfds_drug_otc", "expected": 66,
+      "koRunBase": "otc-grounded-upgrade-trimebutine-100mg-jeong",
+      "translationFile": "otc-en-translations-trimebutine-100mg-v1.json",
+      "outBase": "otc-en-complete-trimebutine-100mg"
+    },
+    "ex-bacillus-250": {
+      "key": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "candidate": "022f4af0-1219-428b-bd69-fa39a5e7fe7f",
+      "sourceType": "mfds_drug_otc", "expected": 56,
+      "koRunBase": "otc-grounded-upgrade-bacillus-liche-250mg-capsule",
+      "translationFile": "otc-en-translations-bacillus-liche-250mg-v1.json",
+      "outBase": "otc-en-complete-bacillus-liche-250mg"
+    },
+    "ex-diosmin-300": {
+      "key": "디오스민|300밀리그램|캡슐",
+      "candidate": "05be62a5-89dc-4f20-95f9-cb6187f5ab35",
+      "sourceType": "mfds_drug_otc", "expected": 38,
+      "koRunBase": "otc-grounded-upgrade-diosmin-300mg-capsule",
+      "translationFile": "otc-en-translations-diosmin-300mg-v1.json",
+      "outBase": "otc-en-complete-diosmin-300mg"
+    }
+  }
+}
