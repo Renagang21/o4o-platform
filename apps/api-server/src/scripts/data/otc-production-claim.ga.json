@@ -1,0 +1,12 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-MULTI-EFFECT-EN-3H-PILOT-GA-V1 — 에이전트 가 claim 파일. 자기 소유 1개만. path-specific commit. 타 claim/config 미접촉. NUTRITION_COMBO_EN_ONLY 다효능 병렬 보존 계약(합성 금지) 대상, 비상호작용·비대형(<500) READY_PARALLEL_PRESERVE 그룹.",
+  "schemaVersion": 1,
+  "owner": "agent-ga",
+  "round": "production-10h-2026-07-22",
+  "track": "NUTRITION_COMBO_EN_ONLY",
+  "claims": [
+    { "groupKey": "벤포벨브이|정제(combo)", "sourceRef": "fcf616ee-339e-489f-9672-a431489fb1ac", "sourceType": "mfds_drug_otc_nutrition_combo", "track": "NUTRITION_COMBO_EN_ONLY", "masters": 4, "op": "EN_ONLY", "status": "CLAIMED" },
+    { "groupKey": "셀레트론플러스|연질캡슐(combo)", "sourceRef": "5a342fe9-1cdf-49c1-863d-84654d433720", "sourceType": "mfds_drug_otc_nutrition_combo", "track": "NUTRITION_COMBO_EN_ONLY", "masters": 5, "op": "EN_ONLY", "status": "CLAIMED" },
+    { "groupKey": "눈모아|연질캡슐(combo)", "sourceRef": "270a10a2-70a3-4a04-a370-9b5316c4a0b4", "sourceType": "mfds_drug_otc_nutrition_combo", "track": "NUTRITION_COMBO_EN_ONLY", "masters": 21, "op": "EN_ONLY", "status": "CLAIMED" }
+  ]
+}
