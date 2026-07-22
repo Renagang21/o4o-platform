@@ -119,6 +119,8 @@ import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
 import ForumHubPage from './pages/forum/ForumHubPage';
+// WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: 일반 회원 포럼 개설 신청 진입
+import ForumRequestPage from './pages/forum/ForumRequestPage';
 
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
@@ -185,6 +187,10 @@ const SupplierB2BContentPage = lazy(() =>
 // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
 const SupplierStoreDescriptionsPage = lazy(() =>
   import('./pages/supplier/SupplierStoreDescriptionsPage').then((m) => ({ default: m.default }))
+);
+// WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C: 공급자 매장용 타블렛 Screen Set 제작·게시
+const SupplierTabletScreenSetsPage = lazy(() =>
+  import('./pages/supplier/SupplierTabletScreenSetsPage').then((m) => ({ default: m.default }))
 );
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() =>
@@ -693,6 +699,8 @@ function App() {
 
               {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
               <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />
+              {/* WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: 개설 신청 (공통 폼, 일반 로그인 회원) */}
+              <Route path="/forum/request" element={<ForumRequestPage />} />
               <Route path="/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
@@ -803,6 +811,8 @@ function App() {
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
               {/* WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1 */}
               <Route path="/supplier/store-descriptions" element={<SupplierStoreDescriptionsPage />} />
+              {/* WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C */}
+              <Route path="/supplier/tablet-screen-sets" element={<SupplierTabletScreenSetsPage />} />
               {/* WO-O4O-SUPPLIER-MYPAGE-PROFILE-REDIRECT-V1: /mypage/business-profile로 통합 */}
               <Route path="/supplier/profile" element={<Navigate to="/mypage/business-profile" replace />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 + WO-MARKET-TRIAL-SUPPLIER-RESULTS-AND-FEEDBACK-V1 */}

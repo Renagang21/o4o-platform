@@ -7,7 +7,8 @@
  * basePath prop 으로 /forum, /workspace/forum 동일 컴포넌트 재사용.
  */
 
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ForumHubTemplate,
   type ForumHubConfig,
@@ -55,6 +56,43 @@ function mapCategory(raw: ForumCategory): ForumHubCategory {
   };
 }
 
+// WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1:
+// Hero 헤더 개설신청 버튼 (auth-aware) — 비로그인 시 로그인 후 /forum/request 복귀.
+const requestBtnStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '10px 18px',
+  backgroundColor: '#059669',
+  color: '#ffffff',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  borderRadius: 8,
+  border: 'none',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+  textDecoration: 'none',
+};
+
+function ForumRequestButton() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/forum/request' } });
+    } else {
+      navigate('/forum/request');
+    }
+  };
+
+  return (
+    <button onClick={handleClick} style={requestBtnStyle}>
+      + 포럼 개설신청
+    </button>
+  );
+}
+
 function mapPost(raw: ForumPost): ForumHubPost {
   return {
     id: raw.id,
@@ -97,7 +135,11 @@ export default function ForumHubPage({
 
     writePrompt: { ctaPath: `${basePath}/posts` },
 
+    // WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: Hero 우측 개설신청 CTA
+    headerAction: <ForumRequestButton />,
+
     infoLinks: [
+      { label: '포럼 개설 신청', href: '/forum/request' },
       { label: '인기 글', href: `${basePath}/posts?sort=popular` },
       { label: '공지사항', href: `${basePath}/posts?type=announcement` },
     ],
