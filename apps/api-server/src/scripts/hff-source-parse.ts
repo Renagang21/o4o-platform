@@ -119,7 +119,7 @@ export function splitFunctions(mainFn: string): string[] {
   return [...new Set(t.split(new RegExp(
     SENT + '|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\\((?:가|나|다|라|마|바|사|\\d+)\\)|(?:^|\\s)\\d+[).]|' +
     '(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\\s*[.,。、/]?\\s+(?=[가-힣])'))
-    .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
+    .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。,，、·\s]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
     .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x)))];
 }
 
@@ -138,7 +138,7 @@ export function parseFnAttribution(mainFn: string): FnParse {
   const pushFns = (k: string, seg: string): void => {
     // 구분자: 원문자 · 번호 · 슬래시(`A 필요 / B 필요`) · 열거 쉼표
     const fns = seg.split(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|(?:^|\s)\d+[).]\s*|\s*\/\s*|,\s*(?=[가-힣].{0,40}(?:필요|도움|유지|보호))/)
-      .map((x) => x.trim().replace(/^[-•*\s:：·]+/, '').replace(/[.。]+$/, '').trim())
+      .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。,，、·\s]+$/, '').trim())
       .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x));
     if (fns.length) byKey.set(k, [...(byKey.get(k) ?? []), ...fns]);
   };

@@ -52,7 +52,11 @@ async function main(): Promise<void> {
   const stmts = items.map((it) => String((it as unknown as { statementNo: string }).statementNo).trim());
   if (new Set(stmts).size !== EXPECT) throw new Error(`신고번호 중복(파일): 유일 ${new Set(stmts).size}/${EXPECT}`);
 
-  const ds = new DataSource({ type: 'postgres', host: PROXY_HOST, port: PROXY_PORT, username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 3, connectionTimeoutMillis: 15000, query_timeout: 120000, statement_timeout: 120000 } });
+  // 타임아웃 env override(기본 120000 불변) — 프로덕션 DB 고부하(동시 product_candidates 전량 스캔) 시
+  // preload SELECT 가 120s 초과하는 경우에만 상향. 락 보유 구간은 UPDATE 이후로 짧아 read 타임아웃 상향은 안전.
+  const QTO = parseInt(process.env.HFF_QUERY_TIMEOUT ?? '120000', 10);
+  const STO = parseInt(process.env.HFF_STMT_TIMEOUT ?? '120000', 10);
+  const ds = new DataSource({ type: 'postgres', host: PROXY_HOST, port: PROXY_PORT, username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 3, connectionTimeoutMillis: 15000, query_timeout: QTO, statement_timeout: STO } });
   await ds.initialize();
   const qr = ds.createQueryRunner(); await qr.connect(); await qr.startTransaction();
   const checks: Record<string, number | string> = {};

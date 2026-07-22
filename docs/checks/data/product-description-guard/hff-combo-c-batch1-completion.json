@@ -1,0 +1,188 @@
+{
+ "wo": "Agent C — 건강기능식품 완결형 생산 1차 배치 (관절·눈·항산화 복합)",
+ "start": "2026-07-22 10:21:54 +0900",
+ "end": "2026-07-22 11:21:43 +0900",
+ "elapsedMin": 60,
+ "readOnly": false,
+ "mode": "조사→KO/EN 설명서→디자인→DB canonical 반영 완결",
+ "baseline": {
+  "comboLive": 605,
+  "inventoryCommit": "1ee2d3fcb",
+  "parserHardeningCommit": "6a2769045",
+  "agentBParserFix": "09d5e50c3"
+ },
+ "source": "file JSONL G:/…/mfds-health-functional-food-info-raw.jsonl (44,885)",
+ "pipeline": "hff-combo-select(--source file) → hff-combo-c-dedup-probe(DB) → hff-combo-generate → hff-combo-c5-audit(은닉감사) → hff-combo-c-categorize → hff-nutrient-store-canonical-apply(dry-run→apply)",
+ "groupsInvestigated": 10,
+ "drop": {
+  "group": "비타민E+코엔자임Q10",
+  "reason": "ELIGIBLE 15 전량 기제작 LIVE 흡수(dedup)"
+ },
+ "funnel": {
+  "rawEligible": 214,
+  "dbDedupRemoved": 15,
+  "clean": 199,
+  "reviewLater": 5,
+  "READY": 194
+ },
+ "hiddenAudit": {
+  "H1": 0,
+  "H3": 0,
+  "liveDup": 0,
+  "note": "9그룹 전수 — 은닉 기능성 0, LIVE 중복 0 (Agent B 파서 안전망으로 omega3형 오염 재발 없음)"
+ },
+ "reviewLater": {
+  "count": 5,
+  "rule": "PRE-SRC-BASIS-UNVERIFIABLE-003(표시량 비율 원문 자동검증 실패)",
+  "items": [
+   {
+    "statementNo": "20040020010320",
+    "productName": "관절박사 M",
+    "group": "m1-msm-zn",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   },
+   {
+    "statementNo": "20040020010369",
+    "productName": "아이러브 엠에스엠",
+    "group": "m1-msm-zn",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   },
+   {
+    "statementNo": "20040020010376",
+    "productName": "케이 조인트엠",
+    "group": "m1-msm-zn",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   },
+   {
+    "statementNo": "2004001602084",
+    "productName": "비타민C레몬맛츄어블",
+    "group": "m6-vc-vd",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   },
+   {
+    "statementNo": "20040020001194",
+    "productName": "칼슘키즈",
+    "group": "m9-zn-ca",
+    "rules": [
+     "PRE-SRC-BASIS-UNVERIFIABLE-003"
+    ]
+   }
+  ]
+ },
+ "groups": [
+  {
+   "key": "m1-msm-zn",
+   "combo": "MSM+아연",
+   "eligibleClean": 11,
+   "reviewLater": 3,
+   "ready": 8
+  },
+  {
+   "key": "m2-msm-glu-vd",
+   "combo": "MSM+글루코사민+비타민D",
+   "eligibleClean": 27,
+   "reviewLater": 0,
+   "ready": 27
+  },
+  {
+   "key": "m3-msm-vd-zn",
+   "combo": "MSM+비타민D+아연",
+   "eligibleClean": 41,
+   "reviewLater": 0,
+   "ready": 41
+  },
+  {
+   "key": "m5-va-vd-ve",
+   "combo": "비타민A+비타민D+비타민E",
+   "eligibleClean": 9,
+   "reviewLater": 0,
+   "ready": 9
+  },
+  {
+   "key": "m6-vc-vd",
+   "combo": "비타민C+비타민D",
+   "eligibleClean": 48,
+   "reviewLater": 1,
+   "ready": 47
+  },
+  {
+   "key": "m7-vc-vd-zn",
+   "combo": "비타민C+비타민D+아연",
+   "eligibleClean": 34,
+   "reviewLater": 0,
+   "ready": 34
+  },
+  {
+   "key": "m8-zn-octa",
+   "combo": "아연+옥타코사놀",
+   "eligibleClean": 19,
+   "reviewLater": 0,
+   "ready": 19
+  },
+  {
+   "key": "m9-zn-ca",
+   "combo": "아연+칼슘",
+   "eligibleClean": 5,
+   "reviewLater": 1,
+   "ready": 4
+  },
+  {
+   "key": "m10-msm-glu",
+   "combo": "MSM+글루코사민",
+   "eligibleClean": 5,
+   "reviewLater": 0,
+   "ready": 5
+  }
+ ],
+ "write": {
+  "expectedTotal": 776,
+  "product_masters": 194,
+  "product_candidates_update": 194,
+  "spd_ko": 194,
+  "spd_en": 194,
+  "mode": "단일 트랜잭션 · 이중게이트 HFF_NUTRIENT_APPLY_CONFIRM=YES"
+ },
+ "dryRun": {
+  "postVerifyPass": true,
+  "canonicalDup": 0
+ },
+ "apply": {
+  "result": "COMMIT 완료",
+  "inTxnPostVerify": {
+   "masters": 194,
+   "spdKo": 194,
+   "spdEn": 194,
+   "canonicalDup": 0,
+   "candidatesLinked": 194,
+   "spdRefLinked": 388
+  }
+ },
+ "independentVerify": {
+  "masters": 194,
+  "spdKo": 194,
+  "spdEn": 194,
+  "canonicalDup": 0,
+  "candidatesLinked": 194,
+  "sourceHff": 388,
+  "pass": true
+ },
+ "existingLiveDrift": 0,
+ "canonicalDup": 0,
+ "comboLiveFinal": {
+  "before": 605,
+  "added": 194,
+  "after": 799
+ },
+ "throughputPerHour": 194,
+ "infraNote": "프로덕션 DB 고부하(동시 product_candidates 전량 스캔 9세션) + 공유 프록시(5442) 토큰 만료로 apply 2회 read-timeout/ECONNRESET 실패(둘 다 write 이전 preload 단계 → DB 무변경 검증). 신규 프록시(5455 fresh token) + 타임아웃 env override(HFF_QUERY_TIMEOUT/HFF_STMT_TIMEOUT, 기본 120000 불변)로 3회차 성공.",
+ "rollbackManifest": "scratchpad/hffc/manifests/hff-combo-c-batch1-apply-rollback-manifest.json (createdMasters 194 · createdSpd 388 · candIds 194 · snapshot 194)",
+ "parserNormalization": "hff-source-parse.ts functionsKo/En 말미 구두점(,，、·) strip — Agent B 선행 쉼표 strip과 대칭. 표시 전용·수량/귀속 불변(재select 카운트 199 동일 확인)."
+}
