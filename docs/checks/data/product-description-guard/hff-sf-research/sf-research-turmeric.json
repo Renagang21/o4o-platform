@@ -1,0 +1,38 @@
+{
+ "key": "강황",
+ "slug": "turmeric",
+ "series": "관절",
+ "counts": {
+  "total": 3,
+  "produced": 0,
+  "notTaken": 3,
+  "READY": 0,
+  "reviewLater": 0,
+  "enPending": 3,
+  "liquid": 0,
+  "bulk": 0,
+  "kidsWomen": 0,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [
+  "관절건강에 도움을 줄 수 있음",
+  "근력개선에 도움을 줄 수 있음",
+  "(국문) 근력개선에 도움을 줄 수 있음 (영문) May help to improve muscle strength"
+ ],
+ "enUnmapped": [
+  "관절건강에 도움을 줄 수 있음",
+  "근력개선에 도움을 줄 수 있음",
+  "(국문) 근력개선에 도움을 줄 수 있음 (영문) May help to improve muscle strength"
+ ],
+ "labelVariants": [
+  "강황추출물(터마신)(제2014-2호)",
+  "강황추출물(제2023-5호)",
+  "강황추출물"
+ ],
+ "readyStmts": []
+}

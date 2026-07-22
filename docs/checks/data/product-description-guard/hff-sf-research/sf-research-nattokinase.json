@@ -1,0 +1,44 @@
+{
+ "key": "나토키나제",
+ "slug": "nattokinase",
+ "series": "혈행",
+ "counts": {
+  "total": 8,
+  "produced": 1,
+  "notTaken": 7,
+  "READY": 0,
+  "reviewLater": 0,
+  "enPending": 7,
+  "liquid": 0,
+  "bulk": 0,
+  "kidsWomen": 0,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [
+  "(국문) -혈압이 높은 사람에게 도움을 줄 수 있음 -혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음 (영문) -May help to improve high blood pressure -May help to improve blood circulation through inhibition of platelet aggregation",
+  "혈압이 높은 사람에게 도움을 줄 수 있음",
+  "혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음",
+  "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하여, 혈액흐름을 원활히 하는데 도움을 줄 수 있음",
+  "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하여, 혈액흐름을 원활히 하는데 도움을 줄 수 있음.(기타 II)"
+ ],
+ "enUnmapped": [
+  "(국문) -혈압이 높은 사람에게 도움을 줄 수 있음 -혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음 (영문) -May help to improve high blood pressure -May help to improve blood circulation through inhibition of platelet aggregation",
+  "혈압이 높은 사람에게 도움을 줄 수 있음",
+  "혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음",
+  "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하여, 혈액흐름을 원활히 하는데 도움을 줄 수 있음",
+  "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하여, 혈액흐름을 원활히 하는데 도움을 줄 수 있음.(기타 II)"
+ ],
+ "labelVariants": [
+  "나토균배양분말",
+  "나토균배양분말(제2012-7호)",
+  "HK 나토배양물",
+  "HK 나토배양물(제2009-50호)",
+  "은행잎 추출물"
+ ],
+ "readyStmts": []
+}

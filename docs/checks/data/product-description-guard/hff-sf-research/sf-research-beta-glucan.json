@@ -1,0 +1,39 @@
+{
+ "key": "베타글루칸",
+ "slug": "beta-glucan",
+ "series": "면역",
+ "counts": {
+  "total": 11,
+  "produced": 0,
+  "notTaken": 11,
+  "READY": 0,
+  "reviewLater": 0,
+  "enPending": 11,
+  "liquid": 0,
+  "bulk": 0,
+  "kidsWomen": 0,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [
+  "(국문) 면역기능 증진에 도움을 줄 수 있음 (영문) May help to improve immune function",
+  "면역기능 증진에 도움을 줄 수 있음",
+  "(국문) 면역기능 증진에 도움을 줄 수 있음 - (영문) May help to improve immune function"
+ ],
+ "enUnmapped": [
+  "(국문) 면역기능 증진에 도움을 줄 수 있음 (영문) May help to improve immune function",
+  "면역기능 증진에 도움을 줄 수 있음",
+  "(국문) 면역기능 증진에 도움을 줄 수 있음 - (영문) May help to improve immune function"
+ ],
+ "labelVariants": [
+  "베타글루칸분말(제2020-10호)",
+  "베타글루칸분말",
+  "베타글루칸 분말",
+  "베타글루칸"
+ ],
+ "readyStmts": []
+}

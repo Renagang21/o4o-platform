@@ -1,0 +1,28 @@
+{
+ "key": "회화나무열매추출물",
+ "slug": "sophora",
+ "series": "갱년기",
+ "counts": {
+  "total": 13,
+  "produced": 0,
+  "notTaken": 13,
+  "READY": 0,
+  "reviewLater": 0,
+  "enPending": 0,
+  "liquid": 0,
+  "bulk": 0,
+  "kidsWomen": 13,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [],
+ "enUnmapped": [],
+ "labelVariants": [
+  "회화나무열매추출물"
+ ],
+ "readyStmts": []
+}

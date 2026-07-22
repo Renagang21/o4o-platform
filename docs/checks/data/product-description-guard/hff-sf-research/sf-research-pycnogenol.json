@@ -1,0 +1,28 @@
+{
+ "key": "프랑스해안송껍질추출물",
+ "slug": "pycnogenol",
+ "series": "혈행",
+ "counts": {
+  "total": 2,
+  "produced": 1,
+  "notTaken": 1,
+  "READY": 0,
+  "reviewLater": 0,
+  "enPending": 0,
+  "liquid": 0,
+  "bulk": 0,
+  "kidsWomen": 1,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [],
+ "enUnmapped": [],
+ "labelVariants": [
+  "비타민E"
+ ],
+ "readyStmts": []
+}

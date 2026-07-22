@@ -1,0 +1,32 @@
+{
+ "key": "콘드로이친",
+ "slug": "chondroitin",
+ "series": "관절",
+ "counts": {
+  "total": 4,
+  "produced": 0,
+  "notTaken": 4,
+  "READY": 0,
+  "reviewLater": 2,
+  "enPending": 2,
+  "liquid": 2,
+  "bulk": 0,
+  "kidsWomen": 0,
+  "servingFail": 0
+ },
+ "shard": {
+  "0": 0,
+  "1": 0,
+  "2": 0
+ },
+ "koFunctions": [
+  "(국문) 관절 및 연골 건강에 도움을 줄 수 있음 (영문) May help to maintain joint and cartilage health"
+ ],
+ "enUnmapped": [
+  "(국문) 관절 및 연골 건강에 도움을 줄 수 있음 (영문) May help to maintain joint and cartilage health"
+ ],
+ "labelVariants": [
+  "콘드로이친황산염(제2025-63호)"
+ ],
+ "readyStmts": []
+}
