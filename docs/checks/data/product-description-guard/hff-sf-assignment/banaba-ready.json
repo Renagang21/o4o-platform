@@ -1,0 +1,968 @@
+[
+ {
+  "statementNo": "200400200073234",
+  "candidateId": "06fe7075-aaae-40b0-9628-35a5a007239b",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "그레이스앤 고지에",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 적갈색의 장방형 연질캡슐\n2) 코로솔산 : 표시량의 80 ~ 120% (표시량 : 1.3mg / 600mg)\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 붕해 : 적합 (20분 이내)\n8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 적갈색의 장방형 연질캡슐",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "200400200141830",
+  "candidateId": "0a46fa0d-c11e-4d7b-81d9-d1602d54f151",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "한포유 혈당케어",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미∙이취가 없으며 점박이가 있는 흰색의 원형 제피정제\n2. 코로솔산: 표시량(1.3 mg/0.3 g)의 80~120%\n3. 납(mg/kg): 1.0 이하\n4. 카드뮴(mg/kg): 0.5 이하\n5. 수은(mg/kg): 0.5 이하\n6. 비소(mg/kg): 1.0 이하\n7. 대장균군: 음성\n8. 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 흰색의 원형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "201000190041284",
+  "candidateId": "0f3f60b3-b169-4114-b7c7-2a587989f2c1",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "뉴혈당케어웰",
+  "manufacturer": "엔피케이(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 진한 적갈색의 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해도 : 60분 이내\n4) 코로솔산 : 표시량(0.45mg/500mg)의 80~120%\n5) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 0.5 이하\n (다) 수은(mg/kg) : 0.5 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 진한 적갈색의 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오."
+  }
+ },
+ {
+  "statementNo": "20040017021769",
+  "candidateId": "0f8e4626-8e96-466e-ac94-b29be1cface5",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "해당정",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제\n②코로솔산 : 표시량(1.3mg/2,000mg)의 80 ~ 120% \n③납(mg/kg) : 1.0 이하\n④카드뮴(mg/kg) : 0.5 이하\n⑤총수은(mg/kg) : 0.5 이하\n⑥총비소(mg/kg) : 1.0 이하\n⑦대장균군 : 음성\n⑧붕해시험 : 30분 이내",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "- 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n- 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오."
+  }
+ },
+ {
+  "statementNo": "20200016052382",
+  "candidateId": "16257844-1023-4474-97cc-642908f02337",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "바나바잎",
+  "manufacturer": "주식회사 상상바이오",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] ① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제\n② 코로솔산 : 표시량(0.45mg/500mg)의 80 ~ 120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 0.5 이하\n⑤ 수은(mg/kg) : 0.5 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "[바나바잎추출물] ① 어린이, 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오."
+  }
+ },
+ {
+  "statementNo": "20040020004126",
+  "candidateId": "19e95568-2898-484d-a7de-584642b12102",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "레벨지",
+  "manufacturer": "(주)네이처텍",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐\n2) 코로소린산(corosolic acid) 함량 : 표시량(0.62mg/3,000mg)의 80~120%\n3) 납(mg/kg) : 1.0 이하\n4) 비소(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 0.5 이하\n6) 수은(mg/kg) : 0.5 이하\n7) 붕해시험 : 20분 이내\n8) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐",
+   "shelfLife": "24개월",
+   "storage": "1) 직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.\r\n2) 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.\r\n3) 잘못된 사용 및 남용을 피하고 품질보존을 위해 다른 용기에 넣지 마십시오.",
+   "caution": "1) 임산부, 수유부, 알레르기 체질, 노약자 및 치료를 받고 계신 중증 질환자 등은 구입처 또는 고객지원팀으로 문의 후 섭취하시기 바랍니다.\r\n2) 어린이에게 섭취시키고자 하실 경우에는 구입처 또는 고객지원팀으로 문의하시고 섭취 시 보호자의 관찰 하에 섭취하도록 하십시오.\r\n3) 권장섭취량을 확인하신 후 섭취하십시오.\r\n4) 섭취자의 신체상태에 따라 특이반응이 나타날 수 있습니다. 이 경우 섭취를 중단하신 후 구입처 또는 고객지원팀으로 문의하시기 바랍니다.\r\n5) 보관상태에 따라 내용물이 분리될 수 있으나, 제품의 품질 및 안전성에는 이상이 없으니 안심하고 드셔도 됩니다."
+  }
+ },
+ {
+  "statementNo": "200400150832470",
+  "candidateId": "1cf8a245-3813-4099-af2a-13cd30648dea",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "닥터겟잇 혈당 프로",
+  "manufacturer": "주식회사한미양행",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니며 이미, 이취가 없고 점박이가 있는 회황색 또는 노란 회색의 장방형 제피 정제\n(2) 코로솔산 : 표시량(1.0 mg/500 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하 \n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취.",
+   "dosageForm": "고유의 향미를 지니며 이미, 이취가 없고 점박이가 있는 회황색 또는 노란 회색의 장방형 제피 정제",
+   "shelfLife": "제조일로부터 36개월까지",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20040017038137",
+  "candidateId": "27629384-29fe-430b-85d0-a245a1d4c8c6",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "당케어N",
+  "manufacturer": "케이지랩 주식회사",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 고유의 향미가 있고 이미, 이취가 없는 어두운갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐\n2. 코로솔산 : 표시량(0.5mg/1,800mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 20분이내",
+   "intake": "1일 2회, 1회 1캡슐(900mg)을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "실온/ 직사광선이나 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.",
+   "caution": "알레르기 등 특이체질의 경우 원료의 성분을 확인 후 섭취하십시오.\n제품 개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의 하시기 바랍니다. \n어린이, 임산부 및 수유부는 섭취를 피할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400200142078",
+  "candidateId": "3ece2d92-4cb8-4b46-a41e-91d90f307600",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "광동 바나바잎추출물",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n(1) 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미,이취가 없으며 점박이가 있는 흰색의 장방형 제피정제\n(2) 코로솔산 : 표시량(1.3mg/500mg)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 수은(mg/kg) : 0.5 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없으며 점박이가 있는 흰색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20172880236302",
+  "candidateId": "40a9bff8-83c8-4bfe-8cbf-76d5a19472ed",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "장인정신 에브리데이 혈당관리 바나바잎",
+  "manufacturer": "주식회사 코스팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린노란색의 내용물을 함유한 검정색의 타원형 연질캡슐\n2) 코로솔산(%) : 표시량(1.3 mg / 500 mg)의 80 이상 120 이하\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린노란색의 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+   "caution": "1) 어린이, 임산부 및 수유부는 섭취를 피하시기 바랍니다. \n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n\n3) 특이체질, 알레르기체질이신 경우 원료 성분을 확인하신 후 섭취하시기 바랍니다.\n4) 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 방법을 준수하시기 바랍니다.\n5) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n6) 용기 안의 방습제(실리카겔)는 섭취하지 마십시오."
+  }
+ },
+ {
+  "statementNo": "20200016052242",
+  "candidateId": "41296e3b-2443-4356-af05-b683e9c5ff45",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당케어 바나바츄",
+  "manufacturer": "주식회사 상상바이오",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] ① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 하양색의 원형 츄어블 정제\n② 코로솔산 : 표시량(1.3mg/2,000mg)의 80 ~ 120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 0.5 이하\n⑤ 수은(mg/kg) : 0.5 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1정을 씹어서 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 하양색의 원형 츄어블 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "200400150832503",
+  "candidateId": "42742129-15a5-47db-89a5-aaf29ade49f3",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "당삼오",
+  "manufacturer": "주식회사한미양행",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제\n(2) 코로솔산 : 표시량(0.9 mg/2,400 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취.",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "2020001201673",
+  "candidateId": "44358cc6-a3a6-4349-a8d4-86bde339ef1c",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "하이퍼마일리지 혈당케어 바나바",
+  "manufacturer": "주식회사 내츄럴엔",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미를 가지고 있으며, 이미, 이취가 없는 연한 갈색의 장방형 정제\n2. 코로솔산 : 1.3mg/550mg의 80~120%\n3. 납 : 1.0 이하\n4. 카드뮴 : 0.5 이하\n5. 수은 : 0.5 이하\n6. 비소 : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해도 : 30분이내",
+   "intake": "1일 1회, 1회 1정(550mg)을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미를 가지고 있으며, 이미, 이취가 없는 연한 갈색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하여 실온보관",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "20160012278105",
+  "candidateId": "49913b10-40c5-4f33-b01f-92ddef7b1a60",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당아이(I)",
+  "manufacturer": "에스에스바이오팜(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색의 환제\n2) 코로솔산: 표시량 0.8mg/8g의 80~120%\n3) 비소(mg/kg): 1.0 이하\n4) 납(mg/kg): 1.0 이하\n5) 카드뮴(mg/kg): 0.5 이하\n6) 수은(mg/kg): 0.5 이하\n7) 대장균군: 음성\n8) 붕해시험: 120분 이내",
+   "intake": "1일 2회, 1회 1포(4g)을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 환제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 받지 않는 서늘한 곳에 보관 및 유통하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "200400150832421",
+  "candidateId": "50f30ebf-826c-4c38-a781-cd24f7ff3a76",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당케어 츄어블정",
+  "manufacturer": "주식회사한미양행",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제\n(2) 코로솔산 : 표시량(1.3 mg/1,700 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "201000190041532",
+  "candidateId": "582231a2-cf8d-4ca1-baea-512a7bd8c3e6",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "당케어",
+  "manufacturer": "엔피케이(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미,이취가 없는 녹갈색의 분말\n2) 대장균군 : 음성\n3) 코로솔산 : 표시량(1.3mg/3,000mg)의 80~120%\n4) 중금속\n(가)납(mg/kg): 1.0 이하\n(나)카드뮴(mg/kg): 0.5 이하\n(다)수은(mg/kg): 0.5 이하\n(라)비소(mg/kg): 1.0 이하",
+   "intake": "1일 1회, 1회 1포 (3g)를 식후 물과 함께 섭취. 샐러드에 뿌리거나 요거트, 우유, 스무디 등에 넣어 섭취. 냉차나 따뜻한 차(80도 이하)로 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 녹갈색의 분말",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[바나바잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20160007515113",
+  "candidateId": "63b8c997-0582-4e08-b52c-1d74ffece57f",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "모모플렉스 캡슐",
+  "manufacturer": "주식회사 제이비케이랩",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] ①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 내용물을 함유한 투명의 경질캡슐\n(2) 코로솔산: 표시량(1.3mg/2,000mg)의 80~120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 수은(mg/kg) : 0.5 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐(1캡슐당 500mg)을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 내용물을 함유한 투명의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 받지 아니하는 실온에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "caution": "어린이, 임산부 및 수유부는 섭취를 피하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오. \n(병포장 시) 습기방지제(방습제)는 먹지 마십시오."
+  }
+ },
+ {
+  "statementNo": "20040016020104",
+  "candidateId": "6b19acfd-77e5-4dff-a4f1-24063dfcbe36",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당&밸런스",
+  "manufacturer": "(주)케이지앤에프",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물 제품]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 연한갈색의 장방형정제\r\n② 코롤로산 : 표시량(1mg/1800mg)의 80~120%\r\n③ 중금속 : (가) 납(mg/kg) : 1.0 이하\r\n            (나) 카드뮴(mg/kg) : 0.5 이하\r\n            (다) 총수은(mg/kg) : 0.5 이하\r\n            (라) 총비소(mg/kg) : 1.0 이하\r\n④ 대장균군 : 음성\r\n⑤ 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취",
+   "dosageForm": "연한갈색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿는 않는 곳에 보관하여 주십시오.",
+   "caution": "① 알레르기 반응이 나타나는 경우에는 섭취 중단하시기 바랍니다.\r\n② 유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. \r\n③ 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "200400151071154",
+  "candidateId": "6ee99ca0-b44f-420b-a2ae-84c8482115de",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당건강 바나바 맥스칸",
+  "manufacturer": "(주)유유헬스케어",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 연두색의 타원형 코팅정제\n2. 코로솔산 : 표시량(1.3 mg/800 mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 적합(음성)\n8. 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 연두색의 타원형 코팅정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선 및 고온·다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "200400200072715",
+  "candidateId": "7740ea59-08b8-41b8-9048-2f420fe71ac6",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "엔닷바이오 솔루션 혈당관리 바나바잎",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미를 가지고 이미,이취가 없는 검정색의 내용물을 함유한 적갈색의 타원형 연질캡슐\n2) 납(mg/kg): 1.0 이하\n3) 카드뮴(mg/kg): 0.5 이하\n4) 수은(mg/kg): 0.5 이하\n5) 비소(mg/kg): 1.0 이하\n6) 대장균군 : 음성\n7) 붕해 : 적합(20분 이내)\n8) 코로솔산 : 표시량의 80 ~ 120% (표시량 : 1.3mg / 500mg)",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미를 가지고 이미,이취가 없는 검정색의 내용물을 함유한 적갈색의 타원형 연질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "caution": "① 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n② 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "20100018018133",
+  "candidateId": "81d259a4-9cf2-42e9-8b86-730d121c1a24",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "하이퍼마일리지 혈당케어",
+  "manufacturer": "포항바이오파크",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미 · 이취가 없는 검정색 점박이가 있는 밝은 회황색의 원형 코팅정제\n2. 코로솔산: 표시량의(0.45mg/300mg)80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험: 적합(60분이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취",
+   "dosageForm": "고유의 향미가 있고 이미 · 이취가 없는 검정색 점박이가 있는 밝은 회황색의 원형 코팅정제",
+   "shelfLife": "제조일로부터 2년",
+   "storage": "고온 다습한 곳이나 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "20180003915114",
+  "candidateId": "86677bfc-b911-4d48-bd68-7b49809e3870",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "바나바",
+  "manufacturer": "(주)팜투팜2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] ①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 황회색의 분말이 든 갈색 투명의 경질캡슐\n(2) 코로솔산 : 표시량 (1.3 mg/ 450 mg)의 80~120%\n(3) 대장균군 : 음성\n(4) 붕해시험 : 20분 이내\n(5) 납(mg/kg) : 1.0 이하\n(6) 카드뮴(mg/kg) : 0.5 이하\n(7) 수은(mg/kg) : 0.5 이하\n(8) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취 하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황회색의 분말이 든 갈색 투명의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "1) 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오.  2) 습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다.  3) 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담 하십시오. \n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. \n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상 사례 발생 시 섭취를 중단하고 전문가와 상담 하십시오."
+  }
+ },
+ {
+  "statementNo": "20220011370165",
+  "candidateId": "8a86fe41-ffd1-4831-94e4-9fce2eeeebc2",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "리뉴비_지",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐\n2. 코로솔산 : 표시량(0.54 mg / 2,000 mg)의 80~120 %\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 20분 이내",
+   "intake": "1일 2회 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐",
+   "shelfLife": "제조일로부터 24개월 까지",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "20140020012143",
+  "candidateId": "9628715d-d382-4846-99fc-0459c4484040",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "한인 혈당엔",
+  "manufacturer": "(주)아오스",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] : 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고, 이미, 이취가 없는 점박이가 있는 회황색의 장방형 제피정제 \n2. 코로솔산 : 표시량(0.45mg/2g)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 점박이가 있는 회황색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "습기와 직사광선을피하여서늘한곳에보관하십시오. 제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.",
+   "caution": "특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원재료를 확인한 후 섭취하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n용기 안의 습기방지제는 먹지 마십시오."
+  }
+ },
+ {
+  "statementNo": "200400200072496",
+  "candidateId": "9ba13912-9b69-478d-9742-101fe84350ce",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당 365",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 장방형 제피정제\n2) 코로솔산 : 표시량의 80 ~ 120% (표시량 : 1.3 mg / 600 mg)\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성\n8) 붕해 : 적합(60분이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "caution": "① 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n② 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "20200016052307",
+  "candidateId": "9f6ec631-62c0-4eec-8c02-b4a6cbb00a42",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "케이헬씨 바나바",
+  "manufacturer": "주식회사 상상바이오",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] ① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제\n② 코로솔산 : 표시량(0.45mg/500mg)의 80 ~ 120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 0.5 이하\n⑤ 수은(mg/kg) : 0.5 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "[바나바잎추출물] ① 어린이, 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오."
+  }
+ },
+ {
+  "statementNo": "200400200083417",
+  "candidateId": "a016d5a6-f436-4513-bd1f-ce099d3e983a",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "바나바잎추출물",
+  "manufacturer": "주식회사 노바렉스",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 장방형 제피 정제\n2. 코로솔산 : 표시량(1.3mg/500mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 투명 장방형 제피 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[바나바잎 추출물] 어린이, 임산부 및 수유부는 섭취를 피할 것"
+  }
+ },
+ {
+  "statementNo": "200400170211972",
+  "candidateId": "a18173f0-f045-4e4b-afa4-ffe94ac8fc22",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "프리미엄 혈당케어",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제\n(2) 코로솔산 : 표시량(1.3 mg/800 mg)의 80~120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 수은(mg/kg) : 0.5 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 적합(60분이내)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400200021360",
+  "candidateId": "a61302f8-d56c-490f-8df8-95b7e51e885d",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "당케어",
+  "manufacturer": "코스맥스바이오(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물 제품]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n② 코로소린산 함량(mg/2000mg) : 표시량(0.65)의 80%~120%\r\n③ 납(mg/kg) : 1.0 이하\r\n④ 카드뮴(mg/kg) : 0.5 이하\r\n⑤ 총수은(mg/kg) : 0.5 이하\r\n⑥ 총비소(mg/kg) : 1.0 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "회색의 제피정제",
+   "shelfLife": "제조일로부터 2년.",
+   "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오. \r\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \r\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "2020000997225",
+  "candidateId": "a9973184-7a20-4a38-aebf-78cd8cabf2ef",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당앤 바나바",
+  "manufacturer": "(주)파마피아",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제\n2) 코로솔산 : 표시량의  80~120% (0.45mg/600mg)\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오",
+   "dosageForm": "이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "2020001201693",
+  "candidateId": "addd628a-2b4b-4d67-a918-c1b746332c35",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "라이프토콜 혈당 케어 바나바 잎 추출물 코로솔산 60일분",
+  "manufacturer": "주식회사 내츄럴엔",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 정제\n(2) 코로솔산 : 1.3mg/500mg 의 80~120%\n(3) 납 : 1.0 이하\n(4) 카드뮴 : 0.5이하\n(5) 수은 : 0.5이하\n(6) 비소 :1.0이하\n(7) 대장균군 : 음성\n(8) 붕행도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정(500mg)을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하여 실온보관",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "200700170352802",
+  "candidateId": "c0ab11ac-9a6a-4b53-818e-ba73177a3251",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "이지팩 바나바리프",
+  "manufacturer": "코스맥스엔비티(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제\n2. 대장균군 : 음성\n3. 붕해도 : 30분 이내\n4. 코로솔산 : 표시량(1.3mg/250mg)의 80~120%\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 0.5 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400150832456",
+  "candidateId": "c24df240-4d1f-49a2-8a98-617fe17d6c55",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당엔 코로솔산 바나바",
+  "manufacturer": "주식회사한미양행",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 회황색 또는 노란 회색의 장방형 제피정제\n(2) 코로솔산 : 표시량(1.3 mg/400 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정 충분한 물과 함께 섭취",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 회황색 또는 노란 회색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400200141719",
+  "candidateId": "c2846bb5-c79e-4ec2-aca4-a66be8d7b1f2",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "안국건강 혈당케어 바나바",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회갈색의 장방형 제피정제\n2. 코로솔산 : 표시량(1.3 mg/850 mg)의 80~120% \n3. 납(mg/kg) : 1.0 이하 \n4. 카드뮴(mg/kg) : 0.5 이하 \n5. 수은(mg/kg) : 0.5 이하 \n6. 비소(mg/kg) : 1.0 이하 \n7. 대장균군 : 음성 \n8. 붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회갈색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[바나바잎추출물]\n어린이, 임산부 및 수유부는 섭취를 피할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200400200142111",
+  "candidateId": "c5dcb51e-390f-4e49-bb9a-f4c18cccd448",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당케어 바나바 포켓",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n(1) 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰 노란색의 장방형 제피정제\n(2) 코로솔산 : 표시량(1.3mg/500mg)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 수은(mg/kg) : 0.5 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 붕해시험 : 60분 이내\n(8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰 노란색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[바나바잎 추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "200700170352478",
+  "candidateId": "cc3a2723-bb7f-4677-b2aa-7bc76fd64621",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "바나바잎플러스",
+  "manufacturer": "코스맥스엔비티(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 검은색점박이가 있는 밝은회황색의 원형 제피 정제\n2. 대장균군 : 음성\n3. 붕해도 : 60분 이내\n4. 코로솔산 : 표시량(1mg/300mg)의 80~120%\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 0.5 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 검은색점박이가 있는 밝은회황색의 원형 제피 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "어린이, 임산부 및 수유부는 섭취를 피할 것\n이상사례 발생시 섭취를 중단하고 전문가와 상담할 것.\n섭취 전에 소비기한을 확인 후 섭취하십시오. 또한 소비기한이 경과한 제품은 섭취하지 마십시오. \n섭취량 및 섭취방법을 확인한 후 섭취하십시오."
+  }
+ },
+ {
+  "statementNo": "201000190041563",
+  "candidateId": "d2b337a4-bb91-4b9a-8dca-7780e65e22fe",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당케어 바나바잎 추출물",
+  "manufacturer": "엔피케이(주)",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎추출물]①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 회황색의 원형 정제\n2) 대장균군: 음성\n3) 붕해시험 : 30분 이내\n4) 코로솔산: 표시량(1.3mg/600mg)의 80~120%\n5) 중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 0.5 이하\n(다) 수은(mg/kg) : 0.5 이하\n(라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색의 원형 정제",
+   "shelfLife": "제조일로부터 24 개월",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[바나바잎 추출물]\n1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20120019007723",
+  "candidateId": "d2f75923-7c2c-4b4a-a09a-953993b540da",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "헬퓨 바나바",
+  "manufacturer": "(주)한풍네이처팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색의 내용물을 함유한 어두운 녹갈색의 장방형 연질캡슐\n2. 코로솔산 : 표시량(1mg/1000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 적합 (캡슐 : 20분 이내 붕해)",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색의 내용물을 함유한 어두운 녹갈색의 장방형 연질캡슐",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "2020000474662",
+  "candidateId": "e61daafa-0656-47ce-8c95-f91ecfba1e81",
+  "shard": 2,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당컷카페라떼맛",
+  "manufacturer": "(주)대웅제약 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음,"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n① 식후 혈당상승 억제에 도움을 줄 수 있음,",
+   "baseStandard": "1) 성상 :고유의 향미가 있고 이미, 이취가 없으며 하양색 알갱이를 포함한 황갈색의 분말\n2) 코로솔산 : 표시량(0.45 mg/24 g)의 80 ~ 120%\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포(12g)를 물 80ml~100ml에 타서 섭취하십시오",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 하양색 알갱이를 포함한 황갈색의 분말",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "200400170211509",
+  "candidateId": "ec59b6eb-9c89-4a3f-9342-bd2bf6744c68",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "혈당건강엔 바나바",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제\n ②코로솔산 : 표시량(1.3 mg/200 mg)의 80~120%\n ③납(mg/kg) : 1.0이하\n ④카드뮴(mg/kg) : 0.5이하\n ⑤수은(mg/kg) : 0.5이하\n ⑥비소(mg/kg) :1.0이하\n ⑦대장균군 : 음성\n ⑧붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": ""
+  }
+ },
+ {
+  "statementNo": "20040017014676",
+  "candidateId": "f8869f54-95b4-44d5-8cc2-164a717eba2c",
+  "shard": 1,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "더루틴 혈당N 바나바",
+  "manufacturer": "(주)뉴팜",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "- 성상 : 고유의 향미가 있고 이미·이취가 없는 검정 점박이가 있는 흰색의 장방형 정제\n- 코로솔산 : 표시량(1.3 mg/600mg)의 80~120%\n- 납(mg/kg) : 1.0 이하\n- 카드뮴(mg/kg) : 0.5 이하\n- 수은(mg/kg) : 0.5 이하\n- 비소(mg/kg) : 1.0 이하\n- 대장균군 : 음성\n- 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 검정 점박이가 있는 흰색의 장방형 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하십시오.",
+   "caution": "(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ },
+ {
+  "statementNo": "20172880193439",
+  "candidateId": "f9e007d8-43de-4454-b110-e89281bfa622",
+  "shard": 0,
+  "ingredientKey": "바나바잎추출물",
+  "productName": "건기남의 올레유러핀",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "functionsKo": [
+   "식후 혈당상승 억제에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with suppressing the rise in blood sugar after meals"
+  ],
+  "source": {
+   "mainFunction": "[올리브잎주정추출물(제2014-9호)\n(국문) 혈압 조절에 도움을 줄 수 있음\n(영문) May help to maintain healthy blood pressure\n[바나바잎추출물]\n① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1.성상: 고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제\n2.코로솔산: 표시량(1.3mg / 800mg)의 80 ~ 120%\n3.Oleuropein: 표시량(90mg / 800mg)의 80 ~ 120%\n4.납(mg/kg): 1.0이하\n5.카드뮴(mg/kg): 0.2이하\n6.수은(mg/kg): 0.1이하\n7.비소(mg/kg); 1.0이하\n8.붕해: 60분이내\n9.대장균군: 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "직사광선과 고온다습한 곳을 피하여 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "[올리브잎주정추출물(제2014-9호)]\n(1) 위, 간 및 신장 질환이 있거나 고혈압치료제 등 복용시 전문가와 상의할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[바나바잎추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+  }
+ }
+]

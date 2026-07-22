@@ -1,0 +1,51 @@
+{
+ "generated": "2026-07-22",
+ "shardAxis": "FNV-1a(String(STTEMNT_NO).trim())%3",
+ "agents": {
+  "0": "A",
+  "1": "B",
+  "2": "C"
+ },
+ "ingredients": {
+  "바나바잎추출물": {
+   "slug": "banaba",
+   "status": "READY",
+   "groundingReadyByShard": {
+    "0": 13,
+    "1": 16,
+    "2": 13
+   },
+   "total": 42
+  },
+  "히알루론산": {
+   "slug": "hyaluronic-acid",
+   "status": "READY",
+   "groundingReadyByShard": {
+    "0": 5,
+    "1": 13,
+    "2": 5
+   },
+   "total": 23
+  },
+  "쏘팔메토열매추출물": {
+   "slug": "saw-palmetto",
+   "status": "READY",
+   "groundingReadyByShard": {
+    "0": 8,
+    "1": 4,
+    "2": 4
+   },
+   "total": 16
+  },
+  "헤마토코쿠스추출물": {
+   "slug": "haematococcus",
+   "status": "PENDING(부분)",
+   "groundingReadyByShard": {
+    "0": 3,
+    "1": 2,
+    "2": 3
+   },
+   "total": 8
+  }
+ }
+}

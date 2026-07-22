@@ -1,0 +1,17 @@
+[
+ {
+  "statementNo": "20040020028133",
+  "productName": "흙 신령 쏘팔메토",
+  "reason": "SERVING_PARSE_FAILED,BULK,GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020028132",
+  "productName": "한일쏘팔메토",
+  "reason": "SERVING_PARSE_FAILED,BULK,GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020028163",
+  "productName": "palmisaw",
+  "reason": "GROUNDING_PENDING_EN"
+ }
+]
