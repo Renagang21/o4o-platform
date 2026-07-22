@@ -58,6 +58,15 @@
       "masters": 331,
       "op": "EN_ONLY",
       "status": "DONE"
+    },
+    {
+      "groupKey": "티티아민(비타민DEC복합)|정제(combo)",
+      "sourceRef": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "track": "NUTRITION_COMBO_EN_ONLY",
+      "masters": 138,
+      "op": "EN_ONLY",
+      "status": "CLAIMED"
     }
   ]
 }
