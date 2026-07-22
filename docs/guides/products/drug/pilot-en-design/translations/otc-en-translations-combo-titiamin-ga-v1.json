@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-INTERACTION-2H-GA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "티티아민(비타민 D·E·C 복합) nutrition_combo EN-only fresh 번역. 유일 원문=ko canonical. 다효능 병렬 보존(합성 0). 병용주의 문구('혈전 소인·에스트로겐 함유 피임약 복용 시 상담')는 대상약물·조건·행동을 그대로 직접 번역 — 상호작용의 원인·기전·결과 신규 설명 없음. ko 미변경.",
+  "testLog": {
+    "효능축(병렬 4)": "①비타민 D·E·C 보급(육체피로·임신수유·병중병후·발육기·노년기) ②말초혈행장애·수족냉증 완화 ③기미·주근깨 색소침착 완화 ④잇몸출혈·코피 예방 — EN 4절 병렬, 합성 0",
+    "용법": "만 12세 이상·성인 1정 1일 2회 — 값 불변",
+    "수치·연령": "만 3개월 미만 영아 금기(타 그룹 12개월과 다름 — 3개월 정확 보존)",
+    "금기(불복용)": "과민증·대두유/콩/땅콩 과민·고칼슘혈증·신장질환·신장결석·3개월 미만 영아 — 전수 보존",
+    "병용주의(상담)": "혈전 소인 = prone to blood clots / 에스트로겐 함유 피임약 = estrogen-containing contraceptives / 상담 = consult a pharmacist — 대상약물·조건·행동 직접 번역, 기전·결과 설명 0"
+  },
+  "translations": [
+    {
+      "groupKey": "티티아민(비타민DEC복합)|정제(combo)",
+      "title": "Vitamin D, E and C Complex Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins D, E and C during physical fatigue, pregnancy and breastfeeding, low energy during and after illness, the growth period and old age; to relieve peripheral circulation problems and cold hands and feet; to relieve skin pigmentation such as melasma and freckles; and to help prevent bleeding of the gums and nose.",
+      "usage": "Children aged 12 or older and adults take one tablet twice a day.",
+      "caution": "Do not take this if you are hypersensitive, if you are hypersensitive to soybean oil, soy or peanuts, if you have high blood calcium, kidney disease or kidney stones, or if the child is under 3 months old. If you are prone to blood clots or are taking estrogen-containing contraceptives, consult a pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamins D, E and C",
+        "How it works": "Supplies vitamins and supports circulation",
+        "Main symptoms": "Nutritional supply and circulation, peripheral circulation, skin pigmentation, prevention of gum and nose bleeding",
+        "Who should be careful": "High blood calcium, kidney stones; soy hypersensitivity",
+        "Why this one": "A vitamin D, E and C complex tablet"
+      }
+    }
+  ],
+  "summary": "Nutritional supply and circulation"
+}

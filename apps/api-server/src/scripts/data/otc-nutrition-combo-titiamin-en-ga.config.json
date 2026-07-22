@@ -1,0 +1,14 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-INTERACTION-2H-GA-V1 (에이전트 가) 티티아민 전용 combo EN-only config. 공용 runner=otc-nutrition-combo-en-only-runner-na.ts --config=<이 파일> --group=titiamin. ko 불변·fresh 번역·병용주의 직접 번역.",
+  "round": "nutrition-combo-interaction-2h-2026-07-22",
+  "en": {
+    "titiamin": {
+      "key": "티티아민(비타민DEC복합)|정제(combo)",
+      "sourceRef": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 138,
+      "translationFile": "otc-en-translations-combo-titiamin-ga-v1.json",
+      "outBase": "otc-combo-en-only-ga-titiamin"
+    }
+  }
+}
