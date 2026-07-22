@@ -1,0 +1,548 @@
+[
+ {
+  "candidateId": "b12-folate-001",
+  "productName": "닥터피엔티 맘 엽산",
+  "productNameEn": "닥터피엔티 맘 엽산",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061229",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산] ①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B12] 정상적인 엽산 대사에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이를 함유한 연한 노란색의 장방형 제피정제\n2) 비타민B12 : 표시량 (0.72ug/450mg)의 80~180%\n3) 엽산 : 표시량 (600ug/450mg)의 80~150%\n4) 붕해 : 60분 이내\n5) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "* 이상사례 발생시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 점박이를 함유한 연한 노란색의 장방형 제피정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 건조한 곳에 보관 하십시오. 어린이의 손이 닿지 않는 곳에 보관 하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.72,
+    "unit": "μg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 0.72μg</span><span class=\"sd-badge is-solid\">엽산 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터피엔티 맘 엽산<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>0.72μg</b>, 엽산 <b>600μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>0.72μg</b>, 엽산 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색 점박이를 함유한 연한 노란색의 장방형 제피정제 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(0.72μg/450mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(600μg/450mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이를 함유한 연한 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 건조한 곳에 보관 하십시오. 어린이의 손이 닿지 않는 곳에 보관 하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 0.72μg</span><span class=\"sd-badge is-solid\">Folate 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터피엔티 맘 엽산<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.72μg</b> of Vitamin B12, <b>600μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>0.72μg</b> Vitamin B12, <b>600μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (0.72μg / 450mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (600μg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이를 함유한 연한 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 건조한 곳에 보관 하십시오. 어린이의 손이 닿지 않는 곳에 보관 하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-002",
+  "productName": "에이팜엽산",
+  "productNameEn": "에이팜엽산",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "manufacturerEn": null,
+  "statementNo": "20060020008627",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n①정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 엽산 : 표시량(620ug DFE/320mg)의 80~150%\n3. 비타민B12 : 표시량(2.6ug/320mg)의 80~180%\n4. 대장균군 : 음성\n5. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기 체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.6,
+    "unit": "μg",
+    "basisAmount": 320,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.6μg</span><span class=\"sd-badge is-solid\">엽산 620μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>에이팜엽산<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.6μg</b>, 엽산 <b>620μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B12 <b>2.6μg</b>, 엽산 <b>620μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.6μg/320mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(620μg/320mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.6μg</span><span class=\"sd-badge is-solid\">Folate 620μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>에이팜엽산<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.6μg</b> of Vitamin B12, <b>620μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>2.6μg</b> Vitamin B12, <b>620μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.6μg / 320mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (620μg / 320mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 어두운 갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-003",
+  "productName": "으뜸명정",
+  "productNameEn": "으뜸명정",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141910",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12] ①정상적인 엽산 대사에 필요\n[엽산] ①세포와 혈액생성에 필요 ②태아 신경관의 정상 발달에 필요 ③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회분홍색의 장방형 제피정제\n2. 비타민B12 : 표시량(440 ㎍/1,200 mg)의 80 ~ 180%\n3. 엽산 : 표시량(1,020 ㎍ DFE/1,200 mg)의 80 ~ 150%\n4. 대장균군 : 음성\n5. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[비타민B12]\n1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회분홍색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 440,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 440μg</span><span class=\"sd-badge is-solid\">엽산 1020μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>으뜸명정<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>440μg</b>, 엽산 <b>1020μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 B12 <b>440μg</b>, 엽산 <b>1020μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회분홍색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(440μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(1020μg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 440μg</span><span class=\"sd-badge is-solid\">Folate 1020μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>으뜸명정<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>440μg</b> of Vitamin B12, <b>1020μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>440μg</b> Vitamin B12, <b>1020μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (440μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (1020μg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-004",
+  "productName": "피크 OPC",
+  "productNameEn": "피크 OPC",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483545",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(1) 정상적인 엽산 대사에 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미•이취가 없으며, 점박이가 있는 밝은 회분홍색의 장방형 제피정제\n붕해 : 60분 이내\n비타민B12 : 표시량 ( 440㎍ / 1200mg)의 80~180%\n엽산 : 표시량 ( 1,020㎍ DFE/ 1200mg)의 80~150%\n대장균군:음성",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 회분홍색의 장방형 제피정제",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 440,
+    "unit": "μg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 440μg</span><span class=\"sd-badge is-solid\">엽산 1020μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>피크 OPC<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>440μg</b>, 엽산 <b>1020μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 B12 <b>440μg</b>, 엽산 <b>1020μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 회분홍색의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(440μg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(1020μg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 회분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 440μg</span><span class=\"sd-badge is-solid\">Folate 1020μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>피크 OPC<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 우리바이오(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>440μg</b> of Vitamin B12, <b>1020μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>440μg</b> Vitamin B12, <b>1020μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 우리바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (440μg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (1020μg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 밝은 회분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-005",
+  "productName": "솔가 활성 엽산 680 위드 비타민 B12(Active Folic Acid 680MCG DFE with B12)",
+  "productNameEn": "솔가 활성 엽산 680 위드 비타민 B12(Active Folic Acid 680MCG DFE with B12)",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352270",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산]\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민 B12]\n정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한분홍색의 점박이가 있는 하양색의 원형 코팅정제\n2. 붕해도 : 60분 이내\n3. 비타민 B12 : 표시량(2.4µg/300mg)의 80~180%\n4. 엽산 : 표시량(680 µg DFE/300mg)의 80~150%\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n1. 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\n2. 섭취 전에 소비기한을 확인 후 섭취하십시오. 또한 소비기한이 경과한 제품은 섭취하지 마십시오. \n3. 특정성분에 알레르기가 있으신 분은 원재료명을 확인 후 섭취하십시오.\n4. 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n5. 제품을 개봉하신 후에는 원료의 특성상 흡습으로 인하여 변질될 수 있으니 섭취 직전에 개봉하여 드시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한분홍색의 점박이가 있는 하양색의 원형 코팅정제",
+   "storage": "1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 680μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>솔가 활성 엽산 680 위드 비타민 B12(Active Folic Acid 680MCG DFE with B12)<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>680μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>680μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한분홍색의 점박이가 있는 하양색의 원형 코팅정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/300mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(680μg/300mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한분홍색의 점박이가 있는 하양색의 원형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 680μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>솔가 활성 엽산 680 위드 비타민 B12(Active Folic Acid 680MCG DFE with B12)<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>680μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2.4μg</b> Vitamin B12, <b>680μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 300mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (680μg / 300mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한분홍색의 점박이가 있는 하양색의 원형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-006",
+  "productName": "프리미엄 안심 엽산 800 플러스",
+  "productNameEn": "프리미엄 안심 엽산 800 플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106439",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산] ①세포와 혈액생성에 필요 ②태아 신경관의 정상 발달에 필요 ③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B12] ①정상적인 엽산 대사에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 장방형 코팅정제\n② 엽산 : 표시량(800㎍/1,000㎎)의 80~150%\n③ 비타민B12 : 표시량(2.4㎍/1,000㎎)의 80~180%\n④ 대장균군 : 음성\n⑤ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n④ 동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란하양색의 장방형 코팅정제",
+   "storage": "실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 800μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 안심 엽산 800 플러스<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란하양색의 장방형 코팅정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1000mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(800μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 800μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 안심 엽산 800 플러스<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>800μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>2.4μg</b> Vitamin B12, <b>800μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1000mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (800μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란하양색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-007",
+  "productName": "에너쎌 활성 엽산",
+  "productNameEn": "에너쎌 활성 엽산",
+  "manufacturer": "(주)웰레스트",
+  "manufacturerEn": null,
+  "statementNo": "20230029284178",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산]\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B12]\n(1) 정상적인 엽산 대사에 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제\n\n2) 엽산 : 표시량(800㎍DFE/500mg)의 80~150%\n\n3) 비타민 B12 : 표시량(2.4ug/500mg)의 80~180%\n\n4) 대장균군 : 음성\n\n5) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제",
+   "storage": "직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 800μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>에너쎌 활성 엽산<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">(주)웰레스트 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제 · (주)웰레스트 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(800μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 800μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>에너쎌 활성 엽산<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by (주)웰레스트 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>800μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2.4μg</b> Vitamin B12, <b>800μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)웰레스트</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (800μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-008",
+  "productName": "임팩트9(Impact9)",
+  "productNameEn": "임팩트9(Impact9)",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082086",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①정상적인 엽산 대사에 필요\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색 장방형의 투명 제피정제\n2. 비타민B12 : 표시량 (2.4ug/4000mg)의 80~180%\n3. 엽산 : 표시량 (680ug DFE/4000mg)의 80~150% \n4. 대장균군 : 음성\n5. 붕해 : 60분 이내",
+   "intake": "1일 2회, 1회 2정(1정당 1000mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n소비기한을 반드시 확인하시고, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n섭취전 제품에 이상이 있는 경우 섭취를 금하십시오.\n제품 개봉 시 포장재에 의해 상처를 입을 위험이 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색 장방형의 투명 제피정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 습기가 적고 직사광선을 받지 않는 실온에 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다. 잘못된 섭취를 피하고 품질을 보호, 유지하기 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 4000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 680μg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>임팩트9(Impact9)<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 2회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>680μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>680μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색 장방형의 투명 제피정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/4000mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(680μg/4000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색 장방형의 투명 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 습기가 적고 직사광선을 받지 않는 실온에 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다. 잘못된 섭취를 피하고 품질을 보호, 유지하기 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 680μg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>임팩트9(Impact9)<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · 2 times a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>680μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 tablets): <b>2.4μg</b> Vitamin B12, <b>680μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 4000mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (680μg / 4000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색 장방형의 투명 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 습기가 적고 직사광선을 받지 않는 실온에 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다. 잘못된 섭취를 피하고 품질을 보호, 유지하기 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-009",
+  "productName": "엽산 800",
+  "productNameEn": "엽산 800",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351541",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산]\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민 B12]\n①정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미∙이취가 없는 흰 노랑색의 원형 제피정제\n2. 엽산 : 표시량(800ug/230mg)의 80~150%\n3. 비타민B12 : 표시량(2.4ug/230mg)의 80~180%\n4. 붕해 : 60분 이내\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취 여부를 결정하십시오.\n 2) 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n 3) 섭취 전에 유통기한을 확인 후 섭취하시기 바라며, 유통기한이 경과한 제품은 섭취하지 마십시오.\n 4) 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나 고객상담실로 문의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 흰 노랑색의 원형 제피정제",
+   "storage": "1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.   2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 230,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 800μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>엽산 800<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>800μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미∙이취가 없는 흰 노랑색의 원형 제피정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/230mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(800μg/230mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미∙이취가 없는 흰 노랑색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 800μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>엽산 800<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>800μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2.4μg</b> Vitamin B12, <b>800μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 230mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (800μg / 230mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미∙이취가 없는 흰 노랑색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-010",
+  "productName": "활성형 엽산",
+  "productNameEn": "활성형 엽산",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007862",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산] 세포와 혈액생성에 필요 / 태아 신경관의 정상 발달에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B12] 정상적인 엽산 대사에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제\n2. 엽산 : 표시량(400μg/500mg)의 80~150%\n3. 비타민B12 : 표시량(25μg/500mg)의 80~180%\n4. 대장균군 : 음성\n5. 붕해 : 음성 (제피정제 : 60분 이내 붕해)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 25μg</span><span class=\"sd-badge is-solid\">엽산 400μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>활성형 엽산<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>25μg</b>, 엽산 <b>400μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>25μg</b>, 엽산 <b>400μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(25μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(400μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 25μg</span><span class=\"sd-badge is-solid\">Folate 400μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>활성형 엽산<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>25μg</b> of Vitamin B12, <b>400μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>25μg</b> Vitamin B12, <b>400μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (25μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (400μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-011",
+  "productName": "라이프토콜 비타민B12 1000 컴플렉스",
+  "productNameEn": "라이프토콜 비타민B12 1000 컴플렉스",
+  "manufacturer": "주식회사 피플리브",
+  "manufacturerEn": null,
+  "statementNo": "2025001831025",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민B12]\n(1) 정상적인 엽산 대사에 필요\n[엽산]\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 빨간 검정색 점박이가 있는 흰색의 원형 정제\n2) 비타민 B12: 표시량(1000㎍/200㎎)의 80~180%\n3) 엽산 : 표시량(400㎍DFE/200㎎)의 80~150%\n4) 대장균군 : 음성\n5) 붕해 : 30분이내",
+   "intake": "1일 1회, 1회 1정 (200mg)을 충분한 물과 함께 섭취",
+   "caution": "1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2) 특이체질, 알레르기 체질인 경우 원료를 확인한 후 섭취하십시오.\n3) 1일 섭취량을 초과하여 섭취하지 마십시오.\n4) 용기 안의 실리카겔(방습제)은 절대 드시지 마십시오.\n5) 소비기한을 확인하시고, 섭취량 및 섭취 방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 빨간 검정색 점박이가 있는 흰색의 원형 정제",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "μg",
+    "basisAmount": 200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 1000μg</span><span class=\"sd-badge is-solid\">엽산 400μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프토콜 비타민B12 1000 컴플렉스<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">주식회사 피플리브 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>1000μg</b>, 엽산 <b>400μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>1000μg</b>, 엽산 <b>400μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 빨간 검정색 점박이가 있는 흰색의 원형 정제 · 주식회사 피플리브 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(1000μg/200mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(400μg/200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 빨간 검정색 점박이가 있는 흰색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 1000μg</span><span class=\"sd-badge is-solid\">Folate 400μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프토콜 비타민B12 1000 컴플렉스<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 주식회사 피플리브 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000μg</b> of Vitamin B12, <b>400μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1000μg</b> Vitamin B12, <b>400μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 피플리브</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (1000μg / 200mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (400μg / 200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 빨간 검정색 점박이가 있는 흰색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-012",
+  "productName": "엽산&비타민B12",
+  "productNameEn": "엽산&비타민B12",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106377",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[엽산] ① 세포와 혈액생성에 필요 ② 태아 신경관의 정상 발달에 필요 ③ 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B12] ① 정상적인 엽산 대사에 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 정제\n② 엽산 : 표시량(600㎍/500mg)의 80~150%\n③ 비타민B12 : 표시량(2.4㎍/500mg)의 80~180%\n④ 대장균군 : 음성\n⑤ 붕해도 : 30분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인한 후 섭취하여 주십시오.\n② 특정 또는 특이체질이실 경우 성분 확인 후 섭취하십시오.\n③ 이상증상이 생길 경우 즉시 섭취를 중단하고 전문가와 상담하십시오.\n④ 동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 정제",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 600μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>엽산&amp;비타민B12<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>600μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>600μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(600μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 600μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>엽산&amp;비타민B12<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>600μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>2.4μg</b> Vitamin B12, <b>600μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (600μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b12-folate-013",
+  "productName": "제트프로엽산",
+  "productNameEn": "제트프로엽산",
+  "manufacturer": "코뉴",
+  "manufacturerEn": null,
+  "statementNo": "2019000437320",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①정상적인 엽산 대사에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형정제 \n② 엽산 : 표시량 1,000μg/1,600mg 의 80~150%\n③ 대장균군 : 음성 \n④ 비타민B12 : 표시량 2.4μg/1,600mg의 80~180% \n④ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취한다.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회황색의 타원형 정제",
+   "storage": "직사광선을 피하고 서늘한곳에 실온 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "μg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 2.4μg</span><span class=\"sd-badge is-solid\">엽산 1000μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>제트프로엽산<small>비타민 B12 · 엽산</small></h1><p class=\"sd-meta\">코뉴 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>2.4μg</b>, 엽산 <b>1000μg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 비타민 B12 <b>2.4μg</b>, 엽산 <b>1000μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회황색의 타원형 정제 · 코뉴 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(2.4μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>엽산</b> 표시량(1000μg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회황색의 타원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한곳에 실온 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B12 · 엽산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B12 2.4μg</span><span class=\"sd-badge is-solid\">Folate 1000μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>제트프로엽산<small>Vitamin B12 · Folate</small></h1><p class=\"sd-meta\">Made by 코뉴 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4μg</b> of Vitamin B12, <b>1000μg</b> of Folate as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>2.4μg</b> Vitamin B12, <b>1000μg</b> Folate</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코뉴</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B12</b><ul class=\"sd-why\"><li>Needed for normal folate metabolism</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B12</b> labelled (2.4μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Folate</b> labelled (1000μg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 회황색의 타원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한곳에 실온 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B12 · Folate together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

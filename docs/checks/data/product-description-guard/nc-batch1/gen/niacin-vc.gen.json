@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "niacin-vc-001",
+  "productName": "에이웰",
+  "productNameEn": "에이웰",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038775",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 연한 분홍색의 분말\n2. 나이아신: 표시량(30 mg NE/3g)의 80~150%\n3. 비타민 C: 표시량(300 mg/3g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1포(3g)을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 연한 분홍색의 분말",
+   "storage": "직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>에이웰<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 연한 분홍색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/3g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(300mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 300mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>에이웰<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>300mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>300mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (300mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-002",
+  "productName": "웰니스 알파",
+  "productNameEn": "웰니스 알파",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038773",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 연한 분홍색의 분말\n2. 나이아신: 표시량(30 mg NE/1g)의 80~150%\n3. 비타민 C: 표시량(100 mg/1g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1스푼(1g)을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 연한 분홍색의 분말",
+   "storage": "직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>웰니스 알파<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1스푼</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1스푼) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 연한 분홍색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1스푼</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/1g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>웰니스 알파<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-003",
+  "productName": "텔로케어",
+  "productNameEn": "텔로케어",
+  "manufacturer": "(주)신비바이오",
+  "manufacturerEn": null,
+  "statementNo": "2023000229640",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) [나이아신] 체내 에너지 생성에 필요\n2) [비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 제피정제\n2) 비타민C : 표시량(50mg/ 500mg)의 80 ~ 150%\n3) 나이아신 : 표시량(30mg NE/ 500mg)의 80 ~ 150%\n4) 대장균군 : 음성\n5) 붕해실험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우 성분을 확인하신 후 섭취하십시오. \n2) 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 방법을 준수하시기 바랍니\n다. \n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다. \n4) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 제피정제",
+   "storage": "습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 50mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>텔로케어<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)신비바이오 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>50mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>50mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 제피정제 · (주)신비바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(50mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 50mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>텔로케어<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)신비바이오 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>50mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>30mg</b> Niacin, <b>50mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)신비바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (50mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰노랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-004",
+  "productName": "어썸스틱",
+  "productNameEn": "어썸스틱",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038771",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 연한 분홍색의 분말\n2. 나이아신: 표시량(30 mg NE/3g)의 80~150%\n3. 비타민 C: 표시량(300 mg/3g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1포(3g) 을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 연한 분홍색의 분말",
+   "storage": "직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 유통기한은 2년임",
+   "shelfLife": "제조일로부터2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>어썸스틱<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 연한 분홍색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/3g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(300mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터2년</div><div class=\"sd-item\"><b>보관</b> 직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 유통기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 300mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>어썸스틱<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>300mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>300mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (300mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 유통기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-005",
+  "productName": "메타칸골드(Metakhan Gold)",
+  "productNameEn": "메타칸골드(Metakhan Gold)",
+  "manufacturer": "원바이오 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "2022000481826",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①체내 에너지 생성에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은 회분홍 색의 분말\n2) 나이아신 : 표시량(23mg/1g)의 80~150%\n    비타민C :  표시량(110mg/1g)의 80~150%\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1스푼(1g)을 물과 함께 섭취하시기 바랍니다.",
+   "caution": "1)\t어린이,임산부,수유부는 섭취에 주의 바랍니다.\n2)\t특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원재료를 확인 후 섭취하시기 바랍니다.\n3)\t이상사례 발생 시 섭취를 중단하고 전문가와 상담하여 주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은회분홍 의 분말",
+   "storage": "고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 23,
+    "unit": "mg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 23mg</span><span class=\"sd-badge is-solid\">비타민 C 110mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메타칸골드(Metakhan Gold)<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">원바이오 주식회사 제조 · 1일 1회 1스푼</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>23mg</b>, 비타민 C <b>110mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1스푼) 섭취로 나이아신 <b>23mg</b>, 비타민 C <b>110mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은회분홍 의 분말 · 원바이오 주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1스푼</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(23mg/1g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(110mg/1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은회분홍 의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 23mg</span><span class=\"sd-badge is-solid\">Vitamin C 110mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메타칸골드(Metakhan Gold)<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by 원바이오 주식회사 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>23mg</b> of Niacin, <b>110mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>23mg</b> Niacin, <b>110mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 원바이오 주식회사</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (23mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (110mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은회분홍 의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-006",
+  "productName": "메타D'테일 B 1 (Meta D'tail B 1)",
+  "productNameEn": "메타D'테일 B 1 (Meta D'tail B 1)",
+  "manufacturer": "원바이오 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "2022000481832",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①체내 에너지 생성에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미,이취가 없는 연한노랑분홍 또는 밝은 회분홍 색의 분말\n2) 나이아신 : 표시량(23mg/1g)의 80~150%\n    비타민C :  표시량(110mg/1g)의 80~150%\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1스푼(1g)을 물과 함께 섭취하시기 바랍니다.",
+   "caution": "1)\t어린이,임산부,수유부는 섭취에 주의 바랍니다.\n2)\t특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원재료를 확인 후 섭취하시기 바랍니다.\n3)\t이상사례 발생 시 섭취를 중단하고 전문가와 상담하여 주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 회황색 또는 황회색 의 분말",
+   "storage": "고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 23,
+    "unit": "mg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 23mg</span><span class=\"sd-badge is-solid\">비타민 C 110mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메타D'테일 B 1 (Meta D'tail B 1)<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">원바이오 주식회사 제조 · 1일 1회 1스푼</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>23mg</b>, 비타민 C <b>110mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1스푼) 섭취로 나이아신 <b>23mg</b>, 비타민 C <b>110mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 회황색 또는 황회색 의 분말 · 원바이오 주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1스푼</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(23mg/1g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(110mg/1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 회황색 또는 황회색 의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 23mg</span><span class=\"sd-badge is-solid\">Vitamin C 110mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메타D'테일 B 1 (Meta D'tail B 1)<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by 원바이오 주식회사 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>23mg</b> of Niacin, <b>110mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>23mg</b> Niacin, <b>110mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 원바이오 주식회사</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (23mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (110mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 회황색 또는 황회색 의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 실온 에서 보관, 유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-007",
+  "productName": "발란스 37",
+  "productNameEn": "발란스 37",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038776",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 연한 분홍색의 분말\n2. 나이아신: 표시량(30 mg NE/3g)의 80~150%\n3. 비타민 C: 표시량(300 mg/3g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1포(3g)을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 연한 분홍색의 분말",
+   "storage": "직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 3,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>발란스 37<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 연한 분홍색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/3g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(300mg/3g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 300mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>발란스 37<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>300mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>300mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (300mg / 3g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-008",
+  "productName": "웰니스 알파스틱",
+  "productNameEn": "웰니스 알파스틱",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038774",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 연한 분홍색의 분말\n2. 나이아신: 표시량(30 mg NE/2.5g)의 80~150%\n3. 비타민 C: 표시량(250 mg/2.5g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1포(2.5g)을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 연한 분홍색의 분말",
+   "storage": "직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 2.5,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>웰니스 알파스틱<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>250mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>250mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 연한 분홍색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/2.5g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 250mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>웰니스 알파스틱<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>250mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>250mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 2.5g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (250mg / 2.5g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "niacin-vc-009",
+  "productName": "아리아 케이 글로우",
+  "productNameEn": "아리아 케이 글로우",
+  "manufacturer": "(주)엘에이치뉴트리",
+  "manufacturerEn": null,
+  "statementNo": "202200038777",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이취가 없는 흰 노랑색의 분말\n2. 나이아신: 표시량(30 mg NE/1g)의 80~150%\n3. 비타민 C: 표시량(100 mg/1g)의 80~150%\n4. 대장균군: 음성",
+   "intake": "1일 1회 1스푼(1g)을 물에 희석 후 섭취",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이취가 없는 흰 노랑색의 분말",
+   "storage": "직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 30,
+    "unit": "mg",
+    "basisAmount": 1,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 30mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아리아 케이 글로우<small>나이아신 · 비타민 C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 제조 · 1일 1회 1스푼</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>30mg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1스푼) 섭취로 나이아신 <b>30mg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이취가 없는 흰 노랑색의 분말 · (주)엘에이치뉴트리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1스푼</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(30mg/1g)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이취가 없는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 30mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아리아 케이 글로우<small>Niacin · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)엘에이치뉴트리 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>30mg</b> of Niacin, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>30mg</b> Niacin, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)엘에이치뉴트리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (30mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이취가 없는 흰 노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

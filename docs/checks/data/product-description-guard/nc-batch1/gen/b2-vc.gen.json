@@ -1,0 +1,380 @@
+[
+ {
+  "candidateId": "b2-vc-001",
+  "productName": "하루씨 1000",
+  "productNameEn": "하루씨 1000",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107590",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\r\n[비타민B2]①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 이미,이취가 없고 고유의 향미가 있는 노란색 분말\r\n2. 비타민C: 표시량(1,000 mg/2,000 mg)의 80~150%\r\n3. 비타민B2:표시량(0.48 mg/2,000 mg)의 80~180%\r\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "1. 알레르기 체질이신분은 성분을 확인하시고 섭취하십시오.\r\n2. 영ㆍ유아, 임신ㆍ수유부나 질환보유자 또는 약물복용중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있는 노란색 분말",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.48,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 0.48mg</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루씨 1000<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>0.48mg</b>, 비타민 C <b>1000mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>0.48mg</b>, 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미,이취가 없고 고유의 향미가 있는 노란색 분말 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.48mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미,이취가 없고 고유의 향미가 있는 노란색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 0.48mg</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>하루씨 1000<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.48mg</b> of Vitamin B2, <b>1000mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.48mg</b> Vitamin B2, <b>1000mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.48mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미,이취가 없고 고유의 향미가 있는 노란색 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-002",
+  "productName": "유니비타민C스틱",
+  "productNameEn": "유니비타민C스틱",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "2004001706246",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]  ① 결합조직 형성과 기능유지에 필요\n                ② 철의 흡수에 필요\n                ③ 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민B2] ①체내 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 입자성이 있는 분말\n② 비타민C : 표시량(520 mg/4 g)의 80~150%\n③ 비타민B2 : 표시량(1.6 mg/4 g)의 80~180% \n④ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포(2 g)를 직접 또는 물과 함께 섭취하십시오.",
+   "caution": "1) 질병을 치료 중이신 분, 특이체질, 알레르기 체질이신 분은 의사, 약사 등 전문가와 상담후 섭취하십시오.\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입지 않도록 주의하십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 과량 섭취하지 않도록 주의하십시오.\n5) 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 입자성이 있는 분말",
+   "storage": "1) 직사광선을 받지 아니하며 습기가 없는 실온에 보관, 유통하여 주십시오.2) 제품이 흡습되지 않도록 포장의 파손 등에 주의하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.6,
+    "unit": "mg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.6mg</span><span class=\"sd-badge is-solid\">비타민 C 520mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>유니비타민C스틱<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.6mg</b>, 비타민 C <b>520mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 B2 <b>1.6mg</b>, 비타민 C <b>520mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 입자성이 있는 분말 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.6mg/4g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(520mg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선을 받지 아니하며 습기가 없는 실온에 보관, 유통하여 주십시오.2) 제품이 흡습되지 않도록 포장의 파손 등에 주의하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.6mg</span><span class=\"sd-badge is-solid\">Vitamin C 520mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>유니비타민C스틱<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.6mg</b> of Vitamin B2, <b>520mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>1.6mg</b> Vitamin B2, <b>520mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.6mg / 4g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (520mg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선을 받지 아니하며 습기가 없는 실온에 보관, 유통하여 주십시오.2) 제품이 흡습되지 않도록 포장의 파손 등에 주의하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-003",
+  "productName": "아반바프리미엄비타민C플러스",
+  "productNameEn": "아반바프리미엄비타민C플러스",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "20040015110656",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1.성상 : 이미, 이취가 없고 고유의 향미가 있으며 코팅된 황색의 육각형정제.\n2.비타민B2 : 표시량(1.4㎎/1200㎎)의 80~180%.\n3.대장균군 : 음성.\n4.비타민C : 표시량(500㎎/1200㎎)의 80~150%.\n5.붕해시험 : 적합(60분이내).",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 분은 원료 성분을 확인하신 후 섭취하십시오. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 코팅된 황색의 육각형정제.",
+   "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오. 제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월."
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.4,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>아반바프리미엄비타민C플러스<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.4mg</b>, 비타민 C <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 비타민 B2 <b>1.4mg</b>, 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 코팅된 황색의 육각형정제. · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 코팅된 황색의 육각형정제.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오. 제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>아반바프리미엄비타민C플러스<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.4mg</b> of Vitamin B2, <b>500mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>1.4mg</b> Vitamin B2, <b>500mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 코팅된 황색의 육각형정제.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오. 제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-004",
+  "productName": "뉴트라비타 에너씨플러스 파우더(NutraVita Ener-C+Powder)",
+  "productNameEn": "뉴트라비타 에너씨플러스 파우더(NutraVita Ener-C+Powder)",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20120017002167",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 노랑색의 분말로 레몬 특유의 맛과 향이 있으며 이미·이취가 없다.\n2. 비타민C 함량 : 표시량(500 mg / 2,000 mg)의 80~150%\n3. 비타민B2 함량 : 표시량(1.24 mg / 2,000 mg)의 80~180%\n4. 대장균군 : 음성",
+   "intake": "1) 8세 이상 어린이 : 식 후 1일 1포를 입안에서 녹여 섭취   2) 성인 : 식 후 1일 2포를 입안에서 녹여 섭취",
+   "caution": "1) 임신부, 수유부, 알레르기 체질 또는 질병으로 인하여 치료를 받고 있는 분은 섭취 전에 상담 후 섭취하십시오.\n2) 개인적인 신체 상태에 따라 이상반응이 드물게 나타날 수 있으며, 이상반응이 나타날 경우 전문가와 상담하시기 바랍니다.\n3) 본 제품은 페닐알라닌을 함유하고 있습니다.",
+   "dosageForm": "노랑색의 분말로 레몬 특유의 맛과 향이 있으며 이미·이취가 없다.",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24 개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.24,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": null,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.24mg</span><span class=\"sd-badge is-solid\">비타민 C 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴트라비타 에너씨플러스 파우더(NutraVita Ener-C+Powder)<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.24mg</b>, 비타민 C <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>1.24mg</b>, 비타민 C <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>노랑색의 분말로 레몬 특유의 맛과 향이 있으며 이미·이취가 없다. · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.24mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(500mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 노랑색의 분말로 레몬 특유의 맛과 향이 있으며 이미·이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24 개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.24mg</span><span class=\"sd-badge is-solid\">Vitamin C 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>뉴트라비타 에너씨플러스 파우더(NutraVita Ener-C+Powder)<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.24mg</b> of Vitamin B2, <b>500mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>1.24mg</b> Vitamin B2, <b>500mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.24mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (500mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 노랑색의 분말로 레몬 특유의 맛과 향이 있으며 이미·이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24 개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-005",
+  "productName": "비타 바이탈씨 과립 레몬맛",
+  "productNameEn": "비타 바이탈씨 과립 레몬맛",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "2012001700226",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 \n[비타민B2]①체내 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없으며 흰 노랑에 입자성이 있는 분말\n2) 비타민C :  표시량(1,000 mg/4 g)의 80~150%\n3) 비타민B2 : 표시량(2.4 mg/4 g)의 80~180%\n4) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포를 입안에서 녹여 섭취하십시오",
+   "caution": "1) 임신부, 수유부, 알레르기 체질 또는 질병으로 인하여 치료를 받고 있는 분은 섭취 전에 상담 후 섭취하십시오.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n3) 본 제품은 페닐알라닌을 함유하고 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 흰 노랑에 입자성이 있는 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "mg",
+    "basisAmount": 4,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 2.4mg</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비타 바이탈씨 과립 레몬맛<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>2.4mg</b>, 비타민 C <b>1000mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 B2 <b>2.4mg</b>, 비타민 C <b>1000mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 흰 노랑에 입자성이 있는 분말 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(2.4mg/4g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/4g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 흰 노랑에 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 2.4mg</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비타 바이탈씨 과립 레몬맛<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4mg</b> of Vitamin B2, <b>1000mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>2.4mg</b> Vitamin B2, <b>1000mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (2.4mg / 4g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 4g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 흰 노랑에 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-006",
+  "productName": "비타그란 비타민C100",
+  "productNameEn": "비타그란 비타민C100",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "20040017062146",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민B2] ①체내 에너지 생성에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 노란색의 입자성이 있는 분말\n② 비타민C : 표시량(100 mg / 2 g)의  80~150%\n③ 비타민B2 : 표시량(1.2 mg / 2 g)의  80~180%\n④ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2. 특정질환, 특이체질, 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 노란색의 입자성이 있는 분말",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.2mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타그란 비타민C100<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.2mg</b>, 비타민 C <b>100mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>1.2mg</b>, 비타민 C <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 밝은 노란색의 입자성이 있는 분말 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.2mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 밝은 노란색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>비타그란 비타민C100<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B2, <b>100mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>1.2mg</b> Vitamin B2, <b>100mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.2mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 밝은 노란색의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-007",
+  "productName": "올데이 프리미엄비타민C",
+  "productNameEn": "올데이 프리미엄비타민C",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "20040017062195",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민B2] (1) 체내 에너지 생성에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노란하양의 입자성이 있는 분말\n2) 비타민C: 표시량(250 mg/2 g)의 80~150%\n3) 비타민B2: 표시량(0.8 mg/2 g)의 80~180%\n4) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포씩 입안에서 녹여 섭취하십시오.",
+   "caution": "1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n2. 특정질환, 특이체질, 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.\n3. 흡습의 우려가 있으니 개봉한 제품은 바로 섭취하십시오.\n4. 과량 섭취하지 않도록 주의하십시오.\n5. 신장질환이 있는 경우 섭취 전 전문가와 상담하십시오.\n6. 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란하양의 입자성이 있는 분말",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.8,
+    "unit": "mg",
+    "basisAmount": 2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 0.8mg</span><span class=\"sd-badge is-solid\">비타민 C 250mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>올데이 프리미엄비타민C<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>0.8mg</b>, 비타민 C <b>250mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 비타민 B2 <b>0.8mg</b>, 비타민 C <b>250mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란하양의 입자성이 있는 분말 · (주)에스엘에스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.8mg/2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(250mg/2g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란하양의 입자성이 있는 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 0.8mg</span><span class=\"sd-badge is-solid\">Vitamin C 250mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>올데이 프리미엄비타민C<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.8mg</b> of Vitamin B2, <b>250mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>0.8mg</b> Vitamin B2, <b>250mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.8mg / 2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (250mg / 2g), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란하양의 입자성이 있는 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-008",
+  "productName": "비타 바이탈씨 과립 레몬맛",
+  "productNameEn": "비타 바이탈씨 과립 레몬맛",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20220020002113",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민C]\n결합조직 형성과 기능유지에 필요\n철의 흡수에 필요\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민B2]\n체내 에너지 생성에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 과립\n\n2) 비타민C : 표시량(1,000 ㎎/4,000 ㎎)의 80 ~ 150%\n3) 비타민B2 : 표시량(2.4 ㎎/4,000 ㎎)의 80 ~ 180%\n\n3) 대장균군 : 음 성",
+   "intake": "1일 2회, 1회 1포를 입안에서 녹여 섭취하십시오.",
+   "caution": "1) 과량 섭취하지 않도록 주의하시기 바랍니다.\n2) 신장질환이 있는 경우 섭취 전 전문가와 상담하시기 바랍니다.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 임신부, 수유부, 알레르기 체질 또는 질병으로 인하여 치료를 받고 있는 분은 섭취 전에 상담 후 섭취하십시오. \n3) 본 제품은 페닐알라닌을 함유하고 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰 노란색의 과립",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2.4,
+    "unit": "mg",
+    "basisAmount": 4000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "powder",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 2.4mg</span><span class=\"sd-badge is-solid\">비타민 C 1000mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비타 바이탈씨 과립 레몬맛<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 2회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>2.4mg</b>, 비타민 C <b>1000mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1포) 섭취로 비타민 B2 <b>2.4mg</b>, 비타민 C <b>1000mg</b></li><li>고유의 향미가 있고 이미·이취가 없는 흰 노란색의 과립 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">녹여 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(2.4mg/4000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(1000mg/4000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 과립</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>분말 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 2.4mg</span><span class=\"sd-badge is-solid\">Vitamin C 1000mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비타 바이탈씨 과립 레몬맛<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · 2 times a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2.4mg</b> of Vitamin B2, <b>1000mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 sachet): <b>2.4mg</b> Vitamin B2, <b>1000mg</b> Vitamin C</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">Let it dissolve</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (2.4mg / 4000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (1000mg / 4000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 과립</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "b2-vc-009",
+  "productName": "트루엔키즈 상큼 비타C",
+  "productNameEn": "트루엔키즈 상큼 비타C",
+  "manufacturer": "주)팜크로스",
+  "manufacturerEn": null,
+  "statementNo": "200400151101176",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미ㆍ이취가 없는 연한 노랑색의 원형 정제\n2. 비타민B2 : 표시량(1㎎/1,600㎎)의 80~180%\n3. 비타민C : 표시량(30㎎/1,600㎎)의 80~150%\n4. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취하십시오.",
+   "caution": "(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미ㆍ이취가 없는 연한 노랑색의 원형 정제",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1,
+    "unit": "mg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "chewable",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1mg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트루엔키즈 상큼 비타C<small>비타민 B2 · 비타민 C</small></h1><p class=\"sd-meta\">주)팜크로스 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1mg</b>, 비타민 C <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 B2 <b>1mg</b>, 비타민 C <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미ㆍ이취가 없는 연한 노랑색의 원형 정제 · 주)팜크로스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1mg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미ㆍ이취가 없는 연한 노랑색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 C 섭취를 함께 챙기고 싶은 분</li><li>츄어블정 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1mg</span><span class=\"sd-badge is-solid\">Vitamin C 30mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>트루엔키즈 상큼 비타C<small>Vitamin B2 · Vitamin C</small></h1><p class=\"sd-meta\">Made by 주)팜크로스 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1mg</b> of Vitamin B2, <b>30mg</b> of Vitamin C as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>1mg</b> Vitamin B2, <b>30mg</b> Vitamin C</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주)팜크로스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1mg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (30mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미ㆍ이취가 없는 연한 노랑색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin C together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]
