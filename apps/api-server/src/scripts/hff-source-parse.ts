@@ -33,6 +33,8 @@ export const CLS: Array<{ k: string; re: RegExp }> = [
   { k: '오메가3', re: /EPA|DHA|정제어유/i }, { k: '루테인', re: /루테인|지아잔틴|마리골드|황반/i }, { k: '밀크씨슬', re: /밀크씨슬|실리마린|카르두스/i },
   { k: 'MSM', re: /MSM|엠에스엠|메틸설포닐|디메틸설폰/i }, { k: '코엔자임Q10', re: /코엔자임|코큐텐|Q10|유비퀴논/i }, { k: '가르시니아', re: /가르시니아|hydroxycitric|HCA/i },
   { k: '글루코사민', re: /글루코사민/i }, { k: '식이섬유', re: /식이섬유|차전자|난소화성말토덱스트린|귀리|이눌린|프락토올리고/i }, { k: '옥타코사놀', re: /옥타코사놀/i }, { k: '프로폴리스', re: /프로폴리스|총\s*플라보노이드/i },
+  // 기능성 원료 registry 확장(WO): spec 라벨 기준. 녹차=카테킨 · 은행잎=플라보놀배당체 · 감마리놀렌산 · 테아닌=L-테아닌.
+  { k: '녹차', re: /녹차|카테킨/i }, { k: '감마리놀렌산', re: /감마리놀렌/i }, { k: '은행잎', re: /은행잎|플라보놀\s*배당체/i }, { k: '테아닌', re: /테아닌|theanine/i },
 ];
 export function classify(label: string): string | null { for (const c of CLS) if (c.re.test(label)) return c.k; return null; }
 

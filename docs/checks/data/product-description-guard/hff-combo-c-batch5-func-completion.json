@@ -1,0 +1,109 @@
+{
+ "wo": "Agent C — HFF 기능성 원료 registry 확장 및 생산 후보 해금",
+ "start": "2026-07-22 15:54:13 +0900",
+ "end": "2026-07-22 16:11:44 +0900",
+ "elapsedMin": 57,
+ "registryExpansion": {
+  "ingredients": [
+   "오메가3",
+   "가르시니아",
+   "녹차",
+   "감마리놀렌산",
+   "프로폴리스",
+   "은행잎",
+   "테아닌"
+  ],
+  "grounding": "ko 기능성 = 실 MAIN_FNCTN 추출(제품수 오메가3 592·가르시니아 967·녹차 348·감마리놀렌산 69·프로폴리스 177·은행잎 176·테아닌 410). 임의 생성 없음.",
+  "changes": {
+   "hff-source-parse CLS": "+4 (녹차=카테킨·감마리놀렌산·은행잎=플라보놀배당체·테아닌=L-테아닌). 오메가3/가르시니아/프로폴리스 기존.",
+   "hff-nutrient-registry INGREDIENT_FN": "+7 grounded ko 세트",
+   "hff-combo-compose SRC_LABEL": "+7 (G-MULTI-AMOUNT-SOURCE 가드용)",
+   "mapFunctionEn": "기존 COMPONENT 인프라로 22 기능성 전량 EN 매핑 성공(null 0)"
+  },
+  "verification": "fnBelongsTo+mapFunctionEn+classify 22 기능성/6 라벨 전량 PASS(0 fail). 회귀: 전체 eligible 2971→4523(+1552 unlock), 기존(신규원료무관) signature 감소 0."
+ },
+ "shard": {
+  "hash": "FNV-1a",
+  "count": 3,
+  "mine": 2,
+  "unlockFreshByShard": {
+   "shard0": 243,
+   "shard1": 264,
+   "shard2": 865
+  }
+ },
+ "funnel": {
+  "shard2Fresh": 865,
+  "selectEligible": 865,
+  "shardSkip": 0,
+  "generate": {
+   "written": 857,
+   "autoHold": 8
+  },
+  "hiddenH1": 0,
+  "hiddenH3": 1,
+  "reviewLater": 4,
+  "READY": 853
+ },
+ "perIngredientReady": {
+  "오메가3": 580,
+  "가르시니아": 48,
+  "녹차": 20,
+  "감마리놀렌산": 7,
+  "프로폴리스": 160,
+  "은행잎": 25,
+  "테아닌": 28
+ },
+ "unlockedSignaturesInReady": 77,
+ "hiddenAudit": {
+  "H1": 0,
+  "H3": 1,
+  "note": "H3 1건=카페인(50,000mg/kg 이하 limit spec, 비기능성 false-positive) → 제외. 카페인 NONFUNC 편입 후속 권고."
+ },
+ "reviewLater": {
+  "count": 4,
+  "breakdown": {
+   "HIDDEN_H3": 1,
+   "PRE-SRC-BASIS-UNVERIFIABLE-003": 3
+  }
+ },
+ "groundedWarningsKeptReady": {
+  "D-CLAIM-GROUNDED-002": 18,
+  "E-NAME-DERIVED-GROUNDED-002": 14
+ },
+ "write": {
+  "committed": 853,
+  "product_masters": 853,
+  "product_candidates_update": 853,
+  "spd_ko": 853,
+  "spd_en": 853,
+  "total": 3412
+ },
+ "apply": {
+  "result": "COMMIT 완료(자동 apply·게이트 전통과)",
+  "skipped": 0,
+  "inTxnPostVerify": {
+   "masters": 853,
+   "spdKo": 853,
+   "spdEn": 853,
+   "canonicalDup": 0,
+   "candidatesLinked": 853,
+   "spdRefLinked": 1706
+  }
+ },
+ "independentVerify": {
+  "masters": 853,
+  "spdKo": 853,
+  "spdEn": 853,
+  "canonicalDup": 0,
+  "candidatesLinked": 853,
+  "sourceHff": 1706,
+  "pass": true
+ },
+ "comboLiveFinalSSOT": 3790,
+ "canonicalDup": 0,
+ "existingLiveDrift": 0,
+ "throughputPerHour": 898,
+ "longRunEstimate": "7원료 unlock 총 combo 후보 1,544(전 shard). shard2 853 생산 완료. shard0/1 잔여 ~507(타 에이전트). 추가 기능성 원료(홍삼·프락토올리고 등) 해금 시 추가 물량 가능.",
+ "concurrentNote": "hff-nutrient-registry 에 타 에이전트 몰리브덴 additive 미커밋 변경 공존(공유 워킹트리). 내 생산은 my-7 signature 한정(몰리브덴/루테인/식이섬유 제외)."
+}
