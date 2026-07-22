@@ -9,7 +9,7 @@
 
 /** 공백/문장부호 제거 정규화 (매핑 키) — 어미/접두 변이 흡수 */
 export function normFn(s: string): string {
-  let t = (s ?? '').replace(/\s+/g, '').replace(/[·.,()（）]/g, '');
+  let t = (s ?? '').replace(/\s+/g, '').replace(/[·.,()（）･・‧]/g, '');
   t = t.replace(/^항산화작용을하여/, ''); // 비타민E 접두 변이
   t = t.replace(/도움을?줄?수?있(음|습니다)?|도움을?줌요?|주는데도움|도움을?주는/g, '도움'); // 어미 변이(필요 의 '요'는 보존)
   return t.trim();
@@ -70,6 +70,8 @@ const RAW_MAP: Array<[string, string]> = [
   // 요오드
   ['갑상선 호르몬의 합성에 필요', 'Needed for the synthesis of thyroid hormones'],
   ['신경발달에 필요', 'Needed for neural development'],
+  // 몰리브덴 (MFDS 공식 기능성 — 실제 제품 MAIN_FNCTN grounding)
+  ['산화·환원 효소의 활성에 필요', 'Needed for the activity of oxidation-reduction (redox) enzymes'],
 ];
 
 const FUNCTION_MAP: Record<string, string> = {};
@@ -158,6 +160,7 @@ export const INGREDIENT_FN: Record<string, string[]> = {
   '구리': ['철의 운반과 이용에 필요', '유해산소로부터 세포를 보호하는데 필요'],
   '망간': ['뼈 형성에 필요', '에너지 이용에 필요', '유해산소로부터 세포를 보호하는데 필요'],
   '요오드': ['갑상선 호르몬의 합성에 필요', '에너지 생성에 필요', '신경발달에 필요'],
+  '몰리브덴': ['산화·환원 효소의 활성에 필요'],
   'MSM': ['관절 및 연골건강에 도움을 줄 수 있음', '관절 및 연골 건강에 도움을 줄 수 있음'],
   '글루코사민': ['관절 및 연골 건강에 도움을 줄 수 있음', '관절 및 연골 건강·피부보습에 도움을 줄 수 있음'],
   '루테인': ['노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음'],
@@ -165,6 +168,14 @@ export const INGREDIENT_FN: Record<string, string[]> = {
   '코엔자임Q10': ['항산화·높은 혈압 감소에 도움을 줄 수 있음', '항산화에 도움을 줄 수 있음', '높은 혈압 감소에 도움을 줄 수 있음'],
   '식이섬유': ['배변활동 원활에 도움을 줄 수 있음', '혈중 콜레스테롤 개선에 도움을 줄 수 있음', '식후 혈당상승 억제에 도움을 줄 수 있음'],
   '옥타코사놀': ['지구력 증진에 도움을 줄 수 있음'],
+  // ─── 기능성 원료 registry 확장(WO) — ko 는 실 MAIN_FNCTN 에서 추출(grounded). 복합형 조합 귀속용 ───
+  '오메가3': ['혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음', '혈중 중성지질 개선에 도움을 줄 수 있음', '혈행 개선에 도움을 줄 수 있음', '건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음', '기억력 개선에 도움을 줄 수 있음'],
+  '가르시니아': ['탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음', '체지방 감소에 도움을 줄 수 있음'],
+  '녹차': ['항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음', '항산화에 도움을 줄 수 있음', '체지방 감소에 도움을 줄 수 있음', '혈중 콜레스테롤 개선에 도움을 줄 수 있음'],
+  '감마리놀렌산': ['혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음', '면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음', '월경전 변화에 의한 불편한 상태 개선에 도움을 줄 수 있음', '혈행개선에 도움을 줄 수 있음', '혈중 콜레스테롤 개선에 도움을 줄 수 있음'],
+  '프로폴리스': ['항산화에 도움을 줄 수 있음', '구강에서의 항균작용에 도움을 줄 수 있음'],
+  '은행잎': ['기억력 개선·혈행 개선에 도움을 줄 수 있음', '기억력 개선에 도움을 줄 수 있음', '혈행 개선에 도움을 줄 수 있음'],
+  '테아닌': ['스트레스로 인한 긴장완화에 도움을 줄 수 있음'],
 };
 const INGREDIENT_FN_NORM: Record<string, Set<string>> = {};
 for (const [k, arr] of Object.entries(INGREDIENT_FN)) INGREDIENT_FN_NORM[k] = new Set(arr.map(normFn));
@@ -216,4 +227,5 @@ export const NUTRIENT_META: Record<string, NutrientMeta> = {
   '망간': { key: '망간', slug: 'manganese', displayKo: '망간', displayEn: 'Manganese' },
   '크롬': { key: '크롬', slug: 'chromium', displayKo: '크롬', displayEn: 'Chromium' },
   '요오드': { key: '요오드', slug: 'iodine', displayKo: '요오드', displayEn: 'Iodine' },
+  '몰리브덴': { key: '몰리브덴', slug: 'molybdenum', displayKo: '몰리브덴', displayEn: 'Molybdenum' },
 };
