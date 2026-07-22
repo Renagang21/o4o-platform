@@ -1,0 +1,135 @@
+[
+ {
+  "slug": "s0-41",
+  "statementNo": "200400170211848",
+  "productName": "트루바이타민 키즈",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "Q-TRUNCATED-002"
+ },
+ {
+  "slug": "s0-41",
+  "statementNo": "200400200082841",
+  "productName": "트루바이타민 Choice UP",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-41",
+  "statementNo": "200400170211443",
+  "productName": "멀티비타민 키즈",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "Q-TRUNCATED-002"
+ },
+ {
+  "slug": "s0-54",
+  "statementNo": "20040015107967",
+  "productName": "앤굿",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "slug": "s0-88",
+  "statementNo": "201000190041445",
+  "productName": "덴티모어 임플타민",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-100",
+  "statementNo": "20040015110957",
+  "productName": "흡수가잘되는 엽산",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "slug": "s0-105",
+  "statementNo": "2019001407141",
+  "productName": "멀티비타민 FOR 맨",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-125",
+  "statementNo": "200400200141163",
+  "productName": "프리미엄 티컨트롤",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-145",
+  "statementNo": "200700170353201",
+  "productName": "아이트니 멀티비타츄",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-158",
+  "statementNo": "200400200082413",
+  "productName": "트루바이타민 Choice",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-162",
+  "statementNo": "200400200023738",
+  "productName": "진정주 비타민B & 마그네슘 + 토코페롤",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-178",
+  "statementNo": "200400200023621",
+  "productName": "볼탭 멀티비타민",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-216",
+  "statementNo": "20040020013278",
+  "productName": "유플러스골드",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-267",
+  "statementNo": "201000190041324",
+  "productName": "행복해 밸런스 비타민 위드 미네랄",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-272",
+  "statementNo": "200400200022999",
+  "productName": "의사가 만든 근거기반 종합비타민",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-285",
+  "statementNo": "20120017002128",
+  "productName": "일양 멀티비타민",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-296",
+  "statementNo": "20040015107683",
+  "productName": "멀티비타민 알파",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-312",
+  "statementNo": "200700170353115",
+  "productName": "멀티비타민&미네랄 구미",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "slug": "s0-315",
+  "statementNo": "200400170211231",
+  "productName": "엘릭솔 하루애",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ }
+]
