@@ -43,6 +43,11 @@ interface ProductCard {
   price?: number | null;
   priceDisplay?: string | null;
   imageUrl?: string | null;
+  // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
+  //   규격·수량·제형·포장(ProductMaster.specification) + 상세 진입용 설명. 태블릿과 동일 표시 원칙.
+  specification?: string | null;
+  description?: string | null;
+  short_description?: string | null;
 }
 
 
@@ -54,6 +59,8 @@ function formatPrice(p: ProductCard): string | null {
 
 export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet }) {
   const [openCard, setOpenCard] = useState<ContentCard | null>(null);
+  // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1: 상품 상세(이미지 없음) 진입.
+  const [openProduct, setOpenProduct] = useState<ProductCard | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR 모바일은 '태블릿 대기화면'을 첫 콘텐츠로 보여주지 않는다.
   //   대기화면은 무조작 태블릿 전용 개념 — 휴대전화로 열면 코너 안내·상품·추가 콘텐츠를 바로 본다.
@@ -84,6 +91,7 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
             key={`${section.blockType}-${idx}`}
             section={section}
             onOpenCard={setOpenCard}
+            onOpenProduct={setOpenProduct}
           />
         ))}
 
@@ -110,6 +118,32 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
           </div>
         </div>
       )}
+
+      {/* WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
+          상품 상세 — 상품 이미지 없음. 상품명 / 규격 / 가격 / 설명(전체 너비) / 안내. */}
+      {openProduct && (
+        <div style={styles.modalOverlay} onClick={() => setOpenProduct(null)} role="presentation">
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <div style={{ minWidth: 0 }}>
+                <h2 style={styles.modalTitle}>{openProduct.name || '상품'}</h2>
+                {openProduct.specification && <p style={styles.productDetailSpec}>{openProduct.specification}</p>}
+                {formatPrice(openProduct) && <p style={styles.productDetailPrice}>{formatPrice(openProduct)}</p>}
+              </div>
+              <button onClick={() => setOpenProduct(null)} style={styles.modalClose} aria-label="닫기">✕</button>
+            </div>
+            <div style={styles.modalBody}>
+              {openProduct.description ? (
+                <ContentRenderer html={openProduct.description} variant="guide" />
+              ) : openProduct.short_description ? (
+                <ContentRenderer html={openProduct.short_description} variant="guide" />
+              ) : (
+                <p style={{ margin: 0, color: colors.neutral500 }}>자세한 내용은 이 화면을 매장 직원에게 보여주세요.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -117,9 +151,11 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
 function SectionBlock({
   section,
   onOpenCard,
+  onOpenProduct,
 }: {
   section: QrScreenSetSection;
   onOpenCard: (c: ContentCard) => void;
+  onOpenProduct: (p: ProductCard) => void;
 }) {
   // corner_description 은 header 에서 이미 렌더 → 본문 반복 안 함.
   if (section.blockType === 'corner_description') return null;
@@ -188,21 +224,24 @@ function SectionBlock({
     return (
       <section style={styles.section}>
         <h2 style={styles.sectionLabel}>제품</h2>
+        {/* WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
+            상품 이미지/📦 제거 → 상품명 + 규격(specification) + 가격 텍스트 버튼. 카드 전체가 상세 진입 버튼. */}
         <div style={styles.productGrid}>
           {products.map((p) => {
             const price = formatPrice(p);
             return (
-              <div key={`${p.type}-${p.id}`} style={styles.productCard}>
-                <div style={styles.productImgArea}>
-                  {p.imageUrl ? (
-                    <img src={p.imageUrl} alt={p.name || ''} style={styles.productImg} />
-                  ) : (
-                    <span style={{ fontSize: 28, color: colors.neutral300 }}>📦</span>
-                  )}
-                </div>
+              <div
+                key={`${p.type}-${p.id}`}
+                onClick={() => onOpenProduct(p)}
+                style={{ ...styles.productCard, cursor: 'pointer' }}
+              >
                 <div style={styles.productInfo}>
                   <span style={styles.productName}>{p.name || '상품'}</span>
-                  {price && <span style={styles.productPrice}>{price}</span>}
+                  {p.specification && <span style={styles.productSpec}>{p.specification}</span>}
+                  <div style={styles.productFooter}>
+                    {price ? <span style={styles.productPrice}>{price}</span> : <span aria-hidden />}
+                    <span style={styles.productMore}>자세히 보기 ›</span>
+                  </div>
                 </div>
               </div>
             );
@@ -348,24 +387,22 @@ const styles: Record<string, React.CSSProperties> = {
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '10px',
   },
+  // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1:
+  //   상품 이미지 영역(productImgArea/productImg) 제거 → 텍스트 버튼형 카드.
   productCard: {
     border: `1px solid ${colors.neutral200}`,
     borderRadius: '12px',
     overflow: 'hidden',
     backgroundColor: '#fff',
   },
-  productImgArea: {
-    width: '100%',
-    aspectRatio: '1/1',
-    backgroundColor: colors.neutral100,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  productImg: { width: '100%', height: '100%', objectFit: 'cover' },
-  productInfo: { padding: '10px', display: 'flex', flexDirection: 'column', gap: '4px' },
-  productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
+  productInfo: { padding: '14px', display: 'flex', flexDirection: 'column', gap: '6px', minHeight: '78px', justifyContent: 'center' },
+  productName: { fontSize: '15px', fontWeight: 700, color: colors.neutral800, lineHeight: 1.35, wordBreak: 'keep-all' },
+  productSpec: { fontSize: '12px', color: colors.neutral500, lineHeight: 1.4 },
+  productFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginTop: '2px' },
   productPrice: { fontSize: '14px', fontWeight: 700, color: colors.primary },
+  productMore: { fontSize: '12px', fontWeight: 600, color: colors.primary, whiteSpace: 'nowrap' },
+  productDetailSpec: { fontSize: '14px', color: colors.neutral600, margin: '6px 0 0', lineHeight: 1.5, wordBreak: 'keep-all' },
+  productDetailPrice: { fontSize: '16px', fontWeight: 800, color: colors.primary, margin: '8px 0 0' },
   footer: {
     display: 'flex',
     alignItems: 'center',

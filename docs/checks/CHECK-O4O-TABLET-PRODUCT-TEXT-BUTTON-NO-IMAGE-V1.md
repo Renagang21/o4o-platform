@@ -82,3 +82,39 @@
 
 ## 7. 미완/후속 (중지조건 #2)
 - QR 공개 상품 화면은 `services/web-kpa-society/src/pages/qr/PublicScreenSetViewer.tsx`(별도 ProductCard)에서 렌더 → 상품 이미지 제거를 원하면 동일 원칙으로 별도 정비 필요(승인 시 진행).
+- **→ 후속 완료: 아래 §8 (WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1)에서 정비함.**
+
+---
+
+## 8. 후속 — QR 렌더러 정렬 + specification 실측 (WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1)
+
+### 8.1 QR 기존 구조
+- `/qr/:slug`(screen_set) → `PublicScreenSetViewer.tsx`(자체 `ProductCard`). `product_list` 블록이 `section.data.products`를 렌더(이미지+📦). 상품 상세 진입 **없었음**(content_list 카드만 모달).
+- 데이터 원천: resolver `store-public-screen-set-resolve.ts`가 **태블릿과 동일한 `queryTabletVisibleProducts`** 호출 후 `supplierResult.data`를 그대로 `data.products`로 전달 + local mirror 병합.
+
+### 8.2 중지조건 검증
+- QR 상품 데이터에 `specification` 전달? **예** — `queryTabletVisibleProducts`(§4에서 `pm.specification` additive 추가) 결과를 resolver가 그대로 통과 → specification 이미 전달됨.
+- QR이 태블릿과 완전히 다른 원천? **아니오** — 동일 쿼리.
+- migration 필요? **아니오**. 렌더러 변경이 QR 랜딩 전체 영향? **아니오** — `product_list` 렌더만 수정(코너/콘텐츠/idle 무관).
+- → **중지조건 미발동, 프론트 최소 수정만 수행.**
+
+### 8.3 변경 파일
+- `services/web-kpa-society/src/pages/qr/PublicScreenSetViewer.tsx` (자체 `ProductCard`만 최소 수정 — TabletKioskPage 통합/재설계 없음)
+
+### 8.4 상품 이미지 제거 + 텍스트 버튼형
+- `product_list` 카드: 이미지 영역(`productImgArea`)·`<img>`·📦 fallback 제거 → **상품명 + 규격(specification, 있을 때) + 가격 + "자세히 보기 ›"** 텍스트 버튼. 카드 전체 클릭.
+- 상품 상세 모달 신설(이미지 없음): 상품명 / 규격 / 가격 / 설명(ContentRenderer, supplier `description`/`short_description`) / 안내. 기존 modal 스타일 재사용.
+- 유지: QR 코드, 코너 소개, 콘텐츠 카드 썸네일(`cardThumbImg`), idle 미디어.
+
+### 8.5 specification 실측
+- 전달 경로: `ProductMaster.specification → queryTabletVisibleProducts(pm.specification) → resolver/TabletProduct → 태블릿 목록·QR 목록·상세`.
+- 태블릿(운영 스모크): 목록/상세 텍스트 버튼·이미지 없음 확인. 매장 자체(local) 상품은 규격 미보유 → 이름만(빈 줄 없음) 확인.
+- **O4O 공급자 상품 규격 2행 표출**: (배포 후 운영 스모크 기록 — 아래)
+
+### 8.6 검증
+- typecheck: web-kpa-society 0.
+- (배포/스모크: 아래 기록)
+  - [ ] QR 상품 목록 이미지 없음 + 상품명 버튼형
+  - [ ] QR 상품 선택 → 상세(이미지 없음, 설명 전체 너비, 닫기)
+  - [ ] 태블릿/QR 양쪽 O4O 상품 규격 2행 · 없으면 빈 줄 없음
+  - [ ] 콘텐츠 이미지·QR·대기 미디어 유지, 콘솔/API 오류 없음
