@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "0f8e4626-8e96-466e-ac94-b29be1cface5",
+  "productName": "해당정",
+  "productNameEn": "해당정",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017021769",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제\n②코로솔산 : 표시량(1.3mg/2,000mg)의 80 ~ 120% \n③납(mg/kg) : 1.0 이하\n④카드뮴(mg/kg) : 0.5 이하\n⑤총수은(mg/kg) : 0.5 이하\n⑥총비소(mg/kg) : 1.0 이하\n⑦대장균군 : 음성\n⑧붕해시험 : 30분 이내",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "- 알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n- 섭취 전 제품에 이상이 있는 경우 섭취하지 마십시오.\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>해당정<small>바나바잎추출물</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>해당정<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 검은 반점이 있는 갈색의 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "19e95568-2898-484d-a7de-584642b12102",
+  "productName": "레벨지",
+  "productNameEn": "레벨지",
+  "manufacturer": "(주)네이처텍",
+  "manufacturerEn": null,
+  "statementNo": "20040020004126",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎추출물]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐\n2) 코로소린산(corosolic acid) 함량 : 표시량(0.62mg/3,000mg)의 80~120%\n3) 납(mg/kg) : 1.0 이하\n4) 비소(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 0.5 이하\n6) 수은(mg/kg) : 0.5 이하\n7) 붕해시험 : 20분 이내\n8) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부, 알레르기 체질, 노약자 및 치료를 받고 계신 중증 질환자 등은 구입처 또는 고객지원팀으로 문의 후 섭취하시기 바랍니다.\r\n2) 어린이에게 섭취시키고자 하실 경우에는 구입처 또는 고객지원팀으로 문의하시고 섭취 시 보호자의 관찰 하에 섭취하도록 하십시오.\r\n3) 권장섭취량을 확인하신 후 섭취하십시오.\r\n4) 섭취자의 신체상태에 따라 특이반응이 나타날 수 있습니다. 이 경우 섭취를 중단하신 후 구입처 또는 고객지원팀으로 문의하시기 바랍니다.\r\n5) 보관상태에 따라 내용물이 분리될 수 있으나, 제품의 품질 및 안전성에는 이상이 없으니 안심하고 드셔도 됩니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐",
+   "storage": "1) 직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.\r\n2) 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.\r\n3) 잘못된 사용 및 남용을 피하고 품질보존을 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>레벨지<small>바나바잎추출물</small></h1><p class=\"sd-meta\">(주)네이처텍 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐 · (주)네이처텍 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2) 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 3) 잘못된 사용 및 남용을 피하고 품질보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>레벨지<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by (주)네이처텍 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)네이처텍</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 갈색의 내용물을 함유한 적색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2) 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 3) 잘못된 사용 및 남용을 피하고 품질보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "27629384-29fe-430b-85d0-a245a1d4c8c6",
+  "productName": "당케어N",
+  "productNameEn": "당케어N",
+  "manufacturer": "케이지랩 주식회사",
+  "manufacturerEn": null,
+  "statementNo": "20040017038137",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 고유의 향미가 있고 이미, 이취가 없는 어두운갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐\n2. 코로솔산 : 표시량(0.5mg/1,800mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 20분이내",
+   "intake": "1일 2회, 1회 1캡슐(900mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "알레르기 등 특이체질의 경우 원료의 성분을 확인 후 섭취하십시오.\n제품 개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의 하시기 바랍니다. \n어린이, 임산부 및 수유부는 섭취를 피할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 내용물을 함유한 적갈색의 장방형 연질캡슐",
+   "storage": "실온/ 직사광선이나 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>당케어N<small>바나바잎추출물</small></h1><p class=\"sd-meta\">케이지랩 주식회사 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>케이지랩 주식회사 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 직사광선이나 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>당케어N<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 케이지랩 주식회사 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 케이지랩 주식회사</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 직사광선이나 고온다습한 곳을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "42742129-15a5-47db-89a5-aaf29ade49f3",
+  "productName": "당삼오",
+  "productNameEn": "당삼오",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832503",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제\n(2) 코로솔산 : 표시량(0.9 mg/2,400 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>당삼오<small>바나바잎추출물</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>당삼오<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 회갈색 또는 갈회색의 장방형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "50f30ebf-826c-4c38-a781-cd24f7ff3a76",
+  "productName": "혈당케어 츄어블정",
+  "productNameEn": "혈당케어 츄어블정",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832421",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제\n(2) 코로솔산 : 표시량(1.3 mg/1,700 mg)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 씹어서 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[바나바잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈당케어 츄어블정<small>바나바잎추출물</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈당케어 츄어블정<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없고 점박이가 있는 노란 하얀색 또는 흰 분홍색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "8a86fe41-ffd1-4831-94e4-9fce2eeeebc2",
+  "productName": "리뉴비_지",
+  "productNameEn": "리뉴비_지",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370165",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎 추출물]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐\n2. 코로솔산 : 표시량(0.54 mg / 2,000 mg)의 80~120 %\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 20분 이내",
+   "intake": "1일 2회 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>리뉴비_지<small>바나바잎추출물</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>리뉴비_지<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 분말이 들어있는 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "9f6ec631-62c0-4eec-8c02-b4a6cbb00a42",
+  "productName": "케이헬씨 바나바",
+  "productNameEn": "케이헬씨 바나바",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052307",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎추출물] ① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제\n② 코로솔산 : 표시량(0.45mg/500mg)의 80 ~ 120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 0.5 이하\n⑤ 수은(mg/kg) : 0.5 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 30분이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[바나바잎추출물] ① 어린이, 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>케이헬씨 바나바<small>바나바잎추출물</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>케이헬씨 바나바<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 황회색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a61302f8-d56c-490f-8df8-95b7e51e885d",
+  "productName": "당케어",
+  "productNameEn": "당케어",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200021360",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎 추출물 제품]식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n② 코로소린산 함량(mg/2000mg) : 표시량(0.65)의 80%~120%\r\n③ 납(mg/kg) : 1.0 이하\r\n④ 카드뮴(mg/kg) : 0.5 이하\r\n⑤ 총수은(mg/kg) : 0.5 이하\r\n⑥ 총비소(mg/kg) : 1.0 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오. \r\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \r\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "회색의 제피정제",
+   "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>당케어<small>바나바잎추출물</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>당케어<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a9973184-7a20-4a38-aebf-78cd8cabf2ef",
+  "productName": "혈당앤 바나바",
+  "productNameEn": "혈당앤 바나바",
+  "manufacturer": "(주)파마피아",
+  "manufacturerEn": null,
+  "statementNo": "2020000997225",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎추출물]①식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제\n2) 코로솔산 : 표시량의  80~120% (0.45mg/600mg)\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오",
+   "caution": "",
+   "dosageForm": "이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제",
+   "storage": "실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈당앤 바나바<small>바나바잎추출물</small></h1><p class=\"sd-meta\">(주)파마피아 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제 · (주)파마피아 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈당앤 바나바<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by (주)파마피아 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)파마피아</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없으며 고유의 향미를 지닌 검정색 점박이를 포함한 회백색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관/ 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "c0ab11ac-9a6a-4b53-818e-ba73177a3251",
+  "productName": "이지팩 바나바리프",
+  "productNameEn": "이지팩 바나바리프",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352802",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제\n2. 대장균군 : 음성\n3. 붕해도 : 30분 이내\n4. 코로솔산 : 표시량(1.3mg/250mg)의 80~120%\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 0.5 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>이지팩 바나바리프<small>바나바잎추출물</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>이지팩 바나바리프<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 분홍빛 하양색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "ec59b6eb-9c89-4a3f-9342-bd2bf6744c68",
+  "productName": "혈당건강엔 바나바",
+  "productNameEn": "혈당건강엔 바나바",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211509",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[바나바추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제\n ②코로솔산 : 표시량(1.3 mg/200 mg)의 80~120%\n ③납(mg/kg) : 1.0이하\n ④카드뮴(mg/kg) : 0.5이하\n ⑤수은(mg/kg) : 0.5이하\n ⑥비소(mg/kg) :1.0이하\n ⑦대장균군 : 음성\n ⑧붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제",
+   "storage": "실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈당건강엔 바나바<small>바나바잎추출물</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈당건강엔 바나바<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 탁한 분홍색의 원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "f9e007d8-43de-4454-b110-e89281bfa622",
+  "productName": "건기남의 올레유러핀",
+  "productNameEn": "건기남의 올레유러핀",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "manufacturerEn": null,
+  "statementNo": "20172880193439",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[올리브잎주정추출물(제2014-9호)\n(국문) 혈압 조절에 도움을 줄 수 있음\n(영문) May help to maintain healthy blood pressure\n[바나바잎추출물]\n① 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "baseStandard": "1.성상: 고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제\n2.코로솔산: 표시량(1.3mg / 800mg)의 80 ~ 120%\n3.Oleuropein: 표시량(90mg / 800mg)의 80 ~ 120%\n4.납(mg/kg): 1.0이하\n5.카드뮴(mg/kg): 0.2이하\n6.수은(mg/kg): 0.1이하\n7.비소(mg/kg); 1.0이하\n8.붕해: 60분이내\n9.대장균군: 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[올리브잎주정추출물(제2014-9호)]\n(1) 위, 간 및 신장 질환이 있거나 고혈압치료제 등 복용시 전문가와 상의할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[바나바잎추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제",
+   "storage": "직사광선과 고온다습한 곳을 피하여 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>건기남의 올레유러핀<small>바나바잎추출물</small></h1><p class=\"sd-meta\">대원헬스케어 주식회사 2공장 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제 · 대원헬스케어 주식회사 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>바나바잎추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Banaba leaf extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>건기남의 올레유러핀<small>Banaba leaf extract</small></h1><p class=\"sd-meta\">Made by 대원헬스케어 주식회사 2공장 · Once a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Banaba leaf extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Banaba leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 대원헬스케어 주식회사 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with suppressing the rise in blood sugar after meals</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선과 고온다습한 곳을 피하여 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Banaba leaf extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]

@@ -1,0 +1,226 @@
+[
+ {
+  "candidateId": "2fe847a9-b665-4f12-b8c4-b39a05870cc8",
+  "productName": "데일리픽 쏘팔메토 케어",
+  "productNameEn": "데일리픽 쏘팔메토 케어",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "20220020002141",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토 열매 추출물] 전립선 건강의 유지에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상:  고유의 향미가 있고 이미·이취가 없는 갈색 내용물을 함유한 검은색의 타원형 연질캡슐\n2. 로르산: 표시량(115 mg/500 mg)의 80~120%\n3. 납(mg/kg): 1.0 이하\n4. 카드뮴(mg/kg): 1.0 이하\n5. 수은(mg/kg): 1.0 이하\n6. 비소(mg/kg): 1.0 이하\n7. 대장균군: 음성\n8. 붕해도: 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 성인남성만 섭취하십시오.\n2. 수술 전후, 출혈성 질환이 있거나 항응고제 등 복용 시 전문가와 상담하십시오.\n3. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n4. 메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있으니 식사 후 섭취하십시오.\n5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 갈색 내용물을 함유한 검은색의 타원형 연질캡슐",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>데일리픽 쏘팔메토 케어<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 갈색 내용물을 함유한 검은색의 타원형 연질캡슐 · 이앤에스(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 갈색 내용물을 함유한 검은색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>데일리픽 쏘팔메토 케어<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 갈색 내용물을 함유한 검은색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "5174064a-a0f4-4568-9322-f7cc1830715c",
+  "productName": "쏘팔메토",
+  "productNameEn": "쏘팔메토",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351929",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토 열매 추출물]  전립선 건강의 유지에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 로르산(%) : 표시량 (70mg/400mg)의 80 % ~ 120 %\n3. 납 (mg/kg) : 1.0 이하\n4. 카드뮴 (mg/kg) : 1.0 이하\n5. 수은 (mg/kg) : 1.0 이하\n6. 비소 (mg/kg) : 1.0 이하\n7. 붕해시험 : 20분 이내 \n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 성인남성만 섭취할 것\n2. 수술 전후, 출혈성 질환이 있거나 항응고제 등 복용 시 전문가와 상담할 것\n3. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n4. 메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있으니 식사 후 섭취할 것\n5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n6. 유통기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쏘팔메토<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쏘팔메토<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "674a42f8-0dad-415f-8ac4-5bcf6be0cbb9",
+  "productName": "마이헬스 쏘팔어스",
+  "productNameEn": "마이헬스 쏘팔어스",
+  "manufacturer": "(주)아오스",
+  "manufacturerEn": null,
+  "statementNo": "20140020012219",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토 열매 추출물] : 전립선 건강의 유지에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 초록색의 타원형 연질캡슐\n2. 로르산 : 표시량(115 mg/550 mg)의 80 ~ 120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "성인 남성만 섭취하십시오.\n수술 전후, 출혈성 질환이 있거나 항응고제 등 복용 시 전문가와 상담하십시오.\n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있으니 식사 후 섭취하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 초록색의 타원형 연질캡슐",
+   "storage": "습기와 직사광선을 피하여 서늘한 곳에 보관하십시오.제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>마이헬스 쏘팔어스<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">(주)아오스 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 초록색의 타원형 연질캡슐 · (주)아오스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 초록색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오.제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>마이헬스 쏘팔어스<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by (주)아오스 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)아오스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 초록색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오.제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a9f92869-b1aa-4ff3-92f4-f6d55a6ab379",
+  "productName": "쏘팔메토",
+  "productNameEn": "쏘팔메토",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006381",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토열매추출물 제품]전립선 건강의 유지에 도움을 줄 수 있음.",
+   "baseStandard": "1.성상: 갈색의 내용물을 함유한 적갈색의 연질캡슐\n2.로르산:표시량(115mg/600mg)의 80~120%\n3.납(mg/kg):1.0이하\n4.총비소(mg/kg):1.0이하\n5.카드뮴(mg/kg):1.0이하\n6.총수은(mg/kg):1.0이하\n12.붕해:20분이내\n13.대장균군:음성",
+   "intake": "1일 1회,1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[쏘팔메토열매추출물 제품]메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있음.\r\n알레르기 체질 또는 질병으로 인하여 치료를 받고 있는 분은 섭취 전에 상담 후 섭취하십시오.",
+   "dosageForm": "갈색의 내용물을 함유한 적갈색의 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 영유아와 어린이의 손이 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쏘팔메토<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>갈색의 내용물을 함유한 적갈색의 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 갈색의 내용물을 함유한 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 영유아와 어린이의 손이 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쏘팔메토<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 갈색의 내용물을 함유한 적갈색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 영유아와 어린이의 손이 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "c56a6215-f9f9-4358-ad3c-e9d5cbef33cd",
+  "productName": "쏘팔메토",
+  "productNameEn": "쏘팔메토",
+  "manufacturer": "(주)다스코바이오",
+  "manufacturerEn": null,
+  "statementNo": "2012001701021",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토열매추출물 제품]전립선 건강의 유지에 도움을 줄 수 있음.",
+   "baseStandard": "1)성상:녹갈색의 내용물을 함유한 흑갈색 연질캡슐\t\r\n2)로르산:표시량(85mg/1.5g)80~120%\t\r\n3)납(mg/kg):1.0이하\t\r\n4)카드뮴(mg/kg)1.0이하\t\r\n5)총수은(mg/kg)1.0이하\t\r\n6)비소(mg/kg)1.0이하\t\r\n7)대장균균:음성\t\r\n8)붕해시험:20분이내",
+   "intake": "1일1회, 1회 3캡슐을 물과 함께 섭취",
+   "caution": "① 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\r\n② 특이체질, 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.\r\n③ 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\r\n④ 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오.\r\n⑤ 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하시거나, 고객상담실로 문의하시기 바랍니다.\r\n⑥ 메스꺼움등 소화계통의 불편함과 설사를 유발할 수 있음",
+   "dosageForm": "녹갈색의 내용물을 함유한 흑갈색 연질캡슐",
+   "storage": "① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쏘팔메토<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">(주)다스코바이오 제조 · 1일 1회 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>녹갈색의 내용물을 함유한 흑갈색 연질캡슐 · (주)다스코바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 녹갈색의 내용물을 함유한 흑갈색 연질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쏘팔메토<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by (주)다스코바이오 · Once a day · 3 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 3 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Made by (주)다스코바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 녹갈색의 내용물을 함유한 흑갈색 연질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 고온다습한 곳과 직사광선을 피하여 보관하시고, 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "d25d0a1c-00d8-4fe7-b403-1394d75fb062",
+  "productName": "쏘팔메토열매",
+  "productNameEn": "쏘팔메토열매",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052372",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토 열매 추출물] ① 전립선 건강의 유지에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 투명한 내용물을 함유한 검정색의 타원형 연질캡슐\n② 로르산 : 표시량(70mg / 500mg)의 80 ~ 120%\n③ 납(mg/kg) : 1.0 이하\n④ 카드뮴(mg/kg) : 1.0 이하\n⑤ 수은(mg/kg) : 1.0 이하\n⑥ 비소(mg/kg) : 1.0 이하\n⑦ 대장균군 : 음성\n⑧ 붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[쏘팔메토 열매 추출물] ① 성인남성만 섭취하십시오. ② 수술 전후, 출혈성 질환이 있거나 항응고제 등 복용 시 전문가와 상담하십시오. ③ 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. ④ 메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있으니 식사 후 섭취하십시오. ⑤ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 투명한 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쏘팔메토열매<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 투명한 내용물을 함유한 검정색의 타원형 연질캡슐 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 투명한 내용물을 함유한 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쏘팔메토열매<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 투명한 내용물을 함유한 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "eadb687c-ad54-4e21-b593-aa3fb34337ef",
+  "productName": "라이프앤진쏘팔메토",
+  "productNameEn": "라이프앤진쏘팔메토",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006643",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토열매추출물]전립선 건강의 유지에 도움을 줄 수 있습니다.",
+   "baseStandard": "① 성상 : 이미, 이취가 없는 적갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제\r\n② Lauric acid(mg/캅셀) : 표시량(86.4mg/0.5g)의 80.0~120.0%\r\n③ 납(mg/kg) : 1.0 이하\r\n④ 총비소(mg/kg) : 1.0 이하\r\n⑤ 카드뮴(mg/kg) : 1.0 이하\r\n⑥ 총수은(mg/kg) : 1.0 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(0.5g)을 충분한 물과 함께 섭취.",
+   "caution": "[쏘팔메토열매추출물]①임산부, 수유여성은 섭취에 주의②매스꺼움이나 설사 등 소화계통의 불편함을 유발할 수 있음",
+   "dosageForm": "적갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프앤진쏘팔메토<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 적갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있습니다</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 적갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프앤진쏘팔메토<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 적갈색의 점조성 내용물을 함유한 암갈색 타원형 연질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "f582f2d3-5860-4398-a52e-50031770ab50",
+  "productName": "쏘팔메토 포르테",
+  "productNameEn": "쏘팔메토 포르테",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211667",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[쏘팔메토 열매 추출물] ①전립선 건강의 유지에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐\n②로르산 : 표시량(70 mg/500 mg)의 80～120%\n③납(mg/kg) : 1.0 이하\n④카드뮴(mg/kg) : 1.0 이하\n⑤수은(mg/kg) : 1.0 이하\n⑥비소(mg/kg) : 1.0 이하\n⑦붕해시험 : 20분 이내\n⑧대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 성인남성만 섭취할 것\n- 수술 전후, 출혈성 질환이 있거나 항응고제 등 복용 시 전문가와 상담할 것\n- 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음\n- 메스꺼움 등 소화계통의 불편함과 설사를 유발할 수 있으니 식사 후 섭취할 것\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "실온/①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다.②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">쏘팔메토열매추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쏘팔메토 포르테<small>쏘팔메토열매추출물</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>쏘팔메토열매추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>쏘팔메토열매추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>전립선 건강의 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다.②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>쏘팔메토열매추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Saw palmetto fruit extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>쏘팔메토 포르테<small>Saw palmetto fruit extract</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Saw palmetto fruit extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Saw palmetto fruit extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with maintaining prostate health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다.②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Saw palmetto fruit extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]
