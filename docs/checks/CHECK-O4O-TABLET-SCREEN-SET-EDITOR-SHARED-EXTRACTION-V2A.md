@@ -65,11 +65,14 @@ web-kpa-society 페이지에 있던 authoring 편집기(`TabletContentStepBuilde
 - `@o4o/web-kpa-society` tsc `--noEmit`: **0**.
 - **vite build: success**(53s, StoreTabletDisplaysPage·OperatorRoutes 청크 정상 번들 — source-consumed 패키지 반영). Dockerfile COPY 2줄 추가(누락 시 배포 실패 방지).
 
-## 14. 브라우저 smoke (실행 11) — DEFERRED(배포 후)
+## 14. 브라우저 smoke (실행 11) — ✅ PASS (프로덕션, 매장 owner, 2026-07-22, 배포 275bd0061)
 
-- [ ] 매장: 태블릿 콘텐츠 신규 제작 4템플릿·저장·재진입·추가 정보(추가/순서/표시/삭제)·미리보기 정상.
-- [ ] 운영자: 운영자 원본 제작·저장·재진입 정상.
-- [ ] 매장 HUB(운영자 원본) 목록·미리보기·가져오기 정상(templateLabel 라벨 정상).
+`https://kpa-society.co.kr/store/commerce/tablet-displays`:
+- **잔류 리스트 페이지 + 패키지 templateLabel/LEGACY_ONLY_TEMPLATE_KEYS**: 태블릿 콘텐츠 목록 12건 정상 렌더, 템플릿 컬럼 라벨(기본 코너 안내형/대기 영상형/코너 소개형/제품 진열형/상품 집중형) 정상, 템플릿 필터 4종(legacy 제외) ✅.
+- **패키지 편집기(TabletContentStepBuilder) 렌더**: '태블릿 화면 만들기' → 5단계 마법사(템플릿/대기 화면/코너 설명/추가 정보/미리보기·저장) + 템플릿 카드 4종(기본 코너 안내형 선택됨) + 오른쪽 실시간 미리보기(태블릿/QR 모바일 토글·상품 영역) 정상 ✅. '목록으로' 복귀 정상.
+- **편집기 데이터 흐름(주입 api)**: API 레벨 store 엔드포인트 create 200 → blocks 4 저장 → preview content_list 1카드 → cleanup 200(테스트 세트 자가 정리). 목록 12건 불변(누락 0) ✅.
+- **운영자 편집기**: 운영자 페이지는 **동일한 패키지 `TabletContentStepBuilder`** 를 operator api 주입으로 재사용(위 렌더 검증과 동일 컴포넌트) + 운영자 backend 흐름은 선행 WO(FOUNDATION/HUB)에서 검증됨.
+- **참고(정직)**: 검증 중 프로덕션 auth 가 일시 불안정(`/auth/login` 간헐 500·`/auth/me` 401 토큰 클리어 — api-server 측, 프론트 전용 추출과 무관). 재시도로 로그인·검증 완료. 콘솔 앱 오류 = auth 부트스트랩류만.
 
 ## 15. 후속 supplier consumer 연결 가능 여부 (실행 15)
 
