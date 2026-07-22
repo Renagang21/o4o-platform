@@ -299,7 +299,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   진입점은 이미 존재하나 '타블렛 구성'이 '화면 제작' 진입으로 읽히지 않음 →
       //   라벨만 '태블릿 화면 제작'으로 정비(코너별 화면·대기화면 제작·적용). key/subPath/route/기능 무변경.
       //   신규 메뉴 추가 아님(같은 route 중복 방지). GP/KCos 무영향.
-      { key: 'tablet-displays', label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
+      { key: 'tablet-displays', label: '태블렛 화면 제작', subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
     //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.

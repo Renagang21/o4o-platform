@@ -1,5 +1,5 @@
 /**
- * TabletScreenSetManager — 매장(store) 태블릿 콘텐츠 라이브러리 페이지(리스트 + 제작 셸 진입)
+ * TabletScreenSetManager — 매장(store) 태블렛 콘텐츠 라이브러리 페이지(리스트 + 제작 셸 진입)
  *
  * WO-O4O-TABLET-SCREEN-SET-EDITOR-SHARED-EXTRACTION-V2A
  *   단계형 authoring 편집기(TabletContentStepBuilder)와 그 내부(picker/미리보기/템플릿 메타)는
@@ -37,7 +37,7 @@ const defaultStoreBuilderApi: ScreenSetBuilderApi = {
   searchStoreContents: searchTabletStoreContents,
 };
 
-// '사용 중인 코너' 계산용 최소 태블릿 정보(페이지의 TabletType 하위집합).
+// '사용 중인 코너' 계산용 최소 태블렛 정보(페이지의 TabletType 하위집합).
 export interface ScreenSetUsageTablet {
   id: string;
   name: string;
@@ -54,9 +54,13 @@ interface Props {
   storeSlug?: string | null;
   // WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 미리보기 코너 문맥(단독=코너 없음) 전달.
   onPreviewContext?: (tabletId: string | null) => void;
+  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 카드 → 대상 태블렛에 바로 적용(기존 current-screen-set API).
+  onApplyToTablet?: (screenSetId: string, tabletId: string) => Promise<void>;
+  // 방금 가져온 사본 하이라이트(HUB 가져오기 완료 시 전달).
+  highlightId?: string | null;
 }
 
-export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext }: Props) {
+export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId }: Props) {
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -135,13 +139,13 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
       <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
         <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> 태블릿 콘텐츠 (화면 세트)
+          <Layers className="w-4 h-4 text-indigo-600" /> 태블렛 콘텐츠 (화면 세트)
         </h3>
       </div>
 
       <div className="p-4 space-y-4">
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
-          <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
+          <p><b className="text-slate-700">화면 세트</b>는 태블렛 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
           <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
           <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(코너에서 사용/연결 중이면 먼저 해제해야 합니다).</p>
         </div>
@@ -160,6 +164,9 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}
           onPreviewContext={onPreviewContext}
+          tablets={tablets}
+          onApplyToTablet={onApplyToTablet}
+          highlightId={highlightId}
         />
       </div>
     </div>

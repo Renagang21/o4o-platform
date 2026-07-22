@@ -1,10 +1,10 @@
 /**
- * TabletContentLibraryList — 태블릿 콘텐츠(화면 세트) O4O 표준 리스트
+ * TabletContentLibraryList — 태블렛 콘텐츠(화면 세트) O4O 표준 리스트
  *
  * WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1 (기반)
  * WO-O4O-KPA-TABLET-CONTENT-LIST-SEARCH-PAGINATION-PREVIEW-V1
  *   - 검색 + 템플릿/상태/사용코너 필터 + 페이지네이션(페이지당 표시 수 선택)
- *   - 행 단위 미리보기(kebab '미리보기' + 콘텐츠명 클릭) → read-only Screen Set preview 모달(태블릿/QR 모바일)
+ *   - 행 단위 미리보기(kebab '미리보기' + 콘텐츠명 클릭) → read-only Screen Set preview 모달(태블렛/QR 모바일)
  * WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1
  *   - 사용자 문구 '보관' → '리스트에서 제거'(내부 status/API 는 archived/soft-delete 그대로).
  *
@@ -13,8 +13,8 @@
  *   미리보기 = 기존 previewScreenSet(저장 전 draft resolve) + TabletKioskPage embedded 재사용.
  */
 
-import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2 } from 'lucide-react';
+import { useMemo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import {
@@ -63,6 +63,8 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
   inlineMax: 0,
   rules: [
     { key: 'preview', label: '미리보기' },
+    // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 → 대상 태블렛에 바로 적용(보관 제외).
+    { key: 'apply', label: '태블렛에 적용', visible: (s) => s.status !== 'archived' },
     { key: 'edit', label: '수정' },
     // 보관(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지). 내부 status 는 archived 그대로.
     { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
@@ -70,9 +72,18 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
 });
 const ACTION_ICONS: Record<string, ReactNode> = {
   preview: <Eye className="w-4 h-4" />,
+  apply: <MonitorSmartphone className="w-4 h-4" />,
   edit: <Edit3 className="w-4 h-4" />,
   archive: <Trash2 className="w-4 h-4" />,
 };
+
+/** 적용 대상 태블렛(최소 형태 — StoreTabletDisplaysPage 의 TabletType 하위집합). */
+export interface ApplyTargetTablet {
+  id: string;
+  name: string;
+  location?: string | null;
+  currentScreenSetId?: string | null;
+}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -88,7 +99,7 @@ interface Props {
   /** WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 필터 드롭다운에서 숨길 legacy 전용 template_key.
    *  (기존 콘텐츠는 목록 '템플릿 전체'에 그대로 노출·편집 가능 — 필터 선택지에서만 제외.) */
   hiddenTemplateFilterKeys?: string[];
-  /** 태블릿 화면 만들기 진입(부모 생성 폼 오픈). */
+  /** 태블렛 화면 만들기 진입(부모 생성 폼 오픈). */
   onCreate: () => void;
   /** 개별 수정(부모 인라인 편집 패널 오픈). dirty guard 는 부모에서 처리. */
   onEdit: (id: string) => void;
@@ -101,6 +112,12 @@ interface Props {
   storeSlug?: string | null;
   /** WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 미리보기 코너 문맥. 리스트 단독은 코너 없음(상품 미표시). */
   onPreviewContext?: (tabletId: string | null) => void;
+  /** WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 적용 대상 태블렛 목록(설치 코너 표시용). */
+  tablets?: ApplyTargetTablet[];
+  /** 콘텐츠 → 대상 태블렛 적용(기존 current-screen-set API). 성공 시 부모가 tablets 상태 갱신. */
+  onApplyToTablet?: (screenSetId: string, tabletId: string) => Promise<void>;
+  /** HUB 가져오기 완료 후 방금 가져온 사본 하이라이트. */
+  highlightId?: string | null;
 }
 
 export default function TabletContentLibraryList({
@@ -117,6 +134,9 @@ export default function TabletContentLibraryList({
   previewApi,
   storeSlug,
   onPreviewContext,
+  tablets,
+  onApplyToTablet,
+  highlightId,
 }: Props) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('available');
@@ -126,6 +146,51 @@ export default function TabletContentLibraryList({
   const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
+
+  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블렛에 적용' 모달 + 하이라이트/스크롤.
+  const [applyFor, setApplyFor] = useState<ScreenSet | null>(null);
+  const [applyBusyTabletId, setApplyBusyTabletId] = useState<string | null>(null);
+  const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
+  const listTopRef = useRef<HTMLDivElement | null>(null);
+
+  // HUB 가져오기 완료 → 방금 가져온 사본을 보이게: 필터 초기화(전체) + 1페이지(최신순이라 상단) + 스크롤 + 하이라이트.
+  useEffect(() => {
+    if (!highlightId) return;
+    setStatusFilter('all');
+    setSearch('');
+    setTemplateFilter('');
+    setCornerFilter('');
+    setPage(1);
+    setActiveHighlight(highlightId);
+    const scrollTimer = setTimeout(() => {
+      listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+    const clearTimer = setTimeout(() => setActiveHighlight(null), 8000);
+    return () => { clearTimeout(scrollTimer); clearTimeout(clearTimer); };
+  }, [highlightId]);
+
+  const openApply = useCallback((s: ScreenSet) => {
+    if (!onApplyToTablet) return;
+    if (!tablets || tablets.length === 0) {
+      toast.error('먼저 ‘코너별 운영’에서 태블렛을 추가해 주세요.');
+      return;
+    }
+    setApplyFor(s);
+  }, [tablets, onApplyToTablet]);
+
+  const handleApplySelect = useCallback(async (tabletId: string) => {
+    if (!applyFor || !onApplyToTablet || applyBusyTabletId) return;
+    setApplyBusyTabletId(tabletId);
+    try {
+      await onApplyToTablet(applyFor.id, tabletId);
+      setApplyFor(null);
+      onRefresh();
+    } catch {
+      /* 오류 토스트는 부모(onApplyToTablet)에서 표시 */
+    } finally {
+      setApplyBusyTabletId(null);
+    }
+  }, [applyFor, onApplyToTablet, applyBusyTabletId, onRefresh]);
 
   // 미리보기 모달 (WO-...-SEARCH-PAGINATION-PREVIEW-V1)
   const canPreview = !!previewApi && !!storeSlug;
@@ -235,16 +300,22 @@ export default function TabletContentLibraryList({
       header: '콘텐츠명',
       sortable: true,
       sortAccessor: (s) => s.name,
-      render: (_v, s) => (
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded flex items-center justify-center bg-indigo-50 shrink-0 text-indigo-500">
-            <Layers className="w-3.5 h-3.5" />
+      render: (_v, s) => {
+        const highlighted = s.id === activeHighlight;
+        return (
+          <div className={`flex items-center gap-2 min-w-0 ${highlighted ? 'ring-2 ring-teal-400 rounded-lg bg-teal-50/60 -mx-1 px-1 py-0.5' : ''}`}>
+            <div className="w-7 h-7 rounded flex items-center justify-center bg-indigo-50 shrink-0 text-indigo-500">
+              <Layers className="w-3.5 h-3.5" />
+            </div>
+            {/* WO-...-REMOVE-REUSE-BADGE-V1: 모든 Screen Set 이 코너와 독립돼 원래 재사용 가능 → '재사용' 배지는 구분정보 아님(제거). */}
+            <span className="font-medium text-slate-800 text-sm truncate">{s.name}</span>
+            {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 방금 가져온 사본 하이라이트 배지. */}
+            {highlighted && (
+              <span className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-teal-600 text-white">방금 가져옴</span>
+            )}
           </div>
-          {/* WO-...-REMOVE-REUSE-BADGE-V1: 모든 Screen Set 이 코너와 독립돼 원래 재사용 가능 → '재사용' 배지는 구분정보 아님(제거).
-              현재 사용처는 '현재 적용 코너' 열로만 표현. 재사용 기능·데이터·코너 적용 API 무변경. */}
-          <span className="font-medium text-slate-800 text-sm truncate">{s.name}</span>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'templateKey',
@@ -302,6 +373,7 @@ export default function TabletContentLibraryList({
         <RowActionMenu
           actions={buildRowActions(contentActionPolicy, s, {
             preview: () => handlePreview(s),
+            apply: () => openApply(s),
             edit: () => onEdit(s.id),
             archive: () => onArchive(s),
           }, {
@@ -312,12 +384,23 @@ export default function TabletContentLibraryList({
         />
       ),
     },
-  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy]);
+  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy, activeHighlight, openApply]);
 
   const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
+  const highlightedSet = activeHighlight ? sets.find((s) => s.id === activeHighlight) : null;
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" ref={listTopRef}>
+      {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 방금 가져온 사본 안내 배너. */}
+      {highlightedSet && (
+        <div className="flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-800">
+          <Check className="w-4 h-4 shrink-0" />
+          <span className="min-w-0">
+            방금 가져온 <b className="truncate">“{highlightedSet.name}”</b> 을(를) 표시했습니다. <b>태블렛에 적용</b>으로 원하는 태블렛에 바로 띄울 수 있어요.
+          </span>
+        </div>
+      )}
       {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) + 만들기 ── */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
@@ -361,7 +444,7 @@ export default function TabletContentLibraryList({
           onClick={onCreate}
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
         >
-          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
+          <Plus className="w-4 h-4" /> 태블렛 화면 만들기
         </button>
       </div>
 
@@ -399,8 +482,8 @@ export default function TabletContentLibraryList({
         loading={loading}
         emptyMessage={
           search || statusFilter !== 'available' || templateFilter || cornerFilter
-            ? '조건에 맞는 태블릿 콘텐츠가 없습니다.'
-            : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
+            ? '조건에 맞는 태블렛 콘텐츠가 없습니다.'
+            : '아직 태블렛 콘텐츠가 없습니다. ‘태블렛 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
         }
         tableId="kpa-tablet-content-list"
         onRowClick={(s) => handlePreview(s)}
@@ -424,7 +507,7 @@ export default function TabletContentLibraryList({
         </div>
       </div>
 
-      {/* ── 미리보기 모달(read-only, 태블릿/QR 모바일 전환) ── */}
+      {/* ── 미리보기 모달(read-only, 태블렛/QR 모바일 전환) ── */}
       {preview && previewApi && (
         <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
           <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -432,7 +515,7 @@ export default function TabletContentLibraryList({
               <span className="text-sm font-semibold truncate">{preview.name}</span>
               <div className="flex gap-1 flex-shrink-0">
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블릿 화면</button>
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블렛 화면</button>
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일 화면</button>
               </div>
@@ -449,7 +532,7 @@ export default function TabletContentLibraryList({
             </div>
           </div>
           <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            저장된 내용을 보여 주는 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            저장된 내용을 보여 주는 미리보기입니다. 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
         </div>
       )}
@@ -458,6 +541,61 @@ export default function TabletContentLibraryList({
         <div className="fixed inset-0 z-[100000] bg-slate-900/40 flex items-center justify-center" role="presentation">
           <div className="bg-white rounded-xl px-4 py-3 text-sm text-slate-600 inline-flex items-center gap-2 shadow-lg">
             <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
+          </div>
+        </div>
+      )}
+
+      {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블렛에 적용' — 대상 태블렛 선택 모달.
+          기존 current-screen-set API 재사용. 적용 = 그 태블렛의 '지금 나오는 화면' 교체(코너별 운영과 동일 결과). */}
+      {applyFor && (
+        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => !applyBusyTabletId && setApplyFor(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-slate-800">태블렛에 적용</h3>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 태블렛에 띄울지 고르세요.</p>
+              </div>
+              <button onClick={() => !applyBusyTabletId && setApplyFor(null)} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-4 py-3 overflow-y-auto">
+              <ul className="space-y-2">
+                {(tablets ?? []).map((t) => {
+                  const corner = t.location?.trim() || null;
+                  const already = t.currentScreenSetId === applyFor.id;
+                  const busyThis = applyBusyTabletId === t.id;
+                  return (
+                    <li key={t.id}>
+                      <button
+                        onClick={() => handleApplySelect(t.id)}
+                        disabled={already || !!applyBusyTabletId}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-colors ${
+                          already ? 'border-emerald-200 bg-emerald-50 cursor-default'
+                          : 'border-slate-200 hover:border-teal-300 hover:bg-teal-50/50 disabled:opacity-50'
+                        }`}
+                      >
+                        <MonitorSmartphone className="w-4 h-4 text-slate-400 shrink-0" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium text-slate-800 truncate">{t.name}</span>
+                          <span className="block text-[11px] text-slate-400 truncate">{corner ? `설치 코너: ${corner}` : '설치 코너 미지정'}</span>
+                        </span>
+                        {busyThis ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-teal-600 shrink-0" />
+                        ) : already ? (
+                          <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700"><Check className="w-3.5 h-3.5" /> 적용 중</span>
+                        ) : (
+                          <span className="shrink-0 text-xs font-semibold text-teal-700">적용</span>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
+                적용하면 해당 태블렛의 ‘지금 나오는 화면’이 바뀝니다. 자동으로 QR이 만들어지지 않으며, 공개 태블렛 화면에서 새로고침하면 반영됩니다.
+              </p>
+            </div>
           </div>
         </div>
       )}
