@@ -23,6 +23,9 @@ export const STORE_ASSET_SOURCE_KINDS = [
   //   운영자 Screen Set 원본(store_tablet_screen_sets origin='operator') → 매장 독립 사본 추적.
   //   추적(provenance) 전용 — FK·자동 동기화·연쇄삭제 없음.
   'operator_screen_set',
+  // WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B:
+  //   공급자 Screen Set 원본(origin='supplier') → 매장 독립 사본 추적(FK 없음).
+  'supplier_screen_set',
 ] as const;
 
 export const STORE_ASSET_DERIVED_KINDS = [

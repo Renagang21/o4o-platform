@@ -102,6 +102,7 @@ import { createStoreVideoStaffController } from '../o4o-store/controllers/video.
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
 // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자 Screen Set 원본 제작 API
 import { createOperatorScreenSetController } from '../o4o-store/controllers/operator-screen-set.controller.js';
+import { createSupplierScreenSetController } from '../o4o-store/controllers/supplier-screen-set.controller.js';
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
@@ -522,6 +523,18 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     'kpa',
   );
   router.use('/operator/screen-sets', kpaOperatorScreenSetController);
+
+  // WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B: 공급자 Screen Set 원본 제작·HUB 게시 API
+  // /api/v1/kpa/supplier/screen-sets (공급자가 매장 배포용 화면 세트 원본을 제작 — origin='supplier')
+  // 권한: 로그인 사용자가 ACTIVE neture_suppliers 구성원(user_id 매핑). 자기 원본만 접근.
+  // 매장/운영자 API 와 별도 라우터. origin='supplier' AND supplier_id AND service_key='kpa' 격리.
+  // 차단: 매장·코너 적용 / current 지정 / 공개 타블렛 URL / Screen Set QR / 매장 콘텐츠 조회.
+  const kpaSupplierScreenSetController = createSupplierScreenSetController(
+    dataSource,
+    coreRequireAuth as any,
+    'kpa',
+  );
+  router.use('/supplier/screen-sets', kpaSupplierScreenSetController);
 
   // WO-O4O-KPA-STORE-HUB-QR-CONTENT-IMPORT-V1: 운영자 QR 템플릿 → 매장 사본 변환 INSERT
   // /api/v1/kpa/stores/:slug/qr/staff/import (매장 owner 가 자기 매장 store_qr_codes 사본 생성)

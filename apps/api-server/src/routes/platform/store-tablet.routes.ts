@@ -56,6 +56,8 @@ import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-publi
 import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
 // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 가져오기 provenance(추적 전용, FK 없음).
 import { recordDerivations } from '../o4o-store/services/store-asset-derivation.service.js';
+// WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B: 공급자 HUB 조회·가져오기 의약품 이중 가드.
+import { analyzeScreenSetMedication, medicationStoreAccessAllowed } from './store-tablet-medication-guard.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -1676,6 +1678,173 @@ export function createStoreTabletRoutes(
       }
       console.error('[StoreTablet] POST /screen-set-hub/templates/:id/import error:', error);
       res.status(500).json({ success: false, error: 'Failed to import operator template', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // ── 매장 HUB: 공급자 Screen Set 원본 열람 + 매장 독립 사본 가져오기 ──
+  //   WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B
+  //   노출 조건: origin='supplier' AND status='active' AND service_key=대상 서비스 AND deleted_at IS NULL
+  //             AND 현재 매장 유형(organizations.type)과 hub_target_store_type 일치 AND 의약품 약국 전용 가드 통과.
+  //   매장 유형: pharmacy→약국 / store→비약국 / 그 외 유형·판별 불가 조직 → HUB 대상 제외.
+  //   목록·상세·가져오기 각각에서 대상·상태·의약품 조건을 재검사(목록 필터만으로 권한 보장하지 않음).
+  const SUPPLIER_HUB_SERVICE_KEY = OPERATOR_TEMPLATE_SERVICE_KEY; // 'kpa'
+
+  // 현재 매장 유형 → HUB 매장 유형('pharmacy'|'non_pharmacy') 또는 null(대상 제외).
+  async function resolveStoreHubType(orgId: string): Promise<'pharmacy' | 'non_pharmacy' | null> {
+    const rows = await dataSource.query(`SELECT type FROM organizations WHERE id = $1 LIMIT 1`, [orgId]);
+    const t = rows?.[0]?.type;
+    if (t === 'pharmacy') return 'pharmacy';
+    if (t === 'store') return 'non_pharmacy';
+    return null;
+  }
+  // hub_target 이 이 매장 유형에 노출되는가: pharmacy 매장 ← pharmacy|all / non_pharmacy 매장 ← non_pharmacy|all
+  function hubTargetVisibleTo(storeType: 'pharmacy' | 'non_pharmacy', hubTarget: string | null): boolean {
+    if (!hubTarget) return false;
+    if (hubTarget === 'all') return true;
+    return hubTarget === storeType;
+  }
+  const SUPPLIER_HUB_WHERE =
+    `origin = 'supplier' AND status = 'active' AND service_key = $SVC AND deleted_at IS NULL`;
+
+  // GET /screen-set-hub/supplier-templates — 목록(대상 매장 유형 일치 + 의약품 가드)
+  router.get('/screen-set-hub/supplier-templates', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const storeType = await resolveStoreHubType(organizationId);
+      if (!storeType) { res.json({ success: true, data: [] }); return; } // 매장이 아닌 조직 → 대상 제외
+      const targetIn = storeType === 'pharmacy' ? ['pharmacy', 'all'] : ['non_pharmacy', 'all'];
+      const params: any[] = [SUPPLIER_HUB_SERVICE_KEY, targetIn];
+      const where: string[] = [SUPPLIER_HUB_WHERE.replace('$SVC', '$1'), `hub_target_store_type = ANY($2)`];
+      const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+      if (q) { params.push(`%${q}%`); where.push(`name ILIKE $${params.length}`); }
+      const sup = typeof req.query.supplierId === 'string' ? req.query.supplierId : '';
+      if (sup) { params.push(sup); where.push(`supplier_id = $${params.length}`); }
+      const tk = typeof req.query.templateKey === 'string' ? req.query.templateKey : '';
+      if (tk) { params.push(tk); where.push(`COALESCE(template_key, 'corner_information_basic_v1') = $${params.length}`); }
+      const rows = await dataSource.query(
+        `SELECT s.id, s.name, s.supplier_id AS "supplierId",
+                (SELECT representative_name FROM neture_suppliers ns WHERE ns.id = s.supplier_id) AS "supplierName",
+                s.hub_target_store_type AS "hubTargetStoreType",
+                COALESCE(s.template_key, 'corner_information_basic_v1') AS "templateKey",
+                s.created_at AS "createdAt", s.updated_at AS "updatedAt",
+                (SELECT COUNT(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
+         FROM store_tablet_screen_sets s
+         WHERE ${where.join(' AND ')}
+         ORDER BY s.updated_at DESC
+         LIMIT 200`,
+        params,
+      );
+      // 비약국: 의약품/미분류 세트 제외(약국은 전부 접근 가능). 목록 단계 의약품 필터.
+      let visible = rows;
+      if (storeType !== 'pharmacy' && rows.length) {
+        const filtered: any[] = [];
+        for (const r of rows) {
+          const blocks = await dataSource.query(`SELECT block_type AS "blockType", config FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [r.id]);
+          const med = await analyzeScreenSetMedication(dataSource, blocks);
+          if (medicationStoreAccessAllowed(med, storeType)) filtered.push(r);
+        }
+        visible = filtered;
+      }
+      res.json({ success: true, data: visible });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-set-hub/supplier-templates error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch supplier templates', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // GET /screen-set-hub/supplier-templates/:id — 상세 + blocks(미리보기 입력). 대상·의약품 재검사.
+  router.get('/screen-set-hub/supplier-templates/:id', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const storeType = await resolveStoreHubType(organizationId);
+      if (!storeType) { res.status(403).json({ success: false, error: 'HUB not available for this organization', code: 'STORE_TYPE_NOT_ELIGIBLE' }); return; }
+      const rows = await dataSource.query(
+        `SELECT id, name, hub_target_store_type AS "hubTargetStoreType",
+                COALESCE(template_key, 'corner_information_basic_v1') AS "templateKey", created_at AS "createdAt", updated_at AS "updatedAt"
+         FROM store_tablet_screen_sets
+         WHERE id = $2 AND ${SUPPLIER_HUB_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+        [SUPPLIER_HUB_SERVICE_KEY, req.params.id],
+      );
+      const s = rows?.[0];
+      if (!s || !hubTargetVisibleTo(storeType, s.hubTargetStoreType)) { res.status(404).json({ success: false, error: 'Supplier template not found', code: 'SUPPLIER_TEMPLATE_NOT_FOUND' }); return; }
+      const blocks = await dataSource.query(
+        `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
+        [req.params.id],
+      );
+      // 비약국의 의약품 원본 상세 접근 거부(직접 호출 방어).
+      const med = await analyzeScreenSetMedication(dataSource, blocks);
+      if (!medicationStoreAccessAllowed(med, storeType)) { res.status(403).json({ success: false, error: '이 화면은 약국 매장에만 제공됩니다(의약품 포함).', code: 'MEDICATION_PHARMACY_ONLY' }); return; }
+      res.json({ success: true, data: { ...s, blocks } });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /screen-set-hub/supplier-templates/:id error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch supplier template', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /screen-set-hub/supplier-templates/:id/import — 매장 소유 독립 사본 생성(단일 트랜잭션).
+  //   사본: organization_id=매장·origin='store'·status='active'·supplier_id=NULL·hub_target=NULL·tablet_id=NULL. 새 ID 값 복사.
+  //   가져오기 직전 대상·상태·의약품 재검사. 원본 FK·동기화 없음. 코너 자동 적용 없음. 반복 가져오기 허용.
+  router.post('/screen-set-hub/supplier-templates/:id/import', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const userId = (req as any).user?.id ?? null;
+      const storeType = await resolveStoreHubType(organizationId);
+      if (!storeType) { res.status(403).json({ success: false, error: 'HUB not available for this organization', code: 'STORE_TYPE_NOT_ELIGIBLE' }); return; }
+      const srcRows = await dataSource.query(
+        `SELECT id, name, template_key AS "templateKey", hub_target_store_type AS "hubTargetStoreType"
+         FROM store_tablet_screen_sets WHERE id = $2 AND ${SUPPLIER_HUB_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+        [SUPPLIER_HUB_SERVICE_KEY, req.params.id],
+      );
+      const src = srcRows?.[0];
+      if (!src || !hubTargetVisibleTo(storeType, src.hubTargetStoreType)) { res.status(404).json({ success: false, error: 'Supplier template not found', code: 'SUPPLIER_TEMPLATE_NOT_FOUND' }); return; }
+      // 가져오기 직전 현재 원본 내용으로 의약품 재검사(비약국 의약품 차단).
+      const preBlocks = await dataSource.query(`SELECT block_type AS "blockType", config FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [src.id]);
+      const med = await analyzeScreenSetMedication(dataSource, preBlocks);
+      if (!medicationStoreAccessAllowed(med, storeType)) { res.status(403).json({ success: false, error: '이 화면은 약국 매장에만 제공됩니다(의약품 포함).', code: 'MEDICATION_PHARMACY_ONLY' }); return; }
+
+      let created: any = null;
+      await dataSource.transaction(async (m) => {
+        const reSrc = await m.query(
+          `SELECT id, name, template_key AS "templateKey", hub_target_store_type AS "hubTargetStoreType"
+           FROM store_tablet_screen_sets WHERE id = $2 AND ${SUPPLIER_HUB_WHERE.replace('$SVC', '$1')} LIMIT 1`,
+          [SUPPLIER_HUB_SERVICE_KEY, req.params.id],
+        );
+        const s = reSrc?.[0];
+        if (!s || !hubTargetVisibleTo(storeType, s.hubTargetStoreType)) throw Object.assign(new Error('source gone'), { code: 'SUPPLIER_TEMPLATE_NOT_FOUND' });
+        // 매장 사본: supplier_id/hub_target 미승계.
+        const ins = await m.query(
+          `INSERT INTO store_tablet_screen_sets
+             (organization_id, service_key, supplier_id, tablet_id, name, origin, status, hub_target_store_type, template_key, created_by_user_id)
+           VALUES ($1, $2, NULL, NULL, $3, 'store', 'active', NULL, $4, $5)
+           RETURNING ${setCols('')}`,
+          [organizationId, SUPPLIER_HUB_SERVICE_KEY, s.name, s.templateKey, userId],
+        );
+        created = ins?.[0];
+        await m.query(
+          `INSERT INTO store_tablet_screen_blocks (screen_set_id, block_type, sort_order, is_visible, config)
+           SELECT $1, block_type, sort_order, is_visible, config FROM store_tablet_screen_blocks WHERE screen_set_id = $2`,
+          [created.id, s.id],
+        );
+      });
+
+      // provenance(best-effort) — source_kind='supplier_screen_set'.
+      try {
+        await recordDerivations(dataSource, {
+          serviceKey: SUPPLIER_HUB_SERVICE_KEY,
+          organizationId,
+          createdBy: userId,
+          derivedKind: 'screen_set',
+          derivedId: created.id,
+          derivedTitle: created.name,
+          sources: [{ kind: 'supplier_screen_set', id: src.id, title: src.name }],
+          metadata: { importedAt: new Date().toISOString() },
+        });
+      } catch (provErr: any) {
+        console.warn('[StoreTablet] supplier screen-set import provenance skipped:', provErr?.message);
+      }
+
+      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, created.id, created) });
+    } catch (error: any) {
+      if (error?.code === 'SUPPLIER_TEMPLATE_NOT_FOUND') { res.status(404).json({ success: false, error: 'Supplier template not found', code: 'SUPPLIER_TEMPLATE_NOT_FOUND' }); return; }
+      console.error('[StoreTablet] POST /screen-set-hub/supplier-templates/:id/import error:', error);
+      res.status(500).json({ success: false, error: 'Failed to import supplier template', code: 'INTERNAL_ERROR' });
     }
   }));
 

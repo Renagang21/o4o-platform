@@ -136,3 +136,28 @@ export function createOperatorContentSourceAdapter(dataSource: DataSource): Cont
     },
   };
 }
+
+/**
+ * 공급자 Adapter — WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B
+ *
+ *   공급자 Screen Set 원본이 소비할 수 있는 콘텐츠 원본을 제한한다.
+ *   - fetchProductDescription: **O4O 표준 상품 정보**(SPD STORE canonical) — 운영자 adapter 와 동일 허용.
+ *       canonical STORE 설명서는 플랫폼 canonical(공급자 사유 데이터 아님)이므로 "사용이 허용된 O4O 표준 상품
+ *       정보"(WO 허용 범위). 비-canonical/미승인 공급자·초안 콘텐츠는 STORE canonical 조건으로 자연 제외되고,
+ *       **다른 공급자의 사유(private) 콘텐츠는 애초에 이 경로로 노출되지 않는다**(canonical 만 조회).
+ *   - fetchStoreContent: **항상 null**(매장 제작 콘텐츠 조회 차단 — WO 차단 조건). 공급자는 특정 매장 org 무소속.
+ *
+ *   ※ 공급자 "자기 상품"(supplier_product_offers) 한정 노출은 별도 own-offer 게이트로 강화 가능하나,
+ *     content_list 는 O4O 표준(canonical) 축이므로 본 adapter 는 canonical 허용 + store 차단으로 둔다.
+ *     의약품 약국 전용 등 안전 제약은 게시·가져오기 시점의 의약품 이중 가드(store-tablet-medication-guard)가 담당.
+ *   신규 테이블·컬럼·migration 없음.
+ */
+export function createSupplierContentSourceAdapter(dataSource: DataSource): ContentSourceAdapter {
+  const store = createStoreContentSourceAdapter(dataSource);
+  return {
+    fetchProductDescription: store.fetchProductDescription,
+    async fetchStoreContent() {
+      return null; // 매장 제작 콘텐츠는 공급자 원본에서 조회 불가.
+    },
+  };
+}
