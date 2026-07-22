@@ -23,8 +23,14 @@ if (!OUT || SHARD_COUNT <= 0) throw new Error('--shard-count N --out <path> 필�
 
 export function stableHash(s: string): number { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 
-// 제외: 불안정 귀속·비대상 원료 signature
-const EXC = /식이섬유|오메가3|루테인|가르시니아|글루코사민|프로폴리스|은행|녹차|테아닌|옥타코사놀|코엔자임|MSM|밀크씨슬|GABA/;
+// 제외: 불안정 귀속·비대상 원료 signature.
+//  - 항상 제외(귀속 불명확·비대상 패밀리): 식이섬유·오메가3·루테인·가르시니아·은행·녹차·테아닌·GABA.
+//  - 기능성앵커(MSM·글루코사민·옥타코사놀·코엔자임Q10·밀크씨슬·프로폴리스)는 registry 귀속 안정(생산 실적 있음).
+//    기본은 제외(기존 동작 불변)하되 `--include-functional` 명시 시에만 포함한다.
+const INCLUDE_FUNCTIONAL = process.argv.includes('--include-functional');
+const EXC_ALWAYS = /식이섬유|오메가3|루테인|가르시니아|은행|녹차|테아닌|GABA/;
+const EXC_FUNCTIONAL = /글루코사민|프로폴리스|옥타코사놀|코엔자임|MSM|밀크씨슬/;
+const EXC = INCLUDE_FUNCTIONAL ? EXC_ALWAYS : new RegExp(`${EXC_ALWAYS.source}|${EXC_FUNCTIONAL.source}`);
 const LIQ = /(액상|시럽|드링크|앰플|튜브형|젤리스틱)/;
 
 async function main(): Promise<void> {
@@ -71,12 +77,12 @@ async function main(): Promise<void> {
     const seen = new Map<string, number>(); let overlap = 0;
     for (const x of all) { if (seen.has(x.sig) && seen.get(x.sig) !== x.shard) overlap++; seen.set(x.sig, x.shard); }
     console.log('signature 다중shard 배정(교집합):', overlap);
-    fs.writeFileSync(OUT, JSON.stringify({ scanned, clean, dist, all: all.map(({ ids, ...r }) => r) }, null, 1));
+    fs.writeFileSync(OUT, JSON.stringify({ scanned, clean, includeFunctional: INCLUDE_FUNCTIONAL, dist, all: all.map(({ ids, ...r }) => r) }, null, 1));
     return;
   }
 
   const mine = all.filter((x) => x.shard === SHARD);
-  fs.writeFileSync(OUT, JSON.stringify({ shard: SHARD, shardCount: SHARD_COUNT, scanned, clean, groups: mine }, null, 1));
+  fs.writeFileSync(OUT, JSON.stringify({ shard: SHARD, shardCount: SHARD_COUNT, includeFunctional: INCLUDE_FUNCTIONAL, scanned, clean, groups: mine }, null, 1));
   console.log(`shard ${SHARD}/${SHARD_COUNT}: signature ${mine.length} · 후보합 ${mine.reduce((s, x) => s + x.c, 0)}`);
   for (const x of mine.slice(0, 25)) console.log('  ', String(x.c).padStart(3), x.sig);
 }

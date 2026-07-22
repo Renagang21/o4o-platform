@@ -1,0 +1,58 @@
+{
+ "wo": "Agent C — Batch 4 전 기능성 수확 기반 정비 (read-only)",
+ "start": "2026-07-22 15:03:46 +0900",
+ "dbWrite": 0,
+ "generate": "none",
+ "apply": "none",
+ "parserRecovery": {
+  "fixes": [
+   "Latin ɑ U+0251 → α 정규화(mgɑ-TE·ɑ-TE)",
+   "α-TE 뒤 trailing dash 제거(α-TE-/ → α-TE /)"
+  ],
+  "recoveredProducts": 2,
+  "examples": [
+   "20040015104218 우리아이튼튼: 비타민A+C+D+아연 → +비타민E(9mg)",
+   "200700170352120 유판씨멀티: +비타민E(11mg)"
+  ],
+  "regression": {
+   "existingVariants": "mga-TE·mga-TE-paren·mg α-TE-space·mgα-TE-greek·ugRAE 전부 불변(unknown 0)",
+   "corpusTotalEligible": "2971→2971 (delta 0, 손실 0)",
+   "signatureChanges": "감소 2(2제품이 완전 비타민E signature로 정정 이동)·증가/신규 대응",
+   "note": "기존 생산 결과 감소 없음(재분류만, LIVE 무관 read-only)"
+  }
+ },
+ "reviewLaterRecheck": {
+  "total": 2,
+  "recoverable": 2,
+  "stillReview": 0,
+  "note": "둘 다 완전 signature·unknown 0 → 복구 가능. 임의 승격 안 함(read-only)."
+ },
+ "shardPlanFunctionalMode": {
+  "flag": "--include-functional (기본 off, 기존 EXC 동작 불변)",
+  "alwaysExcluded": "식이섬유·오메가3·루테인·가르시니아·은행·녹차·테아닌·GABA",
+  "optInIncluded": "MSM·글루코사민·옥타코사놀·코엔자임Q10·밀크씨슬·프로폴리스",
+  "intersection": 0
+ },
+ "shardDistribution": {
+  "looseUpperBound_default": {
+   "shard0": 841,
+   "shard1": 787,
+   "shard2": 630
+  },
+  "looseUpperBound_functional": {
+   "shard0": 1101,
+   "shard1": 991,
+   "shard2": 986
+  },
+  "realisticFullPipeline_targetFamilies": {
+   "shard0": 134,
+   "shard1": 45,
+   "shard2": 7
+  },
+  "note": "shard-plan 은 spec-clean 미승격 상한(귀속/섭취 미검증). realistic 은 full-pipeline(귀속·섭취·guard) 통과 + 현재승격 차감."
+ },
+ "agentCNextBatchRealisticCandidates": {
+  "shard2_targetFamilies": 7,
+  "verdict": "shard 2 사실상 소진. 재배정 권고: shard 0(134) 최다 잔여, shard 1(45)."
+ }
+}
