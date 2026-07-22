@@ -1,0 +1,544 @@
+{
+  "wo": "WO-O4O-OTC-GROUNDED-UPGRADE-NEXT-BATCH-8B-STAGE1-GATE-NA-V1",
+  "agent": "나",
+  "stage": 1,
+  "readOnly": true,
+  "dbWrite": 0,
+  "ssot_commit": "b82d7e7ed",
+  "ssot_file": "otc-next-batch-8b-audit-v1.json",
+  "verdict": "STOP",
+  "formula_recheck": {
+    "T": 59,
+    "ko": 236,
+    "en": 118,
+    "total": 354,
+    "expected": {
+      "T": 59,
+      "ko": 236,
+      "en": 118,
+      "total": 354
+    },
+    "match": true
+  },
+  "bundle_ga": [
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "T": 7,
+      "targetFp": "509aaaf470ce860f",
+      "exclude_nonTarget": 0,
+      "excludeFpCount": 0,
+      "target_master_ids": [
+        "1e0824ad-491f-438e-95b0-3d9545d8fbfe",
+        "42a902e4-e0d5-469b-9e65-9eca6e9b8294",
+        "4547f2c7-08db-4fdf-8034-8ffa21070999",
+        "5c39007e-81a4-4a8f-b3be-d709a137d3dd",
+        "5cfbecb6-626b-4240-86ed-ef192731a5d0",
+        "9e942430-a40b-45ce-a0f5-3eb75d4406de",
+        "b9ebe05a-020c-4ee1-be6c-2c59bca20a24"
+      ]
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "T": 8,
+      "targetFp": "2d3b7629b0aeafca",
+      "exclude_nonTarget": 7,
+      "excludeFpCount": 1,
+      "target_master_ids": [
+        "07dae041-1ef3-4ec7-93d8-c5c3d8ed22a2",
+        "0a237c5c-0674-450e-a01a-7972197bfbbf",
+        "2c8db716-18b7-496a-b889-479d789bafab",
+        "46f1df5d-2ea1-4d6b-b260-5e975699267f",
+        "49a67c91-9981-4b23-85c8-a767ac31e60a",
+        "90ba3578-52b5-49b6-b875-fe0a87803296",
+        "a0b9f6e4-5318-4ba9-ab96-d730984681a4",
+        "e8bf17d7-3746-4866-8bf9-a87046642866"
+      ]
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "T": 7,
+      "targetFp": "f8d2054ae6613aa8",
+      "exclude_nonTarget": 39,
+      "excludeFpCount": 12,
+      "target_master_ids": [
+        "13febfd7-05c6-41e1-9373-b60a0e3677d2",
+        "2c8c107c-1ccd-40ab-9638-4b7cc45b76cd",
+        "31761ab2-1ab9-4d18-b462-db09d7032d17",
+        "3a42ae59-f015-4e9c-bb85-719f3bfe0218",
+        "65e14525-9831-4307-80c0-27cf782f46d8",
+        "9fb8f385-c08c-4e40-a1a4-f5e7a304f9f6",
+        "cc675d43-d7eb-4f7d-a968-3565ba1cb9c0"
+      ]
+    },
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "T": 8,
+      "targetFp": "605e64748c7bc3da",
+      "exclude_nonTarget": 89,
+      "excludeFpCount": 18,
+      "target_master_ids": [
+        "3e5acac6-b9ef-44c5-86e9-5a07008001b1",
+        "531fd3f0-d201-49af-addb-cb336ebf96ca",
+        "7b6b466c-7d30-4314-a2d4-4621e1dd115d",
+        "9753167b-264c-4230-a085-0c4dd86d6c5c",
+        "a50e66ea-522a-4136-876d-6dca7e700e86",
+        "c75b87e2-2532-4c4b-9727-0097d0dfde37",
+        "e2da7a5b-1d46-4a08-9e9d-370e32dddf4d",
+        "f4c3c824-e238-442a-be98-114f7e58140e"
+      ]
+    }
+  ],
+  "bundle_da": [
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "T": 7,
+      "targetFp": "ba82fd1299f5d730",
+      "exclude_nonTarget": 4,
+      "excludeFpCount": 1,
+      "target_master_ids": [
+        "17bdc2d4-9a28-4f80-9a8d-9646aadd21f3",
+        "3a11c560-adde-48c0-a4f2-b96d639b1c88",
+        "3c94d0a6-ac7b-4c69-b0a3-d3613eb00eae",
+        "94338f56-a4a8-4679-b6d8-102dd4dd8065",
+        "b9194ba5-afba-4b06-be00-1a1f2617cc9e",
+        "bbdd53b0-99dd-4742-ae2d-0e7c3980c772",
+        "efe21b3c-96c5-4238-bbaa-e6d5c2982c44"
+      ]
+    },
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "T": 7,
+      "targetFp": "0a755506d14ebefe",
+      "exclude_nonTarget": 12,
+      "excludeFpCount": 3,
+      "target_master_ids": [
+        "58c4b4f8-a922-4e1e-9c68-288e0bfda4db",
+        "66bfe7e2-1de1-4c58-bfb4-3c50d79bccba",
+        "68e51c74-650e-4e08-94d9-b6e57e90b13a",
+        "842bdd4e-7317-4e01-ad34-241bbf62f8bc",
+        "9798ee61-e1ce-404d-a987-2da54f18f5ee",
+        "c97a6d80-f1e2-4a0b-910f-c04c504a91fe",
+        "f03b992f-dcc5-426a-a243-6bea931507c0"
+      ]
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "T": 8,
+      "targetFp": "bbb731cc8414d08a",
+      "exclude_nonTarget": 56,
+      "excludeFpCount": 17,
+      "target_master_ids": [
+        "4d5e925f-0f5c-4e74-a03e-4a876fe57b5d",
+        "6c831b21-3d91-4608-9922-991e81f523a9",
+        "871c4517-2b7a-4b3d-8c9b-7f2ac94f88f8",
+        "96d3cb84-2e80-4aba-b506-e6ffc6f8abda",
+        "a6799861-8cc8-4507-9c13-3788573fa3cb",
+        "af8fc4b1-5fbd-4469-8907-7a35f9bac134",
+        "bdf36756-1fa7-462e-a29f-58a48d5a436c",
+        "c18d02bc-724c-4bdf-b342-6ae8768afd21"
+      ]
+    },
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "T": 7,
+      "targetFp": "bdc125f5b4cd5c39",
+      "exclude_nonTarget": 71,
+      "excludeFpCount": 15,
+      "target_master_ids": [
+        "15d4f040-df60-4424-b77b-b7844114de4e",
+        "5c11677e-957f-49f6-bf08-f74cf111e0b0",
+        "605c70cd-7486-4515-864c-1ede13c3858e",
+        "bde0b450-b511-4d7a-95e7-fe9f3f4801b7",
+        "d8ec0e47-2beb-4b47-9b91-4504b36a018b",
+        "e39ef511-4c64-468f-b25e-c71e69faa220",
+        "f78e9340-5651-4ce8-9541-f5a7957ec01c"
+      ]
+    }
+  ],
+  "disjointness": {
+    "ga_id_count": 30,
+    "da_id_count": 29,
+    "cross_intersection_count": 0,
+    "cross_intersection_ids": [],
+    "all8_duplicate_count": 0,
+    "all8_duplicates": [],
+    "distinct_total": 59
+  },
+  "fingerprints": [
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "targetFp": "509aaaf470ce860f",
+      "excludeFps": []
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "targetFp": "2d3b7629b0aeafca",
+      "excludeFps": [
+        "190a6698c388ebde"
+      ]
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "targetFp": "f8d2054ae6613aa8",
+      "excludeFps": [
+        "2067dfbd6ac7b039",
+        "31be18c5a7eac6d3",
+        "378687eedb3734d9",
+        "4bf59a87b8d27b06",
+        "52d06a22d258cd1d",
+        "53c5b8a9f32f4fa9",
+        "5ff0704493106e8c",
+        "822cbd0b6dedea1d",
+        "a53767f97bdcfc3e",
+        "e113f9c3db859f77",
+        "f2212aa1e83f84d5",
+        "f33613744290cd22"
+      ]
+    },
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "targetFp": "605e64748c7bc3da",
+      "excludeFps": [
+        "0137a72612912f7f",
+        "0da704ccb35bd198",
+        "155dd2ffef13c8dc",
+        "16e90af9107c8689",
+        "1aced0574f7023c8",
+        "365224e49d4e53a2",
+        "56294ed4c3d756a1",
+        "61c17a8585a9efc5",
+        "6a00153d2e1954dc",
+        "7a9b6871c835b7a4",
+        "8242e59d3f17b689",
+        "98c9177907417a44",
+        "aed2641f270d450b",
+        "b44efa6125fc38f1",
+        "cdec8f3a5765ef68",
+        "e5b598f9b640132d",
+        "eee438064d1ded32",
+        "f19cea60bb45cdae"
+      ]
+    },
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "targetFp": "ba82fd1299f5d730",
+      "excludeFps": [
+        "d91a692d447d8808"
+      ]
+    },
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "targetFp": "0a755506d14ebefe",
+      "excludeFps": [
+        "628e1eabd4f25d34",
+        "9915014661de4a10",
+        "bad1fc09d46f260c"
+      ]
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "targetFp": "bbb731cc8414d08a",
+      "excludeFps": [
+        "0c29973df03bb30b",
+        "0c37f95dd421fbff",
+        "1d2ac2d1ed8eff59",
+        "2e50e025ddcc79e5",
+        "41b6e0e1cac5c33c",
+        "59a5f7ed73721534",
+        "6056b2a5fb9af9d7",
+        "6f326895ec050401",
+        "8326bba7abd32bad",
+        "8e2f26c9f29e0c60",
+        "95bd6150d96c06f1",
+        "a6b0dd2590024e11",
+        "a6c5974fb2f4fd0f",
+        "c22e7ea66c009586",
+        "d05a5af45f9f021c",
+        "e00fc37e2636de9a",
+        "ea1507ac2a4a2e53"
+      ]
+    },
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "targetFp": "bdc125f5b4cd5c39",
+      "excludeFps": [
+        "0c0ee073a7189199",
+        "0ce9b94fc509b2da",
+        "181da256b1d2607a",
+        "35ee305c68b34c53",
+        "40e3ba26080d8d16",
+        "56a4640ff10cf2d6",
+        "6b510e608f5450ac",
+        "7bc95f9c91498045",
+        "88cec29cdde489f9",
+        "94302adb23a6c322",
+        "cda6119c4c3016b9",
+        "ceab671080350fd8",
+        "d1450c9e6615d868",
+        "e74a3b1422b1d0da",
+        "e82822a33cae05de"
+      ]
+    }
+  ],
+  "baseline_snapshot": [
+    {
+      "groupKey": "아르기닌티디아시케이트|200밀리그램|연질캡슐",
+      "bundle": "가",
+      "T": 7,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "1e0824ad easy_canon=0",
+        "1e0824ad authored_canon=1",
+        "1e0824ad en_total=1",
+        "42a902e4 easy_canon=0",
+        "42a902e4 authored_canon=1",
+        "42a902e4 en_total=1",
+        "4547f2c7 easy_canon=0",
+        "4547f2c7 authored_canon=1",
+        "4547f2c7 en_total=1",
+        "5c39007e easy_canon=0",
+        "5c39007e authored_canon=1",
+        "5c39007e en_total=1",
+        "5cfbecb6 easy_canon=0",
+        "5cfbecb6 authored_canon=1",
+        "5cfbecb6 en_total=1",
+        "9e942430 easy_canon=0",
+        "9e942430 authored_canon=1",
+        "9e942430 en_total=1",
+        "b9ebe05a easy_canon=0",
+        "b9ebe05a authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "수산화마그네슘|500밀리그램|정",
+      "bundle": "가",
+      "T": 8,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "07dae041 easy_canon=0",
+        "07dae041 authored_canon=1",
+        "07dae041 en_total=1",
+        "0a237c5c easy_canon=0",
+        "0a237c5c authored_canon=1",
+        "0a237c5c en_total=1",
+        "2c8db716 easy_canon=0",
+        "2c8db716 authored_canon=1",
+        "2c8db716 en_total=1",
+        "46f1df5d easy_canon=0",
+        "46f1df5d authored_canon=1",
+        "46f1df5d en_total=1",
+        "49a67c91 easy_canon=0",
+        "49a67c91 authored_canon=1",
+        "49a67c91 en_total=1",
+        "90ba3578 easy_canon=0",
+        "90ba3578 authored_canon=1",
+        "90ba3578 en_total=1",
+        "a0b9f6e4 easy_canon=0",
+        "a0b9f6e4 authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "bundle": "가",
+      "T": 7,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "13febfd7 easy_canon=0",
+        "13febfd7 authored_canon=1",
+        "13febfd7 en_total=1",
+        "2c8c107c easy_canon=0",
+        "2c8c107c authored_canon=1",
+        "2c8c107c en_total=1",
+        "31761ab2 easy_canon=0",
+        "31761ab2 authored_canon=1",
+        "31761ab2 en_total=1",
+        "3a42ae59 easy_canon=0",
+        "3a42ae59 authored_canon=1",
+        "3a42ae59 en_total=1",
+        "65e14525 easy_canon=0",
+        "65e14525 authored_canon=1",
+        "65e14525 en_total=1",
+        "9fb8f385 easy_canon=0",
+        "9fb8f385 authored_canon=1",
+        "9fb8f385 en_total=1",
+        "cc675d43 easy_canon=0",
+        "cc675d43 authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "bundle": "가",
+      "T": 8,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "3e5acac6 easy_canon=0",
+        "3e5acac6 authored_canon=1",
+        "3e5acac6 en_total=1",
+        "531fd3f0 easy_canon=0",
+        "531fd3f0 authored_canon=1",
+        "531fd3f0 en_total=1",
+        "7b6b466c easy_canon=0",
+        "7b6b466c authored_canon=1",
+        "7b6b466c en_total=1",
+        "9753167b easy_canon=0",
+        "9753167b authored_canon=1",
+        "9753167b en_total=1",
+        "a50e66ea easy_canon=0",
+        "a50e66ea authored_canon=1",
+        "a50e66ea en_total=1",
+        "c75b87e2 easy_canon=0",
+        "c75b87e2 authored_canon=1",
+        "c75b87e2 en_total=1",
+        "e2da7a5b easy_canon=0",
+        "e2da7a5b authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "bundle": "다",
+      "T": 7,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "17bdc2d4 easy_canon=0",
+        "17bdc2d4 authored_canon=1",
+        "17bdc2d4 en_total=1",
+        "3a11c560 easy_canon=0",
+        "3a11c560 authored_canon=1",
+        "3a11c560 en_total=1",
+        "3c94d0a6 easy_canon=0",
+        "3c94d0a6 authored_canon=1",
+        "3c94d0a6 en_total=1",
+        "94338f56 easy_canon=0",
+        "94338f56 authored_canon=1",
+        "94338f56 en_total=1",
+        "b9194ba5 easy_canon=0",
+        "b9194ba5 authored_canon=1",
+        "b9194ba5 en_total=1",
+        "bbdd53b0 easy_canon=0",
+        "bbdd53b0 authored_canon=1",
+        "bbdd53b0 en_total=1",
+        "efe21b3c easy_canon=0",
+        "efe21b3c authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "bundle": "다",
+      "T": 7,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "58c4b4f8 easy_canon=0",
+        "58c4b4f8 authored_canon=1",
+        "58c4b4f8 en_total=1",
+        "66bfe7e2 easy_canon=0",
+        "66bfe7e2 authored_canon=1",
+        "66bfe7e2 en_total=1",
+        "68e51c74 easy_canon=0",
+        "68e51c74 authored_canon=1",
+        "68e51c74 en_total=1",
+        "842bdd4e easy_canon=0",
+        "842bdd4e authored_canon=1",
+        "842bdd4e en_total=1",
+        "9798ee61 easy_canon=0",
+        "9798ee61 authored_canon=1",
+        "9798ee61 en_total=1",
+        "c97a6d80 easy_canon=0",
+        "c97a6d80 authored_canon=1",
+        "c97a6d80 en_total=1",
+        "f03b992f easy_canon=0",
+        "f03b992f authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "디오스민|600밀리그램|정",
+      "bundle": "다",
+      "T": 8,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "4d5e925f easy_canon=0",
+        "4d5e925f authored_canon=1",
+        "4d5e925f en_total=1",
+        "6c831b21 easy_canon=0",
+        "6c831b21 authored_canon=1",
+        "6c831b21 en_total=1",
+        "871c4517 easy_canon=0",
+        "871c4517 authored_canon=1",
+        "871c4517 en_total=1",
+        "96d3cb84 easy_canon=0",
+        "96d3cb84 authored_canon=1",
+        "96d3cb84 en_total=1",
+        "a6799861 easy_canon=0",
+        "a6799861 authored_canon=1",
+        "a6799861 en_total=1",
+        "af8fc4b1 easy_canon=0",
+        "af8fc4b1 authored_canon=1",
+        "af8fc4b1 en_total=1",
+        "bdf36756 easy_canon=0",
+        "bdf36756 authored_canon=1"
+      ]
+    },
+    {
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "bundle": "다",
+      "T": 7,
+      "easy_canonical_exactly1": 0,
+      "authored_ko_canonical_zero": 0,
+      "en_zero": 0,
+      "pre_production_clean": false,
+      "deviations": [
+        "15d4f040 easy_canon=0",
+        "15d4f040 authored_canon=1",
+        "15d4f040 en_total=1",
+        "5c11677e easy_canon=0",
+        "5c11677e authored_canon=1",
+        "5c11677e en_total=1",
+        "605c70cd easy_canon=0",
+        "605c70cd authored_canon=1",
+        "605c70cd en_total=1",
+        "bde0b450 easy_canon=0",
+        "bde0b450 authored_canon=1",
+        "bde0b450 en_total=1",
+        "d8ec0e47 easy_canon=0",
+        "d8ec0e47 authored_canon=1",
+        "d8ec0e47 en_total=1",
+        "e39ef511 easy_canon=0",
+        "e39ef511 authored_canon=1",
+        "e39ef511 en_total=1",
+        "f78e9340 easy_canon=0",
+        "f78e9340 authored_canon=1"
+      ]
+    }
+  ],
+  "stop_reasons": [
+    "아르기닌티디아시케이트|200밀리그램|연질캡슐: 기준선 오염 (easy1 0/7, authored0 0/7, en0 0/7)",
+    "수산화마그네슘|500밀리그램|정: 기준선 오염 (easy1 0/8, authored0 0/8, en0 0/8)",
+    "이부프로펜|200밀리그램|연질캡슐: 기준선 오염 (easy1 0/7, authored0 0/7, en0 0/7)",
+    "덱시부프로펜|300밀리그램|정: 기준선 오염 (easy1 0/8, authored0 0/8, en0 0/8)",
+    "사카로마이세스보울라르디균|282.5밀리그램|캡슐: 기준선 오염 (easy1 0/7, authored0 0/7, en0 0/7)",
+    "니푸록사지드|200밀리그램|캡슐: 기준선 오염 (easy1 0/7, authored0 0/7, en0 0/7)",
+    "디오스민|600밀리그램|정: 기준선 오염 (easy1 0/8, authored0 0/8, en0 0/8)",
+    "아세트아미노펜|650밀리그램|정: 기준선 오염 (easy1 0/7, authored0 0/7, en0 0/7)"
+  ],
+  "warnings": []
+}
