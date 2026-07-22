@@ -1,0 +1,466 @@
+{
+ "바나바잎추출물": {
+  "total": 1028,
+  "solid": 973,
+  "unpromoted": 1028,
+  "pureSingleSolidUnproduced": 43,
+  "shardByStmt": {
+   "0": 14,
+   "1": 16,
+   "2": 13
+  },
+  "servingParsePASS": 43,
+  "servingParseFAIL": 0,
+  "servingParseRate": 100,
+  "nameVariants": [
+   [
+    "바나바",
+    1013
+   ],
+   [
+    "코로솔산",
+    10
+   ],
+   [
+    "Banaba",
+    5
+   ]
+  ],
+  "topMainFns": [
+   {
+    "n": 27,
+    "fn": "식후 혈당상승 억제에 도움을 줄 수 있음"
+   },
+   {
+    "n": 7,
+    "fn": "①식후 혈당상승 억제에 도움을 줄 수 있음"
+   },
+   {
+    "n": 5,
+    "fn": "① 식후 혈당상승 억제에 도움을 줄 수 있음"
+   },
+   {
+    "n": 2,
+    "fn": "(1) 식후 혈당상승 억제에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": ": 식후 혈당상승 억제에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "① 식후 혈당상승 억제에 도움을 줄 수 있음,"
+   }
+  ],
+  "enCoverage": [
+   {
+    "fn": "식후 혈당상승 억제에 도움을 줄 수 있음",
+    "n": 27,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   },
+   {
+    "fn": "①식후 혈당상승 억제에 도움을 줄 수 있음",
+    "n": 7,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   },
+   {
+    "fn": "① 식후 혈당상승 억제에 도움을 줄 수 있음",
+    "n": 5,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   },
+   {
+    "fn": "(1) 식후 혈당상승 억제에 도움을 줄 수 있음",
+    "n": 2,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   },
+   {
+    "fn": ": 식후 혈당상승 억제에 도움을 줄 수 있음",
+    "n": 1,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   },
+   {
+    "fn": "① 식후 혈당상승 억제에 도움을 줄 수 있음,",
+    "n": 1,
+    "en": "May help with suppressing the rise in blood sugar after meals"
+   }
+  ]
+ },
+ "포스파티딜세린": {
+  "total": 510,
+  "solid": 500,
+  "unpromoted": 510,
+  "pureSingleSolidUnproduced": 45,
+  "shardByStmt": {
+   "0": 13,
+   "1": 18,
+   "2": 14
+  },
+  "servingParsePASS": 44,
+  "servingParseFAIL": 1,
+  "servingParseRate": 97.8,
+  "nameVariants": [
+   [
+    "포스파티딜세린",
+    510
+   ]
+  ],
+  "topMainFns": [
+   {
+    "n": 12,
+    "fn": "① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 10,
+    "fn": "노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 9,
+    "fn": "노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 4,
+    "fn": "①노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 2,
+    "fn": "노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음"
+   },
+   {
+    "n": 2,
+    "fn": "① 노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "① 노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음 ②자외선에 의한 피부 손상으로부터 피부 건강 유지에 도움을 줄 수 있음 ③ 피부 보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "① 노화로 인해 저하된 인지력 개선⋅자외선에 의한 피부 손상으로부터 피부 건강 유지⋅피부보습에 도움을 줄 수 있음"
+   }
+  ],
+  "enCoverage": [
+   {
+    "fn": "① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+    "n": 12,
+    "en": null
+   },
+   {
+    "fn": "노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+    "n": 10,
+    "en": null
+   },
+   {
+    "fn": "노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+    "n": 9,
+    "en": null
+   },
+   {
+    "fn": "①노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+    "n": 4,
+    "en": null
+   },
+   {
+    "fn": "노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음",
+    "n": 2,
+    "en": null
+   },
+   {
+    "fn": "① 노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음",
+    "n": 2,
+    "en": null
+   },
+   {
+    "fn": "① 노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음 ②자외선에 의한 피부 손상으로부터 피부 건강 유지에 도움을 줄 수 있음 ③ 피부 보습에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "① 노화로 인해 저하된 인지력 개선⋅자외선에 의한 피부 손상으로부터 피부 건강 유지⋅피부보습에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   }
+  ]
+ },
+ "히알루론산": {
+  "total": 398,
+  "solid": 314,
+  "unpromoted": 398,
+  "pureSingleSolidUnproduced": 30,
+  "shardByStmt": {
+   "0": 9,
+   "1": 16,
+   "2": 5
+  },
+  "servingParsePASS": 30,
+  "servingParseFAIL": 0,
+  "servingParseRate": 100,
+  "nameVariants": [
+   [
+    "히알루론산",
+    393
+   ],
+   [
+    "Hyaluron",
+    5
+   ]
+  ],
+  "topMainFns": [
+   {
+    "n": 15,
+    "fn": "피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 3,
+    "fn": "피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 2,
+    "fn": "피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급)"
+   },
+   {
+    "n": 2,
+    "fn": "① 피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "1) 피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "(가) 피부보습･ 자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "(국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat [히알루론산] 피부보습에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "- (국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 - (영문) May help to maintain skin health from skin damage by UV radiation [히알루론산] 피부보습에 도움을 줄 수 있음"
+   }
+  ],
+  "enCoverage": [
+   {
+    "fn": "피부보습에 도움을 줄 수 있음",
+    "n": 15,
+    "en": "May help with skin moisturisation"
+   },
+   {
+    "fn": "피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+    "n": 3,
+    "en": null
+   },
+   {
+    "fn": "피부보습에 도움을 줄 수 있습니다.(기타Ⅱ등급)",
+    "n": 2,
+    "en": "May help with skin moisturisation"
+   },
+   {
+    "fn": "① 피부보습에 도움을 줄 수 있음",
+    "n": 2,
+    "en": null
+   },
+   {
+    "fn": "1) 피부보습에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "(가) 피부보습･ 자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "(국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat [히알루론산] 피부보습에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "- (국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 - (영문) May help to maintain skin health from skin damage by UV radiation [히알루론산] 피부보습에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   }
+  ]
+ },
+ "헤마토코쿠스추출물": {
+  "total": 495,
+  "solid": 488,
+  "unpromoted": 495,
+  "pureSingleSolidUnproduced": 11,
+  "shardByStmt": {
+   "0": 8,
+   "1": 2,
+   "2": 1
+  },
+  "servingParsePASS": 11,
+  "servingParseFAIL": 0,
+  "servingParseRate": 100,
+  "nameVariants": [
+   [
+    "헤마토코쿠스",
+    253
+   ],
+   [
+    "아스타잔틴",
+    242
+   ]
+  ],
+  "topMainFns": [
+   {
+    "n": 6,
+    "fn": "눈의 피로도 개선에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "눈의 피로도 개선에 도움을 줄 수 있음 마리골드꽃추출물(지아잔틴함유) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging [헤마토코쿠스추출물] ①눈의 피로도 개선에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "①눈의 피로도 개선에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "(가) 눈의 피로도 개선에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "마리골드꽃추출물(지아잔틴함유)(제2025-07호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 [헤마토코쿠스추출물] 눈의 피로도 개선에 도움을 줄 수 있음"
+   }
+  ],
+  "enCoverage": [
+   {
+    "fn": "눈의 피로도 개선에 도움을 줄 수 있음",
+    "n": 6,
+    "en": null
+   },
+   {
+    "fn": "눈의 피로도 개선에 도움을 줄 수 있음 마리골드꽃추출물(지아잔틴함유) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging [헤마토코쿠스추출물] ①눈의 피로도 개선에 도움을 줄 수 있음",
+    "n": 1,
+    "en": "May help with maintaining macular pigment density (which can decline with age) for eye health"
+   },
+   {
+    "fn": "①눈의 피로도 개선에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "(가) 눈의 피로도 개선에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "마리골드꽃추출물(지아잔틴함유)(제2025-07호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 [헤마토코쿠스추출물] 눈의 피로도 개선에 도움을 줄 수 있음",
+    "n": 1,
+    "en": "May help with maintaining macular pigment density (which can decline with age) for eye health"
+   }
+  ]
+ },
+ "쏘팔메토열매추출물": {
+  "total": 564,
+  "solid": 558,
+  "unpromoted": 564,
+  "pureSingleSolidUnproduced": 19,
+  "shardByStmt": {
+   "0": 9,
+   "1": 4,
+   "2": 6
+  },
+  "servingParsePASS": 17,
+  "servingParseFAIL": 2,
+  "servingParseRate": 89.5,
+  "nameVariants": [
+   [
+    "쏘팔메토",
+    564
+   ]
+  ],
+  "topMainFns": [
+   {
+    "n": 7,
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 3,
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있음."
+   },
+   {
+    "n": 3,
+    "fn": "①전립선 건강의 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 2,
+    "fn": "① 전립선건강의 유지에 동움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "전립선 건강을 유지하는데 도움을 줄 수 있음(기타기능II)"
+   },
+   {
+    "n": 1,
+    "fn": ": 전립선 건강의 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "① 전립선 건강의 유지에 도움을 줄 수 있음"
+   },
+   {
+    "n": 1,
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있습니다."
+   }
+  ],
+  "enCoverage": [
+   {
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있음",
+    "n": 7,
+    "en": null
+   },
+   {
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있음.",
+    "n": 3,
+    "en": null
+   },
+   {
+    "fn": "①전립선 건강의 유지에 도움을 줄 수 있음",
+    "n": 3,
+    "en": null
+   },
+   {
+    "fn": "① 전립선건강의 유지에 동움을 줄 수 있음",
+    "n": 2,
+    "en": null
+   },
+   {
+    "fn": "전립선 건강을 유지하는데 도움을 줄 수 있음(기타기능II)",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": ": 전립선 건강의 유지에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "① 전립선 건강의 유지에 도움을 줄 수 있음",
+    "n": 1,
+    "en": null
+   },
+   {
+    "fn": "전립선 건강의 유지에 도움을 줄 수 있습니다.",
+    "n": 1,
+    "en": null
+   }
+  ]
+ },
+ "_meta": {
+  "note": "read-only grounding investigation of 5 new functional ingredients; no DB write, no registry mod, no arbitrary EN generation",
+  "pureSingleDef": "MAIN_FNCTN single [ingredient] bracket + solid + unpromoted"
+ }
+}
