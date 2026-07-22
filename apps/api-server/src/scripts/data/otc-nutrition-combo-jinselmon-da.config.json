@@ -1,0 +1,13 @@
+{
+  "_doc": "WO-O4O-OTC-NUTRITION-COMBO-LARGE-GROUP-2H-DA-V1 (에이전트 다) — 진셀몬큐디플러스 585 master EN-only fresh 번역 config. otc-nutrition-combo-en-only-runner-da.ts 전용.",
+  "en": {
+    "jinselmon-qd-plus-combo": {
+      "key": "진셀몬큐디플러스연질캡슐",
+      "sourceRef": "d29b1340-498e-4128-b6e1-b667e0135035",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "expected": 585,
+      "translationFile": "otc-en-translations-jinselmon-qd-plus-combo-da-v1.json",
+      "outBase": "otc-nutrition-combo-en-jinselmon-qd-plus"
+    }
+  }
+}

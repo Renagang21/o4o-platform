@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-OTC-NUTRITION-COMBO-LARGE-GROUP-2H-DA-V1",
+  "guide": "OTC-EN-TRANSLATION-GUIDE V0.5 · OTC-KO-EN-GLOSSARY V0.2",
+  "note": "진셀몬큐디플러스연질캡슐 nutrition_combo(source_ref d29b1340, 585 master, ko md5 1eb3b9df83e99f31560e4e38e0c47928, en 전례 0). fresh 번역 — ko canonical 유일 원문. 다효능 병렬 보존(순서·축 그대로, 합성·성분별 인과·마케팅 0). ko legacy <table> 미승계(sd-* conformant), ko 미변경.",
+  "translations": [
+    {
+      "groupKey": "진셀몬큐디플러스연질캡슐",
+      "title": "Multivitamin and Mineral Soft Capsule — Vitamin E and B group + Magnesium and Zinc (no Vitamin A or Iron)",
+      "usageLabel": "How to take it",
+      "efficacy": "This medicine is used to supply vitamins E, B1, B2 and B6 in physical fatigue, reduced stamina and old age; for peripheral circulation problems and cold hands and feet; for neuralgia and muscle pain; to relieve angular cheilitis and mouth sores; to supply zinc; and for muscle cramps caused by magnesium deficiency.",
+      "usage": "Adults and children aged 12 and over take one capsule twice a day.",
+      "caution": "Do not take this if you are hypersensitive to soybean oil, soya or peanuts, if you are a baby under 12 months, or if you have severe kidney failure. If you take an estrogen-containing contraceptive or are prone to blood clots, taking vitamin E may increase the risk of clots, so seek advice.",
+      "summaryTable": {
+        "Category": "Over-the-counter",
+        "Ingredient": "Vitamin E and B group + magnesium and zinc",
+        "How it works": "Supplies vitamin E, B group, magnesium and zinc",
+        "Main symptoms": "Physical fatigue; poor peripheral circulation",
+        "Who should be careful": "Soya hypersensitivity; vitamin E with contraceptives (blood clots)",
+        "Why this one": "A soft-capsule combination without vitamin A or iron"
+      }
+    }
+  ],
+  "summary": "Physical fatigue; poor peripheral circulation"
+}
