@@ -164,3 +164,55 @@
 - 교집합 0 · cross-permit 0 · canonicalDup 0 · A/C 교집합 0 · drift 0 · basis 무결성 보존 · 복합 기능성 전량 유지.
 - 레이스 복구 yield 0 확인 → **현 파이프·registry 기준 생산가능 안전 후보 소진(B-10 최종 충족)**.
 - 잔여: 식이섬유·차전자피·이눌린 계열(`X g 이상` grounding HOLD) 및 B_NEW_EXTENDABLE(키토산·옥타코사놀 등 미등록 원료)은 별도 저작 규격/registry 확장(B-03 Phase 2) 필요 — 현 파이프 범위 외. 중지 조건 해당 없음.
+
+---
+
+## §10. 미등록·HOLD 재검토 라운드 (WO-O4O-HFF-COMBO-UNREGISTERED-B-GUT-METABOLIC-V1)
+
+전수 재검토로 미등록 원료 combo + dose/basis HOLD 군을 B 전용 additive seam으로 재평가. 태그 네임스페이스 `batch:combo-b-unreg-*`(라운드 provenance 분리, `hff-combo-b-apply.ts` 에 `HFF_COMBO_B_TAG_PREFIX` env 추가).
+
+### 10-1. 식이섬유 combo family → **PENDING_SHARED** (생산 보류, 근거 확정)
+
+WO 우선대상 (4) 차전자피·이눌린·난소화성말토덱스트린 식이섬유 combo를 원천(BASE_STANDARD) 표본 조사한 결과 **공용 파서 확장 없이는 안전 생산 불가**로 확정:
+
+- **generic `식이섬유` 표기 = 서로 다른 실제 원료** — 동일 "식이섬유 : 표시량(Xg/Yg)" 라인이 제품마다 난소화성말토덱스트린 / 폴리덱스트로스 / 무명 식이섬유로 상이. 어느 원료가 표시량을 제공하는지 라인만으로 특정 불가.
+- **다(多)식이섬유 제품 다수** — 폴리덱스트로스 2.6g + 프락토올리고당 1.5g 처럼 원료별 표시량이 별도 존재하나 `parseSpecs` 가 전부 단일 `식이섬유` 키로 붕괴 → **원료별 귀속 소실**.
+- **기능성·타도메인 원료 누락** — `parseSpecs` 가 자일로올리고당(유익균)·은행잎(AC)·홍국(콜레스테롤)·밀크씨슬(간) 등을 sig에서 탈락 → sig `식이섬유+아연` 이 실제 조성을 과소표현. 생산 시 WO "복합 기능성 일부만 남기지 않음" 위반.
+- WO 규정 "여러 식이섬유 원료가 함께 있을 때 원료별 귀속 … 환산 관계가 불명확하면 임의 생산하지 않는다" 및 중지조건 "지표성분·원료량 광범위 오해석"에 해당.
+- **필요 조치(PENDING_SHARED)**: 식이섬유 원천 인지 공용 파서(난소화성말토덱스트린/폴리덱스트로스/프락토올리고당/자일로올리고당 등 원료별 분리 키 + 원료별 표시량 + 탈락 기능성 포착) = Agent C 소유 공용파일(`hff-source-parse.ts`) 변경. B 단독 생산 금지 → 별도 WO 핸드오프.
+
+### 10-2. dom=B 비식이섬유 AC-free combo → **14 신규 LIVE**
+
+전수 census(41,261 스캔)에서 dom=B·untaken·비식이섬유·AC 무오염 sig **83개(182 untaken)** 를 공용 `select --exclude-taken` + `generate`(무편집, 완전가드) 로 sweep:
+
+- eligible 7 → generate PASS **14 unit** (exact TARGET_SET 매칭 + HOLD_MULTI 대량 제외 + exclude-taken 로 tail 소진 확인).
+- 조성: 프로폴리스(면역) 11 + 옥타코사놀(콜레스테롤/혈행) 3. 전부 registry 등록 원료·완전가드 통과.
+- 이중게이트 apply(dry-run gateFail 0 → `--apply`): **applied 14 · DB write 56 · gateFail 0**.
+
+### 10-3. 정당 HOLD (false-negative 아님, 유지)
+
+eligible 중 4건은 공용 가드가 정당 차단(basis 무결성 보호, WO 요구대로 유지):
+
+- `PRE-SRC-BASIS-MISMATCH-002` 1건(아연+프로폴리스) · `G-MULTI-AMOUNT-SOURCE` 3건(가르시니아+녹차, 옥타코사놀+프로폴리스, 녹차+마그네슘) — 원료간 수치 이동/basis 불일치 차단. false-negative 없음.
+
+### 10-4. 독립검증 (별도 연결, `HFF_COMBO_B_VERIFY_TAG` 델타)
+
+| 범위 | myMasters | ko | en | candLinked | canonicalDup | permitDup | crossPermitWithOthers | barcode/regType/sourceType |
+|------|---:|---:|---:|---:|---:|---:|---:|:---:|
+| 델타 `combo-b-unreg-%` | 14 | 14 | 14 | 14 | 0 | 0 | 0 | 0 |
+| 패밀리 `combo-b-%` | 102 | 102 | 102 | 102 | 0 | 0 | 0 | 0 |
+
+- 패밀리 102 = 2차 sweep 88 + 이번 14. crossPermitWithOthers 0 → 1차(190)·A·C 등 타 산출물과 permit 충돌 0(완전 disjoint).
+
+### 10-5. 라운드 결론
+
+| 항목 | 값 |
+|------|---|
+| 신규 마스터 | **14** (프로폴리스 11 + 옥타코사놀 3) |
+| DB write | **56** (master 14 + candidate 14 + SPD ko 14 + SPD en 14) |
+| 정당 HOLD | 4 (guard 유지) |
+| PENDING_SHARED | 식이섬유 combo family (공용 파서 확장 필요) |
+| 독립검증 | PASS (canonicalDup 0 · permitDup 0 · crossPermit 0 · drift 0) |
+| **누적 B** | 549 + 278 + **14** = **841** |
+
+- 비식이섬유 dom=B 안전 후보는 이번 14로 사실상 소진(83 sig 중 eligible 7·PASS 14 unit). 잔여 안전 확장 = 식이섬유 공용파서(PENDING_SHARED) 에 종속.

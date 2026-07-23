@@ -11,7 +11,9 @@ async function main(): Promise<void> {
   await ds.initialize();
   const q = async (s: string, p: unknown[] = []): Promise<number> => (await ds.query(s, p))[0].c as number;
   try {
-    const TAG = "EXISTS (SELECT 1 FROM jsonb_array_elements_text(m.tags::jsonb) t WHERE t LIKE 'batch:combo-b-%')";
+    // 기본 batch:combo-b-% (전체 combo-b 패밀리). HFF_COMBO_B_VERIFY_TAG 로 라운드별(예: batch:combo-b-unreg-%) 델타 검증.
+    const TAG_LIKE = process.env.HFF_COMBO_B_VERIFY_TAG || 'batch:combo-b-%';
+    const TAG = `EXISTS (SELECT 1 FROM jsonb_array_elements_text(m.tags::jsonb) t WHERE t LIKE '${TAG_LIKE}')`;
     const v: Record<string, number> = {};
     v.myMasters = await q(`SELECT count(*)::int c FROM product_masters m WHERE ${TAG}`);
     v.myKo = await q(`SELECT count(*)::int c FROM product_masters m JOIN shared_product_descriptions sp ON sp.master_id=m.id WHERE ${TAG} AND sp.language='ko' AND sp.description_type='STORE' AND sp.status='canonical' AND sp.deleted_at IS NULL`);

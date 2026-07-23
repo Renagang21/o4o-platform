@@ -39,8 +39,10 @@ for (const r of todo) {
   const units = fs.existsSync(target) ? (JSON.parse(fs.readFileSync(target, 'utf8')) as unknown[]).length : 0;
   if (units === 0) { results.push({ i: r.i, sig: r.sig, stage: 'skip', ok: false, reason: 'target 0' }); continue; }
   r.PASS = units;
-  const tag = `batch:combo-b-${r.slug.replace(/^cb-\d+-/, '').replace(/[^0-9A-Za-z가-힣_]/g, '').slice(0, 60)}`;
-  const rollback = `hff-combo-b-${r.i}`;
+  // TAG_PREFIX: 라운드별 provenance 분리(기본 combo-b, 미등록 재검토 라운드=combo-b-unreg). verify 는 batch:<prefix>-% 로 델타 식별.
+  const TAG_PREFIX = process.env.HFF_COMBO_B_TAG_PREFIX || 'combo-b';
+  const tag = `batch:${TAG_PREFIX}-${r.slug.replace(/^cb-\d+-/, '').replace(/[^0-9A-Za-z가-힣_]/g, '').slice(0, 60)}`;
+  const rollback = `hff-${TAG_PREFIX}-${r.i}`;
   const env = { ...process.env, HFF_SF_APPLY_CONFIRM: 'YES' };
   const args = ['--import', 'tsx', APPLY_SCRIPT, '--target', target, '--tag', tag, '--rollback', rollback];
   // dry-run first
