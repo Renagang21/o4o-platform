@@ -267,6 +267,106 @@
    "masters": 7,
    "op": "KO_EN",
    "note": "GA-V5 batch6 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "활짝정|A09AA|170밀리그램|정",
+   "targetFp": "0e8729cb7b617ee4",
+   "sourceType": "mfds_drug_otc",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "아이피아연질캡슐|A11JC|296.7밀리그램|연질캡슐",
+   "targetFp": "1caa441848f10fd1",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "디카맥스1000정|A12AX|1250밀리그램|정",
+   "targetFp": "26025df241557f80",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "가네진정|A05BA|300밀리그램|정",
+   "targetFp": "262be157b0e4825d",
+   "sourceType": "mfds_drug_otc",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "배가나정|A02AX|100밀리그램|정",
+   "targetFp": "263b17547f3e5e24",
+   "sourceType": "mfds_drug_otc",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "디카본300정|A12AX|300밀리그램|정",
+   "targetFp": "3f21c651205a3b2d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "메가비콤정|A11EX|100밀리그램|정",
+   "targetFp": "3fc4b2d180d678c4",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "위엔탈정|A02AX|100밀리그램|정",
+   "targetFp": "46ffa6d03d0eb6dc",
+   "sourceType": "mfds_drug_otc",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "콘티600정|A11EX|5밀리그램|정",
+   "targetFp": "4840d3b5304687cc",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "투와이스플러스연질캡슐|A11JC|500밀리그램|연질캡슐",
+   "targetFp": "4cd5aacc94a0af56",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V5 batch7 claim (2026-07-23)"
   }
  ]
 }
