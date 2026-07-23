@@ -1,0 +1,734 @@
+[
+ {
+  "statementNo": "20060020008992",
+  "productName": "프리벤트라 인지력 기억력엔 브레인 PS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080209",
+  "productName": "징코빌리프",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041048",
+  "productName": "센트라겐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041307",
+  "productName": "센씨맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162317",
+  "productName": "먼데이 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021645",
+  "productName": "프라임 징코플러스 알파 스페셜",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081420",
+  "productName": "차지맥스(Charge Max)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107626",
+  "productName": "기억력개선에 도움을 줄 수 있는 브레인 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20110020099333",
+  "productName": "고려 닥터PS알파 포스파티딜세린",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193134",
+  "productName": "징코비타프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141637",
+  "productName": "기억력 혈행개선엔 징코 프리미엄 100정",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020016689",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352434",
+  "productName": "옵테인 에센셜 G",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141358",
+  "productName": "면역밸런스 닥터큐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107685",
+  "productName": "제너럴밸런스 콜케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083829",
+  "productName": "징코빌로바11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071157",
+  "productName": "기억력 혈행엔 은행잎 추출물 징코 알파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081024",
+  "productName": "유한 포텐업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190016403190",
+  "productName": "메노락토 프리미엄 징코",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193375",
+  "productName": "센시더스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083244",
+  "productName": "우먼올핏",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041261",
+  "productName": "센C플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352736",
+  "productName": "콜레올로지 더블샷 10일",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041513",
+  "productName": "센스밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352698",
+  "productName": "콜레올로지 더블샷 7일",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032444",
+  "productName": "하루엔진 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352882",
+  "productName": "탄탄 슬리밍 트리플 부스터 샷 5일+2일",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007746",
+  "productName": "헬퓨 B데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032709",
+  "productName": "여주은행잎홍국비타민미네랄정제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028637",
+  "productName": "혈행엔 징코맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193267",
+  "productName": "남재현&신현재 박사의 혈당콜 S 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023744",
+  "productName": "백세혈당혈압케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002928457",
+  "productName": "기억력 혈당·혈행엔 징코바나바",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141618",
+  "productName": "슬림 앤 에너지부스트 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033095",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068240",
+  "productName": "징코 마그 나인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021514",
+  "productName": "스마일렌 징코 11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141877",
+  "productName": "아이원 루테인 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020859",
+  "productName": "징코후",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352420",
+  "productName": "올인원 골드팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020745",
+  "productName": "징코 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022001137064",
+  "productName": "잇츠컷 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000462466",
+  "productName": "추억저장소",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370368",
+  "productName": "힘앤슬림 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002876683",
+  "productName": "기억력·혈행엔 징코 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020668",
+  "productName": "엠에스 은행잎 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000462425",
+  "productName": "하루 한포 멀티팩 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032113",
+  "productName": "관절강 기억강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083931",
+  "productName": "플래티넘징코플러스11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071007",
+  "productName": "혈당혈압혈행기억력엔 바나바 코큐텐 징코 트리플",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020024470",
+  "productName": "옵티젠 리프레쉬 마그네슘 & 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483271",
+  "productName": "혈당건강바나바 징코플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071250",
+  "productName": "두뇌･기억력엔 PS85 징코 Max",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020335",
+  "productName": "기억력 혈행건강 징코",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032398",
+  "productName": "루피움 에버 리셋 컷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110941",
+  "productName": "아반바 슈퍼브레인 큐 알파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032748",
+  "productName": "하루엔진 50+ 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020046688",
+  "productName": "혈행케어(BLOOD FLOW CARE)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080453",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201298",
+  "productName": "마이핏 S 스피드 팻버닝 핑크핏 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193281",
+  "productName": "기억력ㆍ혈행 건강엔 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083129",
+  "productName": "원데이 멀티팩 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081417",
+  "productName": "튼튼닷컴 징코맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006947",
+  "productName": "닥터 징코원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107656",
+  "productName": "프리미엄징코플러스오리지날",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141946",
+  "productName": "올인원 데일리 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022902",
+  "productName": "당케어 365 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061788",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023711",
+  "productName": "밸러니티 두뇌 기억력 인지력 개선엔 PS 포스파티딜세린 징코",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083441",
+  "productName": "관절혈통",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023889",
+  "productName": "리프비타 임팩트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023338",
+  "productName": "커팅밤 블링핏 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162223",
+  "productName": "서큐 플러스 브레인 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193437",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141543",
+  "productName": "혈행앤 징코 브레인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002876680",
+  "productName": "기억력·혈행엔 징코액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023590",
+  "productName": "커팅밤블링핏다이어트프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553330",
+  "productName": "옵티마 리프레쉬 마그네슘 & 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082788",
+  "productName": "닥터디엣 버닝플로우 나이트타임- 잔티젠 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052191",
+  "productName": "에이드핏 이지 라인 AID FIT EASY LINE",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "202300287663",
+  "productName": "우성의 선물",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007256",
+  "productName": "건강한 징코플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107718",
+  "productName": "혈통원 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370119",
+  "productName": "유한m 징코미네랄플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211680",
+  "productName": "혈당력",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002132849",
+  "productName": "혈행핏 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035762",
+  "productName": "메모리 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104410",
+  "productName": "이지슬림그린플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141568",
+  "productName": "기억력엔 은행잎 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052343",
+  "productName": "뷔셀 데이케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190016403195",
+  "productName": "메노락토 프리미엄 퀸즈",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071259",
+  "productName": "프리미엄징코플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028712",
+  "productName": "혈행엔 기억력 징큐란",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083326",
+  "productName": "뉴시아 로얄 골든팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032947",
+  "productName": "위슬로 여주랑 트리플혈케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201172",
+  "productName": "징코빌로바 은행잎추출물",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083191",
+  "productName": "파마코브레인 PS징코",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081255",
+  "productName": "원방비책 명품 통(通) : 혈행 개선책",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002876666",
+  "productName": "기억력 혈당·혈행엔 징코바나바",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052197",
+  "productName": "에고랩스 메모리업 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041310",
+  "productName": "더비랩 기억력",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008982",
+  "productName": "루테인지아잔틴 메모리케어 GR",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020001343",
+  "productName": "우먼코드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370106",
+  "productName": "5070 면역비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083245",
+  "productName": "리피어라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017106435",
+  "productName": "프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081009",
+  "productName": "마인드비타 기억력&눈건강엔 징코 루테인지아잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141860",
+  "productName": "징코 플러스엔탑 혈행·기억력 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022779",
+  "productName": "슈퍼루지A+아스타잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008577",
+  "productName": "기억력 혈당·혈행엔 브레인 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220020002111",
+  "productName": "기억력 개선 은행잎추출물",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002132854",
+  "productName": "혈행핏 다이어트 V2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081039",
+  "productName": "맨즈비아(MENZBia) 1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104223",
+  "productName": "맨즈 메가 부스터 MEN'S MEGA BOOSTER",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107974",
+  "productName": "써큐 플로우 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211737",
+  "productName": "튼튼닷컴 징코맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080404",
+  "productName": "루피움 에버 리셋 컷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162242",
+  "productName": "좋은아침",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071013",
+  "productName": "올인원 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028708",
+  "productName": "징코골드플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107694",
+  "productName": "이비에프(EBF)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000939491",
+  "productName": "리얼퀸 센시다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]

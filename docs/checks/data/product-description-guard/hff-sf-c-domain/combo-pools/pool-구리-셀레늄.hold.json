@@ -1,0 +1,5702 @@
+[
+ {
+  "statementNo": "200400200083153",
+  "productName": "헬시아민 올인원 솔루션 이뮨 비타 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483154",
+  "productName": "하루틴 메가멀티B",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193103",
+  "productName": "올인원 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017062191",
+  "productName": "올타민 장용성 멀티비타민 미네랄 이뮨 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023005",
+  "productName": "금단미인 비타민미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022364",
+  "productName": "멀티메가비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284240",
+  "productName": "트루알엑스 올인원 멀티비타민 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006796",
+  "productName": "정거멀즈",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193410",
+  "productName": "눈건강 파워 루테인 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022077",
+  "productName": "가네파워",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082972",
+  "productName": "셀로맥스 트레이스 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2017288019398",
+  "productName": "프라임 루테인 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211704",
+  "productName": "플로빗 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101144",
+  "productName": "멀티비타민 미네랄 이지퍼펙트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141221",
+  "productName": "온리원멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061501",
+  "productName": "에센셜포맨50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032525",
+  "productName": "내몸에 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083418",
+  "productName": "이뮨 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008684",
+  "productName": "마큐란프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141631",
+  "productName": "멀티비타민 아르테미스 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553351",
+  "productName": "아임비타 멀티비타민 이뮨플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080379",
+  "productName": "비타플러스미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028596",
+  "productName": "맥스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041498",
+  "productName": "아나민 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000997221",
+  "productName": "신미보 보(補) 멀티비타민 데일리원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141456",
+  "productName": "리얼닥터 멀티비타민 123 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022001309337",
+  "productName": "진심멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083412",
+  "productName": "올인원 멀티비타민 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080507",
+  "productName": "베이직 뉴트리언트 2데이",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009105299",
+  "productName": "비타 이뮨 플래티넘 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104436",
+  "productName": "맥스 멀티비타민미네랄 올인원 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142043",
+  "productName": "모어네이처 올인원 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023150",
+  "productName": "그린 멀티비타민미네랄 Ⅲ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020001635427",
+  "productName": "종합건강 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352047",
+  "productName": "데이&나이트 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20110020099313",
+  "productName": "부원건강 종합비타민19",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001407138",
+  "productName": "멀티비타민 FOR 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080468",
+  "productName": "나프라우드 셀이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080514",
+  "productName": "애터미 프로팩타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000229634",
+  "productName": "멀티비타민&미네랄 비타민B 1000",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081140",
+  "productName": "파워 이뮨 멀티비타민 & 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052196",
+  "productName": "에고랩스 밸런스업 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023545",
+  "productName": "멀티미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008468",
+  "productName": "리포좀 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007948",
+  "productName": "혈당밸런스엔 바나바 마그네슘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080557",
+  "productName": "Centrum 실버 맨 플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083964",
+  "productName": "루테인12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083330",
+  "productName": "올인원 뉴트리션 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082809",
+  "productName": "미네타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353194",
+  "productName": "울트라 비타 액션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2024002023362",
+  "productName": "루테인지아잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082582",
+  "productName": "코어 헬스 팩(Core Health)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110887",
+  "productName": "3초습관 플러스타민 종합영양제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080504",
+  "productName": "비타온 멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080294",
+  "productName": "퍼펙트한 종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141637",
+  "productName": "기억력 혈행개선엔 징코 프리미엄 100정",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193278",
+  "productName": "이뮨 올인원 멀티비타민&미네랄 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107840",
+  "productName": "포텐셜",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033079",
+  "productName": "닥터박스 올인원 멀티비타민미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082612",
+  "productName": "에센셜 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110912",
+  "productName": "옵티마 밸런스 멀티비타민 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032426",
+  "productName": "루피움 밸런스 뉴트리션 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024033",
+  "productName": "멀티바이탈 이뮨샷 이지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021977",
+  "productName": "헬시엑소 멀티 비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201324",
+  "productName": "이뮨 올인원 종합 멀티비타민 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022854",
+  "productName": "에이토솔루션 레드프로폴리스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071223",
+  "productName": "데일리 퍼팩트 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141163",
+  "productName": "프리미엄 티컨트롤",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022143",
+  "productName": "아이원 눈에 좋은 루테인 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220020002117",
+  "productName": "종합건강 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107636",
+  "productName": "헬스트리 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211523",
+  "productName": "프리미엄 아로픽시아 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201336",
+  "productName": "부스터 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083829",
+  "productName": "징코빌로바11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141884",
+  "productName": "케이투미네랄부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101096",
+  "productName": "면역 비타민 레드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104440",
+  "productName": "meditree 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284156",
+  "productName": "에너쎌 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120017002135",
+  "productName": "온가족 멀티비타민 플러스 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483692",
+  "productName": "우리멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080428",
+  "productName": "센트룸 실버 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553272",
+  "productName": "빅비타 이뮨 종합비타민 샷 Big Vita Immune Multi Vitamin Shot",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020971",
+  "productName": "데이랩 종합비타민 멀티플케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142132",
+  "productName": "4050 에너지 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141627",
+  "productName": "멀티비타민 포세이돈 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001029750",
+  "productName": "해비타 듀얼랩 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201260",
+  "productName": "마이핏 V 멀티비타민 미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080364",
+  "productName": "데일리21 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032663",
+  "productName": "헬시아민 멀티비타민미네랄 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483618",
+  "productName": "고운마더스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000229664",
+  "productName": "프리미엄 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022711",
+  "productName": "그린멀티트리플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141638",
+  "productName": "닥터에디션 퍼틸리티 우먼 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107595",
+  "productName": "멀티맘뉴트리밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023064",
+  "productName": "스타멀티맥스23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033013",
+  "productName": "올인원 포 우먼 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081441",
+  "productName": "오스타민D 본케어팩 2000IU",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032983",
+  "productName": "타마플렉스 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211408",
+  "productName": "멀티비타민&미네랄23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141828",
+  "productName": "종합비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000295",
+  "productName": "소중한그녀 슈가컷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353162",
+  "productName": "액티브 데일리 멀티 포 올",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020003137",
+  "productName": "비타민C+5",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023412",
+  "productName": "바이탈에버 멀티비타민·미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000997253",
+  "productName": "종합비타민 미네랄 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032385",
+  "productName": "센트룸 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200021240",
+  "productName": "스마타민멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553316",
+  "productName": "힙스 비타파워 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082757",
+  "productName": "원데이 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040019002124",
+  "productName": "입쁨 에센셜 멀티 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352917",
+  "productName": "알고케어 종합비타민 보틀",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110935",
+  "productName": "멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020287",
+  "productName": "퍼펙트 이뮨 플러스 밀크씨슬 알티지오메가3 루테인 올인원 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031975",
+  "productName": "위슬로 종합비타민미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352601",
+  "productName": "베투키 칼마미",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015191234",
+  "productName": "비타믹스(VITAMIXX)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142164",
+  "productName": "닥터언 장용성 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032713",
+  "productName": "올인원 뉴트리션 멀티비타민 코큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082746",
+  "productName": "맨 프로그램",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007636",
+  "productName": "시리어스 뉴트리언트 원데이 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032092",
+  "productName": "멀티비타민 앤 미네랄 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2017286000739",
+  "productName": "모노라이프 V9",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015191160",
+  "productName": "휴럼 비타민 활력 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015102135",
+  "productName": "인성 오메가3+멀티비타민&미네랄 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351477",
+  "productName": "뉴라이프 뉴트리션 멀티 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201554",
+  "productName": "스프링멜로디 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553247",
+  "productName": "데일리 에너지 부스트 울트라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080390",
+  "productName": "멀티비타민유니버셜 (Multivitamin Universal)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201154",
+  "productName": "연세 데일리 멀티비타민 리퀴드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022801",
+  "productName": "인큐텐 멀티비타민 트리플 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008358",
+  "productName": "아이스페셜 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082472",
+  "productName": "브리오 종합비타민 미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "202500049679",
+  "productName": "멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553305",
+  "productName": "뉴칸 이뮨파워 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141732",
+  "productName": "우리 가족 건강한 습관 올인원 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033093",
+  "productName": "애터미 우먼 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351235",
+  "productName": "인생 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071343",
+  "productName": "jw중외제약 이뮨 남성 · 여성 올인원 23종 멀티 종합 비타민 미네랄 플러스 칼슘 마그네슘 영양제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022032",
+  "productName": "홍천웅에너지팩I",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483429",
+  "productName": "하루틴 리포좀 멀티비타민 알파α",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553468",
+  "productName": "하루엔진 이뮨비타샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032152",
+  "productName": "하루바이타민 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007249",
+  "productName": "앱솔루트 파워 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061248",
+  "productName": "남성을 위한 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021679",
+  "productName": "앱솔루트 파워 멀티비타민&미네랄 22플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200021275",
+  "productName": "스마타민블루파우더",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483824",
+  "productName": "하루틴 리포좀 멀티비타민 리펀",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211751",
+  "productName": "트루바이타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110914",
+  "productName": "옵티마 밸런스 멀티비타민 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141164",
+  "productName": "데일리원멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020001140",
+  "productName": "헬스케어 MVP",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033219",
+  "productName": "올인원 뉴트리션 멀티비타민 칼슘 마그네슘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600568",
+  "productName": "고려은단 비타플렉스 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082586",
+  "productName": "그린스 우먼스 멀티",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553439",
+  "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052163",
+  "productName": "VECELL 오리지날 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352474",
+  "productName": "울트라 플러스 멀티비타민 & 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083708",
+  "productName": "루테인플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2014002007319",
+  "productName": "프로칼맥 디(ProCALMAG D)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017031262",
+  "productName": "올인원멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022830",
+  "productName": "칼마디K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052347",
+  "productName": "올인원 헬스팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007902",
+  "productName": "종합멀티비타민미네랄 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104418",
+  "productName": "헬시아민 멀티비타민미네랄 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083117",
+  "productName": "액티브솔루션남성건강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082500",
+  "productName": "울트라 비타민 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080323",
+  "productName": "센트룸 실버 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193389",
+  "productName": "멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001602416",
+  "productName": "포우먼 멀티비타민+미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041292",
+  "productName": "퓨어원 종합 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483612",
+  "productName": "익스트림 꼬막칼슘 마그네슘 비타민D&K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000948343",
+  "productName": "일양눈건강루테인골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201358",
+  "productName": "리얼 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022398",
+  "productName": "멀티비타민.무기질컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020672",
+  "productName": "면역엔 비타민앤미네랄 7",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032982",
+  "productName": "타마플렉스정",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483317",
+  "productName": "메가 멀티비타민 플러스 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141261",
+  "productName": "프리미엄티컨트롤멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007746",
+  "productName": "헬퓨 B데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2025002875910",
+  "productName": "종합 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104458",
+  "productName": "올데이 멀티비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020408",
+  "productName": "멀티비타민30+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080562",
+  "productName": "Centrum 우먼 더블업 플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141498",
+  "productName": "밀크씨슬 멀티미네랄 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080427",
+  "productName": "센트룸 맨 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353188",
+  "productName": "이뮨듀오 올인원 포우먼 멀티비타민팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007258",
+  "productName": "건강한 프로폴리스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141562",
+  "productName": "피나트린 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141969",
+  "productName": "뉴트리4(Nutri4)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071072",
+  "productName": "뉴트원멀티비타민올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082089",
+  "productName": "프리솔라 에센셜",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162271",
+  "productName": "에센셜 멀티비타민미네랄 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035519",
+  "productName": "슈퍼라인 울트라 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353182",
+  "productName": "우먼맥스팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141271",
+  "productName": "프리미엄 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201548",
+  "productName": "동국 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142114",
+  "productName": "활력 멀티비타민 포켓",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080542",
+  "productName": "올인원 멀티비타민미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082344",
+  "productName": "대상 트리플케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553267",
+  "productName": "바로타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553315",
+  "productName": "하이퍼 멀티 비타 올인원 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080365",
+  "productName": "우먼즈 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600585",
+  "productName": "고려은단 멀티비타민 올인원 이지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007581",
+  "productName": "닥터스메가비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201495",
+  "productName": "바이탈 이뮨 올인원 마그네슘 멀티비타민 비오틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002928443",
+  "productName": "리얼 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110775",
+  "productName": "멀티비타민미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023993",
+  "productName": "오션스 케이2 칼마디 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041402",
+  "productName": "팜쿱 멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007752",
+  "productName": "헬퓨 J데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201380",
+  "productName": "올인원 멀티비타민 에너지샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061247",
+  "productName": "여성을 위한 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023062",
+  "productName": "부원건강멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035773",
+  "productName": "마더스밸런스1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071248",
+  "productName": "쎈탁스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082711",
+  "productName": "GNC 남성멀티팩 30+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141842",
+  "productName": "나프라우드 셀이뮨 종합 멀티비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023663",
+  "productName": "아세로라비타민C",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061499",
+  "productName": "에센셜포우먼50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193140",
+  "productName": "루테인 마리골드 포르테",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000474653",
+  "productName": "하루 영양 튼튼 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483702",
+  "productName": "하루틴 리포좀 멀티비타민 알파R",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041264",
+  "productName": "이뮨 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032977",
+  "productName": "마이핏 ORIGIN 프라임 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000270",
+  "productName": "올데이 눈에는루테인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141812",
+  "productName": "YDY 풀스펙멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483269",
+  "productName": "원데이 비타22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022331",
+  "productName": "더건강한비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083249",
+  "productName": "올인원 멀티비타민 코어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007985",
+  "productName": "라세핀 앤 이뮨 액상 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033095",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201374",
+  "productName": "이뮨 멀티비타민&미네랄 원샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032423",
+  "productName": "올인원케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024047",
+  "productName": "올투비타엔미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081174",
+  "productName": "바로타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080257",
+  "productName": "마이핏 ORIGIN 프라임 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006882",
+  "productName": "퍼틸케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021514",
+  "productName": "스마일렌 징코 11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083120",
+  "productName": "멀티비타민미네랄 데일리",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032885",
+  "productName": "애터미 프로팩타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600520",
+  "productName": "비타플렉스 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104448",
+  "productName": "비타민B 2000",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082771",
+  "productName": "우먼스울트라메가건강팩30플러스 Women's Ultra Mega Live Well pack 30 Plus",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483841",
+  "productName": "팬슈미츠 비오틴 & 판토텐산",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20160007515114",
+  "productName": "티엠플렉스 에프 캡슐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020859",
+  "productName": "징코후",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017015426",
+  "productName": "프롬비타 더블액션 멀티비타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083126",
+  "productName": "코티프로 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110915",
+  "productName": "건강더함 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020863",
+  "productName": "유한m(엠) 프리미엄멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032540",
+  "productName": "올인원 뉴트리션 멀티비타민+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023907",
+  "productName": "퍼펙트케어 앤 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020745",
+  "productName": "징코 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061299",
+  "productName": "드림 메이드 멀티비타민미네랄3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211191",
+  "productName": "엔닷바이오 솔루션 종합비타민미네랄 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553464",
+  "productName": "이뮨 올인원 멀티비타민 & 미네랄 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553410",
+  "productName": "연세 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081132",
+  "productName": "엔지엔 원샷 메리바이타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141768",
+  "productName": "바디닥터스 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142135",
+  "productName": "원데이 풀케어 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20160007515149",
+  "productName": "비바녹스 셀프로텍트 캡슐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023789",
+  "productName": "진정주 헬씨 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600519",
+  "productName": "비타플렉스 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083190",
+  "productName": "코티프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141472",
+  "productName": "맘스포뮬러 1단계",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008565",
+  "productName": "멀티비타민 & 미네랄 17 올인원 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032306",
+  "productName": "라이트닝 메모리",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032960",
+  "productName": "센트룸 원데이팩 우먼 2030",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052184",
+  "productName": "원데이올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033094",
+  "productName": "애터미 리바이탈 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142020",
+  "productName": "신미보 보(補) 멀티비타민 데일리원 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553228",
+  "productName": "마이니 부스터 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032141",
+  "productName": "퍼틸리티프리미엄 에프 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061494",
+  "productName": "에센셜포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000238",
+  "productName": "당밸런스원 크롬",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201263",
+  "productName": "데이랩 간에좋은 밀크씨슬",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353207",
+  "productName": "센트룸 메노포즈 릴리프 데일리 뉴트리션 팩 Centrum Menopause relief daily nutrition pack",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071350",
+  "productName": "Reformator all in one for men",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211816",
+  "productName": "미네랄멀티비타민23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020041549",
+  "productName": "멀티비타민울트라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061807",
+  "productName": "비오유 올인원 종합영양제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082642",
+  "productName": "멀티 비타민 미네랄 맥스 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141673",
+  "productName": "멀티비타민 데메테르 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107897",
+  "productName": "이너피스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201089",
+  "productName": "멀티비타민&미네랄+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20140020012221",
+  "productName": "굿데이 멀티비타민 컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082552",
+  "productName": "에센셜 포 맨 S",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352806",
+  "productName": "이지팩 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023614",
+  "productName": "액티풀샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033197",
+  "productName": "마이밸런스 데일리팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080534",
+  "productName": "Centrum 맨 더블업 플러스+ Ex",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001634024",
+  "productName": "뉴트리마인 M3C(엠쓰리씨)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033138",
+  "productName": "데이팩 올인원 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104178",
+  "productName": "원데이 멀티 비타민 미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082738",
+  "productName": "스트롱 맨 오맥스팩 프로그램 Strong Men Omexpak Program 40+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015191225",
+  "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071055",
+  "productName": "활력충전 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081108",
+  "productName": "클리어 샷 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081344",
+  "productName": "비타 몬스터 샷 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033146",
+  "productName": "올인원 뉴트리션 이뮨 데일리 팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032897",
+  "productName": "액티브 케어 멀티비타민K1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032668",
+  "productName": "멀티비타민 DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081228",
+  "productName": "슈어비타 멀티비타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600592",
+  "productName": "고려은단 멀티비타민 올인원 우먼 60+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007763",
+  "productName": "헬퓨 E데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141473",
+  "productName": "맘스포뮬러 2단계",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007759",
+  "productName": "헬퓨 H데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081102",
+  "productName": "멀티비타민팩 어드밴스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032751",
+  "productName": "퍼펙트한 종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141817",
+  "productName": "아이엠포뮬러 에센셜 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081139",
+  "productName": "올인원 이뮨 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141924",
+  "productName": "에코 멀티비타민 21종",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483843",
+  "productName": "하루틴 리포좀 멀티비타민 초이스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600516",
+  "productName": "비타플렉스 핑크",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211242",
+  "productName": "멀티비타민&미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007423",
+  "productName": "B다이나믹 메타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007993",
+  "productName": "멀티비타민 미네랄 액상 이뮨샷 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193115",
+  "productName": "루테인11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032779",
+  "productName": "비타민미네랄FDT",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081315",
+  "productName": "판티오 이뮨 비타 올케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052187",
+  "productName": "멜라필 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007737",
+  "productName": "헬퓨 I데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033070",
+  "productName": "멀티비타민마스터 이지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015191206",
+  "productName": "비타랩스 멀티비타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104402",
+  "productName": "멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080555",
+  "productName": "Centrum 실버 우먼 플러스+ Ex",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101213",
+  "productName": "이너뷰티 리포좀 비타민C",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020668",
+  "productName": "엠에스 은행잎 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032712",
+  "productName": "데이팩 올인원 EX",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200021539",
+  "productName": "징코맥스Q",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081317",
+  "productName": "아이원 눈건강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083363",
+  "productName": "맥스 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007577",
+  "productName": "바이탈큐브 가르시니아 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20110020099114",
+  "productName": "프리텍플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141583",
+  "productName": "비타민B 컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553233",
+  "productName": "올라운드 멀티비타 메가에너지 부스터샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068215",
+  "productName": "에너맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553211",
+  "productName": "멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033129",
+  "productName": "하루엔진 올인원 퍼펙트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483351",
+  "productName": "멀티비타민 & 멀티미네랄 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022001722036",
+  "productName": "올인원 21종 종합 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553470",
+  "productName": "듀얼 이뮨 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083065",
+  "productName": "에너지멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083931",
+  "productName": "플래티넘징코플러스11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000261",
+  "productName": "당밸런스원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061444",
+  "productName": "멀티비타민 오메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110876",
+  "productName": "브이보멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023531",
+  "productName": "휴온스 멀티비타민미네랄&이뮨 올인원샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080370",
+  "productName": "액티브 케어 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023157",
+  "productName": "알티지오메가3 메타 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000604514",
+  "productName": "종합비타민K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201401",
+  "productName": "원어데이 올인원 23종 종합 멀티비타민 미네랄 앤 칼슘 마그네슘 컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "202200130934",
+  "productName": "효비타 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080401",
+  "productName": "멀티비타민포우먼 (Multivitamin for Women)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553446",
+  "productName": "옵티젠 이뮨 멀티비타민&미네랄(구)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211630",
+  "productName": "뉴로랩스 그랜티정 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007680",
+  "productName": "루테인엔 탑 눈건강 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193310",
+  "productName": "듀얼 이뮨 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083183",
+  "productName": "활력충전 멀티비타민 미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141625",
+  "productName": "멀티비타민 헤라 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023276",
+  "productName": "마이 데일리 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141726",
+  "productName": "맘포피아",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020024470",
+  "productName": "옵티젠 리프레쉬 마그네슘 & 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141594",
+  "productName": "멀티비타민 솔루션팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000997255",
+  "productName": "종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351151",
+  "productName": "종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083299",
+  "productName": "멀티비타민 미네랄 플러스B",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032958",
+  "productName": "센트룸 원데이팩 맨 40",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017062188",
+  "productName": "브이타민21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033036",
+  "productName": "멀티미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032658",
+  "productName": "헬시아민 멀티비타민미네랄 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041347",
+  "productName": "비타부스트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023507",
+  "productName": "메리트C 리포좀 비타민C 트리플샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007710",
+  "productName": "가네파워",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082609",
+  "productName": "에센셜 포 맨 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031283",
+  "productName": "멀티비타민화이토",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033052",
+  "productName": "비타플러스미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211677",
+  "productName": "멀티비타민 앤 미네랄 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483504",
+  "productName": "리포좀 데일리 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032447",
+  "productName": "락티브 멀티케어 종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211274",
+  "productName": "멀티비타민미네랄 스트롱",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032479",
+  "productName": "헬씨콕스 멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110941",
+  "productName": "아반바 슈퍼브레인 큐 알파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020041535",
+  "productName": "종합비타민 미네랄 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071224",
+  "productName": "SeniorVibe for Men",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553326",
+  "productName": "아임비타 멀티비타민 이뮨샷 40",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081688",
+  "productName": "마이니 활력 멀티우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211796",
+  "productName": "원데이 20 멀티비타민 & 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352933",
+  "productName": "건강프로젝트365 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020001289",
+  "productName": "슈퍼바이탈비",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000210",
+  "productName": "올인원 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483563",
+  "productName": "멀티비타민&미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553308",
+  "productName": "마이 에너지 부스터 이뮨 21샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024066",
+  "productName": "여에스더 멀티비타민·미네랄 Daily",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023218",
+  "productName": "비타마스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022461",
+  "productName": "메가엑스 프리미엄(MEGA X PREMIUM)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082444",
+  "productName": "프리나탈 포뮬라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083979",
+  "productName": "올바른 루테인12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023084",
+  "productName": "메리트엔티 멀티비타민X",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083954",
+  "productName": "플래티넘 루테인11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080337",
+  "productName": "헤라클레스 멀티퍼포먼스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052415",
+  "productName": "코오롱 쏘팔 시그니처 올인원 25",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007779",
+  "productName": "아브카 에센셜 온가족 활력충전 멀티 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080453",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023045",
+  "productName": "슈퍼포뮬러 멀티비타민미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141179",
+  "productName": "웰씨드 데일리 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352751",
+  "productName": "NYO3® WOMEN'S MULTI-VITAMINS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2025002875911",
+  "productName": "데일리 멀티비타민 미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023853",
+  "productName": "마더네스트 이뮨 바이탈 부스터 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193352",
+  "productName": "대원헬스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120017002187",
+  "productName": "뉴메이트 멀티비타민 올인원 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083638",
+  "productName": "복합쏘팔메토포맨파워",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017059299",
+  "productName": "비오팅",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061104",
+  "productName": "서흥 여성을 위한 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061099",
+  "productName": "멀티비타민 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071047",
+  "productName": "멀티비타민 for 실버 Pro",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201287",
+  "productName": "락티브 메가샷 멀티비타민 이뮨 에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193281",
+  "productName": "기억력ㆍ혈행 건강엔 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022817",
+  "productName": "뉴:트립 맥스 바이탈 미네랄8",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052144",
+  "productName": "뉴트리언트 부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107687",
+  "productName": "제너럴밸런스 종합바이타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009105173",
+  "productName": "비타민C 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033131",
+  "productName": "데이팩 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007978",
+  "productName": "종합멀티비타민 미네랄21 프리미엄 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032384",
+  "productName": "센트룸 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032763",
+  "productName": "와이즈헬스 멀티비타미네",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201052",
+  "productName": "루체 멀티비타민 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107889",
+  "productName": "닥터헬씨멀티비타정",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023149",
+  "productName": "그린 멀티비타민미네랄 Ⅱ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483318",
+  "productName": "메가 칼슘 마그네슘 아연 플러스 비타민D·K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483875",
+  "productName": "포켓 멀티비타민 & 미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082790",
+  "productName": "멀티비타민미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141622",
+  "productName": "멀티비타민 디오니소스 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141642",
+  "productName": "이뮨 앤 에너지부스트 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022865",
+  "productName": "시그니처 멀티비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083867",
+  "productName": "루테인 LUTEIN",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015191202",
+  "productName": "멀티비타 액상 이뮨샷 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081057",
+  "productName": "바이탈 이뮨 올인원 마그네슘 멀티비타민 비오틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022399",
+  "productName": "락피도멀티비타민맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080219",
+  "productName": "맥스데이 멀티부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008154",
+  "productName": "아이브라이트 아레즈투",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107919",
+  "productName": "오늘더청춘 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033012",
+  "productName": "올인원 포 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2011002009989",
+  "productName": "나눔비타민사랑주는어른용",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023972",
+  "productName": "스마타민 비타민BC와 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032853",
+  "productName": "센트룸 우먼 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370409",
+  "productName": "눈건강 루테인 지아잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023555",
+  "productName": "리세린지 리-본 다이어트 (Reseringe Re-born Diet)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006933",
+  "productName": "엘레뉴 III",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142115",
+  "productName": "눈건강 루테인지아잔틴 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061360",
+  "productName": "엔케이365",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007963",
+  "productName": "울트라 B12 부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352795",
+  "productName": "쌩쌩타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080558",
+  "productName": "Centrum 실버 맨 플러스+ Ex",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083298",
+  "productName": "올인원 멀티비타민 23 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141946",
+  "productName": "올인원 데일리 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020910",
+  "productName": "멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351428",
+  "productName": "뉴라이프 뉴트리션 종합비타민16",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023481",
+  "productName": "그린스토어 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2014002007320",
+  "productName": "프로칼맥디 골드 (ProCALMAGD Gold)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007399",
+  "productName": "에버업 멀티비타민(&)엔미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081327",
+  "productName": "백세온담",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20140020012171",
+  "productName": "뉴트리네이션 멀티비타민 플러스 (Nutrination Multivitamin Plus)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081689",
+  "productName": "마이니 활력 멀티맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193383",
+  "productName": "올바른 멀티비타민&미네랄 23 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023552",
+  "productName": "헬시부트 올데이샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352107",
+  "productName": "진정주헬시큐엑스정",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080440",
+  "productName": "멀티비타민&미네랄 올앤원 우먼 코어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083775",
+  "productName": "에브리데이멀티비타민미네랄포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211933",
+  "productName": "오늘의 건강한팩 활력충전 데일리팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020046642",
+  "productName": "LWJ 이왕재박사 메가 이뮨 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083180",
+  "productName": "올인원 솔루션 멀티팩 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035779",
+  "productName": "마더스 밸런스 3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352145",
+  "productName": "멀티비타민미네랄 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083771",
+  "productName": "에브리데이멀티비타민미네랄포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211304",
+  "productName": "원데이 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017015274",
+  "productName": "다편안 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082367",
+  "productName": "트리플24",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041360",
+  "productName": "비건 멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193296",
+  "productName": "익스트림 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000751537",
+  "productName": "비바진 에프 캡슐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353122",
+  "productName": "DAILY WISE 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020001318",
+  "productName": "마그네슘 미네랄 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201580",
+  "productName": "락티브 맘스 온리원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20140020012136",
+  "productName": "스프링멜로디",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023819",
+  "productName": "여에스더 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023029",
+  "productName": "젠타민 미네랄8",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600588",
+  "productName": "고려은단 멀티비타민 올인원 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483835",
+  "productName": "하루틴 리포좀 멀티비타민 프리미어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052294",
+  "productName": "KoreanVita Womanenergy 코리안비타 우먼에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080301",
+  "productName": "퓨어젠 케이투 키즈 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082601",
+  "productName": "그린스 멘스 멀티",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061090",
+  "productName": "엘레뉴5",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032696",
+  "productName": "젤튼튼 키즈멀티비타민미네랄 츄어블",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20180003915200",
+  "productName": "셀렌프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052164",
+  "productName": "VECELL 오리지날 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007445",
+  "productName": "잠백이 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352667",
+  "productName": "멀티비타민 활력케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023423",
+  "productName": "스트레스케어 플러스 멀티비타민&이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211834",
+  "productName": "스마트 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553266",
+  "productName": "멀티비타민 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104451",
+  "productName": "멀티비타민 컴팩트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020013278",
+  "productName": "유플러스골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081325",
+  "productName": "멀티비타민 미네랄 액상 이뮨샷 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009105298",
+  "productName": "닥터 올인원 비타 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162223",
+  "productName": "서큐 플러스 브레인 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141701",
+  "productName": "멀티비타민미네랄 데일리",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483348",
+  "productName": "랄츠맘 스텝2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001407140",
+  "productName": "멀티비타민 베이직",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061333",
+  "productName": "멀티비타민미네랄 139",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080446",
+  "productName": "멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553473",
+  "productName": "올인원 원데이 멀티비타민팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193280",
+  "productName": "이뮨 멀티비타민&미네랄 원샷 스틱",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141810",
+  "productName": "내몸엔영양밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061776",
+  "productName": "현대약품 비오틴 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107839",
+  "productName": "젬무브생생디앤알",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023887",
+  "productName": "아이마음 키키 kiki 케이2 칼마디 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352515",
+  "productName": "울트라 프리미엄 K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142168",
+  "productName": "원데이 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061776",
+  "productName": "비오유엠",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017062205",
+  "productName": "광동 멀티비타민미네랄 플러스 마그네슘 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20110020099327",
+  "productName": "미네키(Minekey)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141543",
+  "productName": "혈행앤 징코 브레인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033003",
+  "productName": "멀티팩 맨 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022542",
+  "productName": "비타 원데이 (Vita One/1 day)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110654",
+  "productName": "뉴트리굿멀티비타미네",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061298",
+  "productName": "드림 메이드 멀티비타민미네랄2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081000",
+  "productName": "멀티비타G 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201279",
+  "productName": "랄츠비 멀티비타민 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20180003915175",
+  "productName": "웰러스 바른 철분",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080431",
+  "productName": "센트룸 우먼 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553345",
+  "productName": "하이비타 스트레스 앤 릴렉스 이뮨 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007601",
+  "productName": "초임계알티지오메가3루테인아스타잔틴눈건강대박",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017015451",
+  "productName": "올인원 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082739",
+  "productName": "스트롱 맨 오맥스팩 프로그램 Strong Men Omexpak Program 30+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068124",
+  "productName": "일양 종합 비타민 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071345",
+  "productName": "옵티마 이뮨 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553265",
+  "productName": "마그네슘 에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553215",
+  "productName": "듀얼타민(Dualtamin)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023670",
+  "productName": "옴니 밸런스 360° (OMNI BALANCE 360°)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141500",
+  "productName": "임팩트 멀티비타민 미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041438",
+  "productName": "벤포밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033162",
+  "productName": "올인원 뉴트리션 멀티비타민 유산균",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083286",
+  "productName": "종합비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141909",
+  "productName": "엔바이탈 장용성 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083419",
+  "productName": "멀티비타민미네랄 B+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142131",
+  "productName": "2030 에너지 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032997",
+  "productName": "멀티팩 맨 40",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193264",
+  "productName": "와이즈헬스 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023002876629",
+  "productName": "올인원 종합 비타민 미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023309",
+  "productName": "당밸런스원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104189",
+  "productName": "바디시그널 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201375",
+  "productName": "6년근 홍삼 부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052132",
+  "productName": "리즈온 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553330",
+  "productName": "옵티마 리프레쉬 마그네슘 & 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080457",
+  "productName": "데이팩 에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080533",
+  "productName": "Centrum 맨 더블업 플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022737",
+  "productName": "트리플엔맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201350",
+  "productName": "하루영양 튼튼 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031940",
+  "productName": "우먼즈 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032054",
+  "productName": "센트룸 실버 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023345",
+  "productName": "뷰티풀컷 다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007256",
+  "productName": "건강한 징코플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201202",
+  "productName": "네이처그랜드 종합비타민 & 미네랄 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483831",
+  "productName": "하루틴 리포좀 멀티비타민 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031937",
+  "productName": "맨즈 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082613",
+  "productName": "에센셜 포 우먼 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033171",
+  "productName": "올인원 뉴트리션 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071172",
+  "productName": "장사의신 멀티비타민미네랄23종",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141937",
+  "productName": "투퍼데이 칼마디K2 Plus",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351975",
+  "productName": "모인 맥스 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033061",
+  "productName": "오비유 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028552",
+  "productName": "리얼 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032837",
+  "productName": "멀티비타민 마스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101110",
+  "productName": "플러스마이너스케어 멀티비타민앤미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553245",
+  "productName": "이뮨 원샷 올인원 멀티 비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021734",
+  "productName": "모셀업징크",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141284",
+  "productName": "굿나잇슬리밍다이어트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200021035",
+  "productName": "멀티비타민.무기질컴플렉스골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370119",
+  "productName": "유한m 징코미네랄플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080429",
+  "productName": "센트룸 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007739",
+  "productName": "헬퓨 A데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141851",
+  "productName": "멀티비타민미네랄플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201400",
+  "productName": "올인원 멀티비타민 앤 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284124",
+  "productName": "올인원 멀티비타민미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022400",
+  "productName": "락피도멀티비타민우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033149",
+  "productName": "올인원 영양제 한판승",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082652",
+  "productName": "멀티비타민 FOR 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082932",
+  "productName": "웅진 오직 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080325",
+  "productName": "센트룸 실버 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553243",
+  "productName": "이뮨비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141656",
+  "productName": "종합 멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190016024126",
+  "productName": "퓨어젠 케이투 키즈 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107725",
+  "productName": "포뮬러 멀티비타민미네랄 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023332",
+  "productName": "닥터. 비타민젤리스틱 튼튼쑥쑥",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483401",
+  "productName": "눈건강 파워 루테인 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553241",
+  "productName": "데일리 에너지 부스트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201507",
+  "productName": "랄츠비 올인원 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2025002875912",
+  "productName": "올인원 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141785",
+  "productName": "멀티비타민&미네랄 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023147",
+  "productName": "그린 멀티비타민미네랄 Ⅰ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483837",
+  "productName": "올 뉴 분홍이 시즌4",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007660",
+  "productName": "슈퍼 데일리 21 멀티비타민&미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083959",
+  "productName": "탑클래스 루테인 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020982",
+  "productName": "종합비타민 미네랄 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107684",
+  "productName": "슈퍼 멀티비타민&미네랄 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020272",
+  "productName": "프리미엄 루테인 플러스 12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007751",
+  "productName": "헬퓨 C데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033126",
+  "productName": "애터미 청소년 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083261",
+  "productName": "멀티비타민미네랄 365",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032969",
+  "productName": "센트룸 원데이팩 우먼 40",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142125",
+  "productName": "이뮨 건강 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082750",
+  "productName": "우먼 프로그램",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211860",
+  "productName": "리얼 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082769",
+  "productName": "네이처셋 더 액티브 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141276",
+  "productName": "구.케이투미네랄부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193293",
+  "productName": "멀티비타민 플러스 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007965",
+  "productName": "식후혈당 케어 관리 조절 바나바잎 추출물 코로솔산 프로 09",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141662",
+  "productName": "멀티비타민 아테네 쥬니어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023723",
+  "productName": "올키 그로우 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021859",
+  "productName": "퍼포먼스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2017286000720",
+  "productName": "나프라우드 셀이뮨 종합 멀티비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483159",
+  "productName": "하루틴 멀티비타민 원데이",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201026",
+  "productName": "엠에스 멀티비타민 & 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022611",
+  "productName": "이뮤니플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083391",
+  "productName": "여에스더 멀티비타민 미네랄 & 리포좀 비타민 B1 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023185",
+  "productName": "멀티비타민미네랄 한포유",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211672",
+  "productName": "멀티비타민 앤 미네랄 포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083184",
+  "productName": "올인원 멀티비타민 미네랄 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061105",
+  "productName": "서흥 남성을 위한 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193226",
+  "productName": "유한양행 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352471",
+  "productName": "아연 멀티미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107843",
+  "productName": "닥터에스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017038235",
+  "productName": "트리밋",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080171",
+  "productName": "멀티비타민 마스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193143",
+  "productName": "랄츠맘 스텝1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370382",
+  "productName": "온가족 데일리21 종합비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023139",
+  "productName": "초임계 알티지오메가 트리플",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061333",
+  "productName": "비타민미네랄연질",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071139",
+  "productName": "셀렌톡",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052166",
+  "productName": "지셀라 멀티케어 Y",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600591",
+  "productName": "고려은단 멀티비타민 올인원 맨 60+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141535",
+  "productName": "메타믹스 멀티비타민&미네랄 원데이 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032946",
+  "productName": "동성제약 멀티비타민 올인원 by Dr.Yodd",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022942",
+  "productName": "트리플 활력건강 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352961",
+  "productName": "여에스더 for Kids 멀티비타민 미네랄 gummy",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008568",
+  "productName": "리포플러스17",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201344",
+  "productName": "루미너스 필업 원스 스킨앤에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028697",
+  "productName": "메가렉스 루테인 플러스 12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110798",
+  "productName": "원이지 비씨엠(One Easy BCM)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061013",
+  "productName": "영양가득 비타푸드Q",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080426",
+  "productName": "센트룸 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008648",
+  "productName": "이뮨멀티비타민올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000604513",
+  "productName": "일양헬스케어 온가족 종합비타민18+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052165",
+  "productName": "지셀라 멀티케어 W",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080340",
+  "productName": "밸런스탑 멀티비타민&미네랄 Balance Top Multivitamin&Mineral",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352087",
+  "productName": "바이디자인 에너지업 플러스(BYDZYNE ENERGY-UP PLUS)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600590",
+  "productName": "정제3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483309",
+  "productName": "멀티비타민 & 멀티미네랄 포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023914",
+  "productName": "멀티비타민미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20140020012112",
+  "productName": "맨즈 멀티비타민 & 미네랄(Man's Multi-Vitamin & Mineral)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061491",
+  "productName": "안국 눈에 좋은 루테인 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2017288019350",
+  "productName": "바디루트 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022788",
+  "productName": "뉴:트립 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033073",
+  "productName": "액티브 케어 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351683",
+  "productName": "멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083265",
+  "productName": "멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000783513",
+  "productName": "김소형원방 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284221",
+  "productName": "88루틴 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080137",
+  "productName": "우리아이 면역비책 이뮨파파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2004001704688",
+  "productName": "바이탈셀라 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023240",
+  "productName": "인큐텐 멀티비타민 트리플 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141479",
+  "productName": "종합비타민 멀티미네랄 18 포 우먼 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284141",
+  "productName": "멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141742",
+  "productName": "폴리비타뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020843",
+  "productName": "멀티비타민 미네랄19",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082498",
+  "productName": "울트라 비타민 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023228",
+  "productName": "티나는 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141568",
+  "productName": "기억력엔 은행잎 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061172",
+  "productName": "슈퍼데일리프로그램",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052343",
+  "productName": "뷔셀 데이케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107726",
+  "productName": "포뮬러 멀티비타민미네랄 포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052160",
+  "productName": "지셀라 멀티케어 M",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061614",
+  "productName": "엠브이피오 4 in 1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041270",
+  "productName": "메가 멀티비타민 앤 미네랄 우먼 1600",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483826",
+  "productName": "하루틴 리포좀 멀티비타민 파워",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201341",
+  "productName": "종합비타민 미네랄 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553451",
+  "productName": "액상 멀티비타민 이뮨 앤 피로개선",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061736",
+  "productName": "비오유엠이었다",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081344",
+  "productName": "우먼스울트라메가 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033168",
+  "productName": "닥터에디션 퍼스트맘Ⅱ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022772",
+  "productName": "복합미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352940",
+  "productName": "이뮨듀오올인원멀티비타민팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023119",
+  "productName": "링비타 에너바이탈",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141917",
+  "productName": "올인원 케어+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200021658",
+  "productName": "레비멜라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201584",
+  "productName": "올인원 멀티비타민미네랄 21+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483445",
+  "productName": "광동 맑은365 눈건강 루테인11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352760",
+  "productName": "셀비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142011",
+  "productName": "이지맘스텝2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104419",
+  "productName": "헬시아민 멀티비타민미네랄 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200081342",
+  "productName": "메가맨 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080300",
+  "productName": "맨즈 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028712",
+  "productName": "혈행엔 기억력 징큐란",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031243",
+  "productName": "애터미 바이탈컬러 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352685",
+  "productName": "올인원 맨즈팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080425",
+  "productName": "센트룸 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032574",
+  "productName": "나를 위한 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082655",
+  "productName": "멀티비타민 베이직",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2017288019365",
+  "productName": "프라임 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211288",
+  "productName": "활기찬 하루엔 멀티비타민 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142133",
+  "productName": "60+ 에너지 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083326",
+  "productName": "뉴시아 로얄 골든팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142160",
+  "productName": "해피문데이 랩 데일리 멀티비타민 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022859",
+  "productName": "프리미엄 루테인 플러스 12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035271",
+  "productName": "멀티비타민 미네랄 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007466",
+  "productName": "밸런스 플러스 비타민 + 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002106784",
+  "productName": "멀티비타민 미네랄 MAX 토탈솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080544",
+  "productName": "Centrum 우먼 더블업 플러스+ Ex",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2010001801896",
+  "productName": "면역케어 아연/셀레늄 플러스 홍삼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000939474",
+  "productName": "올 뉴 분홍이 시즌4",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082553",
+  "productName": "에센셜 포 우먼 S",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022025",
+  "productName": "화애락밸런스팩I",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080349",
+  "productName": "멀티비타민 DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141599",
+  "productName": "에너지 더하기 멀티비타민미네랄 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2004001706194",
+  "productName": "B다이나믹메타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000604510",
+  "productName": "비타 몬스터 이뮨 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020280",
+  "productName": "데이빗 멀티비타민 밀크씨슬",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035670",
+  "productName": "마더스밸런스2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201172",
+  "productName": "징코빌로바 은행잎추출물",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201368",
+  "productName": "원어데이 올인원 21종 종합 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142146",
+  "productName": "멀티 액티브 데일리 비타민 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000948382",
+  "productName": "루테인 88청춘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028520",
+  "productName": "프리미엄 루테인 플러스12",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020041534",
+  "productName": "정직한 멀티 비타민 미네랄 마그네슘 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141236",
+  "productName": "프리미엄 종합비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023651",
+  "productName": "옴니 밸런스360°@",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141652",
+  "productName": "멀티비타민 아레스 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201419",
+  "productName": "올인원 이뮨 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201280",
+  "productName": "랄츠비 멀티비타민 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352220",
+  "productName": "종합비타민&미네랄 16",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553452",
+  "productName": "비타민엔젤스 멀티비타민미네랄 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022886",
+  "productName": "원어데이 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600515",
+  "productName": "비타플렉스 블루",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553462",
+  "productName": "프리미엄 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083369",
+  "productName": "앙쥬 면역젤리 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080511",
+  "productName": "Centrum 실버 우먼 플러스+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000474616",
+  "productName": "V21 하루 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023606",
+  "productName": "베어헬스 혈당 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352346",
+  "productName": "장용성 종합비타민 미네랄 이뮨+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211378",
+  "productName": "건강엔 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020266",
+  "productName": "올인원 뉴트리션 멀티비타민 칼슘 마그네슘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483833",
+  "productName": "하루틴 리포좀 멀티비타민 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032242",
+  "productName": "알고케어 멀티미네랄 보틀",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022178",
+  "productName": "알티지오메가 트리플",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008652",
+  "productName": "멀티비타민 미네랄 올인원 23",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032852",
+  "productName": "센트룸 맨 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020003529",
+  "productName": "원데이21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000279",
+  "productName": "멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061348",
+  "productName": "닥터에디션 퍼스트맘 Ⅲ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071096",
+  "productName": "아이토닉플러스(Eye tonic plus)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041333",
+  "productName": "멀티비타민 플러스 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061159",
+  "productName": "엘레뉴Ⅱ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052288",
+  "productName": "KoreanVita Manenergy 코리안비타 맨에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483339",
+  "productName": "에버업 멀티비타민미네랄 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033123",
+  "productName": "애터미 스포츠 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007712",
+  "productName": "헬퓨 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061097",
+  "productName": "닥터에디션 퍼스트맘Ⅱ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083047",
+  "productName": "마이토스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284103",
+  "productName": "멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141554",
+  "productName": "서퍼데이, 에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553220",
+  "productName": "올인원 바이탈 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201288",
+  "productName": "데이랩 종합 멀티케어 비타민 이뮨샷 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082756",
+  "productName": "우먼스울트라메가건강팩40플러스 Women's Ultra Mega Live Well pack 40 Plus",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107779",
+  "productName": "닥터에스오리지날",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023941",
+  "productName": "뉴시아 비타렌",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142073",
+  "productName": "SKYLAB 멀티비타민 프리미엄 포틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032244",
+  "productName": "투퍼데이 이너케어 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083885",
+  "productName": "루테인11",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141569",
+  "productName": "멀티비타민 데일리",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007761",
+  "productName": "헬퓨 D데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083381",
+  "productName": "올케어 4.0",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351949",
+  "productName": "멀티비타민&미네랄 맨케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032957",
+  "productName": "센트룸 원데이팩 맨 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052197",
+  "productName": "에고랩스 메모리업 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553271",
+  "productName": "비몬 슈퍼부스터 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600587",
+  "productName": "고려은단 멀티비타민 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061596",
+  "productName": "비타B컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201377",
+  "productName": "올인원 액상 멀티비타민 이뮨샷 투투 밸런스 22",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020281",
+  "productName": "데이빗 멀티비타민 칼슘마그네슘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141670",
+  "productName": "투퍼데이 액티브 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101245",
+  "productName": "한큐타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022515",
+  "productName": "Healthy Eye 헬씨아이",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041310",
+  "productName": "더비랩 기억력",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081091",
+  "productName": "멀티바이탈 이뮨 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061929",
+  "productName": "어썸 CMK2 젤리스틱 미네랄 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017062153",
+  "productName": "리얼 멀티 종합 비타민미네랄21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020908",
+  "productName": "비타올락 플러스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068235",
+  "productName": "인포맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553319",
+  "productName": "아임비타 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020001283",
+  "productName": "골든 테라타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082797",
+  "productName": "활력충전 멀티비타민 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083425",
+  "productName": "올인원 루틴팩 아스타잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353057",
+  "productName": "맨즈 맥스팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020842",
+  "productName": "아이즈리코",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082883",
+  "productName": "익스트림 올인원 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080444",
+  "productName": "쎈탁스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068258",
+  "productName": "종합비타민 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082792",
+  "productName": "활력충전 멀티비타민 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083361",
+  "productName": "셀트리온 토탈 바이탈팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370106",
+  "productName": "5070 면역비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201286",
+  "productName": "피로개선 앤 액상 멀티비타민 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101001",
+  "productName": "미네랄 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083424",
+  "productName": "올인원 루틴팩 테아닌",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023360",
+  "productName": "슈퍼올인원 멀티비타민 종합영양제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081402",
+  "productName": "비타파워 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061339",
+  "productName": "트리플엑스 127",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068236",
+  "productName": "브이타민21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000229676",
+  "productName": "울트라 프리미엄K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080527",
+  "productName": "멀티비타민&미네랄 분말",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107683",
+  "productName": "멀티비타민 알파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142041",
+  "productName": "나프라우드 셀이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015083985",
+  "productName": "자연가득 눈사랑 루테인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033066",
+  "productName": "밸런스탑 멀티비타민&미네랄 Balance Top Multivitamin&Mineral",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20230029284181",
+  "productName": "뉴트리가든핏 멀티비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201403",
+  "productName": "진생바이타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032959",
+  "productName": "센트룸 원데이팩 우먼 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083426",
+  "productName": "올인원 루틴팩 비타민C",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020041539",
+  "productName": "올인원 멀티비타민 미네랄 21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083442",
+  "productName": "올인원 뉴트리션 멀티비타민 원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083291",
+  "productName": "네추럴라이즈 멀티비타민 젤리스틱",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162123",
+  "productName": "리얼 콤플렉스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353139",
+  "productName": "하루엔진올인원멀티비타샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071059",
+  "productName": "닥터로이 멀티비타민미네랄 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080515",
+  "productName": "애터미 우먼 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061136",
+  "productName": "슈퍼멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141787",
+  "productName": "올인원 멀티비타민미네랄 맥스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040016020304",
+  "productName": "올인원 데일리 멀티비타민 트리플팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007770",
+  "productName": "잠백이 멀티팩 비타민 & 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081030",
+  "productName": "멀티비타민 미네랄 20 이뮨샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006977",
+  "productName": "파이토시크릿데이",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007603",
+  "productName": "하루한팩 기초건강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352741",
+  "productName": "이뮨듀오 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352197",
+  "productName": "듀오랩 바이옴 플러스 데일리 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001407141",
+  "productName": "멀티비타민 FOR 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352218",
+  "productName": "베네비타 밸런스 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033035",
+  "productName": "방탄 캡슐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032098",
+  "productName": "멀티비타민 앤 미네랄 포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019001602412",
+  "productName": "포맨 멀티비타민+미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141716",
+  "productName": "센티포유",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082605",
+  "productName": "에센셜 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "202300283023",
+  "productName": "부원건강 종합비타민19",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022779",
+  "productName": "슈퍼루지A+아스타잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080374",
+  "productName": "나를 위한 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081291",
+  "productName": "헬씨디어 퍼펙트 이뮨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081017",
+  "productName": "이뮨 바이탈 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020001635420",
+  "productName": "유디멀티비타민미네랄(UD MULTI VITAMIN MINERAL)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211921",
+  "productName": "오늘의 건강한팩 다시채움 항산화팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553296",
+  "productName": "이뮨 올인원 종합 멀티비타민 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080403",
+  "productName": "멀티비타민포맨 (Multivitamin for Men)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2014002007349",
+  "productName": "칼마디 플러스 (CalMaD Plus)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352280",
+  "productName": "멀티비타민&미네랄15",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483818",
+  "productName": "올케어 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2004001702944",
+  "productName": "데일리 퍼팩트 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082740",
+  "productName": "스트롱 맨 오맥스팩 프로그램 Strong Men Omexpak Program 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032967",
+  "productName": "맥스데이 멀티부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110972",
+  "productName": "웨이업 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020013454",
+  "productName": "아이패스 로켓샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352788",
+  "productName": "라이필 멀티비타민 컴팩 포 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007668",
+  "productName": "헬스뱅 요오드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082540",
+  "productName": "맥스 비오틴 12000",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015104444",
+  "productName": "울트라도스 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211934",
+  "productName": "오늘의 건강한팩 활력엔진 지구력팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022001309344",
+  "productName": "닥터포우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083033",
+  "productName": "에브리데이 멀티비타민 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083204",
+  "productName": "데일리젤리스틱 멀티비타민 & 에센셜",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141613",
+  "productName": "온가족 멀티비타민미네랄엔탑 원데이 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071153",
+  "productName": "장용성이뮨 종합비타민 비타부스트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083382",
+  "productName": "유한 멀티비타23데이앤나잇",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553218",
+  "productName": "멀티비타민 이뮨샷 7",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041334",
+  "productName": "멀티비타민 플러스 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2020000997263",
+  "productName": "올인원 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20100018018126",
+  "productName": "삼대오백 올인원 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052195",
+  "productName": "비타밀크씨슬 이뮨 플러스 에너지샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082765",
+  "productName": "네이처셋 더 스트롱 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015107944",
+  "productName": "테아닌멀티비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006936",
+  "productName": "엘레뉴Ⅰ",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483279",
+  "productName": "잠백이 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353184",
+  "productName": "Day and Night 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211965",
+  "productName": "이뮨 남성 여성 올인원 23종 멀티종합비타민 미네랄 플러스 칼슘 마그네슘 영양제",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061153",
+  "productName": "서흥 오메가 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2016000600589",
+  "productName": "고려은단 멀티비타민 올인원 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483860",
+  "productName": "눈건강 루테인지아잔틴 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20070017035343",
+  "productName": "뉴트리베루스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211037",
+  "productName": "올라운드 멀티비타",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162255",
+  "productName": "멀티비타민13&미네랄6",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211717",
+  "productName": "튼튼닷컴 종합비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061245",
+  "productName": "코엔자임Q10 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000948396",
+  "productName": "뉴딜팜 100일분 21종 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151101136",
+  "productName": "액티브업 멀티비타민 B컴플렉스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022877",
+  "productName": "이너랩 멀티비타민 미네랄 이지퍼펙트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483629",
+  "productName": "엑티브 칼맥 더블 액션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061480",
+  "productName": "에센셜 포맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110806",
+  "productName": "리얼 콤플렉스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083359",
+  "productName": "멀티비타민 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080200",
+  "productName": "원데이21",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032961",
+  "productName": "센트룸 원데이팩 맨 2030",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023028",
+  "productName": "멀티비타민울트라",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022873",
+  "productName": "이너셋 데일리 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201474",
+  "productName": "simplus 이중제형 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032860",
+  "productName": "헤라클레스 멀티퍼포먼스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015110874",
+  "productName": "멀티비타민 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483569",
+  "productName": "리포좀 비타민CD 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024059",
+  "productName": "올인원샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041355",
+  "productName": "올인원 퍼펙트 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020452",
+  "productName": "면역솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082763",
+  "productName": "우먼스울트라메가건강팩50플러스 Women's Ultra Mega Live Well pack 50 Plus",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211850",
+  "productName": "칼슘 마그네슘 비타민D&K 아연",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032017",
+  "productName": "이너풀 히알루론산멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083220",
+  "productName": "하루한팩 올인원 솔루션 for 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081109",
+  "productName": "멀티비타민 이뮨 더블업",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080375",
+  "productName": "동성제약 멀티비타민 올인원 by Dr.Yodd",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020024381",
+  "productName": "릴렉스 샷 스트레스 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081160",
+  "productName": "피로컷 앤 멀티비타민 이뮨 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553463",
+  "productName": "에버콜라겐 시그니처 올인원 샷",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017068186",
+  "productName": "루테인 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2023000229652",
+  "productName": "액티브 우먼 올인원 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082654",
+  "productName": "멀티비타민 FOR 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071195",
+  "productName": "틴업 맥스 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141405",
+  "productName": "토탈케어 멀티비타민 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200201281",
+  "productName": "데이랩 몸에 좋은 종합비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023715",
+  "productName": "밸러니티 올인원 31 멀티솔루션 멀티팩 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553329",
+  "productName": "피에이치-19",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201000190041246",
+  "productName": "마그네슘&셀레늄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483503",
+  "productName": "리포좀 멀티비타민 미네랄 20",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022702",
+  "productName": "오큐플로우(OCU FLOW)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20220011370410",
+  "productName": "올인원 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022694",
+  "productName": "비타민10종과미네랄9종이함유된멀티비타민미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017021820",
+  "productName": "퓨네즈 맥스마이 가르시니아",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023846",
+  "productName": "멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071194",
+  "productName": "데이타민 칼마디K2 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200142003",
+  "productName": "루테인 플러스 오메가-3 멀티비타민 앤 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028837",
+  "productName": "프리미엄 칼슘 마그네슘 아연 비타민D&K",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007247",
+  "productName": "비포 브이-타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2006002000851",
+  "productName": "루테인 플러스 오메가-3 멀티비타민 앤 미네랄 (Lutein Plus Omega-3 Multi Vitamin and Mineral)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031603",
+  "productName": "쎈탁스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162237",
+  "productName": "건강한 멀티비타민 미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020020490",
+  "productName": "강블리라이프 퍼스트 핏 멀티비타민&미네랄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033090",
+  "productName": "애터미 에센셜 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083411",
+  "productName": "익스트림 올인원 포 맨 컴팩트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]

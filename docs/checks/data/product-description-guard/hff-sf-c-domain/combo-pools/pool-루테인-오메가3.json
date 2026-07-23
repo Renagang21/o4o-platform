@@ -1,0 +1,136 @@
+[
+ {
+  "statementNo": "20060020008230",
+  "productName": "네이처셋 오메가루테인캡슐",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 1110,
+     "unit": "mg",
+     "basisAmount": 1500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 선명한 빨간주황의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐\n2. 루테인 : 표시량(20mg/1500mg)의 80~120%\n3. EPA와DHA의합 : 표시량(1110mg/1500mg)의 80~120%\n4. 헥산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 2.9 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n개인에 따라 피부 관련 이상반응이 발생 할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피할 것.\n흡연자는 섭취 시 전문가와 상담할 것.\n투명한 연질 캡슐 안에는 오메가3(EPA 및 DHA 함유유지)와 루테인(마리골드꽃추출물)만 들어 있습니다.\n캡슐의 하단의 침전물은 루테인(마리골드꽃추출물)이며, 제품품질에는 문제가 없으니 안심하고 드십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 선명한 빨간주황의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오.3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이    없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2024002023353",
+  "productName": "데일리픽 루테인&오메가 케어",
+  "manufacturer": "(주)비오팜2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] : 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\r\n[마리골드꽃추출물] : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 내용물을 함유한 검정색의 장방형 연질캡슐\r\n(2)EPA 및 DHA 함유유지 : 표시량(600 mg/1,200 mg)의 80~120%\r\n(3)루테인 : 표시량(20 mg/1,200 mg)의 80~120%\r\n(4)납(mg/kg ) : 2.8이하\r\n(5)카드뮴(mg/kg) : 1.0이하\r\n(6)수은(mg/kg ) : 0.5이하\r\n(7)비소(mg/kg ) : 1.0이하\r\n(8)헥산(mg/kg ) : 5.0이하\r\n(9)붕해시험 : 20분 이내\r\n(10)대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\r\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\r\n(다) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\r\n(라) 흡연자는 섭취 시 전문가와 상담할 것\r\n(마) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\r\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 내용물을 함유한 검정색의 장방형 연질캡슐",
+   "storage": "실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다. (2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다. (3)어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

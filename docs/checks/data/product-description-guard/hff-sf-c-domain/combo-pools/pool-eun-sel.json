@@ -1,0 +1,209 @@
+[
+ {
+  "statementNo": "20040020040112",
+  "productName": "가온비 브레인플러스",
+  "manufacturer": "(주)한국파비스알엔디",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 6,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "μg",
+     "basisAmount": 6,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상: 고유의 향미가 있고 이미,이취가 없는 갈색의 과립\n(2)플라보놀배당체: 표시량(28mg/6g)의 80~120%\n(3)셀레늄: 표시량(30㎍/6g)의 80~150%\n(4)깅콜릭산(mg/kg): 5.0이하\n(5)납(mg/kg): 1.0이하\n(6)카드뮴(mg/kg): 1.0이하\n(7)수은(mg/kg): 1.0이하\n(8)비소(mg/kg): 1.0이하\n(9)대장균군: 음성\n(10)붕해시험: 30분이내",
+   "intake": "1일 2회, 1회 1포씩 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색의 과립",
+   "storage": "고온다습.직사광선을 피하여 서늘한 곳에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020040100",
+  "productName": "메모리엔",
+  "manufacturer": "(주)한국파비스알엔디",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 6,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "μg",
+     "basisAmount": 6,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상:이미,이취가 없고 고유의 향미가 있는 갈색의 과립\n(2)플라보놀배당체:표시량(28mg/6g)의 80~120%\n(3)셀레늄:표시량(30㎍/6g)의 80~150%\n(4)깅콜릭산(mg/kg):5.0이하\n(5)납(mg/kg):1.0이하\n(6)카드뮴(mg/kg):1.0이하\n(7)총수은(mg/kg):1.0이하\n(8)총비소(mg/kg):1.0이하\n(9)대장균군:음성\n(10)붕해시험:30분이내",
+   "intake": "1일2회,1회1포씩 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "갈색의 과립으로 이미.이취가 없어야한다.",
+   "storage": "고온다습.직사광선을 피하여 서늘한 곳에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020006938",
+  "productName": "50+징코+셀렌(50+Gingko+Se)",
+  "manufacturer": "(주)서흥",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물 제품]①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\r\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 회황색의 제피정제 \r\n2) 플라보놀배당체 : 표시량(28.8 mg/ 2 g)의 80~120%\r\n3) 셀렌 : 표시량(55 ㎍/ 2 g)의 80~150% \r\n4) 깅콜릭산(mg/kg) : 5.0 이하\r\n5) 납(mg/kg) : 1.0 이하\r\n6) 카드뮴(mg/kg) : 1.0 이하\r\n7) 총수은(mg/kg) : 1.0 이하\r\n8) 총비소(mg/kg) : 1.0 이하\r\n9) 대장균군 : 음성\r\n10) 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정(2 g) 또는 1일 2회, 1회 1정(1g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물 제품]① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의\r\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의",
+   "dosageForm": "회황색의 제피정제",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습(흡습)되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

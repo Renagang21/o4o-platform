@@ -1,0 +1,286 @@
+[
+ {
+  "statementNo": "20230029284208",
+  "productName": "우리가족 눈건강 루테인&비타민A",
+  "manufacturer": "(주)웰레스트",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "마리골드꽃추출물 (1) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n비타민A (1) 어두운 곳에서 시각 적응을 위해 필요 (2) 피부와 점막을 형성하고 기능을 유지하는데 필요 (3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "성상 : 고유의 향미가 있고 이미, 이취가 없는 진갈색의 내용물을 함유한 타원형 연질캡슐\n루테인 : 20mg/500mg(표시량의 80~120%)\n중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 1.0 이하\n(다) 수은(mg/kg) : 1.0 이하\n(라) 비소(mg/kg) : 1.0 이하\n잔류용매\n(가)헥산(mg/kg) : 5.0 이하\n비타민A : 700 ㎍ RAE/500mg(표시량의 80~150%)\n대장균군 : 음성\n붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캅셀을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진갈색의 내용물을 함유한 타원형 연질캡슐",
+   "storage": "직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015104159",
+  "productName": "아이헬스 루테인 플러스",
+  "manufacturer": "주식회사 네추럴웨이",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 홍색-적갈색 알갱이가 있는 연보라색 분말\n2. 비타민A : 700㎍ RE/2g(표시량의 80-150%)\n3. 루테인 : 20mg/2g(표시량의 80-120%)\n4. 납(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 총 수은(mg/kg) : 1.0 이하\n7. 총 비소(mg/kg) : 1.0 이하\n8. 헥산(mg/kg) : 5.0 이하\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(2 g)을 그대로 또는 물과 함께 섭취하십시오.",
+   "caution": "(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 홍색-적갈색 알갱이가 있는 연보라색 분말",
+   "storage": "",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2014002001245",
+  "productName": "레모나프렌즈루테인 톡",
+  "manufacturer": "(주)아오스",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 450,
+     "unit": "μg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1.성상 :이미, 이취가 없고 고유의 향미가 있는 분홍색의 분말\n2. 루테인 : 20mg/2.5g(80~120%)\n3. 비타민 A : 450㎍RE/2.5g(80~150%)\n4. 납(mg/kg) : 1.0 이하\n5. 총비소(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 총수은(mg/kg) 1.0 이하\n8. 대장균군 : 음성",
+   "intake": "1일1회,1회1포(2,500mg)를 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 분홍색의 분말",
+   "storage": "습기와 직사광선을피하여서늘한곳에보관하십시오. 제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020020994",
+  "productName": "하루 루테인 20",
+  "manufacturer": "엠에스바이오텍(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 * 비타민A"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 210,
+     "unit": "μg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "* 마리골드꽃추출물\n① 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n* 비타민A\n① 어두운 곳에서 시각 적응을 위해 필요\n② 피부와 점막을 형성하고 기능을 유지하는데 필요\n③ 상피세포의 성장과 발달에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양, 진한 적자색 알갱이가 들어있는 밝은 회황색의 분말\n② 루테인 : 20 mg / 2 g (표시량의 80-120%)\n③ 비타민A : 210 ㎍ RE / 2 g (표시량의 80-150%)\n④ 납 : (mg/kg) : 1.0 이하\n⑤ 비소 : (mg/kg) : 1.0 이하\n⑥ 수은 : (mg/kg) : 1.0 이하\n⑦ 카드뮴 : (mg/kg) : 1.0 이하\n⑧ 헥산 : (mg/kg) : 5.0 이하\n⑨ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 혹은 물과 함께 섭취",
+   "caution": "* 마리골드꽃추출물 \n① 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n② 흡연자는 섭취 시 전문가와 상담할 것\n③ 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양, 진한 적자색 알갱이가 들어있는 밝은 회황색의 분말",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

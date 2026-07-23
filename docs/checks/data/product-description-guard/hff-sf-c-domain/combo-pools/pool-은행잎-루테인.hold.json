@@ -1,0 +1,218 @@
+[
+ {
+  "statementNo": "20172880193138",
+  "productName": "일양당밸런스원1",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020003962",
+  "productName": "메모리&아이 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081161",
+  "productName": "와이즈 부스터",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020016689",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352434",
+  "productName": "옵테인 에센셜 G",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022001137042",
+  "productName": "혈류신통 루테인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008684",
+  "productName": "혜당명쾌정",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "20120019007746",
+  "productName": "헬퓨 B데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000237",
+  "productName": "당화정(糖和精)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023744",
+  "productName": "백세혈당혈압케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033095",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141877",
+  "productName": "아이원 루테인 징코 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352420",
+  "productName": "올인원 골드팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201728208674",
+  "productName": "오큐아레즈투G",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022323",
+  "productName": "겟스마트나인투식스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032748",
+  "productName": "하루엔진 50+ 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20240028080453",
+  "productName": "애터미 맨 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081277",
+  "productName": "패스메이트",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083129",
+  "productName": "원데이 멀티팩 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20130020008584",
+  "productName": "혜당 메모리",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "200400200141946",
+  "productName": "올인원 데일리 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061788",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352347",
+  "productName": "비젼브레인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193437",
+  "productName": "아이클리어 루테인아스타잔틴DS",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201728208676",
+  "productName": "오큐트리플G",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023603",
+  "productName": "백세혈당혈압케어실버",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023297",
+  "productName": "당화정(糖和精)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2019000910510",
+  "productName": "당앤고 알파 골드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193185",
+  "productName": "코오롱 징코루테인 플러스",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "200400200083326",
+  "productName": "뉴시아 로얄 골든팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081255",
+  "productName": "원방비책 명품 통(通) : 혈행 개선책",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052197",
+  "productName": "에고랩스 메모리업 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008982",
+  "productName": "루테인지아잔틴 메모리케어 GR",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081009",
+  "productName": "마인드비타 기억력&눈건강엔 징코 루테인지아잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022779",
+  "productName": "슈퍼루지A+아스타잔틴",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211720",
+  "productName": "김오곤 원장의 징코 메모리 혈행보감 & 루테인",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]

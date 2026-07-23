@@ -1,0 +1,32 @@
+[
+ {
+  "statementNo": "20060020008258",
+  "productName": "플라젠에스 플래티넘",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023021",
+  "productName": "백세혈통",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "200400200061242",
+  "productName": "마이니 혈행케어 징코&보라지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061331",
+  "productName": "써큐란 알파",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020004272",
+  "productName": "알로맥프로지(G)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]

@@ -1,0 +1,668 @@
+[
+ {
+  "statementNo": "201200190071035",
+  "productName": "올인원 블러드솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081259",
+  "productName": "씨.케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200031928",
+  "productName": "퍼틸비타 우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061462",
+  "productName": "네추럴라이프 오메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353205",
+  "productName": "올인원 블러드케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483477",
+  "productName": "오큐엠파워 징코메가Q텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006853",
+  "productName": "하나면 충분해 우먼 WOMAN",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061843",
+  "productName": "나프라우드 블러드 써큘케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141638",
+  "productName": "닥터에디션 퍼틸리티 우먼 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033013",
+  "productName": "올인원 포 우먼 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061219",
+  "productName": "프로메가 올케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008892",
+  "productName": "혈행개선 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032713",
+  "productName": "올인원 뉴트리션 멀티비타민 코큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351889",
+  "productName": "뉴트리미 에센셜팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007640",
+  "productName": "큐라에스 원샷-오메가",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081177",
+  "productName": "블러드 케어 올-인-원 헬스 (Blood Care All-in-One Health)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023081",
+  "productName": "닥터리본 데일리 올케어 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017031262",
+  "productName": "올인원멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083314",
+  "productName": "올인원 멀티팩 이뮨 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353063",
+  "productName": "뉴트리미에센셜팩영",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2024002023315",
+  "productName": "알티지오메가 Q10",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141969",
+  "productName": "뉴트리4(Nutri4)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351563",
+  "productName": "뉴트리티지 데일리팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071125",
+  "productName": "퍼틸케어 엠(M)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083249",
+  "productName": "올인원 멀티비타민 코어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006433",
+  "productName": "혈행N멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006882",
+  "productName": "퍼틸케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022491",
+  "productName": "세노메가 알티지오메가3 큐텐+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200032141",
+  "productName": "퍼틸리티프리미엄 에프 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008655",
+  "productName": "멀티 액션 큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033197",
+  "productName": "마이밸런스 데일리팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033146",
+  "productName": "올인원 뉴트리션 이뮨 데일리 팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082946",
+  "productName": "브레인 포스파티딜세린 앤 코큐텐 오메가3 올인원팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081184",
+  "productName": "글루코션 블러드케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015162422",
+  "productName": "스마힐 하루 한번 혈행건강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052265",
+  "productName": "바이탈 플로우",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024094",
+  "productName": "블러드 포뮬러",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400151071119",
+  "productName": "뉴바이탈 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007580",
+  "productName": "트리플골드메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007749",
+  "productName": "헬퓨 L데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483773",
+  "productName": "알파 스위치 SAGX",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040015102186",
+  "productName": "이오스타 이너 바이오코드 오큐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071128",
+  "productName": "퍼틸리티 프리미엄 에프 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008532",
+  "productName": "써큐시안 블러드케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081248",
+  "productName": "엔지엔 혈행건강 홍메가큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083129",
+  "productName": "원데이 멀티팩 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022263",
+  "productName": "슈퍼트리플3Q10E",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022713",
+  "productName": "알티지오메가큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081442",
+  "productName": "혈압·혈당·혈행 관리엔",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082881",
+  "productName": "프롬바이오 올인원 멀티 프로",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170353223",
+  "productName": "신스바이오 오메가3 츄어블 플러스 코엔자임Q10",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "200400200023128",
+  "productName": "닥터에스더 초임계 알티지 오메가&코큐텐 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083180",
+  "productName": "올인원 솔루션 멀티팩 종합비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028741",
+  "productName": "써큐 블러드 솔루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483815",
+  "productName": "남자의자격 세이지엑스 레드에너지",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083350",
+  "productName": "올인원 데일리팩 이뮨 항산화",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061533",
+  "productName": "에이엠 데일리 멀티팩 멀티비타민",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083125",
+  "productName": "쁘띠앤드",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211320",
+  "productName": "마이케어팩 B",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023124",
+  "productName": "오큐징코큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023939",
+  "productName": "써큐파인 블랙오메가 SAC3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141641",
+  "productName": "닥터에디션 퍼틸리티 맨 액티브",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008831",
+  "productName": "써큘 블러드케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020028742",
+  "productName": "써큐 블러드 올인원",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006716",
+  "productName": "에이엠 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008917",
+  "productName": "글루코션 블러드케어 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007596",
+  "productName": "트리플액션메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170351991",
+  "productName": "올인원 맨즈팩(시즌1)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20172880193338",
+  "productName": "루큐텐 써큘 오메가3 트리플 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553344",
+  "productName": "혈행애존 Good for Blood Circulation",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033002",
+  "productName": "코큐메가",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023145",
+  "productName": "알티지 오메가 트리플 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081316",
+  "productName": "올인원 혈행케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170211682",
+  "productName": "맥파워 플러스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061414",
+  "productName": "서흥 오메가3코큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007751",
+  "productName": "헬퓨 C데이팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081116",
+  "productName": "글루코션 블러드케어 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20060020008904",
+  "productName": "블루션 프리미엄",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061472",
+  "productName": "혈행마스터 아쿠아셀 오메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200033008",
+  "productName": "엔지뉴트 수프림",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061616",
+  "productName": "휴먼네이처 루테인 아스타잔틴 rTG오메가3 비타민D3 코엔자임Q10",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190009483595",
+  "productName": "올인원 블러드 케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352287",
+  "productName": "랄츠비 퍼틸액티브우먼",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023324",
+  "productName": "홍국 코엔자임Q10 오메가3",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007775",
+  "productName": "초임계 식물성 알티지 오메가3 코엔자임Q10",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352685",
+  "productName": "올인원 맨즈팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141452",
+  "productName": "트리플코엔자임Q10",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083326",
+  "productName": "뉴시아 로얄 골든팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061372",
+  "productName": "듀썸 헬씨 유코드 오메가큐텐",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "부원료/미귀속 기능성: EPA 및 DHA 함유 유지 :"
+ },
+ {
+  "statementNo": "20060020008790",
+  "productName": "블러드싸이클",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023606",
+  "productName": "베어헬스 혈당 밸런스",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20120019007556",
+  "productName": "트루원1070",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017038173",
+  "productName": "블러드케어 레드오메가",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20100019004450",
+  "productName": "베터 블러드 써큘레이션 투모로우",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20200016052200",
+  "productName": "디엘오 코어팩 2.2",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "201200190071111",
+  "productName": "바이리브 큐오메가",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "200700170352369",
+  "productName": "올인원 맨즈팩(시즌2)",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352590",
+  "productName": "당당자유 블러드케어 파워",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200022496",
+  "productName": "오메가써큐텐",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200700170352279",
+  "productName": "올인원 우먼팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023163",
+  "productName": "벨르 솔루션 원데이 멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082740",
+  "productName": "스트롱 맨 오맥스팩 프로그램 Strong Men Omexpak Program 50+",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200024079",
+  "productName": "히말카 액티브 멀티케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "2022002000216",
+  "productName": "알티지 오메가-3 메가 익스텐션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082593",
+  "productName": "오피스팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082763",
+  "productName": "우먼스울트라메가건강팩50플러스 Women's Ultra Mega Live Well pack 50 Plus",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200083220",
+  "productName": "하루한팩 올인원 솔루션 for 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200141468",
+  "productName": "콜레스테롤·혈행·혈압엔",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023715",
+  "productName": "밸러니티 올인원 31 멀티솔루션 멀티팩 포 맨",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200600200081180",
+  "productName": "블루션",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400170061792",
+  "productName": "에너씨슬 플래티넘 메가",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]

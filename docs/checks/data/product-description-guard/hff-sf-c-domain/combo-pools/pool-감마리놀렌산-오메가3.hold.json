@@ -1,0 +1,20 @@
+[
+ {
+  "statementNo": "200400200023133",
+  "productName": "닥터에스더 초임계 알티지 오메가 감마 우먼케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040017006433",
+  "productName": "혈행N멀티팩",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20210016229123",
+  "productName": "콜레스티지 오메가3&6 The red",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "부원료/미귀속 기능성: 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+ }
+]

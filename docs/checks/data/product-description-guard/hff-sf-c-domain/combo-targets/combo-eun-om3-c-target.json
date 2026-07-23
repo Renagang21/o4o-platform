@@ -1,0 +1,170 @@
+[
+ {
+  "candidateId": "combo-eun-om3-c-001",
+  "productName": "알티지오메가3 징코빌로바",
+  "productNameEn": "알티지오메가3 징코빌로바",
+  "manufacturer": "(주)케이지앤에프",
+  "manufacturerEn": null,
+  "statementNo": "20040016020203",
+  "category": "hff",
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n-기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐 \n2. EPA　및　DHA의　합 : 표시량(600mg/1220mg)의 80~120%\n3. 플라보놀 배당체 : 표시량(36mg/1220mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하 \n4. 납(mg/kg) : 2.8 이하\n5. 카드뮴(mg/kg): 1.0 이하\n6. 수은(mg/kg): 0.6 이하\n7. 비소(mg/kg): 1.0 이하\n8. 대장균군: 음성\n9. 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐씩 물과 함께 섭취",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(라) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(마) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 1220,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>알티지오메가3 징코빌로바<small>은행잎추출물 · 오메가3</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐 · (주)케이지앤에프 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>알티지오메가3 징코빌로바<small>Ginkgo leaf extract · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)케이지앤에프 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>600mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>36mg</b> Ginkgo leaf extract, <b>600mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)케이지앤에프</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-om3-c-002",
+  "productName": "혈행&기억력365",
+  "productNameEn": "혈행&기억력365",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483386",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]\n혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음\n건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐\n2. EPA와DHA의 합: 표시량(600mg/1,220mg)의 80~120%\n3. 플라보놀배당체 : 표시량(36mg/1,220mg)의 80~120%\n4. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 2.7 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 비소(mg/kg) : 1.0 이하\n8. 수은(mg/kg) : 0.6 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "[EPA 및 DHA 함유 유지]\n(가)의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[은행잎 추출물]\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 1220,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행&amp;기억력365<small>은행잎추출물 · 오메가3</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행&amp;기억력365<small>Ginkgo leaf extract · Omega-3</small></h1><p class=\"sd-meta\">Made by 우리바이오(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>600mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>36mg</b> Ginkgo leaf extract, <b>600mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 우리바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li><li>May help with improving dry eyes for eye health</li><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-om3-c-003",
+  "productName": "브레인 알티지오메가3",
+  "productNameEn": "브레인 알티지오메가3",
+  "manufacturer": "(주)케이지앤에프",
+  "manufacturerEn": null,
+  "statementNo": "20040016020217",
+  "category": "hff",
+  "source": {
+   "mainFunction": "*EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n*은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐\n2. EPA　및　DHA의　합 : 표시량(600mg/1220mg)의 80~120%\n3. 플라보놀 배당체 : 표시량(36mg/1220mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 2.8 이하\n6. 카드뮴(mg/kg): 1.0 이하\n7. 수은(mg/kg): 0.6 이하\n8. 비소(mg/kg): 1.0 이하\n9. 대장균군: 음성\n10. 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐",
+   "storage": "어린이 손이 닿지 않고, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 1220,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>브레인 알티지오메가3<small>은행잎추출물 · 오메가3</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 은행잎추출물 <b>36mg</b>, 오메가3 <b>600mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐 · (주)케이지앤에프 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 *은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 *은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/1220mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 어린이 손이 닿지 않고, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>브레인 알티지오메가3<small>Ginkgo leaf extract · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)케이지앤에프 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>600mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>36mg</b> Ginkgo leaf extract, <b>600mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)케이지앤에프</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with improving dry eyes for eye health</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 1220mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미,이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 어린이 손이 닿지 않고, 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-om3-c-004",
+  "productName": "광동 파인(FINE) 혈통보감",
+  "productNameEn": "광동 파인(FINE) 혈통보감",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028622",
+  "category": "hff",
+  "source": {
+   "mainFunction": "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음\n\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐\n2. 플라보놀 배당체 : 표시량(28mg/1,000mg)의 80~120%\n3. EPA와 DHA의 합 : 표시량(500mg/1,000mg)의 80~120%\n4. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해도 : 20분 내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상)한 곳에 두시면 젤라틴 피막이 변형될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다..",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge is-solid\">오메가3 500mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>광동 파인(FINE) 혈통보감<small>은행잎추출물 · 오메가3</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>28mg</b>, 오메가3 <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 은행잎추출물 <b>28mg</b>, 오메가3 <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(500mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃ 이상, 상대습도 75% 이상)한 곳에 두시면 젤라틴 피막이 변형될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다..</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge is-solid\">Omega-3 500mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>광동 파인(FINE) 혈통보감<small>Ginkgo leaf extract · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28mg</b> of Ginkgo leaf extract, <b>500mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>28mg</b> Ginkgo leaf extract, <b>500mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (500mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃ 이상, 상대습도 75% 이상)한 곳에 두시면 젤라틴 피막이 변형될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다..</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

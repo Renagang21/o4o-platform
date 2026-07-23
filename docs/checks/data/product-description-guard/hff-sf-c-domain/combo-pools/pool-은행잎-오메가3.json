@@ -1,0 +1,280 @@
+[
+ {
+  "statementNo": "20040016020203",
+  "productName": "알티지오메가3 징코빌로바",
+  "manufacturer": "(주)케이지앤에프",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n-기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐 \n2. EPA　및　DHA의　합 : 표시량(600mg/1220mg)의 80~120%\n3. 플라보놀 배당체 : 표시량(36mg/1220mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하 \n4. 납(mg/kg) : 2.8 이하\n5. 카드뮴(mg/kg): 1.0 이하\n6. 수은(mg/kg): 0.6 이하\n7. 비소(mg/kg): 1.0 이하\n8. 대장균군: 음성\n9. 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐씩 물과 함께 섭취",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(라) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(마) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란갈색의 내용물을 함유한 흑색의 장방형 연질캡슐",
+   "storage": "실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009483386",
+  "productName": "혈행&기억력365",
+  "manufacturer": "우리바이오(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation",
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+     "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation",
+     "May help with improving dry eyes for eye health",
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]\n혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음\n건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐\n2. EPA와DHA의 합: 표시량(600mg/1,220mg)의 80~120%\n3. 플라보놀배당체 : 표시량(36mg/1,220mg)의 80~120%\n4. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 2.7 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 비소(mg/kg) : 1.0 이하\n8. 수은(mg/kg) : 0.6 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "[EPA 및 DHA 함유 유지]\n(가)의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[은행잎 추출물]\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 탁한 황갈색의 점도가 있는 내용물을 함유한 검정색의 장방형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040016020217",
+  "productName": "브레인 알티지오메가3",
+  "manufacturer": "(주)케이지앤에프",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 *은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving dry eyes for eye health"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1220,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 *은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "*EPA 및 DHA 함유 유지: 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n*은행잎 추출물: 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐\n2. EPA　및　DHA의　합 : 표시량(600mg/1220mg)의 80~120%\n3. 플라보놀 배당체 : 표시량(36mg/1220mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 2.8 이하\n6. 카드뮴(mg/kg): 1.0 이하\n7. 수은(mg/kg): 0.6 이하\n8. 비소(mg/kg): 1.0 이하\n9. 대장균군: 음성\n10. 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 황갈색의 내용물을 함유한 흑갈색의 장방형 연질캡슐",
+   "storage": "어린이 손이 닿지 않고, 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020028622",
+  "productName": "광동 파인(FINE) 혈통보감",
+  "manufacturer": "(주)유니쎌팜",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation",
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation",
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음\n\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐\n2. 플라보놀 배당체 : 표시량(28mg/1,000mg)의 80~120%\n3. EPA와 DHA의 합 : 표시량(500mg/1,000mg)의 80~120%\n4. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해도 : 20분 내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 황갈색 내용물을 함유하는 초록색 장방형 연질캡슐",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상)한 곳에 두시면 젤라틴 피막이 변형될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다..",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

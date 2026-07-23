@@ -1,0 +1,69 @@
+[
+ {
+  "statementNo": "200400200023954",
+  "productName": "스마타민 코큐텐루테인",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 코엔자임Q10 : 항산화·높은 혈압 감소에 도움을 줄 수 있음.\n2) 마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 갈흑색 타원형 연질캡슐\n2) 코엔자임Q10 : 표시량(100mg/300mg)의 80~120%\n3) 루테인 : 표시량(20mg/300mg)의 80~120%\n4) 헥산(mg/kg) : 5.0 이하\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 1.0 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 대장균군 : 음성\n10) 붕해시험 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n수유부는 섭취를 피하십시오.\n항응고제 복용시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n영·유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n흡연자는 섭취 시 전문가와 상담하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 내용물을 함유한 갈흑색 타원형 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

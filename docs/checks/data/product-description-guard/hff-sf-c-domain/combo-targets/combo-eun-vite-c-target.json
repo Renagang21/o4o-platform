@@ -1,0 +1,296 @@
+[
+ {
+  "candidateId": "combo-eun-vite-c-001",
+  "productName": "기억력 그린라이트(Memory Green Light)",
+  "productNameEn": "기억력 그린라이트(Memory Green Light)",
+  "manufacturer": "한국바이오팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "2022002106796",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2) 플라보놀 배당체 : 표시량(28mg/550mg)의 80~120%\n3) 깅콜릭산(mg/kg) : 5.0 이하\n4) 비타민E: 표시량(3.3mg α-TE/550mg)의 80 ~ 150%\n5) 납(mg/kg): 1.0 이하\n6) 카드뮴(mg/kg): 1.0 이하\n7) 수은(mg/kg): 1.0 이하\n8) 비소(mg/kg): 1.0 이하 \n9) 대장균군: 음성\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n② 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n③ 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n④ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28,
+    "unit": "mg",
+    "basisAmount": 550,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>기억력 그린라이트(Memory Green Light)<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">한국바이오팜(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>28mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 은행잎추출물 <b>28mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 · 한국바이오팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/550mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/550mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>기억력 그린라이트(Memory Green Light)<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28mg</b> of Ginkgo leaf extract, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>28mg</b> Ginkgo leaf extract, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 550mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 550mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-002",
+  "productName": "더나토써큘7",
+  "productNameEn": "더나토써큘7",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352424",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음\n[나토균배양분말(개별인정형 제2013-6호)]\n혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제\n2. 붕해도 : 60분 이내\n3. 플라보놀 배당체: 표시량(36mg/2200mg)의 80~120%\n4. 피브린용해효소활성(FU/g): 표시량(1507FU/2200mg)의 80~120%\n5. 비타민 E: 표시량(3.3mg α-TE/2200mg)의 80~150%\n6. 납(mg/kg): 1.0 이하\n7. 총비소(mg/kg): 1.0 이하\n8. 카드뮴(mg/kg): 1.0 이하\n9. 총수은(mg/kg): 1.0 이하\n10. 총아플라톡신(μg/kg): 10.0 이하\n11. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0이하\n12. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n[나토균배양분말(개별인정형 제 2013-6호)]\n대두에 알레르기를 나타내는 사람은 섭취에 주의\n임산부·수유부 섭취에 주의\n의약품(혈액항응고제) 복용 시 섭취에 주의\n수술 전·후 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 2200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더나토써큘7<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 은행잎추출물 <b>36mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/2200mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/2200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>더나토써큘7<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>36mg</b> Ginkgo leaf extract, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li><li>May help with improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 2200mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 2200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-003",
+  "productName": "프리미엄 블러드 스트림",
+  "productNameEn": "프리미엄 블러드 스트림",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141233",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제\n② 플라보놀 배당체 : 표시량(28.8 mg/1,000 mg)의 80~120% \n③ 깅콜릭산(mg/kg) : 5.0 이하\n④ 비타민E : 표시량(3.3 mg α-TE/1,000 mg)의 80~150%\n⑤ 납(mg/kg) : 1.0 이하\n⑥ 카드뮴(mg/kg) : 1.0 이하\n⑦ 총수은(mg/kg) : 1.0 이하\n⑧ 총비소(mg/kg) : 1.0 이하\n⑨ 대장균군 : 음성\n⑩ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[은행잎추출물]\n② 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n③ 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28.8,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 블러드 스트림<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>28.8mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 은행잎추출물 <b>28.8mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 블러드 스트림<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28.8mg</b> of Ginkgo leaf extract, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>28.8mg</b> Ginkgo leaf extract, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-004",
+  "productName": "기억력 그린라이트(Memory Green Light)",
+  "productNameEn": "기억력 그린라이트(Memory Green Light)",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046679",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선･혈행 개선에 도움을 줄 수 있음\r\n\r\n[비타민E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\r\n2) 플라보놀 배당체 : 표시량(28mg/550mg)의 80~120%\r\n3) 깅콜릭산(mg/kg) : 5.0 이하\r\n4) 비타민E: 표시량(3.3mg α-TE/550mg)의 80~150%\r\n5) 납(mg/kg): 1.0 이하\r\n6) 카드뮴(mg/kg): 1.0 이하\r\n7) 수은(mg/kg): 1.0 이하\r\n8) 비소(mg/kg): 1.0 이하 \r\n9) 대장균군: 음성\r\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "① 어린이, 임산부 및 수유부는 섭취를 피하십시오.\r\n② 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담하십시오.\r\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\r\n④ 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\r\n⑤ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\r\n⑥ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28,
+    "unit": "mg",
+    "basisAmount": 550,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>기억력 그린라이트(Memory Green Light)<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>28mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 은행잎추출물 <b>28mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/550mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/550mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>기억력 그린라이트(Memory Green Light)<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28mg</b> of Ginkgo leaf extract, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>28mg</b> Ginkgo leaf extract, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 550mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 550mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-005",
+  "productName": "건강프로젝트365 두뇌기억력엔 징코",
+  "productNameEn": "건강프로젝트365 두뇌기억력엔 징코",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352932",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제\n2. 플라보놀배당체: 표시량(36mg/500mg)의 80~120%\n3. 비타민E: 표시량(11mg α-TE/500mg)의 80~150%\n4. 깅콜릭산(ginkgolic acid)(mg/kg): 5.0 이하\n5. 납(mg/kg): 1.0 이하\n6. 카드뮴(mg/kg): 1.0 이하\n7. 수은(mg/kg): 1.0 이하\n8. 비소(mg/kg): 1.0 이하\n9. 대장균군: 음성\n10. 붕해도: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n어린이, 임산부 및 수유부는 섭취를 피할 것\n수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>건강프로젝트365 두뇌기억력엔 징코<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>건강프로젝트365 두뇌기억력엔 징코<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>11mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>36mg</b> Ginkgo leaf extract, <b>11mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-006",
+  "productName": "징코센시나",
+  "productNameEn": "징코센시나",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041145",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[나토균배양분말(제2013-6호)] 혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)\n\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제\n2) 대장균군: 음성\n3) 붕해도: 60분 이내\n4) 피브린용효소활성: 표시량(1507.5FU/600mg)의 80~120%\n5) 플라보놀 배당체: 표시량(36mg/600mg)의 80~120%\n6) 비타민E: 표시량(11mgα-TE/600mg)의 80~150%\n7) 총아플라톡신(B1, B2, G1 및 G2 의 합)(㎍/kg) : 15 이하(단, B1은 10.0 이하)\n8) 깅콜릭산(ginkgolic acid)(mg/kg): 5.0 이하\n9) 중금속\n (가) 납(mg/kg): 1.0 이하\n (나) 카드뮴(mg/kg): 1.0 이하\n (다) 수은(mg/kg): 1.0 이하\n (라) 비소(mg/kg): 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[나토균배양분말(제2013-6호)]\n1) 대두에 알레르기를 나타내는 사람은 섭취에 주의할 것\n2) 어린이, 임산부 및 수유부는 섭취를 피할것\n3) 수술전후, 의약품(혈액항응고제) 복용 시 전문가와 상담할 것\n4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎추출물]\n-임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n-의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>징코센시나<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)</li><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/600mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>징코센시나<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>11mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>36mg</b> Ginkgo leaf extract, <b>11mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with improving blood circulation</li><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 600mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-eun-vite-c-007",
+  "productName": "기억력엔 징코 PLUS",
+  "productNameEn": "기억력엔 징코 PLUS",
+  "manufacturer": "주식회사 네추럴웨이",
+  "manufacturerEn": null,
+  "statementNo": "20040015104468",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제\n2. 대장균군 : 음성\n3. 붕해 : 60분 이내\n4. 플라보놀배당체 : 표시량(36mg/500mg)의 80~120%\n5. 비타민E : 표시량(11mg a-TE/500mg)의 80~150%\n6. 깅콜릭산(mg/kg) : 5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴 (mg/kg) : 1.0 이하\n9. 수은 (mg/kg) : 1.0 이하\n10. 비소 (mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취에 주의\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제",
+   "storage": "실온보관 (1~35℃)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 36,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>기억력엔 징코 PLUS<small>은행잎추출물 · 비타민 E</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 은행잎추출물 <b>36mg</b>, 비타민 E <b>11mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제 · 주식회사 네추럴웨이 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 (1~35℃)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 은행잎추출물 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>기억력엔 징코 PLUS<small>Ginkgo leaf extract · Vitamin E</small></h1><p class=\"sd-meta\">Made by 주식회사 네추럴웨이 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>36mg</b> of Ginkgo leaf extract, <b>11mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>36mg</b> Ginkgo leaf extract, <b>11mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네추럴웨이</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 (1~35℃)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

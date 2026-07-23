@@ -1,0 +1,136 @@
+[
+ {
+  "statementNo": "200400200023635",
+  "productName": "순환 이지 다이어트",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 녹차추출물 : 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n2) 은행잎추출물 : 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흐린 황갈색의 장타원형 제피정제\n2) 카테킨 : 표시량(300mg/800mg)의 80~120%\n3) 플라보놀 배당체 : 표시량(36mg/800mg)의 80~120%\n4) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n5) 카페인(mg/kg) : 50,000 이하\n6) 초산에틸(mg/kg) : 50.0 이하\n7) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8) 납(mg/kg) : 1.0 이하\n9) 카드뮴(mg/kg) : 1.0 이하\n10) 수은(mg/kg) : 1.0 이하\n11) 비소(mg/kg) : 1.0 이하\n12) 대장균군 : 음성\n13) 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n어린이, 임산부 및 수유부는 섭취를 피하십시오.\n간질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있습니다.\n식사 후 섭취하십시오.\n카페인을 함유한 식품의 섭취에 주의하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n의약품(항응고제) 복용 시 섭취에 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흐린 황갈색의 장타원형 제피정제",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015104450",
+  "productName": "메노웰 액티브",
+  "manufacturer": "주식회사 네추럴웨이",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선 ･ 혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선 ･ 혈행 개선에 도움을 줄 수 있음\n[녹차추출물] 항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 노란 분홍의 점박이가 있는 장방형 제피정제\t\t\t\t\t\t\t\t\t\t\t\n2. 대장균군 : 음성\n3. 붕해 : 물에서 60분 이내\n4. 카테킨 : 표시량  (300mg / 2,000 mg)의 80~120%\n5. 플라보놀배당체 : 표시량 (28mg / 2,000 mg)의 80~120%\n6. 에피갈로카텐킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n7. 카페인(mg/kg) : 50,000 이하\n8. 초산에틸(mg/kg) : 50.0 이하\n9. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n10. 납(mg/kg) : 1.0 이하\n11. 카드뮴(mg/kg) : 1.0 이하\n12. 수은(mg/kg) : 1.0 이하\n13. 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 어린이, 임산부 및 수유부는 섭취를 피할 것\n2. 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n3. 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n4. 식사 후 섭취할 것\n5. 카페인을 함유한 식품의 섭취에 주의할 것\n6. 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n7. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 노란 분홍의 점박이가 있는 장방형 제피정제",
+   "storage": "실온보관 (1~35℃)",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

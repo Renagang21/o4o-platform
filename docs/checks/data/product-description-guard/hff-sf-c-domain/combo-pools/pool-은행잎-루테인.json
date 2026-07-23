@@ -1,0 +1,337 @@
+[
+ {
+  "statementNo": "200600200032613",
+  "productName": "엘엠케이 징코루테인",
+  "manufacturer": "콜마비앤에이치(주)음성공장",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n은행잎추출물 : 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 내용물을 함유한 검정색의 타원형 연질캡슐\n2. 루테인 : 표시량(10 mg/500 mg)의 80~120%\n3. 플라보놀배당체 : 표시량(28 mg/500 mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하\n5. 헥산(mg/kg) :5.0 이하\n6. 초산에틸(mg/kg) : 50.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 1.0 이하\n9. 수은(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성\n12. 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n- 흡연자는 섭취 시 전문가와 상담할 것\n- 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n- 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n- 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "1) 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 2) 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009483454",
+  "productName": "라이프메모리 프리미엄",
+  "manufacturer": "우리바이오(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[은행잎추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 검정색의 타원형 연질캡슐\n2) 루테인 : 표시량(10mg/1,000mg)의 80~120%\n3) 플라보놀배당체 : 표시량(36mg/1,000mg)의 80~120%\n4) 헥산(mg/kg) : 5.0 이하\n5) 깅콜릭산(ginkgolic acid) : 5.0 이하\n6) 납(mg/kg) : 1.0 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 대장균군 : 음성\n11) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "[마리골드꽃추출물]\n(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[은행잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것 \n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2017278206864",
+  "productName": "아이락",
+  "manufacturer": "(주)메디바이오랩",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 적갈색의 타원형 제피정제  \n②플라보놀배당체 : 표시량( 28.8 mg/1,000 mg) 의 80~120%\n③루테인 : 표시량(10 mg/1,000 mg)의 80~120%\n④깅콜릭산(mg/kg) : 5.0 이하\n⑤헥산(mg/kg) : 5.0이하\n⑥납(mg/kg) : 1.0 이하\n⑦카드뮴(mg/kg) : 1.0 이하\n⑧수은(mg/kg) : 1.0 이하\n⑨비소(mg/kg) : 1.0 이하\n⑩붕해시험 : 적합(제피정제 :60분 이내 붕해)\n⑪대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 적갈색의 타원형 제피정제",
+   "storage": "①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다.②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2017288019340",
+  "productName": "스카이메모리",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 연질캡슐\n2. 플라보놀배당체 : 표시량(36mg/1000mg)의 80~120%\n3. 루테인 : 표시량(10mg/1000mg)의 80~120%\n4. 깅콜릭산(mg/kg) : 5.0 이하\n5. 초산에틸(mg/kg) : 50.0 이하\n6. 헥산(mg/kg) :5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 1.0 이하\n9. 수은(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성\n12. 붕해도 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 연질캡슐",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 실온에 보관하시고, 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 영.유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2016000396678",
+  "productName": "혜당메모리",
+  "manufacturer": "드림바이오(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 35,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 12.6,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n-기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미,이취가 없는 연한 황갈색의 장방형 제피정제\n2.플라보놀 배당체 : 표시량(35mg/2000mg)의 80~120%\n3.깅콜릭산 : 5.0이하\n4.루테인:표시량(12.6mg/2000mg)의 80~120%\n5.중금속\n -1. 납(mg/Kg) : 1.0이하\n -2. 카드뮴(mg/Kg) : 1.0이하\n -3. 수은(mg/Kg) : 1.0이하\n -4. 비소(mg/Kg) : 1.0이하\n6.대장균군 : 음성\n7.붕해도:60분 이내\n8.잔류용매\n -1. 헥산(mg/Kg) : 5.0이하\n -2.초산에틸(mg/Kg) : 50.0이하",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 연한 황갈색의 장방형 제피정제",
+   "storage": "",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

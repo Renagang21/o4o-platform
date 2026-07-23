@@ -1,0 +1,270 @@
+[
+ {
+  "statementNo": "200600200081093",
+  "productName": "프롬바이오 rTG오메가3+코엔자임Q10",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1020,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 1020,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA및DHA함유유지] 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[코엔자임Q10] 항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미∙이취가 없는 밝은 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐\n2. EPA와DHA의합 : 표시량(500mg/1020mg)의 80~120%\n3. 코엔자임Q10 : 표시량(100mg/1020mg)의 80~150%\n4. 초산에틸(mg/kg) : 50.0 이하\n5. 납(mg/kg) : 2.7 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 비소(mg/kg) : 1.0 이하\n8. 수은(mg/kg) : 0.6 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[EPA및DHA함유유지]\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n개인에 따라 피부 관련 이상반응이 발생할 수 있음\n[코엔자임Q10]\n수유부는 섭취를 피할 것\n항응고제 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 밝은 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20172880193164",
+  "productName": "코큐텐 알티지 오메가3",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "ingredients": [
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n\n①항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 흑갈색 장방형 연질캡슐\n2. 코엔자임Q10 : 표시량(100mg/1,050mg)의 80~120%\n3. EPA및DHA함유유지 : 표시량(500mg/1,050mg)의 80~120%\n4. 납(mg/kg) : 1.0이하\n5. 카드뮴(mg/kg) : 1.0이하\n6. 수은(mg/kg) : 0.5이하\n7. 헥산(mg/kg) : 5.0이하\n8. 아세톤(mg/kg) : 30.0이하\n9. 이소프로필알콜(mg/kg) : 50.0이하\n10. 초산에틸(mg/kg) : 50.0이하\n11. 비소(mg/kg) : 1.0이하\n12. 대장균군 : 음성\n13. 붕해 : 20분 이내",
+   "intake": "1일1회, 1회1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[EPA 및 DHA 함유 유지]\n(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[코엔자임Q10]\n(가) 수유부는 섭취를 피할 것\n(나) 항응고제 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 흑갈색 장방형 연질캡슐",
+   "storage": "직사광선을 피하여 실온에 보관하시고, 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오. 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2017288019346",
+  "productName": "코큐텐오메가3",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "ingredients": [
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n①항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "1. 코엔자임Q10 : 표시량(100 mg/1,050 mg)의 80~120 %\n2. EPA및DHA함유유지 : 표시량(600 mg/ 1,050 mg)의 80~120 %\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 헥산(mg/kg) : 5.0 이하\n7. 아세톤(mg/kg) : 30.0이하\n8. 이소프로필알콜(mg/kg) : 50.0 이하\n9. 초산에틸(mg/kg) : 50.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성\n12. 붕해도 :  20분이내\n13. 성상 : 이미 ,이취가 없고 고유의 향미가 있는 주황색 내용물을 함유한 흑갈색연질캡슐",
+   "intake": "1일1회, 1회1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미 ,이취가 없고 고유의 향미가 있는 주황색 내용물을 함유한 흑갈색연질캡슐",
+   "storage": "직사광선을 피하여 실온에 보관하시고, 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2024002023349",
+  "productName": "알티지 트루오메가 듀얼",
+  "manufacturer": "(주)비오팜2공장",
+  "ingredients": [
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 90,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지]  혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[코엔자임Q10] 항산화･높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 진한 빨강색의 장방형 연질캡슐\n(2)EPA 및 DHA 함유유지 : 표시량(600mg/1,200mg)의 80-120%\n(3)코엔자임Q10 : 표시량(90mg/1,200mg)의 80-120%\n(4)납(mg/kg) : 2.8 이하\n(5)카드뮴(mg/kg) : 1.0 이하\n(6)수은(mg/kg) : 0.5 이하\n(7)비소(mg/kg) : 1.0 이하\n(8)헥산(mg/kg) : 5.0 이하\n(9)초산에틸(mg/kg) : 50.0 이하\n(10)대장균군 : 음성\n(11)붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 수유부는 섭취를 피할 것\n(라) 항응고제 복용 시 전문가와 상담할 것\n(마) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 진한 빨강색의 장방형 연질캡슐",
+   "storage": "실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

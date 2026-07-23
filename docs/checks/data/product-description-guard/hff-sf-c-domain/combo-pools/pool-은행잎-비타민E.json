@@ -1,0 +1,475 @@
+[
+ {
+  "statementNo": "2022002106796",
+  "productName": "기억력 그린라이트(Memory Green Light)",
+  "manufacturer": "한국바이오팜(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2) 플라보놀 배당체 : 표시량(28mg/550mg)의 80~120%\n3) 깅콜릭산(mg/kg) : 5.0 이하\n4) 비타민E: 표시량(3.3mg α-TE/550mg)의 80 ~ 150%\n5) 납(mg/kg): 1.0 이하\n6) 카드뮴(mg/kg): 1.0 이하\n7) 수은(mg/kg): 1.0 이하\n8) 비소(mg/kg): 1.0 이하 \n9) 대장균군: 음성\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n② 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n③ 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n④ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200700170352424",
+  "productName": "더나토써큘7",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 2200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 2200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음\n[나토균배양분말(개별인정형 제2013-6호)]\n혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제\n2. 붕해도 : 60분 이내\n3. 플라보놀 배당체: 표시량(36mg/2200mg)의 80~120%\n4. 피브린용해효소활성(FU/g): 표시량(1507FU/2200mg)의 80~120%\n5. 비타민 E: 표시량(3.3mg α-TE/2200mg)의 80~150%\n6. 납(mg/kg): 1.0 이하\n7. 총비소(mg/kg): 1.0 이하\n8. 카드뮴(mg/kg): 1.0 이하\n9. 총수은(mg/kg): 1.0 이하\n10. 총아플라톡신(μg/kg): 10.0 이하\n11. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0이하\n12. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n[나토균배양분말(개별인정형 제 2013-6호)]\n대두에 알레르기를 나타내는 사람은 섭취에 주의\n임산부·수유부 섭취에 주의\n의약품(혈액항응고제) 복용 시 섭취에 주의\n수술 전·후 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 코팅정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200141233",
+  "productName": "프리미엄 블러드 스트림",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제\n② 플라보놀 배당체 : 표시량(28.8 mg/1,000 mg)의 80~120% \n③ 깅콜릭산(mg/kg) : 5.0 이하\n④ 비타민E : 표시량(3.3 mg α-TE/1,000 mg)의 80~150%\n⑤ 납(mg/kg) : 1.0 이하\n⑥ 카드뮴(mg/kg) : 1.0 이하\n⑦ 총수은(mg/kg) : 1.0 이하\n⑧ 총비소(mg/kg) : 1.0 이하\n⑨ 대장균군 : 음성\n⑩ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[은행잎추출물]\n② 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n③ 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 황회색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020046679",
+  "productName": "기억력 그린라이트(Memory Green Light)",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선･혈행 개선에 도움을 줄 수 있음\r\n\r\n[비타민E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\r\n2) 플라보놀 배당체 : 표시량(28mg/550mg)의 80~120%\r\n3) 깅콜릭산(mg/kg) : 5.0 이하\r\n4) 비타민E: 표시량(3.3mg α-TE/550mg)의 80~150%\r\n5) 납(mg/kg): 1.0 이하\r\n6) 카드뮴(mg/kg): 1.0 이하\r\n7) 수은(mg/kg): 1.0 이하\r\n8) 비소(mg/kg): 1.0 이하 \r\n9) 대장균군: 음성\r\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취한다.",
+   "caution": "① 어린이, 임산부 및 수유부는 섭취를 피하십시오.\r\n② 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담하십시오.\r\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\r\n④ 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\r\n⑤ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\r\n⑥ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200700170352932",
+  "productName": "건강프로젝트365 두뇌기억력엔 징코",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[은행잎 추출물]\n기억력 개선･혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제\n2. 플라보놀배당체: 표시량(36mg/500mg)의 80~120%\n3. 비타민E: 표시량(11mg α-TE/500mg)의 80~150%\n4. 깅콜릭산(ginkgolic acid)(mg/kg): 5.0 이하\n5. 납(mg/kg): 1.0 이하\n6. 카드뮴(mg/kg): 1.0 이하\n7. 수은(mg/kg): 1.0 이하\n8. 비소(mg/kg): 1.0 이하\n9. 대장균군: 음성\n10. 붕해도: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n어린이, 임산부 및 수유부는 섭취를 피할 것\n수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색 또는 회황색의 장방형 코팅 정제",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "201000190041145",
+  "productName": "징코센시나",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood circulation",
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[나토균배양분말(제2013-6호)] 혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)\n\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제\n2) 대장균군: 음성\n3) 붕해도: 60분 이내\n4) 피브린용효소활성: 표시량(1507.5FU/600mg)의 80~120%\n5) 플라보놀 배당체: 표시량(36mg/600mg)의 80~120%\n6) 비타민E: 표시량(11mgα-TE/600mg)의 80~150%\n7) 총아플라톡신(B1, B2, G1 및 G2 의 합)(㎍/kg) : 15 이하(단, B1은 10.0 이하)\n8) 깅콜릭산(ginkgolic acid)(mg/kg): 5.0 이하\n9) 중금속\n (가) 납(mg/kg): 1.0 이하\n (나) 카드뮴(mg/kg): 1.0 이하\n (다) 수은(mg/kg): 1.0 이하\n (라) 비소(mg/kg): 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[나토균배양분말(제2013-6호)]\n1) 대두에 알레르기를 나타내는 사람은 섭취에 주의할 것\n2) 어린이, 임산부 및 수유부는 섭취를 피할것\n3) 수술전후, 의약품(혈액항응고제) 복용 시 전문가와 상담할 것\n4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎추출물]\n-임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n-의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 녹회색의 장방형 코팅정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015104468",
+  "productName": "기억력엔 징코 PLUS",
+  "manufacturer": "주식회사 네추럴웨이",
+  "ingredients": [
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제\n2. 대장균군 : 음성\n3. 붕해 : 60분 이내\n4. 플라보놀배당체 : 표시량(36mg/500mg)의 80~120%\n5. 비타민E : 표시량(11mg a-TE/500mg)의 80~150%\n6. 깅콜릭산(mg/kg) : 5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴 (mg/kg) : 1.0 이하\n9. 수은 (mg/kg) : 1.0 이하\n10. 비소 (mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취에 주의\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 황회색의 장방형 제피정제",
+   "storage": "실온보관 (1~35℃)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

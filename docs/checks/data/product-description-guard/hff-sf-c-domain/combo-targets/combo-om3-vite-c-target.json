@@ -1,0 +1,170 @@
+[
+ {
+  "candidateId": "combo-om3-vite-c-001",
+  "productName": "코어 알티지 오메가3",
+  "productNameEn": "코어 알티지 오메가3",
+  "manufacturer": "주식회사 네이처팩토리",
+  "manufacturerEn": null,
+  "statementNo": "202100128551",
+  "category": "hff",
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1 성상: 이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 내용물을 함유한 투명한 장방형 장용성 연질캡슐\n2 EPA 및 DHA의 합: 1,000mg/2,000mg의 80~120%\n3 비타민E: 11mg α-TE/2,000mg의 80~150%\n4 납: 3.0mg/kg 이하\n5 카드뮴: 1.0mg/kg 이하\n6 수은: 0.5mg/kg 이하\n7 대장균군: 음성\n8 붕해도: \n가) 제1액에 의하여 120분간 붕해되지 않음\n나) 제2액에 의하여 60분 이내 붕해",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 내용물을 함유한 투명한 장방형 장용성 연질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가3 1000mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코어 알티지 오메가3<small>오메가3 · 비타민 E</small></h1><p class=\"sd-meta\">주식회사 네이처팩토리 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 오메가3 <b>1000mg</b>, 비타민 E <b>11mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 오메가3 <b>1000mg</b>, 비타민 E <b>11mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 내용물을 함유한 투명한 장방형 장용성 연질캡슐 · 주식회사 네이처팩토리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>오메가3</b> 표시량(1000mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 내용물을 함유한 투명한 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 오메가3 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 1000mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코어 알티지 오메가3<small>Omega-3 · Vitamin E</small></h1><p class=\"sd-meta\">Made by 주식회사 네이처팩토리 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000mg</b> of Omega-3, <b>11mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>1000mg</b> Omega-3, <b>11mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 네이처팩토리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Omega-3</b> labelled (1000mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 노란색의 내용물을 함유한 투명한 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-om3-vite-c-002",
+  "productName": "혈행·눈 건강·기억력 알티지 오메가3",
+  "productNameEn": "혈행·눈 건강·기억력 알티지 오메가3",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200081006",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA및DHA함유유지] 혈중 중성지질 개선･혈행 개선･기억력 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미∙이취가 없는 밝은 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐\n2. EPA와 DHA의 합 : 표시량(1000mg/1688mg)의 80~120%\n3. 비타민E : 표시량(11mg α-TE/1688mg)의 80~150%\n4. 납(mg/kg) : 3.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 0.5 이하\n7. 대장균군 : 음성\n8. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(1캡슐당 844mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[EPA및DHA함유유지]\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n개인에 따라 피부 관련 이상반응이 발생할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 밝은 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1000,
+    "unit": "mg",
+    "basisAmount": 1688,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가3 1000mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행·눈 건강·기억력 알티지 오메가3<small>오메가3 · 비타민 E</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 오메가3 <b>1000mg</b>, 비타민 E <b>11mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 오메가3 <b>1000mg</b>, 비타민 E <b>11mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미∙이취가 없는 밝은 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선･기억력 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>오메가3</b> 표시량(1000mg/1688mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1688mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미∙이취가 없는 밝은 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 오메가3 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 1000mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행·눈 건강·기억력 알티지 오메가3<small>Omega-3 · Vitamin E</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스2공장 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1000mg</b> of Omega-3, <b>11mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>1000mg</b> Omega-3, <b>11mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Omega-3</b> labelled (1000mg / 1688mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1688mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미∙이취가 없는 밝은 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-om3-vite-c-003",
+  "productName": "슈퍼오메가3 플러스",
+  "productNameEn": "슈퍼오메가3 플러스",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "20070017035335",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]①혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] ① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 투명한 노랑색의 내용물을 함유한 투명한 장방형 연질캡슐\n2) 대장균군: 음성\n3) 붕해도: 20분 이내\n4) EPA와 DHA의 합: 550mg/1,005mg의 80~120%\n5) 비타민E: 3.3mg α-TE/1,005mg의 80~150%\n6) 납(mg/kg): 3.0이하\n7) 카드뮴(mg/kg): 1.0이하\n8) 총수은(mg/kg): 0.5이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n개인에 따라 피부 관련 이상반응이 발생할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 투명한 노랑색의 내용물을 함유한 투명한 장방형 연질캡슐",
+   "storage": "1) 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n2) 어린이의 손이 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 550,
+    "unit": "mg",
+    "basisAmount": 1005,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가3 550mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼오메가3 플러스<small>오메가3 · 비타민 E</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 오메가3 <b>550mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 오메가3 <b>550mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 투명한 노랑색의 내용물을 함유한 투명한 장방형 연질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>오메가3</b> 표시량(550mg/1005mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1005mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 투명한 노랑색의 내용물을 함유한 투명한 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선을 피해 서늘한 곳에 보관하십시오. 2) 어린이의 손이 닿지 않도록 주의하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 오메가3 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 550mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>슈퍼오메가3 플러스<small>Omega-3 · Vitamin E</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>550mg</b> of Omega-3, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>550mg</b> Omega-3, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Omega-3</b> labelled (550mg / 1005mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1005mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 투명한 노랑색의 내용물을 함유한 투명한 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선을 피해 서늘한 곳에 보관하십시오. 2) 어린이의 손이 닿지 않도록 주의하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "combo-om3-vite-c-004",
+  "productName": "락티브 초임계 rTG 알티지 오메가3",
+  "productNameEn": "락티브 초임계 rTG 알티지 오메가3",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006595",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]①혈중 중성지질 개선·혈행 개선·기억력 개선에 도움을 줄 수 있음 ②건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[비타민E]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 연질캡슐\n2. EPA와 DHA의 합 : 표시량 900 mg / 1,200 mg의 80~120%\n3. 비타민E : 표시량 3.3 mg α-TE / 1,200 mg의 80~150%\n4. 중금속 : 납(3.0 mg/kg 이하), 카드뮴(1.0 mg/kg 이하), 수은(0.5 mg/kg 이하)\n5. 대장균군 : 음성\n6. 붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "유통기한을 확인하시기 바라며, 임신, 수유부나 질병으로 치료 중이신 분은 섭취 전 전문가와 상의하십시오.\n특정성분에 알레르기가 있거나 특이체질이신 분은 섭취에 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 900,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가3 900mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>락티브 초임계 rTG 알티지 오메가3<small>오메가3 · 비타민 E</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 오메가3 <b>900mg</b>, 비타민 E <b>3.3mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 오메가3 <b>900mg</b>, 비타민 E <b>3.3mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선·기억력 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>오메가3</b> 표시량(900mg/1200mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 오메가3 · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 900mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>락티브 초임계 rTG 알티지 오메가3<small>Omega-3 · Vitamin E</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>900mg</b> of Omega-3, <b>3.3mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>900mg</b> Omega-3, <b>3.3mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, and memory improvement</li><li>May help with improving dry eyes for eye health</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Omega-3</b> labelled (900mg / 1200mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,50 @@
+[
+ {
+  "statementNo": "200400200061219",
+  "productName": "프로메가 올케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20190004553290",
+  "productName": "어쎔코드 DF",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200023096",
+  "productName": "활력슬림쏙",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061145",
+  "productName": "프로메가클렌즈",
+  "holdCode": "HOLD_GROUNDING",
+  "reason": "원료 기능성 귀속/매핑 실패"
+ },
+ {
+  "statementNo": "20040015162422",
+  "productName": "스마힐 하루 한번 혈행건강",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200082770",
+  "productName": "사이클 다이어트 그린",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "200400200061222",
+  "productName": "프로메가 듀얼케어",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ },
+ {
+  "statementNo": "20040020006802",
+  "productName": "메타 Q",
+  "holdCode": "HOLD_MULTI_FUNCTIONAL",
+  "reason": "추가 기능성 원료/미분류 스펙"
+ }
+]
