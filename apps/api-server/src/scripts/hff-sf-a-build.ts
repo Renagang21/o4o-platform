@@ -31,6 +31,18 @@ interface IngCfg {
   otherMark: RegExp;       // 타 기능성 원료 지표(복합형 신호). 부원료(산화방지 비타민E 등)는 제외 설계.
   match: RegExp;           // 후보 SQL 매칭 정규식(원료명)
   fnNormalize?: (ko: string) => string; // 기능성 원문 래퍼 정규화(인정번호 prefix·따옴표·기타기능 suffix 제거)
+  // ── 부원료 비타민/미네랄 허용형(콜라겐-vitmin) 전용 옵션. 미설정 시 기존 동작 무변경 ──
+  vitminSub?: RegExp;      // 부원료 비타민/미네랄(colMark/otherMark 외 카운트만, 귀속 불방해)
+  multivitName?: RegExp;   // 멀티비타민 hero 제품명(콜라겐이 부원료 → 오귀속 방지, REVIEW_LATER)
+  maxVitmin?: number;      // 허용 부원료 비타민/미네랄 최대 수(초과=hero, REVIEW_LATER)
+  requireMarkAmount?: boolean; // 지표(콜라겐/펩타이드) 표시량 존재 필수(부재=원료 귀속 불명확, REVIEW_LATER)
+}
+
+// 콜라겐 지표(콜라겐/펩타이드 서열)에 표시량·함량 마커가 붙어 있는지 — 부원료가 아닌 유효 원료 확인용.
+function colHasAmount(base: string): boolean {
+  const t = String(base);
+  return /콜라겐[^\n]{0,30}(표시량|㎎|mg|g\/|%|이상)/i.test(t)
+    || /(Gly\s*-?\s*Pro\s*-?\s*Hyp|하이드록시프롤린|hydroxyprolyl|hydroxyproline)[^\n]{0,30}(표시량|㎍|㎎|mg|%|이상)/i.test(t);
 }
 
 const COMMON_OTHER_FN = /장\s*건강|배변|혈중\s*콜레스테롤|혈중\s*중성지방|콜레스테롤\s*개선|기억력|인지|눈\s*건강|망막|혈행|혈압|혈당|체지방|간\s*건강|피로개선|면역|항산화\s*작용|칼슘\s*흡수|뼈\s*건강|골밀도|전립선|요로|위\s*점막|긴장\s*완화|수면|갱년기|월경|정자|운동수행|근력|손발\s*시림|잇몸/;
@@ -66,6 +78,34 @@ const INGREDIENTS: Record<string, IngCfg> = {
     colMark: /콜라겐|Gly\s*-\s*Pro|Pro\s*-\s*Hyp|hydroxyprolyl|hydroxyproline/i,
     otherMark: /비타민\s?[ABCDEK]\d?|엽산|나이아신|판토텐산|비오틴|콜린|비타민|토코페롤|레티놀|아스코르브|칼슘|마그네슘|아연|철분?|셀레늄|구리|망간|요오드|몰리브덴|크롬|프로바이오틱|유산균|오메가|EPA|DHA|루테인|지아잔틴|코엔자임|밀크씨슬|실리마린|글루코사민|콘드로이틴|MSM|보스웰리아|히알루론|프로폴리스|홍삼|인삼|가르시니아|녹차|카테킨|GABA|테아닌|글루타치온|폴리페놀|안토시아닌|프락토올리고|이눌린|차전자|식이섬유|프리바이오/i,
     match: /콜라겐/,
+  },
+  // 부원료 비타민/미네랄만 동반하는 단일-콜라겐(콜라겐이 유효원료, 비타민/미네랄은 기능성 클레임 없는 부원료).
+  // fn-set positive 게이트로 제품 기능성은 콜라겐 집합 한정 보장됨. 타 '기능성 원료'(HARD_OTHER)만 복합형으로 배제하고,
+  // 멀티비타민 hero(콜라겐 부원료) 와 지표 표시량 부재 제품은 REVIEW_LATER 로 분리(대량 오귀속 방지).
+  'collagen-vitmin': {
+    slug: 'collagen',
+    display: (label, base, name) => {
+      const s = `${label} ${base} ${name}`;
+      if (/피쉬|fish/i.test(s)) return { ko: '피쉬콜라겐펩타이드', en: 'Fish collagen peptide' };
+      if (/저분자/.test(s)) return { ko: '저분자콜라겐펩타이드', en: 'Low-molecular collagen peptide' };
+      return { ko: '콜라겐펩타이드', en: 'Collagen peptide' };
+    },
+    fnSet: [
+      { key: 'skin_moist', re: /피부\s*보습/, en: 'May help to moisturise the skin' },
+      { key: 'skin_uv', re: /자외선.*피부\s*손상.*피부\s*건강|자외선에\s*의한\s*피부/, en: 'May help to maintain skin health from skin damage caused by UV radiation' },
+      { key: 'hair', re: /모발\s*상태|모발상태/, en: 'May help to improve hair condition (luster and elasticity)' },
+      { key: 'joint', re: /관절\s*(?:및|,)?\s*연골|관절\s*건강|연골\s*건강/, en: 'May help joint and cartilage health' },
+    ],
+    otherFn: COMMON_OTHER_FN,
+    colMark: /콜라겐|Gly\s*-\s*Pro|Pro\s*-\s*Hyp|hydroxyprolyl|hydroxyproline/i,
+    // otherMark = 타 '기능성 원료'만(히알루론/세라마이드/글루코사민/콘드로이틴/MSM/보스웰/뮤코다당/초록입홍합/엘라스틴/소나무껍질/오메가 등).
+    // 부원료 비타민/미네랄은 여기서 제외(vitminSub 로 별도 카운트).
+    otherMark: /히알루론|세라마이드|글루코실세라마이드|아세틸글루코사민|곤약|글루코사민|콘드로이[친틴]|메틸설포닐메탄|디메틸설폰|\bMSM\b|보스웰|유니베스틴|뮤코다당|점액다당|초록입홍합|리프리놀|엘라스틴|소나무껍질|피크노제놀|폴리감마글루탐산|쌀겨세라마이드|밀추출물|오메가|EPA|DHA|루테인|지아잔틴|코엔자임|밀크씨슬|프로바이오틱|유산균|홍삼|인삼|가르시니아|녹차|카테킨|프로폴리스|안토시아닌|프락토올리고/i,
+    match: /콜라겐/,
+    vitminSub: /비타민|토코페롤|아스코르브|나이아신|판토텐|비오틴|엽산|칼슘|마그네슘|아연|철분?|셀레늄|구리|망간|미네랄/i,
+    multivitName: /멀티\s*비타민|종합\s*비타민|멀티\s*미네랄|비타민\s*미네랄|미네랄\s*\d{2}|비타민\s*\d{2}|멀티팩|얼티밋|토탈\s*케어|23\s*종|멀티\s*미네럴/i,
+    maxVitmin: 4,
+    requireMarkAmount: true,
   },
   glm: {
     slug: 'green-lipped-mussel',
@@ -175,7 +215,7 @@ async function main(): Promise<void> {
               OR coalesce(raw_payload->'source'->>'PRDUCT','') ~ $1
               OR coalesce(raw_payload->'source'->>'BASE_STANDARD','') ~ $1)`, [src]);
 
-    const funnel = { scanned: rows.length, fnSetPass: 0, basePure: 0, baseCombo: 0, baseNoMark: 0, solid: 0, unpromoted: 0, notTaken: 0, target: 0, liquidHeld: 0, guardHold: 0, dup: 0 };
+    const funnel = { scanned: rows.length, fnSetPass: 0, basePure: 0, baseCombo: 0, baseNoMark: 0, solid: 0, unpromoted: 0, notTaken: 0, target: 0, liquidHeld: 0, guardHold: 0, dup: 0, multivitHero: 0, noMarkAmount: 0 };
     const target: unknown[] = []; const pool: unknown[] = []; const combo: unknown[] = []; const liquid: unknown[] = []; const hold: unknown[] = [];
     const seen = new Set<string>(); const distSig: Record<string, number> = {}; const distDisplay: Record<string, number> = {};
 
@@ -192,6 +232,16 @@ async function main(): Promise<void> {
       const other = labels.filter((l) => cfg.otherMark.test(l) && !cfg.colMark.test(l));
       if (!hasMark) { funnel.baseNoMark++; continue; }
       if (other.length) { combo.push({ stmt: r.stmt, name: r.name.trim(), otherLabels: other.slice(0, 4) }); funnel.baseCombo++; continue; }
+      // 부원료 비타민 허용형: 멀티비타민 hero / 지표 표시량 부재 분리(REVIEW_LATER). 미설정 config 는 무영향.
+      if (cfg.vitminSub) {
+        const vits = labels.filter((l) => cfg.vitminSub!.test(l) && !cfg.colMark.test(l) && !cfg.otherMark.test(l));
+        if ((cfg.multivitName && cfg.multivitName.test(r.name)) || (cfg.maxVitmin != null && vits.length > cfg.maxVitmin)) {
+          hold.push({ stmt: r.stmt, name: r.name.trim(), reason: 'REVIEW_MULTIVIT_HERO', vitCount: vits.length }); funnel.multivitHero++; continue;
+        }
+        if (cfg.requireMarkAmount && !colHasAmount(r.base)) {
+          hold.push({ stmt: r.stmt, name: r.name.trim(), reason: 'REVIEW_NO_MARKER_AMOUNT' }); funnel.noMarkAmount++; continue;
+        }
+      }
       funnel.basePure++;
       const stmt = String(r.stmt).trim(); if (!stmt || seen.has(stmt)) { funnel.dup++; continue; }
       seen.add(stmt);
