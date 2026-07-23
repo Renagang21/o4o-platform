@@ -2,9 +2,9 @@
  "_doc": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉. 트랙=피부 외용제(topical skin) ingredient×form 단위 선점.",
  "schemaVersion": 1,
  "owner": "agent-da",
- "round": "topical-special-form-10h-2026-07-23",
+ "round": "topical-patch-v7-2026-07-23",
  "track": "TOPICAL_SKIN_STORE_LEAFLET",
- "verdict": "PRODUCING",
+ "verdict": "ROUND_DONE",
  "claims": [
   {
    "groupKey": "무피로신|연고",
@@ -393,110 +393,110 @@
   {
    "groupKey": "케토프로펜|첩부제(플라스타·파프·카타플라스마)",
    "sourceType": "o4o_drug_otc_topical",
-   "masters": 171,
+   "masters": 179,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "DONE",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 DONE 179 master KO+EN LIVE (batch1~4, 플라스타·파프·카타플라스마·핑거). HOLD=하루펜 4(HOLD_MIX_NONRETAIL 군납용 혼입). 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7)"
   },
   {
    "groupKey": "플루르비프로펜|첩부제",
    "sourceType": "o4o_drug_otc_topical",
-   "masters": 166,
+   "masters": 173,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "DONE",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 DONE 173 master KO+EN LIVE (batch5 18hash/34run). 트로키·스프레이 제외(경구·구강). effkey='관절염'(퇴행성 관절염 공백표기 대응). '복용하기 전에' 경구오기 정규화 추가. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7)"
   },
   {
    "groupKey": "디클로페낙나트륨|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 149,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "DONE",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 DONE 149 master KO+EN LIVE (batch6 12hash/22run, EN 7형: A공유형 4hash/1일1회/15세+ · 류마스탑 · 디클로맥스 · 디클로하이 · 디쿨파워 · 디센플러스공유 2hash · 게보핏스트롱). '병용(함께 복용, 사용)' 괄호주해 정규화 추가. 디펜 run이 트라스트디펜 흡수(동일 hash). 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7)"
   },
   {
    "groupKey": "록소프로펜나트륨(수화물 포함)|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 65,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "펠비낙|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 48,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "퓨시드산나트륨|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 18,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "인도메타신|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 17,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "이부프로펜|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 16,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "피록시캄|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 11,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   },
   {
    "groupKey": "디클로페낙디에틸암모늄|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 8,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "DONE",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 DONE 8 master KO+EN LIVE (batch6 3hash/3run: 노펜24첩부제·맨담디클론첩부제·코디톱플라스타, EN 3형). 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7)"
   },
   {
    "groupKey": "디클로페낙에폴아민|첩부제",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 4,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "DONE",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 DONE 4 master KO+EN LIVE (batch6 1hash/1run 에폴민카타, 적응증별 용법 14일/3일 상한·CABG 금기·16세+ 보존, effkey=상과염). 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7)"
   },
   {
    "groupKey": "살리실산|플라스타",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 4,
    "op": "KO_EN",
-   "status": "CLAIMED",
+   "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
-   "note": "census 2026-07-23, 성분×제형×안전 fingerprint 분리 예정"
+   "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
   }
  ],
  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
