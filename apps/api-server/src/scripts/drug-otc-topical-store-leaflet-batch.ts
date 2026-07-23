@@ -4,7 +4,8 @@
  * per-fp 계약(compose per-master·apply TX·postVerify)은 검증본과 동일. efficacy-key 가드로 이질 fp HOLD.
  * dry-run 기본. apply: --apply + TOPICAL_APPLY_CONFIRM=YES.
  * Usage: PROXY_PORT=54xx npx tsx src/scripts/drug-otc-topical-store-leaflet-batch.ts \
- *   --ingredient 테르비나핀 --form 크림 --title "..." --en <en.json> --effkey "피부진균감염증|족부백선" --slugbase terbinafine-cream [--apply] [--max N]
+ *   --ingredient 테르비나핀 --form 크림 --title "..." --en <en.json> --effkey "피부진균감염증|족부백선" --slugbase terbinafine-cream [--wo-id WO-...] [--apply] [--max N]
+ *   WO ID 해석 우선순위: --wo-id > EN config(woId ?? wo) > env TOPICAL_WO_ID > 없으면 실행 중지 (하드코딩 금지)
  */
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -110,11 +111,15 @@ async function main(): Promise<void> {
   const APPLY = process.argv.includes('--apply') && process.env.TOPICAL_APPLY_CONFIRM === 'YES';
   if (!INGREDIENT || !FORM || !TITLE || !EN_FILE || !SLUGBASE || !EFFKEYS.length) throw new Error('--ingredient --form --title --en --slugbase --effkey 필요');
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  const enBuilt = buildDrugOtcEnConsumerHtml((JSON.parse(fs.readFileSync(EN_FILE, 'utf8')) as { translation: DrugOtcEnTranslation }).translation);
+  const enConfig = JSON.parse(fs.readFileSync(EN_FILE, 'utf8')) as { wo?: string; woId?: string; translation: DrugOtcEnTranslation };
+  const enBuilt = buildDrugOtcEnConsumerHtml(enConfig.translation);
   if (enBuilt.missing.length || /[가-힣]/.test(enBuilt.html)) throw new Error('EN invalid: ' + enBuilt.missing.join(','));
+  // WO ID는 하드코딩하지 않는다. 우선순위: ① CLI --wo-id ② config(EN json woId ?? wo) ③ 환경변수 TOPICAL_WO_ID ④ 없으면 실행 중지
+  const WO_ID = arg('wo-id') || enConfig.woId || enConfig.wo || process.env.TOPICAL_WO_ID || '';
+  if (!WO_ID) throw new Error('WO ID 필요: --wo-id 또는 EN config의 woId/wo 또는 env TOPICAL_WO_ID 중 하나를 지정하십시오');
   const ds = new DataSource({ type: 'postgres', host: process.env.PROXY_HOST ?? '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5455', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { statement_timeout: 120000 } });
   await ds.initialize();
-  const summary: any = { wo: 'WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4', ingredient: INGREDIENT, form: FORM, slugbase: SLUGBASE, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
+  const summary: any = { wo: WO_ID, ingredient: INGREDIENT, form: FORM, slugbase: SLUGBASE, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
   try {
     const coarse: Row[] = await ds.query(`SELECT pm.id::text id, pm.name, pm.specification spec, es.content, es.id::text "easyId"
       FROM product_masters pm JOIN LATERAL (SELECT id, content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type=$3 AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
