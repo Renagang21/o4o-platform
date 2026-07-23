@@ -316,6 +316,43 @@ export class AuthRegisterController extends BaseController {
           }
         }
 
+        // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
+        //   기존 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
+        //   KPA / K-Cosmetics / GlycoPharm 패턴과 동일 — best-effort.
+        if (serviceKey === 'neture') {
+          try {
+            const roleLabel = effectiveRole === 'supplier' ? '공급자' : '파트너';
+            const operators: { userId: string }[] = await AppDataSource.query(
+              `SELECT DISTINCT user_id AS "userId"
+                 FROM role_assignments
+                WHERE role IN ('neture:operator','neture:admin')
+                  AND is_active = true
+                LIMIT 20`,
+            );
+            await Promise.allSettled(
+              operators.map((op) =>
+                notificationService.createNotification({
+                  userId: op.userId,
+                  type: 'member.registration_pending',
+                  title: `신규 Neture ${roleLabel} 가입 신청`,
+                  message: `${resolvedName || data.email}님이 Neture ${roleLabel} 가입을 신청했습니다.`,
+                  serviceKey: 'neture',
+                  actorId: existingUser.id,
+                  metadata: {
+                    userId: existingUser.id,
+                    targetUrl: '/operator/applications',
+                  },
+                }),
+              ),
+            );
+          } catch (notifyError) {
+            logger.warn('[AuthRegisterController.register] Neture operator notification failed (best-effort)', {
+              error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+              userId: existingUser.id,
+            });
+          }
+        }
+
         return BaseController.created(res, {
           message: '서비스 가입 신청이 완료되었습니다. 승인을 기다려주세요.',
           user: {
@@ -599,6 +636,43 @@ export class AuthRegisterController extends BaseController {
           );
         } catch (notifyError) {
           logger.warn('[AuthRegisterController.register] GlycoPharm operator notification failed (best-effort)', {
+            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
+            userId: user.id,
+          });
+        }
+      }
+
+      // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
+      //   신규 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
+      //   KPA / K-Cosmetics / GlycoPharm 패턴과 동일 — best-effort.
+      if (serviceKey === 'neture') {
+        try {
+          const roleLabel = effectiveRole === 'supplier' ? '공급자' : '파트너';
+          const operators: { userId: string }[] = await AppDataSource.query(
+            `SELECT DISTINCT user_id AS "userId"
+               FROM role_assignments
+              WHERE role IN ('neture:operator','neture:admin')
+                AND is_active = true
+              LIMIT 20`,
+          );
+          await Promise.allSettled(
+            operators.map((op) =>
+              notificationService.createNotification({
+                userId: op.userId,
+                type: 'member.registration_pending',
+                title: `신규 Neture ${roleLabel} 가입 신청`,
+                message: `${resolvedName || data.email}님이 Neture ${roleLabel} 가입을 신청했습니다.`,
+                serviceKey: 'neture',
+                actorId: user.id,
+                metadata: {
+                  userId: user.id,
+                  targetUrl: '/operator/applications',
+                },
+              }),
+            ),
+          );
+        } catch (notifyError) {
+          logger.warn('[AuthRegisterController.register] Neture operator notification failed (best-effort)', {
             error: notifyError instanceof Error ? notifyError.message : String(notifyError),
             userId: user.id,
           });
