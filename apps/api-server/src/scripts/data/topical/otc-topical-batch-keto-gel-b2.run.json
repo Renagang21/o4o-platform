@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "케토프로펜",
+ "form": "시푸로겔3%",
+ "slugbase": "keto-gel-b2",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "324ac1e6c033cf8d",
+   "n": 1
+  },
+  {
+   "fp": "5961e1c60e7e92d5",
+   "n": 1
+  },
+  {
+   "fp": "73cb97ad0ed67989",
+   "n": 1
+  },
+  {
+   "fp": "b4962c8b0fc853cd",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

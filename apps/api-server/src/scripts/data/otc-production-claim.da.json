@@ -163,8 +163,8 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 46,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "V6 우선순위⑤ 추가 단일성분. 겔 46 = 1일1~4회형 33 + 1일수회형 10(케프겔+시푸로겔3%) + 3%/5% 농도별형 3(케펨겔). 경고제 12=첩부제 계열 생산 제외(다음 트랙 정리) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 20fp/46 = 농도별형 3fp/3(케펨겔 3%·5% 횟수 분리) + 수회형 8fp/10(케프겔6+시푸로겔3% 4) + 1~4회형 9fp/33(아마프로겔3% 2+광역 31). 광과민증 2주 자외선 회피·fibrate/옥시벤존 교차과민·15세미만 금기 EN 3형 분리. 경고제 12=첩부제 계열 생산 제외. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",

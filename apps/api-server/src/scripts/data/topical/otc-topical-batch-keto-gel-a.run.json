@@ -1,0 +1,42 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "케토프로펜",
+ "form": "겔(케토프로펜",
+ "slugbase": "keto-gel-a",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b16b5bdb72a3cf60",
+   "n": 11
+  },
+  {
+   "fp": "567fa3604155f785",
+   "n": 10
+  },
+  {
+   "fp": "da164c543d55254a",
+   "n": 5
+  },
+  {
+   "fp": "0a83fc5e31246181",
+   "n": 2
+  },
+  {
+   "fp": "38d91a6323a13c63",
+   "n": 1
+  },
+  {
+   "fp": "27f8060b54747b62",
+   "n": 1
+  },
+  {
+   "fp": "8418a0a29afa3399",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 31,
+ "koWrite": 124,
+ "enWrite": 62
+}

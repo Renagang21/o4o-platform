@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "케토프로펜",
+ "form": "케프겔",
+ "slugbase": "keto-gel-b",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c5d1a711e07a25c2",
+   "n": 2
+  },
+  {
+   "fp": "43a92e4d4aeaa459",
+   "n": 2
+  },
+  {
+   "fp": "d6e60ca737d4b85f",
+   "n": 1
+  },
+  {
+   "fp": "731f559055d1cd8e",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}
