@@ -237,6 +237,22 @@
       "op": "KO_EN",
       "status": "DONE",
       "note": "V6 완결 5fp/5 = 판테뉴크림 2(2fp)+판테올크림 3(3fp), EN 2형(판테올=점막 경미 자극 이상반응 추가). 유두균열 수유 전 닦아내기 문구 보존. 덱스판테놀 정제·나잘스프레이=경구·비강으로 제외 확정. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "폴리데옥시리보뉴클레오티드나트륨|크림",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 10,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 리쥬비넥스크림+더마그램피디알엔크림=2 원문형(EN 2형). PDRN 점안액 다수=안과로 제외(form 크림명 타겟팅) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "크로타미톤|연고",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 유락신연고+타미락신연고=1 원문형(동일 문구, EN 1형 공유). 급성 루푸스성 피부염 금기·안과용 금지 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
