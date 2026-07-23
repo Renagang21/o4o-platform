@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "제일파프케이카타플라스마",
+ "slugbase": "keto-pap-jeil-papk",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f09f4c137664dcdc",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "파워스탑스키니플라스타",
+ "slugbase": "keto-plaster-powerstop-skinny",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "4a39e21207d19c59",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

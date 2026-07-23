@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "맨담케토쿨카타플라스마",
+ "slugbase": "keto-pap-mandam-ketocool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b9c1ca9983b53745",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

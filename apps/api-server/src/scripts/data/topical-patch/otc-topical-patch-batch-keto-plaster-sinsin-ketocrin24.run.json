@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "신신케토크린24플라스타",
+ "slugbase": "keto-plaster-sinsin-ketocrin24",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "4a39e21207d19c59",
+   "n": 4
+  },
+  {
+   "fp": "2d7c50197469ab7e",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}
