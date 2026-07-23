@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "0a7a3b22-8fbe-4122-8ad8-9557f5696d34",
+  "productName": "물레방아",
+  "productNameEn": "물레방아",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003142",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]①콜레스테롤 개선②혈행개선",
+   "baseStandard": "ⓛ성상 : 적자색의 연질캡슐\r\n②감마리놀렌산 : 표시량(240.768mg/3200mg)의 80~120%\r\n③대장균군 : 음성\r\n④붕해 : 20분 이내이어야 한다.",
+   "intake": "1일 2회, 1회 2캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "적자색의 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>물레방아<small>감마리놀렌산</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>적자색의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 적자색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>물레방아<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 적자색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "22a50a69-880b-4fed-90d8-95c5ad7e2ee6",
+  "productName": "건강한 감마리놀렌산100",
+  "productNameEn": "건강한 감마리놀렌산100",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107423",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]①콜레스테롤 개선②혈행개선",
+   "baseStandard": "① 성상 : 이미, 이취가 없는 투명한 내용물을 함유한 투명한 연질캡슐\r\n② 감마리놀렌산 : 표시량(240mg/3000mg)의 80~120%\r\n③ 대장균군 : 음성\r\n④ 붕해시험 : 적합",
+   "intake": "500mg  : 1일 3회, 1회 2캡슐을 물과 함께 섭취하십시오.\r\n1000mg : 1일 3회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취 여부를 결정\r\n② PTP포장의 경우 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의",
+   "dosageForm": "이미, 이취가 없는 투명한 내용물을 함유한 투명한 연질캡슐",
+   "storage": "① 연질캡슐 특성상 보관상태에 따라 외형 및 성상변화가 생길 우려가 있으니 반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온ㆍ습도가 높은 조건(온도 35℃이상, 상대습도 75%이상)을 피하여 보관하십시오.\r\n② 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>건강한 감마리놀렌산100<small>감마리놀렌산</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 투명한 내용물을 함유한 투명한 연질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 투명한 내용물을 함유한 투명한 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 연질캡슐 특성상 보관상태에 따라 외형 및 성상변화가 생길 우려가 있으니 반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온ㆍ습도가 높은 조건(온도 35℃이상, 상대습도 75%이상)을 피하여 보관하십시오. ② 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>건강한 감마리놀렌산100<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 투명한 내용물을 함유한 투명한 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 연질캡슐 특성상 보관상태에 따라 외형 및 성상변화가 생길 우려가 있으니 반드시 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온ㆍ습도가 높은 조건(온도 35℃이상, 상대습도 75%이상)을 피하여 보관하십시오. ② 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "32a173e5-f22d-427e-9db1-6d4e34a1d220",
+  "productName": "이브감마리놀렌산 300",
+  "productNameEn": "이브감마리놀렌산 300",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001130",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]1. 콜레스테롤 개선  2. 혈행개선",
+   "baseStandard": "1.성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 투명한 타원형 연질캅셀\r\n2.감마리놀렌산 함량(mg) : 표시량(300mg/1500mg)의 80~120% \r\n3.대장균군 : 음성\r\n4.붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캅셀을 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 투명한 타원형 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "18"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>이브감마리놀렌산 300<small>감마리놀렌산</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 투명한 타원형 연질캅셀 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 투명한 타원형 연질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>이브감마리놀렌산 300<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 내용물을 함유한 투명한 타원형 연질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "589b4064-6f57-4cde-9aae-b43310437780",
+  "productName": "이브감마리놀렌산에스(S)",
+  "productNameEn": "이브감마리놀렌산에스(S)",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001114",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]1. 콜레스테롤 개선  2. 혈행개선",
+   "baseStandard": "1.성상 : 고유의 향미를 가지며, 이미, 이취가 없는 흑갈색 내용물을 함유한 투명한 연질캅셀\r\n2.감마리놀렌산 함량(mg) : 표시량(122mg/1200mg)의 80~120% \r\n3.대장균군 : 음성\r\n4.붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캅셀을 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 향미를 가지며, 이미, 이취가 없는 흑갈색 내용물을 함유한 투명한 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>이브감마리놀렌산에스(S)<small>감마리놀렌산</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며, 이미, 이취가 없는 흑갈색 내용물을 함유한 투명한 연질캅셀 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며, 이미, 이취가 없는 흑갈색 내용물을 함유한 투명한 연질캅셀</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>이브감마리놀렌산에스(S)<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며, 이미, 이취가 없는 흑갈색 내용물을 함유한 투명한 연질캅셀</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "a04f25e4-30b9-4be2-a334-aabfaf12ed20",
+  "productName": "감마리놀렌산플러스",
+  "productNameEn": "감마리놀렌산플러스",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107458",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]①콜레스테롤 개선②혈행개선",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 투명한 연질캡슐\r\n2. 감마리놀렌산 : 표시량(240mg/2000mg)이상 80~120%\r\n3. 잔류용매(mg/kg) : 5.0 이하\r\n4. 대장균군 : 음성\r\n5. 붕해도 : 적합",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 분은 성분을 확인 후 섭취하시기 바랍니다.\r\n영·유아, 임신·수유부나 질환보유자 또는 약물복용중이신 분은 섭취 전에 의사, 약사 등 전문가와 상의하십시오.",
+   "dosageForm": "이미 이취가 없고 노란색의 내용물을 함유한 투명한 연질캡슐",
+   "storage": "직사광선을 피하여 서늘한 곳에 보관\r\n제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 섭취",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>감마리놀렌산플러스<small>감마리놀렌산</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 투명한 연질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 투명한 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보관 제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 섭취</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>감마리놀렌산플러스<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 투명한 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보관 제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 섭취</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "aeeb4c2d-bfa7-46a1-a599-f10d615370b8",
+  "productName": "감마리놀렌산 이피오",
+  "productNameEn": "감마리놀렌산 이피오",
+  "manufacturer": "(주)생명과학",
+  "manufacturerEn": null,
+  "statementNo": "2004002003897",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지 제품]1. 콜레스테롤 개선  2. 혈행개선",
+   "baseStandard": "① 성상: 미황색의 내용물이 들어있는 투명한 연질 캡슐로 이미·이취가 없다.\r\n② 감마리놀렌산: 표시량(   80mg/900mg 1회분량/2캡슐당)의 80~120%\r\n③ 대장균군: 음성\r\n④ 붕해시험: 20분 이내",
+   "intake": "1일 3회, 1회 2캡슐씩을 물과 함께 섭취하십시오.",
+   "caution": "특정 성분에 알레르기체질이신 분은 섭취 전 원료(성분)를 확인하시기 바랍니다.",
+   "dosageForm": "미황색의 내용물이 들어있는 투명한 연질 캡슐",
+   "storage": "직사광선을 피하고 건냉한곳에 보관하십시오.",
+   "shelfLife": "2년"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>감마리놀렌산 이피오<small>감마리놀렌산</small></h1><p class=\"sd-meta\">(주)생명과학 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>감마리놀렌산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>감마리놀렌산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물이 들어있는 투명한 연질 캡슐로 이미·이취가 없다. · (주)생명과학 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물이 들어있는 투명한 연질 캡슐로 이미·이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 건냉한곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>감마리놀렌산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>감마리놀렌산 이피오<small>Gamma-linolenic acid</small></h1><p class=\"sd-meta\">Made by (주)생명과학 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Gamma-linolenic acid</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Gamma-linolenic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)생명과학</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물이 들어있는 투명한 연질 캡슐로 이미·이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 건냉한곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "c7dc50af-bb61-45e1-8748-a63865503e35",
+  "productName": "닥터스뷰 콜레스마늘 골드",
+  "productNameEn": "닥터스뷰 콜레스마늘 골드",
+  "manufacturer": "(주)메디언스",
+  "manufacturerEn": null,
+  "statementNo": "2012001507924",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음②기억력 개선에 도움을 줄 수 있음③항산화에 도움을 줄 수 있음,[마늘] 혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 밝은 회황색의 분말을 함유한 흰색의 경질캡슐\n2. 알리인 : 표시량(6mg/800mg)의 80% 이상\n3. 진세노사이드 Rg1,Rb1 및 Rg3의 합 : 표시량(2.4mg/800mg)의 80% 이상\n4. 납 (mg/kg) : 0.5이하\n5. 총비소(mg/kg) : 0.5이하\n6. 총수은(mg/kg) : 0.5이하\n7. 카드뮴(mg/kg) : 0.5이하\n8. 대장균군 : 음성\n9. 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 밝은 회황색의 분말을 함유한 흰색의 경질캡슐",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마늘</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>닥터스뷰 콜레스마늘 골드<small>마늘</small></h1><p class=\"sd-meta\">(주)메디언스 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>마늘</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>마늘</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 밝은 회황색의 분말을 함유한 흰색의 경질캡슐 · (주)메디언스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음,  혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 밝은 회황색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>마늘 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Garlic</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>닥터스뷰 콜레스마늘 골드<small>Garlic</small></h1><p class=\"sd-meta\">Made by (주)메디언스 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Garlic</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Garlic</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)메디언스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood circulation by inhibiting platelet aggregation.</li><li>May help improve memory.</li><li>May help antioxidant activity.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 밝은 회황색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Garlic</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication</div></div>"
+  }
+ },
+ {
+  "candidateId": "ceaac46d-2658-4abf-93b5-de21292b4e98",
+  "productName": "하드셀",
+  "productNameEn": "하드셀",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351504",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물]\n기억력 개선, 혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미·이취가 없는 검은 점박이가 있는 밝은 회색의 내용물을 함유한 투명한 장방형 경질캡슐\n2. 붕해도 : 20분 이내\n3. 대장균군 : 음성\n4. 플라보놀배당체 : 표시량(28mg/2000mg)의 80~120%\n5. 깅콜릭산(mg/kg) : 5.0 이하\n6. 납(mg/kg) : 1.0 이하\n7. 카드뮴(mg/kg) : 1.0 이하\n8. 총수은(mg/kg) : 1.0 이하\n9. 총비소(mg/kg) : 1.0 이하",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 섭취량 및 섭취방법을 확인한 후 섭취하십시오. \n2. 섭취 전에 유통기한을 확인 후 섭취하십시오. 또한 유통기한이 경과한 제품은 섭취하지 마십시오. \n3. 특정성분에 알레르기가 있으신 분은 원재료명을 확인 후 섭취하십시오.\n4. 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오,\n5. 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n6. 강력방습제인 실리카겔은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 검은 점박이가 있는 밝은 회색의 내용물을 함유한 투명한 장방형 경질캡슐",
+   "storage": "1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">은행잎추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>하드셀<small>은행잎추출물</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>은행잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>은행잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 검은 점박이가 있는 밝은 회색의 내용물을 함유한 투명한 장방형 경질캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>기억력 개선, 혈행 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 검은 점박이가 있는 밝은 회색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>은행잎추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>하드셀<small>Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Ginkgo leaf extract</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Ginkgo leaf extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve memory.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 검은 점박이가 있는 밝은 회색의 내용물을 함유한 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Ginkgo leaf extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "2b5a4e1c-7ecb-4794-a373-46e2be595db2",
+  "productName": "닥터리브 히알루론산 맥스",
+  "productNameEn": "닥터리브 히알루론산 맥스",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "manufacturerEn": null,
+  "statementNo": "200400200072418",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산] 피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 노란색의 내용물을 함유한 백색의 연질캡슐\n2) 히알루론산 : 표시량의 80 ~ 120% (표시량 : 240 mg / 1,600 mg)\n3) 납(mg/kg) : 2.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 붕해 : 적합 (20분 이내) \n8) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1캡슐(1캡슐 당 800 mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n② 유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "노란색의 내용물을 함유한 백색의 연질캡슐",
+   "storage": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>닥터리브 히알루론산 맥스<small>히알루론산</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>노란색의 내용물을 함유한 백색의 연질캡슐 · (주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 노란색의 내용물을 함유한 백색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>닥터리브 히알루론산 맥스<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by (주)한국씨엔에스팜 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국씨엔에스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help support skin moisturizing, maintain skin health from UV-induced skin damage.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 노란색의 내용물을 함유한 백색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "91d835c2-3e1d-473c-9950-601d180eebb3",
+  "productName": "Vitamin C jelly sticks \"Glow on the go\"",
+  "productNameEn": "Vitamin C jelly sticks \"Glow on the go\"",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170352674",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[히알루론산]\n피부보습 ･자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 금발색 또는 모카색\n2. 히알루론산 : 표시량(120mg/20g)의 80~120%\n3. 납(mg/kg) : 2.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포을(를) 잘 씹어서 섭취하십시오.",
+   "caution": "이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n1. 소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n2. 임산부, 수유부, 특이체질, 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.\n3. 개봉 후, 즉시 섭취하시기 바랍니다.\n4. 제품 개봉 및 섭취 시 절단면에 상해를 입을 수 있으니 주의하십시오.\n5. 제품 특성상 갈변될 수 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.\n6. 원료의 점박이가 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 금발색 또는 모카색",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)전자레인지에 포를 데우지 않도록 주의하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>Vitamin C jelly sticks \"Glow on the go\"<small>히알루론산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 금발색 또는 모카색 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습 ･자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 금발색 또는 모카색</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)전자레인지에 포를 데우지 않도록 주의하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>히알루론산 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Hyaluronic acid</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>Vitamin C jelly sticks \"Glow on the go\"<small>Hyaluronic acid</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Hyaluronic acid</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Hyaluronic acid</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help support skin moisturizing, maintain skin health from UV-induced skin damage.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 금발색 또는 모카색</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.3)전자레인지에 포를 데우지 않도록 주의하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Hyaluronic acid</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "d4b7a10a-9c27-4831-9ae7-2d803aefd59b",
+  "productName": "슈퍼 클리어 눈 건강 루테인지아잔틴",
+  "productNameEn": "슈퍼 클리어 눈 건강 루테인지아잔틴",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832493",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마리골드꽃추출물(지아잔틴함유)(제2026-9호)]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색 또는 빨간 주황색의 내용물을 함유한 흑색의 타원형 연질캡슐\n(2) 루테인 : 표시량(16.667 mg/ 83.34 mg)의 80% 이상 120% 이하\n(3) 총지아잔틴 : 표시량(3.333 mg/ 83.34 mg)의 80% 이상 120% 이하\n(4) 헥산(mg/kg) : 5.0 이하\n(5) 납(mg/kg) : 1.0 이하\n(6) 카드뮴(mg/kg) : 1.0 이하\n(7) 비소(mg/kg) : 1.0 이하\n(8) 수은(mg/kg) : 1.0 이하\n(9) 대장균군 : 음성\n(10) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[마리골드꽃추출물(지아잔틴함유)(제2026-9호)]\n(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색 또는 빨간 주황색의 내용물을 함유한 흑색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마리골드꽃추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼 클리어 눈 건강 루테인지아잔틴<small>마리골드꽃추출물</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>마리골드꽃추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>마리골드꽃추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색 또는 빨간 주황색의 내용물을 함유한 흑색의 타원형 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색 또는 빨간 주황색의 내용물을 함유한 흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>마리골드꽃추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Marigold flower extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>슈퍼 클리어 눈 건강 루테인지아잔틴<small>Marigold flower extract</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Marigold flower extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Marigold flower extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help maintain macular pigment density that may decline with aging and support eye health.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색 또는 빨간 주황색의 내용물을 함유한 흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Marigold flower extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "0431ffbb-b41b-4246-8fe0-62165167b699",
+  "productName": "라이토플렉스 U플러스",
+  "productNameEn": "라이토플렉스 U플러스",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211582",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[로즈힙분말]\n(국문) 관절 및 연골 건강에 도움을 줄 수 있음\n(영문) May help to maintain healthy joint and cartilage",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 황갈색의 분말\n ②Hyperoside : 표시량(0.25 mg/7,000 mg)의 60~140%\n ③납(mg/kg) : 0.8 이하 \n ④카드뮴(mg/kg) : 0.5 이하\n ⑤수은(mg/kg) : 0.3 이하\n ⑥비소(mg/kg) : 0.5 이하\n ⑦대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오",
+   "caution": "-알레르기 반응을 보이는 사람의 경우 섭취전 성분 확인 필요함\n-임산부, 수유부, 어린이의 섭취는 전문의와 상담 후 섭취를 권장함",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 황갈색의 분말",
+   "storage": "실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">로즈힙</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이토플렉스 U플러스<small>로즈힙</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>로즈힙</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>로즈힙</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 황갈색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 황갈색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>로즈힙 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Rosehip</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이토플렉스 U플러스<small>Rosehip</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Rosehip</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Rosehip</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with joint and cartilage health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 황갈색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Rosehip</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]
