@@ -1,0 +1,26 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 디오스민 300mg 캡슐 그룹 TM 저작(8줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "디오스민|300밀리그램|캡슐",
+  "meta": {
+    "titleKo": "디오스민 300mg 캡슐 (정맥순환 개선제)",
+    "titleEn": "Diosmin 300 mg Capsules (Venous Circulation Medicine)",
+    "ingKo": "디오스민 300밀리그램",
+    "ingEn": "Diosmin 300 mg",
+    "actionKo": "정맥 긴장도와 모세혈관 저항성을 높여 정맥부전 증상과 치질 관련 징후를 개선하는 약입니다.",
+    "actionEn": "A medicine that improves venous insufficiency symptoms and hemorrhoid-related signs by increasing vein tone and capillary resistance."
+  },
+  "effSummaries": {
+    "d8840da0": { "symKo": "정맥부전 관련 증상(다리 중압감, 통증 등) 개선, 모세혈관 취약증 장애의 보조치료, 치질 관련 징후 치료", "symEn": "Improvement of venous insufficiency symptoms (leg heaviness, pain), adjuvant treatment of capillary fragility disorders, treatment of hemorrhoid-related signs", "pointKo": "다리 무거움·통증 등 정맥순환 증상과 치질 징후에 쓰는 디오스민 제제입니다.", "pointEn": "A diosmin preparation for venous circulation symptoms such as leg heaviness and pain, and hemorrhoid signs." }
+  },
+  "cauSummaries": {},
+  "en": {
+    "d8840da0": "This medicine is used to improve symptoms related to venous insufficiency (heaviness in the legs, pain, etc.), as adjuvant treatment for disorders caused by capillary fragility, and to treat signs related to hemorrhoids.",
+    "3c4921cd": "Adults take 1 capsule (300 mg) per dose, 2 times a day (with lunch and dinner).",
+    "8047d758": "Adults take 1 tablet per dose, 2 times a day.",
+    "47856904": "If hemorrhoids recur or worsen, up to 1,200 to 1,800 mg per 1 day may be taken.",
+    "87db2425": "If hemorrhoids recur or worsen, up to 4 to 6 capsules (1,200 to 1,800 mg) per 1 day may be taken.",
+    "b7c5a1aa": "Adjust appropriately according to age and symptoms.",
+    "5d35a0a8": "Do not take this medicine for a long period.",
+    "dd7d1b2b": "If symptoms do not improve quickly, an anal examination and a review of the treatment are needed."
+  }
+}

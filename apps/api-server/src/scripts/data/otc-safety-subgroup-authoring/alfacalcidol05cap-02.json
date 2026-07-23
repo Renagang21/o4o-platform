@@ -1,0 +1,66 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "alfacalcidol05cap-02",
+  "order": 2002,
+  "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+  "safetyFp": "5cb7d1aabe41cbde",
+  "sourceRef": "d5b46e0c-15f1-4c1d-8da6-c2e56d5812da",
+  "sensitive": false,
+  "title": "알파칼시돌 0.5㎍ 연질캡슐 (활성형 비타민 D 제제)",
+  "expectEasyMd5": "492cbf43",
+  "masterIds": [
+    "2a80c422-6f9c-4ef7-9ca5-e0ff79ac264a",
+    "613621e8-81b5-433a-8a8b-2ee33fc89f81",
+    "99afb09f-0b32-4dd4-8aa9-8e9c39146597",
+    "f7aa7240-462f-4bc1-afd7-a5b805f55e74"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "492cbf43",
+    "names": [
+      "알파디연질캡슐(알파칼시돌)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 16,
+    "en": 8,
+    "total": 24
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 만성신부전, 부갑상선기능저하증, 비타민 D 저항성 구루병·골연화증에 있어서 비타민 D 대사이상에 수반되는 증상(저칼슘혈증, 테타니, 뼈의 통증, 뼈의 병변(변화) 등)의 개선과 골다공증에 사용합니다.",
+    "usage": "환자의 혈청 칼슘수치의 충분한 관리 하에 투여량을 조절합니다.\n\n성인은 만성신부전·골다공증의 경우, 1회 1~2캡슐(0.5～1 ㎍)씩, 1일 1회 경구투여(복용)합니다. 부갑상선기능저하증·기타 비타민 D 대사이상에 따른 질환의 경우, 1회 2~8캡슐(1～4 ㎍)씩, 1일 1회 경구투여(복용)합니다.\n\n어린이는 골다공증의 경우, 1회 체중 kg당 0.01～0.03 ㎍씩, 1일 1회 경구투여(복용)합니다. 기타 질환의 경우, 1회 체중 kg당 0.05～0.1 ㎍씩, 1일 1회 경구투여(복용)합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "고칼슘혈증, 고인산혈증, 고마그네슘혈증, Ca×P 생성물 ＞ 3.7 (mmol/L)2, 혈액 pH ＞ 7.44의 알칼리혈증(우유 알칼리 증후군, Burnett 증후군), 비타민 D 독성발현의 증후가 있는 환자, 이 약(비타민 D 또는 유도체 및 유사체) 및 이 약에 포함된 성분 과민증 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 어린이, 고령자(노인), 신장결석 경험자, 유육종증 환자, 황색5호(선셋옐로우 FCF) 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.\n\n수유부가 부득이하게 복용해야 하는 경우에는 수유하지 마십시오.\n\n마그네슘 함유제제, 비타민 D와 그 유도체, 칼슘 함유제제 또는 치아지드계 이뇨제와 함께 복용하지 마십시오.\n\n이 약을 복용하기 전에 디기탈리스를 복용 중인 환자, 콜레스티라민 같은 수지나 사하제인 미네랄 오일을 복용 중인 환자, 페니토인과 글루코코르티코이드, 콜레스티폴, 수크랄페이트 또는 알루미늄이 다량 함유된 제산제를 복용 중인 환자, 에스트로겐(에치닐에스트라디올, 노르에티스테론)을 복용 중인 환자, 바르비탈계 약물 또는 항전간제를 복용 중인 환자는 의사 또는 약사와 상의하십시오.\n\n소화기계(때때로 식욕부진, 구역, 구토, 설사, 변비, 위통 등의 위장장애, 위부불쾌감, 복부팽만감, 소화불량, 드물게 구갈(목마름), 구강내 이화감, 기타 다음·다갈증, 췌장염, 금속성 맛), 정신신경계(때때로 다리근육 경축, 두통, 머리무거움, 불면, 초조감, 무력감, 권태감, 드물게 어지러움, 저림, 졸음, 가슴쓰림, 어깨결림, 노인성 난청, 이명(귀울림), 기억력·기명력의 감퇴, 현성 정신병, 기타 의식장애, 등통증), 순환기계(때때로 경도의 혈압상승, 드물게 심계항진(두근거림), 기타 심부정맥), 신장(혈청 칼슘 상승을 수반하는 급성신부전, 때때로 BUN, 크레아티닌의 상승(신기능 저하), 드물게 신장결석, 기타 신석회증), 간장(AST, ALT, ALP, 드물게 LDH, GGTP의 상승을 수반하는 간기능장애, 황달), 피부(때때로 가려움, 발진, 드물게 열감), 눈(때때로 결막충혈, 기타 결막염, 각막 석회화, 눈부심), 골격계(때때로 관절주위의 석회화(화골형성), 기타 뼈의 통증), 드물게 쉰 목소리, 부종(부기), 기타 체중감소, 배뇨곤란, 다뇨(소변과다증), 야뇨, 전위성 석회화, 근육통, 콧물, 고열, 성욕감퇴, 단백뇨, 고콜레스테롤혈증 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "알파칼시돌 0.5마이크로그램",
+      "작용": "체내에서 활성형 비타민 D로 전환되어 칼슘 대사를 조절하고 비타민 D 대사이상 증상과 골다공증을 개선하는 약입니다.",
+      "주요 증상": "만성신부전·부갑상선기능저하증·비타민 D 저항성 구루병·골연화증의 비타민 D 대사이상 증상(저칼슘혈증, 테타니, 뼈 통증·병변) 개선, 골다공증",
+      "주의 대상": "고칼슘혈증·고인산혈증·고마그네슘혈증·알칼리혈증·비타민 D 독성 징후·성분 과민증 환자 복용 금지",
+      "선택 포인트": "비타민 D 대사이상 증상과 골다공증에 쓰는 활성형 비타민 D 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Alfacalcidol 0.5 mcg Soft Capsules (Active Vitamin D Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to improve symptoms accompanying vitamin D metabolism abnormalities (hypocalcemia, tetany, bone pain, bone lesions (changes), etc.) in chronic kidney failure, hypoparathyroidism, and vitamin D-resistant rickets and osteomalacia, and for osteoporosis.",
+    "usage": "Adjust the dose under sufficient monitoring of the patient's serum calcium levels. Adults take 1 to 2 capsules (0.5 to 1 mcg) per dose, 1 time a day, by mouth for chronic kidney failure and osteoporosis, and 2 to 8 capsules (1 to 4 mcg) per dose, 1 time a day, by mouth for hypoparathyroidism and other diseases caused by vitamin D metabolism abnormalities. Children take 0.01 to 0.03 mcg per kg of body weight per dose, 1 time a day, by mouth for osteoporosis. For other diseases, they take 0.05 to 0.1 mcg per kg of body weight per dose, 1 time a day, by mouth.",
+    "caution": "Do not take this medicine if you have hypercalcemia, hyperphosphatemia, hypermagnesemia, a Ca×P product > 3.7 (mmol/L)2, or alkalemia with blood pH > 7.44 (milk-alkali syndrome, Burnett's syndrome), if you have signs of vitamin D toxicity, or if you are hypersensitive to this medicine (vitamin D or its derivatives and analogues) or any ingredient contained in it. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, or are breastfeeding; are a child or elderly; have had kidney stones; have sarcoidosis; or are or have been hypersensitive to Yellow No. 5 (Sunset Yellow FCF). If a breastfeeding woman must take this medicine, do not breastfeed. Do not take this medicine together with magnesium-containing preparations, vitamin D and its derivatives, calcium-containing preparations, or thiazide diuretics. Before taking this medicine, consult a doctor or pharmacist if you are taking digitalis; resins such as cholestyramine or mineral oil laxatives; phenytoin and glucocorticoids, colestipol, sucralfate, or antacids containing large amounts of aluminum; estrogens (ethinylestradiol, norethisterone); or barbiturates or antiepileptic medicines. If reactions occur in the gastrointestinal system (sometimes gastrointestinal disturbances such as loss of appetite, nausea, vomiting, diarrhea, constipation, and stomach pain, stomach discomfort, abdominal bloating, indigestion, rarely dry mouth (thirst), abnormal sensations in the mouth, and other excessive drinking and thirst, pancreatitis, metallic taste), psychoneurological system (sometimes leg muscle cramps, headache, heaviness of the head, sleeplessness, irritability, weakness, malaise, rarely dizziness, numbness, drowsiness, heartburn, stiff shoulders, age-related hearing loss, ringing in the ears, decline in memory and retention, overt psychosis, and other disturbances of consciousness, back pain), circulatory system (sometimes mild increases in blood pressure, rarely palpitations, and other cardiac arrhythmia), kidneys (acute kidney failure accompanied by elevated serum calcium, sometimes elevated BUN and creatinine (decreased kidney function), rarely kidney stones, and other nephrocalcinosis), liver (liver function disorders accompanied by elevated AST, ALT, ALP, and rarely LDH and GGTP, jaundice), skin (sometimes itching, rash, rarely feeling of heat), eyes (sometimes conjunctival redness, and other conjunctivitis, corneal calcification, glare), skeletal system (sometimes calcification around the joints (ossification), and other bone pain), or rarely hoarse voice, swelling, and other weight loss, difficulty urinating, excessive urination (polyuria), nighttime urination, ectopic calcification, muscle pain, runny nose, high fever, decreased libido, protein in the urine, or high cholesterol occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Alfacalcidol 0.5 mcg",
+      "How it works": "A medicine converted in the body to active vitamin D that regulates calcium metabolism, improving symptoms of vitamin D metabolism abnormalities and osteoporosis.",
+      "Main symptoms": "Improvement of vitamin D metabolism abnormality symptoms (hypocalcemia, tetany, bone pain and lesions) in chronic kidney failure, hypoparathyroidism, and vitamin D-resistant rickets/osteomalacia; osteoporosis",
+      "Caution for": "Do not use with hypercalcemia, hyperphosphatemia, hypermagnesemia, alkalemia, signs of vitamin D toxicity, or hypersensitivity to its ingredients",
+      "Why this one": "An active vitamin D preparation for vitamin D metabolism abnormality symptoms and osteoporosis."
+    }
+  }
+}

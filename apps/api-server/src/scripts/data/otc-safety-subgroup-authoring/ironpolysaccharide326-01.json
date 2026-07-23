@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "ironpolysaccharide326-01",
+  "order": 3501,
+  "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+  "safetyFp": "5a38772b0e1c4588",
+  "sourceRef": "92b2cb43-c300-484b-88cc-8f13952ba328",
+  "sensitive": false,
+  "title": "폴리사카리드철착염 326.1mg 캡슐 (철분제)",
+  "expectEasyMd5": "645b9dee",
+  "masterIds": [
+    "3eedd58b-d3d1-41f7-99d1-541e0f625767",
+    "55e221ff-179b-4013-a75f-36aa19b67712",
+    "ca78551f-9e30-4c81-964c-c1e52c161afc"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "645b9dee",
+    "names": [
+      "헤모데이캡슐(폴리사카리드철착염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 철 결핍성 빈혈에 사용합니다.",
+    "usage": "성인은 1회 1캡슐(150 ㎎), 1일 1회 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 만 12개월 미만의 영아, 혈색소증(철 대사 이상으로 철이 간장, 췌장에 침착하는 질환), 헤모시데린 침착증, 철 이용 장애, 비철결핍성 빈혈, 골수 부족에 의한 빈혈, 만성 용혈성빈혈, 철 과잉증, 감염이나 종양으로 인한 철 결핍성 빈혈, 만성 췌장염, 간경변, 갈락토오스불내성, Lapp 유당분해효소결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 소화성궤양, 만성궤양성대장염, 국한성대장염 등의 위장질환 환자, 심장ㆍ순환기계기능장애, 발작성 야간 혈색소뇨증, 신장애, 저단백혈증 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 항생제, 제산제와 함께 복용하지 마십시오.철 함유제제(철분제, MRI용 간장 조영제 등), 항알도스테론제, 트리암테렌, 퀴놀론계, 페니실라민, 콜레스티라민, 췌장엑스 및 비타민 E와 같은 제제, 디포스폰산 염류, 티록신, 세프디니르 제제, 200 ㎎ 이상의 아스코르빈산(비타민 C)과 함께 복용 시 의사 또는 약사와 상의하십시오.녹차, 홍차 등 탄닌을 함유하는 차 및 우유ㆍ유제품은 복용 중, 복용 전후에는 피하십시오.\n\n두드러기, 가려움, 햇빛 노출시 피부 과민반응, 복부ㆍ위통증, 위 경련, 구토, 설사, 열, 혼수, 때때로 AST, ALT의 상승, 드물게 ALP 상승, 구역, 식욕부진, 변비, 흑변, 치아 변색, 위부불쾌감 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "폴리사카리드철착염 326.1밀리그램 (철로서 150밀리그램)",
+      "작용": "부족한 철분을 보충하여 철 결핍성 빈혈을 개선하는 철분제입니다.",
+      "주요 증상": "철 결핍성 빈혈",
+      "주의 대상": "과민증, 12개월 미만 영아, 혈색소증·헤모시데린침착증, 비철결핍성 빈혈, 철 과잉, 만성 췌장염·간경변, 갈락토오스 불내성 복용 금지",
+      "선택 포인트": "철 결핍성 빈혈에 쓰는 폴리사카리드철 철분제입니다."
+    }
+  },
+  "en": {
+    "title": "Iron Polysaccharide Complex 326.1 mg Capsules (Iron Supplement Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for iron deficiency anemia.",
+    "usage": "Adults take 1 capsule (150 mg) per dose, 1 time a day.",
+    "caution": "Do not take this medicine if you are hypersensitive to it; are an infant under 12 months old; or have hemochromatosis (a disease in which iron is deposited in the liver and pancreas due to abnormal iron metabolism), hemosiderosis, impaired iron utilization, non-iron-deficiency anemia, anemia due to bone marrow insufficiency, chronic hemolytic anemia, iron overload, iron deficiency anemia caused by infection or tumor, chronic pancreatitis, liver cirrhosis, or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have gastrointestinal diseases such as peptic ulcers, chronic ulcerative colitis, or regional colitis, or have heart or circulatory system dysfunction, paroxysmal nocturnal hemoglobinuria, kidney disorders, or hypoproteinemia. Follow the prescribed dosage and administration carefully. When giving this medicine to children, give it under the guidance and supervision of a guardian. If symptoms do not improve after taking it for about 1 month, stop taking this medicine immediately and consult a doctor or pharmacist. Do not take this medicine together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a doctor or pharmacist when taking it together with iron-containing preparations (iron supplements, liver contrast agents for MRI, etc.), anti-aldosterone agents, triamterene, quinolones, penicillamine, cholestyramine, preparations such as pancreatic extract and vitamin E, diphosphonate salts, thyroxine, cefdinir preparations, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, and milk and dairy products, while taking this medicine and before and after taking it. If hives, itching, skin hypersensitivity reactions on exposure to sunlight, abdominal and stomach pain, stomach cramps, vomiting, diarrhea, fever, coma, sometimes elevated AST and ALT, rarely elevated ALP, nausea, loss of appetite, constipation, black stools, tooth discoloration, or stomach discomfort occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Iron polysaccharide complex 326.1 mg (150 mg as iron)",
+      "How it works": "An iron supplement that improves iron deficiency anemia by replenishing iron.",
+      "Main symptoms": "Iron deficiency anemia",
+      "Caution for": "Do not use with hypersensitivity, for infants under 12 months, hemochromatosis or hemosiderosis, non-iron-deficiency anemia, iron overload, chronic pancreatitis or cirrhosis, or galactose intolerance",
+      "Why this one": "An iron polysaccharide supplement for iron deficiency anemia."
+    }
+  }
+}

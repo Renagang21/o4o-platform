@@ -1,0 +1,29 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 은행엽건조엑스 80mg 정 그룹 TM 저작(9줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "은행엽건조엑스|80밀리그램|정",
+  "meta": {
+    "titleKo": "은행엽건조엑스 80mg 정 (혈액순환 개선제)",
+    "titleEn": "Ginkgo Leaf Dried Extract 80 mg Tablets (Blood Circulation Medicine)",
+    "ingKo": "은행엽건조엑스 80밀리그램",
+    "ingEn": "Ginkgo leaf dried extract 80 mg",
+    "actionKo": "말초혈액순환을 개선하여 간헐성파행증과 어지러움·이명, 치매성 증상을 수반하는 기질성 뇌기능장애를 치료하는 약입니다.",
+    "actionEn": "A medicine that improves peripheral blood circulation to treat intermittent claudication, dizziness, ringing in the ears, and organic brain dysfunction with dementia-like symptoms."
+  },
+  "effSummaries": {
+    "3cebcb24": { "symKo": "말초동맥순환장애(간헐성파행증), 어지러움, 혈관성·퇴행성 이명, 치매성 증상(기억력감퇴·집중력장애·우울감 등)을 수반하는 기질성 뇌기능장애", "symEn": "Peripheral arterial circulation disorders (intermittent claudication), dizziness, vascular and degenerative tinnitus, and organic brain dysfunction with dementia-like symptoms (memory decline, poor concentration, depressed mood)", "pointKo": "말초순환장애와 어지러움·이명·기억력감퇴 등에 쓰는 은행엽 제제입니다.", "pointEn": "A ginkgo leaf preparation for peripheral circulation disorders, dizziness, tinnitus, and memory decline." }
+  },
+  "cauSummaries": {
+    "2b6f2ad2": { "watchKo": "과민증, 12세 이하 소아, 임부, 갈락토오스 불내성 등 유전적 문제, 수술 예정자 복용 금지", "watchEn": "Do not use with hypersensitivity, for children 12 or younger, if pregnant, with hereditary problems such as galactose intolerance, or before scheduled surgery" }
+  },
+  "en": {
+    "3cebcb24": "This medicine is used to treat peripheral arterial circulation disorders (intermittent claudication), and to treat dizziness, vascular and degenerative tinnitus (ringing in the ears), and organic brain dysfunction accompanied by dementia-like symptoms such as ringing in the ears, headache, memory decline, difficulty concentrating, depressed mood, and dizziness.",
+    "897be10a": "For peripheral arterial circulation disorders, dizziness, and ringing in the ears, adults take 1/2 tablet (40 mg) per dose, 3 times a day, or 1 tablet (80 mg) per dose, 2 times a day.",
+    "0259de86": "For organic brain dysfunction, adults take 1/2 to 1 tablet (40 to 80 mg) per dose, 3 times a day, or 1.5 tablets (120 mg) per dose, 2 times a day.",
+    "2b6f2ad2": "Do not take this medicine if you are hypersensitive to it, are a child 12 years old or younger, are pregnant, have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption, or have surgery scheduled.",
+    "3b5a804d": "This medicine is not a treatment for high blood pressure, so do not give it to patients with high blood pressure requiring special treatment.",
+    "f159aa13": "Before using this medicine, consult a doctor or pharmacist if you are breastfeeding.",
+    "c031804e": "Consult a doctor or pharmacist when taking this medicine together with anticoagulants (e.g., phenprocoumon, warfarin) or antiplatelet agents (e.g., clopidogrel, acetylsalicylic acid, and other nonsteroidal anti-inflammatory drugs).",
+    "256fc8f2": "In rare cases, if mild gastrointestinal discomfort, headache, or allergic skin reactions occur, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "7c324822": "If symptoms do not improve after 3 months, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

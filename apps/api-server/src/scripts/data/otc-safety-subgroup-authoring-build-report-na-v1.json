@@ -3,101 +3,21 @@
   "agent": "나",
   "built": [
     {
-      "slug": "cetirizine10cap-01",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "6331acb23a01df21",
-      "T": 3,
-      "order": 1901,
-      "sourceRef": "21e8b9f3-4008-4cae-845a-036f8f96542d",
-      "koHtmlLen": 2722,
-      "enHtmlLen": 5400
-    },
-    {
-      "slug": "cetirizine10cap-02",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "17c5d428eb158d4f",
-      "T": 2,
-      "order": 1902,
-      "sourceRef": "dcca6a51-199f-4cb6-8d48-2e4ee9cc9956",
-      "koHtmlLen": 2653,
-      "enHtmlLen": 5302
-    },
-    {
-      "slug": "cetirizine10cap-03",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "374205afe6cb9878",
-      "T": 2,
-      "order": 1903,
-      "sourceRef": "7e1ec4aa-499e-4a31-82af-a3d018ca3ef8",
-      "koHtmlLen": 2810,
-      "enHtmlLen": 5671
-    },
-    {
-      "slug": "cetirizine10cap-04",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "4680e03bc7c59233",
-      "T": 2,
-      "order": 1904,
-      "sourceRef": "a8522909-9ada-4219-88da-e57216d6de48",
-      "koHtmlLen": 2818,
-      "enHtmlLen": 5674
-    },
-    {
-      "slug": "cetirizine10cap-05",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "4bce0f1df379d467",
-      "T": 2,
-      "order": 1905,
-      "sourceRef": "84ecdedf-44d8-4f82-8469-c86ba5abf8b9",
-      "koHtmlLen": 2794,
-      "enHtmlLen": 5662
-    },
-    {
-      "slug": "cetirizine10cap-06",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "c9c500f119982e53",
-      "T": 2,
-      "order": 1906,
-      "sourceRef": "02f841dc-d115-4499-8a97-b5f1fc5b2039",
-      "koHtmlLen": 2773,
-      "enHtmlLen": 5539
-    },
-    {
-      "slug": "cetirizine10cap-07",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "ce05f0fb2b4616dd",
-      "T": 2,
-      "order": 1907,
-      "sourceRef": "2961aaac-8122-4e70-812c-b07f6944b775",
-      "koHtmlLen": 2804,
-      "enHtmlLen": 5657
-    },
-    {
-      "slug": "cetirizine10cap-08",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "d1d8f2ce00e772c8",
-      "T": 2,
-      "order": 1908,
-      "sourceRef": "c5860f5e-af59-4842-8866-8ead46bd8bb6",
-      "koHtmlLen": 2818,
-      "enHtmlLen": 5669
-    },
-    {
-      "slug": "cetirizine10cap-09",
-      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
-      "safetyFp": "d605689d5fd9ea3f",
-      "T": 2,
-      "order": 1909,
-      "sourceRef": "1e995eb3-079c-44e2-8d82-c0d0713d52e9",
-      "koHtmlLen": 2806,
-      "enHtmlLen": 5815
+      "slug": "erdosteine300-01",
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "safetyFp": "ed0b9e1c34407e10",
+      "T": 4,
+      "order": 3801,
+      "sourceRef": "7638593b-9304-482a-84a0-fb3000ba25a5",
+      "koHtmlLen": 1807,
+      "enHtmlLen": 3180
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 9,
-    "builtMasters": 19,
+    "builtFiles": 1,
+    "builtMasters": 4,
     "holds": 0,
     "missingTm": 0
   }

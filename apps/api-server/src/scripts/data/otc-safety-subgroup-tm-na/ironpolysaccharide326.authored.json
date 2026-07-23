@@ -1,0 +1,30 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 폴리사카리드철착염 326.1mg 캡슐 그룹 TM 저작(9줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+  "meta": {
+    "titleKo": "폴리사카리드철착염 326.1mg 캡슐 (철분제)",
+    "titleEn": "Iron Polysaccharide Complex 326.1 mg Capsules (Iron Supplement Medicine)",
+    "ingKo": "폴리사카리드철착염 326.1밀리그램 (철로서 150밀리그램)",
+    "ingEn": "Iron polysaccharide complex 326.1 mg (150 mg as iron)",
+    "actionKo": "부족한 철분을 보충하여 철 결핍성 빈혈을 개선하는 철분제입니다.",
+    "actionEn": "An iron supplement that improves iron deficiency anemia by replenishing iron."
+  },
+  "effSummaries": {
+    "0896b4b0": { "symKo": "철 결핍성 빈혈", "symEn": "Iron deficiency anemia", "pointKo": "철 결핍성 빈혈에 쓰는 폴리사카리드철 철분제입니다.", "pointEn": "An iron polysaccharide supplement for iron deficiency anemia." }
+  },
+  "cauSummaries": {
+    "41688d17": { "watchKo": "6세 이하 어린이 과량 복용 시 철분 중독 사망 위험 — 어린이 손이 닿지 않게 보관", "watchEn": "Overdose in children 6 or younger can cause fatal iron poisoning — keep out of children's reach" },
+    "69c8146f": { "watchKo": "과민증, 12개월 미만 영아, 혈색소증·헤모시데린침착증, 비철결핍성 빈혈, 철 과잉, 만성 췌장염·간경변, 갈락토오스 불내성 복용 금지", "watchEn": "Do not use with hypersensitivity, for infants under 12 months, hemochromatosis or hemosiderosis, non-iron-deficiency anemia, iron overload, chronic pancreatitis or cirrhosis, or galactose intolerance" }
+  },
+  "en": {
+    "0896b4b0": "This medicine is used for iron deficiency anemia.",
+    "3650488e": "Adults take 1 capsule (150 mg) per dose, 1 time a day.",
+    "7d8936d3": "Adults take 1 capsule (150 mg as iron), 1 time a day.",
+    "46c3e31b": "Do not take this medicine if you are hypersensitive to it; are an infant under 12 months old; or have hemochromatosis (a disease in which iron is deposited in the liver and pancreas due to abnormal iron metabolism), hemosiderosis, non-iron-deficiency anemia, impaired iron utilization, iron overload, anemia due to bone marrow insufficiency, chronic hemolytic anemia, iron deficiency anemia caused by infection or tumor, chronic pancreatitis, or liver cirrhosis. Before taking this medicine, consult a doctor or pharmacist if you have gastrointestinal diseases such as peptic ulcers, chronic ulcerative colitis, or regional colitis, or have heart or circulatory system dysfunction, paroxysmal nocturnal hemoglobinuria, kidney disorders, or hypoproteinemia. Follow the prescribed dosage and administration carefully. When giving this medicine to children, give it under the guidance and supervision of a guardian.",
+    "69c8146f": "Do not take this medicine if you are hypersensitive to it; are an infant under 12 months old; or have hemochromatosis (a disease in which iron is deposited in the liver and pancreas due to abnormal iron metabolism), hemosiderosis, impaired iron utilization, non-iron-deficiency anemia, anemia due to bone marrow insufficiency, chronic hemolytic anemia, iron overload, iron deficiency anemia caused by infection or tumor, chronic pancreatitis, liver cirrhosis, or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have gastrointestinal diseases such as peptic ulcers, chronic ulcerative colitis, or regional colitis, or have heart or circulatory system dysfunction, paroxysmal nocturnal hemoglobinuria, kidney disorders, or hypoproteinemia. Follow the prescribed dosage and administration carefully. When giving this medicine to children, give it under the guidance and supervision of a guardian. If symptoms do not improve after taking it for about 1 month, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "41688d17": "An overdose in children 6 years old or younger can cause fatal iron poisoning, so keep this medicine out of the reach of children.",
+    "bd0c0921": "Do not take this medicine together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a doctor or pharmacist when taking it together with iron-containing preparations (iron supplements, liver contrast agents for MRI, etc.), anti-aldosterone agents, triamterene, diphosphonate salts, thyroxine, cefdinir preparations, quinolones, penicillamine, cholestyramine, preparations such as pancreatic extract and vitamin E, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, and milk and dairy products, while taking this medicine and before and after taking it.",
+    "dde26243": "Do not take this medicine together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a doctor or pharmacist when taking it together with iron-containing preparations (iron supplements, liver contrast agents for MRI, etc.), anti-aldosterone agents, triamterene, quinolones, penicillamine, cholestyramine, preparations such as pancreatic extract and vitamin E, diphosphonate salts, thyroxine, cefdinir preparations, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, and milk and dairy products, while taking this medicine and before and after taking it.",
+    "3fa33a46": "If hives, itching, skin hypersensitivity reactions on exposure to sunlight, abdominal and stomach pain, stomach cramps, vomiting, diarrhea, fever, coma, sometimes elevated AST and ALT, rarely elevated ALP, nausea, loss of appetite, constipation, black stools, tooth discoloration, or stomach discomfort occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

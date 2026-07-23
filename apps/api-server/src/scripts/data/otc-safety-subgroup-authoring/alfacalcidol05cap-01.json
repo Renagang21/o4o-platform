@@ -1,0 +1,71 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "alfacalcidol05cap-01",
+  "order": 2001,
+  "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+  "safetyFp": "8903739732775906",
+  "sourceRef": "b291a291-305c-44e3-8126-65e6cb29748f",
+  "sensitive": false,
+  "title": "알파칼시돌 0.5㎍ 연질캡슐 (활성형 비타민 D 제제)",
+  "expectEasyMd5": "f6a4a9d6",
+  "masterIds": [
+    "2197ee37-b87c-49e9-8e27-bbbffddf6d1b",
+    "2e9d75d3-001a-4205-9fcb-c7ca2aeaca75",
+    "31e0969d-0ca9-433b-add8-a02d1d78c3c3",
+    "3d68b624-d3da-4cb3-9571-0f6d12ea6315",
+    "3ddafa2c-8fab-4679-801a-08e17655d9ac",
+    "7e077db4-8d6a-4ba3-851d-b4c6a86526f1",
+    "7fea47c8-93dd-4dbb-b986-bf670090ad84",
+    "bdcee2f3-44c6-4499-b886-1a6a464666ab",
+    "ca82a4ac-c922-4fab-8601-aa5345bc313a"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "f6a4a9d6",
+    "names": [
+      "화니돌0.5마이크로그램연질캡슐(알파칼시돌)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 36,
+    "en": 18,
+    "total": 54
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 만성신부전, 부갑상선기능저하증, 비타민 D 저항성 구루병·골연화증 질환의 비타민 D 대사이상에 수반되는 증상(저칼슘혈증, 테타니, 뼈의 통증, 뼈의 병변(변화) 등)의 개선과 골다공증에 사용합니다.",
+    "usage": "성인은 만성신부전·골다공증에 1일 1회 1~2캡슐(0.5~1 ㎍)을 복용하며 부갑상선기능저하증, 기타 비타민 D 대사이상에 따른 질환에 1일 1회 2~8캡슐(1~4 ㎍)을 복용합니다.\n\n어린이는 골다공증에 1일 1회 체중 kg당 0.01~0.03 ㎍을 복용하며 기타질환에는 1일 1회 체중 kg당 0.05~0.1 ㎍을 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 고칼슘혈증, 고인산혈증, 고마그네슘혈증, Ca×P 생성물 ＞ 3.7 (mmol/L)2 환자, 혈액 pH ＞ 7.44의 알칼리혈증(우유 알칼리 증후군, Burnett 증후군), 비타민 D 독성발현의 증후가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 어린이, 고령자, 신장결석 경험자, 유육종증 환자, 황색 203호·퀴놀린옐로우 WS 과민증 환자 또는 알레르기 반응 경험자는 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n식이 또는 보급제로서 칼슘섭취에 대한 지시를 준수하십시오.\n\n이 약을 복용하는 동안 마그네슘 함유제제, 비타민 D와 그 유도체, 칼슘 함유제제 또는 티아지드계 이뇨제를 복용하지 마십시오.\n\n디기탈리스, 콜레스티라민 같은 수지나 사하제인 미네랄 오일, 페니토인과 글루코코르티코이드, 콜레스티폴, 수크랄페이트 또는 알루미늄이 다량 함유된 제산제, 에스트로겐(에티닐에스트라디올, 노르에티스테론), 바르비탈계 약물 또는 항전간제를 복용 중인 환자는 의사 또는 약사와 상의하십시오.\n\n때때로 식욕부진, 구역, 구토, 설사, 변비, 위통 등의 위장장애, 위부불쾌감, 복부팽만감, 소화불량, 드물게 구갈(목마름), 구강내 이화감, 다갈증, 췌장염, 금속성 맛, 다리근육 경축, 두통, 머리무거움, 불면, 초조감, 무력감, 권태감, 어지러움, 저림, 졸음, 가슴쓰림, 어깨결림, 노인성 난청, 이명(귀울림), 기억력·기명력의 감퇴, 현성 정신병, 의식장애, 등통증, 경도의 혈압상승, 심계항진(두근거림), 심부정맥, 급성 신부전, BUN, 크레아티닌의 상승(신기능 저하), 신장결석, 신석회증, 간기능장애, 황달, 가려움, 발진, 열감, 결막충혈, 기타 결막염, 각막 석회화, 눈부심, 관절주위의 석회화(화골형성), 뼈의 통증, 쉰 목소리, 부종(부기), 체중감소, 배뇨곤란, 다뇨(소변과다증), 야뇨, 전위성 석회화, 근육통, 콧물, 고열, 성욕감퇴, 단백뇨, 고콜레스테롤혈증 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "알파칼시돌 0.5마이크로그램",
+      "작용": "체내에서 활성형 비타민 D로 전환되어 칼슘 대사를 조절하고 비타민 D 대사이상 증상과 골다공증을 개선하는 약입니다.",
+      "주요 증상": "만성신부전·부갑상선기능저하증·비타민 D 저항성 구루병·골연화증의 비타민 D 대사이상 증상(저칼슘혈증, 테타니, 뼈 통증·병변) 개선, 골다공증",
+      "주의 대상": "과민증·고칼슘혈증·고인산혈증·고마그네슘혈증·알칼리혈증·비타민 D 독성 징후 환자 복용 금지",
+      "선택 포인트": "비타민 D 대사이상 증상과 골다공증에 쓰는 활성형 비타민 D 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Alfacalcidol 0.5 mcg Soft Capsules (Active Vitamin D Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to improve symptoms accompanying vitamin D metabolism abnormalities (hypocalcemia, tetany, bone pain, bone lesions (changes), etc.) in the diseases of chronic kidney failure, hypoparathyroidism, and vitamin D-resistant rickets and osteomalacia, and for osteoporosis.",
+    "usage": "Adults take 1 to 2 capsules (0.5 to 1 mcg) 1 time a day for chronic kidney failure and osteoporosis, and 2 to 8 capsules (1 to 4 mcg) 1 time a day for hypoparathyroidism and other diseases caused by vitamin D metabolism abnormalities. Children take 0.01 to 0.03 mcg per kg of body weight 1 time a day for osteoporosis, and 0.05 to 0.1 mcg per kg of body weight 1 time a day for other diseases.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, if you have hypercalcemia, hyperphosphatemia, hypermagnesemia, or a Ca×P product > 3.7 (mmol/L)2, or alkalemia with blood pH > 7.44 (milk-alkali syndrome, Burnett's syndrome), or if you have signs of vitamin D toxicity. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, or are breastfeeding; are a child or elderly; have had kidney stones; have sarcoidosis; or are hypersensitive to Yellow No. 203 (Quinoline Yellow WS) or have experienced allergic reactions to it. Follow the prescribed dosage and administration carefully. Follow the instructions on calcium intake from your diet or from supplements. While taking this medicine, do not take magnesium-containing preparations, vitamin D and its derivatives, calcium-containing preparations, or thiazide diuretics. Consult a doctor or pharmacist if you are taking digitalis; resins such as cholestyramine or mineral oil laxatives; phenytoin and glucocorticoids, colestipol, sucralfate, or antacids containing large amounts of aluminum; estrogens (ethinylestradiol, norethisterone); or barbiturates or antiepileptic medicines. If sometimes gastrointestinal disturbances such as loss of appetite, nausea, vomiting, diarrhea, constipation, and stomach pain, stomach discomfort, abdominal bloating, and indigestion, rarely dry mouth (thirst), abnormal sensations in the mouth, excessive thirst, pancreatitis, metallic taste, leg muscle cramps, headache, heaviness of the head, sleeplessness, irritability, weakness, malaise, dizziness, numbness, drowsiness, heartburn, stiff shoulders, age-related hearing loss, ringing in the ears, decline in memory and retention, overt psychosis, disturbances of consciousness, back pain, mild increases in blood pressure, palpitations, cardiac arrhythmia, acute kidney failure, elevated BUN and creatinine (decreased kidney function), kidney stones, nephrocalcinosis, liver function disorders, jaundice, itching, rash, feeling of heat, conjunctival redness, other conjunctivitis, corneal calcification, glare, calcification around the joints (ossification), bone pain, hoarse voice, swelling, weight loss, difficulty urinating, excessive urination (polyuria), nighttime urination, ectopic calcification, muscle pain, runny nose, high fever, decreased libido, protein in the urine, or high cholesterol occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Alfacalcidol 0.5 mcg",
+      "How it works": "A medicine converted in the body to active vitamin D that regulates calcium metabolism, improving symptoms of vitamin D metabolism abnormalities and osteoporosis.",
+      "Main symptoms": "Improvement of vitamin D metabolism abnormality symptoms (hypocalcemia, tetany, bone pain and lesions) in chronic kidney failure, hypoparathyroidism, and vitamin D-resistant rickets/osteomalacia; osteoporosis",
+      "Caution for": "Do not use with hypersensitivity to this medicine, hypercalcemia, hyperphosphatemia, hypermagnesemia, alkalemia, or signs of vitamin D toxicity",
+      "Why this one": "An active vitamin D preparation for vitamin D metabolism abnormality symptoms and osteoporosis."
+    }
+  }
+}

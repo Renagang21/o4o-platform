@@ -1,0 +1,32 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. L-시스틴 500mg 연질캡슐 그룹 TM 저작(11줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+  "meta": {
+    "titleKo": "L-시스틴 500mg 연질캡슐 (피부·모발 보조치료제)",
+    "titleEn": "L-Cystine 500 mg Soft Capsules (Skin and Hair Adjuvant Medicine)",
+    "ingKo": "L-시스틴 500밀리그램",
+    "ingEn": "L-cystine 500 mg",
+    "actionKo": "각질 형성에 필요한 아미노산을 보충하여 습진·여드름과 손발톱·머리카락 갈라짐 등 각질부위 질환의 보조치료에 쓰는 약입니다.",
+    "actionEn": "A medicine that supplies an amino acid needed for keratin formation, used as adjuvant treatment for eczema, acne, and keratin-area conditions such as splitting nails and hair."
+  },
+  "effSummaries": {
+    "60fda01a": { "symKo": "습진·여드름의 보조치료, 손톱·발톱·머리카락이 쉽게 갈라지는 각질부위 질환의 보조치료", "symEn": "Adjuvant treatment of eczema and acne, and of keratin-area conditions such as easily splitting fingernails, toenails, and hair", "pointKo": "습진·여드름과 손발톱·모발 갈라짐에 쓰는 L-시스틴 보조치료제입니다.", "pointEn": "An L-cystine adjuvant medicine for eczema, acne, and splitting nails and hair." }
+  },
+  "cauSummaries": {
+    "037720f9": { "watchKo": "중증 신기능 장애·간성혼수, 6세 이하 소아, 시스틴뇨증, 대두유·콩·땅콩 과민증 환자 복용 금지", "watchEn": "Do not use with severe kidney dysfunction or hepatic coma, for children 6 or younger, with cystinuria, or with soybean oil, soybean, or peanut hypersensitivity" },
+    "80f7d2a2": { "watchKo": "중증 신기능 장애·간성혼수, 6세 이하 소아, 시스틴뇨증, 대두유·콩·땅콩 과민증 환자 복용 금지", "watchEn": "Do not use with severe kidney dysfunction or hepatic coma, for children 6 or younger, with cystinuria, or with soybean oil, soybean, or peanut hypersensitivity" }
+  },
+  "en": {
+    "60fda01a": "This medicine is used as adjuvant treatment for eczema and acne, and as adjuvant treatment for conditions of keratin areas such as fingernails, toenails, or hair that split easily.",
+    "1fad28f0": "Take 2 to 4 capsules (1,000 to 2,000 mg) per 1 day, for 10 to 20 days out of 1 month.",
+    "e89af9c5": "Take 1,000 to 2,000 mg of this medicine per 1 day, for 10 to 20 days out of 1 month.",
+    "037720f9": "Do not take this medicine if you have severe kidney dysfunction or hepatic coma, are a child 6 years old or younger, have cystinuria, are hypersensitive to soybean oil or have experienced allergic reactions to it, or are hypersensitive to soybeans or peanuts.",
+    "80f7d2a2": "Do not take this medicine if you have severe kidney dysfunction or hepatic coma, are a child 6 years old or younger, have cystinuria, are hypersensitive to soybean oil or have experienced allergies to it, or are hypersensitive to soybeans or peanuts.",
+    "c0085c69": "Before taking this medicine, consult a doctor or pharmacist if you are hypersensitive to it or have kidney stones (nephrolithiasis).",
+    "f88bad97": "Before taking this medicine, consult a doctor or pharmacist if you are hypersensitive to it; have kidney stones (nephrolithiasis); have fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or must use lipid emulsions with caution; or are hypersensitive to Yellow No. 5 (Sunset Yellow FCF) or have experienced allergies to it.",
+    "26152e9f": "If sometimes nausea, or rarely diarrhea, dry mouth, or mild abdominal pain occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "4d7c6f40": "Sometimes nausea, and rarely diarrhea, dry mouth (thirst), and mild abdominal (stomach) pain may occur; in this case, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "0f06fc5c": "If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist.",
+    "36a38728": "If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist."
+  }
+}

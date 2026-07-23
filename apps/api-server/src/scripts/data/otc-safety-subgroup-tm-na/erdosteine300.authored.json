@@ -1,0 +1,26 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 에르도스테인 300mg 정 그룹 TM 저작(6줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "에르도스테인|300밀리그램|정",
+  "meta": {
+    "titleKo": "에르도스테인 300mg 정 (거담제)",
+    "titleEn": "Erdosteine 300 mg Tablets (Expectorant Medicine)",
+    "ingKo": "에르도스테인 300밀리그램",
+    "ingEn": "Erdosteine 300 mg",
+    "actionKo": "가래를 묽게 하여 배출을 돕는 점액용해 거담제입니다.",
+    "actionEn": "A mucolytic expectorant that thins phlegm and helps cough it up."
+  },
+  "effSummaries": {
+    "c45ae129": { "symKo": "급·만성 호흡기질환에서의 점액용해 및 거담", "symEn": "Mucolysis and expectoration in acute and chronic respiratory diseases", "pointKo": "급·만성 호흡기질환의 가래 배출에 쓰는 에르도스테인 거담제입니다.", "pointEn": "An erdosteine expectorant for phlegm in acute and chronic respiratory diseases." }
+  },
+  "cauSummaries": {
+    "a9984d8b": { "watchKo": "과민증, 간경변, 시스타티오닌 합성효소 결핍, 소화성궤양, 중증 신장장애(크레아티닌 청소율 25 미만) 복용 금지", "watchEn": "Do not use with hypersensitivity, liver cirrhosis, cystathionine synthase deficiency, peptic ulcers, or severe kidney disorders (creatinine clearance below 25)" }
+  },
+  "en": {
+    "c45ae129": "This medicine is used for mucolysis (thinning mucus) and expectoration in acute and chronic respiratory diseases.",
+    "082b1045": "Adults take 1 tablet (300 mg) per dose, 2 to 3 times a day. When taking this medicine for acute respiratory diseases, do not take it for more than 10 consecutive days.",
+    "a9984d8b": "Do not take this medicine if you are hypersensitive to it, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcers, or severe kidney disorders (creatinine clearance < 25 mL/min).",
+    "7dd69ce0": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or have mild or moderate liver disorders.",
+    "afb01c81": "Consult a doctor or pharmacist when taking this medicine together with cough medicines.",
+    "8df33f06": "Headache, cold symptoms, difficulty breathing, taste abnormalities, nausea, vomiting, diarrhea, upper abdominal pain, abdominal pain, heartburn, hives, redness (erythema), and eczema may occur."
+  }
+}

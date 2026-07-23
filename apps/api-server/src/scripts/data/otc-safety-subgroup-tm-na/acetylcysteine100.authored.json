@@ -1,0 +1,38 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 아세틸시스테인 100mg 캡슐 그룹 TM 저작(16줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+  "meta": {
+    "titleKo": "아세틸시스테인 100mg 캡슐 (거담제)",
+    "titleEn": "Acetylcysteine 100 mg Capsules (Expectorant Medicine)",
+    "ingKo": "아세틸시스테인 100밀리그램",
+    "ingEn": "Acetylcysteine 100 mg",
+    "actionKo": "가래를 묽게 하여 배출을 쉽게 하는 점액용해 거담제입니다.",
+    "actionEn": "A mucolytic expectorant that thins phlegm and makes it easier to cough up."
+  },
+  "effSummaries": {
+    "19dfa642": { "symKo": "급·만성기관지염, 기관지천식, 후두염, 부비동염, 낭성섬유증에서의 객담배출곤란", "symEn": "Difficulty expelling phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis, and cystic fibrosis", "pointKo": "가래 배출이 어려운 호흡기 질환에 쓰는 점액용해 거담제입니다.", "pointEn": "A mucolytic expectorant for respiratory conditions with difficulty expelling phlegm." },
+    "498572bf": { "symKo": "급·만성기관지염, 기관지천식, 후두염, 부비동염, 낭성섬유증의 객담배출곤란", "symEn": "Difficulty expelling phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis, and cystic fibrosis", "pointKo": "가래 배출이 어려운 호흡기 질환에 쓰는 점액용해 거담제입니다.", "pointEn": "A mucolytic expectorant for respiratory conditions with difficulty expelling phlegm." }
+  },
+  "cauSummaries": {
+    "6d58e027": { "watchKo": "과민증, 위·십이지장궤양 환자, 2세 미만 영아, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, gastric or duodenal ulcers, for infants under 2, or with hereditary problems such as galactose intolerance" },
+    "ec90c404": { "watchKo": "과민증, 위·십이지장궤양 환자, 2세 미만 영아 복용 금지", "watchEn": "Do not use with hypersensitivity, gastric or duodenal ulcers, or for infants under 2" }
+  },
+  "en": {
+    "19dfa642": "This medicine is used for difficulty expelling phlegm in the diseases of acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis, and cystic fibrosis.",
+    "498572bf": "This medicine is used for difficulty expelling phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis, and cystic fibrosis.",
+    "4ea2258f": "For acute conditions, adults usually take 2 capsules (200 mg) per 1 dose, 3 times a day, and children 6 to 14 years old take 2 capsules (200 mg) per 1 dose, 2 times a day, before meals with a small amount of water.",
+    "803068f8": "For acute conditions, adults take 2 capsules (200 mg) per 1 dose, 3 times a day, and children 6 to 14 years old take 2 capsules (200 mg) per 1 dose, 2 times a day, before meals with a small amount of water.",
+    "514ea400": "For chronic conditions, adults usually take 2 capsules (200 mg) per dose, 2 times a day, and children 6 to 14 years old take 1 capsule (100 mg) per dose, 3 times a day, before meals with a small amount of water.",
+    "cb9e0227": "For chronic conditions, adults take 2 capsules (200 mg) per dose, 2 times a day, and children 6 to 14 years old take 1 capsule (100 mg) per dose, 3 times a day, before meals with a small amount of water.",
+    "8f12d233": "For cystic fibrosis, people 6 years and older take 2 capsules (200 mg) per 1 dose, 3 times a day, before meals with a small amount of water.",
+    "e4972b72": "For cystic fibrosis, people 6 years and older take 2 capsules (200 mg) per 1 dose, 3 times a day, before meals with a small amount of water.",
+    "6d58e027": "Do not take this medicine if you are hypersensitive to it, have gastric or duodenal ulcers, are an infant under 2 years old, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "ec90c404": "Do not take this medicine if you are hypersensitive to it, have gastric or duodenal ulcers, or are an infant under 2 years old.",
+    "64bbe172": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding.",
+    "1b9e3b15": "When taking this medicine with oral antibiotics (amoxicillin, cefuroxime, doxycycline, erythromycin, thiamphenicol), take them at least 2 hours apart.",
+    "df841609": "Consult a doctor or pharmacist when taking this medicine together with oral antibiotics (amoxicillin, cefuroxime, doxycycline, erythromycin, thiamphenicol), other antibiotics, tetracycline, erythromycin, or bromhexine.",
+    "a7e59321": "Avoid adding other medicines to a solution of this medicine.",
+    "2741da30": "In rare cases, if nausea, vomiting, mouth sores (stomatitis), heartburn, diarrhea, hives, itching, rash, headache, ringing in the ears, bronchospasm (especially in asthma patients), rapid pulse, high blood pressure, difficulty breathing, or rarely anaphylaxis occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "bf49d164": "In rare cases, if nausea, vomiting, mouth sores (stomatitis), heartburn, diarrhea, hives, itching, rash, headache, ringing in the ears, bronchospasm (especially in asthma patients), rapid pulse, or high blood pressure occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

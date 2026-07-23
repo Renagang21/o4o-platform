@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "loperamide2-04",
+  "order": 2204,
+  "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+  "safetyFp": "7e6593d7633cb83f",
+  "sourceRef": "49957ddc-4d0b-4788-8530-25b1a48f5740",
+  "sensitive": false,
+  "title": "로페라미드염산염 2mg 캡슐 (설사약)",
+  "expectEasyMd5": "003ba30a",
+  "masterIds": [
+    "2f5117a6-c282-48ff-8caf-d052944693fe",
+    "3e94fccc-96a6-41e9-8007-6e6928088093"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "003ba30a",
+    "names": [
+      "로피딘캡슐(로페라미드염산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 급성설사와 만성설사에 사용합니다.",
+    "usage": "급성설사에 성인은 처음 복용량으로 2캡슐(4 mg)을 복용하고, 유지량으로는 묽은 변이 있을 때마다 1캡슐(2 mg)씩 복용합니다. 1일 상용량은 3~4캡슐(6~8 mg)이며 1일 최대복용량은 8캡슐(16 mg)입니다.\n\n소아는 처음 복용량으로 1캡슐(2 mg)을 복용하고, 유지량으로는 묽은 변이 있을 때마다 1캡슐(2 mg)씩 복용합니다. 1일 최대복용량은 3캡슐(6 mg)입니다.\n\n만성설사에 성인은 처음 복용량으로 2캡슐(4 mg)을 복용하고, 설사가 치료될 때까지 묽은 변이 있을 때마다 1캡술(2 mg)을 복용합니다. 그 이후에는 환자 개별적으로 필요에 맞도록 용량을 감소시킵니다. 1일 최적투여량이 결정되면 이를 1일 1회 또는 1일 2회로 나누어 복용합니다. 보통 유지용량은 1일 1~3캡슐(2~6 mg)이며, 1일 최대용량은 8캡슐(16 mg)입니다.\n\n연령, 증상에 따라 적절히 증감할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 24개월 미만의 영아, 소아(만성설사인 경우), 혈변 및 고열이 있는 세균성 설사, 급성 궤양성 대장염, 광범위 항생물질 투여와 관련된 위막성 대장염, 장폐색증, 거대결장증, 중독성거대결장증, 출혈성 대장염, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 간장애, AIDS 환자, 임부 또는 임신할 가능성이 있는 여성 및 수유부, 고령자는 의사 또는 약사와 상의하십시오.\n\n급성설사의 경우 48시간 이내, 만성설사의 경우 10일 이내에 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n복용 후에 피로, 어지러움, 졸음이 나타날 수 있으므로 운전 또는 기계조작 시 주의하십시오.\n\n퀴니딘, 리토나비르와 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n매우 드물게 발진, 두드러기, 소양감, 이례적으로 혈관부종, 중독성표피박리, 다형성 홍반, 스티븐스-존슨 증후군을 포함하는 수포성 발진, 이례적으로 알레르기 반응, 아나필락시스 쇽 및 아나필락시스 양 반응을 포함하는 중증의 과민반응, 매우 드물게 복통, 장폐색증, 복부팽만, 구역, 변비, 구토, 중독성 거대결장증을 포함하는 거대결장증, 고창 및 소화불량, 빈도 불명의 급성췌장염, 뇨저류, 매우 드물게 졸음, 어지러움 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "로페라미드염산염 2밀리그램",
+      "작용": "장운동을 억제하여 급성·만성 설사를 멎게 하는 지사제입니다.",
+      "주요 증상": "급성설사, 만성설사",
+      "주의 대상": "과민증, 24개월 미만 영아, 소아(만성설사), 혈변·고열 세균성 설사, 궤양성·위막성·출혈성 대장염, 장폐색증·거대결장증, 갈락토오스 불내성 복용 금지",
+      "선택 포인트": "급성·만성 설사에 쓰는 로페라미드 지사제입니다."
+    }
+  },
+  "en": {
+    "title": "Loperamide Hydrochloride 2 mg Capsules (Antidiarrheal Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for acute diarrhea and chronic diarrhea.",
+    "usage": "For acute diarrhea, adults take 2 capsules (4 mg) as the first dose, and as a maintenance dose take 1 capsule (2 mg) after each loose stool. The usual daily dose is 3 to 4 capsules (6 to 8 mg), and the maximum daily dose is 8 capsules (16 mg). Children take 1 capsule (2 mg) as the first dose, and as a maintenance dose take 1 capsule (2 mg) after each loose stool. The maximum daily dose is 3 capsules (6 mg). For chronic diarrhea, adults take an initial dose of 2 capsules (4 mg), then take 1 capsule (2 mg) after each loose stool until the diarrhea is controlled. After that, reduce the dose to fit each patient's individual needs. Once the optimal daily dose is determined, take it 1 time a day or divided into 2 times a day. The usual maintenance dose is 1 to 3 capsules (2 to 6 mg) per day, and the maximum daily dose is 8 capsules (16 mg). The dose may be adjusted appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you are hypersensitive to it; are an infant under 24 months old or a child (in the case of chronic diarrhea); have bacterial diarrhea with bloody stools and high fever, acute ulcerative colitis, pseudomembranous colitis associated with broad-spectrum antibiotic use, intestinal obstruction, megacolon, toxic megacolon, or hemorrhagic colitis; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have liver disorders or AIDS, are pregnant or may be pregnant, are breastfeeding, or are elderly. If symptoms do not improve within 48 hours for acute diarrhea or within 10 days for chronic diarrhea, stop taking this medicine immediately and consult a doctor or pharmacist. Fatigue, dizziness, and drowsiness may occur after taking this medicine, so be careful when driving or operating machinery. Consult a doctor or pharmacist when taking this medicine together with quinidine or ritonavir. If very rarely rash, hives, and itching, exceptionally angioedema, toxic epidermal necrolysis, erythema multiforme, and bullous eruptions including Stevens-Johnson syndrome, exceptionally allergic reactions and severe hypersensitivity reactions including anaphylactic shock and anaphylactoid reactions, very rarely abdominal pain, intestinal obstruction, abdominal bloating, nausea, constipation, vomiting, megacolon including toxic megacolon, flatulence, and indigestion, acute pancreatitis of unknown frequency, urinary retention, or very rarely drowsiness or dizziness occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Loperamide hydrochloride 2 mg",
+      "How it works": "An antidiarrheal that stops acute and chronic diarrhea by slowing bowel movement.",
+      "Main symptoms": "Acute diarrhea, chronic diarrhea",
+      "Caution for": "Do not use with hypersensitivity, for infants under 24 months, children (chronic diarrhea), bacterial diarrhea with bloody stools and fever, ulcerative/pseudomembranous/hemorrhagic colitis, intestinal obstruction or megacolon, or galactose intolerance",
+      "Why this one": "A loperamide antidiarrheal for acute and chronic diarrhea."
+    }
+  }
+}

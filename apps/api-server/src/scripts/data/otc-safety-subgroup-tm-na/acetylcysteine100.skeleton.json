@@ -4,7 +4,7 @@
   "subgroups": 2,
   "masters": 9,
   "metaAuthored": false,
-  "missingLineCount": 17,
+  "missingLineCount": 16,
   "missingLines": [
     {
       "h8": "19dfa642",
@@ -71,12 +71,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "이 약의 용액에 다른 약물의 첨가는 피하십시오."
-    },
-    {
-      "h8": "bee542ff",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "bf49d164",

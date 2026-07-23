@@ -1,0 +1,66 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "ginkgo80-01",
+  "order": 3701,
+  "groupKey": "은행엽건조엑스|80밀리그램|정",
+  "safetyFp": "5125c0035aff0e88",
+  "sourceRef": "9f14255d-19b5-429b-883f-bbfd3fdba548",
+  "sensitive": false,
+  "title": "은행엽건조엑스 80mg 정 (혈액순환 개선제)",
+  "expectEasyMd5": "74ec1651",
+  "masterIds": [
+    "4b1f2516-cecd-466f-a67e-7139fda12a4a",
+    "76c10252-f159-4d2c-8d2f-3bea041a2e7a",
+    "a21cb66e-f5a7-4f6a-abf4-cd6bf0f545ec",
+    "e272615c-9fdf-409d-8a1a-c51dc034602c"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "74ec1651",
+    "names": [
+      "써큐로민정80밀리그램(은행엽건조엑스)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 16,
+    "en": 8,
+    "total": 24
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 말초동맥순환장애(간헐성파행증)의 치료와 어지러움, 혈관성 및 퇴행성이명(귀울림)과 이명(귀울림), 두통, 기억력감퇴, 집중력장애, 우울감, 어지러움등의 치매성증상을 수반하는 기질성 뇌기능장애의 치료에 사용합니다.",
+    "usage": "말초동맥순환장애, 어지러움, 이명(귀울림)에 성인은 1회 1/2정(40 mg)씩, 1일 3회 또는 1회 1정(80 mg)씩, 1일 2회 복용합니다.\n\n기질성 뇌기능장애에 성인은 1회 1/2~1정(40~80 mg)씩, 1일 3회 또는 1회 1.5정(120 mg)씩, 1일 2회 복용합니다.\n\n연령, 증상에 따라 적절히 증감합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 12세 이하의 소아, 임부, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자, 수술이 예정된 자는 이 약을 복용하지 마십시오.\n\n이 약을 사용하기 전에 수유부는 의사 또는 약사와 상의하십시오.\n\n이 약은 고혈압 치료제가 아니므로 특별한 치료를 요하는 고혈압 환자에는 투여하지 마십시오.\n\n3개월 후에도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n항응고제(예 : 펜프로쿠몬, 와파린), 항혈소판제(예 : 클로피도그렐, 아세틸살리실산 및 기타 비스테로이드성 항염증제)와 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n드물게 가벼운 위장관 불쾌감, 두통, 알레르기성 피부반응 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "은행엽건조엑스 80밀리그램",
+      "작용": "말초혈액순환을 개선하여 간헐성파행증과 어지러움·이명, 치매성 증상을 수반하는 기질성 뇌기능장애를 치료하는 약입니다.",
+      "주요 증상": "말초동맥순환장애(간헐성파행증), 어지러움, 혈관성·퇴행성 이명, 치매성 증상(기억력감퇴·집중력장애·우울감 등)을 수반하는 기질성 뇌기능장애",
+      "주의 대상": "과민증, 12세 이하 소아, 임부, 갈락토오스 불내성 등 유전적 문제, 수술 예정자 복용 금지",
+      "선택 포인트": "말초순환장애와 어지러움·이명·기억력감퇴 등에 쓰는 은행엽 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Ginkgo Leaf Dried Extract 80 mg Tablets (Blood Circulation Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to treat peripheral arterial circulation disorders (intermittent claudication), and to treat dizziness, vascular and degenerative tinnitus (ringing in the ears), and organic brain dysfunction accompanied by dementia-like symptoms such as ringing in the ears, headache, memory decline, difficulty concentrating, depressed mood, and dizziness.",
+    "usage": "For peripheral arterial circulation disorders, dizziness, and ringing in the ears, adults take 1/2 tablet (40 mg) per dose, 3 times a day, or 1 tablet (80 mg) per dose, 2 times a day. For organic brain dysfunction, adults take 1/2 to 1 tablet (40 to 80 mg) per dose, 3 times a day, or 1.5 tablets (120 mg) per dose, 2 times a day. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are a child 12 years old or younger, are pregnant, have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption, or have surgery scheduled. Before using this medicine, consult a doctor or pharmacist if you are breastfeeding. This medicine is not a treatment for high blood pressure, so do not give it to patients with high blood pressure requiring special treatment. If symptoms do not improve after 3 months, stop taking this medicine immediately and consult a doctor or pharmacist. Consult a doctor or pharmacist when taking this medicine together with anticoagulants (e.g., phenprocoumon, warfarin) or antiplatelet agents (e.g., clopidogrel, acetylsalicylic acid, and other nonsteroidal anti-inflammatory drugs). In rare cases, if mild gastrointestinal discomfort, headache, or allergic skin reactions occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Ginkgo leaf dried extract 80 mg",
+      "How it works": "A medicine that improves peripheral blood circulation to treat intermittent claudication, dizziness, ringing in the ears, and organic brain dysfunction with dementia-like symptoms.",
+      "Main symptoms": "Peripheral arterial circulation disorders (intermittent claudication), dizziness, vascular and degenerative tinnitus, and organic brain dysfunction with dementia-like symptoms (memory decline, poor concentration, depressed mood)",
+      "Caution for": "Do not use with hypersensitivity, for children 12 or younger, if pregnant, with hereditary problems such as galactose intolerance, or before scheduled surgery",
+      "Why this one": "A ginkgo leaf preparation for peripheral circulation disorders, dizziness, tinnitus, and memory decline."
+    }
+  }
+}
