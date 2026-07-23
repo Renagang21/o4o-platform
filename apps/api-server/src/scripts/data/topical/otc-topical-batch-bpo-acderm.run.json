@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "가수과산화벤조일",
+ "form": "아크덤겔",
+ "slugbase": "bpo-acderm",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5d3ca1c6afc1846a",
+   "n": 1
+  },
+  {
+   "fp": "66de38e32fe04f7a",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

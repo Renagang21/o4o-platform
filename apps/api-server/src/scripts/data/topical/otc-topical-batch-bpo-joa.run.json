@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "가수과산화벤조일",
+ "form": "조아아크네겔",
+ "slugbase": "bpo-joa",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8f17413beddb7c9a",
+   "n": 1
+  },
+  {
+   "fp": "31bde1d30cc8dcde",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

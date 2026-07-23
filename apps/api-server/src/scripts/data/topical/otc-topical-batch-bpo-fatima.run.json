@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "가수과산화벤조일",
+ "form": "파티마겔",
+ "slugbase": "bpo-fatima",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "6da6614f92cadc7f",
+   "n": 1
+  },
+  {
+   "fp": "05254ceec9d75f33",
+   "n": 1
+  },
+  {
+   "fp": "458240f89668137d",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

@@ -195,8 +195,8 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 7,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 조아아크네겔2+아크덤겔2+파티마겔2.5% 3=3 원문형 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 7fp/7 = 조아아크네겔 2fp/2+아크덤겔 2fp/2+파티마겔2.5% 3fp/3 — EN 3형(금기·이상반응 서술 상이: 아크덤=임신 마지막달 금기, 파티마=표백·감수성 이상반응 서술). '겔2.5%(' 이름=--assume-route topical. ko7=en7·dup0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
