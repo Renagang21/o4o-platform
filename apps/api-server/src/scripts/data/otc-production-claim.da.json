@@ -2,9 +2,9 @@
  "_doc": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉. 트랙=피부 외용제(topical skin) ingredient×form 단위 선점.",
  "schemaVersion": 1,
  "owner": "agent-da",
- "round": "topical-patch-v7-2026-07-23",
+ "round": "topical-patch-remainder-v8-2026-07-24",
  "track": "TOPICAL_SKIN_STORE_LEAFLET",
- "verdict": "ROUND_DONE",
+ "verdict": "PRODUCING",
  "claims": [
   {
    "groupKey": "무피로신|연고",
@@ -497,6 +497,69 @@
    "status": "RELEASED",
    "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
    "note": "V7 종료임계(40fp+400master) 달성으로 미착수 — claim 해제. 후속 라운드(V8) 재시작 지점"
+  },
+  {
+   "groupKey": "록소프로펜|첩부제(플라스타·파프·첩부제)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 65,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "펠비낙|첩부제(파프·플라스타·첩부제)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 48,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "퓨시드산나트륨|첩부제",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 18,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "인도메타신|첩부제(파프·첩부제)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 17,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "이부프로펜|플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 16,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "피록시캄|플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 11,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
+  },
+  {
+   "groupKey": "살리실산|플라스타(특별게이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+   "note": "V8 선점 — V7 RELEASED 잔여 첩부제. census 재현 완료(가·나 claim 교집합 0)"
   }
  ],
  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
