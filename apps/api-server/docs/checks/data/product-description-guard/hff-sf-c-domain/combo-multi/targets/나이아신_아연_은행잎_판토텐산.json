@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm19-001",
+  "productName": "브레인써큘라",
+  "productNameEn": "브레인써큘라",
+  "manufacturer": "(주)세종바이오팜",
+  "manufacturerEn": null,
+  "statementNo": "20190009105200",
+  "category": "hff",
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①체내 에너지 생성에 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제\n2. 플라보놀 배당체 : 표시량(30mg/600mg)의 80~120%\n3. 아연 : 표시량(8.5mg/600mg)의 80~150%\n4. 나이아신 : 표시량(10mg NE/600mg)의 80~150%\n5. 판토텐산 : 표시량(5mg/600mg)의 80~180%\n6. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 1.0 이하\n9. 수은(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군: 음성\n12. 붕해도: 건강기능식품공전 중 붕해도 시험의 정제 제품 시험법에 따라 30분 내에 붕해",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n\n\n\n\n(1)",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 10mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 30mg</span><span class=\"sd-badge is-solid\">판토텐산 5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>브레인써큘라<small>나이아신 · 아연 · 은행잎추출물 · 판토텐산</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>10mg</b>, 아연 <b>8.5mg</b>, 은행잎추출물 <b>30mg</b>, 판토텐산 <b>5mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 나이아신 <b>10mg</b>, 아연 <b>8.5mg</b>, 은행잎추출물 <b>30mg</b>, 판토텐산 <b>5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제 · (주)세종바이오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(10mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(30mg/600mg)의 80~120%</div><div class=\"sd-item\"><b>판토텐산</b> 표시량(5mg/600mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 아연 · 은행잎추출물 · 판토텐산 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 10mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 30mg</span><span class=\"sd-badge is-solid\">Pantothenic acid 5mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>브레인써큘라<small>Niacin · Zinc · Ginkgo leaf extract · Pantothenic acid</small></h1><p class=\"sd-meta\">Made by (주)세종바이오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10mg</b> of Niacin, <b>8.5mg</b> of Zinc, <b>30mg</b> of Ginkgo leaf extract, <b>5mg</b> of Pantothenic acid as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>10mg</b> Niacin, <b>8.5mg</b> Zinc, <b>30mg</b> Ginkgo leaf extract, <b>5mg</b> Pantothenic acid</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세종바이오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Pantothenic acid</b><ul class=\"sd-why\"><li>Needed for the metabolism of fat, carbohydrate and protein and for energy production</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (10mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (30mg / 600mg), 80~120%</div><div class=\"sd-item\"><b>Pantothenic acid</b> labelled (5mg / 600mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Zinc · Ginkgo leaf extract · Pantothenic acid together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

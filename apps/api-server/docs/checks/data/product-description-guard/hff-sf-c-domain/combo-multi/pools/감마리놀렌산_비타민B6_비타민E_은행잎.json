@@ -1,0 +1,111 @@
+[
+ {
+  "statementNo": "20040020004272",
+  "productName": "알로맥프로지(G)",
+  "manufacturer": "(주)네이처텍",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선․혈행개선·월경전 변화에 의한 불편한 상태 개선· 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with easing discomfort related to premenstrual changes",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n혈중 콜레스테롤 개선․혈행개선·월경전 변화에 의한 불편한 상태 개선· 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n\n①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐\n2) 비타민B6 : 1.5 mg/3,000 mg (표시량의 80 ~ 150%)\n3) 비타민E : 11 mg α-TE/3,000 mg (표시량의 80 ~ 150%)\n4) 감마리놀렌산 : 300 mg/3,000 mg (표시량의 80 ~ 120%)\n5) 플라보놀배당체 : 36 mg/3,000 mg (표시량의 80 ~ 120%)\n6) 깅콜릭산 : 5.0 mg/kg 이하\n7) 납 : 1.0 mg/kg 이하\n8) 카드뮴 : 1.0 mg/kg 이하\n9) 총 수은 : 1.0 mg/kg 이하\n10) 총 비소 : 1.0 mg/kg 이하\n11) 붕해시험 : 20분 이내\n12) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐(3,000 mg)을 충분한 양의 물과 함께 섭취하십시오.",
+   "caution": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것 (면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시‧판매하는 경우에 한함)\n\n① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐",
+   "storage": "실온",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 3
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

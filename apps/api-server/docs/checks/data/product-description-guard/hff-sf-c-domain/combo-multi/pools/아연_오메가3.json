@@ -1,0 +1,71 @@
+[
+ {
+  "statementNo": "20040015107708",
+  "productName": "파워메가바이오",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 6,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐\n2. EPA와 DHA의 합 : 표시량(500 mg/2,000 mg)의 80 ~ 120%\n3. 아연 : 표시량(6 mg/2,000 mg)의 80 ~ 150%\n4. 납(mg/kg) : 3.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 총 수은(mg/kg) : 0.5 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n2. 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

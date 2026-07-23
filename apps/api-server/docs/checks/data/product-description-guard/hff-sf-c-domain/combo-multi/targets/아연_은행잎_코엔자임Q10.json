@@ -1,0 +1,170 @@
+[
+ {
+  "candidateId": "cm110-001",
+  "productName": "코엔자임 혈행 플러스",
+  "productNameEn": "코엔자임 혈행 플러스",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041500",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[코엔자임Q10]①항산화･높은 혈압 감소에 도움을 줄 수 있음\n[은행잎 추출물]①기억력 개선･혈행 개선에 도움을 줄 수 있음\n[아연]①정상적인 면역기능에 필요 ②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐\n2) 대장균군 : 음성\n3) 붕해시험 : 20분 이내\n4) 코엔자임Q10 : 표시량(100mg/450mg)의 80~120%\n5) 플라보놀배당체 : 표시량(28mg/450mg)의 80~120%\n6) 아연 : 표시량(8.5mg/450mg)의 80~150%\n7) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8) 잔류용매\n(가) 헥산(mg/kg) : 5.0 이하\n(라) 초산에틸(mg/kg) : 50.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[코엔자임Q10]\n 1) 수유부는 섭취를 피할 것\n 2) 항응고제 복용 시 전문가와 상담할 것\n 3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎 추출물]\n 1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n 2) 의약품(항응고제) 복용 시 섭취에 주의\n[바나바잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코엔자임 혈행 플러스<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>28mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>28mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화･높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/450mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코엔자임 혈행 플러스<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>28mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>8.5mg</b> Zinc, <b>28mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-002",
+  "productName": "일양 코큐텐징코",
+  "productNameEn": "일양 코큐텐징코",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046518",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①항산화에 도움을 줄 수 있음② 높은 혈압 감소에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120% 이어야 한다.\n3) 코엔자임Q10 : 표시량(100.0mg/500mg)의 80~120% 이어야 한다.\n4) 아연 : 표시량(9.0mg/500mg)의 80~150% 이어야 한다.\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 헥산(mg/kg) : 5.0 이하\n7) 초산에틸(mg/kg) : 50.0 이하\n8) 납(mg/kg) : 1.0 이하\n9) 카드뮴(mg/kg) : 1.0 이하\n10) 총수은(mg/kg) : 1.0 이하\n11) 총비소(mg/kg) : 1.0 이하\n12) 붕해시험 : 20분 이내\n13) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 9,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 9mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>일양 코큐텐징코<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>9mg</b>, 은행잎추출물 <b>28.8mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>9mg</b>, 은행잎추출물 <b>28.8mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li><li>높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(9mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 9mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>일양 코큐텐징코<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>9mg</b> of Zinc, <b>28.8mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>9mg</b> Zinc, <b>28.8mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity</li><li>May help with lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (9mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-003",
+  "productName": "활력징코큐텐",
+  "productNameEn": "활력징코큐텐",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028451",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①항산화·높은 혈압 감소에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐\n2. 플라보놀배당체 : 36mg / 450mg 의 80~120%\n3. 코엔자임Q10 : 100mg / 450mg 의 80~120%\n4. 아연 : 8.5mg / 450mg 의 80~150%\n5. 납(mg/kg) : 1.0 이하\n6. 카드늄(mg/kg) : 1.0 이하\n7. 총 수은(mg/kg) : 1.0 이하\n8. 총 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해시험 : 20분 이내",
+   "intake": "450mg / 1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취 하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의\n알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n잘못된 섭취를 피하고 품질을 보호 유지하기 위해 다른 용기에 넣지 마십시오.\n어린이의 손에 닿지 않도록 주의하시기 바랍니다.\n유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐",
+   "storage": "수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>활력징코큐텐<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/450mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>활력징코큐텐<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>8.5mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-004",
+  "productName": "유학써큐-K",
+  "productNameEn": "유학써큐-K",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211421",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[은행잎추출물] -기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[코엔자임Q10] ①항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐\n②플라보놀배당체 : 표시량(36mg/500mg)의 80~120%\n③코엔자임Q10 : 표시량(100mg/500mg)의 80~120%\n④아연 : 표시량(28mg/500mg)의 80~150%\n⑤납(mg/kg) : 1.0 이하\n⑥카드뮴(mg/kg) : 1.0 이하\n⑦수은(mg/kg) : 1.0 이하\n⑧비소(mg/kg) : 1.0 이하\n⑨깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n⑩헥산(mg/kg) : 5.0 이하\n⑪아세톤(mg/kg) : 30.0 이하\n⑫초산에틸(mg/kg) : 50.0 이하\n⑬붕해시험 : 적합(20분 이내)\n⑭대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 28mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>유학써큐-K<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>28mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>28mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(28mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 28mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>유학써큐-K<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>28mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (28mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

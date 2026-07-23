@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm16-001",
+  "productName": "오큐트리플G",
+  "productNameEn": "오큐트리플G",
+  "manufacturer": "(주)태준제약",
+  "manufacturerEn": null,
+  "statementNo": "201728208676",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n2) 기억력 개선･혈행 개선에 도움을 줄 수 있음\n3) 체내 에너지 생성에 필요",
+   "baseStandard": "1)\t붕해시험 : 60분 이내로 적합\n2)\t나이아신: 표시량(500mg NE/775mg)의 80~150 %로 적합\n3)\t플라보놀배당체: 표시량(28.8mg/775mg)의 80~120 %로 적합\n4)\t루테인: 표시량(10mg/775mg)의 80~120 %로 적합\n5)\t깅콜릭산: 5.0(mg/kg) 이하로 적합\n6)\t잔류용매(헥산) : 5.0(mg/kg) 이하로 적합\n7)\t납 : 1.0 (mg/kg) 이하로 적합\n8)\t카드뮴 : 1.0 (mg/kg) 이하로 적합\n9)\t수은 : 1.0 (mg/kg) 이하로 적합\n10)\t비소 : 1.0 (mg/kg) 이하로 적합\n11)\t대장균군 : 음성으로 적합",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1)\t영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것 \n2)\t흡연자는 섭취 시 전문가와 상담할 것\n3)\t과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음 \n4)\t이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n5)\t수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 회녹색의 장방형 필름 코팅정제",
+   "storage": "직사광선을 받지 않는 서늘한 곳에서 보관·유통하시고, 어린이의 손에 닿지 않도록 주의 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 500,
+    "unit": "mg",
+    "basisAmount": 775,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "film",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">나이아신 500mg</span><span class=\"sd-badge is-solid\">루테인 10mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오큐트리플G<small>나이아신 · 루테인 · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)태준제약 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 나이아신 <b>500mg</b>, 루테인 <b>10mg</b>, 은행잎추출물 <b>28.8mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 나이아신 <b>500mg</b>, 루테인 <b>10mg</b>, 은행잎추출물 <b>28.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 회녹색의 장방형 필름 코팅정제 · (주)태준제약 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>나이아신</b> 표시량(500mg/775mg)의 80~150%</div><div class=\"sd-item\"><b>루테인</b> 표시량(10mg/775mg)의 80~120%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/775mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회녹색의 장방형 필름 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 서늘한 곳에서 보관·유통하시고, 어린이의 손에 닿지 않도록 주의 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 나이아신 · 루테인 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>필름 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Niacin 500mg</span><span class=\"sd-badge is-solid\">Lutein 10mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오큐트리플G<small>Niacin · Lutein · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)태준제약 · Once a day · 1 film</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>500mg</b> of Niacin, <b>10mg</b> of Lutein, <b>28.8mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 film): <b>500mg</b> Niacin, <b>10mg</b> Lutein, <b>28.8mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)태준제약</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Niacin</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 film per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Niacin</b> labelled (500mg / 775mg), 80~150%</div><div class=\"sd-item\"><b>Lutein</b> labelled (10mg / 775mg), 80~120%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 775mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회녹색의 장방형 필름 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 서늘한 곳에서 보관·유통하시고, 어린이의 손에 닿지 않도록 주의 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Niacin · Lutein · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,144 @@
+[
+ {
+  "statementNo": "20120019007560",
+  "productName": "루테인비타민D 2000IU",
+  "manufacturer": "(주)한풍네이처팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 130,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "μg",
+     "basisAmount": 130,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요 / 뼈의 형성과 유지에 필요 / 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 빨간 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐\n2. 루테인 : 표시량(20 mg/130 mg)의 80~120%\n3. 비타민D : 표시량(50 ㎍/130 mg)의 80~180%\n4. 헥산 : 5.0 이하(mg/kg)\n5. 초산에틸 : 50.0 이하(mg/kg)\n6. 납(mg/kg) : 1.0 이하\n7. 카드뮴(mg/kg) : 1.0 이하\n8. 수은(mg/kg) : 1.0 이하\n9. 비소(mg/kg) : 1.0 이하\n10 . 대장균군 : 음성 \n11. 붕해 : 적합",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다. \n영유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n흡연자는 섭취 시 전문가와 상담사십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다. \n어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으니 서늘한곳에 보관해 주십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 빨간 주황색의 내용물을 함유한 어두운 적갈색의 타원형 연질캡슐",
+   "storage": "고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008296",
+  "productName": "루테인비타민D2000IU",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐\n2. 루테인 : 표시량(20mg/500mg)의 80~120%\n3. 헥산(mg/kg) : 5.0 이하\n4. 비타민D : 표시량(50μg/500mg)의 80~180%\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 1.0 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다. \n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 빨간 주황색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

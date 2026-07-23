@@ -1,0 +1,73 @@
+[
+ {
+  "statementNo": "201000190041407",
+  "productName": "기억력개선, 혈행개선엔 뉴로마스터 은행잎추출물&요오드",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "요오드",
+    "labelKo": "요오드",
+    "labelEn": "Iodine",
+    "declaredAmount": {
+     "value": 2400,
+     "unit": "μg",
+     "basisAmount": 1500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "갑상선 호르몬의 합성에 필요",
+     "에너지 생성에 필요",
+     "신경발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the synthesis of thyroid hormones",
+     "Needed for energy production",
+     "Needed for neural development"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물]기억력 개선･혈행 개선에 도움을 줄 수 있음\n[요오드]]①갑상선 호르몬의 합성에 필요②에너지 생성에 필요③신경발달에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해시험 : 60분 이내\n4) 요오드: 표시량(2,400㎍/1,500mg)의 80~150%\n5) 플라보놀배당체: 표시량(36mg/1,500mg)의 80~120%\n6) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,131 @@
+[
+ {
+  "statementNo": "20040015107694",
+  "productName": "이비에프(EBF)",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B12",
+    "labelKo": "비타민 B12",
+    "labelEn": "Vitamin B12",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 900,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "정상적인 엽산 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal folate metabolism"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.6,
+     "unit": "mg",
+     "basisAmount": 900,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 900,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 70,
+     "unit": "μg",
+     "basisAmount": 900,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 900,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①정상적인 엽산 대사에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 코팅정제\n2. 플라보놀 배당체 : 표시량(28 mg/900 mg)의 80~120%\n3. 비타민B6 : 표시량(1.6 mg/900 mg)의 80~150%\n4. 비타민B12 : 표시량(10 ㎍/900 mg)의 80~180%\n5. 비타민D : 표시량(10 ㎍/900 mg)의 80~180%\n6. 셀렌 : 표시량(70 ㎍/900 mg)의 80~150%\n7. 깅콜릭산 : 5.0(mg/kg) 이하\n8. 납 : 1.0(mg/kg) 이하\n9. 카드뮴 : 1.0(mg/kg) 이하\n10. 총수은 : 1.0(mg/kg) 이하\n11. 총비소 : 1.0(mg/kg) 이하\n12. 대장균군 : 음성\n13. 붕해시험: 적합",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 코팅정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,128 @@
+[
+ {
+  "candidateId": "cm71-001",
+  "productName": "센트라겐",
+  "productNameEn": "센트라겐",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041048",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해도 : 60분 이내\n4) 플라보놀 배당체 : 표시량(28mg/1,300mg)의 80~120%\n5) 비타민C : 표시량(200mg/1,300mg)의 80~150%\n6) 망간 : 표시량(3mg/1,300mg)의 80~150%\n7) 셀렌 : 표시량(55㎍/1,300mg)의 80~150%\n8) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n9) 중금속\n (가)납(mg/kg) : 1.0 이하\n (나)카드뮴(mg/kg) : 1.0 이하\n (다)수은(mg/kg) : 1.0 이하\n (라)비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 1300,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 C 200mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>센트라겐<small>망간 · 비타민 C · 셀레늄 · 은행잎추출물</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 망간 <b>3mg</b>, 비타민 C <b>200mg</b>, 셀레늄 <b>55μg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 망간 <b>3mg</b>, 비타민 C <b>200mg</b>, 셀레늄 <b>55μg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>망간</b><ul class=\"sd-why\"><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(3mg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(200mg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1300mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1300mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 · 비타민 C · 셀레늄 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin C 200mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>센트라겐<small>Manganese · Vitamin C · Selenium · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3mg</b> of Manganese, <b>200mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>3mg</b> Manganese, <b>200mg</b> Vitamin C, <b>55μg</b> Selenium, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for bone formation</li><li>Needed for energy utilisation</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (200mg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1300mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1300mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Manganese · Vitamin C · Selenium · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm71-002",
+  "productName": "센씨맥스",
+  "productNameEn": "센씨맥스",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041307",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 플라보놀배당체 : 표시량(36mg/1,100mg)의 80~120%\n5) 비타민C : 표시량(100mg/1,100mg)의 80~150%\n6) 망간 : 표시량(3mg/1,100mg)의 80~150%\n7) 셀렌 : 표시량(55㎍/1,100mg)의 80~150%\n8) 깅콜릭산(mg/kg) : 5.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 C 100mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>센씨맥스<small>망간 · 비타민 C · 셀레늄 · 은행잎추출물</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 망간 <b>3mg</b>, 비타민 C <b>100mg</b>, 셀레늄 <b>55μg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 망간 <b>3mg</b>, 비타민 C <b>100mg</b>, 셀레늄 <b>55μg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>망간</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(3mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(100mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1100mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 · 비타민 C · 셀레늄 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin C 100mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>센씨맥스<small>Manganese · Vitamin C · Selenium · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3mg</b> of Manganese, <b>100mg</b> of Vitamin C, <b>55μg</b> of Selenium, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>3mg</b> Manganese, <b>100mg</b> Vitamin C, <b>55μg</b> Selenium, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for bone formation</li><li>Needed for energy utilisation</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (100mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1100mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Manganese · Vitamin C · Selenium · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm71-003",
+  "productName": "센C플러스",
+  "productNameEn": "센C플러스",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041261",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 플라보놀배당체 : 표시량(33.6mg/2,000mg)의 80~120%\n5) 비타민C : 표시량(300mg/2,000mg)의 80~150%\n6) 망간 : 표시량(3mg/2,000mg)의 80~150%\n7) 셀렌 : 표시량(110ug/2,000mg)의 80~150%\n8) 깅콜릭산(mg/kg) : 5.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 2회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 유통기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">망간 3mg</span><span class=\"sd-badge is-solid\">비타민 C 300mg</span><span class=\"sd-badge is-solid\">셀레늄 110μg</span><span class=\"sd-badge is-solid\">은행잎추출물 33.6mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>센C플러스<small>망간 · 비타민 C · 셀레늄 · 은행잎추출물</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 2회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 망간 <b>3mg</b>, 비타민 C <b>300mg</b>, 셀레늄 <b>110μg</b>, 은행잎추출물 <b>33.6mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1정) 섭취로 망간 <b>3mg</b>, 비타민 C <b>300mg</b>, 셀레늄 <b>110μg</b>, 은행잎추출물 <b>33.6mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>망간</b><ul class=\"sd-why\"><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>망간</b> 표시량(3mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(300mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(110μg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(33.6mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 망간 · 비타민 C · 셀레늄 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Manganese 3mg</span><span class=\"sd-badge is-solid\">Vitamin C 300mg</span><span class=\"sd-badge is-solid\">Selenium 110μg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 33.6mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>센C플러스<small>Manganese · Vitamin C · Selenium · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · 2 times a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3mg</b> of Manganese, <b>300mg</b> of Vitamin C, <b>110μg</b> of Selenium, <b>33.6mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 tablet): <b>3mg</b> Manganese, <b>300mg</b> Vitamin C, <b>110μg</b> Selenium, <b>33.6mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Manganese</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for bone formation</li><li>Needed for energy utilisation</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Manganese</b> labelled (3mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (300mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (110μg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (33.6mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Manganese · Vitamin C · Selenium · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

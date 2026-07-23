@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm86-001",
+  "productName": "징코 큐텐(Ginkgo Q10)",
+  "productNameEn": "징코 큐텐(Ginkgo Q10)",
+  "manufacturer": "주식회사 셀로닉스",
+  "manufacturerEn": null,
+  "statementNo": "2014002007326",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[코엔자임Q10] 항산화･높은 혈압 감소에 도움을 줄 수 있음\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐\n2. 코엔자임Q10 : 표시량(100 mg/1,630 mg)의 80 ~ 120%\n3. 플라보놀 배당체 : 표시량(36 mg/1,630 mg)의 80~120%\n4. 비타민B1 : 표시량(65 mg/1,630 mg)의 80 ~ 180%\n5. 비타민B2 : 표시량(30 mg/1,630 mg)의 80 ~ 180%\n6. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7. 헥산(mg/kg) : 5.0 이하\n8. 아세톤(mg/kg) : 30.0 이하\n9. 납(mg/kg) : 1.0 이하\n10. 카드뮴(mg/kg) : 1.0 이하\n11. 수은(mg/kg) : 1.0 이하\n12. 비소(mg/kg) : 1.0 이하\n13. 대장균군 : 음성\n14. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐씩 또는 1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "ㆍ임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\nㆍ의약품(항응고제) 복용 시 섭취에 주의\nㆍ이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\nㆍ수유부는 섭취를 피할 것\nㆍ항응고제 복용 시 전문가와 상담할 것\nㆍ이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐",
+   "storage": "ㆍ직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. ㆍ영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 65,
+    "unit": "mg",
+    "basisAmount": 1630,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 65mg</span><span class=\"sd-badge is-solid\">비타민 B2 30mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>징코 큐텐(Ginkgo Q10)<small>비타민 B1 · 비타민 B2 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">주식회사 셀로닉스 제조 · 1일 2회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>65mg</b>, 비타민 B2 <b>30mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(1캡슐) 섭취로 비타민 B1 <b>65mg</b>, 비타민 B2 <b>30mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐 · 주식회사 셀로닉스 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화･높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(65mg/1630mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(30mg/1630mg)의 80~180%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1630mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/1630mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ㆍ직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. ㆍ영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 65mg</span><span class=\"sd-badge is-solid\">Vitamin B2 30mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>징코 큐텐(Ginkgo Q10)<small>Vitamin B1 · Vitamin B2 · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 주식회사 셀로닉스 · 2 times a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>65mg</b> of Vitamin B1, <b>30mg</b> of Vitamin B2, <b>36mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (1 capsule): <b>65mg</b> Vitamin B1, <b>30mg</b> Vitamin B2, <b>36mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 셀로닉스</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (65mg / 1630mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (30mg / 1630mg), 80~180%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1630mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 1630mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ㆍ직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. ㆍ영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

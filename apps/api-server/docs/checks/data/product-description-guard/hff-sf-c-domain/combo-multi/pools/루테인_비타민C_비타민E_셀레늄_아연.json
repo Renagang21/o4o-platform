@@ -1,0 +1,256 @@
+[
+ {
+  "statementNo": "20220011370266",
+  "productName": "플로라 루테인 에센스",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "(1) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n(1) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 내용물을 함유한 검은 빨강색의 타원형 연질캡슐\n2) 루테인 : 표시량(10mg / 500mg)의 80~120%\n3) 비타민C : 표시량(30mg / 500mg)의 80~150%\n4) 비타민 E : 표시량(3.3mga-TE / 500mg)의 80~150%\n5) 아연 : 표시량(2.55mg / 500mg)의 80~150%\n6) 셀레늄 : 표시량(16.5ug / 500mg)의 80~150%\n7) 헥산(mg/kg) : 5.0 이하\n8) 초산에틸(mg/kg) : 50.0 이하                                                       \n9) 납(mg/kg) : 1.0 이하\n10) 카드뮴(mg/kg) : 1.0 이하\n11) 수은(mg/kg) : 1.0 이하\n12) 비소(mg/kg) : 1.0 이하\n13) 대장균군 : 음성\n14) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통 하십시오. 영·유아 및 어린이 손에 닿지않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170061357",
+  "productName": "플로라 루테인 에센스",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요",
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)",
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[셀렌] ①유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 진한 적갈색의 타원형 연질캡슐\n2)루테인 : 표시량(10mg/500mg)의 80~120%\n3)비타민C: 표시량(30mg/500mg)의 80~150%\n4)비타민E : 표시량(3.3 mga-TE/500mg)의 80~150%\n5)아연 : 표시량(2.55mg/500mg)의 80~150%\n6)셀레늄 : 표시량(16.5ug/500mg)의 80~150%\n7)납 : 1.0mg/kg 이하\n8)카드뮴 : 1.0mg/kg 이하\n9)수은: 1.0mg/kg 이하\n10)비소: 1.0mg/kg 이하\n11)헥산(해당 용매를 사용한 경우): 5.0mg/kg 이하\n12)붕해시험: 20분 이내\n13)대장균군: 음성",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 진한 적갈색의 타원형 연질캡슐",
+   "storage": "실온/ 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

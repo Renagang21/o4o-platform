@@ -1,0 +1,296 @@
+[
+ {
+  "candidateId": "cm35-001",
+  "productName": "핑크그린 나이트컷 시즌2",
+  "productNameEn": "핑크그린 나이트컷 시즌2",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211459",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[녹차추출물]  항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌]  스트레스로 인한 긴장완화에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨칼레이트((-)-epigallocatechin gallate,EGCG)(mg) : 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 60분 이내\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>핑크그린 나이트컷 시즌2<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(200mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>핑크그린 나이트컷 시즌2<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>200mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>300mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>200mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (200mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-002",
+  "productName": "편안한 밤 하늘이 다이어트",
+  "productNameEn": "편안한 밤 하늘이 다이어트",
+  "manufacturer": "(주)케비젠",
+  "manufacturerEn": null,
+  "statementNo": "20150010018153",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌]\n스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제\n2. 카테킨 : 표시량(375 mg/2,100 mg)의 80~120%\n3. EGCG : 일일섭취량(2,100 mg) 중 300 mg 이하\n4. 카페인(mg/kg) : 50,000 이하\n5. 테아닌 : 표시량(250 mg/2,100 mg)의 80~120%\n6. 비타민 E : 표시량(3.3 mg α-TE/2,100 mg)의 80~150%\n7. 잔류용매(mg/kg) : 50.0 이하 (초산에틸)\n8. 납(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.5 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 비소(mg/kg) : 1.0 이하\n12. 대장균군 : 음성\n13. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 3정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[테아닌]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의할 것\n(다) 수술전후 환자는 전문가와 상담할 것\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 375,
+    "unit": "mg",
+    "basisAmount": 2100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 375mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 250mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>편안한 밤 하늘이 다이어트<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)케비젠 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>375mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>250mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 녹차 카테킨 <b>375mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>250mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제 · (주)케비젠 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(375mg/2100mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/2100mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(250mg/2100mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 375mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 250mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>편안한 밤 하늘이 다이어트<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)케비젠 · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>375mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>250mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 tablets): <b>375mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>250mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)케비젠</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (375mg / 2100mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 2100mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (250mg / 2100mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-003",
+  "productName": "핑크그린 나이트컷",
+  "productNameEn": "핑크그린 나이트컷",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211245",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[녹차추출물] ①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌] ① 스트레스로 인한 긴장완화에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨 갈레이트(mg) : 일일섭취량(1,800mg) 중 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 60분이내\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>핑크그린 나이트컷<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(200mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>핑크그린 나이트컷<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>200mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>300mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>200mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (200mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-004",
+  "productName": "편안한 밤 하늘이 다이어트",
+  "productNameEn": "편안한 밤 하늘이 다이어트",
+  "manufacturer": "(주)미누스토리",
+  "manufacturerEn": null,
+  "statementNo": "2019000939490",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n① 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제\n2) 카테킨 : 375mg/2100mg (80 ~ 120%) / 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 300 이하\n3) 테아닌 : 250mg/2100mg (80 ~ 120%)\n4) 비타민 E : 3.3mg a-TE/2100mg ( 80 ~ 150%)\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 0.5 이하\n7) 수은(mg/kg) : 0.5 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 카페인(mg/kg) : 50,000 이하\n10) 잔류용매(mg/kg) : 50.0 이하(초산에틸)\n11) 붕해: 60분이내\n12) 대장균군: 음성",
+   "intake": "1일 1회, 1회 3정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n(나) 수술전후 환자는 전문가와 상담하십시오.\n(다) 간질환이 있거나 의약품 복용 시 전문가와 상담하십\n시오.\n(라) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수\n있으니 주의하십시오.\n(마) 식사 후 섭취하십시오.\n(마) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취\n에 주의 하십시오.\n(바) 카페인을 함유한 식품의 섭취에 주의하십시오.\n(사) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하\n십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 375,
+    "unit": "mg",
+    "basisAmount": 2100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 375mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 250mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>편안한 밤 하늘이 다이어트<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)미누스토리 제조 · 1일 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>375mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>250mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(3정) 섭취로 녹차 카테킨 <b>375mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>250mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제 · (주)미누스토리 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(375mg/2100mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/2100mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(250mg/2100mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 375mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 250mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>편안한 밤 하늘이 다이어트<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)미누스토리 · Once a day · 3 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>375mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>250mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (3 tablets): <b>375mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>250mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)미누스토리</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (375mg / 2100mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 2100mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (250mg / 2100mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-005",
+  "productName": "제트헬퍼 아무도 모르게 나이트번 시즌4 NIGHT BURN SEASON4",
+  "productNameEn": "제트헬퍼 아무도 모르게 나이트번 시즌4 NIGHT BURN SEASON4",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007558",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음 \n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제\n2. 카테킨 : 표시량(300 mg/1,800 mg)의 80~120 % \n3. L-테아닌 : 표시량(200 mg/1,800 mg)의 80~120 % \n4. 비타민E : 표시량(3.3 mgα-TE/1,800 mg)의 80~150 % \n5. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n6. 카페인(mg/kg) : 50,000 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 0.5 이하\n9. 수은(mg/kg) : 0.5 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성 \n12. 붕해 : 적합",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의하십시오.\n어린이, 임산부 및 수유부는 섭취를 피하십시오.\n간질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있습니다.\n식사 후 섭취하십시오.\n카페인을 함유한 식품의 섭취에 주의하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n수술전후 환자는 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제",
+   "storage": "고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>제트헬퍼 아무도 모르게 나이트번 시즌4 NIGHT BURN SEASON4<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제 · (주)한풍네이처팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(200mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>제트헬퍼 아무도 모르게 나이트번 시즌4 NIGHT BURN SEASON4<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>200mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>300mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>200mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (200mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-006",
+  "productName": "제트헬퍼 아무도 모르게 나이트번 (NIGHT BURN) 시즌2",
+  "productNameEn": "제트헬퍼 아무도 모르게 나이트번 (NIGHT BURN) 시즌2",
+  "manufacturer": "(주)신비바이오",
+  "manufacturerEn": null,
+  "statementNo": "2023000229617",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제\n2. 카테킨 : 표시량(300 mg/1,800 mg)의 80~120 %\n3. L-테아닌 : 표시량(200 mg/1,800 mg)의 80~120 %\n4. 비타민E : 표시량(3.3 mgα-TE/1,800 mg)의 80~150 %\n5. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n6. 카페인(mg/kg) : 50,000 이하\n7. 초산에틸(mg/kg) : 50.0이하\n8. 납(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.5 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 비소(mg/kg) : 1.0 이하\n12. 대장균군 : 음성\n13. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(3) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(4) 식사 후 섭취할 것\n(5) 카페인을 함유한 식품의 섭취에 주의할 것\n(6) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[테아닌]\n(1) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n(2) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제",
+   "storage": "습기 및 직사광선을 피하고 건조하고 서늘한 곳에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>제트헬퍼 아무도 모르게 나이트번 (NIGHT BURN) 시즌2<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)신비바이오 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제 · (주)신비바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(200mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 직사광선을 피하고 건조하고 서늘한 곳에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>제트헬퍼 아무도 모르게 나이트번 (NIGHT BURN) 시즌2<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)신비바이오 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>200mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>300mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>200mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)신비바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (200mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기 및 직사광선을 피하고 건조하고 서늘한 곳에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm35-007",
+  "productName": "드림온 다이어트",
+  "productNameEn": "드림온 다이어트",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211455",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨칼레이트((-)-epigallocatechin gallate,EGCG)(mg) : 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 적합(제피정제 : 60분 이내 붕해)\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1800,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">L-테아닌 200mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>드림온 다이어트<small>녹차 카테킨 · 비타민 E · L-테아닌</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 녹차 카테킨 <b>300mg</b>, 비타민 E <b>3.3mg</b>, L-테아닌 <b>200mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>L-테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/1800mg)의 80~150%</div><div class=\"sd-item\"><b>L-테아닌</b> 표시량(200mg/1800mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 비타민 E · L-테아닌 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">L-theanine 200mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>드림온 다이어트<small>Green tea catechin · Vitamin E · L-theanine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>3.3mg</b> of Vitamin E, <b>200mg</b> of L-theanine as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>300mg</b> Green tea catechin, <b>3.3mg</b> Vitamin E, <b>200mg</b> L-theanine</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>L-theanine</b><ul class=\"sd-why\"><li>May help with relief of stress-induced tension</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 1800mg), 80~150%</div><div class=\"sd-item\"><b>L-theanine</b> labelled (200mg / 1800mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Vitamin E · L-theanine together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

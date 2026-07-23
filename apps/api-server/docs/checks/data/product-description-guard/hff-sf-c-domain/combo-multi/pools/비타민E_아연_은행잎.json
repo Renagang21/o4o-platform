@@ -1,0 +1,439 @@
+[
+ {
+  "statementNo": "2019001407122",
+  "productName": "프롬바이오 은행잎",
+  "manufacturer": "주식회사 프롬바이오 익산공장",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제\n2) 플라보놀 배당체 : 표시량(36mg/600mg)의 80~120%\n3) 깅콜릭산(mg/kg) : 5.0 이하\n4) 비타민E : 표시량(11mg/600mg)의 80~150%\n5) 아연 : 표시량(8.5mg/600mg)의 80~150%\n6) 대장균군 : 음성\n7) 납(mg/kg) : 1.0 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 카드뮴(mg/kg) : 1.0 이하\n10) 수은(mg/kg) : 1.0 이하\n11) 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정(1정당 600mg)을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제",
+   "storage": "● 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.● 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.● 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020046459",
+  "productName": "프리미엄 징코 앤 메모리",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.25,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물 제품]①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n[비타민E]①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120% 이어야 한다.\n3) 비타민E : 표시량(5.5mg α-TE/500mg)의 80~150% 이어야 한다.\n4) 아연 : 표시량(4.25mg/500mg)의 80~150% 이어야 한다.\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 납(mg/kg) : 1.0 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 붕해시험 : 20분 이내\n11) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 어린이, 임산부 및 수유부는 섭취를 피하십시오. \n② 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담하십시오. \n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n④ 특정원료에 알레르기 및 과민증상이 있는 체질이신 경우 성분을 확인한 후 섭취 여부를 결정하시고 섭취 외 다른 용도로 사용하지 마십시오. \n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2022002000234",
+  "productName": "징코플러스골드",
+  "manufacturer": "이앤에스(주)",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물]\t기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민 E]\t\t항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]\t\t정상적인 면역기능에 필요\n\t\t\t정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐\n2) 플라보놀 배당체 : 표시량(36 ㎎/500 ㎎) 의 80~120%\n3) 깅콜릭산(㎎/㎏) : 5.0 이하\n4) 비타민 E : 표시량(3.3 ㎎ α-TE/500 ㎎)의 80 ~150%\n5) 아연 : 표시량(2.55 ㎎/500 ㎎)의 80 ~150%\n6) 납(㎎/㎏) : 1.0 이하\n7) 카드뮴(㎎/㎏) : 1.0 이하\n8) 수은(㎎/㎏) : 1.0 이하\n9) 비소(㎎/㎏) : 1.0 이하\n10) 대장균군 : 음성\n11) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n2) 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n3) 특이체질, 알레르기체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하십시오.\n4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐",
+   "storage": "직사광선을 받지 아니하는 서늘한 실온에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200141314",
+  "productName": "라이프에이드포르테",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 6,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연] ① 정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제\n② 플라보놀 배당체 : 표시량(28.8 mg/500 mg)의 80~120%\n③ 비타민E : 표시량(5 mg α-TE/500 mg)의 80~150%\n④ 아연 : 표시량(6 mg/500 mg)의 80~150%\n⑤ 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하 \n⑥ 납(mg/kg) : 1.0 이하\n⑦ 카드뮴(mg/kg) : 1.0 이하\n⑧ 수은(mg/kg) : 1.0 이하\n⑨ 비소(mg/kg) : 1.0 이하\n⑩ 대장균군 : 음성\n⑪ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[은행잎추출물]\n② 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n③ 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2022002106730",
+  "productName": "프리미엄징코앤메모리",
+  "manufacturer": "한국바이오팜(주)",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.25,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120%\n3) 비타민E : 표시량(5.5mg α-TE/500mg)의 80~150%\n4) 아연 : 표시량(4.25mg/500mg)의 80~150%\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 납(mg/kg) : 1.0 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 붕해시험 : 20분 이내\n11) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이, 수술전후 환자 및 의약품(항응고제) 복용 시 섭취에 주의하시기 바랍니다.\n② 특정원료에 알레르기 및 과민증상이 있는 체질이신 경우 성분을 확인한 후 섭취 여부를 결정하시고 섭취 외 다른 용도로 사용하지 마십시오.\n③ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,338 @@
+[
+ {
+  "candidateId": "cm84-001",
+  "productName": "청춘큐",
+  "productNameEn": "청춘큐",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107902",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>청춘큐<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>청춘큐<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-002",
+  "productName": "비답",
+  "productNameEn": "비답",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211853",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물] (1)기억력 개선･혈행 개선에 도움을 줄 수 있음\n[비타민E] (1)항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n[비타민B2] (1) 체내 에너지 생성에 필요\n[비타민B6] (1) 단백질 및 아미노산 이용에 필요, (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "4. 규격\n1)성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐\n2)플라보놀배당체 : 표시량(28 mg/1,200 mg)의 80~120%\n3)깅콜릭산(mg/kg) : 5.0 이하\n4)비타민E : 표시량(3.74 mg α-TE/1,200 mg)의 80~150%\n5)비타민 B2 :　표시량(0.644 mg/1,200 mg)의 80~180%\n6)비타민 B6： 표시량(0.525 mg/1,200 mg)의 80~150%\n7)비타민 B1 : 표시량(0.504 mg/1,200 mg)의 80~180%\n8)납(mg/kg) : 1.0이하\n9)카드뮴(mg/kg) : 1.0이하 \n10)수은(mg/kg) : 1.0이하\n11)비소(mg/kg) : 1.0이하\n12)붕해시험: 20분 이내\n13)대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할것\n(라) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐",
+   "storage": "실온/1) 제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.2) 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.504,
+    "unit": "mg",
+    "basisAmount": 1200,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.504mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.644mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.525mg</span><span class=\"sd-badge is-solid\">비타민 E 3.74mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비답<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.504mg</b>, 비타민 B2 <b>0.644mg</b>, 비타민 B6 <b>0.525mg</b>, 비타민 E <b>3.74mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.504mg</b>, 비타민 B2 <b>0.644mg</b>, 비타민 B6 <b>0.525mg</b>, 비타민 E <b>3.74mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.504mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.644mg/1200mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.525mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.74mg/1200mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1200mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/1) 제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.2) 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.504mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.644mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.525mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.74mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비답<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.504mg</b> of Vitamin B1, <b>0.644mg</b> of Vitamin B2, <b>0.525mg</b> of Vitamin B6, <b>3.74mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.504mg</b> Vitamin B1, <b>0.644mg</b> Vitamin B2, <b>0.525mg</b> Vitamin B6, <b>3.74mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.504mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.644mg / 1200mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.525mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.74mg / 1200mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1200mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/1) 제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.2) 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-003",
+  "productName": "엔알에이피 캡슐",
+  "productNameEn": "엔알에이피 캡슐",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071123",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg /2,000 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg /2,000 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg /2,000 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg /2,000 mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE /2,000 mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합(20분 이내)\n13. 대장균군 : 적합(음성)",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n② 의약품(항응고제) 복용 시 섭취에 주의\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>엔알에이피 캡슐<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/2000mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>엔알에이피 캡슐<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 2000mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-004",
+  "productName": "뉴로-퀸",
+  "productNameEn": "뉴로-퀸",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107876",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg / 1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg / 1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg / 1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg / 1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE / 1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>뉴로-퀸<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>뉴로-퀸<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-005",
+  "productName": "비답",
+  "productNameEn": "비답",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107695",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐\r\n2. 플라보놀배당체 : 표시량(28 mg / 1,400 mg) 의 80~120% \r\n3. 비타민B1 : 표시량(0.51 mg / 1,400 mg) 의 80~180% \r\n4. 비타민B2 : 표시량(0.65 mg / 1,400 mg) 의 80~180% \r\n5. 비타민B6 : 표시량(0.53 mg / 1,400mg)의 80~150% \r\n6. 비타민E : 표시량(3.78 mg α-TE / 1,400mg) 의 80~150%\r\n7. 납(mg/kg) : 1.0 이하 \r\n8. 총비소(mg/kg) : 1.0 이하 \r\n9. 카드뮴(mg/kg) : 1.0 이하 \r\n10. 총수은(mg/kg) : 1.0 이하 \r\n11. 깅콜릭산(mg/kg) : 5.0 이하 \r\n12. 붕해시험 : 적합 \r\n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물] \r\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\r\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\r\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\r\n\r\n[비타민B1, 비타민B2]\r\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\r\n\r\n[비타민B6] \r\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비답<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>비답<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-006",
+  "productName": "슈브",
+  "productNameEn": "슈브",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071034",
+  "category": "hff",
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐\n2. 비타민E: 표시량(11 mgα-TE / 1,400 mg)의 80~150%\n3. 비타민B1: 표시량(1.2 mg / 1,400 mg)의 80~180%\n4. 비타민B2: 표시량(1.4 mg / 1,400 mg)의 80~180%\n5. 비타민B6: 표시량(1.5 mg / 1,400 mg)의 80~150%\n6. 플라보놀배당체: 표시량(28 mg / 1,400 mg)의 80~120%\n7. 깅콜릭산(mg/kg): 적합(5.0 이하)\n8. 납(mg/kg): 적합(1.0 이하)\n9. 카드뮴(mg/kg): 적합(1.0 이하)\n10. 수은(mg/kg): 적합(1.0 이하)\n11. 비소(mg/kg): 적합(1.0 이하)\n12. 대장균군: 적합(음성)\n13. 붕해시험: 적합(20분 이내)",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.2,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 1.2mg</span><span class=\"sd-badge is-solid\">비타민 B2 1.4mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>슈브<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>1.2mg</b>, 비타민 B2 <b>1.4mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 은행잎추출물 <b>28mg</b></li><li>고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(1.2mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.4mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 1.2mg</span><span class=\"sd-badge is-solid\">Vitamin B2 1.4mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>슈브<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.2mg</b> of Vitamin B1, <b>1.4mg</b> of Vitamin B2, <b>1.5mg</b> of Vitamin B6, <b>11mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>1.2mg</b> Vitamin B1, <b>1.4mg</b> Vitamin B2, <b>1.5mg</b> Vitamin B6, <b>11mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (1.2mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.4mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-007",
+  "productName": "뉴로에이피",
+  "productNameEn": "뉴로에이피",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107933",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n1. 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n2. 의약품(항응고제) 복용 시 섭취에 주의\n3. 어린이, 임산부 및 수유부는 섭취를 피할 것\n4. 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n\n[비타민B1, 비타민B2]\n1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B6]\n1. 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>뉴로에이피<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>뉴로에이피<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm84-008",
+  "productName": "웨이크 뉴로(WAKE NEURO)",
+  "productNameEn": "웨이크 뉴로(WAKE NEURO)",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107883",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n[비타민E] \n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물] \n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n\n[비타민B1, 비타민B2] \n(가) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B6]\n(가) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.51,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B1 0.51mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.65mg</span><span class=\"sd-badge is-solid\">비타민 B6 0.53mg</span><span class=\"sd-badge is-solid\">비타민 E 3.78mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>웨이크 뉴로(WAKE NEURO)<small>비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b>를 표시량으로 담은 5원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 B1 <b>0.51mg</b>, 비타민 B2 <b>0.65mg</b>, 비타민 B6 <b>0.53mg</b>, 비타민 E <b>3.78mg</b>, 은행잎추출물 <b>28mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.51mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.65mg/1400mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(0.53mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.78mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B1 · 비타민 B2 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B1 0.51mg</span><span class=\"sd-badge is-solid\">Vitamin B2 0.65mg</span><span class=\"sd-badge is-solid\">Vitamin B6 0.53mg</span><span class=\"sd-badge is-solid\">Vitamin E 3.78mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>웨이크 뉴로(WAKE NEURO)<small>Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.51mg</b> of Vitamin B1, <b>0.65mg</b> of Vitamin B2, <b>0.53mg</b> of Vitamin B6, <b>3.78mg</b> of Vitamin E, <b>28mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>0.51mg</b> Vitamin B1, <b>0.65mg</b> Vitamin B2, <b>0.53mg</b> Vitamin B6, <b>3.78mg</b> Vitamin E, <b>28mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B1</b><ul class=\"sd-why\"><li>Needed for carbohydrate and energy metabolism</li></ul></li><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B1</b> labelled (0.51mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B2</b> labelled (0.65mg / 1400mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (0.53mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.78mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B1 · Vitamin B2 · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

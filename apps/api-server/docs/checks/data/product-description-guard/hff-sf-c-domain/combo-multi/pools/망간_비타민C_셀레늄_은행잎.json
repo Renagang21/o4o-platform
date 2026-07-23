@@ -1,0 +1,335 @@
+[
+ {
+  "statementNo": "201000190041048",
+  "productName": "센트라겐",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "망간",
+    "labelKo": "망간",
+    "labelEn": "Manganese",
+    "declaredAmount": {
+     "value": 3,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "뼈 형성에 필요",
+     "에너지 이용에 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)",
+     "Needed for bone formation",
+     "Needed for energy utilisation"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해도 : 60분 이내\n4) 플라보놀 배당체 : 표시량(28mg/1,300mg)의 80~120%\n5) 비타민C : 표시량(200mg/1,300mg)의 80~150%\n6) 망간 : 표시량(3mg/1,300mg)의 80~150%\n7) 셀렌 : 표시량(55㎍/1,300mg)의 80~150%\n8) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n9) 중금속\n (가)납(mg/kg) : 1.0 이하\n (나)카드뮴(mg/kg) : 1.0 이하\n (다)수은(mg/kg) : 1.0 이하\n (라)비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 하얀색의 점박이가 있는 진한 회황색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "201000190041307",
+  "productName": "센씨맥스",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "망간",
+    "labelKo": "망간",
+    "labelEn": "Manganese",
+    "declaredAmount": {
+     "value": 3,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "뼈 형성에 필요",
+     "에너지 이용에 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)",
+     "Needed for bone formation",
+     "Needed for energy utilisation"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 플라보놀배당체 : 표시량(36mg/1,100mg)의 80~120%\n5) 비타민C : 표시량(100mg/1,100mg)의 80~150%\n6) 망간 : 표시량(3mg/1,100mg)의 80~150%\n7) 셀렌 : 표시량(55㎍/1,100mg)의 80~150%\n8) 깅콜릭산(mg/kg) : 5.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 연노랑색의 점박이가 있는 탁한 황갈색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "201000190041261",
+  "productName": "센C플러스",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "망간",
+    "labelKo": "망간",
+    "labelEn": "Manganese",
+    "declaredAmount": {
+     "value": 3,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "뼈 형성에 필요",
+     "에너지 이용에 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)",
+     "Needed for bone formation",
+     "Needed for energy utilisation"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 110,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 33.6,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물]①기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[망간]①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[셀렌]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 플라보놀배당체 : 표시량(33.6mg/2,000mg)의 80~120%\n5) 비타민C : 표시량(300mg/2,000mg)의 80~150%\n6) 망간 : 표시량(3mg/2,000mg)의 80~150%\n7) 셀렌 : 표시량(110ug/2,000mg)의 80~150%\n8) 깅콜릭산(mg/kg) : 5.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 2회, 1회 1정 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 유통기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2) 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 자주색의 점박이가 있는 진한 황회색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

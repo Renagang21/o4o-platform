@@ -1,0 +1,113 @@
+[
+ {
+  "statementNo": "200400200061242",
+  "productName": "마이니 혈행케어 징코&보라지",
+  "manufacturer": "(주)서흥",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood cholesterol, improving blood circulation, easing discomfort related to premenstrual changes, and improving skin condition related to immune hypersensitivity",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 134,
+     "unit": "mg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 2.5,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "감마리놀렌산함유유지 : 혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음 \n\n비타민C : ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n비타민E : ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n은행잎추출물 : ①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 점도가 있는 내용물을 함유한 적갈색의 연질캡슐\n (2) 감마리놀렌산 : 표시량(240 mg/2.5g)의 80~120%\n (3) 비타민C : 표시량(500 mg/2.5g)의 80~150%\n (4) 비타민E : 표시량(134 mg α-TE/2.5g)의 80~150%\n (5) 플라보놀 배당체 : 표시량(28 mg/2.5g)의 80~120%\n (6) 깅콜릭산 : 5.0mg/kg 이하 \n (7) 헥산 : 5.0mg/kg 이하\n (8) 납 ; 1.0mg/kg 이하\n (9) 카드뮴 ; 1.0mg/kg 이하\n (10) 수은 : 1.0mg/kg 이하\n (11) 비소 : 1.0mg/kg 이하\n (12) 대장균군 : 음성\n (13) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(2.5 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 수술전후 환자,질병치료 중인 분, 영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것\n② 의약품(항응고제) 복용 시 섭취에 주의\n③ 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n④ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 점도가 있는 내용물을 함유한 적갈색의 연질캡슐",
+   "storage": "① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오.   ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

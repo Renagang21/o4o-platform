@@ -1,0 +1,71 @@
+[
+ {
+  "statementNo": "2004001701393",
+  "productName": "뉴진포니프리미엄",
+  "manufacturer": "(주)녹십초알로에",
+  "ingredients": [
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.57,
+     "unit": "mg",
+     "basisAmount": 2.4,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 605.04,
+     "unit": "mg",
+     "basisAmount": 2.4,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선‧ 혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA의 합]\n① 혈중 중성지질 개선‧ 혈행 개선에 도움을 줄 수 있음\n\n[비타민 B6]\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미,이취가 없는 흐린 황갈색의 내용물을 함유한 탁한 연두색의 연질캅셀\n2) EPA 및 DHA의 합 : 표시량(605.04mg/2.4g)의 80~120%\n3) 비타민 B6 : 표시량(1.57mg/2.4g)의 80~150%\n4) 납(mg/kg) : 3.0  이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 0.5 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 20분이내",
+   "intake": "(1캡슐: 400mg) 1일 3회, 1회 2캅셀씩 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(라) 손발 따끔거림, 작열감 또는 저림 등의  이상사례 발생 시 섭취를 중단하고 전문가와   상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 흐린 황갈색의 내용물을 함유한 탁한 연두색의 연질캅셀",
+   "storage": "실온보관 및 유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 3
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

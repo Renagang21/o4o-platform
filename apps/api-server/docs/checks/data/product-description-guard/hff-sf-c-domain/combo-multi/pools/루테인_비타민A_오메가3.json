@@ -1,0 +1,95 @@
+[
+ {
+  "statementNo": "20040020004232",
+  "productName": "알브라이트 플러스",
+  "manufacturer": "(주)네이처텍",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 2400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 210,
+     "unit": "μg",
+     "basisAmount": 2400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요,1) EPA및 DHA함유 유지: 혈중 중성지질 개선∙혈행 개선∙기억력 개선∙건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "May help with improving dry eyes for eye health",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 900,
+     "unit": "mg",
+     "basisAmount": 2400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강, 기억력 개선에 도움을 줄 수 있음",
+     "상피세포의 성장과 발달에 필요,1) EPA및 DHA함유 유지: 혈중 중성지질 개선∙혈행 개선∙기억력 개선∙건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health",
+     "May help with improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강, 기억력 개선에 도움을 줄 수 있음\n\n①노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요,1) EPA및 DHA함유 유지: 혈중 중성지질 개선∙혈행 개선∙기억력 개선∙건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n2) 루테인: 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n3) 비타민A: 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상: 이미, 이취가 없고 고유의 향미가 있는 적색 점조성 내용물을 함유한 암적색의 연질캡슐\n2) EPA와 DHA의 합: 900mg/2,400mg (표시량의 80~120%)\n3) 루테인: 20mg/2,400mg (표시량의 80~120%)\n4) 비타민A: 210μg RE/2,400mg (표시량의 80~150%)\n5) 대장균군: 음성이어야 한다.\n6) 붕해: 20분 이내여야 한다.\n7) 납: 1.0 mg/kg이하여야 한다.\n8) 카드뮴: 1.0 mg/kg이하여야 한다.\n9) 총수은: 0.5 mg/kg이하여야 한다.\n10) 총비소: 1.0 mg/kg이하여야 한다.",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 적색 점조성 내용물을 함유한 암적색의 연질캡슐",
+   "storage": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관하십시오.2) 영∙유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

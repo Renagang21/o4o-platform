@@ -1,0 +1,137 @@
+[
+ {
+  "statementNo": "20160012278168",
+  "productName": "혜당청뇌원",
+  "manufacturer": "에스에스바이오팜(주)",
+  "ingredients": [
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 230,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 24,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 12.6,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음",
+     "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+     "기억력 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels",
+     "May help with improving blood circulation",
+     "May help with improving dry eyes for eye health",
+     "May help with memory improvement"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈행 개선에 도움을 줄 수 있음",
+     "기억력 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood circulation",
+     "May help with memory improvement"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]\n① 혈중 중성지질 개선에 도움을 줄 수 있음\n② 혈행 개선에 도움을 줄 수 있음\n③ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[은행잎 추출물]\n① 기억력 개선에 도움을 줄 수 있음\n② 혈행 개선에 도움을 줄 수 있음,[비타민E]\n① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]\n① 정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요\n[비타민A]\n① 어두운 곳에서 시각 적응을 위해 필요\n② 피부와 점막을 형성하고 기능을 유지하는데 필요\n③ 상피세포의 성장과 발달에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 황갈색의 내용물을 함유한 어두운 회녹색의 장방형 연질캡슐\n② EPA와 DHA의 합 : 표시량(600mg/2,000mg)의 80~120%\n③ 플라보놀 배당체 : 표시량(36mg/2,000mg)의 80~120%\n④ 비타민E : 표시량(24mg α-TE/2,000mg)의 80~150%\n⑤ 아연 : 표시량(12.6mg/2,000mg)의 80~150%\n⑥ 비타민A : 표시량(230μg RAE/2,000mg)의 80~150%\n⑦ 헥산(mg/kg) : 5.0 이하 \n⑧ 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n⑨ 납(mg/kg) : 1.0 이하\n⑩ 카드뮴(mg/kg) : 1.0 이하\n⑪ 수은(mg/kg) : 0.5 이하\n⑫ 비소(mg/kg) : 1.0 이하\n⑬ 대장균군: 음성\n⑭ 붕해시험: 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[EPA 및 DHA 함유 유지]\n① 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n② 개인에 따라 피부 관련 이상반응이 발생 할 수 있음\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 황갈색의 내용물을 함유한 어두운 회녹색의 장방형 연질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

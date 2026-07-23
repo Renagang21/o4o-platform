@@ -1,0 +1,331 @@
+[
+ {
+  "statementNo": "200400200141669",
+  "productName": "순환엔 골드",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "마그네슘",
+    "labelKo": "마그네슘",
+    "labelEn": "Magnesium",
+    "declaredAmount": {
+     "value": 140,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "에너지 이용에 필요",
+     "신경과 근육 기능 유지에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy utilisation",
+     "Needed to help maintain normal nerve and muscle function"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "엽산",
+    "labelKo": "엽산",
+    "labelEn": "Folate",
+    "declaredAmount": {
+     "value": 680,
+     "unit": "μg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "세포와 혈액생성에 필요",
+     "태아 신경관의 정상 발달에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for cell and blood formation",
+     "Needed for the normal development of the fetal neural tube",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마그네슘] ① 에너지 이용에 필요 ② 신경과 근육 기능 유지에 필요\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[엽산] ① 세포와 혈액생성에 필요 ② 태아 신경관의 정상 발달에 필요 ③ 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미∙이취가 없는 밝은 회녹색의 장방형 제피정제\n2. 플라보놀배당체 : 표시량(36 mg/ 1,100 mg)의 80 ~ 120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8. 마그네슘 : 표시량(140 mg/1,100 mg)의 80 ~ 150%\n9. 엽산 : 표시량(680 ㎍ DFE/1,100 mg)의 80 ~ 150% \n10. 비타민 E : 표시량(5 mg α-TE/1,100 mg)의 80 ~ 150%\n11. 대장균군 : 음성\n12. 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n1. 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n2. 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 밝은 회녹색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200081882",
+  "productName": "엔오카디 징코",
+  "manufacturer": "주식회사 노바렉스",
+  "ingredients": [
+   {
+    "key": "마그네슘",
+    "labelKo": "마그네슘",
+    "labelEn": "Magnesium",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "에너지 이용에 필요",
+     "신경과 근육 기능 유지에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy utilisation",
+     "Needed to help maintain normal nerve and muscle function"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "엽산",
+    "labelKo": "엽산",
+    "labelEn": "Folate",
+    "declaredAmount": {
+     "value": 680,
+     "unit": "μg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "세포와 혈액생성에 필요",
+     "태아 신경관의 정상 발달에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for cell and blood formation",
+     "Needed for the normal development of the fetal neural tube",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고, 이미·이취가 없는 점박이를 함유한 회적색 장방형의 연한 자줏빛 분홍색 제피정제\n2. 플라보놀 배당체 : 표시량(36mg/1200mg)의 80~120%\n3. 마그네슘 : 표시량(100mg/1200mg)의 80~150%\n4. 비타민E : 표시량(11mg α-TE/1200mg)의 80~150%\n5. 엽산 : 표시량(680ug DFE/1200mg)의 80~150%\n6. 깅콜릭산(mg/kg) : 5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 1.0 이하\n9. 수은(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성\n12. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정(1정당 600mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시, 섭취를 중단하고 전문가와 상담할 것.\n[은행잎추출물]\n어린이, 임산부 및 수유부는 섭취를 피할 것\n수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고, 이미·이취가 없는 점박이를 함유한 회적색 장방형의 연한 자줏빛 분홍색 제피정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오.3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200141377",
+  "productName": "순환엔",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "마그네슘",
+    "labelKo": "마그네슘",
+    "labelEn": "Magnesium",
+    "declaredAmount": {
+     "value": 140,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "에너지 이용에 필요",
+     "신경과 근육 기능 유지에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy utilisation",
+     "Needed to help maintain normal nerve and muscle function"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "엽산",
+    "labelKo": "엽산",
+    "labelEn": "Folate",
+    "declaredAmount": {
+     "value": 400,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "세포와 혈액생성에 필요",
+     "태아 신경관의 정상 발달에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for cell and blood formation",
+     "Needed for the normal development of the fetal neural tube",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마그네슘] ① 에너지 이용에 필요 ② 신경과 근육 기능 유지에 필요\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[엽산] ① 세포와 혈액생성에 필요 ② 태아 신경관의 정상 발달에 필요 ③ 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 연두색의 장방형 제피정제\n② 마그네슘 : 표시량(140 mg/1,000 mg)의 80~150%\n③ 플라보놀 배당체 : 표시량(36 mg/1,000 mg)의 80~120%\n④ 비타민E : 표시량(5 mg α-TE/1,000 mg)의 80~150%\n⑤ 엽산 : 표시량(400 ㎍/1,000 mg)의 80~150%\n⑥ 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n⑦ 납(mg/kg) : 1.0 이하 \n⑧ 카드뮴(mg/kg) : 1.0 이하\n⑨ 수은(mg/kg) : 1.0 이하 \n⑩ 비소(mg/kg) : 1.0 이하 \n⑪ 대장균군 : 음성\n⑫ 붕해시험 : 60분 이내",
+   "intake": "1일 2회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[은행잎 추출물]\n② 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n③ 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없는 연한 연두색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

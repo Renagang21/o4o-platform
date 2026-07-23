@@ -1,0 +1,1067 @@
+[
+ {
+  "statementNo": "200700170351363",
+  "productName": "내 눈에 하트충전 젤리",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10.8,
+     "unit": "mg",
+     "basisAmount": 9,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.58,
+     "unit": "mg",
+     "basisAmount": 9,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n[베타카로틴]\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색의 하트 모양 젤리\n2. 루테인 : 표시량(10.80mg/9g)의 80~120%\n3. 베타카로틴 : 표시량(0.58mg/9g)의 80~150%\n4. 헥산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 총수은(mg/kg) : 1.0 이하\n8. 총비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2개를 씹어서 섭취하십시오",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색의 하트 모양 젤리",
+   "storage": "1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.  2. 제품 개봉 후에는 변질될 수 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오. 3. 빛이나 열에 의하여 색상이 변할 수 있으나 품질에는 문제가 되지 않으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "serving": {
+   "unitType": "gummy",
+   "servingUnitKo": "개",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200700170353026",
+  "productName": "매일 눈건강 케어 루테인 구미",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 15,
+     "unit": "mg",
+     "basisAmount": 8,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.42,
+     "unit": "mg",
+     "basisAmount": 8,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[베타카로틴]\n어두운 곳에서 시각 적응을 위해 필요\n피부와 점막을 형성하고 기능을 유지하는데 필요\n상피세포의 성장과 발달에 필요\n\n[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 BETTER모양이 있는 타원형 젤리\n2. 루테인 : 표시량(15mg/8g)의 80~120%\n3. 베타카로틴 : 표시량 (0.42mg/8g)의 80~150%\n4. 헥산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하 \n6. 카드뮴(mg/kg) : 1.0 이하 \n7. 수은(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2개를 잘 씹어서 섭취하십시오.",
+   "caution": "[베타카로틴]\n흡연자는 섭취 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[마리골드꽃추출물]\n영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n1. 특이체질, 알레르기 체질의 경우, 개인에 따라 과민반응을 나타낼 수 있으므로 원료 확인 후 섭취하십시오.\n2. 만성질환이 있거나 현재 질병치료 및 약물복용 중이신 분은 전문가와 반드시 상의 후 섭취하십시오.\n3. 섭취량 및 섭취방법을 확인한 후 섭취하십시오.\n4. 섭취 전에 소비기한을 확인 후 섭취하십시오. 또한 소비기한이 경과한 제품은 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 빨강색의 BETTER모양이 있는 타원형 젤리",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "serving": {
+   "unitType": "gummy",
+   "servingUnitKo": "개",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008580",
+  "productName": "울트라 눈 밝은 세상",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 16,
+     "unit": "mg",
+     "basisAmount": 700,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.42,
+     "unit": "mg",
+     "basisAmount": 700,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미‧이취가 없는 적갈색의 점도가 있는 내용물을 함유한 빨간 주황색의 장방형 연질캡슐\n2. 루테인 : 표시량(16mg/700mg)의 80~120%\n3. 총지아잔틴 : 표시량(4mg/700mg)의 80~120%\n4. 베타카로틴 : 표시량(0.42mg/700mg)의 80~150%\n5. 헥산(mg/kg) : 5.0 이하\n6. 메탄올(mg/kg) : 50 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 0.5 이하\n9. 수은(mg/kg) : 0.5 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성\n12. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[루테인지아잔틴복합추출물20%(제2013-23호)]\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n[베타카로틴] 흡연자는 섭취 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미‧이취가 없는 적갈색의 점도가 있는 내용물을 함유한 빨간 주황색의 장방형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200600200081437",
+  "productName": "눈엔 루테인지아잔틴 PLUS",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 150,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 7,
+     "unit": "mg",
+     "basisAmount": 150,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃주정추출물(지아잔틴함유)(제2025-70호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[베타카로틴] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흐린 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(20mg/150mg)의 80~120%\n3. 총지아잔틴 : 표시량(4mg/150mg)의 80~120%\n4. 베타카로틴 : 표시량(7mg/150mg)의 80~150%\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 수은(mg/kg) : 1.0 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[마리골드꽃주정추출물(지아잔틴함유)(제2025-70호)]\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n[베타카로틴] 흡연자는 섭취 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흐린 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나, 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20220011370101",
+  "productName": "룩엣70",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 1.8,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[베타카로틴](1) 어두운 곳에서 시각 적응을 위해 필요 (2) 피부와 점막을 형성하고 기능을 유지하는데 필요 (3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질캡슐\n2. 루테인 : 표시량(20 mg / 1,000 mg)의 80~120%\n3. 베타카로틴 : 표시량(1.8 mg / 1,000 mg)의 80~150%\n4. 헥산(mg/kg) : 5.0 이하\n5. 초산에틸(mg/kg) : 50.0 이하\n6. 납(mg/kg) : 1.0 이하\n7. 카드뮴(mg/kg) : 1.0 이하\n8. 수은(mg/kg) : 1.0 이하\n9. 비소(mg/kg) : 1.0 이하\n10. 대장균군 : 음성\n11. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(1) 흡연자는 섭취 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200022627",
+  "productName": "원더루키 맛있츄어블 루테인 베타카로틴",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 1,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음.\n2) 베타카로틴 : 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 적갈색의 유상 내용물을 함유한 흑갈색의 타원형 츄어블 연질캡슐\n2) 루테인 : 표시량(10mg/500mg)의 80~120%\n3) 베타카로틴 : 표시량(1mg/500mg)의 80~150%\n4) 카드뮴(mg/kg) : 1.0 이하\n5) 수은(mg/kg) : 1.0 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 납(mg/kg) : 1.0 이하\n8) 헥산(mg/kg) : 5.0 이하\n9) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n흡연자는 섭취 시 전문가와 상담하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 유상 내용물을 함유한 흑갈색의 타원형 츄어블 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200700170351442",
+  "productName": "Eye Health Gummy",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10.8,
+     "unit": "mg",
+     "basisAmount": 9,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.58,
+     "unit": "mg",
+     "basisAmount": 9,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n[베타카로틴]\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색의 하트 모양 젤리\n2. 루테인 : 표시량(10.80mg/9g)의 80~120%\n3. 베타카로틴 : 표시량(0.58mg/9g)의 80~150%\n4. 헥산(mg/kg) : 5.0 이하\n5. 납(mg/kg) : 1.0 이하\n6. 카드뮴(mg/kg) : 1.0 이하\n7. 총수은(mg/kg) : 1.0 이하\n8. 총비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2개를 씹어서 섭취하십시오",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색의 하트 모양 젤리",
+   "storage": "1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.  2. 제품 개봉 후에는 변질될 수 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오. 3. 빛이나 열에 의하여 색상이 변할 수 있으나 품질에는 문제가 되지 않으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "serving": {
+   "unitType": "gummy",
+   "servingUnitKo": "개",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200023554",
+  "productName": "한포유루테인",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 250,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 1,
+     "unit": "mg",
+     "basisAmount": 250,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n2) 베타카로틴 : 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2) 루테인 : 표시량 (20mg/250mg)의 80~120%\n3) 베타카로틴 : 표시량 (1mg/250mg)의 80~150%\n4) 헥산(mg/kg) : 5.0 이하\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 1.0 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 대장균군 : 음성\n10) 붕해시험 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 성분에 알레르기가 있으신 분은 원료 성분을 확인 후 섭취하십시오.\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n흡연자는 섭취 시 전문가와 상담하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008863",
+  "productName": "루테인지아잔틴 맥스 24",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20.1348,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 2.28,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n(영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging\n(1) 어두운 곳에서 시각 적응을 위해 필요(2) 피부와 점막을 형성하고 기능을 유지하는데 필요(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미· 이취가 없는 주황색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(20.1348mg/100mg)의 80~120%\n3. 총지아잔틴 : 표시량(3.8652mg/100mg)의 80~120%\n4. 베타카로틴 : 표시량(2.28mg/100mg)의 80~150%\n5. 헥산(mg/kg) : 5.0 이하\n6. 초산에틸(mg/kg) : 50.0 이하\n7. 납(mg/kg) : 0.5 이하\n8. 카드뮴(mg/kg) : 0.1 이하\n9. 비소(mg/kg) : 1.0 이하\n10. 수은(mg/kg) : 0.1 이하\n11. 대장균군 : 음성\n12. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n영.유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(1) 흡연자는 섭취 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미· 이취가 없는 주황색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008930",
+  "productName": "루테인지아잔틴 미니 24",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20.1348,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 2.28,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[루테인지아잔틴복합추출물(기능성원료인정제2018-11호)]\n(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n(영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging\n[베타카로틴](1) 어두운 곳에서 시각 적응을 위해 필요(2) 피부와 점막을 형성하고 기능을 유지하는데 필요(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(20.1348mg/100mg)의 80~120%\n3. 총지아잔틴 : 표시량(3.8652mg/100mg)의 80~120% \n4. 베타카로틴 : 표시량(2.28mg/100mg)의 80~150%\n5. 헥산(mg/kg) : 5.0 이하\n6. 초산에틸(mg/kg) : 50.0 이하\n7. 납(mg/kg) : 0.5 이하\n8. 카드뮴(mg/kg) : 0.1 이하\n9. 비소(mg/kg) : 1.0 이하\n10. 수은(mg/kg) : 0.1 이하\n11. 대장균군 : 음성\n12. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n[루테인지아잔틴복합추출물(기능성원료인정제2018-11호)]\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것 \n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[베타카로틴]\n(가) 흡연자는 섭취 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008897",
+  "productName": "진정주 루테인지아잔틴 미니",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 16,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.62,
+     "unit": "mg",
+     "basisAmount": 100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n(영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(16mg/100mg)의 80~120%\n3. 총지아잔틴 : 표시량(4mg/100mg)의 80~120%\n4. 베타카로틴 : 표시량(0.62mg/100mg)의 80~150%\n5. 헥산(mg/kg) : 5.0 이하\n6. 메탄올(mg/kg) : 50.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 0.5 이하 \n9. 비소(mg/kg) : 1.0 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 대장균군 : 음성\n12. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040017006967",
+  "productName": "케어-온 루테인",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.7,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[베타카로틴] ①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 어두운 갈색의 타원형 연질캡슐\n2) 루테인: 표시량(20 mg/500 mg)의 80~120%\n3) 베타카로틴: 표시량(0.7 mg/500 mg)의 80~150%\n4) 중금속 : 비소(1.0 mg/kg 이하), 수은(1.0 mg/kg 이하), 납(1.0 mg/kg 이하), 카드뮴(1.0 mg/kg 이하)\n5) 잔류용매 : 헥산(5.0 mg/kg 이하), 초산에틸(50.0 mg/kg 이하)\n6) 붕해시험: 20분 이내\n7) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[마리골드꽃추출물]\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n\n[베타카로틴]\n(가) 흡연자는 섭취 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 빨간색의 내용물을 함유한 어두운 갈색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015104234",
+  "productName": "하루야채 바이탈 눈 건강 이중캡",
+  "manufacturer": "주식회사 네추럴웨이",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 260,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 2,
+     "unit": "mg",
+     "basisAmount": 260,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성 상 : 이미, 이취가 없으며 고유의 향미가 있는 적갈색의 알갱이가 있는 연한 노란색 분말을 함유한 경질캡슐\n2. 루테인 : 10mg/260mg(표시량의 80-120%)\n3. 베타카로틴 : 2mg/260mg(표시량의 80-150%)\n3. 납(mg/kg) : 1.0 이하\n4. 비소(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 1.0 이하\n7. 헥산(mg/kg) : 5.0 이하\n6. 대장균군 : 음성\n7. 붕해 : 20분",
+   "intake": "1일 1회, 1회 2캡슐",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n\n(1) 흡연자는 섭취 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없으며 고유의 향미가 있는 적갈색의 알갱이가 있는 연한 노란색 분말을 함유한 경질캡슐",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 42일까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020028491",
+  "productName": "아이러뷰 루테인",
+  "manufacturer": "(주)유니쎌팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 210,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상: 주황색의 내용물을 함유한 초콜렛색연질캡슐\n2 마리골드꽃추출물 : \n  표시량(20mg/500mg)의 80~120%\n3. 비타민A:\n  표시량(210ugRE/500mg)의 80~150% \n4. 잔류용매:\n   (가) 헥산(mg/kg) : 5.0 이하\n5. 중금속\n   (가) 납(mg/kg) : 1.0 이하\n   (나) 카드뮴(mg/kg) : 1.0 이하\n   (다) 총수은(mg/kg) : 1.0 이하\n   (라) 총비소(mg/kg) : 1.0 이하\n6. 대장균군 : 음성\n7. 붕해시험 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "주황색의 내용물을 함유한 초콜렛색 연질캡슐",
+   "storage": "고온다습한 곳에 두시면 젤라틴 피막이 변형 될 수 있으므로 반드시 직사광선과 습기를 피하여 서늘한 곳에 보관 하십시오.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200600200081223",
+  "productName": "루테인지아잔틴 24 베타카로틴",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20.1348,
+     "unit": "mg",
+     "basisAmount": 250,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 0.42,
+     "unit": "mg",
+     "basisAmount": 250,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[루테인지아잔틴복합추출물(제2018-11호)] (국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging\n[베타카로틴] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 빨간 주황의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(20.1348mg/250mg)의 80~120%\n3. 총지아잔틴 : 표시량(3.8652mg/250mg)의 80~120%\n4. 베타카로틴 : 표시량(0.42mg/250mg)의 80~150%\n5. 헥산(mg/kg) : 5.0 이하\n6. 초산에틸(mg/kg) : 50 이하\n7. 납(mg/kg) : 0.5 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.1 이하\n10. 수은(mg/kg) : 0.1 이하\n11. 대장균군 : 음성\n12. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[루테인지아잔틴복합추출물(제2018-11호)]\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n[베타카로틴] 흡연자는 섭취 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 빨간 주황의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나, 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

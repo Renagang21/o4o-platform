@@ -1,0 +1,87 @@
+[
+ {
+  "statementNo": "2024002023315",
+  "productName": "알티지오메가 Q10",
+  "manufacturer": "(주)비오팜2공장",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 900,
+     "unit": "mg",
+     "basisAmount": 1600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지] 혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[코엔자임Q10] 항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐\n(2)EPA 및 DHA 함유유지 : 표시량(900mg/1,600mg)의 80-120%\n(3)코엔자임Q10 : 표시량(100mg/1,600mg)의 80-120%\n(4)비타민E : 표시량(11mg α-TE/1600mg)의 80-150%\n(5)납(mg/kg) : 2.8 이하\n(6)카드뮴(mg/kg) : 1.0 이하\n(7)수은(mg/kg) : 0.5 이하\n(8)비소(mg/kg) : 1.0 이하\n(9)헥산(mg/kg) : 5.0 이하\n(10)초산에틸(mg/kg) : 50.0 이하\n(11)대장균군 : 음성\n(12)붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 수유부는 섭취를 피할 것\n(라) 항응고제 복용 시 전문가와 상담할 것\n(마) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐",
+   "storage": "실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

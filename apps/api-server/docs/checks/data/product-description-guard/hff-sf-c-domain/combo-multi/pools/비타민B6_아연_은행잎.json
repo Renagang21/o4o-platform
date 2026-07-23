@@ -1,0 +1,93 @@
+[
+ {
+  "statementNo": "20040017021541",
+  "productName": "트리플징코플러스",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\r\n\r\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n\r\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 연갈색의 장방형 제피정제\n②플라보놀 배당체 : 표시량(28.8mg/600mg)의 80 ~120% \n③비타민B6 : 표시량(1.5mg/600mg) 80~150%\n④아연 : 표시량(8.5mg/600mg) 의 80~150%\n⑤깅콜릭산(ginkgolic acid)(mg/kg) : 5.0이하\n⑥대장균군 : 음성\n⑦납(mg/kg) : 1.0이하\n⑧카드뮴(mg/kg) : 1.0이하\n⑨수은(mg/kg) : 1.0이하\n⑩비소(mg/kg) : 1.0이하\n⑪붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정를 물과 함께 섭취한다.",
+   "caution": "①임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n②의약품(항응고제) 복용 시 섭취에 주의\n③개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \n④알레르기 체질이신 경우 원료 성분을 확인 하신 후 섭취하십시오.\n⑤제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.\n⑥손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n⑦어린이, 임산부 및 수유부는 섭취를 피할 것\n⑧수술 전후, 의약품(항응고제)복용 시 전문가와 상담할 것\n⑨이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연갈색의 장방형 제피정제",
+   "storage": "실온/① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.③ 제품의 향미에 영향을 줄 수 있는 다른 식품 및 식품첨가물과는 분리 보관하여야 한다.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

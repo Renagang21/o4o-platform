@@ -1,0 +1,290 @@
+[
+ {
+  "statementNo": "20040015162317",
+  "productName": "먼데이 솔루션",
+  "manufacturer": "(주)허브큐어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있으며 불규칙한 점박이를 포함한 흐린황갈색의 장방형 코팅정제.\n(2) 플라보놀 배당체 : 표시량(30mg/500mg)의 80~120%\n(3) 비타민B1 : 표시량(1.2mg/500mg)의 80~180%\n(4) 비타민B2 : 표시량(1.4mg/500mg)의 80~180%\n(5) 비타민B6 : 표시량(1.5mg/500mg)의 80~150%\n(6) 셀레늄 : 표시량(55㎍/500mg)의 80~150%\n(7) 아연 : 표시량(8.5mg/500mg)의 80~150%\n(8) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n(9) 납(mg/kg) : 1.0 이하\n(10) 카드뮴(mg/kg) : 1.0 이하\n(11) 총수은(mg/kg) : 1.0 이하\n(12) 총비소(mg/kg) : 1.0 이하\n(13) 대장균군 : 음성\n(14) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 불규칙한 점박이를 포함한 흐린 황갈색의 장방형 코팅정제.",
+   "storage": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20172880193134",
+  "productName": "징코비타프리미엄",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색의 장방형 제피정제\n2. 플라보놀배당체 : 표시량(36 mg/500 mg)의 80~120%\n3. 아연 : 표시량(8.5 mg/500 mg)의 80~150%\n4. 비타민B1 : 표시량(1.2 mg/500 mg)의 80~180%\n5. 비타민B2 : 표시량(1.4 mg/500 mg)의 80~180%\n6. 비타민B6 : 표시량(1.5 mg/500 mg)의 80~150%\n7. 셀레늄 : 표시량(55 ug/500 mg)의 80~150%\n8. 깅콜릭산(mg/kg) : 5.0 이하\n9. 납(mg/kg) : 1.0 이하\n10. 카드뮴(mg/kg) : 1.0 이하\n11. 수은(mg/kg) : 1.0 이하\n12. 비소(mg/kg) : 1.0 이하\n13. 대장균군 : 음성\n14. 붕해시험 : 60분 이내 적합",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색의 장방형 제피정제",
+   "storage": "직사광선을 피하여 실온에 보관하시고, 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

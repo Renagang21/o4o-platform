@@ -1,0 +1,91 @@
+[
+ {
+  "statementNo": "2016001213717",
+  "productName": "녹차카테킨 에프터 다이어트",
+  "manufacturer": "(주)원일바이오",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 351,
+     "unit": "mg",
+     "basisAmount": 2600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "망간",
+    "labelKo": "망간",
+    "labelEn": "Manganese",
+    "declaredAmount": {
+     "value": 1.76,
+     "unit": "mg",
+     "basisAmount": 2600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "뼈 형성에 필요",
+     "에너지 이용에 필요",
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for bone formation",
+     "Needed for energy utilisation",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 12.74,
+     "unit": "mg",
+     "basisAmount": 2600,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n①체내 에너지 생성에 필요\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연녹색의 장방형정제\n② 카테킨 : 표시량(  351mg / 2600 mg )의 80~120%\n③ 비타민B2 : 표시량(  12.74 mg / 2600  mg )의 80~180%\n④ 망간 : 표시량(  1.76 mg / 2600  mg )의 80~150%\n⑤ 카페인(mg/kg) : 50,000 이하\n⑥ 에피갈로카테킨 갈레이트(mg/2600mg) : 300 이하\n⑦ 대장균군 : 음성 \n⑧ 붕해도시험 : 적합 (30분 이내)",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "①어린이, 임산부 및 수유부는 섭취를 피할 것 ②간질환이 있거나 의약품 복용 시 전문가와 상담할 것 ③카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음 ④식사 후 섭취할 것 ⑤카페인을 함유한 식품의 섭취에 주의할 것 ⑥이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연녹색의 장방형정제",
+   "storage": "- 직사광선 및 고온다습한 곳을 피하여 보관하십시오.- 고온다습한 곳에 두면 흡습되어 변경 될 수 있으므로 밀봉 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

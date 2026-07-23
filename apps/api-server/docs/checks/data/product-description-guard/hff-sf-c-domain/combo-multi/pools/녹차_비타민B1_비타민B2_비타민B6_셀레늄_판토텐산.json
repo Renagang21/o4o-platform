@@ -1,0 +1,143 @@
+[
+ {
+  "statementNo": "200400200141614",
+  "productName": "콜레올로지 컷 라이트",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 0.3,
+     "unit": "g",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물]\n① 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[셀렌]\n① 유해산소로부터 세포를 보호하는데 필요\n[판토텐산]\n① 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민B6]\n① 단백질 및 아미노산 이용에 필요 ② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1]\n① 탄수화물과 에너지 대사에 필요\n[비타민B2]\n① 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 연한 황갈색의 장방형 제피정제\n2. 카테킨 : 표시량(0.3 g/1,200 mg)의 80~120%\n3. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하(300 mg/1,200 mg 이하) \n4. 카페인(mg/kg) : 50,000 이하\n5. 잔류용매(mg/kg) : 50.0 이하(초산에틸을 사용한 경우)\n6. 셀렌 : 표시량(55 μg/1,200 mg)의 80~150%\n7. 판토텐산 : 표시량(5 mg/1,200 mg)의 80~180%\n8. 비타민B6 : 표시량(1.5 mg/1,200 mg)의 80~150%\n9. 비타민B1 : 표시량(1.2 mg/1,200 mg)의 80~180%\n10. 비타민B2 :표시량(1.4 mg/1,200 mg)의 80~180%\n11. 대장균군 : 음성\n12. 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n1. 어린이, 임산부 및 수유부는 섭취를 피할 것\n2. 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n3. 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n4. 식사 후 섭취할 것\n5. 카페인을 함유한 식품의 섭취에 주의할 것\n6. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[판토텐산/비타민B1/비타민B2]\n7. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 연한 황갈색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

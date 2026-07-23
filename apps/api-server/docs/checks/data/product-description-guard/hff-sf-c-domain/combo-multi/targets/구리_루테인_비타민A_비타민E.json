@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm11-001",
+  "productName": "눈에좋은 루테인지아잔틴",
+  "productNameEn": "눈에좋은 루테인지아잔틴",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "manufacturerEn": null,
+  "statementNo": "20060020008675",
+  "category": "hff",
+  "source": {
+   "mainFunction": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n(영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(8mg/500mg)의 80~120%\n3. 총지아잔틴 : 표시량(2mg/500mg)의 80~120%\n4. 비타민A : 표시량(560μg RAE/500mg)의 80~150%\n5. 비타민E : 표시량(4.4mg α-TE/500mg)의 80~150%\n6. 구리 : 표시량(0.24mg/500mg)의 80~150%\n7. 납(mg/kg) : 1.0 이하\n8. 비소(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.5 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 헥산(mg/kg) : 5.0 이하\n12. 메탄올(mg/kg) : 50 이하\n13. 대장균군 : 음성\n14. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[루테인지아잔틴복합추출물20%(제2013-23호)]\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 0.24,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.24mg</span><span class=\"sd-badge is-solid\">루테인 8mg</span><span class=\"sd-badge is-solid\">비타민 A 560μg</span><span class=\"sd-badge is-solid\">비타민 E 4.4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>눈에좋은 루테인지아잔틴<small>구리 · 루테인 · 비타민 A · 비타민 E</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.24mg</b>, 루테인 <b>8mg</b>, 비타민 A <b>560μg</b>, 비타민 E <b>4.4mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>0.24mg</b>, 루테인 <b>8mg</b>, 비타민 A <b>560μg</b>, 비타민 E <b>4.4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>구리</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>철의 운반과 이용에 필요</li></ul></li><li><b>루테인</b><ul class=\"sd-why\"><li>(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.24mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>루테인</b> 표시량(8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(560μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(4.4mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 구리 · 루테인 · 비타민 A · 비타민 E 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Copper 0.24mg</span><span class=\"sd-badge is-solid\">Lutein 8mg</span><span class=\"sd-badge is-solid\">Vitamin A 560μg</span><span class=\"sd-badge is-solid\">Vitamin E 4.4mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>눈에좋은 루테인지아잔틴<small>Copper · Lutein · Vitamin A · Vitamin E</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>0.24mg</b> of Copper, <b>8mg</b> of Lutein, <b>560μg</b> of Vitamin A, <b>4.4mg</b> of Vitamin E as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>0.24mg</b> Copper, <b>8mg</b> Lutein, <b>560μg</b> Vitamin A, <b>4.4mg</b> Vitamin E</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Copper</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li><li>Needed for the transport and utilisation of iron</li></ul></li><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Copper</b> labelled (0.24mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Lutein</b> labelled (8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (560μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (4.4mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Copper · Lutein · Vitamin A · Vitamin E together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

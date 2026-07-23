@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm87-001",
+  "productName": "슈퍼액티라이프골드",
+  "productNameEn": "슈퍼액티라이프골드",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061009",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음\r\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요\r\n[비타민E]①유해산소로부터 세포를 보호하는데 필요\r\n[비타민B2]①체내 에너지 생성에 필요\r\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\r\n[엽산]①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "① 성상 : 탁한 황갈색의 점조성 내용물을 함유한 어두운 회자주색의 장용성 연질캡슐\r\n② EPA와 DHA의 합 : 표시량 (545 mg/1.2 g)의 80~120%\r\n③ 셀렌 : 표시량(55 μg/1.2 g)의 80~150%\r\n④ 비타민E : 표시량(12 mg α-TE/1.2 g)의 80~150%\r\n⑤ 비타민B2 : 표시량(1.5 mg/1.2 g)의 80~180%\r\n⑥ 비타민D : 표시량(7 μg/1.2 g)의 80~180%\r\n⑦ 엽산 : 표시량(280 μg/1.2 g)의 80~150%\r\n⑧ 납 : 3.0 mg/kg 이하\r\n⑨ 카드뮴 : 1.0 mg/kg 이하\r\n⑩ 총수은 : 0.5 mg/kg 이하\r\n⑪ 대장균군 : 음성\r\n⑫ 붕해 : 적합( 1액 120분 이상, 2액 60분 이내)",
+   "intake": "1일 1회, 1회 2캡슐(1.2 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취 시 주의하시기 바랍니다.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "탁한 황갈색의 점조성 내용물을 함유한 어두운 회자주색의 장용성 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 1.5,
+    "unit": "mg",
+    "basisAmount": 1.2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B2 1.5mg</span><span class=\"sd-badge is-solid\">비타민 D 7μg</span><span class=\"sd-badge is-solid\">비타민 E 12mg</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">엽산 280μg</span><span class=\"sd-badge is-solid\">오메가3 545mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼액티라이프골드<small>비타민 B2 · 비타민 D · 비타민 E · 셀레늄 · 엽산 · 오메가3</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B2 <b>1.5mg</b>, 비타민 D <b>7μg</b>, 비타민 E <b>12mg</b>, 셀레늄 <b>55μg</b>, 엽산 <b>280μg</b>, 오메가3 <b>545mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 B2 <b>1.5mg</b>, 비타민 D <b>7μg</b>, 비타민 E <b>12mg</b>, 셀레늄 <b>55μg</b>, 엽산 <b>280μg</b>, 오메가3 <b>545mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>탁한 황갈색의 점조성 내용물을 함유한 어두운 회자주색의 장용성 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B2</b> 표시량(1.5mg/1.2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(7μg/1.2g)의 80~180%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(12mg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(280μg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(545mg/1.2g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 탁한 황갈색의 점조성 내용물을 함유한 어두운 회자주색의 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 B2 · 비타민 D · 비타민 E · 셀레늄 · 엽산 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin B2 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin D 7μg</span><span class=\"sd-badge is-solid\">Vitamin E 12mg</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Folate 280μg</span><span class=\"sd-badge is-solid\">Omega-3 545mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>슈퍼액티라이프골드<small>Vitamin B2 · Vitamin D · Vitamin E · Selenium · Folate · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>1.5mg</b> of Vitamin B2, <b>7μg</b> of Vitamin D, <b>12mg</b> of Vitamin E, <b>55μg</b> of Selenium, <b>280μg</b> of Folate, <b>545mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>1.5mg</b> Vitamin B2, <b>7μg</b> Vitamin D, <b>12mg</b> Vitamin E, <b>55μg</b> Selenium, <b>280μg</b> Folate, <b>545mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin B2</b><ul class=\"sd-why\"><li>Needed for energy production in the body</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Folate</b><ul class=\"sd-why\"><li>Needed for cell and blood formation</li><li>Needed for the normal development of the fetal neural tube</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin B2</b> labelled (1.5mg / 1.2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (7μg / 1.2g), 80~180%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (12mg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Folate</b> labelled (280μg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (545mg / 1.2g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 탁한 황갈색의 점조성 내용물을 함유한 어두운 회자주색의 장용성 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin B2 · Vitamin D · Vitamin E · Selenium · Folate · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

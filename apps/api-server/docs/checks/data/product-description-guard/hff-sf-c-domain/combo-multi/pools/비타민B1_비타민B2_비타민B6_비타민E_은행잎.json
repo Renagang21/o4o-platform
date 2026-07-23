@@ -1,0 +1,998 @@
+[
+ {
+  "statementNo": "20040015107902",
+  "productName": "청춘큐",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 연한 갈색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170211853",
+  "productName": "비답",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.504,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.644,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.525,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.74,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물] (1)기억력 개선･혈행 개선에 도움을 줄 수 있음\n[비타민E] (1)항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n[비타민B2] (1) 체내 에너지 생성에 필요\n[비타민B6] (1) 단백질 및 아미노산 이용에 필요, (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "4. 규격\n1)성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐\n2)플라보놀배당체 : 표시량(28 mg/1,200 mg)의 80~120%\n3)깅콜릭산(mg/kg) : 5.0 이하\n4)비타민E : 표시량(3.74 mg α-TE/1,200 mg)의 80~150%\n5)비타민 B2 :　표시량(0.644 mg/1,200 mg)의 80~180%\n6)비타민 B6： 표시량(0.525 mg/1,200 mg)의 80~150%\n7)비타민 B1 : 표시량(0.504 mg/1,200 mg)의 80~180%\n8)납(mg/kg) : 1.0이하\n9)카드뮴(mg/kg) : 1.0이하 \n10)수은(mg/kg) : 1.0이하\n11)비소(mg/kg) : 1.0이하\n12)붕해시험: 20분 이내\n13)대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할것\n(라) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 하양색 경질캡슐",
+   "storage": "실온/1) 제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.2) 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400151071123",
+  "productName": "엔알에이피 캡슐",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg /2,000 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg /2,000 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg /2,000 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg /2,000 mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE /2,000 mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합(20분 이내)\n13. 대장균군 : 적합(음성)",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n② 의약품(항응고제) 복용 시 섭취에 주의\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말을 함유한 연한 노란 연두색 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": false,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015107876",
+  "productName": "뉴로-퀸",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg / 1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg / 1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg / 1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg / 1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE / 1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015107695",
+  "productName": "비답",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐\r\n2. 플라보놀배당체 : 표시량(28 mg / 1,400 mg) 의 80~120% \r\n3. 비타민B1 : 표시량(0.51 mg / 1,400 mg) 의 80~180% \r\n4. 비타민B2 : 표시량(0.65 mg / 1,400 mg) 의 80~180% \r\n5. 비타민B6 : 표시량(0.53 mg / 1,400mg)의 80~150% \r\n6. 비타민E : 표시량(3.78 mg α-TE / 1,400mg) 의 80~150%\r\n7. 납(mg/kg) : 1.0 이하 \r\n8. 총비소(mg/kg) : 1.0 이하 \r\n9. 카드뮴(mg/kg) : 1.0 이하 \r\n10. 총수은(mg/kg) : 1.0 이하 \r\n11. 깅콜릭산(mg/kg) : 5.0 이하 \r\n12. 붕해시험 : 적합 \r\n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물] \r\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\r\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\r\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\r\n\r\n[비타민B1, 비타민B2]\r\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\r\n\r\n[비타민B6] \r\n손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 미황색의 분말을 함유한 미황색 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400151071034",
+  "productName": "슈브",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 1.5,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐\n2. 비타민E: 표시량(11 mgα-TE / 1,400 mg)의 80~150%\n3. 비타민B1: 표시량(1.2 mg / 1,400 mg)의 80~180%\n4. 비타민B2: 표시량(1.4 mg / 1,400 mg)의 80~180%\n5. 비타민B6: 표시량(1.5 mg / 1,400 mg)의 80~150%\n6. 플라보놀배당체: 표시량(28 mg / 1,400 mg)의 80~120%\n7. 깅콜릭산(mg/kg): 적합(5.0 이하)\n8. 납(mg/kg): 적합(1.0 이하)\n9. 카드뮴(mg/kg): 적합(1.0 이하)\n10. 수은(mg/kg): 적합(1.0 이하)\n11. 비소(mg/kg): 적합(1.0 이하)\n12. 대장균군: 적합(음성)\n13. 붕해시험: 적합(20분 이내)",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 황갈색의 내용물을 함유한 흰색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": false,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015107933",
+  "productName": "뉴로에이피",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물]\n1. 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 \n2. 의약품(항응고제) 복용 시 섭취에 주의\n3. 어린이, 임산부 및 수유부는 섭취를 피할 것\n4. 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n5. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n\n[비타민B1, 비타민B2]\n1. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B6]\n1. 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040015107883",
+  "productName": "웨이크 뉴로(WAKE NEURO)",
+  "manufacturer": "(주)유유헬스케어",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 0.51,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.65,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.53,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.78,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n[비타민E] \n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐\n2. 플라보놀배당체 : 표시량(28 mg/1,400 mg) 의 80~120% \n3. 비타민B1 : 표시량(0.51 mg/1,400 mg) 의 80~180% \n4. 비타민B2 : 표시량(0.65 mg/1,400 mg) 의 80~180% \n5. 비타민B6 : 표시량(0.53 mg/1,400mg)의 80~150% \n6. 비타민E : 표시량(3.78 mg α-TE/1,400mg) 의 80~150%\n7. 납(mg/kg) : 1.0 이하 \n8. 비소(mg/kg) : 1.0 이하 \n9. 카드뮴(mg/kg) : 1.0 이하 \n10. 수은(mg/kg) : 1.0 이하 \n11. 깅콜릭산(mg/kg) : 5.0 이하 \n12. 붕해시험 : 적합 \n13. 대장균군 : 음성",
+   "intake": "1일 2회,  1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[은행잎 추출물] \n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n\n[비타민B1, 비타민B2] \n(가) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B6]\n(가) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있으며 미황색의 내용물을 함유한 백색의 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

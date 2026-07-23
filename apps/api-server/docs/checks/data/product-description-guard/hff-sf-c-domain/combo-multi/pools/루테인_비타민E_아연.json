@@ -1,0 +1,89 @@
+[
+ {
+  "statementNo": "2022001137034",
+  "productName": "루테인 알파",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[비타민E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물이 들어있는 검정색의 타원형 연질캡슐\n2) 루테인 : 표시량(20 mg / 500 mg)의 80~120%\n3) 아연 : 표시량(4.5 mg / 500 mg)의 80~150%\n4) 비타민E : 표시량(4 mgα-TE / 500 mg)의 80~150%\n5) 헥산(mg/kg) : 5.0이하\n6) 초산에틸(mg/kg) : 50.0이하\n7) 납(mg/kg) : 1.0이하\n8) 카드뮴(mg/kg) : 1.0이하\n9) 수은(mg/kg) : 1.0이하\n10) 비소(mg/kg) : 1.0이하\n11) 대장균군 : 음성\n12) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "①영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n②흡연자는 섭취 시 전문가와 상담하십시오.\n③과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n④이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물이 들어있는 검정색의 타원형 연질캡슐",
+   "storage": "고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관 및 유통하시고, 영·유아 및 어린이 손이 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

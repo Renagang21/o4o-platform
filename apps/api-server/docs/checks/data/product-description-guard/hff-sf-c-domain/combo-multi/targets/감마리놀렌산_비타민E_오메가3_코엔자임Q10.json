@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm8-001",
+  "productName": "혈행N멀티팩",
+  "productNameEn": "혈행N멀티팩",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006433",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[코엔자임Q10제품] ① 항산화에 도움을 줄 수 있음 ② 높은 혈압 감소에 도움을 줄 수 있음\n[오메가-3지방산함유유지 제품] ① 혈중 중성지질 개선에 도움을 줄 수 있음 ② 혈행개선에 도움을 줄 수 있음\n[비타민E] ① 유해산소로부터 세포를 보호하는데 필요\n[감마리놀렌산함유유지 제품] ① 혈중 콜레스테롤 개선에 도움을 줄 수 있음 ② 혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐\n2) 코엔자임Q10 : 표시량(100 mg/2,255 mg)의 80~120%\n3) EPA와 DHA의 합 : 표시량(500 mg/2,255 mg)의 80~120%\n4) 비타민E : 표시량(10.8 mg a-TE/2,255 mg)의 80~150 %\n5) 감마리놀렌산 : 표시량(240 mg/2,255 mg)의 80~120% %\n6) 중금속 : 납: 1.0 mg/kg이하, 카드뮴: 1.0 mg/kg이하, 총비소: 1.0 mg/kg이하, 총수은: 0.5 mg/kg이하\n7) 잔류용매 : 헥산:5.0 mg/kg이하, 초산에틸:50.0 mg/kg이하\n8) 붕해 : 20분 이내 \n9) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(4캡슐)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "[EPA및 DHA 함유유지]\n(1) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(2) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐",
+   "storage": "연질캡슐은 수분, 열에 의한 영향에 민감하므로, 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 240,
+    "unit": "mg",
+    "basisAmount": 2255,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산 240mg</span><span class=\"sd-badge is-solid\">비타민 E 10.8mg</span><span class=\"sd-badge is-solid\">오메가3 500mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행N멀티팩<small>감마리놀렌산 · 비타민 E · 오메가3 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 감마리놀렌산 <b>240mg</b>, 비타민 E <b>10.8mg</b>, 오메가3 <b>500mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 감마리놀렌산 <b>240mg</b>, 비타민 E <b>10.8mg</b>, 오메가3 <b>500mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>감마리놀렌산</b><ul class=\"sd-why\"><li>혈행개선에 도움을 줄 수 있음</li><li>혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li><li>높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>감마리놀렌산</b> 표시량(240mg/2255mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(10.8mg/2255mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(500mg/2255mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/2255mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> 연질캡슐은 수분, 열에 의한 영향에 민감하므로, 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 감마리놀렌산 · 비타민 E · 오메가3 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid 240mg</span><span class=\"sd-badge is-solid\">Vitamin E 10.8mg</span><span class=\"sd-badge is-solid\">Omega-3 500mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행N멀티팩<small>Gamma-linolenic acid · Vitamin E · Omega-3 · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 sachet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>240mg</b> of Gamma-linolenic acid, <b>10.8mg</b> of Vitamin E, <b>500mg</b> of Omega-3, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 sachet): <b>240mg</b> Gamma-linolenic acid, <b>10.8mg</b> Vitamin E, <b>500mg</b> Omega-3, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Gamma-linolenic acid</b><ul class=\"sd-why\"><li>May help with improving blood circulation</li><li>May help with improving blood cholesterol</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels</li><li>May help with improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity</li><li>May help with lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 sachet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Gamma-linolenic acid</b> labelled (240mg / 2255mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (10.8mg / 2255mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (500mg / 2255mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 2255mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> 연질캡슐은 수분, 열에 의한 영향에 민감하므로, 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid · Vitamin E · Omega-3 · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

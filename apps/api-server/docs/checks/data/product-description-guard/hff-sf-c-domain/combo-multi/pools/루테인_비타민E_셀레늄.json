@@ -1,0 +1,87 @@
+[
+ {
+  "statementNo": "20060020008416",
+  "productName": "눈 건강 루테인 지아잔틴 솔루션",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 16,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 갈색의 점도가 있는 내용물을 함유한 빨간색의 타원형 연질캡슐\n2. 루테인 : 표시량(16mg/500mg)의 80~120%\n3. 총지아잔틴 : 표시량(4mg/500mg)의 80~120%\n4. 비타민E : 표시량(3.3mg α-TE/500mg)의 80~150%\n5. 셀렌 : 표시량(16.5μg/500mg)의 80~150%\n6. 헥산(mg/kg) : 5.0 이하\n7. 메탄올(mg/kg) : 50 이하\n8. 납(mg/kg) : 1.0 이하\n9. 비소(mg/kg) : 1.0 이하\n10. 카드뮴(mg/kg) : 0.5 이하\n11. 수은(mg/kg) : 0.5 이하\n12. 대장균군 : 음성\n13. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n2. 흡연자는 섭취 시 전문가와 상담할 것\n3. 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n4. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n특정질환, 특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취 전에 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 갈색의 점도가 있는 내용물을 함유한 빨간색의 타원형 연질캡슐",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4) 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생 될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

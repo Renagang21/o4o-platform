@@ -1,0 +1,228 @@
+[
+ {
+  "statementNo": "200700170351955",
+  "productName": "렉스플로 체인저블",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood cholesterol, improving blood circulation, easing discomfort related to premenstrual changes, and improving skin condition related to immune hypersensitivity"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 1400,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 33,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[감마리놀렌산 함유 유지]\n혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n\n[비타민 A]\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n[비타민 D]\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 투명한 노란색의 내용물을 함유한 투명한 타원형의 연질캡슐\n2. 붕해시험: 20분이내\n3. 감마리놀렌산: 표시량(240mg/2000mg)의 80~120% \n4. 비타민 A: 표시량(1400μgRAE/2000mg)의 80~150%\n5. 비타민 D: 표시량(50μg/2000mg)의 80~180%\n6. 비타민 E: 표시량(33mgα-TE/2000mg)의 80~150%\n7. 대장균군: 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것 (면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시‧판매하는 경우에 한함)\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 투명한 노란색의 내용물을 함유한 투명한 타원형의 연질캡슐",
+   "storage": "1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.  2. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200700170351894",
+  "productName": "젬무브 생생 정일품",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선･혈행개선에 도움을 줄 수 있음",
+     "월경전 변화에 의한 불편한 상태 개선에 도움을 줄 수 있음",
+     "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood cholesterol and improving blood circulation",
+     "May help with easing discomfort related to premenstrual changes",
+     "May help with improving skin condition related to immune hypersensitivity"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 1400,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "μg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 33,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[감마리놀렌산 함유 유지]\n①혈중 콜레스테롤 개선･혈행개선에 도움을 줄 수 있음\n②월경전 변화에 의한 불편한 상태 개선에 도움을 줄 수 있음\n③면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[비타민 A]\n①어두운 곳에서 시각 적응을 위해 필요\n②피부와 점막을 형성하고 기능을 유지하는데 필요\n③상피세포의 성장과 발달에 필요\n[비타민 D]\n①칼슘과 인이 흡수되고 이용되는데 필요\n②뼈의 형성과 유지에 필요\n③골다공증발생 위험 감소에 도움을 줌\n[비타민E]\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명의 타원형 연질캡슐\n2. 붕해시험 : 20분이내\n3. 감마리놀렌산 : 표시량(240mg/2,000mg)의 80~120% \n4. 비타민 A : 표시량(1,400μgRAE/2,000mg)의 80~150%\n5. 비타민 D : 표시량(50μg/2,000mg)의 80~180%\n6. 비타민 E : 표시량(33mgα-TE/2,000mg)의 80~150%\n7. 대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "영･유아･어린이는 섭취 전 의사와 상담한 후 섭취할 것 (면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시‧판매하는 경우에 한함)\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 함유한 투명의 타원형 연질캡슐",
+   "storage": "실온/ 1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오. 2. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,113 @@
+[
+ {
+  "statementNo": "20040020028629",
+  "productName": "싸이토팜 하이퍼포머 관절 연골엔 식물성 엠에스엠(MSM)과 뼈엔 비타민D",
+  "manufacturer": "(주)유니쎌팜",
+  "ingredients": [
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 3200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 3200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 3200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 3200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "관절 및 연골건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with joint and cartilage health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n① 관절 및 연골건강에 도움을 줄 수 있음\n\n-기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미,이취가 없는 흐린 노란색 장방형 정제\n2. MSM : 표시향(1,500mg/3,200mg)의 80~120%\n3. 비타민B1 : 표시량(1.2mg/3,200mg)의 80~180%\n4. 비타민D : 표시량(10ug/3,200mg)의 80~180%\n5. 비타민A : 표시량(700ugRE/3,200mg)의 80~150%\n6. 플라보놀 배당체 : 표시량(28mg/3,200mg)의 80~120%\n7. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8. 납(mg/kg) : 0.1 이하\n9. 카드뮴(mg/kg) : 0.1 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 비소(mg/kg) : 0.1 이하\n12. 대장균군 : 음성\n13. 붕해시험 : 30분 이내",
+   "intake": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오",
+   "caution": "(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n(가) 신장질환이 있는 사람은 섭취 전 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미,이취가 없는 흐린 노란색 장방형 정제",
+   "storage": "고온 다습한 곳과 직사광선을 피하여 실온 보관 및 유통.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

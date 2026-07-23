@@ -1,0 +1,89 @@
+[
+ {
+  "statementNo": "200700170352773",
+  "productName": "포더데이",
+  "manufacturer": "코스맥스엔비티(주)",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood cholesterol, improving blood circulation, easing discomfort related to premenstrual changes, and improving skin condition related to immune hypersensitivity"
+    ]
+   },
+   {
+    "key": "마그네슘",
+    "labelKo": "마그네슘",
+    "labelEn": "Magnesium",
+    "declaredAmount": {
+     "value": 94.5,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "에너지 이용에 필요",
+     "신경과 근육 기능 유지에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy utilisation",
+     "Needed to help maintain normal nerve and muscle function"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[마그네슘]\n에너지 이용에 필요\n신경과 근육 기능 유지에 필요\n\n[감마리놀렌산 함유 유지]\n혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+   "baseStandard": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 분홍의 내용물을 함유한 흐린 갈색 타원형 츄어블 연질 캡슐\n2. 마그네슘 : 표시량(94.5mg/3000mg)의 80~150%\t\n3. 감마리놀렌산 : 표시량(240mg/3000mg)의 80~120%\t\n4. 비타민 E : 표시량(11mg a-TE/3000mg)의 80~150%\t\n5. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 6캡슐을 씹어서 섭취하십시오.",
+   "caution": "[감마리놀렌산 함유 유지]\n영･유아･어린이는 섭취 전 전문가와 상담한 후 섭취할 것(면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시･판매하는 경우에 한함)\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 분홍의 내용물을 함유한 흐린 갈색 타원형 츄어블 연질 캡슐",
+   "storage": "실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "chewable",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 6,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,926 @@
+[
+ {
+  "candidateId": "cm100-002",
+  "productName": "맥파워 플러스",
+  "productNameEn": "맥파워 플러스",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211682",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] ①혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음 ②건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[코엔자임Q10] ①항산화･높은 혈압 감소에 도움을 줄 수 있음           \n[비타민E] ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요 ③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 주황색의 내용물을 함유한 검정색의 장방형 연질캡슐\n ②EPA와 DHA의 합 : 표시량(600 mg/1,600 mg) 의 80~120%\n ③코엔자임Q10 : 표시량(100 mg/1,600 mg) 의 80~120%\n ④비타민D : 표시량( 10 μg /1,600 mg) 의 80~180%\n ⑤비타민E : 표시량( 11mg α-TE/1,600 mg)의 80~150%\n ⑥초산에틸(mg/kg) : 50.0 이하\n ⑦헥산(mg/kg) : 5.0 이하\n ⑧아세톤(mg/kg) : 30.0 이하\n ⑨납(mg/kg) : 2.8 이하\n ⑩카드뮴(mg/kg) : 1.0 이하\n ⑪수은(mg/kg) : 0.5 이하\n ⑫비소(mg/kg) : 1.0이하\n ⑬붕해시험 : 20분 이내\n ⑭대장균군 : 음성",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "- 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n- 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n- 수유부는 섭취를 피할 것\n- 항응고제 복용 시 전문가와 상담할 것\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n- 고칼슘혈증이 있거나 의약품 복용시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 주황색의 내용물을 함유한 검정색의 장방형 연질캡슐",
+   "storage": "실온/①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다.②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>맥파워 플러스<small>비타민 D · 비타민 E · 오메가3 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 비타민 E <b>11mg</b>, 오메가3 <b>600mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 D <b>10μg</b>, 비타민 E <b>11mg</b>, 오메가3 <b>600mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 주황색의 내용물을 함유한 검정색의 장방형 연질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화･높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/1600mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/1600mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/1600mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 주황색의 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 비타민 E · 오메가3 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>맥파워 플러스<small>Vitamin D · Vitamin E · Omega-3 · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>11mg</b> of Vitamin E, <b>600mg</b> of Omega-3, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>10μg</b> Vitamin D, <b>11mg</b> Vitamin E, <b>600mg</b> Omega-3, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li><li>May help with improving dry eyes for eye health</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 1600mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 1600mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 1600mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 주황색의 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①제품은 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Vitamin E · Omega-3 · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm100-003",
+  "productName": "혈행마스터 아쿠아셀 오메가3",
+  "productNameEn": "혈행마스터 아쿠아셀 오메가3",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061472",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA및 DHA함유유지] 혈중 중성지질 개선· 혈행 개선· 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[코엔자임Q10] ①항산화 · 높은 혈압 감소에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 노란주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐\n2) EPA와 DHA의 합: 표시량(600 mg / 1,240 mg)의 80~120%\t\t\n3) 코엔자임Q10: 표시량(100 mg / 1,240 mg)의 80~120%\t\t\n4) 비타민 E: 표시량(11 mg a-TE / 1,240 mg)의 80~150%\t\t\n5) 비타민 D: 표시량(20 ug / 1,240 mg)의 80~180%\t\t\n6) 헥산(mg/kg): 5.0 이하\n7) 납(mg/kg): 2.8 이하\n8) 카드뮴(mg/kg): 1.0 이하\n9) 수은(mg/kg): 0.5 이하\n10) 비소(mg/kg): 1.0 이하\n11) 붕해: 20분 이내\n12) 대장균군: 음성",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[EPA및 DHA함유유지]\n(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민D]\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "μg",
+    "basisAmount": 1240,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 20μg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행마스터 아쿠아셀 오메가3<small>비타민 D · 비타민 E · 오메가3 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>20μg</b>, 비타민 E <b>11mg</b>, 오메가3 <b>600mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 D <b>20μg</b>, 비타민 E <b>11mg</b>, 오메가3 <b>600mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선· 혈행 개선· 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화 · 높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(20μg/1240mg)의 80~180%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1240mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/1240mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/1240mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 비타민 E · 오메가3 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 20μg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행마스터 아쿠아셀 오메가3<small>Vitamin D · Vitamin E · Omega-3 · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20μg</b> of Vitamin D, <b>11mg</b> of Vitamin E, <b>600mg</b> of Omega-3, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>20μg</b> Vitamin D, <b>11mg</b> Vitamin E, <b>600mg</b> Omega-3, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (20μg / 1240mg), 80~180%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1240mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 1240mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 1240mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Vitamin E · Omega-3 · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm101-001",
+  "productName": "웰키즈 식물성오메가 플러스 디",
+  "productNameEn": "웰키즈 식물성오메가 플러스 디",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006480",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1.성상: 고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐\n2.EPA와 DHA의 합: 표시량(500mg/4,400mg)의 80~120%\n3.아연: 표시량(8.5mg/4,400mg)의 80~150%\n4.비타민D: 표시량(5.0㎍/4,400mg)의 80~180%\n5.중금속: 납3.0mg/kg 이하, 카드뮴1.0mg/kg 이하, 수은 0.5mg/kg 이하\n6.대장균군: 음성",
+   "intake": "1일 2회, 1회 2캡슐을 씹어서 섭취 하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량 등의 증상이 있을 경우 섭취를 중단하십시오.\r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 성분에 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.\r\n영,유아 섭취 시 보호자의 지도 아래 섭취할 수 있도록 해주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "μg",
+    "basisAmount": 4400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 5μg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">오메가3 500mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>웰키즈 식물성오메가 플러스 디<small>비타민 D · 아연 · 오메가3</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>5μg</b>, 아연 <b>8.5mg</b>, 오메가3 <b>500mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 D <b>5μg</b>, 아연 <b>8.5mg</b>, 오메가3 <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(5μg/4400mg)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/4400mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(500mg/4400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 아연 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 5μg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Omega-3 500mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>웰키즈 식물성오메가 플러스 디<small>Vitamin D · Zinc · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5μg</b> of Vitamin D, <b>8.5mg</b> of Zinc, <b>500mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>5μg</b> Vitamin D, <b>8.5mg</b> Zinc, <b>500mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (5μg / 4400mg), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 4400mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (500mg / 4400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Zinc · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm101-002",
+  "productName": "키즈오메가3",
+  "productNameEn": "키즈오메가3",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "200400170061883",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리\n2) EPA와 DHA의 합: 표시량(600 mg/3.8 g)의80~120%\n3) 아연: 표시량(4 mg /3.8 g)의80~150%\n4) 비타민D : 표시량(10 μg /3.8 g)의80~180%\n4) 중금속(mg/kg) : 납 3.0이하, 카드뮴1.0이하, 수은 0.5이하\n5) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2젤리를 씹어서 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n\n\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리",
+   "storage": "제품은 고온에 약하니 직사광선을 피하여 실온(25도 이하 권장), 습도가 낮은 곳에서 보관·소비해주십시오.유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 10,
+    "unit": "μg",
+    "basisAmount": 3.8,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "gummy",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">아연 4mg</span><span class=\"sd-badge is-solid\">오메가3 600mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>키즈오메가3<small>비타민 D · 아연 · 오메가3</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 2젤리</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>10μg</b>, 아연 <b>4mg</b>, 오메가3 <b>600mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2젤리) 섭취로 비타민 D <b>10μg</b>, 아연 <b>4mg</b>, 오메가3 <b>600mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리 · (주)알피바이오 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2젤리</span><span class=\"sd-tag\">씹어 섭취</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/3.8g)의 80~180%</div><div class=\"sd-item\"><b>아연</b> 표시량(4mg/3.8g)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(600mg/3.8g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 제품은 고온에 약하니 직사광선을 피하여 실온(25도 이하 권장), 습도가 낮은 곳에서 보관·소비해주십시오.유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 아연 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>젤리 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge is-solid\">Zinc 4mg</span><span class=\"sd-badge is-solid\">Omega-3 600mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>키즈오메가3<small>Vitamin D · Zinc · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 2 gummys</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>10μg</b> of Vitamin D, <b>4mg</b> of Zinc, <b>600mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 gummys): <b>10μg</b> Vitamin D, <b>4mg</b> Zinc, <b>600mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 gummys per serving</span><span class=\"sd-tag\">Chew to take</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 3.8g), 80~180%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4mg / 3.8g), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (600mg / 3.8g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>Storage</b> 제품은 고온에 약하니 직사광선을 피하여 실온(25도 이하 권장), 습도가 낮은 곳에서 보관·소비해주십시오.유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Zinc · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm102-001",
+  "productName": "브레인 초임계 알티지 오메가3 미니",
+  "productNameEn": "브레인 초임계 알티지 오메가3 미니",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142065",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지]\n(1)혈중 중성지질 개선･혈행 개선･기억력 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없는 주황색의 내용물을 함유한 노란 주황색의 타원형 연질캡슐\n(2) EPA와 DHA의 합 : 표시량(900mg/1,680mg)의 80 ~ 120%\n(3) 비타민D : 표시량(25㎍/1,680mg)의 80 ~ 180%\n(4) 납(mg/kg) : 3.0 이하\n(5) 카드뮴(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 0.5 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[EPA 및 DHA 함유유지]\n(1) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(2) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D]\n(1) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없는 주황색의 내용물을 함유한 노란 주황색의 타원형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 25,
+    "unit": "μg",
+    "basisAmount": 1680,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 D 25μg</span><span class=\"sd-badge is-solid\">오메가3 900mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>브레인 초임계 알티지 오메가3 미니<small>비타민 D · 오메가3</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 D <b>25μg</b>, 오메가3 <b>900mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 비타민 D <b>25μg</b>, 오메가3 <b>900mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없는 주황색의 내용물을 함유한 노란 주황색의 타원형 연질캡슐 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선･기억력 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 D</b> 표시량(25μg/1680mg)의 80~180%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(900mg/1680mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없는 주황색의 내용물을 함유한 노란 주황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 D · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin D 25μg</span><span class=\"sd-badge is-solid\">Omega-3 900mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>브레인 초임계 알티지 오메가3 미니<small>Vitamin D · Omega-3</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>25μg</b> of Vitamin D, <b>900mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>25μg</b> Vitamin D, <b>900mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin D</b> labelled (25μg / 1680mg), 80~180%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (900mg / 1680mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없는 주황색의 내용물을 함유한 노란 주황색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin D · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have hypercalcaemia or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm103-001",
+  "productName": "닥터에스더 식물성 알티지 오메가 프리미엄 900",
+  "productNameEn": "닥터에스더 식물성 알티지 오메가 프리미엄 900",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023132",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n2) 비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. \n3) 셀렌 : 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐\n2) EPA와 DHA의 합 : 표시량(900mg/1400mg)의 80~120%\n3) 비타민E : 표시량(11mg α-TE/1400mg) 80~150%\n4) 셀렌 : 표시량(27.5ug/1400mg) 80~150%\n5) 납(mg/kg) : 3.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 0.5 이하\n8) 대장균군 : 음성 \n9) 붕해시험 : 1액에서 120분이내 내용물이 방출안됨, 2액에서 60분이내 붕해",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 11,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">셀레늄 27.5μg</span><span class=\"sd-badge is-solid\">오메가3 900mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에스더 식물성 알티지 오메가 프리미엄 900<small>비타민 E · 셀레늄 · 오메가3</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>11mg</b>, 셀레늄 <b>27.5μg</b>, 오메가3 <b>900mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 E <b>11mg</b>, 셀레늄 <b>27.5μg</b>, 오메가3 <b>900mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(27.5μg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(900mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 셀레늄 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Selenium 27.5μg</span><span class=\"sd-badge is-solid\">Omega-3 900mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에스더 식물성 알티지 오메가 프리미엄 900<small>Vitamin E · Selenium · Omega-3</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>11mg</b> of Vitamin E, <b>27.5μg</b> of Selenium, <b>900mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>11mg</b> Vitamin E, <b>27.5μg</b> Selenium, <b>900mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (27.5μg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (900mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Selenium · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm104-001",
+  "productName": "프롬바이오 은행잎",
+  "productNameEn": "프롬바이오 은행잎",
+  "manufacturer": "주식회사 프롬바이오 익산공장",
+  "manufacturerEn": null,
+  "statementNo": "2019001407122",
+  "category": "hff",
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제\n2) 플라보놀 배당체 : 표시량(36mg/600mg)의 80~120%\n3) 깅콜릭산(mg/kg) : 5.0 이하\n4) 비타민E : 표시량(11mg/600mg)의 80~150%\n5) 아연 : 표시량(8.5mg/600mg)의 80~150%\n6) 대장균군 : 음성\n7) 납(mg/kg) : 1.0 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 카드뮴(mg/kg) : 1.0 이하\n10) 수은(mg/kg) : 1.0 이하\n11) 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 1정(1정당 600mg)을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제",
+   "storage": "● 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.● 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.● 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 11,
+    "unit": "mg",
+    "basisAmount": 600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프롬바이오 은행잎<small>비타민 E · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">주식회사 프롬바이오 익산공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>11mg</b>, 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 E <b>11mg</b>, 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제 · 주식회사 프롬바이오 익산공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/600mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/600mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ● 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.● 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.● 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프롬바이오 은행잎<small>Vitamin E · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 주식회사 프롬바이오 익산공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>11mg</b> of Vitamin E, <b>8.5mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>11mg</b> Vitamin E, <b>8.5mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 프롬바이오 익산공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 600mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 600mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 황갈색의 점박이가 있는 흐린 황갈색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ● 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.● 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.● 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm104-002",
+  "productName": "프리미엄 징코 앤 메모리",
+  "productNameEn": "프리미엄 징코 앤 메모리",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046459",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물 제품]①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n[비타민E]①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120% 이어야 한다.\n3) 비타민E : 표시량(5.5mg α-TE/500mg)의 80~150% 이어야 한다.\n4) 아연 : 표시량(4.25mg/500mg)의 80~150% 이어야 한다.\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 납(mg/kg) : 1.0 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 붕해시험 : 20분 이내\n11) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 어린이, 임산부 및 수유부는 섭취를 피하십시오. \n② 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담하십시오. \n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n④ 특정원료에 알레르기 및 과민증상이 있는 체질이신 경우 성분을 확인한 후 섭취 여부를 결정하시고 섭취 외 다른 용도로 사용하지 마십시오. \n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5.5,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 5.5mg</span><span class=\"sd-badge is-solid\">아연 4.25mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 징코 앤 메모리<small>비타민 E · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>5.5mg</b>, 아연 <b>4.25mg</b>, 은행잎추출물 <b>28.8mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 E <b>5.5mg</b>, 아연 <b>4.25mg</b>, 은행잎추출물 <b>28.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(5.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(4.25mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 5.5mg</span><span class=\"sd-badge is-solid\">Zinc 4.25mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 징코 앤 메모리<small>Vitamin E · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5.5mg</b> of Vitamin E, <b>4.25mg</b> of Zinc, <b>28.8mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>5.5mg</b> Vitamin E, <b>4.25mg</b> Zinc, <b>28.8mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (5.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4.25mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm104-003",
+  "productName": "징코플러스골드",
+  "productNameEn": "징코플러스골드",
+  "manufacturer": "이앤에스(주)",
+  "manufacturerEn": null,
+  "statementNo": "2022002000234",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물]\t기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민 E]\t\t항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]\t\t정상적인 면역기능에 필요\n\t\t\t정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐\n2) 플라보놀 배당체 : 표시량(36 ㎎/500 ㎎) 의 80~120%\n3) 깅콜릭산(㎎/㎏) : 5.0 이하\n4) 비타민 E : 표시량(3.3 ㎎ α-TE/500 ㎎)의 80 ~150%\n5) 아연 : 표시량(2.55 ㎎/500 ㎎)의 80 ~150%\n6) 납(㎎/㎏) : 1.0 이하\n7) 카드뮴(㎎/㎏) : 1.0 이하\n8) 수은(㎎/㎏) : 1.0 이하\n9) 비소(㎎/㎏) : 1.0 이하\n10) 대장균군 : 음성\n11) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n2) 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n3) 특이체질, 알레르기체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하십시오.\n4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐",
+   "storage": "직사광선을 받지 아니하는 서늘한 실온에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 3.3,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>징코플러스골드<small>비타민 E · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">이앤에스(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐 · 이앤에스(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 실온에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 3.3mg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>징코플러스골드<small>Vitamin E · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 이앤에스(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>3.3mg</b> of Vitamin E, <b>2.55mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>3.3mg</b> Vitamin E, <b>2.55mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 이앤에스(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (3.3mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 갈색의 내용물을 함유한 진한 연두색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월 까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 실온에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm104-004",
+  "productName": "라이프에이드포르테",
+  "productNameEn": "라이프에이드포르테",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141314",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연] ① 정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제\n② 플라보놀 배당체 : 표시량(28.8 mg/500 mg)의 80~120%\n③ 비타민E : 표시량(5 mg α-TE/500 mg)의 80~150%\n④ 아연 : 표시량(6 mg/500 mg)의 80~150%\n⑤ 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하 \n⑥ 납(mg/kg) : 1.0 이하\n⑦ 카드뮴(mg/kg) : 1.0 이하\n⑧ 수은(mg/kg) : 1.0 이하\n⑨ 비소(mg/kg) : 1.0 이하\n⑩ 대장균군 : 음성\n⑪ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[은행잎추출물]\n② 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n③ 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 5mg</span><span class=\"sd-badge is-solid\">아연 6mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이프에이드포르테<small>비타민 E · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>5mg</b>, 아연 <b>6mg</b>, 은행잎추출물 <b>28.8mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 E <b>5mg</b>, 아연 <b>6mg</b>, 은행잎추출물 <b>28.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(6mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 5mg</span><span class=\"sd-badge is-solid\">Zinc 6mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이프에이드포르테<small>Vitamin E · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5mg</b> of Vitamin E, <b>6mg</b> of Zinc, <b>28.8mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>5mg</b> Vitamin E, <b>6mg</b> Zinc, <b>28.8mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (6mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 탁한 연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm104-005",
+  "productName": "프리미엄징코앤메모리",
+  "productNameEn": "프리미엄징코앤메모리",
+  "manufacturer": "한국바이오팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "2022002106730",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120%\n3) 비타민E : 표시량(5.5mg α-TE/500mg)의 80~150%\n4) 아연 : 표시량(4.25mg/500mg)의 80~150%\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 납(mg/kg) : 1.0 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 붕해시험 : 20분 이내\n11) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이, 수술전후 환자 및 의약품(항응고제) 복용 시 섭취에 주의하시기 바랍니다.\n② 특정원료에 알레르기 및 과민증상이 있는 체질이신 경우 성분을 확인한 후 섭취 여부를 결정하시고 섭취 외 다른 용도로 사용하지 마십시오.\n③ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 5.5,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 5.5mg</span><span class=\"sd-badge is-solid\">아연 4.25mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄징코앤메모리<small>비타민 E · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">한국바이오팜(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>5.5mg</b>, 아연 <b>4.25mg</b>, 은행잎추출물 <b>28.8mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 E <b>5.5mg</b>, 아연 <b>4.25mg</b>, 은행잎추출물 <b>28.8mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐 · 한국바이오팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(5.5mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(4.25mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 5.5mg</span><span class=\"sd-badge is-solid\">Zinc 4.25mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄징코앤메모리<small>Vitamin E · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>5.5mg</b> of Vitamin E, <b>4.25mg</b> of Zinc, <b>28.8mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>5.5mg</b> Vitamin E, <b>4.25mg</b> Zinc, <b>28.8mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (5.5mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (4.25mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 초록색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm105-001",
+  "productName": "알티지오메가 Q10",
+  "productNameEn": "알티지오메가 Q10",
+  "manufacturer": "(주)비오팜2공장",
+  "manufacturerEn": null,
+  "statementNo": "2024002023315",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지] 혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[코엔자임Q10] 항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "(1)성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐\n(2)EPA 및 DHA 함유유지 : 표시량(900mg/1,600mg)의 80-120%\n(3)코엔자임Q10 : 표시량(100mg/1,600mg)의 80-120%\n(4)비타민E : 표시량(11mg α-TE/1600mg)의 80-150%\n(5)납(mg/kg) : 2.8 이하\n(6)카드뮴(mg/kg) : 1.0 이하\n(7)수은(mg/kg) : 0.5 이하\n(8)비소(mg/kg) : 1.0 이하\n(9)헥산(mg/kg) : 5.0 이하\n(10)초산에틸(mg/kg) : 50.0 이하\n(11)대장균군 : 음성\n(12)붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 수유부는 섭취를 피할 것\n(라) 항응고제 복용 시 전문가와 상담할 것\n(마) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐",
+   "storage": "실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 11,
+    "unit": "mg",
+    "basisAmount": 1600,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">오메가3 900mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>알티지오메가 Q10<small>비타민 E · 오메가3 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)비오팜2공장 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>11mg</b>, 오메가3 <b>900mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 E <b>11mg</b>, 오메가3 <b>900mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐 · (주)비오팜2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선 ･ 혈행 개선 ･ 기억력 개선 ･ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1600mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(900mg/1600mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/1600mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 오메가3 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Omega-3 900mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>알티지오메가 Q10<small>Vitamin E · Omega-3 · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)비오팜2공장 · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>11mg</b> of Vitamin E, <b>900mg</b> of Omega-3, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>11mg</b> Vitamin E, <b>900mg</b> Omega-3, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels, improving blood circulation, memory improvement, and improving dry eyes for eye health</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1600mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (900mg / 1600mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 1600mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 주황색 내용물을 함유한 빨강색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1)제품은 직사광선 및 고온 다습한 곳을 피하여 실온에 보관 유통하여야 한다.(2)제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Omega-3 · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm106-001",
+  "productName": "프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스",
+  "productNameEn": "프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106435",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[셀레늄(셀렌)] 유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제\n② 플라보놀 배당체 : 표시량(36㎎/1,000㎎)의 80~120%\n③ 셀레늄 : 표시량(16.5㎍/1,000㎎)의 80~150%\n④ 아연 : 표시량(2.55㎎/1,000㎎)의 80~150%\n⑤ 깅콜릭산(㎎/㎏) : 5.0 이하\n⑥ 납(㎎/㎏) : 1.0 이하\n⑦ 카드뮴(㎎/㎏) : 1.0 이하\n⑧ 수은(㎎/㎏) : 1.0 이하\n⑨ 비소(㎎/㎏) : 1.0 이하\n⑩ 대장균군 : 음성\n⑪ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.\n③ 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n④ 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n⑤ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n⑥ 동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제",
+   "storage": "실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 16.5,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스<small>셀레늄 · 아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스<small>Selenium · Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>16.5μg</b> of Selenium, <b>2.55mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>16.5μg</b> Selenium, <b>2.55mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm107-001",
+  "productName": "트리플코엔자임Q10",
+  "productNameEn": "트리플코엔자임Q10",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141452",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[코엔자임Q10] 항산화·높은 혈압 감소에 도움을 줄 수 있음\n[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐 \n② EPA와 DHA의 합 : 표시량(500 mg/1,000 mg)의 80~120%\n③ 코엔자임Q10 : 표시량(100 mg/1,000 mg)의 80~120%\n④ 셀레늄(또는 셀렌) : 표시량(55 ㎍/1,000 mg)의 80~150%\n⑤ 헥산(mg/kg) : 5.0 이하\n⑥ 아세톤(mg/kg) : 30.0 이하\n⑦ 이소프로필알콜(mg/kg) : 50.0 이하\n⑧ 초산에틸(mg/kg) : 50.0 이하\n⑨ 납(mg/kg) : 2.8 이하\n⑩ 카드뮴(mg/kg) : 1.0 이하\n⑪ 수은(mg/kg) : 0.6 이하\n⑫ 비소(mg/kg) : 1.0 이하\n⑬ 대장균군 : 음성\n⑭ 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[EPA 및 DHA 함유 유지]\n② 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n③ 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 55,
+    "unit": "μg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">셀레늄 55μg</span><span class=\"sd-badge is-solid\">오메가3 500mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트리플코엔자임Q10<small>셀레늄 · 오메가3 · 코엔자임Q10</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 셀레늄 <b>55μg</b>, 오메가3 <b>500mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 셀레늄 <b>55μg</b>, 오메가3 <b>500mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>셀레늄</b> 표시량(55μg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(500mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 셀레늄 · 오메가3 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Selenium 55μg</span><span class=\"sd-badge is-solid\">Omega-3 500mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>트리플코엔자임Q10<small>Selenium · Omega-3 · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>55μg</b> of Selenium, <b>500mg</b> of Omega-3, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>55μg</b> Selenium, <b>500mg</b> Omega-3, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Selenium</b> labelled (55μg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (500mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Selenium · Omega-3 · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm108-001",
+  "productName": "파워메가바이오",
+  "productNameEn": "파워메가바이오",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107708",
+  "category": "hff",
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐\n2. EPA와 DHA의 합 : 표시량(500 mg/2,000 mg)의 80 ~ 120%\n3. 아연 : 표시량(6 mg/2,000 mg)의 80 ~ 150%\n4. 납(mg/kg) : 3.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 총 수은(mg/kg) : 0.5 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1. 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n2. 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 6,
+    "unit": "mg",
+    "basisAmount": 2000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 6mg</span><span class=\"sd-badge is-solid\">오메가3 500mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>파워메가바이오<small>아연 · 오메가3</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>6mg</b>, 오메가3 <b>500mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(2캡슐) 섭취로 아연 <b>6mg</b>, 오메가3 <b>500mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(6mg/2000mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(500mg/2000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 6mg</span><span class=\"sd-badge is-solid\">Omega-3 500mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>파워메가바이오<small>Zinc · Omega-3</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>6mg</b> of Zinc, <b>500mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (2 capsules): <b>6mg</b> Zinc, <b>500mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving blood triglyceride levels and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (6mg / 2000mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (500mg / 2000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 검정색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm109-001",
+  "productName": "경남 징코진골드",
+  "productNameEn": "경남 징코진골드",
+  "manufacturer": "(주)세종바이오팜",
+  "manufacturerEn": null,
+  "statementNo": "2019000910590",
+  "category": "hff",
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고, 이미·이취가 없는 탁한 노란 연두색의 장방형 제피정제\n2) 플라보놀 배당체: 표시량(36mg/1,000mg)의 80~120%\n3) 깅콜릭산: 5.0 이하\n4) 아연 : 표시량(8.5mg/1,000mg)의 80~150%\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 총수은(mg/kg) : 1.0 이하\n8) 총비소(mg/kg) : 1.0 이하\n9) 대장균군: 음성\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n2) 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 제품이 변질 및 변색된 경우에는 섭취하지 마시고 소비자 상담실로 문의하시기 바랍니다.\n5) 유통기한이 경과한 제품은 섭취하지 마시고, 섭취 시 섭취량 및 섭취방법을 준수하십시오.\n6) 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미,이취가 없는 탁한 노란 연두색의 장방형 제피정제",
+   "storage": "1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 1000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>경남 징코진골드<small>아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미,이취가 없는 탁한 노란 연두색의 장방형 제피정제 · (주)세종바이오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미,이취가 없는 탁한 노란 연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>경남 징코진골드<small>Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)세종바이오팜 · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>8.5mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세종바이오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1000mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고, 이미,이취가 없는 탁한 노란 연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm109-002",
+  "productName": "뉴 치파니",
+  "productNameEn": "뉴 치파니",
+  "manufacturer": "(주)녹십초알로에",
+  "manufacturerEn": null,
+  "statementNo": "2004001701390",
+  "category": "hff",
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 흐린 초록색의 경질캡슐\n2) 플라보놀배당체 : 표시량(30mg/1.2g)의 80~120%\n3) 깅콜릭산 : 5.0이하\n4) 아연: 표시량(8.5 mg/ 1.2g)의 80~150%\n5) 납(mg/kg) : 1.0  이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 1.0  이하\n8) 비소(mg/kg) : 1.0 이하\n9) 대장균군 : 음성\n10) 붕해시험 : 20분이내",
+   "intake": "(1캡슐: 200mg) 1일 2회, 1회 3캅셀씩 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n (나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n (다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흐린 초록색의 경질 캡슐",
+   "storage": "실온보관 및 유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 1.2,
+    "basisUnit": "g"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 3,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 2,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 30mg</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>뉴 치파니<small>아연 · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)녹십초알로에 제조 · 1일 2회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>30mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 2회(3캡슐) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>30mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흐린 초록색의 경질 캡슐 · (주)녹십초알로에 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1.2g)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(30mg/1.2g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흐린 초록색의 경질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 및 유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 30mg</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>뉴 치파니<small>Zinc · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)녹십초알로에 · 2 times a day · 3 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>30mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>2 times a day (3 capsules): <b>8.5mg</b> Zinc, <b>30mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)녹십초알로에</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 1.2g), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (30mg / 1.2g), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흐린 초록색의 경질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온보관 및 유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-001",
+  "productName": "코엔자임 혈행 플러스",
+  "productNameEn": "코엔자임 혈행 플러스",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041500",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[코엔자임Q10]①항산화･높은 혈압 감소에 도움을 줄 수 있음\n[은행잎 추출물]①기억력 개선･혈행 개선에 도움을 줄 수 있음\n[아연]①정상적인 면역기능에 필요 ②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐\n2) 대장균군 : 음성\n3) 붕해시험 : 20분 이내\n4) 코엔자임Q10 : 표시량(100mg/450mg)의 80~120%\n5) 플라보놀배당체 : 표시량(28mg/450mg)의 80~120%\n6) 아연 : 표시량(8.5mg/450mg)의 80~150%\n7) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8) 잔류용매\n(가) 헥산(mg/kg) : 5.0 이하\n(라) 초산에틸(mg/kg) : 50.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[코엔자임Q10]\n 1) 수유부는 섭취를 피할 것\n 2) 항응고제 복용 시 전문가와 상담할 것\n 3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎 추출물]\n 1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n 2) 의약품(항응고제) 복용 시 섭취에 주의\n[바나바잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[은행잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코엔자임 혈행 플러스<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>28mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>28mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화･높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/450mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코엔자임 혈행 플러스<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>28mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>8.5mg</b> Zinc, <b>28mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며, 진한 노랑색의 내용물을 함유한 투명한 갈색 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-002",
+  "productName": "일양 코큐텐징코",
+  "productNameEn": "일양 코큐텐징코",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046518",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①항산화에 도움을 줄 수 있음② 높은 혈압 감소에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐\n2) 플라보놀 배당체 : 표시량(28.8mg/500mg)의 80~120% 이어야 한다.\n3) 코엔자임Q10 : 표시량(100.0mg/500mg)의 80~120% 이어야 한다.\n4) 아연 : 표시량(9.0mg/500mg)의 80~150% 이어야 한다.\n5) 깅콜릭산(mg/kg) : 5.0 이하\n6) 헥산(mg/kg) : 5.0 이하\n7) 초산에틸(mg/kg) : 50.0 이하\n8) 납(mg/kg) : 1.0 이하\n9) 카드뮴(mg/kg) : 1.0 이하\n10) 총수은(mg/kg) : 1.0 이하\n11) 총비소(mg/kg) : 1.0 이하\n12) 붕해시험 : 20분 이내\n13) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 9,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 9mg</span><span class=\"sd-badge is-solid\">은행잎추출물 28.8mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>일양 코큐텐징코<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>9mg</b>, 은행잎추출물 <b>28.8mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>9mg</b>, 은행잎추출물 <b>28.8mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li><li>높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(9mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(28.8mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 9mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 28.8mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>일양 코큐텐징코<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>9mg</b> of Zinc, <b>28.8mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>9mg</b> Zinc, <b>28.8mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity</li><li>May help with lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (9mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (28.8mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색 분말을 함유한 탁한 분홍색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-003",
+  "productName": "활력징코큐텐",
+  "productNameEn": "활력징코큐텐",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028451",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n①항산화·높은 혈압 감소에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐\n2. 플라보놀배당체 : 36mg / 450mg 의 80~120%\n3. 코엔자임Q10 : 100mg / 450mg 의 80~120%\n4. 아연 : 8.5mg / 450mg 의 80~150%\n5. 납(mg/kg) : 1.0 이하\n6. 카드늄(mg/kg) : 1.0 이하\n7. 총 수은(mg/kg) : 1.0 이하\n8. 총 비소(mg/kg) : 1.0 이하\n9. 대장균군 : 음성\n10. 붕해시험 : 20분 이내",
+   "intake": "450mg / 1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취 하십시오.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의\n알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n잘못된 섭취를 피하고 품질을 보호 유지하기 위해 다른 용기에 넣지 마십시오.\n어린이의 손에 닿지 않도록 주의하시기 바랍니다.\n유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐",
+   "storage": "수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 8.5,
+    "unit": "mg",
+    "basisAmount": 450,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>활력징코큐텐<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>8.5mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/450mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/450mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 8.5mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>활력징코큐텐<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>8.5mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>8.5mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (8.5mg / 450mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 450mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 황색의 내용물을 함유한 녹색 불투명의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 수분과 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm110-004",
+  "productName": "유학써큐-K",
+  "productNameEn": "유학써큐-K",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211421",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[은행잎추출물] -기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[코엔자임Q10] ①항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐\n②플라보놀배당체 : 표시량(36mg/500mg)의 80~120%\n③코엔자임Q10 : 표시량(100mg/500mg)의 80~120%\n④아연 : 표시량(28mg/500mg)의 80~150%\n⑤납(mg/kg) : 1.0 이하\n⑥카드뮴(mg/kg) : 1.0 이하\n⑦수은(mg/kg) : 1.0 이하\n⑧비소(mg/kg) : 1.0 이하\n⑨깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n⑩헥산(mg/kg) : 5.0 이하\n⑪아세톤(mg/kg) : 30.0 이하\n⑫초산에틸(mg/kg) : 50.0 이하\n⑬붕해시험 : 적합(20분 이내)\n⑭대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 28,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "capsule",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 28mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>유학써큐-K<small>아연 · 은행잎추출물 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 아연 <b>28mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 아연 <b>28mg</b>, 은행잎추출물 <b>36mg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(28mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 아연 · 은행잎추출물 · 코엔자임Q10 섭취를 함께 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Zinc 28mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge is-solid\">Coenzyme Q10 100mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>유학써큐-K<small>Zinc · Ginkgo leaf extract · Coenzyme Q10</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>28mg</b> of Zinc, <b>36mg</b> of Ginkgo leaf extract, <b>100mg</b> of Coenzyme Q10 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>28mg</b> Zinc, <b>36mg</b> Ginkgo leaf extract, <b>100mg</b> Coenzyme Q10</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li><li><b>Coenzyme Q10</b><ul class=\"sd-why\"><li>May help with antioxidant activity and lowering high blood pressure</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Zinc</b> labelled (28mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Coenzyme Q10</b> labelled (100mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑색의 분말이 든 탁한 노란 주황색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Zinc · Ginkgo leaf extract · Coenzyme Q10 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ },
+ {
+  "candidateId": "cm111-001",
+  "productName": "기억력개선, 혈행개선엔 뉴로마스터 은행잎추출물&요오드",
+  "productNameEn": "기억력개선, 혈행개선엔 뉴로마스터 은행잎추출물&요오드",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041407",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[은행잎추출물]기억력 개선･혈행 개선에 도움을 줄 수 있음\n[요오드]]①갑상선 호르몬의 합성에 필요②에너지 생성에 필요③신경발달에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해시험 : 60분 이내\n4) 요오드: 표시량(2,400㎍/1,500mg)의 80~150%\n5) 플라보놀배당체: 표시량(36mg/1,500mg)의 80~120%\n6) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎 추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 2400,
+    "unit": "μg",
+    "basisAmount": 1500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">요오드 2400μg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>기억력개선, 혈행개선엔 뉴로마스터 은행잎추출물&amp;요오드<small>요오드 · 은행잎추출물</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 요오드 <b>2400μg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2정) 섭취로 요오드 <b>2400μg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제 · 엔피케이(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>요오드</b><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>요오드</b> 표시량(2400μg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/1500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 요오드 · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Iodine 2400μg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>기억력개선, 혈행개선엔 뉴로마스터 은행잎추출물&amp;요오드<small>Iodine · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 2 tablets</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>2400μg</b> of Iodine, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 tablets): <b>2400μg</b> Iodine, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Iodine</b><ul class=\"sd-why\"><li>Needed for the synthesis of thyroid hormones</li><li>Needed for energy production</li><li>Needed for neural development</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement and improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Iodine</b> labelled (2400μg / 1500mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 1500mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Iodine · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,91 @@
+[
+ {
+  "statementNo": "201000190041513",
+  "productName": "센스밸런스",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎추출물] 기억력 개선･혈행 개선에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없으며 흰색과 검정색의 점박이가 있는 회갈색의 장방형 제피정제\n2) 대장균군 : 음성\n3) 붕해도 : 60분 이내 \n4) 플라보놀배당체 : 표시량(28.8mg/1,300mg)의 80~120%\n5) 비타민C : 표시량(100mg/1,300mg)의 80~150%\n6) 셀렌 : 표시량(55㎍/1,300mg)의 80~150%\n7) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n8) 중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 1.0 이하\n(다) 수은(mg/kg) : 1.0 이하\n(라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1정씩 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[은행잎추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n[비타민C]\n(가) 과량 섭취하지 않도록 주의할 것\n(나) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 흰색과 검정색의 점박이가 있는 회갈색의 장방형 제피정제",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm4-001",
+  "productName": "알로맥프로지(G)",
+  "productNameEn": "알로맥프로지(G)",
+  "manufacturer": "(주)네이처텍",
+  "manufacturerEn": null,
+  "statementNo": "20040020004272",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n혈중 콜레스테롤 개선․혈행개선·월경전 변화에 의한 불편한 상태 개선· 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n\n①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐\n2) 비타민B6 : 1.5 mg/3,000 mg (표시량의 80 ~ 150%)\n3) 비타민E : 11 mg α-TE/3,000 mg (표시량의 80 ~ 150%)\n4) 감마리놀렌산 : 300 mg/3,000 mg (표시량의 80 ~ 120%)\n5) 플라보놀배당체 : 36 mg/3,000 mg (표시량의 80 ~ 120%)\n6) 깅콜릭산 : 5.0 mg/kg 이하\n7) 납 : 1.0 mg/kg 이하\n8) 카드뮴 : 1.0 mg/kg 이하\n9) 총 수은 : 1.0 mg/kg 이하\n10) 총 비소 : 1.0 mg/kg 이하\n11) 붕해시험 : 20분 이내\n12) 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐(3,000 mg)을 충분한 양의 물과 함께 섭취하십시오.",
+   "caution": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것 (면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시‧판매하는 경우에 한함)\n\n① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐",
+   "storage": "실온",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 3000,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 3,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">감마리놀렌산 300mg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">은행잎추출물 36mg</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>알로맥프로지(G)<small>감마리놀렌산 · 비타민 B6 · 비타민 E · 은행잎추출물</small></h1><p class=\"sd-meta\">(주)네이처텍 제조 · 1일 3회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 감마리놀렌산 <b>300mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 은행잎추출물 <b>36mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 3회(2캡슐) 섭취로 감마리놀렌산 <b>300mg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 은행잎추출물 <b>36mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐 · (주)네이처텍 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>감마리놀렌산</b><ul class=\"sd-why\"><li>혈중 콜레스테롤 개선․혈행개선·월경전 변화에 의한 불편한 상태 개선· 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>은행잎추출물</b><ul class=\"sd-why\"><li>기억력 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>감마리놀렌산</b> 표시량(300mg/3000mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/3000mg)의 80~150%</div><div class=\"sd-item\"><b>은행잎추출물</b> 표시량(36mg/3000mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 실온</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 감마리놀렌산 · 비타민 B6 · 비타민 E · 은행잎추출물 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Gamma-linolenic acid 300mg</span><span class=\"sd-badge is-solid\">Vitamin B6 1.5mg</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Ginkgo leaf extract 36mg</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>알로맥프로지(G)<small>Gamma-linolenic acid · Vitamin B6 · Vitamin E · Ginkgo leaf extract</small></h1><p class=\"sd-meta\">Made by (주)네이처텍 · 3 times a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Gamma-linolenic acid, <b>1.5mg</b> of Vitamin B6, <b>11mg</b> of Vitamin E, <b>36mg</b> of Ginkgo leaf extract as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>3 times a day (2 capsules): <b>300mg</b> Gamma-linolenic acid, <b>1.5mg</b> Vitamin B6, <b>11mg</b> Vitamin E, <b>36mg</b> Ginkgo leaf extract</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)네이처텍</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Gamma-linolenic acid</b><ul class=\"sd-why\"><li>May help with easing discomfort related to premenstrual changes</li><li>May help with improving blood circulation</li></ul></li><li><b>Vitamin B6</b><ul class=\"sd-why\"><li>Needed for protein and amino acid utilisation</li><li>Needed to help maintain normal blood homocysteine levels</li></ul></li><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Ginkgo leaf extract</b><ul class=\"sd-why\"><li>May help with memory improvement</li><li>May help with improving blood circulation</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Gamma-linolenic acid</b> labelled (300mg / 3000mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin B6</b> labelled (1.5mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 3000mg), 80~150%</div><div class=\"sd-item\"><b>Ginkgo leaf extract</b> labelled (36mg / 3000mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 진한 갈색의 내용물을 함유한 흑갈색 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Gamma-linolenic acid · Vitamin B6 · Vitamin E · Ginkgo leaf extract together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

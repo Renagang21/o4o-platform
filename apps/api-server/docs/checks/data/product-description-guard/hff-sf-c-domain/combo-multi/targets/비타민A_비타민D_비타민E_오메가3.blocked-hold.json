@@ -1,0 +1,14 @@
+[
+ {
+  "statementNo": "20160012278196",
+  "productName": "삼성 태동천",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "statementNo": "20160012278185",
+  "productName": "태동천(太動天)",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "PRE-SRC-BASIS-MISMATCH-002"
+ }
+]

@@ -1,0 +1,147 @@
+[
+ {
+  "statementNo": "20190009483860",
+  "productName": "눈건강 루테인지아잔틴 플러스",
+  "manufacturer": "우리바이오(주)",
+  "ingredients": [
+   {
+    "key": "구리",
+    "labelKo": "구리",
+    "labelEn": "Copper",
+    "declaredAmount": {
+     "value": 0.24,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "철의 운반과 이용에 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)",
+     "Needed for the transport and utilisation of iron"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 16.503,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "] (국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 (영문) May support eye health by maintaining the density of macular pigments which can be affected by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민B6",
+    "labelKo": "비타민 B6",
+    "labelEn": "Vitamin B6",
+    "declaredAmount": {
+     "value": 0.45,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "단백질 및 아미노산 이용에 필요",
+     "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for protein and amino acid utilisation",
+     "Needed to help maintain normal blood homocysteine levels"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[루테인지아잔틴추출복합물[제2025-35호]] \n (국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n (영문) May support eye health by maintaining the density of macular pigments which can be affected by aging\n[비타민 E]\n (가) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[셀레늄(또는 셀렌)]\n (가) 유해산소로부터 세포를 보호하는데 필요\n[아연]\n (가) 정상적인 면역기능에 필요\n (나) 정상적인 세포분열에 필요\n[구리]\n (가) 철의 운반과 이용에 필요\n (나) 유해산소로부터 세포를 보호하는데 필요\n[비타민 B6]\n (가) 단백질 및 아미노산 이용에 필요\n (나) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 진한 주황의 점도가 있는 내용물을 함유한 검정색의 타원형 연질캡슐\n2. 루테인 : 표시량(16.503 mg / 300 mg)의 80~120%\n3. 총지아잔틴 : 표시량(3.497 mg / 300 mg)의 80~120%\n4. 비타민E : 표시량(3.3 mg α-TE / 300 mg)의 80~150%\n5. 셀레늄(또는 셀렌) : 표시량(16.5 μg / 300 mg)의 80~150%\n6. 아연 : 표시량(2.55 mg / 300 mg)의 80~150%\n7. 구리 : 표시량(0.24 mg / 300 mg)의 80~150%\n8. 비타민B6 : 표시량(0.45 mg / 300 mg)의 80~150%\n9. 총 아플라톡신(B1, B2, G1 및 G2의 합)(μg/kg) : 15.0 이하(단, B1은 10.0 이하)\n10. 헥산(g/kg) : 0.005 미만\n11. 납(mg/kg) : 0.4 이하\n12. 카드뮴(mg/kg) : 0.1 이하\n13. 수은(mg/kg) : 0.1 이하\n14. 비소(mg/kg) : 0.5 이하\n15. 대장균군 : 음성\n16. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취 하십시오",
+   "caution": "(1) 영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(4) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(5) 흡연자는 섭취 시 전문가와 상담할 것\n(6) 손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 진한 주황의 점도가 있는 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

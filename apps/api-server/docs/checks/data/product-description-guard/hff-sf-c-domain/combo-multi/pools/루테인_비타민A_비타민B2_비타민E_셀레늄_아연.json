@@ -1,0 +1,582 @@
+[
+ {
+  "statementNo": "2016001227881",
+  "productName": "아이 빛나라 눈",
+  "manufacturer": "에스에스바이오팜(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.48,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 18,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①체내 에너지 생성에 필요",
+   "baseStandard": "1) 성상: 이미, 이취가 없고 고유의 향미가 있는 주황색의 내용물을 함유한 흑갈색의 연질캅셀\n2 루테인: 표시량(20mg/500mg)의 80~120%\n3) 비타민A: 표시량(600μg RE/500mg)의 80~150%\n4) 비타민B2: 표시량(0.48mg/500mg)의 80~180%\n5) 비타민E: 표시량(4mg a-TE/500mg)의 80~150%\n6) 아연: 표시량(4.3mg/500mg)의 80~150%\n7) 셀렌: 표시량(18μg/500mg)의 80~150%\n8) 헥산(mg/kg): 5.0 이하\n9) 붕해도: 20분이내\n10) 납(mg/kg): 1.0 이하 \n11) 카드뮴(mg/kg): 1.0 이하\n12) 총수은(mg/kg): 1.0 이하\n13) 총비소(mg/kg): 1.0 이하\n14) 대장균군: 음성",
+   "intake": "1일1회,1회1캅셀씩물과함께섭취하십시오.",
+   "caution": "[루테인제품] 과다 섭취시 일시적으로 피부가 황색으로 변할 수 있음\n1. 임신, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.\n2. 특이체질 알레르기체질인 경우에는 의사와 상담 후 섭취여부를 결정하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 주황색의 내용물을 함유한 흑갈색의 연질캅셀",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에 보관, 유통하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200061407",
+  "productName": "비타할로 루테인 플러스",
+  "manufacturer": "(주)서흥",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.7,
+     "unit": "mg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5.5,
+     "unit": "mg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 27.5,
+     "unit": "μg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 0.5,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n셀렌 : ①유해산소로부터 세포를 보호하는데 필요\n\n아연 : ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n비타민E : ①유해산소로부터 세포를 보호하는데 필요\n\n비타민A : ①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n비타민B2 : ①체내 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 적갈색의 점조성 내용물을 함유한 흑갈색 연질캡슐\n (2) 루테인 : 표시량(20 mg/0.5g)의 80~120%\n (3) 셀렌 : 표시량(27.5 ㎍/0.5g)의 80~150%\n (4) 아연 : 표시량(8.5 mg/0.5g)의 80~150%\n (5) 비타민E : 표시량(5.5 mg α-TE/0.5g)의 80~150%\n (6) 비타민A : 표시량(700 ㎍RE/0.5g)의 80~150%\n (7) 비타민B2 : 표시량(0.7 mg/0.5g)의 80~180%\n (8) 헥산(mg/kg) : 5.0 이하\n (9) 납(mg/kg) : 1.0 이하\n (10) 카드뮴(mg/kg) : 1.0 이하\n (11) 수은(mg/kg) : 1.0 이하\n (12) 비소(mg/kg) : 1.0 이하\n (13) 대장균군 : 음성\n (14) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(0.5g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음. \n    ② 임산부와 수유부, 질병치료 중인 분은 섭취 전 의사와 상담 후 섭취하십시오.\n    ③ 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n    ④ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "적갈색의 점조성 내용물을 함유한 흑갈색 연질캡슐",
+   "storage": "① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오.   ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040017006792",
+  "productName": "20100 파워루테인 플러스",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.48,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 18,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①체내 에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 이미, 이취가 없고 고유의 향미가 있는 진한 주황색 내용물을 함유한 타원형의 암갈색 연질 캡슐\n2) 비타민A : 표시량 (600 ㎍RAE / 500 mg)의 80~150%\n3) 비타민E: 표시량 (4 mg α-TE / 500 mg)의 80~150%\n4) 비타민B2 : 표시량 (0.48 mg / 500 mg)의 80~180%\n5) 아연: 표시량 (4.3 mg / 500 mg)의 80~150%\n6) 셀렌: 표시량 (18 ㎍/ 500 mg)의 80~150%\n7) 루테인: 표시량(20 mg/ 500 mg)의 80~120%\n8) 중금속 : 총 비소(1.0 mg/kg 이하), 총 수은(1.0 mg/kg 이하), 납(1.0 mg/kg 이하), 카드뮴(1.0 mg/kg 이하)\n9) 잔류용매 : 헥산(5.0 mg/kg 이하)\n10) 대장균군 : 음성\n11) 붕해: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[마리골드꽃추출물]\n(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민B2]\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 진한 주황색 내용물을 함유한 타원형의 암갈색 연질 캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20060020008680",
+  "productName": "뷰티아이 루테인",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 550,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 0.52,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.63,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 17.6,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.98,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n①유해산소로부터 세포를 보호하는데 필요\n①체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 갈색의 타원형 연질캡슐\n2. 루테인 : 표시량(20mg/500mg)의 80~120%\n3. 아연 : 표시량(2.98mg/500mg)의 80~150%\n4. 비타민A : 표시량(550μg RAE/500mg)의 80~150%\n5. 비타민E : 표시량(3.63mg α-TE/500mg)의 80~150%\n6. 비타민B2 : 표시량(0.52mg/500mg)의 80~180%\n7. 셀레늄 : 표시량(17.6μg/500mg)의 80~150%\n8. 납(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 수은(mg/kg) : 1.0 이하\n12. 헥산(mg/kg) : 5.0 이하\n13. 대장균군 : 음성\n14. 붕해 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것.\n영·유아, 어린이, 임산부 및 수유부는 섭취를 피할 것.\n흡연자는 섭취 시 전문가와 상담할 것.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 갈색의 타원형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

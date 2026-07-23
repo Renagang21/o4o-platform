@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm42-001",
+  "productName": "국민루테인20",
+  "productNameEn": "국민루테인20",
+  "manufacturer": "엔피케이(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "2021001622942",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]①노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데  필요\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 빨간색의 내용물을 함유한 검정색의 타원형 연질캡슐\n2) 대장균군 : 음성\n3) 붕해시험 : 20분 이내\n4) 루테인 : 표시량(20mg/500mg)의 80~120%\n5) 비타민C : 표시량(40mg/500mg)의 80~150%\n6) 비타민A : 표시량(700㎍RAE/500mg)의 80~150%\n7) 비타민D : 표시량(10㎍/500mg)의 80~180%\n8) 잔류용매\n (가) 헥산(mg/kg) : 5.0 이하\n (나) 초산에틸(mg/kg) : 50.0 이하\n9) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[마리골드꽃추출물]\n 1) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n 2) 흡연자는 섭취 시 전문가와 상담할 것\n 3) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n 4) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D]\n 1) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n 2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민C]\n1) 과량 섭취하지 않도록 주의할 것\n2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 빨간색의 내용물을 함유한 검정색의 타원형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 40mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>국민루테인20<small>루테인 · 비타민 A · 비타민 C · 비타민 D</small></h1><p class=\"sd-meta\">엔피케이(주) 2공장 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>40mg</b>, 비타민 D <b>10μg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>40mg</b>, 비타민 D <b>10μg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 빨간색의 내용물을 함유한 검정색의 타원형 연질캡슐 · 엔피케이(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(40mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/500mg)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 빨간색의 내용물을 함유한 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A · 비타민 C · 비타민 D 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 700μg</span><span class=\"sd-badge is-solid\">Vitamin C 40mg</span><span class=\"sd-badge is-solid\">Vitamin D 10μg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>국민루테인20<small>Lutein · Vitamin A · Vitamin C · Vitamin D</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) 2공장 · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>700μg</b> of Vitamin A, <b>40mg</b> of Vitamin C, <b>10μg</b> of Vitamin D as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>700μg</b> Vitamin A, <b>40mg</b> Vitamin C, <b>10μg</b> Vitamin D</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주) 2공장</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Vitamin C</b><ul class=\"sd-why\"><li>Needed for the formation and maintenance of connective tissue</li><li>Needed for the absorption of iron</li><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Vitamin D</b><ul class=\"sd-why\"><li>Needed for the absorption and utilisation of calcium and phosphorus</li><li>Needed for the formation and maintenance of bone</li><li>Recognised as helping reduce the risk of developing osteoporosis</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (700μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin C</b> labelled (40mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Vitamin D</b> labelled (10μg / 500mg), 80~180%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 빨간색의 내용물을 함유한 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A · Vitamin C · Vitamin D together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have hypercalcaemia or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

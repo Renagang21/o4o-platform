@@ -1,0 +1,212 @@
+[
+ {
+  "statementNo": "2022001137010",
+  "productName": "뷰라이트 루테인",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[비타민E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[셀레늄(또는 셀렌)]유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 어두운 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐\n2) 루테인 : 표시량(20 mg / 500 mg)의 80~120%\n3) 비타민E : 표시량 (4 mg α-TE / 500 mg)의 80~150%\n4) 아연 : 표시량 (4.5 mg / 500 mg)의 80~150%\n5) 셀레늄 : 표시량 (20 ㎍/ 500 mg)의 80~150%\n6) 비소 : 1.0 mg/kg 이하\n7) 수은 : 1.0 mg/kg 이하\n8) 납 : 1.0 mg/kg 이하\n9) 카드뮴 : 1.0 mg/kg 이하\n10) 헥산 : 5.0 mg/kg 이하\n11) 초산에틸 : 50.0 mg/kg 이하\n12) 대장균군 : 음성\n13) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오. ②흡연자는 섭취 시 전문가와 상담하십시오. ③과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. ④이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 어두운 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐",
+   "storage": "직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통 하십시오. 영·유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009483774",
+  "productName": "하루틴 루테인",
+  "manufacturer": "우리바이오(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[비타민E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[아연]\n(가) 정상적인 면역기능에 필요\n(나) 정상적인 세포분열에 필요\n\n[셀렌]\n유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 주황색의 내용물을 함유한 갈색 타원형 연질캡슐\n2) 루테인 : 표시량 (20 mg/500 mg)의 80~120%\n3) 비타민 E : 표시량 (3.3 mg α-TE/500 mg)의 80~150%\n4) 아연 : 표시량 (2.55 mg/500 mg)의 80~150%\n5) 셀렌 : 표시량(16.5 ug/500mg)의 80~150%\n6) 헥산(mg/kg) : 5.0 이하\n7) 납(mg/kg) : 1.0 이하\n8) 카드뮴(mg/kg) : 1.0 이하\n9) 수은(mg/kg) : 1.0 이하\n10) 비소(mg/kg) : 1.0 이하\n11) 대장균군 : 음성\n12) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n2) 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.  \n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n5) 흡연자는 섭취 시 전문가와 상담하십시오.\n6) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 갈색 타원형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

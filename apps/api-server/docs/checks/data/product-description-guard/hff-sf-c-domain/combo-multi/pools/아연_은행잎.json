@@ -1,0 +1,140 @@
+[
+ {
+  "statementNo": "2019000910590",
+  "productName": "경남 징코진골드",
+  "manufacturer": "(주)세종바이오팜",
+  "ingredients": [
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고, 이미·이취가 없는 탁한 노란 연두색의 장방형 제피정제\n2) 플라보놀 배당체: 표시량(36mg/1,000mg)의 80~120%\n3) 깅콜릭산: 5.0 이하\n4) 아연 : 표시량(8.5mg/1,000mg)의 80~150%\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 총수은(mg/kg) : 1.0 이하\n8) 총비소(mg/kg) : 1.0 이하\n9) 대장균군: 음성\n10) 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n2) 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n4) 제품이 변질 및 변색된 경우에는 섭취하지 마시고 소비자 상담실로 문의하시기 바랍니다.\n5) 유통기한이 경과한 제품은 섭취하지 마시고, 섭취 시 섭취량 및 섭취방법을 준수하십시오.\n6) 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고, 이미,이취가 없는 탁한 노란 연두색의 장방형 제피정제",
+   "storage": "1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2004001701390",
+  "productName": "뉴 치파니",
+  "manufacturer": "(주)녹십초알로에",
+  "ingredients": [
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 1.2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 1.2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 회황색의 내용물을 함유한 흐린 초록색의 경질캡슐\n2) 플라보놀배당체 : 표시량(30mg/1.2g)의 80~120%\n3) 깅콜릭산 : 5.0이하\n4) 아연: 표시량(8.5 mg/ 1.2g)의 80~150%\n5) 납(mg/kg) : 1.0  이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 1.0  이하\n8) 비소(mg/kg) : 1.0 이하\n9) 대장균군 : 음성\n10) 붕해시험 : 20분이내",
+   "intake": "(1캡슐: 200mg) 1일 2회, 1회 3캅셀씩 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n (나) 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것\n (다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흐린 초록색의 경질 캡슐",
+   "storage": "실온보관 및 유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 3,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

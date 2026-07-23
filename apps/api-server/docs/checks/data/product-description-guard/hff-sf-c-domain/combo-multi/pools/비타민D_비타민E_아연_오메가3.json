@@ -1,0 +1,442 @@
+[
+ {
+  "statementNo": "20040020006906",
+  "productName": "오메가-3 징크 . 디",
+  "manufacturer": "(주)서흥",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "μg",
+     "basisAmount": 4.2,
+     "basisUnit": "g",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 4.2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8,
+     "unit": "mg",
+     "basisAmount": 4.2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 540,
+     "unit": "mg",
+     "basisAmount": 4.2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음\r\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\r\n[비타민E]①유해산소로부터 세포를 보호하는데 필요\r\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "① 성상 : 미황색 점조성 내용물을 함유한 황색의 장방형 연질캡슐\r\n② EPA와 DHA의 합 : 표시량(540 mg/4.2g)의 80~120%\r\n③ 아연 : 표시량(8 mg/4.2g)의 80~150%\r\n④ 비타민E : 표시량(5 mg α-TE/4.2g)의 80~150%\r\n⑤ 비타민D : 표시량(5 ㎍/4.2g)의 80~180%\r\n⑥ 헥산 : 5.0 mg/kg 이하\r\n⑦ 납 : 3.0 mg/kg 이하\r\n⑧ 카드뮴 : 1.0 mg/kg 이하\r\n⑨ 총수은 : 0.5 mg/kg 이하 \r\n⑩ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 3캡슐(2.1g)을 충분히 씹어서 섭취",
+   "caution": "① 의약품을 복용중인 분이나 임신.수유부는 제품 섭취 전에 의사와 상담하시길 권장합니다.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색 점조성 내용물을 함유한 황색의 장방형 연질캡슐",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 3,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040017006453",
+  "productName": "리튠 츄어블DHA",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "μg",
+     "basisAmount": 3600,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 3600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 3600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 3600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA  함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음②혈행개선에 도움을 줄 수 있음\n[비타민E]①유해산소로부터 세포를 보호하는데 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1. 성상: 미황색의 내용물을 함유한 타원형 모양의 연질캡슐\n2. EPA와 DHA의 합: 표시량(500mg/3,600mg)의 80~120%\n3. 아연함량: 표시량(8.5mg/3,600mg)의 80~150%\n4. 비타민E함량: 표시량(11mgα-TE/3,600mg)의 80~150%\n5. 비타민D함량: 표시량(5μg/3,600mg)의 80~180%\n6. 중금속: 납 3.0mg/kg이하, 카드뮴 1.0mg/kg이하, 총 수은 0.5mg/kg이하\n7. 대장균군: 음성",
+   "intake": "1일 3회, 1회 2캡슐 씹어서 섭취하십시오.",
+   "caution": "유통기한을 확인하시기 바라며, 특정 원료에 알레르기 및 과민증이 있는 체질인 경우 성분을 확인한 후 섭취하시기 바랍니다.\n어린이가 섭취할 때는 보호자의 관리 감독하에 주의하여 섭취시켜 주십시오.\n과량 섭취시 부작용이 있을 수 있으며, 질병치료나 약물투여 중인 분들은 섭취 전 의사와 상의하십시오.",
+   "dosageForm": "미황색의 내용물을 함유한 타원형 모양의 연질캡슐",
+   "storage": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 3
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040017006811",
+  "productName": "알티지오메가3 키즈",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "μg",
+     "basisAmount": 2800,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 2800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 2800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 2800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선․혈행 개선․건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①혈중 중성지질 개선․혈행 개선․건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 노란 연두색의 내용물을 함유한 노란색 타원형 츄어블 연질캡슐\n2) EPA와 DHA의 합 : 표시량 (600 mg / 2,800 mg)의 80~120%\n3) 비타민D : 표시량 (25 ㎍ / 2,800 mg)의 80~180%\n4) 비타민E : 표시량 (11 mg α-TE/ 2,800 mg)의 80~150%\n5) 아연 : 표시량 (8.5 mg/ 2,800 mg)의 80~150%\n6) 중금속 :  수은(0.5mg/kg 이하), 납(3.0 mg/kg 이하), 카드뮴(1.0 mg/kg 이하)\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 4캡슐을 씹어서 섭취하십시오.",
+   "caution": "특정 성분에 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.\n[EPA 및 DHA 함유유지]\n영 · 유아 섭취시 보호자의 지도 아래 섭취할 수 있도록 해주시기 바랍니다.\n(1) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(2) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D]\n(1)고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 연두색의 내용물을 함유한 노란색 타원형 츄어블 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 4,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009483180",
+  "productName": "초임계 알티지(rTG) 프리미엄 오메가3",
+  "manufacturer": "우리바이오(주)",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "μg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 3,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선··건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "혈중 중성지질 개선·혈행 개선··건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 흑색의 장방형 연질 캡슐\n2. 붕해: 20분 이내\n3. 대장균군: 음성\n4. 납(mg/kg): 3.0 이하\n5. 카드뮴(mg/kg): 1.0 이하\n6. 수은(mg/kg): 0.5 이하\n7. 비타민D: 표시량(50㎍/800mg)의 80 ~ 180%\n8. 비타민E: 표시량(3.3mg a-TE/800mg)의 80 ~ 150%\n9. 아연: 표시량(3mg/800mg)의 80~150%\n10. EPA와 DHA의 합:표시량(600mg/800mg)의 80~120%",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 내용물을 함유한 흑색의 장방형 연질 캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

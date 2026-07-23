@@ -1,0 +1,87 @@
+[
+ {
+  "statementNo": "200400200141452",
+  "productName": "트리플코엔자임Q10",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[코엔자임Q10] 항산화·높은 혈압 감소에 도움을 줄 수 있음\n[셀레늄(또는 셀렌)] 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐 \n② EPA와 DHA의 합 : 표시량(500 mg/1,000 mg)의 80~120%\n③ 코엔자임Q10 : 표시량(100 mg/1,000 mg)의 80~120%\n④ 셀레늄(또는 셀렌) : 표시량(55 ㎍/1,000 mg)의 80~150%\n⑤ 헥산(mg/kg) : 5.0 이하\n⑥ 아세톤(mg/kg) : 30.0 이하\n⑦ 이소프로필알콜(mg/kg) : 50.0 이하\n⑧ 초산에틸(mg/kg) : 50.0 이하\n⑨ 납(mg/kg) : 2.8 이하\n⑩ 카드뮴(mg/kg) : 1.0 이하\n⑪ 수은(mg/kg) : 0.6 이하\n⑫ 비소(mg/kg) : 1.0 이하\n⑬ 대장균군 : 음성\n⑭ 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[EPA 및 DHA 함유 유지]\n② 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n③ 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 진한 노란 주황색의 점도가 있는 내용물을 함유한 어두운 적갈색의 장방형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

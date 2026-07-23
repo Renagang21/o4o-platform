@@ -1,0 +1,111 @@
+[
+ {
+  "statementNo": "20040017006433",
+  "productName": "혈행N멀티팩",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 2255,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈행개선에 도움을 줄 수 있음",
+     "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood circulation",
+     "May help with improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 10.8,
+     "unit": "mg",
+     "basisAmount": 2255,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 2255,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels",
+     "May help with improving blood circulation"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 2255,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화에 도움을 줄 수 있음",
+     "높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity",
+     "May help with lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[코엔자임Q10제품] ① 항산화에 도움을 줄 수 있음 ② 높은 혈압 감소에 도움을 줄 수 있음\n[오메가-3지방산함유유지 제품] ① 혈중 중성지질 개선에 도움을 줄 수 있음 ② 혈행개선에 도움을 줄 수 있음\n[비타민E] ① 유해산소로부터 세포를 보호하는데 필요\n[감마리놀렌산함유유지 제품] ① 혈중 콜레스테롤 개선에 도움을 줄 수 있음 ② 혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐\n2) 코엔자임Q10 : 표시량(100 mg/2,255 mg)의 80~120%\n3) EPA와 DHA의 합 : 표시량(500 mg/2,255 mg)의 80~120%\n4) 비타민E : 표시량(10.8 mg a-TE/2,255 mg)의 80~150 %\n5) 감마리놀렌산 : 표시량(240 mg/2,255 mg)의 80~120% %\n6) 중금속 : 납: 1.0 mg/kg이하, 카드뮴: 1.0 mg/kg이하, 총비소: 1.0 mg/kg이하, 총수은: 0.5 mg/kg이하\n7) 잔류용매 : 헥산:5.0 mg/kg이하, 초산에틸:50.0 mg/kg이하\n8) 붕해 : 20분 이내 \n9) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(4캡슐)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "[EPA및 DHA 함유유지]\n(1) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(2) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "주황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 장방형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐, 미황색의 내용물을 함유한 타원형 연질캡슐",
+   "storage": "연질캡슐은 수분, 열에 의한 영향에 민감하므로, 고온다습한 곳과 직사광선을 피해 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

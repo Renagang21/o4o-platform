@@ -1,0 +1,109 @@
+[
+ {
+  "statementNo": "20040017021587",
+  "productName": "뉴트리 디-데이 다이어트 카테킨 올뉴",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[비타민C] ①결합조직 형성과 기능유지에 필요, ②철의 흡수에 필요, ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민E] ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[셀레늄] ①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,000mg)의 80 ~120% \n③비타민C : 표시량(50mg/1,000mg)의 80~150%\n④비타민E : 표시량(3.3mg α-TE/1,000mg)의 80~150%\n⑤셀렌 : 표시량(16.5㎍/1,000mg)의 80~150%\n⑥카페인: 50,000mg/kg 이하\n⑦에피갈로카테킨갈레이트(mg/1,000mg) : 300 이하\n⑧붕해시험 : 물 60분 이내\n⑨대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정를 물과 함께 섭취한다.",
+   "caution": "- 과량 섭취하지 않도록 주의할 것\n- 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n- 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n- 어린이, 임산부 및 수유부는 섭취를 피할 것\n- 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n- 식사 후 섭취할 것\n- 카페인을 함유한 식품의 섭취에 주의할 것\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 하양색 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "storage": "① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

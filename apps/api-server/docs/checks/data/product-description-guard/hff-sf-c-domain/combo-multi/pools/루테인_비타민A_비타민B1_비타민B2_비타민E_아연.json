@@ -1,0 +1,292 @@
+[
+ {
+  "statementNo": "200600200081254",
+  "productName": "눈 건강 호안방 루테인지아잔틴",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20.1348,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 500,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[루테인지아잔틴복합추출물(제2018-11호)] (국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging \n[비타민 E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[비타민 A] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요\n[비타민 B1] 탄수화물과 에너지 대사에 필요\n[비타민 B2] 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐\n2. 루테인 : 표시량(20.1348mg/500mg)의 80~120%\n3. 총지아잔틴 : 표시량(3.8652mg/500mg)의 80~120%\n4. 비타민E : 표시량(11mg α-TE/500mg)의 80~150%\n5. 아연 : 표시량(8.5mg/500mg)의 80~150%\n6. 비타민A : 표시량(700ug RAE/500mg)의 80~150%\n7. 비타민B1 : 표시량(1.2mg/500mg)의 80~180%\n8. 비타민B2 : 표시량(1.4mg/500mg)의 80~180%\n9. 헥산(mg/kg) : 5.0 이하\n10. 초산에틸(mg/kg) : 50 이하\n11. 납(mg/kg) : 0.5 이하\n12. 카드뮴(mg/kg) : 0.1 이하\n13. 비소(mg/kg) : 1.0 이하\n14. 수은(mg/kg) : 0.1 이하\n15. 대장균군 : 음성\n16. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[루테인지아잔틴복합추출물(제2018-11호)]\n영유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 4. 온도 및 습도 등의 변화에 의해 캡슐이 붙는 현상이 발생될 수 있으나, 품질에 이상이 없으니 안심하고 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20172880193334",
+  "productName": "루테인지아잔틴",
+  "manufacturer": "대원헬스케어 주식회사 2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 18.18,
+     "unit": "mg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 700,
+     "unit": "μg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 1.2,
+     "unit": "mg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 1.4,
+     "unit": "mg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 450,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[루테인지아잔틴복합추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 \n[비타민A] 어두운 곳에서 시각 적응을 위해 필요 / 피부와 점막을 형성하고 기능을 유지하는데 필요 / 상피세포의 성장과 발달에 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요 \n[비타민B2] 체내 에너지 생성에 필요\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연] 정상적인 면역기능에 필요 / 정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐\n2) 루테인: 표시량(18.18 mg/450 mg)의 80~120%\n3) 총지아잔틴: 표시량(1.82 mg/450 mg)의 80~120%\n4) 비타민E: 표시량(11 mgα-TE/450 mg)의 80~150%\n5) 아연: 표시량(8.5 mg/450 mg)의 80~150%\n6) 비타민A: 표시량(700 μgRAE/450 mg)의 80~150%\n7) 비타민B1: 표시량(1.2 mg/450 mg)의 80~180%\n8) 비타민B2: 표시량(1.4 mg/450 mg)의 80~180%\n9) 납(mg/kg): 0.5 이하\n10) 카드뮴(mg/kg): 0.1 이하\n11) 수은(mg/kg): 0.1 이하\n12) 비소(mg/kg):0.1 이하\n13) 헥산(mg/kg): 5.0 이하\n14) 대장균군: 음성\n15) 붕해: 20분 이내",
+   "intake": "1일 1회, 1회 1 캡슐을 물과 함께 섭취하십시오.",
+   "caution": "영유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n흡연자는 섭취 시 전문가와 상담하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. \n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐",
+   "storage": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

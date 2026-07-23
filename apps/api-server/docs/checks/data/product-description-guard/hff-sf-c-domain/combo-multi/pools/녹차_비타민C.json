@@ -1,0 +1,288 @@
+[
+ {
+  "statementNo": "200400200083104",
+  "productName": "체지방 감소 녹차카테킨",
+  "manufacturer": "주식회사 노바렉스",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 850,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 850,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 탁한 빨간 주황색의 회분홍색 장방형 장용성 제피 정제\n2. 카테킨 : 표시량(300mg/850mg)의 80~120%\n3. 비타민C : 표시량(30mg/850mg)의 80~150%\n4. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n5. 카페인(mg/kg) : 50,000 이하\n6. 초산에틸(mg/kg) : 50.0 이하\n7. 대장균군 : 음성\n8. 붕해 : ① 1액 : 120분 내에 붕해 되어서는 안된다. ② 2액 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[녹차추출물] \n어린이, 임산부 및 수유부는 섭취를 피할 것\n간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n식사 후 섭취할 것\n카페인을 함유한 식품의 섭취에 주의할 것\n[비타민C]\n과량 섭취하지 않도록 주의할 것\n신장질환이 있는 경우 섭취 전 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 탁한 빨간 주황색의 회분홍색 장방형 장용성 제피 정제",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200141666",
+  "productName": "다이브 인 핏",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 750,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 750,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물]\n①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[비타민C]\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 주황색의 장방형 제피정제\n2. 카테킨 : 표시량(300 mg/750 mg)의 80~120%\n3. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하 (300 mg/750 mg 이하)\n4. 카페인(mg/kg) : 50,000 이하\n5. 잔류용매(mg/kg) : 50.0 이하(초산에틸을 사용한 경우)\n6. 비타민 C : 표시량(30 mg/750 mg)의 80 ~ 150%\n7. 붕해시험 : 60분 이내\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n1. 어린이, 임산부 및 수유부는 섭취를 피할 것\n2. 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n3. 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n4. 식사 후 섭취할 것\n5. 카페인을 함유한 식품의 섭취에 주의할 것\n6. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 탁한 노란 주황색의 장방형 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20040020020527",
+  "productName": "쿨가이",
+  "manufacturer": "엠에스바이오텍(주)",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화에 도움을 줄 수 있음",
+     "체지방 감소에 도움을 줄 수 있음3. 혈중 콜레스테롤 개손에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity",
+     "May help with body-fat reduction"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1. 항산화에 도움을 줄 수 있음 2.체지방 감소에 도움을 줄 수 있음3. 혈중 콜레스테롤 개손에 도움을 줄 수 있음\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 갈색장방형의 코팅정제\n②대장균군 : 음성\n③카테킨 : 300mg/2,000mg  표시량의 80~120% ( EGCG 300mg이하)\n④카페인 : 50,000mg/kg이하\n⑤비타민C : 200mg /2,000mg  표시량의 80~150%\n⑥붕해시험 : 60분 이하",
+   "intake": "1일1회, 1회 2정씩 또는 1일 2회, 1회1정씩 음용수와 함께 섭취",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n② 제품을 개봉할 때 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의 하십시오.\n③ 어린이, 임산부 및 수유부는 섭취를 피할 것\n④ 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n⑤ 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n⑥ 식사 후 섭취할 것\n⑦ 카페인을 함유한 식품의 섭취에 주의할 것\n⑧ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "갈색장방형의 코팅정제",
+   "storage": "직사광선을 피하여 서늘하고 건조한 곳에 보관",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200023584",
+  "productName": "베어헬스 카테킨",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 녹차추출물 : 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n2) 비타민C : 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 갈색의 장타원형 제피정제\n2) 카테킨 : 표시량(300mg/800mg)의 80~120%\n3) 비타민C : 표시량(30mg/800mg)의 80~150%\n4) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n5) 카페인(mg/kg) : 50,000 이하\n6) 대장균군 : 음성\n7) 붕해시험 : 적합(60분 이내)",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n어린이, 임산부 및 수유부는 섭취를 피하십시오.\n간질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있습니다.\n식사 후 섭취하십시오.\n카페인을 함유한 식품의 섭취에 주의하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 갈색의 장타원형 제피정제",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

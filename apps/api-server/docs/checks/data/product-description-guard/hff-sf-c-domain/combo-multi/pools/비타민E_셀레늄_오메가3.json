@@ -1,0 +1,87 @@
+[
+ {
+  "statementNo": "200400200023132",
+  "productName": "닥터에스더 식물성 알티지 오메가 프리미엄 900",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 27.5,
+     "unit": "μg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 900,
+     "unit": "mg",
+     "basisAmount": 1400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n2) 비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. \n3) 셀렌 : 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐\n2) EPA와 DHA의 합 : 표시량(900mg/1400mg)의 80~120%\n3) 비타민E : 표시량(11mg α-TE/1400mg) 80~150%\n4) 셀렌 : 표시량(27.5ug/1400mg) 80~150%\n5) 납(mg/kg) : 3.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 0.5 이하\n8) 대장균군 : 음성 \n9) 붕해시험 : 1액에서 120분이내 내용물이 방출안됨, 2액에서 60분이내 붕해",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,87 @@
+[
+ {
+  "statementNo": "201728208676",
+  "productName": "오큐트리플G",
+  "manufacturer": "(주)태준제약",
+  "ingredients": [
+   {
+    "key": "나이아신",
+    "labelKo": "나이아신",
+    "labelEn": "Niacin",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 775,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 775,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28.8,
+     "unit": "mg",
+     "basisAmount": 775,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n2) 기억력 개선･혈행 개선에 도움을 줄 수 있음\n3) 체내 에너지 생성에 필요",
+   "baseStandard": "1)\t붕해시험 : 60분 이내로 적합\n2)\t나이아신: 표시량(500mg NE/775mg)의 80~150 %로 적합\n3)\t플라보놀배당체: 표시량(28.8mg/775mg)의 80~120 %로 적합\n4)\t루테인: 표시량(10mg/775mg)의 80~120 %로 적합\n5)\t깅콜릭산: 5.0(mg/kg) 이하로 적합\n6)\t잔류용매(헥산) : 5.0(mg/kg) 이하로 적합\n7)\t납 : 1.0 (mg/kg) 이하로 적합\n8)\t카드뮴 : 1.0 (mg/kg) 이하로 적합\n9)\t수은 : 1.0 (mg/kg) 이하로 적합\n10)\t비소 : 1.0 (mg/kg) 이하로 적합\n11)\t대장균군 : 음성으로 적합",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "1)\t영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것 \n2)\t흡연자는 섭취 시 전문가와 상담할 것\n3)\t과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음 \n4)\t이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n5)\t수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 회녹색의 장방형 필름 코팅정제",
+   "storage": "직사광선을 받지 않는 서늘한 곳에서 보관·유통하시고, 어린이의 손에 닿지 않도록 주의 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "film",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

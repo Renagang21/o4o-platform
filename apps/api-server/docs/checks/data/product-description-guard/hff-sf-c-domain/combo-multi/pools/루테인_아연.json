@@ -1,0 +1,278 @@
+[
+ {
+  "statementNo": "200400200201412",
+  "productName": "아이눈 EYE NOON",
+  "manufacturer": "엠에스바이오텍(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 * 아연"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 2,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "* 마리골드꽃추출물\n①노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n* 아연\n①정상적인 면역기능에 필요\n②정상적인 세포분열에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 연한 노란 주황색의 분말 \n② 루테인 : 10 mg / 2 g (표시량의 80-120%)\n③ 아연 : 8.5 mg / 2 g (표시량의 80-150%)\n④ 납(mg/kg) : 1.0 이하 \n⑤ 비소(mg/kg) : 1.0 이하\n⑥ 수은(mg/kg) : 1.0 이하\n⑦ 카드뮴(mg/kg) : 1.0 이하\n⑧ 헥산(mg/kg) : 5.0 이하\n⑨ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 혹은 물과 함께 섭취하십시오.",
+   "caution": "* 마리골드꽃추출물\n①영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n②흡연자는 섭취 시 전문가와 상담할 것\n③과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n④이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 알갱이가 있는 연한 노란 주황색의 분말",
+   "storage": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "powder",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009105390",
+  "productName": "눈건강엔 루테인골드",
+  "manufacturer": "(주)세종바이오팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 12,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐\n2) 루테인: 표시량(20mg/550mg)의 80~120%\n3) 아연 : 표시량(12mg/550mg)의 80~150%\n4) 납(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 1.0 이하\n7) 비소(mg/kg) : 1.0 이하\n8) 대장균군: 음성\n9) 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오. \n흡연자는 섭취 시 전문가와 상담하십시오. \n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. \n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n질환이 있거나 의약품 복용 시 전문가와 상담하십시오. \n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009105389",
+  "productName": "눈엔루테인플러스",
+  "manufacturer": "(주)세종바이오팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 12,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐\n2) 루테인: 표시량(20mg/550mg)의 80~120%\n3) 아연 : 표시량(12mg/550mg)의 80~150%\n4) 납(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 1.0 이하\n7) 비소(mg/kg) : 1.0 이하\n8) 헥산(mg/kg) : 5.0 이하\n9) 초산에틸(mg/kg) : 50.0 이하\n10) 대장균군: 음성\n11) 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오. \n흡연자는 섭취 시 전문가와 상담하십시오. \n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. \n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n질환이 있거나 의약품 복용 시 전문가와 상담하십시오. \n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20190009105385",
+  "productName": "눈 밝은세상 루테인",
+  "manufacturer": "(주)세종바이오팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 12,
+     "unit": "mg",
+     "basisAmount": 550,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐\n2) 루테인: 표시량(20mg/550mg)의 80~120%\n3) 아연 : 표시량(12mg/550mg)의 80~150%\n4) 납(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 1.0 이하\n7) 비소(mg/kg) : 1.0 이하\n8) 대장균군: 음성\n9) 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "영‧유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오. \n흡연자는 섭취 시 전문가와 상담하십시오. \n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다. \n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오. \n질환이 있거나 의약품 복용 시 전문가와 상담하십시오. \n알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고, 이미·이취가 없는 주황색의 내용물을 함유한 갈색의 타원형 연질캡슐",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

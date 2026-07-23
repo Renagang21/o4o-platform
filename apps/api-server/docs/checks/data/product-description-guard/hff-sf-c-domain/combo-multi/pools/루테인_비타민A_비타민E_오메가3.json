@@ -1,0 +1,109 @@
+[
+ {
+  "statementNo": "2021001285512",
+  "productName": "루테인&오메가3 5종 복합 기능성",
+  "manufacturer": "주식회사 네이처팩토리",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민A",
+    "labelKo": "비타민 A",
+    "labelEn": "Vitamin A",
+    "declaredAmount": {
+     "value": 840,
+     "unit": "μg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "어두운 곳에서 시각 적응을 위해 필요",
+     "피부와 점막을 형성하고 기능을 유지하는데 필요",
+     "상피세포의 성장과 발달에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the adaptation of vision in dim light",
+     "Needed to form and maintain skin and mucous membranes",
+     "Needed for the growth and development of epithelial cells"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 13.2,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1050,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요",
+   "baseStandard": "1)성상: 고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 빨간검정색의 장방형 연질캡슐\n2)루테인: 20mg/1,050mg의 80~120%\n3)EPA 및 DHA의 합: 600mg/1,050mg의 80~120%\n4)비타민 A: 840μg RE/1,050mg의 80~150%\n5)비타민 E: 13.2mg α-TE/1,050mg의 80~150%\n6)베타카로틴 : 1.26mg/1,050mg의 80 ~ 150%\n7)납: 1.0mg/kg 이하\n8)카드뮴: 1.0mg/kg 이하\n9)수은: 0.5mg/kg 이하\n10)비소: 1.0mg/kg 이하\n11)헥산: 5.0mg/kg 이하\n12)대장균군: 음성\n13)붕해도: 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "1)\t과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n2)\t영∙유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n3)\t흡연자는 섭취 시 전문가와 상담할 것\n4)\t의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n5)\t개인에 따라 피부 관련 이상반응이 발생할 수 있음\n6)\t이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 빨간검정색의 장방형 연질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온보관",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

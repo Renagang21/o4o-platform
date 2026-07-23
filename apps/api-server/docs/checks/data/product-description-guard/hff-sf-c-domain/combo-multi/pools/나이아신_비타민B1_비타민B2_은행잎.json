@@ -1,0 +1,107 @@
+[
+ {
+  "statementNo": "20040017021624",
+  "productName": "아이글라우",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "나이아신",
+    "labelKo": "나이아신",
+    "labelEn": "Niacin",
+    "declaredAmount": {
+     "value": 32,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 50,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 32,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 28,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선에 도움을 줄 수 있음",
+     "혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물 제품]①기억력 개선에 도움을 줄 수 있음 ②혈행 개선에 도움을 줄 수 있음\n\n[비타민B1]①탄수화물과 에너지 대사에 필요\n\n[비타민B2]①체내 에너지 생성에 필요\n\n[나이아신] ①체내 에너지 생성에 필요",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있는 녹색의 제피정제\n②플라보놀 배당체 : 표시량(28mg/2,000mg)의 80 ~ 120% \n③비타민B1 : 표시량(50mg/2,000mg)의 80 ~ 180%\n④비타민B2 : 표시량(32mg/2,000mg)의 80 ~ 180%\n⑤나이아신 : 표시량(32mg NE/2,000mg)의 80 ~ 150%\n⑥깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n⑦납(mg/kg) : 1.0 이하\n⑧총수은(mg/kg) : 1.0 이하\n⑨총비소(mg/kg) : 1.0 이하\n⑩카드뮴(mg/kg) : 1.0 이하\n⑪대장균군 : 음성\n⑫붕해시험 : 물 60분 이내",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취한다.",
+   "caution": "① 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의 ② 의약품(항응고제) 복용 시 섭취에 주의",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 녹색의 제피정제",
+   "storage": "① 직사광선을 받지 않는 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

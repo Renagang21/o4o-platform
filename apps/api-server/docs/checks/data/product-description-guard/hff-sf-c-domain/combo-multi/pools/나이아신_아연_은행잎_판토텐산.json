@@ -1,0 +1,107 @@
+[
+ {
+  "statementNo": "20190009105200",
+  "productName": "브레인써큘라",
+  "manufacturer": "(주)세종바이오팜",
+  "ingredients": [
+   {
+    "key": "나이아신",
+    "labelKo": "나이아신",
+    "labelEn": "Niacin",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "mg",
+     "basisAmount": 600,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①체내 에너지 생성에 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "1. 성상: 고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제\n2. 플라보놀 배당체 : 표시량(30mg/600mg)의 80~120%\n3. 아연 : 표시량(8.5mg/600mg)의 80~150%\n4. 나이아신 : 표시량(10mg NE/600mg)의 80~150%\n5. 판토텐산 : 표시량(5mg/600mg)의 80~180%\n6. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 1.0 이하\n9. 수은(mg/kg) : 1.0 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군: 음성\n12. 붕해도: 건강기능식품공전 중 붕해도 시험의 정제 제품 시험법에 따라 30분 내에 붕해",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\n의약품(항응고제) 복용 시 섭취에 주의\n\n\n\n\n\n(1)",
+   "dosageForm": "고유의 향미가 있고, 이미, 이취가 없는 갈색의 장방형 정제",
+   "storage": "실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

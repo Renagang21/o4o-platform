@@ -1,0 +1,323 @@
+[
+ {
+  "statementNo": "200400200141432",
+  "productName": "루테인오메가3D",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 12,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "μg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 560,
+     "unit": "mg",
+     "basisAmount": 1200,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민D] ① 칼슘과 인이 흡수되고 이용되는데 필요 ② 뼈의 형성과 유지에 필요 ③ 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점성이 있는 내용물을 함유한 어두운 갈색의 타원형 연질캡슐\n② EPA와 DHA의 합 : 표시량(560 mg/1,200 mg)의 80~120%\n③ 루테인 : 표시량(12 mg/1,200 mg)의 80~120%\n④ 비타민E : 표시량(11 mg α-TE/1,200 mg)의 80~150%\n⑤ 비타민D : 표시량(25 ㎍/1,200 mg)의 80~180%\n⑥ 헥산(mg/kg) : 5.0 이하\n⑦ 초산에틸(mg/kg) : 50.0 이하\n⑧ 납(mg/kg) : 2.9 이하\n⑨ 카드뮴(mg/kg) : 1.0 이하\n⑩ 수은(mg/kg) : 0.5 이하\n⑪ 비소(mg/kg) : 1.0 이하\n⑫ 대장균군 : 음성\n⑬ 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "알레르기 체질이신 경우 성분을 확인한 후 섭취여부를 결정하여야 함\n[EPA 및 DHA 함유 유지]\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n개인에 따라 피부 관련 이상반응이 발생할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[마리골드꽃추출물]\n영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n흡연자는 섭취 시 전문가와 상담할 것\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민D]\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 빨간 주황색의 점성이 있는 내용물을 함유한 어두운 갈색의 타원형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200022878",
+  "productName": "세노메가 알티지오메가3 루테인 비타민D",
+  "manufacturer": "코스맥스바이오(주)",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "1) EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음.\n2) 마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음.\n3) 비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.\n4) 비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐\n2) EPA와 DHA의 합 : 표시량(600mg/1000mg)의 80~120%\n3) 루테인 : 표시량(20mg/1000mg)의 80~120%\n4) 비타민D : 표시량(10ug/1000mg)의 80~180%\n5) 비타민E : 표시량(11mg a-TE/1000mg)의 80~150%\n6) 납(mg/kg) : 2.8 이하\n7) 카드뮴(mg/kg) : 1.0 이하\n8) 수은(mg/kg) : 0.6 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 헥산(mg/kg) : 5.0 이하 \n11) 대장균군 : 음성\n12) 붕해시험 : 1액에서 120분이내 내용물이 붕해안됨, 2액에서 60분이내 붕해",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있습니다.\n고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 선명한 빨간 주황색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170061638",
+  "productName": "세노메가 알티지오메가3 루테인 비타민D",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지]\n혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[마리골드꽃추출물]\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n[비타민D]\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n[비타민E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 내용물을 함유한 흑갈색의 장방형 장용성 연질캡슐\n 2) 비타민D: 표시량(10 μg/1,000 mg)의 80~180%\n 3) 비타민E: 표시량(11 mga-TE/1,000 mg)의 80~150%\n 4) EPA와 DHA의 합: 표시량(600 mg/1,000 mg)의 80~120%\n 5) 루테인: 표시량(20 mg/1,000 mg)의 80~120%\n 6) 납(mg/kg): 2.8 이하\n 7) 카드뮴(mg/kg): 1.0 이하\n8) 비소(mg/kg): 1.0 이하\n 9) 수은(mg/kg): 0.6이하\n10) 헥산(mg/kg): 5.0 이하\n11) 대장균군: 음성\n12) 붕해: 적합(장용성: 1액에서 120분이내 내용물이 방출안됨, 2액에서 60분이내 붕해",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 내용물을 함유한 흑갈색의 장방형 장용성 연질캡슐",
+   "storage": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

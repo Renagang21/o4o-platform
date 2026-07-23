@@ -1,0 +1,109 @@
+[
+ {
+  "statementNo": "200400200142124",
+  "productName": "혈압 건강 올인원",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[비타민C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[코엔자임 Q10]\n(1) 항산화･높은 혈압 감소에 도움을 줄 수 있음\n[비타민E]\n(1) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[셀렌]\n(1) 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "[비타민정제]\n(1) 성상 : 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰색의 장방형 제피정제\n(2) 비타민C :  표시량(500mg/1300mg)의 80 ~ 150%\n(3) 비타민E : 표시량(11㎎ α-TE/1300mg)의 80 ~ 150%\n(4) 셀렌 :  표시량(55㎍/1300mg)의 80 ~ 150%\n(5) 대장균군 : 음성\n(6) 붕해시험 : 60분이내\n\n[코엔자임캡슐]\n(1) 성상 : 고유의 향미가 있고 이미.이취가 없는 빨간 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐\n(2) 코엔자임Q10 : 표시량(100mg/1300mg)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 수은(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 헥산(mg/kg) : 5.0 이하\n(8) 초산에틸(mg/kg) : 50.0 이하\n(9) 대장균군 : 음성\n(10) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1포(1정, 1캡슐)를 물과 함께 섭취하십시오.[비타민정제 (800mg x 1정), 코엔자임캡슐(500mg x 1캡슐)]",
+   "caution": "[비타민C]\r\n(1) 과량 섭취하지 않도록 주의할 것\r\n(2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\r\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\r\n[코엔자임Q10]\r\n(1) 수유부는 섭취를 피할 것\r\n(2) 항응고제 복용 시 전문가와 상담할 것\r\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "[비타민정제]고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰색의 장방형 제피정제 / [코엔자임캡슐]고유의 향미가 있고 이미.이취가 없는 빨간 주황색의 내용물을 함유한 흑갈색의 타원형 연질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

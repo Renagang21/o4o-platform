@@ -1,0 +1,69 @@
+[
+ {
+  "statementNo": "200400200081398",
+  "productName": "써모스택 정",
+  "manufacturer": "주식회사 노바렉스",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 4000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "옥타코사놀",
+    "labelKo": "옥타코사놀",
+    "labelEn": "Octacosanol",
+    "declaredAmount": {
+     "value": 7,
+     "unit": "mg",
+     "basisAmount": 4000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "지구력 증진에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving endurance"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①지구력 증진에 도움을 줄 수 있음\n\n①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 연한 노란 분홍색의 투명 장방형 제피 정제\n2. 카테킨 : 표시량(300mg/4000mg)의 80~120%\n3. 옥타코사놀 : 표시량(7mg/4000mg)의 80~120%\n4. 카페인(mg/kg) : 50,000 이하\n5. 대장균군 : 음성\n6. 붕해 : 60분 이내\n7. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n8. 초산에틸(mg/kg) : 50.0 이하",
+   "intake": "성인 1일 1회, 1회 5정을 식후 2잔(400mL)의 충분한 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n개인의 상황에 따라 섭취량 및 섭취방법에 관한 영양상담이 필요할 수 있으므로, 섭취 전 영양사와 상담하시기 바랍니다.\n운동을 병행하는 것이 체지방 감소에 효과적입니다.\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있으며 운동선수의 경우 도핑테스트에서 양성반응을 나타낼 수 있으므로 주의해 주십시오.\n적은 양부터 섭취해보시기 바랍니다.\n잠자기 6시간 전에는 섭취를 자제해 주십시오. \n특이체질이거나 알레르기 체질의 경우에는 개인에 따라 과민 반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오. (특히 심장질환, 고혈압, 신장질환, 위장질환, 갑상선기능 항진증, 불안장애, 신경쇠약 시 섭취를 금합니다.)\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 연한 노란 분홍색의 투명 장방형 제피 정제",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오\r\n2) 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오\r\n3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 5,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

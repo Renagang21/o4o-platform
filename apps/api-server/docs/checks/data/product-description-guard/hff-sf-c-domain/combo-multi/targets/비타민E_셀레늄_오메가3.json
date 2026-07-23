@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm103-001",
+  "productName": "닥터에스더 식물성 알티지 오메가 프리미엄 900",
+  "productNameEn": "닥터에스더 식물성 알티지 오메가 프리미엄 900",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200023132",
+  "category": "hff",
+  "source": {
+   "mainFunction": "1) EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n2) 비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. \n3) 셀렌 : 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐\n2) EPA와 DHA의 합 : 표시량(900mg/1400mg)의 80~120%\n3) 비타민E : 표시량(11mg α-TE/1400mg) 80~150%\n4) 셀렌 : 표시량(27.5ug/1400mg) 80~150%\n5) 납(mg/kg) : 3.0 이하\n6) 카드뮴(mg/kg) : 1.0 이하\n7) 수은(mg/kg) : 0.5 이하\n8) 대장균군 : 음성 \n9) 붕해시험 : 1액에서 120분이내 내용물이 방출안됨, 2액에서 60분이내 붕해",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오. \n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.\n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐",
+   "storage": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 11,
+    "unit": "mg",
+    "basisAmount": 1400,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 2,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">셀레늄 27.5μg</span><span class=\"sd-badge is-solid\">오메가3 900mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에스더 식물성 알티지 오메가 프리미엄 900<small>비타민 E · 셀레늄 · 오메가3</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 E <b>11mg</b>, 셀레늄 <b>27.5μg</b>, 오메가3 <b>900mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(2캡슐) 섭취로 비타민 E <b>11mg</b>, 셀레늄 <b>27.5μg</b>, 오메가3 <b>900mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(27.5μg/1400mg)의 80~150%</div><div class=\"sd-item\"><b>오메가3</b> 표시량(900mg/1400mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 비타민 E · 셀레늄 · 오메가3 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Vitamin E 11mg</span><span class=\"sd-badge is-solid\">Selenium 27.5μg</span><span class=\"sd-badge is-solid\">Omega-3 900mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에스더 식물성 알티지 오메가 프리미엄 900<small>Vitamin E · Selenium · Omega-3</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 2 capsules</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>11mg</b> of Vitamin E, <b>27.5μg</b> of Selenium, <b>900mg</b> of Omega-3 as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (2 capsules): <b>11mg</b> Vitamin E, <b>27.5μg</b> Selenium, <b>900mg</b> Omega-3</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Vitamin E</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Omega-3</b><ul class=\"sd-why\"><li>May help with improving dry eyes for eye health</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Vitamin E</b> labelled (11mg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (27.5μg / 1400mg), 80~150%</div><div class=\"sd-item\"><b>Omega-3</b> labelled (900mg / 1400mg), 80~120%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 노란색의 내용물을 함유한 갈흑색의 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Vitamin E · Selenium · Omega-3 together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

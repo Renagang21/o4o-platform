@@ -1,0 +1,597 @@
+[
+ {
+  "statementNo": "200400170211459",
+  "productName": "핑크그린 나이트컷 시즌2",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물]  항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌]  스트레스로 인한 긴장완화에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨칼레이트((-)-epigallocatechin gallate,EGCG)(mg) : 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 60분 이내\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 탁한 흐린 황갈색의 장방형 제피정제",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20150010018153",
+  "productName": "편안한 밤 하늘이 다이어트",
+  "manufacturer": "(주)케비젠",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 375,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 250,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌]\n스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n[비타민 E]\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제\n2. 카테킨 : 표시량(375 mg/2,100 mg)의 80~120%\n3. EGCG : 일일섭취량(2,100 mg) 중 300 mg 이하\n4. 카페인(mg/kg) : 50,000 이하\n5. 테아닌 : 표시량(250 mg/2,100 mg)의 80~120%\n6. 비타민 E : 표시량(3.3 mg α-TE/2,100 mg)의 80~150%\n7. 잔류용매(mg/kg) : 50.0 이하 (초산에틸)\n8. 납(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.5 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 비소(mg/kg) : 1.0 이하\n12. 대장균군 : 음성\n13. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 3정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[테아닌]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의할 것\n(다) 수술전후 환자는 전문가와 상담할 것\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 노랑 분홍의 장방형 코팅 정제",
+   "storage": "실온",
+   "shelfLife": "제조일로부터 24개월 까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 3,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170211245",
+  "productName": "핑크그린 나이트컷",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[녹차추출물] ①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌] ① 스트레스로 인한 긴장완화에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨 갈레이트(mg) : 일일섭취량(1,800mg) 중 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 60분이내\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2019000939490",
+  "productName": "편안한 밤 하늘이 다이어트",
+  "manufacturer": "(주)미누스토리",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 375,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 250,
+     "unit": "mg",
+     "basisAmount": 2100,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n① 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제\n2) 카테킨 : 375mg/2100mg (80 ~ 120%) / 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 300 이하\n3) 테아닌 : 250mg/2100mg (80 ~ 120%)\n4) 비타민 E : 3.3mg a-TE/2100mg ( 80 ~ 150%)\n5) 납(mg/kg) : 1.0 이하\n6) 카드뮴(mg/kg) : 0.5 이하\n7) 수은(mg/kg) : 0.5 이하\n8) 비소(mg/kg) : 1.0 이하\n9) 카페인(mg/kg) : 50,000 이하\n10) 잔류용매(mg/kg) : 50.0 이하(초산에틸)\n11) 붕해: 60분이내\n12) 대장균군: 음성",
+   "intake": "1일 1회, 1회 3정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피하십시오.\n(나) 수술전후 환자는 전문가와 상담하십시오.\n(다) 간질환이 있거나 의약품 복용 시 전문가와 상담하십\n시오.\n(라) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수\n있으니 주의하십시오.\n(마) 식사 후 섭취하십시오.\n(마) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취\n에 주의 하십시오.\n(바) 카페인을 함유한 식품의 섭취에 주의하십시오.\n(사) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하\n십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흐린 노란 분홍색의 장방형 코팅정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 3,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "20120019007558",
+  "productName": "제트헬퍼 아무도 모르게 나이트번 시즌4 NIGHT BURN SEASON4",
+  "manufacturer": "(주)한풍네이처팜",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음 \n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제\n2. 카테킨 : 표시량(300 mg/1,800 mg)의 80~120 % \n3. L-테아닌 : 표시량(200 mg/1,800 mg)의 80~120 % \n4. 비타민E : 표시량(3.3 mgα-TE/1,800 mg)의 80~150 % \n5. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n6. 카페인(mg/kg) : 50,000 이하\n7. 납(mg/kg) : 1.0 이하\n8. 카드뮴(mg/kg) : 0.5 이하\n9. 수은(mg/kg) : 0.5 이하\n10. 비소(mg/kg) : 1.0 이하\n11. 대장균군 : 음성 \n12. 붕해 : 적합",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의하십시오.\n어린이, 임산부 및 수유부는 섭취를 피하십시오.\n간질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있습니다.\n식사 후 섭취하십시오.\n카페인을 함유한 식품의 섭취에 주의하십시오.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n수술전후 환자는 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 갈색의 점박이가 있는 연한 노란 분홍색의 타원형 제피정제",
+   "storage": "고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2023000229617",
+  "productName": "제트헬퍼 아무도 모르게 나이트번 (NIGHT BURN) 시즌2",
+  "manufacturer": "(주)신비바이오",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제\n2. 카테킨 : 표시량(300 mg/1,800 mg)의 80~120 %\n3. L-테아닌 : 표시량(200 mg/1,800 mg)의 80~120 %\n4. 비타민E : 표시량(3.3 mgα-TE/1,800 mg)의 80~150 %\n5. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n6. 카페인(mg/kg) : 50,000 이하\n7. 초산에틸(mg/kg) : 50.0이하\n8. 납(mg/kg) : 1.0 이하\n9. 카드뮴(mg/kg) : 0.5 이하\n10. 수은(mg/kg) : 0.5 이하\n11. 비소(mg/kg) : 1.0 이하\n12. 대장균군 : 음성\n13. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(3) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(4) 식사 후 섭취할 것\n(5) 카페인을 함유한 식품의 섭취에 주의할 것\n(6) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[테아닌]\n(1) 카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n(2) 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 분홍색의 장타원형 제피정제",
+   "storage": "습기 및 직사광선을 피하고 건조하고 서늘한 곳에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170211455",
+  "productName": "드림온 다이어트",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 3.3,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "테아닌",
+    "labelKo": "L-테아닌",
+    "labelEn": "L-theanine",
+    "declaredAmount": {
+     "value": 200,
+     "unit": "mg",
+     "basisAmount": 1800,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with relief of stress-induced tension"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제\n②카테킨 : 표시량(300mg/1,800mg)의 80~120% \n③L-테아닌 : 표시량(200mg/1,800mg)의 80~120%\n④비타민E : 표시량(3.3mg α-TE/1,800mg)의 80~150%\n⑤에피갈로카테킨칼레이트((-)-epigallocatechin gallate,EGCG)(mg) : 300 이하\n⑥카페인(mg/kg) : 50,000 이하\n⑦납(mg/kg) : 1.0 이하\n⑧카드뮴(mg/kg) : 0.5 이하\n⑨수은(mg/kg) : 0.5 이하\n⑩비소(mg/kg) : 1.0 이하\n⑪붕해시험 : 적합(제피정제 : 60분 이내 붕해)\n⑫대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의\n임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 탁한 노란 분홍색의 장방형 제피정제",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

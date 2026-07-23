@@ -1,0 +1,147 @@
+[
+ {
+  "statementNo": "201000190041389",
+  "productName": "잇츠 브이 포 우먼",
+  "manufacturer": "엔피케이(주)",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 240,
+     "unit": "mg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood cholesterol, improving blood circulation, easing discomfort related to premenstrual changes, and improving skin condition related to immune hypersensitivity"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "비타민E",
+    "labelKo": "비타민 E",
+    "labelEn": "Vitamin E",
+    "declaredAmount": {
+     "value": 11,
+     "unit": "mg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 55,
+     "unit": "μg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 2300,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[감마리놀렌산함유유지]①혈중 콜레스테롤 개선･혈행개선･월경전 변화에 의한 불편한 상태 개선･면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[코엔자임Q10]①항산화･높은 혈압 감소에 도움을 줄 수 있음\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민E]①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "코팅정제1(비타민C, 비타민E, 셀렌, 아연) 600mg\n1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 갈색과 흰색의 점박이가 있는 흐린 황갈색의 장방형 제피정제\n2) 대장균군: 음성\n3) 붕해시험 : 60분 이내\n4) 비타민C: 표시량(100mg/2,300mg) 80~150%\n5) 비타민E: 표시량(11mg a-TE/2,300mg) 80~150%\n6) 아연: 표시량(8.5mg/2,300mg) 80~150%\n7) 셀렌: 표시량(55㎍/2,300mg) 80~150%\n\n연질캡슐2(감마리놀레산함유유지) 600mg\n1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 내용물을 함유한 투명한 타원형 연질캡슐\n2) 대장균군: 음성\n3) 붕해시험 : 20분 이내\n4) 감마리놀렌산 함유유지: 표시량(240mg/2,300mg)의 80~120%\n5) 잔류용매(mg/kg) : 5.0 이하(헥산을 사용한 경우)\n\n연질캡슐3(코엔자임Q10) 500mg\n1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 타원형 연질캡슐\n2) 대장균군: 음성\n3) 붕해시험 : 20분 이내\n4) 코엔자임Q10 : 표시량(100mg/2,300mg)의 80~120%\n5) 잔류용매(해당 용매를 사용한 경우에 한함)\n (가) 헥산(mg/kg) : 5.0 이하\n (나) 아세톤(mg/kg) : 30.0 이하\n (다) 이소프로필알콜(mg/kg) : 50.0 이하\n (라) 초산에틸(mg/kg) : 50.0 이하\n6) 중금속\n (가) 납(mg/kg) : 1.0 이하\n (나) 카드뮴(mg/kg) : 1.0 이하\n (다) 수은(mg/kg) : 1.0 이하\n (라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1포씩 물과 함께 섭취하십시오",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[감마리놀렌산함유유지]\n (가) 영･유아･어린이는 섭취 전 전문가와 상담한 후 섭취할 것\n (나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "코팅정제 1. 고유의 향미가 있고 이미, 이취가 없으며 갈색과 흰색의 점박이가 있는 흐린 황갈색의 장방형 제피정제(비타민C, 비타민E, 셀렌, 아연), 연질캡슐 2. 고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 내용물을 함유한 투명한 타원형 연질캡슐(감마리놀레산 함유유지), 연질캡슐 3. 고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 타원형 연질캡슐(코엔자임Q10)",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "포",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

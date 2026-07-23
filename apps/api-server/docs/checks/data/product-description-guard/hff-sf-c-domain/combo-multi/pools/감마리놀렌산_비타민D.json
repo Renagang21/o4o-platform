@@ -1,0 +1,75 @@
+[
+ {
+  "statementNo": "20040015083918",
+  "productName": "엠투퀸20",
+  "manufacturer": "주식회사한미양행",
+  "ingredients": [
+   {
+    "key": "감마리놀렌산",
+    "labelKo": "감마리놀렌산",
+    "labelEn": "Gamma-linolenic acid",
+    "declaredAmount": {
+     "value": 210,
+     "unit": "mg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "월경전 변화에 의한 불편한 상태 개선에 도움을 줄 수 있음",
+     "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with easing discomfort related to premenstrual changes",
+     "May help with improving skin condition related to immune hypersensitivity"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 18,
+     "unit": "μg",
+     "basisAmount": 3000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①월경전 변화에 의한 불편한 상태 개선에 도움을 줄 수 있음, 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 황갈색의 내용물을 함유한 적갈색 연질캡슐\n(2) 감마리놀렌산 : 표시량(210mg/3,000mg)의 80~120%\n(3) 비타민D : 표시량(18ug/3,000mg)의 80~180%\n(4) 대장균군 : 음성\n(5) 붕해시험 : 적합",
+   "intake": "1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취.",
+   "caution": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것\n\n알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 황갈색의 내용물을 함유한 적갈색 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

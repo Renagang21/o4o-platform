@@ -1,0 +1,91 @@
+[
+ {
+  "statementNo": "200400170211232",
+  "productName": "아이럭스 플러스",
+  "manufacturer": "(주)비오팜",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 20,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선·혈행 개선· 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[EPA DHA함유 유지] 혈중 중성지질 개선·혈행 개선· 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질캡슐\n②EPA와 DHA의 합 : 표시량(600 mg/2,000 mg)의 80 ~ 120%\n③루테인 : 표시량(20 mg/2,000 mg)의 80 ~ 120%\n④비타민C : 표시량(30 mg/2,000 mg)의 80 ~ 150%\n⑤헥산(mg/kg) : 5.0 이하(해당 용매를 사용한 경우에 한함)\n⑥납(mg/kg) : 2.8 이하\n⑦카드뮴(mg/kg) : 1.0 이하\n⑧수은(mg/kg) : 0.5 이하\n⑨비소(mg/kg) : 1.0 이하\n⑩붕해시험 : 20분 이내\n⑪대장균군 : 음성",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n\n(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 내용물을 함유한 적갈색의 타원형 연질캡슐",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,186 @@
+[
+ {
+  "statementNo": "20040017006480",
+  "productName": "웰키즈 식물성오메가 플러스 디",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 5,
+     "unit": "μg",
+     "basisAmount": 4400,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 4400,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 500,
+     "unit": "mg",
+     "basisAmount": 4400,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels",
+     "May help with improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유유지]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1.성상: 고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐\n2.EPA와 DHA의 합: 표시량(500mg/4,400mg)의 80~120%\n3.아연: 표시량(8.5mg/4,400mg)의 80~150%\n4.비타민D: 표시량(5.0㎍/4,400mg)의 80~180%\n5.중금속: 납3.0mg/kg 이하, 카드뮴1.0mg/kg 이하, 수은 0.5mg/kg 이하\n6.대장균군: 음성",
+   "intake": "1일 2회, 1회 2캡슐을 씹어서 섭취 하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량 등의 증상이 있을 경우 섭취를 중단하십시오.\r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 성분에 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.\r\n영,유아 섭취 시 보호자의 지도 아래 섭취할 수 있도록 해주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 미황색의 내용물을 함유한 노란색 물고기 모양의 츄어블 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "softgel",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400170061883",
+  "productName": "키즈오메가3",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 3.8,
+     "basisUnit": "g",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 4,
+     "unit": "mg",
+     "basisAmount": 3.8,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "오메가3",
+    "labelKo": "오메가3",
+    "labelEn": "Omega-3",
+    "declaredAmount": {
+     "value": 600,
+     "unit": "mg",
+     "basisAmount": 3.8,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with improving blood triglyceride levels, improving blood circulation, and improving dry eyes for eye health"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[EPA 및 DHA 함유 유지] 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리\n2) EPA와 DHA의 합: 표시량(600 mg/3.8 g)의80~120%\n3) 아연: 표시량(4 mg /3.8 g)의80~150%\n4) 비타민D : 표시량(10 μg /3.8 g)의80~180%\n4) 중금속(mg/kg) : 납 3.0이하, 카드뮴1.0이하, 수은 0.5이하\n5) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2젤리를 씹어서 섭취하십시오.",
+   "caution": "(가) 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것\n(나) 개인에 따라 피부 관련 이상반응이 발생할 수 있음\n(다) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n\n\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 원형 젤리",
+   "storage": "제품은 고온에 약하니 직사광선을 피하여 실온(25도 이하 권장), 습도가 낮은 곳에서 보관·소비해주십시오.유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오",
+   "shelfLife": "제조일로부터 18개월"
+  },
+  "serving": {
+   "unitType": "gummy",
+   "servingUnitKo": "젤리",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ }
+]

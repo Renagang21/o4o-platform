@@ -1,0 +1,89 @@
+[
+ {
+  "statementNo": "20040017106435",
+  "productName": "프리미엄 기억력 혈행개선 은행잎추출물 징코 플러스",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "ingredients": [
+   {
+    "key": "셀레늄",
+    "labelKo": "셀레늄",
+    "labelEn": "Selenium",
+    "declaredAmount": {
+     "value": 16.5,
+     "unit": "μg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 2.55,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n[셀레늄(셀렌)] 유해산소로부터 세포를 보호하는데 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제\n② 플라보놀 배당체 : 표시량(36㎎/1,000㎎)의 80~120%\n③ 셀레늄 : 표시량(16.5㎍/1,000㎎)의 80~150%\n④ 아연 : 표시량(2.55㎎/1,000㎎)의 80~150%\n⑤ 깅콜릭산(㎎/㎏) : 5.0 이하\n⑥ 납(㎎/㎏) : 1.0 이하\n⑦ 카드뮴(㎎/㎏) : 1.0 이하\n⑧ 수은(㎎/㎏) : 1.0 이하\n⑨ 비소(㎎/㎏) : 1.0 이하\n⑩ 대장균군 : 음성\n⑪ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 섭취량 및 섭취방법을 확인 후 섭취하십시오.\n② 특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.\n③ 임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.\n④ 의약품(항응고제) 복용 시 섭취에 주의하십시오.\n⑤ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n⑥ 동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린녹갈색의 장방형 코팅정제",
+   "storage": "실온/ 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

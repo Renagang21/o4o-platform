@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm54-001",
+  "productName": "일양 루테인 프로",
+  "productNameEn": "일양 루테인 프로",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483202",
+  "category": "hff",
+  "source": {
+   "mainFunction": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐\n2) 루테인 : 표시량(20mg/500mg)의 80~120%\n3) 비타민E : 표시량(3.3mg α-TE/500me)의 80~150%\n4) 셀레늄(또는 셀렌) : 표시량 (16.5μg/500mg)의 80~150%\n5) 베타카로틴 : 표시량 (1.0mg/500mg)의 80~150%\n6) 아연 : 표시량(2.55mg/500mg)의 80~150%\n7) 납(mg/kg) : 1.0 이하\n8) 카드뮴(mg/kg) : 1.0 이하\n9) 비소(mg/kg) : 1.0 이하\n10) 수은(mg/kg) : 1.0 이하\n11) 헥산(mg/kg) : 5.0 이하\n12) 대장균군 : 음성\n13) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n\n\n\n\n\n(1) 흡연자는 섭취 시 전문가와 상담할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 20,
+    "unit": "mg",
+    "basisAmount": 500,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "softgel",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 1mg</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>일양 루테인 프로<small>루테인 · 비타민 A · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>1mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>1mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(1mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 루테인 · 비타민 A · 셀레늄 · 아연 섭취를 함께 챙기고 싶은 분</li><li>연질캡슐 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lutein 20mg</span><span class=\"sd-badge is-solid\">Vitamin A 1mg</span><span class=\"sd-badge is-solid\">Selenium 16.5μg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>일양 루테인 프로<small>Lutein · Vitamin A · Selenium · Zinc</small></h1><p class=\"sd-meta\">Made by 우리바이오(주) · Once a day · 1 capsule</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>20mg</b> of Lutein, <b>1mg</b> of Vitamin A, <b>16.5μg</b> of Selenium, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 capsule): <b>20mg</b> Lutein, <b>1mg</b> Vitamin A, <b>16.5μg</b> Selenium, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 우리바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Lutein</b><ul class=\"sd-why\"><li>May help with maintaining macular pigment density (which can decline with age) for eye health</li></ul></li><li><b>Vitamin A</b><ul class=\"sd-why\"><li>Needed for the adaptation of vision in dim light</li><li>Needed to form and maintain skin and mucous membranes</li><li>Needed for the growth and development of epithelial cells</li></ul></li><li><b>Selenium</b><ul class=\"sd-why\"><li>Needed to protect cells from harmful oxygen (free radicals)</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Lutein</b> labelled (20mg / 500mg), 80~120%</div><div class=\"sd-item\"><b>Vitamin A</b> labelled (1mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Selenium</b> labelled (16.5μg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 500mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 주황색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lutein · Vitamin A · Selenium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Stop use and consult a professional if adverse effects occur · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

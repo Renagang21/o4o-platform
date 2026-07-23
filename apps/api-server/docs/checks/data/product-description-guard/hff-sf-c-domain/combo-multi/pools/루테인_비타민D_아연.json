@@ -1,0 +1,93 @@
+[
+ {
+  "statementNo": "200400170061842",
+  "productName": "루테인 츄 패밀리",
+  "manufacturer": "(주)알피바이오",
+  "ingredients": [
+   {
+    "key": "루테인",
+    "labelKo": "루테인",
+    "labelEn": "Lutein",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "mg",
+     "basisAmount": 1.9,
+     "basisUnit": "g",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with maintaining macular pigment density (which can decline with age) for eye health"
+    ]
+   },
+   {
+    "key": "비타민D",
+    "labelKo": "비타민 D",
+    "labelEn": "Vitamin D",
+    "declaredAmount": {
+     "value": 10,
+     "unit": "μg",
+     "basisAmount": 1.9,
+     "basisUnit": "g",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "functionsEn": [
+     "Needed for the absorption and utilisation of calcium and phosphorus",
+     "Needed for the formation and maintenance of bone",
+     "Recognised as helping reduce the risk of developing osteoporosis"
+    ]
+   },
+   {
+    "key": "아연",
+    "labelKo": "아연",
+    "labelEn": "Zinc",
+    "declaredAmount": {
+     "value": 8.5,
+     "unit": "mg",
+     "basisAmount": 1.9,
+     "basisUnit": "g",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "정상적인 면역기능에 필요",
+     "정상적인 세포분열에 필요"
+    ],
+    "functionsEn": [
+     "Needed for normal immune function",
+     "Needed for normal cell division"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[마리골드꽃추출물]\n(1) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 검은 빨간색의 원형 젤리\n2) 루테인 : 표시량(10 mg/1.9 g)의80~120%\n3) 비타민D : 표시량(10 ug/1.9 g)의80~180%\n4) 아연 : 표시량(8.5 mg/1.9 g)의80~150%\n5) 중금속 : 납 1.0 mg/kg 이하, 카드뮴1.0 mg/kg 이하, \n수은 1.0 mg/kg 이하, 비소 1.0 mg/kg 이하\n6) 헥산: 5.0이하(mg/kg)\n7) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1젤리를 씹어서 섭취하십시오.",
+   "caution": "[마리골드꽃추출물]\n(가) 영‧유아, 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 흡연자는 섭취 시 전문가와 상담할 것\n(다) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음\n(라) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n\n[비타민D]\n(가) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 검은 빨간색의 원형 젤리",
+   "storage": "제품은 고온에 약하니 직사광선을 피하여 실온(25도 이하 권장), 습도가 낮은 곳에서 보관 소비하여야한다. 2) 제품은 소비 중 변질되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "gummy",
+   "servingUnitKo": "젤리",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": false,
+   "chew": true,
+   "melt": false
+  }
+ }
+]

@@ -1,0 +1,44 @@
+[
+ {
+  "candidateId": "cm21-001",
+  "productName": "머슬키퍼 내추럴다이어트",
+  "productNameEn": "머슬키퍼 내추럴다이어트",
+  "manufacturer": "우리바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20190009483433",
+  "category": "hff",
+  "source": {
+   "mainFunction": "①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 탁한 주황색 장방형의 제피정제\n2. 카테킨 : 표시량 (300 mg / 1100mg)의 80~120%\n3. 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n4. 카페인(mg/kg) : 50,000 이하\n5. 잔류용매(mg/kg) : 50.0이하 (초산에틸을 사용한 경우)\n6. 아연 : 표시량 (2.55 mg / 1100mg)의 80~150%\n7. 마그네슘 : 표시량 (160 mg / 1100mg)의 80~150%\n8. 대장균군 : 음성\n9. 붕해시험 : 60분 이내 적합",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취 하십시오.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이를 함유한 탁한 주황색 장방형의 제피정제",
+   "storage": "실온 및 실온유통",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": {
+    "value": 300,
+    "unit": "mg",
+    "basisAmount": 1100,
+    "basisUnit": "mg"
+   },
+   "serving": {
+    "unitType": "tablet",
+    "unitWeight": null,
+    "unitWeightUnit": null,
+    "unitsPerServing": 1,
+    "servingTotalWeight": null,
+    "servingTotalWeightUnit": null,
+    "servingsPerDay": 1,
+    "servingsPerDayMax": null
+   },
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">녹차 카테킨 300mg</span><span class=\"sd-badge is-solid\">마그네슘 160mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>머슬키퍼 내추럴다이어트<small>녹차 카테킨 · 마그네슘 · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 녹차 카테킨 <b>300mg</b>, 마그네슘 <b>160mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 녹차 카테킨 <b>300mg</b>, 마그네슘 <b>160mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 함유한 탁한 주황색 장방형의 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>녹차 카테킨</b> 표시량(300mg/1100mg)의 80~120%</div><div class=\"sd-item\"><b>마그네슘</b> 표시량(160mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/1100mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 함유한 탁한 주황색 장방형의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>매일 녹차 카테킨 · 마그네슘 · 아연 섭취를 함께 챙기고 싶은 분</li><li>정제 형태를 선호하는 분</li><li>간편하게 여러 영양을 함께 관리하고 싶은 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Green tea catechin 300mg</span><span class=\"sd-badge is-solid\">Magnesium 160mg</span><span class=\"sd-badge is-solid\">Zinc 2.55mg</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>머슬키퍼 내추럴다이어트<small>Green tea catechin · Magnesium · Zinc</small></h1><p class=\"sd-meta\">Made by 우리바이오(주) · Once a day · 1 tablet</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product combines <b>300mg</b> of Green tea catechin, <b>160mg</b> of Magnesium, <b>2.55mg</b> of Zinc as labelled amounts. The officially recognised functions of each are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Once a day (1 tablet): <b>300mg</b> Green tea catechin, <b>160mg</b> Magnesium, <b>2.55mg</b> Zinc</li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 우리바이오(주)</li></ul>\n  <h2>Officially recognised functions by ingredient</h2><ul class=\"sd-func\"><li><b>Green tea catechin</b><ul class=\"sd-why\"><li>May help with antioxidant activity, body-fat reduction, and improving blood cholesterol</li></ul></li><li><b>Magnesium</b><ul class=\"sd-why\"><li>Needed for energy utilisation</li><li>Needed to help maintain normal nerve and muscle function</li></ul></li><li><b>Zinc</b><ul class=\"sd-why\"><li>Needed for normal immune function</li><li>Needed for normal cell division</li></ul></li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Green tea catechin</b> labelled (300mg / 1100mg), 80~120%</div><div class=\"sd-item\"><b>Magnesium</b> labelled (160mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Zinc</b> labelled (2.55mg / 1100mg), 80~150%</div><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 함유한 탁한 주황색 장방형의 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 및 실온유통</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Green tea catechin · Magnesium · Zinc together daily</li><li>Those who prefer this form</li><li>Those who want a convenient way to manage multiple nutrients</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a condition or take medication · Stop use and consult a professional if adverse effects occur · Keep out of reach of children · Refer to the official cautions printed on the product</div></div>"
+  }
+ }
+]

@@ -1,0 +1,358 @@
+[
+ {
+  "statementNo": "20040017015281",
+  "productName": "핏앤핏 카테킨",
+  "manufacturer": "(주)바이오 로제트",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 300,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "mg",
+     "basisAmount": 2000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 연한 노란 분홍색의 장방형 제피정제\n2) 카테킨: 표시량(300mg/2,000mg)의80~120%\n3) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량(2,000mg) 중300 이하\n4) 잔류용매(mg/kg) : 50.0 이하(초산에틸을 사용한 경우)\n5) 카페인(mg/kg) : 50,000 이하\n6) 비타민C : 표시량(30mg/2,000mg)의80~150%\n7) 판토텐산: 표시량(25mg/2,000mg)의80~180%\n8) 붕해시험: 60분 \n9) 대장균군: 음성",
+   "intake": "1일 2회, 1회 2정을 물과 함께 섭취한다.",
+   "caution": "(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(사) 질병으로 치료중이시거나 알레르기, 특이체질이신 분은 본 제품의 원료를 확인하시고 섭취 전 전문가와 상의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 연한 노란 분홍색의 장방형 제피정제",
+   "storage": "1) 직사광선과 고온다습한 곳을 피하여 실온에 보관하십시오.      2) 제품 개봉 후에는 변질될 수 있으니 바로 섭취하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "202500049675",
+  "productName": "녹차카테킨",
+  "manufacturer": "(주)대웅제약 1공장",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 360,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[판토텐산]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[녹차추출물]\n(1) 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 탁한 노란 분홍의 장방형 제피정제\n2) 카테킨 : 표시량 (360mg/1,000mg)의 80 ~ 120%\n3) 판토텐산 : 표시량 (25mg/1,000mg)의 80 ~ 180%\n4) 비타민C : 표시량 (30mg/1,000mg)의 80 ~ 150%\n5) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n6) 카페인(mg/kg) : 50,000 이하\n7) 잔류용매(mg/kg) : 50.0 이하 (초산에틸을 사용한 경우)\n8) 대장균군 : 음성\n9) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[비타민 C]\n(1) 과량 섭취하지 않도록 주의할 것\n(2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것 \n\n[녹차추출물]\n(가) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(나) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(다) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(라) 식사 후 섭취할 것\n(마) 카페인을 함유한 식품의 섭취에 주의할 것\n(바) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 탁한 노란 분홍의 장방형 제피정제",
+   "storage": "직사광선 및 고온, 다습한 곳을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "2022002000278",
+  "productName": "녹차 카테킨",
+  "manufacturer": "이앤에스(주)",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 360,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화·체지방 감소 ·혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "mg",
+     "basisAmount": 1000,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차 추출물]\n항산화·체지방 감소 ·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[판토텐산]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민C]\n결합조직 형성과 기능유지에 필요\n철의 흡수에 필요\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없으며 광택이 없는 흰색 점박이가 있는 흐린 노란 분홍의 장방형 제피정제\n2) 카테킨 : 표시량 (360 ㎎/1,000 ㎎)의 80~120%\n3) 에피갈로카테킨갈레이트((-)-epigallocathecin gallate,EGCG)(㎎) : 일일섭취량 중 300 이하\n4) 판토텐산 : 표시량 (25 ㎎/1,000 ㎎)의 80~180%\n5) 비타민 C : 표시량 (30 ㎎/1,000 ㎎)의 80~150%\n6) 카페인(㎎/kg) : 50,000 이하\n7) 초산에틸(㎎/kg) : 50.0 이하\n8) 붕해도 : 60분 이내\n9) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1정씩 충분한 물과 함께 섭취하십시오",
+   "caution": "1) 어린이, 임산부 및 수유부는 섭취를 피하시기 바랍니다.\n2) 간질환이 있거나 의약품 복용 시 전문가와 상담하시기 바랍니다.\n3) 카페인이 함유되어 있어, 초조감, 불면 등을 나타낼 수 있습니다.\n4) 식사 후 섭취하시기 바랍니다.\n5) 카페인을 함유한 식품의 섭취에 주의하시기 바랍니다\n6) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.\n7) 알레르기, 특이체질인 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 광택이 없는 흰색 점박이가 있는 흐린 노란 분홍의 장방형 제피정제",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 1,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ },
+ {
+  "statementNo": "200400200142140",
+  "productName": "리하닉스 슬리밍 그린 카테킨",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "ingredients": [
+   {
+    "key": "녹차",
+    "labelKo": "녹차 카테킨",
+    "labelEn": "Green tea catechin",
+    "declaredAmount": {
+     "value": 360,
+     "unit": "mg",
+     "basisAmount": 840,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity, body-fat reduction, and improving blood cholesterol"
+    ]
+   },
+   {
+    "key": "비타민C",
+    "labelKo": "비타민 C",
+    "labelEn": "Vitamin C",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 840,
+     "basisUnit": "mg",
+     "ratio": "80~150%"
+    },
+    "functionsKo": [
+     "결합조직 형성과 기능유지에 필요",
+     "철의 흡수에 필요",
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "functionsEn": [
+     "Needed for the formation and maintenance of connective tissue",
+     "Needed for the absorption of iron",
+     "Needed to protect cells from harmful oxygen (free radicals)"
+    ]
+   },
+   {
+    "key": "판토텐산",
+    "labelKo": "판토텐산",
+    "labelEn": "Pantothenic acid",
+    "declaredAmount": {
+     "value": 25,
+     "unit": "mg",
+     "basisAmount": 840,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for the metabolism of fat, carbohydrate and protein and for energy production"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[녹차추출물]\n(1) 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[비타민C]\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[판토텐산]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰 노란색의 원형 장용성 제피정제\n(2) 카테킨 : 표시량(360mg/840mg)의 80~120%\n(3) 비타민C : 표시량(30mg/840mg)의 80 ~ 150%\n(4) 판토텐산 : 표시량(25mg/840mg)의 80 ~ 180%\n(5) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하\n(6) 카페인(mg/kg) : 50,000 이하\n(7) 초산에틸(mg/kg) : 50.0이하\n(8) 대장균군 : 음성\n(9) 붕해시험: 제1액-120분 이내 용해되지 않음, 제2액-60분 이내 용해",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "[녹차추출물]\n(1) 어린이, 임산부 및 수유부는 섭취를 피할 것\n(2) 간질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(3) 카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음\n(4) 식사 후 섭취할 것\n(5) 카페인을 함유한 식품의 섭취에 주의할 것\n(6) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[비타민C]\n(1) 과량 섭취하지 않도록 주의할 것\n(2) 신장질환이 있는 경우 섭취 전 전문가와 상담할 것\n(3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[판토텐산]\n(1) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 흰 노란색의 원형 장용성 제피정제",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "tablet",
+   "servingUnitKo": "정",
+   "unitsPerServing": 2,
+   "servingsPerDay": 1
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]

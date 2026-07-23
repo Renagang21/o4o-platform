@@ -1,0 +1,105 @@
+[
+ {
+  "statementNo": "2014002007326",
+  "productName": "징코 큐텐(Ginkgo Q10)",
+  "manufacturer": "주식회사 셀로닉스",
+  "ingredients": [
+   {
+    "key": "비타민B1",
+    "labelKo": "비타민 B1",
+    "labelEn": "Vitamin B1",
+    "declaredAmount": {
+     "value": 65,
+     "unit": "mg",
+     "basisAmount": 1630,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "functionsEn": [
+     "Needed for carbohydrate and energy metabolism"
+    ]
+   },
+   {
+    "key": "비타민B2",
+    "labelKo": "비타민 B2",
+    "labelEn": "Vitamin B2",
+    "declaredAmount": {
+     "value": 30,
+     "unit": "mg",
+     "basisAmount": 1630,
+     "basisUnit": "mg",
+     "ratio": "80~180%"
+    },
+    "functionsKo": [
+     "체내 에너지 생성에 필요"
+    ],
+    "functionsEn": [
+     "Needed for energy production in the body"
+    ]
+   },
+   {
+    "key": "은행잎",
+    "labelKo": "은행잎추출물",
+    "labelEn": "Ginkgo leaf extract",
+    "declaredAmount": {
+     "value": 36,
+     "unit": "mg",
+     "basisAmount": 1630,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with memory improvement and improving blood circulation"
+    ]
+   },
+   {
+    "key": "코엔자임Q10",
+    "labelKo": "코엔자임Q10",
+    "labelEn": "Coenzyme Q10",
+    "declaredAmount": {
+     "value": 100,
+     "unit": "mg",
+     "basisAmount": 1630,
+     "basisUnit": "mg",
+     "ratio": "80~120%"
+    },
+    "functionsKo": [
+     "항산화･높은 혈압 감소에 도움을 줄 수 있음"
+    ],
+    "functionsEn": [
+     "May help with antioxidant activity and lowering high blood pressure"
+    ]
+   }
+  ],
+  "source": {
+   "mainFunction": "[코엔자임Q10] 항산화･높은 혈압 감소에 도움을 줄 수 있음\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐\n2. 코엔자임Q10 : 표시량(100 mg/1,630 mg)의 80 ~ 120%\n3. 플라보놀 배당체 : 표시량(36 mg/1,630 mg)의 80~120%\n4. 비타민B1 : 표시량(65 mg/1,630 mg)의 80 ~ 180%\n5. 비타민B2 : 표시량(30 mg/1,630 mg)의 80 ~ 180%\n6. 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하\n7. 헥산(mg/kg) : 5.0 이하\n8. 아세톤(mg/kg) : 30.0 이하\n9. 납(mg/kg) : 1.0 이하\n10. 카드뮴(mg/kg) : 1.0 이하\n11. 수은(mg/kg) : 1.0 이하\n12. 비소(mg/kg) : 1.0 이하\n13. 대장균군 : 음성\n14. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐씩 또는 1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "ㆍ임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의\nㆍ의약품(항응고제) 복용 시 섭취에 주의\nㆍ이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\nㆍ수유부는 섭취를 피할 것\nㆍ항응고제 복용 시 전문가와 상담할 것\nㆍ이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 광택이 있는 밝은 녹갈색의 원형 정제와 주황색의 유동성이 있는 내용물을 함유한 자주색의 띠로 접착시킨 투명한 장방형 경질캡슐",
+   "storage": "ㆍ직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오. ㆍ영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "serving": {
+   "unitType": "capsule",
+   "servingUnitKo": "캡슐",
+   "unitsPerServing": 1,
+   "servingsPerDay": 2
+  },
+  "compose": {
+   "hasColiform": true,
+   "directGrounded": false
+  },
+  "flags": {
+   "waterInSource": true,
+   "chew": false,
+   "melt": false
+  }
+ }
+]
