@@ -174,9 +174,16 @@ export class KpaAssetResolver implements ContentResolver {
     };
   }
 
+  /**
+   * WO-O4O-SUPPLIER-RESOURCE-CURRENT-PUBLISH-AND-HUB-FLOW-PRESERVE-V1:
+   * status='published' 게이트 추가 — HUB 목록(cms 탭: status='published')과 가져오기 게이트 정합.
+   * 종전에는 ID 만 알면 pending/draft/archived cms 콘텐츠도 매장 사본 생성이 가능했다
+   * (승인 전 공급자 제출물 포함). resolveBlog/resolvePop 과 동일 패턴.
+   * service_key 정합은 기존 결정대로 listing 단 담당(resolvePop 주석 참조 — 인터페이스 확장 별도 WO).
+   */
   private async resolveCms(id: string): Promise<ResolvedContent | null> {
     const repo = this.dataSource.getRepository(CmsContent);
-    const content = await repo.findOne({ where: { id } });
+    const content = await repo.findOne({ where: { id, status: 'published' } });
     if (!content) return null;
 
     return {
@@ -302,12 +309,17 @@ export class KpaAssetResolver implements ContentResolver {
     };
   }
 
+  /**
+   * WO-O4O-SUPPLIER-RESOURCE-CURRENT-PUBLISH-AND-HUB-FLOW-PRESERVE-V1:
+   * status='active' 게이트 추가 — HUB signage 목록(status='active')과 가져오기 게이트 정합.
+   * scope/serviceKey 정합은 기존 결정대로 listing 단 담당.
+   */
   private async resolveSignage(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
       `SELECT "id", "name", "description", "mediaType", "sourceType", "sourceUrl",
               "thumbnailUrl", "duration", "resolution", "content", "tags", "metadata"
        FROM "signage_media"
-       WHERE "id" = $1 AND "deletedAt" IS NULL
+       WHERE "id" = $1 AND "deletedAt" IS NULL AND "status" = 'active'
        LIMIT 1`,
       [id],
     );

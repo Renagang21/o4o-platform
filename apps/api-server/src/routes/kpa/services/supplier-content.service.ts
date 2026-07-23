@@ -38,7 +38,12 @@ export interface SubmitContentData {
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const SERVICE_KEY = 'kpa-society';
+// WO-O4O-SUPPLIER-RESOURCE-CURRENT-PUBLISH-AND-HUB-FLOW-PRESERVE-V1:
+// 'kpa-society' → 'kpa'. KPA 매장 HUB 의 CMS 소비 지점(HubContentLibraryPage 'cms' 탭,
+// StoreHubLatestFeed 등)은 전부 serviceKey='kpa' 정확일치로 조회하므로, 종전 값으로는
+// 승인(published) 후에도 매장 HUB 목록에 영원히 나타나지 않았다(게시-미노출 단절).
+// 기존 데이터 영향 0 (kpa-society 공급자 cms row 운영 0건 — migration/backfill 불필요).
+const SERVICE_KEY = 'kpa';
 
 export class SupplierContentService {
   constructor(private dataSource: DataSource) {}
