@@ -16,7 +16,7 @@ import { parseServing, normalizeSource } from '../modules/content-guard/source-g
 import { A_INGREDIENTS, FN, NONA_FUNC, LIQUID } from './hff-combo-a-unregistered-registry.js';
 import { attributeFunctions, type Assigned } from './hff-combo-a-classify.js';
 import { mapFunctionEn } from './hff-nutrient-registry.js';
-import { extractFunctionsKo } from './hff-sf-registry.js';
+import { splitFunctions } from './hff-source-parse.js'; // parser 보강(74c9e8f2d 기준): 원자 분리·라벨경계·라벨접두 스트립
 
 const esc = (s: string): string => (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
@@ -112,19 +112,22 @@ async function main(): Promise<void> {
       if (r.mid != null || taken.has(stmt)) { funnel.takenOrPromoted++; continue; }
       if (LIQUID.test(`${r.name} ${r.sungsang} ${r.srv}`) && !INCLUDE_LIQUID) { funnel.liquid++; hold.push({ stmt, reason: 'LIQUID' }); continue; }
       const attr = attributeFunctions(present, mf); if (attr.ok === false) { funnel.aAttrFail++; hold.push({ stmt, reason: `A_${attr.reason}` }); continue; }
-      // 완전성: MAIN_FNCTN 전 기능성 문장이 A(FN) ∪ 비-A(mapFunctionEn) 로 커버되는지
-      const allFns = extractFunctionsKo(mf);
-      const nonAFns: Array<{ ko: string; en: string }> = []; let incomplete = false; const uncovered: string[] = [];
+      // 완전성: MAIN_FNCTN 전 기능성 문장이 A(FN) ∪ 비-A(mapFunctionEn) 로 커버되는지.
+      // parser 보강: splitFunctions(원자·라벨경계·라벨접두 스트립). 이중언어 (영문) 블록 사전 제거(국문만 추출).
+      const mfKo = mf.replace(/\(영문\)[^()]*(?:\([^)]*\)[^()]*)*/g, ' ').replace(/\(국문\)/g, ' ');
+      const allFns = splitFunctions(mfKo);
+      const nonAFns: Array<{ ko: string; en: string }> = []; let incomplete = false, enPending = false; const uncovered: string[] = [];
       for (const f of allFns) {
         const isA = Object.values(FN).some((v) => v.re.test(f));
         if (isA) continue; // A 는 A 블록에서 렌더
-        // 클린니스: 라벨 잔재(원료명:·함유유지·EPA/DHA/NAG·추출물:)가 섞인 문장은 정제 불가 → 완전성 실패로 HOLD(가비지 렌더 방지)
-        if (/[:：]|함유\s*유지|\bEPA\b|\bDHA\b|\bNAG\b|프로바이오틱|유산균|추출물\s|\(엔에이지|함유유지/i.test(f)) { incomplete = true; uncovered.push('DIRTY:' + f.slice(0, 25)); continue; }
+        // 클린니스(잔여): 콜론(미스트립 라벨) 또는 원료명 잔재가 남은 문장 → 정제 불가 → 완전성 실패(가비지 렌더 방지)
+        if (/[:：]|함유\s*유지|\bEPA\b|\bDHA\b|\bNAG\b|프로바이오틱|유산균|아세틸글루코사민|정제어유|추출물\b/i.test(f)) { incomplete = true; uncovered.push('DIRTY:' + f.slice(0, 25)); continue; }
         const en = mapFunctionEn(f);
-        if (en == null) { incomplete = true; uncovered.push(f.slice(0, 30)); continue; }
+        if (en == null) { enPending = true; uncovered.push('EN_PENDING:' + f.slice(0, 30)); continue; }
         if (!nonAFns.some((x) => x.ko === f)) nonAFns.push({ ko: f, en });
       }
       if (incomplete) { funnel.incomplete++; hold.push({ stmt, reason: 'INCOMPLETE_NONA_RENDER', uncovered }); continue; }
+      if (enPending) { funnel.incomplete++; hold.push({ stmt, reason: 'FN_EN_PENDING', uncovered }); continue; }
       const seed: Seed = { statementNo: stmt, candidateId: r.id, productName: r.name.trim(), manufacturer: r.maker.trim(), aIngs: attr.assigned, nonAFns, source: { mainFunction: mf.trim(), baseStandard: base.trim(), intake: r.srv.trim(), dosageForm: r.sungsang.trim(), shelfLife: r.shelf.trim(), storage: r.storage.trim(), caution: r.caution.trim() } };
       const c = compose(seed); if ('error' in c) { funnel.servingHold++; hold.push({ stmt, reason: `COMPOSE_${c.error}` }); continue; }
       const gi = { candidateId: r.id, productName: seed.productName, productNameEn: seed.productName, manufacturer: seed.manufacturer, manufacturerEn: null, statementNo: stmt, category: 'hff', source: { mainFunction: seed.source.mainFunction, baseStandard: seed.source.baseStandard, intake: seed.source.intake, caution: seed.source.caution, dosageForm: seed.source.dosageForm, storage: seed.source.storage, shelfLife: seed.source.shelfLife }, grounding: { declaredAmount: null, serving: null, calculationAllowed: false, ageBandsRaw: null }, drafts: { ko: c.ko, en: c.en } };
