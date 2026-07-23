@@ -1,0 +1,38 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "폴리데옥시리보뉴클레오티드나트륨",
+ "form": "리쥬비넥스크림",
+ "slugbase": "pdrn-cream-a",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "4401542296868c1a",
+   "n": 1
+  },
+  {
+   "fp": "7d7b033f2055cd77",
+   "n": 1
+  },
+  {
+   "fp": "6e556063ec043706",
+   "n": 1
+  },
+  {
+   "fp": "8c254a3cc8bd92f0",
+   "n": 1
+  },
+  {
+   "fp": "f4bf5f726f50b980",
+   "n": 1
+  },
+  {
+   "fp": "07c40010563ef7d2",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

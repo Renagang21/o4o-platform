@@ -243,16 +243,16 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 10,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 리쥬비넥스크림+더마그램피디알엔크림=2 원문형(EN 2형). PDRN 점안액 다수=안과로 제외(form 크림명 타겟팅) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 10fp/10 = 리쥬비넥스크림 6(6fp)+더마그램피디알엔크림 4(4fp), EN 2형(더마그램=의사 지시·과민 상담 문구). PDRN 점안액=안과로 제외(form 크림명 타겟팅). ko10=en10·dup0·drift0(점안 포함 검사)·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "크로타미톤|연고",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 4,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 유락신연고+타미락신연고=1 원문형(동일 문구, EN 1형 공유). 급성 루푸스성 피부염 금기·안과용 금지 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 2fp/4 = 유락신연고+타미락신연고(동일 문구, EN 1형 공유·단일 서브런 form=연고). 급성 루푸스성 피부염 금기·안과용 금지 보존. ko4=en4·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."

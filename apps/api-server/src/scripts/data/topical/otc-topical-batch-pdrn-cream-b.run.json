@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "폴리데옥시리보뉴클레오티드나트륨",
+ "form": "더마그램피디알엔크림",
+ "slugbase": "pdrn-cream-b",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f39c4d3920758f8a",
+   "n": 1
+  },
+  {
+   "fp": "933823089859997b",
+   "n": 1
+  },
+  {
+   "fp": "112220b57a380a7f",
+   "n": 1
+  },
+  {
+   "fp": "522466e6b81ee1bc",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}
