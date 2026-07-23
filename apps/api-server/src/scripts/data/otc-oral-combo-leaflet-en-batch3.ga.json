@@ -1,0 +1,200 @@
+{
+  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-EN-COMPLETION-GA-V4 — batch3 15그룹 EN fresh 번역(에이전트 가). 유일 원문=각 그룹 KO canonical(content_json). KO에 없는 의료 사실 추가 0 · 수치/연령/횟수/질환명/상호작용 보존 · 강도 완화 0 · 마케팅 0. summaryTable은 KO 3축(분류/작용/주요 증상) 대응(Category/How it works/Main symptoms). 병용주의(에스트로겐 피임약 등)는 대상약물·조건·행동 직접 번역, 기전 신규 설명 0.",
+  "en": {
+    "04bd48d7695c3f2f": {
+      "groupKey": "헤모텐캡슐|B03AE01|155밀리그램|캡슐",
+      "title": "Hemoten Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for the prevention and treatment of iron-deficiency anemia.",
+      "usage": "Adults and children aged 12 or older take 1 capsule once a day after a meal. Keep to the stated dose.",
+      "caution": "Warning: an overdose in children aged 6 or under can cause fatal iron poisoning, so keep this medicine out of the reach of children. Do not take this medicine if you are hypersensitive to it, are an infant under 12 months, or have hemochromatosis, hemosiderosis, an iron-utilization disorder, non-iron-deficiency anemia, iron overload, iron-deficiency anemia caused by infection or tumor, chronic pancreatitis, or liver cirrhosis. Consult a pharmacist before use if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis or regional colitis, or have heart or circulatory disorders, paroxysmal nocturnal hemoglobinuria, kidney impairment, low blood protein, or folic acid deficiency. Keep to the stated dose and directions. For adolescents aged 12 or older, use under the supervision of a guardian. Do not take it together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a pharmacist before taking it with iron-containing preparations (iron supplements, MRI liver contrast agents), anti-aldosterone agents, triamterene, quinolones, penicillamine, cholestyramine, pancreatic extract and substances such as vitamin E, diphosphonates, thyroxine, cefdinir preparations, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, and milk and dairy products, while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if you notice hives, itching, skin reactions on sun exposure, abdominal or stomach pain, stomach cramps, stomach discomfort, vomiting, diarrhea, nausea, loss of appetite, constipation, black stools, tooth discoloration, fever, coma, or raised AST, ALT or ALP on diagnosis or testing.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Prevention and treatment of iron-deficiency anemia",
+        "Main symptoms": "Prevention and treatment of iron-deficiency anemia"
+      }
+    },
+    "a00226e518d14b64": {
+      "groupKey": "에이프로젠알마게이트정|A02AD03|500밀리그램|정",
+      "title": "Aprogen Almagate Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine used for antacid action and symptom improvement in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain, and sour burping.",
+      "usage": "Adults and children aged 12 or older chew 2 tablets (1 g) at a time, 3 times a day, 30 minutes to 1 hour after meals. If needed, one more dose may be taken before bedtime. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, or have Alzheimer's disease, hemorrhoids, fluid retention (swelling), toxemia of pregnancy, diarrhea, or undiagnosed gastrointestinal bleeding. Consult a doctor or pharmacist before use if you have kidney impairment, are physically weak, are on a low-phosphorus diet, have digestive-absorption disorders, are elderly, have symptoms of gastrointestinal bleeding such as vomiting blood or black stools, or are pregnant, may be pregnant, or are breastfeeding. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take tetracycline antibiotics while taking this medicine. Consult a pharmacist before use if you take nonsteroidal anti-inflammatory analgesics, ulcer medicines, digitalis preparations, chlorpromazine, lansoprazole, prednisolone, penicillin, quinolones, iron (Fe) salt preparations, or salicylates. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Antacid action and symptom improvement in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain, and sour burping",
+        "Main symptoms": "Gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea"
+      }
+    },
+    "9609747b0e51a5ec": {
+      "groupKey": "네오칼큐정|A12AX|475밀리그램|정",
+      "title": "Neocalcu Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for supplying vitamins D and B1 during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, the growth period and old age, and for poor development of bones and teeth and the prevention of rickets.",
+      "usage": "Adults take 1 tablet once a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you have hypercalcemia (excess calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, are hypersensitive to it, are an infant under 12 months, or have kidney stones or severe kidney failure. Consult a pharmacist before use if you are pregnant or may be pregnant, are breastfeeding, for premature babies and infants, or if you have heart or circulatory disorders, kidney impairment, low blood protein, are taking cardiac glycosides, or have had kidney stones. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Do not take it together with phosphates, calcium salts, oral tetracycline preparations, or antacids. Consult a pharmacist before taking it with anti-aldosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if nausea, vomiting, diarrhea, loose stools, constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supplies vitamins D and B1 and helps prevent poor development of bones and teeth and rickets",
+        "Main symptoms": "Vitamin D and B1 supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, the growth period and old age, and bone and tooth development"
+      }
+    },
+    "132cf3a84bb7b4f2": {
+      "groupKey": "가네탑골드연질캡슐|A05BA|200밀리그램|연질캡슐",
+      "title": "Ganetop Gold Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease.",
+      "usage": "Adults take 1 capsule 3 times a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, are hypersensitive to soybean oil, soy or peanuts, have severe biliary obstruction, or are a child aged 12 or under. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are a patient at particular risk from fat overload, are pregnant or may be pregnant, or are breastfeeding. Keep to the stated dose and directions. Do not take it together with levodopa. Consult a pharmacist before use with intravenous lipid preparations.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease",
+        "Main symptoms": "Supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease"
+      }
+    },
+    "18765dd0a0ddaebf": {
+      "groupKey": "제텐비정|A11JB|69.15밀리그램|정",
+      "title": "Zeten-B Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for supplying vitamins B1, B2, B6, C and E during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age; for relieving neuralgia, muscle pain and joint pain (back pain, stiff shoulders); for beriberi; for relieving eye strain, angular cheilitis (inflamed mouth corners), cheilitis (inflamed lips), stomatitis (mouth sores), glossitis (inflamed tongue), eczema and dermatitis; and for supplying zinc.",
+      "usage": "Children aged 12 or older and adults take 1 to 2 tablets once a day after a meal. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, are an infant under 12 months, or have hypercalcemia (excess calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, kidney stones, or severe kidney failure. Consult a pharmacist before use for children who get plenty of sunlight and eat normal meals, if you are pregnant or may be pregnant or breastfeeding, for premature babies and infants, or if you have hyperoxaluria (excess oxalate in the urine), heart or circulatory disorders, low blood protein, gout or kidney stones, a tendency to blood clots, folic acid deficiency, or hypersensitivity or past reactions to Yellow No. 5. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. This medicine may interfere with the detection of glucose in urine tests and may turn the urine yellow, affecting laboratory test values. Do not take it together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Consult a pharmacist before taking it with cardiac glycosides, oral contraceptives containing estrogen, anti-aldosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, loss of appetite, abdominal bloating, low blood pressure, facial flushing, irregular heartbeat, skin rash, gastrointestinal disorders, indigestion, upper abdominal pain or pulmonary edema occurs, or if your period comes earlier than expected, becomes gradually heavier, or bleeding continues for a long time.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supplies vitamins B1, B2, B6, C, E and zinc and relieves neuralgia, muscle and joint pain, beriberi, eye strain and mouth or skin inflammation",
+        "Main symptoms": "Vitamin B1, B2, B6, C, E supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age"
+      }
+    },
+    "a7a9ec4399a40e57": {
+      "groupKey": "베스자임정|A09AA02|400밀리그램|정",
+      "title": "Beszyme Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for indigestion, loss of appetite, overeating, food stagnation, promoting digestion, and stomach bloating caused by indigestion.",
+      "usage": "Adults take 1 tablet 3 times a day after meals. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are a child aged 7 or under, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Consult a pharmacist before use if you are taking other medicines or are on a sodium-restricted diet.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Relieves indigestion, loss of appetite, overeating, food stagnation and bloating from indigestion, and promotes digestion",
+        "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promoting digestion, stomach bloating from indigestion"
+      }
+    },
+    "7608bd26d8331055": {
+      "groupKey": "안타신정|A02AD01|250밀리그램|정",
+      "title": "Antacin Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+      "usage": "Adults take 3 tablets at a time, 3 times a day after meals. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are receiving dialysis or are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment. Keep to the stated dose and directions. Do not take it together with tetracycline antibiotics. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+        "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+      }
+    },
+    "c9461e993aaada78": {
+      "groupKey": "헤파비트에프연질캡슐|A05BA|100밀리그램|연질캡슐",
+      "title": "Hepavit-F Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease and toxic liver disease.",
+      "usage": "Adults take 1 capsule at a time, 3 times a day. After treatment, reduce the dose to 1 to 2 capsules a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to soybean oil, soy, or peanuts. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are pregnant, are a patient at particular risk from fat overload, or are hypersensitive to Yellow No. 4. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Consult a pharmacist before use with intravenous lipid preparations. Stop taking it immediately and consult a pharmacist if diarrhea or similar symptoms occur.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supportive treatment of chronic liver disease and toxic liver disease",
+        "Main symptoms": "Supportive treatment of chronic liver disease and toxic liver disease"
+      }
+    },
+    "d5c6d09b517eb36b": {
+      "groupKey": "미소쿨정|A02AH|200밀리그램|정",
+      "title": "Misocool Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+      "usage": "People aged 15 or older and adults take 2 tablets at a time, and children aged 8 to under 15 take 1 tablet at a time, 3 times a day between meals and at bedtime. Leave at least 4 hours between doses. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are receiving dialysis or are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment or are on a sodium-restricted diet. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take it together with tetracycline antibiotics. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+        "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+      }
+    },
+    "12ba103fd120ecfe": {
+      "groupKey": "아미노포르테정|A13A|18.75밀리그램|정",
+      "title": "Amino Forte Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for nutritional supply in cases of general weakness and tonic support, a weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance, febrile wasting disease, and pregnancy and breastfeeding.",
+      "usage": "Adolescents aged 15 or older and adults take 2 tablets at a time, and children aged 7 to 14 take 1 tablet at a time, 1 to 2 times a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, have severe kidney failure, are a child under 7, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you are pregnant or breastfeeding, or have a tendency to blood clots. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take it together with levodopa. Consult a pharmacist before taking it with oral contraceptives containing estrogen. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, or loose stools occur. Your period may come earlier than expected or become gradually heavier, and prolonged bleeding may occur.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Nutritional supply for general weakness, weak constitution, physical fatigue, during and after illness, gastrointestinal and nutritional disturbance, febrile wasting disease, and pregnancy and breastfeeding",
+        "Main symptoms": "General weakness and tonic support, weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance"
+      }
+    },
+    "7d04798c82f6076e": {
+      "groupKey": "대웅우루사연질캡슐|A05AA|50밀리그램|연질캡슐",
+      "title": "Daewoong Urusa Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for improving liver function in chronic liver disease and improving physical fatigue and general weariness caused by impaired liver function.",
+      "usage": "Adults take 1 capsule at a time, 3 times a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, have severe biliary obstruction, fulminant hepatitis, are pregnant or may be pregnant or are breastfeeding, are a child, have inflammation of the large or small intestine such as Crohn's disease, radiolucent calcified gallstones, a non-functioning gallbladder, acute cholecystitis, kidney disease, or peptic ulcer (acute gastric or duodenal ulcer), or have hypersensitivity or a history of allergic reactions to soybean oil, soy or peanuts. Consult a pharmacist before use if you have severe pancreatic disease, gallstones, a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are a patient requiring careful use of lipid emulsions, have hypersensitivity or a history of allergic reactions to Yellow No. 4 or Yellow No. 5, or are a patient at particular risk from fat overload. Keep to the stated dose and directions. Do not take it together with oral diabetes medicines (tolbutamide), cholestyramine, colestipol, medicinal charcoal, antacids containing magnesium and aluminum hydroxide, medicines that increase cholesterol secretion from the liver (for example, oral contraceptives containing estrogen, lipid-lowering medicines such as clofibrate), or medicines that damage the liver. Stop taking it immediately and consult a doctor or pharmacist if diarrhea, nausea, vomiting, stomach ache, constipation, heartburn, stomach discomfort, itching, rash, general weariness, dizziness, calcification of gallstones, raised liver enzyme values, reduced white blood cells, or interstitial pneumonia (with fever, cough, difficulty breathing, or chest X-ray abnormalities) occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Improves liver function in chronic liver disease and relieves physical fatigue and general weariness caused by impaired liver function",
+        "Main symptoms": "Improving liver function in chronic liver disease and physical fatigue and general weariness caused by impaired liver function"
+      }
+    },
+    "f685b978a8f69623": {
+      "groupKey": "리게논-큐연질캡슐|A05BA|100밀리그램|연질캡슐",
+      "title": "Ligenon-Q Soft Capsule",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease and toxic liver disease.",
+      "usage": "Adults take 1 capsule 3 times a day. After treatment, reduce the dose to 1 to 2 capsules a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to soybean oil, soy, or peanuts. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are pregnant, or are hypersensitive to Yellow No. 5. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Consult a pharmacist before use with intravenous lipid preparations. Stop taking it immediately and consult a pharmacist if diarrhea or similar symptoms occur.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supportive treatment of chronic liver disease and toxic liver disease",
+        "Main symptoms": "Supportive treatment of chronic liver disease and toxic liver disease"
+      }
+    },
+    "ed62945363c6a2e0": {
+      "groupKey": "아로나민골드정|A11JA|72.2밀리그램|정",
+      "title": "Aronamin Gold Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for supplying vitamins B1, B2, B6, E and C during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age (when containing cod liver oil and vitamins D and E); for relieving neuralgia, muscle pain and joint pain (back pain, stiff shoulders); for beriberi; and for eye strain.",
+      "usage": "Adults take 1 tablet at a time, twice a day. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are hypersensitive to it, are an infant under 3 months, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you have hyperoxaluria (excess oxalate in the urine), are pregnant or may be pregnant or breastfeeding, for premature babies and infants, or if you have gout or kidney stones, folic acid deficiency, a tendency to blood clots, or hypersensitivity or past reactions to Yellow No. 5. Keep to the stated dose and directions. This medicine may interfere with the detection of glucose in urine tests and may turn the urine yellow, affecting laboratory test values. Do not take it together with levodopa. Consult a pharmacist before taking it with oral contraceptives containing estrogen. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, stomatitis (mouth sores), loss of appetite or abdominal bloating occurs, or if your period comes earlier than expected, becomes gradually heavier, or bleeding continues for a long time.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Supplies vitamins B1, B2, B6, E and C and relieves neuralgia, muscle and joint pain, beriberi, and eye strain",
+        "Main symptoms": "Vitamin B1, B2, B6, E, C supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age (when containing cod liver oil and vitamins D and E)"
+      }
+    },
+    "1b7e045cd5fff863": {
+      "groupKey": "스토마제정|A09AA|175밀리그램|정",
+      "title": "Stomaze Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for indigestion, loss of appetite, overeating, food stagnation, promoting digestion, and upper stomach bloating caused by indigestion.",
+      "usage": "People aged 15 or older and adults take 2 tablets 3 times a day after meals. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are a child aged 7 or under, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you are hypersensitive to Yellow No. 4 or have had reactions to it, or if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Consult a pharmacist before use if you are taking other medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Relieves indigestion, loss of appetite, overeating, food stagnation and upper stomach bloating from indigestion, and promotes digestion",
+        "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promoting digestion, upper stomach bloating from indigestion"
+      }
+    },
+    "7bd7dea6b0070669": {
+      "groupKey": "탄시나정|A02AH|500밀리그램|정",
+      "title": "Tansina Tablet",
+      "usageLabel": "How to take it",
+      "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+      "usage": "People aged 15 or older and adults take 2 tablets at a time, 3 times a day. Leave at least 4 hours between doses. Keep to the stated dose.",
+      "caution": "Do not take this medicine if you are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment, are on a sodium-restricted diet, or are hypersensitive to Yellow No. 4 or have had reactions to it. Keep to the stated dose and directions. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+      "summaryTable": {
+        "Category": "Over-the-counter medicine",
+        "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+        "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+      }
+    }
+  }
+}

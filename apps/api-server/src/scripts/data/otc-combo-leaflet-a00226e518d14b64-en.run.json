@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "에이프로젠알마게이트정|A02AD03|500밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "3129fd32-33e7-6c6b-7714-271642aa0c36",
+  "anomalies": [],
+  "targetMasters": 22,
+  "koFingerprintKinds": 1,
+  "builtLen": 3154,
+  "builtMd5": "01ebfd0b26dfef7928a374a76bacf2a0",
+  "existingEnCanonical": 22,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 22,
+    "STEP2_flip": 22,
+    "total": 44
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

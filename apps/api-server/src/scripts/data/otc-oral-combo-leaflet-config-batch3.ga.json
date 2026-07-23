@@ -65,6 +65,19 @@
     "usageLabel": "복용 안내",
     "caution": "경고: 만 6세 이하의 어린이가 과량 복용시 철분 중독성 사망을 일으킬 수 있으므로 어린이의 손에 닿지 않는 곳에 보관하세요.\n\n다음 분은 복용하지 마세요. 이 약에 과민증 환자, 12개월 미만의 영아, 혈색소증, 헤모시데린침착증, 철 이용 장애, 비철결핍성 빈혈, 철과잉증, 감염이나 종양으로 인한 철결핍성빈혈, 만성췌장염, 간경변 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 소화성궤양, 만성궤양성대장염, 국한성대장염 등의 위장질환, 심장ㆍ순환기계기능 장애, 발작성야 혈색소뇨증, 신장애, 저단백혈증, 폴산이 부족한 환자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n12세 이상 청소년에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 항생제, 제산제와 함께 복용하지 마세요.이 약을 복용하기 전에 철 함유제제(철분제, MRI용 간장 조영제 등), 항알도스테론제, 트리암테렌, 퀴놀론계, 페니실라민, 콜레스티라민, 췌장엑스 및 비타민 E와 같은 물질, 디포스폰산 염류, 티록신, 세프디니르 제제, 200 mg 이상의 아스코르빈산(비타민 C)을 함께 복용 시 약사와 상의하세요.녹차, 홍차 등 탄닌을 함유하는 차 및 우유ㆍ유제품은 복용 중, 복용 전후에는 피하세요.\n\n두드러기, 가려움, 햇빛 노출시 피부 과민반응, 복부ㆍ위통증, 위 경련, 위부불쾌감, 구토, 설사, 구역, 식욕부진, 변비, 흑변, 치아변색, 열, 혼수, 진단 또는 검사 시 AST, ALT의 상승, ALP 상승 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "헤모텐캡슐|B03AE01|155밀리그램|캡슐",
+    "title": "Hemoten Capsule",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for the prevention and treatment of iron-deficiency anemia.",
+    "usage": "Adults and children aged 12 or older take 1 capsule once a day after a meal. Keep to the stated dose.",
+    "caution": "Warning: an overdose in children aged 6 or under can cause fatal iron poisoning, so keep this medicine out of the reach of children. Do not take this medicine if you are hypersensitive to it, are an infant under 12 months, or have hemochromatosis, hemosiderosis, an iron-utilization disorder, non-iron-deficiency anemia, iron overload, iron-deficiency anemia caused by infection or tumor, chronic pancreatitis, or liver cirrhosis. Consult a pharmacist before use if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis or regional colitis, or have heart or circulatory disorders, paroxysmal nocturnal hemoglobinuria, kidney impairment, low blood protein, or folic acid deficiency. Keep to the stated dose and directions. For adolescents aged 12 or older, use under the supervision of a guardian. Do not take it together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a pharmacist before taking it with iron-containing preparations (iron supplements, MRI liver contrast agents), anti-aldosterone agents, triamterene, quinolones, penicillamine, cholestyramine, pancreatic extract and substances such as vitamin E, diphosphonates, thyroxine, cefdinir preparations, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, and milk and dairy products, while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if you notice hives, itching, skin reactions on sun exposure, abdominal or stomach pain, stomach cramps, stomach discomfort, vomiting, diarrhea, nausea, loss of appetite, constipation, black stools, tooth discoloration, fever, coma, or raised AST, ALT or ALP on diagnosis or testing.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Prevention and treatment of iron-deficiency anemia",
+     "Main symptoms": "Prevention and treatment of iron-deficiency anemia"
+    }
    }
   },
   "a00226e518d14b64": {
@@ -107,6 +120,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 알츠하이머병, 치질, 체액저류(부기), 임신중독증, 설사, 진단되지 않은 소화기관출혈 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 신장애, 신체 허약자, 인 함량이 낮은 식이요법 실시자, 소화흡수장애가 있는 사람, 고령자, 혈액구토 또는 흑색대변 등과 같은 소화기관출혈 증상이 있는 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상담하세요. 2주정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n이 약을 복용하는 동안 테트라사이클린계 항생제는 복용하지 마세요.이 약을 복용하기 전에 비스테로이드소염(항염)진통제, 궤양치료제, 디기탈리스 제제, 클로르프로마진, 란소프라졸, 프레드니솔론, 페니실린, 퀴놀론, 철(Fe)염 제제, 살리실산염을 복용하는 환자는 약사와 상의하세요.\n\n변비, 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "에이프로젠알마게이트정|A02AD03|500밀리그램|정",
+    "title": "Aprogen Almagate Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine used for antacid action and symptom improvement in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain, and sour burping.",
+    "usage": "Adults and children aged 12 or older chew 2 tablets (1 g) at a time, 3 times a day, 30 minutes to 1 hour after meals. If needed, one more dose may be taken before bedtime. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, or have Alzheimer's disease, hemorrhoids, fluid retention (swelling), toxemia of pregnancy, diarrhea, or undiagnosed gastrointestinal bleeding. Consult a doctor or pharmacist before use if you have kidney impairment, are physically weak, are on a low-phosphorus diet, have digestive-absorption disorders, are elderly, have symptoms of gastrointestinal bleeding such as vomiting blood or black stools, or are pregnant, may be pregnant, or are breastfeeding. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take tetracycline antibiotics while taking this medicine. Consult a pharmacist before use if you take nonsteroidal anti-inflammatory analgesics, ulcer medicines, digitalis preparations, chlorpromazine, lansoprazole, prednisolone, penicillin, quinolones, iron (Fe) salt preparations, or salicylates. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Antacid action and symptom improvement in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain, and sour burping",
+     "Main symptoms": "Gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea"
+    }
    }
   },
   "9609747b0e51a5ec": {
@@ -148,6 +174,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태), 유육종증(원인을 알 수 없는 전신 염증질환), 신장질환, 이 약에 과민증 환자, 만 12개월 미만의 젖먹이, 신장결석, 심한 증상의 신부전 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 심장·순환기계기능 장애, 신장장애, 저단백혈증, 강심배당체를 투여 중인 환자, 신장결석 경험자는 약사와 상의하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마세요. 항알도스테론제, 트리암테렌과 함께 복용 시 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 설사, 묽은 변, 변비, 저혈압, 얼굴달아오름, 심박동불규칙, 피부발진 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "네오칼큐정|A12AX|475밀리그램|정",
+    "title": "Neocalcu Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for supplying vitamins D and B1 during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, the growth period and old age, and for poor development of bones and teeth and the prevention of rickets.",
+    "usage": "Adults take 1 tablet once a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you have hypercalcemia (excess calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, are hypersensitive to it, are an infant under 12 months, or have kidney stones or severe kidney failure. Consult a pharmacist before use if you are pregnant or may be pregnant, are breastfeeding, for premature babies and infants, or if you have heart or circulatory disorders, kidney impairment, low blood protein, are taking cardiac glycosides, or have had kidney stones. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Do not take it together with phosphates, calcium salts, oral tetracycline preparations, or antacids. Consult a pharmacist before taking it with anti-aldosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if nausea, vomiting, diarrhea, loose stools, constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supplies vitamins D and B1 and helps prevent poor development of bones and teeth and rickets",
+     "Main symptoms": "Vitamin D and B1 supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, the growth period and old age, and bone and tooth development"
+    }
    }
   },
   "132cf3a84bb7b4f2": {
@@ -187,6 +226,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 대두유 또는 콩, 땅콩에 과민증 환자, 심한 담도폐쇄 환자, 12세 이하 소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 고지단백혈증, 당뇨병성 고지질혈증 및 췌장염 등 지방대사이상, 지방과부하로 특별한 위험이 예상되는 환자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n레보도파와 함께 복용하지 마세요.정주용 지질제와 함께 복용 시 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "가네탑골드연질캡슐|A05BA|200밀리그램|연질캡슐",
+    "title": "Ganetop Gold Soft Capsule",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease.",
+    "usage": "Adults take 1 capsule 3 times a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are hypersensitive to soybean oil, soy or peanuts, have severe biliary obstruction, or are a child aged 12 or under. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are a patient at particular risk from fat overload, are pregnant or may be pregnant, or are breastfeeding. Keep to the stated dose and directions. Do not take it together with levodopa. Consult a pharmacist before use with intravenous lipid preparations.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease",
+     "Main symptoms": "Supportive treatment of chronic liver disease, liver cirrhosis, and toxic liver disease"
+    }
    }
   },
   "18765dd0a0ddaebf": {
@@ -224,6 +276,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 만 12개월 미만의 젖먹이, 고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태), 유육종증(원인을 알 수 없는 전신 염증질환), 신장질환, 신장결석, 심한 증상의 신부전 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 임부 및 임신하고 있을 가능성이 있는 여성 및 수유부, 미숙아, 유아, 고옥살산뇨증(뇨중에 과량의 수산염이 배설되는 상태), 심장ㆍ순환기계기능 장애, 저단백혈증, 통풍 또는 신장결석, 혈전(혈관 막힘)성 소인이 있는 환자, 폴산이 부족한 환자, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n각종 요검사 시에 혈당의 검출을 방해할 수 있으며, 요를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제, 레보도파와 함께 복용하지 마세요. 강심배당체, 에스트로겐을 포함한 경구용 피임제, 항알도스테론제, 트리암테렌과 함께 복용 시 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적, 구역, 구토, 묽은 변, 식욕부진, 복부팽만감, 저혈압, 얼굴달아오름, 심박동불규칙, 피부발진, 위장관장애, 소화장애, 상복부통증, 폐부종, 생리가 예정보다 빨라지거나 양이 점점 많아지고, 출혈이 오래 지속 되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "제텐비정|A11JB|69.15밀리그램|정",
+    "title": "Zeten-B Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for supplying vitamins B1, B2, B6, C and E during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age; for relieving neuralgia, muscle pain and joint pain (back pain, stiff shoulders); for beriberi; for relieving eye strain, angular cheilitis (inflamed mouth corners), cheilitis (inflamed lips), stomatitis (mouth sores), glossitis (inflamed tongue), eczema and dermatitis; and for supplying zinc.",
+    "usage": "Children aged 12 or older and adults take 1 to 2 tablets once a day after a meal. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are an infant under 12 months, or have hypercalcemia (excess calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, kidney stones, or severe kidney failure. Consult a pharmacist before use for children who get plenty of sunlight and eat normal meals, if you are pregnant or may be pregnant or breastfeeding, for premature babies and infants, or if you have hyperoxaluria (excess oxalate in the urine), heart or circulatory disorders, low blood protein, gout or kidney stones, a tendency to blood clots, folic acid deficiency, or hypersensitivity or past reactions to Yellow No. 5. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. This medicine may interfere with the detection of glucose in urine tests and may turn the urine yellow, affecting laboratory test values. Do not take it together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Consult a pharmacist before taking it with cardiac glycosides, oral contraceptives containing estrogen, anti-aldosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, loss of appetite, abdominal bloating, low blood pressure, facial flushing, irregular heartbeat, skin rash, gastrointestinal disorders, indigestion, upper abdominal pain or pulmonary edema occurs, or if your period comes earlier than expected, becomes gradually heavier, or bleeding continues for a long time.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supplies vitamins B1, B2, B6, C, E and zinc and relieves neuralgia, muscle and joint pain, beriberi, eye strain and mouth or skin inflammation",
+     "Main symptoms": "Vitamin B1, B2, B6, C, E supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age"
+    }
    }
   },
   "a7a9ec4399a40e57": {
@@ -261,6 +326,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 체질인 환자는 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 경우, 나트륨 제한 식이를 하는 사람은 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "베스자임정|A09AA02|400밀리그램|정",
+    "title": "Beszyme Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for indigestion, loss of appetite, overeating, food stagnation, promoting digestion, and stomach bloating caused by indigestion.",
+    "usage": "Adults take 1 tablet 3 times a day after meals. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are a child aged 7 or under, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Consult a pharmacist before use if you are taking other medicines or are on a sodium-restricted diet.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Relieves indigestion, loss of appetite, overeating, food stagnation and bloating from indigestion, and promotes digestion",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promoting digestion, stomach bloating from indigestion"
+    }
    }
   },
   "7608bd26d8331055": {
@@ -297,6 +375,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 투석요법을 받고 있는 환자, 만 7세 이하의 어린이는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 신장장애 환자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n테트라사이클린계 항생제와 함께 복용하지 마세요.\n\n변비 또는 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "안타신정|A02AD01|250밀리그램|정",
+    "title": "Antacin Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+    "usage": "Adults take 3 tablets at a time, 3 times a day after meals. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are receiving dialysis or are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment. Keep to the stated dose and directions. Do not take it together with tetracycline antibiotics. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+     "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+    }
    }
   },
   "c9461e993aaada78": {
@@ -333,6 +424,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 대두유 또는 콩, 땅콩에 과민증 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사이상, 임부, 지방과부하로 특별한 위험이 예상되는 환자, 황색4호에 과민증 환자는 약사와 상의하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n정주용 지질제와 함께 복용 시 약사와 상의하세요.\n\n설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "헤파비트에프연질캡슐|A05BA|100밀리그램|연질캡슐",
+    "title": "Hepavit-F Soft Capsule",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease and toxic liver disease.",
+    "usage": "Adults take 1 capsule at a time, 3 times a day. After treatment, reduce the dose to 1 to 2 capsules a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to soybean oil, soy, or peanuts. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are pregnant, are a patient at particular risk from fat overload, or are hypersensitive to Yellow No. 4. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Consult a pharmacist before use with intravenous lipid preparations. Stop taking it immediately and consult a pharmacist if diarrhea or similar symptoms occur.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supportive treatment of chronic liver disease and toxic liver disease",
+     "Main symptoms": "Supportive treatment of chronic liver disease and toxic liver disease"
+    }
    }
   },
   "d5c6d09b517eb36b": {
@@ -369,6 +473,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 투석요법을 받고 있는 환자, 만 7세 이하의 어린이는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 신장장애 환자, 나트륨 제한 식이를 하는 사람은 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n테트라사이클린계 항생제와 함께 복용하지 마세요.\n\n변비, 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "미소쿨정|A02AH|200밀리그램|정",
+    "title": "Misocool Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+    "usage": "People aged 15 or older and adults take 2 tablets at a time, and children aged 8 to under 15 take 1 tablet at a time, 3 times a day between meals and at bedtime. Leave at least 4 hours between doses. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are receiving dialysis or are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment or are on a sodium-restricted diet. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take it together with tetracycline antibiotics. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+     "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+    }
    }
   },
   "12ba103fd120ecfe": {
@@ -404,6 +521,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 중증의 신부전 환자, 7세 미만의 소아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 및 수유부, 혈전성 소인이 있는 환자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n레보도파와 함께 복용하지 마세요.에스트로겐을 포함한 경구용피임제와 함께 복용 시 약사와 상의하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적, 구역, 구토, 묽은 변 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.생리가 예정보다 빨라지거나 양이 점점 많아 질 수 있으며, 출혈 지속 등이 나타날 수 있습니다.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "아미노포르테정|A13A|18.75밀리그램|정",
+    "title": "Amino Forte Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for nutritional supply in cases of general weakness and tonic support, a weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance, febrile wasting disease, and pregnancy and breastfeeding.",
+    "usage": "Adolescents aged 15 or older and adults take 2 tablets at a time, and children aged 7 to 14 take 1 tablet at a time, 1 to 2 times a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, have severe kidney failure, are a child under 7, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you are pregnant or breastfeeding, or have a tendency to blood clots. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Do not take it together with levodopa. Consult a pharmacist before taking it with oral contraceptives containing estrogen. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, or loose stools occur. Your period may come earlier than expected or become gradually heavier, and prolonged bleeding may occur.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Nutritional supply for general weakness, weak constitution, physical fatigue, during and after illness, gastrointestinal and nutritional disturbance, febrile wasting disease, and pregnancy and breastfeeding",
+     "Main symptoms": "General weakness and tonic support, weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance"
+    }
    }
   },
   "7d04798c82f6076e": {
@@ -439,6 +569,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 심한 담도폐쇄, 전격성 간염, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 크론병과 같은 대장 및 소장염, 방사선 비투과성 석회화된 담석, 비기능성 담낭(쓸개), 급성 담낭(쓸개)염, 신질환, 소화성궤양(급성 위ㆍ십이지장 궤양) 환자, 대두유·콩·땅콩 과민증 또는 알레르기 반응 경험자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 심한 췌장(이자)질환, 담석증, 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 환자 또는 지질성 유제를 신중히 투여해야 하는 환자, 황색4호·황색5호 과민증 또는 알레르기 반응 경험자, 지방과부하로 특별한 위험이 예상되는 환자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n경구용 당뇨병용제(톨부타미드), 콜레스티라민, 콜레스티폴, 약용탄, 마그네슘 및 수산화알루미늄을 함유하는 제산제, 간에서 콜레스테롤 분비를 증가시키는 약물(예: 에스트로겐 함유 경구용 피임제, 클로피브레이트와 같은 지질감소약물, 간에 손상을 주는 약물과 함께 복용하지 마세요.\n\n설사, 구역, 구토, 배 아픔, 변비, 가슴앓이, 위부불쾌감, 가려움, 발진, 전신권태감, 어지럼, 담석의 석회화, 간효소치의 증가, 백혈구 감소, 간질성폐렴(발열, 기침, 호흡곤란, 흉부 X선 이상을 동반) 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상담하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "대웅우루사연질캡슐|A05AA|50밀리그램|연질캡슐",
+    "title": "Daewoong Urusa Soft Capsule",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for improving liver function in chronic liver disease and improving physical fatigue and general weariness caused by impaired liver function.",
+    "usage": "Adults take 1 capsule at a time, 3 times a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, have severe biliary obstruction, fulminant hepatitis, are pregnant or may be pregnant or are breastfeeding, are a child, have inflammation of the large or small intestine such as Crohn's disease, radiolucent calcified gallstones, a non-functioning gallbladder, acute cholecystitis, kidney disease, or peptic ulcer (acute gastric or duodenal ulcer), or have hypersensitivity or a history of allergic reactions to soybean oil, soy or peanuts. Consult a pharmacist before use if you have severe pancreatic disease, gallstones, a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are a patient requiring careful use of lipid emulsions, have hypersensitivity or a history of allergic reactions to Yellow No. 4 or Yellow No. 5, or are a patient at particular risk from fat overload. Keep to the stated dose and directions. Do not take it together with oral diabetes medicines (tolbutamide), cholestyramine, colestipol, medicinal charcoal, antacids containing magnesium and aluminum hydroxide, medicines that increase cholesterol secretion from the liver (for example, oral contraceptives containing estrogen, lipid-lowering medicines such as clofibrate), or medicines that damage the liver. Stop taking it immediately and consult a doctor or pharmacist if diarrhea, nausea, vomiting, stomach ache, constipation, heartburn, stomach discomfort, itching, rash, general weariness, dizziness, calcification of gallstones, raised liver enzyme values, reduced white blood cells, or interstitial pneumonia (with fever, cough, difficulty breathing, or chest X-ray abnormalities) occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Improves liver function in chronic liver disease and relieves physical fatigue and general weariness caused by impaired liver function",
+     "Main symptoms": "Improving liver function in chronic liver disease and physical fatigue and general weariness caused by impaired liver function"
+    }
    }
   },
   "f685b978a8f69623": {
@@ -473,6 +616,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 대두유 또는 콩, 땅콩에 과민증 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사이상, 임부, 황색5호에 과민증 환자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n정주용 지질제와 함께 복용 시 약사와 상의하세요.\n\n설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "리게논-큐연질캡슐|A05BA|100밀리그램|연질캡슐",
+    "title": "Ligenon-Q Soft Capsule",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for the supportive treatment of chronic liver disease and toxic liver disease.",
+    "usage": "Adults take 1 capsule 3 times a day. After treatment, reduce the dose to 1 to 2 capsules a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to soybean oil, soy, or peanuts. Consult a pharmacist before use if you have a fat-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia or pancreatitis, are pregnant, or are hypersensitive to Yellow No. 5. Keep to the stated dose and directions. For children, use under the supervision of a guardian. Consult a pharmacist before use with intravenous lipid preparations. Stop taking it immediately and consult a pharmacist if diarrhea or similar symptoms occur.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supportive treatment of chronic liver disease and toxic liver disease",
+     "Main symptoms": "Supportive treatment of chronic liver disease and toxic liver disease"
+    }
    }
   },
   "ed62945363c6a2e0": {
@@ -506,6 +662,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 만 3개월 미만의 젖먹이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 고옥살산뇨증(뇨중에 과량의 수산염이 배설되는 상태), 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 통풍 또는 신장결석, 폴산이 부족한 환자, 혈전성 소인이 있는 환자, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n각종 요검사 시에 혈당의 검출을 방해할 수 있으며, 요를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다.\n\n레보도파와 함께 복용하지 마세요. 에스트로겐을 포함한 경구용 피임제와 함께 복용 시 약사와 상의하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적, 구역, 구토, 묽은 변, 구내염(입안염), 식욕부진, 복부팽만감, 생리가 예정보다 빨라지거나 양이 점점 많아질 수 있으며, 출혈이 오래 지속되는 증상이 나타나는 경우 즉각 복용을 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "아로나민골드정|A11JA|72.2밀리그램|정",
+    "title": "Aronamin Gold Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for supplying vitamins B1, B2, B6, E and C during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age (when containing cod liver oil and vitamins D and E); for relieving neuralgia, muscle pain and joint pain (back pain, stiff shoulders); for beriberi; and for eye strain.",
+    "usage": "Adults take 1 tablet at a time, twice a day. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are an infant under 3 months, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you have hyperoxaluria (excess oxalate in the urine), are pregnant or may be pregnant or breastfeeding, for premature babies and infants, or if you have gout or kidney stones, folic acid deficiency, a tendency to blood clots, or hypersensitivity or past reactions to Yellow No. 5. Keep to the stated dose and directions. This medicine may interfere with the detection of glucose in urine tests and may turn the urine yellow, affecting laboratory test values. Do not take it together with levodopa. Consult a pharmacist before taking it with oral contraceptives containing estrogen. Stop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, stomatitis (mouth sores), loss of appetite or abdominal bloating occurs, or if your period comes earlier than expected, becomes gradually heavier, or bleeding continues for a long time.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Supplies vitamins B1, B2, B6, E and C and relieves neuralgia, muscle and joint pain, beriberi, and eye strain",
+     "Main symptoms": "Vitamin B1, B2, B6, E, C supply during physical fatigue, pregnancy and breastfeeding, lowered strength during and after illness, and old age (when containing cod liver oil and vitamins D and E)"
+    }
    }
   },
   "1b7e045cd5fff863": {
@@ -538,6 +707,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 황색4호에 과민증 환자 또는 경험자, 알레르기 체질인 환자는 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 경우 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "스토마제정|A09AA|175밀리그램|정",
+    "title": "Stomaze Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for indigestion, loss of appetite, overeating, food stagnation, promoting digestion, and upper stomach bloating caused by indigestion.",
+    "usage": "People aged 15 or older and adults take 2 tablets 3 times a day after meals. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are a child aged 7 or under, or have a hereditary problem such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Consult a pharmacist before use if you are hypersensitive to Yellow No. 4 or have had reactions to it, or if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist. Keep to the stated dose and directions. Consult a pharmacist before use if you are taking other medicines.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Relieves indigestion, loss of appetite, overeating, food stagnation and upper stomach bloating from indigestion, and promotes digestion",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promoting digestion, upper stomach bloating from indigestion"
+    }
    }
   },
   "7bd7dea6b0070669": {
@@ -570,6 +752,19 @@
     "usageLabel": "복용 안내",
     "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 신장장애 환자, 나트륨 제한 식이를 하는 사람, 황색4호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n변비 또는 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
     "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "탄시나정|A02AH|500밀리그램|정",
+    "title": "Tansina Tablet",
+    "usageLabel": "How to take it",
+    "efficacy": "An over-the-counter medicine for excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping.",
+    "usage": "People aged 15 or older and adults take 2 tablets at a time, 3 times a day. Leave at least 4 hours between doses. Keep to the stated dose.",
+    "caution": "Do not take this medicine if you are a child aged 7 or under. Consult a pharmacist before use if you have kidney impairment, are on a sodium-restricted diet, or are hypersensitive to Yellow No. 4 or have had reactions to it. Keep to the stated dose and directions. Stop taking it immediately and consult a pharmacist if constipation or diarrhea occurs.",
+    "summaryTable": {
+     "Category": "Over-the-counter medicine",
+     "How it works": "Relieves excess stomach acid, heartburn, stomach discomfort, bloating, food stagnation, nausea, vomiting, stomach pain, and sour burping",
+     "Main symptoms": "Excess stomach acid, heartburn, stomach discomfort, stomach bloating, food stagnation, nausea"
+    }
    }
   }
  }
