@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "다제스캡슐|A05A|25밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "96394fb0-44cf-1001-fbdf-fe588c967563",
+  "expected": 8,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/8"
+  ],
+  "fetched": 8,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 8,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 8,
+  "htmlLen": 1912,
+  "htmlMd5": "af8bbe9d338c27aa9c56f158a5bef242",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "위제로정|A09AC|170밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "b61bfdd4-9a63-724b-ddf9-8b755987066a",
+  "anomalies": [],
+  "targetMasters": 10,
+  "koFingerprintKinds": 1,
+  "builtLen": 2945,
+  "builtMd5": "e84e1f2717d9a4f14833e7d9efeee1b3",
+  "existingEnCanonical": 10,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 10,
+    "STEP2_flip": 10,
+    "total": 20
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

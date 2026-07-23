@@ -1,0 +1,430 @@
+{
+ "_doc": "batch12 (GA-V6) deterministic KO compose (faithful source restructure). EN authored separately.",
+ "groups": {
+  "4218427430774c9c": {
+   "key": "시알딘정|A02AH|125밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "4218427430774c9c",
+   "target_master_ids": [
+    "14e7e676-3dbb-432b-9054-9c1bd5f46b42",
+    "1c5ec785-6bd9-455b-8953-688f251a98db",
+    "2c128f2d-bb1e-42be-aa79-ded7fbbcbef7",
+    "57d1f9a3-35a6-4c2f-81b9-235dd1a60054",
+    "6581ce91-c27b-4267-828b-3173e5aaa6fc",
+    "6738183b-4757-4eeb-b8c0-d2f7ecb2f65c",
+    "7c131f45-4d04-4568-a4e1-f4d9da43f786",
+    "88b56979-2380-4ce6-9cf7-75b5502bf447",
+    "9017a75b-7b13-41f2-903d-b7aecf6ce8d2",
+    "e15151d5-12eb-4aa2-acc8-364895573800",
+    "e5c142a1-f228-4de4-bc62-227a8468d9d5",
+    "f84abefb-9482-4646-9353-94cd983ffc4d",
+    "fb9e4442-6797-4ae7-af0e-bac81391d171"
+   ],
+   "title": "시알딘정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "위통, 속쓰림, 체함, 구역",
+     "주요 증상": "위통, 속쓰림, 체함, 구역"
+    },
+    "efficacy": "위통, 속쓰림, 체함, 구역에 사용하는 일반의약품입니다.",
+    "usage": "15세 이상~80세 미만 성인은 1회 2정씩 복용합니다.필요시 4시간 간격으로 1회 2정씩, 1일 3회까지 복용할 수 있습니다.단, 1일 3회(6정)을 초과하여 복용하지 마세요.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 히스타민 H2-수용체 길항제에 과민증 환자, 투석요법을 받고 있는 환자, 혈액질환, 신장·간장질환, 위·십이지장질환, 천식, 류마티스 등의 면역계질환 환자, 적혈구감소증, 혈소판감소증, 백혈구감소증 등의 혈액이상 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 15세 미만 소아 및 80세 이상 고령자, 스테로이드제, 항생물질, 항암제, 아졸계 항진균제를 복용중인 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 65세 이상 고령자, 약에 과민증 경험자, 인후통, 기침, 고열, 원인불명의 체중감소, 복통 환자, 신장병 경험자는 약사와 상의하세요. 3일간 복용하여도 증상의 개선이 없을 경우 복용을 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n스테로이드제, 항생물질, 항암제, 아졸계 항진균제, 다른 위장약과 함께 복용하지 마세요.기관지확장제(테오필린 등), 혈액응고저지제(와파린 등), 항전간제(페니토인 등), 벤조디아제핀계 약제(디아제팜, 트리아졸람 등), 삼환계항우울제(이미프라민 등), 협심증·고혈압 치료제(베타-차단제 프로프라놀롤 등), 칼슘길항제(니페디핀 등), 부정맥치료제(멕실레틴 등), 마크로라이드계 항생물질(테트라사이클린 등), 뉴퀴놀론계 항균제(오플록사신 등), 테트라사이클린계 항생물질과 함께 사용 시 약사와 상의하세요.복용 중에는 알코올성 음료를 피하세요.\n\n두드러기, 부종, 가슴답답함과 동시에 안색창백, 수족냉증, 식은땀, 숨가뿜, 고열을 동반한 발진, 발적, 열상의 수종 등의 심한 증상이 전신의 피부, 입, 눈의 점막에 나타나는 경우, 알레르기 증상(발진, 발적, 가려움, 부종), 변비, 설사, 두통, 발열, 권태감, 탈력감, 감기 증상, 하지ㆍ점막하출혈, 사지저림 및 굳은감, 두근거림, 황달, 전신부종, 혈뇨 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "시알딘정|A02AH|125밀리그램|정",
+    "title": "Cialdin Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for stomach pain, heartburn, food stagnation, and nausea.",
+    "usage": "Adults aged 15 to under 80 years: take 2 tablets at a time. If needed, take 2 tablets at 4-hour intervals, up to 3 times daily. Do not exceed 3 times (6 tablets) per day.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to histamine H2-receptor antagonists; patients on dialysis; blood disorders; kidney or liver disease; stomach or duodenal disease; immune-system diseases such as asthma or rheumatism; a history of blood abnormalities such as decreased red blood cells, decreased platelets, or decreased white blood cells; pregnant or possibly pregnant women and breastfeeding women; children under 15 years and elderly aged 80 years or older; patients taking steroids, antibiotics, anticancer agents, or azole antifungals.\n\nConsult a pharmacist before taking this medicine if any of the following applies: elderly aged 65 years or older; a history of hypersensitivity to medicines; sore throat, cough, high fever, unexplained weight loss, or abdominal pain; a history of kidney disease. If symptoms do not improve after 3 days of use, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take together with steroids, antibiotics, anticancer agents, azole antifungals, or other stomach medicines. Consult a pharmacist before using together with bronchodilators (such as theophylline), anticoagulants (such as warfarin), antiepileptics (such as phenytoin), benzodiazepines (such as diazepam or triazolam), tricyclic antidepressants (such as imipramine), medicines for angina or high blood pressure (such as the beta-blocker propranolol), calcium antagonists (such as nifedipine), antiarrhythmics (such as mexiletine), macrolide antibiotics (such as tetracycline), new quinolone antibacterials (such as ofloxacin), or tetracycline antibiotics. Avoid alcoholic beverages while taking this medicine.\n\nIf severe symptoms appear over the skin, mouth, or eye mucous membranes throughout the body — such as hives, swelling, and chest tightness together with pallor, cold hands and feet, cold sweat, shortness of breath, and a high fever accompanied by rash, redness, and blistering edema — or if allergic symptoms (rash, flushing, itching, swelling), constipation, diarrhea, headache, fever, fatigue, weakness, cold-like symptoms, submucosal bleeding of the legs, numbness and stiffness of the limbs, palpitations, jaundice, generalized edema, or blood in the urine occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves stomach pain, heartburn, food stagnation, and nausea",
+     "Main symptoms": "Stomach pain, heartburn, food stagnation, nausea"
+    }
+   }
+  },
+  "f994328ac501290b": {
+   "key": "리포유정|A09A|30밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "f994328ac501290b",
+   "target_master_ids": [
+    "1fc8eb4e-d54d-4a04-a5fb-34bbcc2204b0",
+    "4879dd98-2806-44aa-98fd-cc4791c2322a",
+    "51d1ad94-d53c-4099-87c5-515b231c00f3",
+    "56d60bf9-2ce0-4249-846e-01de258e5f8b",
+    "5acd4454-58ba-4b67-bd23-ef9d041840b1",
+    "7726fc34-5504-418e-8e09-27a9d625263d",
+    "8a1c5dd1-873f-4218-b915-4c426f62fe6e",
+    "91f5c2d2-0acc-42b2-9b46-990efbdfb420",
+    "b36f2244-14ef-4097-9ebc-66a05e75d3dc",
+    "c24a6bda-e84a-4fb7-8050-b43f58e54620",
+    "d1d36e9e-424d-4c3d-b87f-b2c986b6bb78",
+    "e8fc8edc-9e34-43cd-9a58-2a53030ce235",
+    "f6e3274b-491b-4e36-9af8-c3b7ee63adf6"
+   ],
+   "title": "리포유정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1~2정 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "리포유정|A09A|30밀리그램|정",
+    "title": "Lipoyou Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults: take 1 to 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Keep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  },
+  "0d0bb7bea51e5e9a": {
+   "key": "베아제정|A09A|50밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "0d0bb7bea51e5e9a",
+   "target_master_ids": [
+    "1f42fc06-c654-4fd5-90a3-1a0d370cc5b7",
+    "2f68103f-3cae-4193-ae19-2ae1800bf220",
+    "3cacc941-856c-4857-83a6-65114fefbb5b",
+    "4866f1b6-aadf-47b0-ab7a-5adcbcbea9fa",
+    "5c0698c8-420f-403e-ae47-7f34e9102b55",
+    "6755beba-18d9-4507-95ba-ec5bd1b034fa",
+    "c873ec40-3af4-4618-99c1-6c26a9235a86",
+    "d25ec2e2-cfec-400b-8cd2-265af36c06ac",
+    "f832de88-4725-421b-8ea9-9363b31b0336",
+    "feb9e994-7a6e-4585-9226-4fed3a1d430a"
+   ],
+   "title": "베아제정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "성인 1회 1정 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 체질인 환자, 임부 또는 임신하고 있을 가능성이 있는 여성은 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "베아제정|A09A|50밀리그램|정",
+    "title": "Bearse Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults: take 1 tablet, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if the following applies: children aged 7 years or younger.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; pregnant or possibly pregnant women. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  },
+  "2ba5b9751a578bd4": {
+   "key": "세미론정|A09AA|175밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "2ba5b9751a578bd4",
+   "target_master_ids": [
+    "167a20b3-14a4-473a-8649-c4fd4f74a7c3",
+    "3c294e4c-d30e-4b75-8e1c-dcb7bab8ef40",
+    "4e54bc03-8d07-4954-a6f7-7792f2fa90d9",
+    "4f2d0250-f20a-4217-b820-f8d3e09d5958",
+    "6b73f553-9d3f-4a85-841c-64f6500823a3",
+    "76967261-dd1f-4797-9a5b-49dc20964b26",
+    "79f7faac-c0e2-4cd4-bee8-c1b795b84735",
+    "a5d13979-d0d1-4797-b188-5f78f83938eb",
+    "c3b0671a-e6a4-4139-968d-3ff033b98955",
+    "faa8250e-aa51-4eae-8317-483103b7babf"
+   ],
+   "title": "세미론정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 2정, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 체질인 환자는 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "세미론정|A09AA|175밀리그램|정",
+    "title": "Semiron Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults: take 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children aged 7 years or younger; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  },
+  "ec46f83b056a84b9": {
+   "key": "위제로정|A09AC|170밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "ec46f83b056a84b9",
+   "target_master_ids": [
+    "086e422e-9d8a-4b55-9502-fa7d6237f5aa",
+    "1fbd8d1a-e6d8-48a2-a71e-9b99da889f86",
+    "5be5342a-5bf0-4aa6-b4b2-68444187afb8",
+    "6bf0cc04-fd11-4570-a10e-48184e6d45f4",
+    "6ccef81f-a170-44b0-9a58-184cb5b99c40",
+    "9a27afa6-ab0e-41a3-ac72-a1489c0bed8c",
+    "abe98bd0-6d87-45a9-b0e3-61dc944f2a94",
+    "bbebbb6e-36b0-4d22-9ebe-3570791bdd20",
+    "e255e51d-67f4-453b-b83c-80ebd86ed653",
+    "f0ad443a-9e07-462d-be7f-49470956d81c"
+   ],
+   "title": "위제로정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부…",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 체함, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 소아 및 성인은 1회 3정 1일 3회 식후 또는 식간에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 투석요법을 받고 있는 환자, 만 15세 미만 소아, 갈락토오스 불내성, Lapp 유당분해효소결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 신장(콩팥)장애, 알레르기 체질, 임부 또는 임신하고 있을 가능성이 있는 여성, 황색4호 과민증 환자 또는 경험자, 나트륨 제한 식이를 하는 사람은 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n만 15세 이상 소아에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 사람은 약사와 상의하세요.\n\n이 약을 복용하는 동안 변비 또는 설사의 증상이 나타날 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "위제로정|A09AC|170밀리그램|정",
+    "title": "Wizero Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, promotion of digestion, upper abdominal bloating caused by indigestion, excess stomach acid, heartburn, stomach discomfort, food stagnation, nausea, vomiting, stomach pain, and sour belching.",
+    "usage": "Children aged 15 years and older and adults: take 3 tablets, 3 times daily after meals or between meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: patients on dialysis; children under 15 years of age; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: kidney disorder; allergic constitution; pregnant or possibly pregnant women; hypersensitivity to Yellow No. 4 or a past reaction to it; people on a sodium-restricted diet. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving to children aged 15 years and older, administer under the guidance and supervision of a guardian.\n\nConsult a pharmacist before taking this medicine if you are taking other medicines.\n\nIf constipation or diarrhea occurs while taking this medicine, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion, excess stomach acid, and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, promotion of digestion, upper abdominal bloating, excess stomach acid, heartburn, stomach discomfort, food stagnation, nausea, vomiting, stomach pain, sour belching"
+    }
+   }
+  },
+  "0543e8bcca5c2663": {
+   "key": "다제스캡슐|A05A|25밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "0543e8bcca5c2663",
+   "target_master_ids": [
+    "0129a97f-2095-48ea-94e4-82d98c3a43df",
+    "141fdcf1-f56b-4fb1-9276-03ab9dda52d3",
+    "1c731132-025f-417b-9af9-32111c09ba14",
+    "1c81b6c1-fd13-4e36-b201-5a8f4bd82103",
+    "4958b414-4294-4ffa-8cea-108e66b95233",
+    "963029cb-b19a-4427-9021-c2305eb5d822",
+    "9c14dee0-5bdf-46e0-b43c-8176682948a5",
+    "b2ca90f8-af17-45bc-b4a4-8672034d0712"
+   ],
+   "title": "다제스캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개…",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개즙) 분비 부전으로 오는 간질환"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개즙) 분비 부전으로 오는 간질환, 담도(쓸개길)(담관(쓸개관), 담낭(쓸개))계 질환의 보조치료로 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1~2캡슐을 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 급성간염, 심한 담도 폐쇄, 방사선비투과성 석회화된 담석, 비기능성 담낭(쓸개), 급성 담낭(쓸개)염, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 신질환, 소화성궤양, 크론병과 같은 대장 및 소장염, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 체질인 환자, 심한 췌장(이자) 질환, 담석, 정맥류 출혈, 간성혼수, 복수(뱃물), 간이식이 필요한 환자, 황색5호에 과민증 환자 또는 경험자, 고령자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 경우 약사와 상의하세요.\n\n때때로 설사, 묽은 변, 구역, 구토, 드물게 배아픔, 변비, 가슴쓰림, 위부불쾌감, 때때로 가려움, 드물게 발진, 발열, 기침, 호흡곤란, 흉부 X선 이상을 동반한 간질성 폐렴, 드물게 전신권태감, 어지러움, 구내불쾌감, 담석의 석회화, 간효소치의 증가(ALT, ALP, AST, γ-GT), 백혈구 감소 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "다제스캡슐|A05A|25밀리그램|캡슐",
+    "title": "Dazes Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion, and as adjunctive treatment for liver disease arising from insufficient bile secretion and for diseases of the biliary tract (bile ducts, gallbladder).",
+    "usage": "Adults: take 1 to 2 capsules, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; acute hepatitis; severe biliary obstruction; radiolucent calcified gallstones; a non-functioning gallbladder; acute cholecystitis; pregnant or possibly pregnant women and breastfeeding women; children; kidney disease; peptic ulcer; inflammation of the large or small intestine such as Crohn's disease; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; severe pancreatic disease; gallstones; variceal bleeding; hepatic coma; ascites; conditions requiring liver transplantation; hypersensitivity to Yellow No. 5 or a past reaction to it; elderly patients.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking other medicines.\n\nIf occasional diarrhea, loose stools, nausea, or vomiting; rarely abdominal pain, constipation, heartburn, or stomach discomfort; occasional itching; rarely rash, fever, cough, or interstitial pneumonia with abnormal chest X-ray; rarely general malaise, dizziness, mouth discomfort, calcification of gallstones, increased liver enzymes (ALT, ALP, AST, gamma-GT), or decreased white blood cells occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and supports bile-related liver and biliary tract conditions",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating, liver disease from insufficient bile secretion, biliary tract diseases"
+    }
+   }
+  },
+  "31a80694d9b40f87": {
+   "key": "다우제큐정|A09A|10밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "31a80694d9b40f87",
+   "target_master_ids": [
+    "0c69259c-8149-4e6d-8536-fe3214903ef4",
+    "446822ba-55d3-412f-9a2d-cd1bd5c05ebd",
+    "52dcad79-116d-455d-9831-7d57382b6a66",
+    "71f8af4e-b1e0-4128-b0f0-fa71d7712194",
+    "8a6b3580-16b7-42cf-8dc0-eaecc4528289",
+    "b4dc8f41-559c-468f-880e-edd16f010ae4",
+    "b913accf-5c6f-463d-a0ef-ffe9d3f0eabb",
+    "e0d60798-405f-4554-ada9-4227b6543d17"
+   ],
+   "title": "다우제큐정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정씩, 만 8세 이상~만 15세 미만은 1회 1정씩 1일 3회 식후에 복용합니다.\n복용간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 대두유, 콩 또는 땅콩에 과민증 환자 또는 경험자, 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 알레르기 체질, 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사이상 환자 또는 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자 약사와 상의하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "다우제큐정|A09A|10밀리그램|정",
+    "title": "Dauzeq Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults aged 15 years and older: take 2 tablets at a time; children aged 8 to under 15 years: take 1 tablet at a time, 3 times daily after meals.\nAllow at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity or past reaction to soybean oil, soybeans, or peanuts; children aged 7 years or younger; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if you are pregnant or may be pregnant, or if any of the following applies: allergic constitution; disorders of fat metabolism such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or conditions requiring careful use of lipid emulsions; conditions at particular risk from fat overload. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  },
+  "43108cb05f7b33b7": {
+   "key": "다이제틴정|A09A|20밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "43108cb05f7b33b7",
+   "target_master_ids": [
+    "13b142de-b42b-498d-a424-44bd104678a7",
+    "18f380c4-e98b-4e6d-ac7f-f4aa81afb8fb",
+    "5264ff6d-0d69-4e40-8cae-f2ba8fc3b2de",
+    "7ba15b6c-3f71-4a2a-a14e-5fb9e68edb54",
+    "8b1e37ce-5292-494c-ae85-30b8431cfc4d",
+    "97aaf1e0-309a-4b6d-9d3f-62cfe35fc4eb",
+    "f6e14ecc-ef1d-4b0d-a0c2-3b25f6d1a3fb",
+    "faf32836-7acb-4cc5-a32d-a411992ef1fe"
+   ],
+   "title": "다이제틴정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1~2정 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "다이제틴정|A09A|20밀리그램|정",
+    "title": "Digetin Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults: take 1 to 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Keep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  },
+  "a89e74addc957d65": {
+   "key": "씨메탈시정|A02AH|50밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "a89e74addc957d65",
+   "target_master_ids": [
+    "2591750d-9faf-4604-bb1a-a94e8f76ff5d",
+    "25a7bcc4-b9c7-4872-8e83-5cc045c7dce2",
+    "48c5ea60-1cc9-485b-9723-7e4f3c750a74",
+    "4c53f209-02ba-40f2-ab01-5ba034b1c2f0",
+    "4feb9390-28bf-4154-91e8-c914775c62f0",
+    "8a04022a-08b1-4404-bc88-721871491706",
+    "8e793988-6721-40f5-a5f2-98e079c71ca3",
+    "eae1ce8e-c9dd-485e-9cdf-08982e55c6b9"
+   ],
+   "title": "씨메탈시정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "위통, 속쓰림, 체함, 구역",
+     "주요 증상": "위통, 속쓰림, 체함, 구역"
+    },
+    "efficacy": "위통, 속쓰림, 체함, 구역에 사용하는 일반의약품입니다.",
+    "usage": "15세 이상~80세 미만 성인은 1회 2정씩 복용합니다.필요시 4시간 간격으로 1회 2정씩, 1일 3회까지 복용할 수 있습니다.단, 1일 3회(6정)을 초과하여 복용하지 마세요.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 히스타민 H2-수용체 길항제에 과민증 환자, 투석요법을 받고 있는 환자, 혈액질환, 신장·간장질환, 위·십이지장질환, 천식, 류마티스 등의 면역계질환 환자, 적혈구감소증, 혈소판감소증, 백혈구감소증 등의 혈액이상 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 15세 미만 소아 및 80세 이상 고령자, 스테로이드제, 항생물질, 항암제, 아졸계 항진균제를 복용중인 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 65세 이상 고령자, 약에 과민증 경험자, 인후통, 기침, 고열, 원인불명의 체중감소, 복통 환자, 신장병 경험자는 약사와 상의하세요. 3일간 복용하여도 증상의 개선이 없을 경우 복용을 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n스테로이드제, 항생물질, 항암제, 아졸계 항진균제, 다른 위장약과 함께 복용하지 마세요.기관지확장제(테오필린 등), 혈액응고저지제(와파린 등), 항전간제(페니토인 등), 벤조디아제핀계 약제(디아제팜, 트리아졸람 등), 삼환계항우울제(이미프라민 등), 협심증·고혈압 치료제(베타-차단제 프로프라놀롤 등), 칼슘길항제(니페디핀 등), 부정맥치료제(멕실레틴 등), 마크로라이드계 항생물질(테트라사이클린 등), 뉴퀴놀론계 항균제(오플록사신 등), 테트라사이클린계 항생물질과 함께 사용 시 약사와 상의하세요.복용 중에는 알코올성 음료를 피하세요.\n\n두드러기, 부종, 가슴답답함과 동시에 안색창백, 수족냉증, 식은땀, 숨가뿜, 고열을 동반한 발진, 발적, 열상의 수종 등의 심한 증상이 전신의 피부, 입, 눈의 점막에 나타나는 경우, 알레르기 증상(발진, 발적, 가려움, 부종), 변비, 설사, 두통, 발열, 권태감, 탈력감, 감기 증상, 하지ㆍ점막하출혈, 사지저림 및 굳은감, 두근거림, 황달, 전신부종, 혈뇨 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "씨메탈시정|A02AH|50밀리그램|정",
+    "title": "Cimetalsi Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for stomach pain, heartburn, food stagnation, and nausea.",
+    "usage": "Adults aged 15 to under 80 years: take 2 tablets at a time. If needed, take 2 tablets at 4-hour intervals, up to 3 times daily. Do not exceed 3 times (6 tablets) per day.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to histamine H2-receptor antagonists; patients on dialysis; blood disorders; kidney or liver disease; stomach or duodenal disease; immune-system diseases such as asthma or rheumatism; a history of blood abnormalities such as decreased red blood cells, decreased platelets, or decreased white blood cells; pregnant or possibly pregnant women and breastfeeding women; children under 15 years and elderly aged 80 years or older; patients taking steroids, antibiotics, anticancer agents, or azole antifungals.\n\nConsult a pharmacist before taking this medicine if any of the following applies: elderly aged 65 years or older; a history of hypersensitivity to medicines; sore throat, cough, high fever, unexplained weight loss, or abdominal pain; a history of kidney disease. If symptoms do not improve after 3 days of use, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take together with steroids, antibiotics, anticancer agents, azole antifungals, or other stomach medicines. Consult a pharmacist before using together with bronchodilators (such as theophylline), anticoagulants (such as warfarin), antiepileptics (such as phenytoin), benzodiazepines (such as diazepam or triazolam), tricyclic antidepressants (such as imipramine), medicines for angina or high blood pressure (such as the beta-blocker propranolol), calcium antagonists (such as nifedipine), antiarrhythmics (such as mexiletine), macrolide antibiotics (such as tetracycline), new quinolone antibacterials (such as ofloxacin), or tetracycline antibiotics. Avoid alcoholic beverages while taking this medicine.\n\nIf severe symptoms appear over the skin, mouth, or eye mucous membranes throughout the body — such as hives, swelling, and chest tightness together with pallor, cold hands and feet, cold sweat, shortness of breath, and a high fever accompanied by rash, redness, and blistering edema — or if allergic symptoms (rash, flushing, itching, swelling), constipation, diarrhea, headache, fever, fatigue, weakness, cold-like symptoms, submucosal bleeding of the legs, numbness and stiffness of the limbs, palpitations, jaundice, generalized edema, or blood in the urine occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves stomach pain, heartburn, food stagnation, and nausea",
+     "Main symptoms": "Stomach pain, heartburn, food stagnation, nausea"
+    }
+   }
+  },
+  "7b6fe68d4df970e9": {
+   "key": "닥터베아제정|A09A|80밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "7b6fe68d4df970e9",
+   "target_master_ids": [
+    "3d036045-27f2-41b9-8f20-dfbaa966d1ce",
+    "8c3a7955-b9d1-43f3-a556-b264bb632fd7",
+    "a2955cc2-584a-426e-9d40-ce919ca13417",
+    "b2c06576-3e60-4159-81ad-3cd319107999",
+    "d21ea72b-e90e-4b50-99fc-d7e811d73f3e",
+    "e177ce9f-390f-4bf0-93b0-0a99d0d8be89",
+    "fb4dbda6-af9c-4037-8fd0-1f850fd77085"
+   ],
+   "title": "닥터베아제정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+     "주요 증상": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감"
+    },
+    "efficacy": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+    "usage": "성인 1회 1정을 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 체질인 사람, 임부 또는 임신하고 있을 가능성이 있는 여성, 이 약 또는 황색4호에 과민증 환자는 의사 또는 약사와 상담하세요. 2주 정도 복용하여도 증상의 개선이 없을 경우 즉각 복용을 중지하고 의사 또는 약사와 상담하세요.\n\n정해진 용법과 용량을 잘 지키세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "닥터베아제정|A09A|80밀리그램|정",
+    "title": "Dr. Bearse Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+    "usage": "Adults: take 1 tablet, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if the following applies: children aged 7 years or younger.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; pregnant or possibly pregnant women; hypersensitivity to this medicine or to Yellow No. 4. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+     "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+    }
+   }
+  }
+ }
+}

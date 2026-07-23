@@ -1,0 +1,136 @@
+{
+ "wo": "WO-O4O-OTC-ORAL-COMBO-REMAINDER-COMPLETION-GA-V6",
+ "batch": "batch12",
+ "en": {
+  "4218427430774c9c": {
+   "groupKey": "시알딘정|A02AH|125밀리그램|정",
+   "title": "Cialdin Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for stomach pain, heartburn, food stagnation, and nausea.",
+   "usage": "Adults aged 15 to under 80 years: take 2 tablets at a time. If needed, take 2 tablets at 4-hour intervals, up to 3 times daily. Do not exceed 3 times (6 tablets) per day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to histamine H2-receptor antagonists; patients on dialysis; blood disorders; kidney or liver disease; stomach or duodenal disease; immune-system diseases such as asthma or rheumatism; a history of blood abnormalities such as decreased red blood cells, decreased platelets, or decreased white blood cells; pregnant or possibly pregnant women and breastfeeding women; children under 15 years and elderly aged 80 years or older; patients taking steroids, antibiotics, anticancer agents, or azole antifungals.\n\nConsult a pharmacist before taking this medicine if any of the following applies: elderly aged 65 years or older; a history of hypersensitivity to medicines; sore throat, cough, high fever, unexplained weight loss, or abdominal pain; a history of kidney disease. If symptoms do not improve after 3 days of use, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take together with steroids, antibiotics, anticancer agents, azole antifungals, or other stomach medicines. Consult a pharmacist before using together with bronchodilators (such as theophylline), anticoagulants (such as warfarin), antiepileptics (such as phenytoin), benzodiazepines (such as diazepam or triazolam), tricyclic antidepressants (such as imipramine), medicines for angina or high blood pressure (such as the beta-blocker propranolol), calcium antagonists (such as nifedipine), antiarrhythmics (such as mexiletine), macrolide antibiotics (such as tetracycline), new quinolone antibacterials (such as ofloxacin), or tetracycline antibiotics. Avoid alcoholic beverages while taking this medicine.\n\nIf severe symptoms appear over the skin, mouth, or eye mucous membranes throughout the body — such as hives, swelling, and chest tightness together with pallor, cold hands and feet, cold sweat, shortness of breath, and a high fever accompanied by rash, redness, and blistering edema — or if allergic symptoms (rash, flushing, itching, swelling), constipation, diarrhea, headache, fever, fatigue, weakness, cold-like symptoms, submucosal bleeding of the legs, numbness and stiffness of the limbs, palpitations, jaundice, generalized edema, or blood in the urine occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves stomach pain, heartburn, food stagnation, and nausea",
+    "Main symptoms": "Stomach pain, heartburn, food stagnation, nausea"
+   }
+  },
+  "f994328ac501290b": {
+   "groupKey": "리포유정|A09A|30밀리그램|정",
+   "title": "Lipoyou Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults: take 1 to 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Keep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "0d0bb7bea51e5e9a": {
+   "groupKey": "베아제정|A09A|50밀리그램|정",
+   "title": "Bearse Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults: take 1 tablet, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if the following applies: children aged 7 years or younger.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; pregnant or possibly pregnant women. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "2ba5b9751a578bd4": {
+   "groupKey": "세미론정|A09AA|175밀리그램|정",
+   "title": "Semiron Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults: take 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 years or younger; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "ec46f83b056a84b9": {
+   "groupKey": "위제로정|A09AC|170밀리그램|정",
+   "title": "Wizero Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, promotion of digestion, upper abdominal bloating caused by indigestion, excess stomach acid, heartburn, stomach discomfort, food stagnation, nausea, vomiting, stomach pain, and sour belching.",
+   "usage": "Children aged 15 years and older and adults: take 3 tablets, 3 times daily after meals or between meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients on dialysis; children under 15 years of age; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: kidney disorder; allergic constitution; pregnant or possibly pregnant women; hypersensitivity to Yellow No. 4 or a past reaction to it; people on a sodium-restricted diet. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving to children aged 15 years and older, administer under the guidance and supervision of a guardian.\n\nConsult a pharmacist before taking this medicine if you are taking other medicines.\n\nIf constipation or diarrhea occurs while taking this medicine, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion, excess stomach acid, and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, promotion of digestion, upper abdominal bloating, excess stomach acid, heartburn, stomach discomfort, food stagnation, nausea, vomiting, stomach pain, sour belching"
+   }
+  },
+  "0543e8bcca5c2663": {
+   "groupKey": "다제스캡슐|A05A|25밀리그램|캡슐",
+   "title": "Dazes Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion, and as adjunctive treatment for liver disease arising from insufficient bile secretion and for diseases of the biliary tract (bile ducts, gallbladder).",
+   "usage": "Adults: take 1 to 2 capsules, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; acute hepatitis; severe biliary obstruction; radiolucent calcified gallstones; a non-functioning gallbladder; acute cholecystitis; pregnant or possibly pregnant women and breastfeeding women; children; kidney disease; peptic ulcer; inflammation of the large or small intestine such as Crohn's disease; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; severe pancreatic disease; gallstones; variceal bleeding; hepatic coma; ascites; conditions requiring liver transplantation; hypersensitivity to Yellow No. 5 or a past reaction to it; elderly patients.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking other medicines.\n\nIf occasional diarrhea, loose stools, nausea, or vomiting; rarely abdominal pain, constipation, heartburn, or stomach discomfort; occasional itching; rarely rash, fever, cough, or interstitial pneumonia with abnormal chest X-ray; rarely general malaise, dizziness, mouth discomfort, calcification of gallstones, increased liver enzymes (ALT, ALP, AST, gamma-GT), or decreased white blood cells occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and supports bile-related liver and biliary tract conditions",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating, liver disease from insufficient bile secretion, biliary tract diseases"
+   }
+  },
+  "31a80694d9b40f87": {
+   "groupKey": "다우제큐정|A09A|10밀리그램|정",
+   "title": "Dauzeq Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults aged 15 years and older: take 2 tablets at a time; children aged 8 to under 15 years: take 1 tablet at a time, 3 times daily after meals.\nAllow at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity or past reaction to soybean oil, soybeans, or peanuts; children aged 7 years or younger; hereditary conditions such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if you are pregnant or may be pregnant, or if any of the following applies: allergic constitution; disorders of fat metabolism such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or conditions requiring careful use of lipid emulsions; conditions at particular risk from fat overload. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "43108cb05f7b33b7": {
+   "groupKey": "다이제틴정|A09A|20밀리그램|정",
+   "title": "Digetin Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults: take 1 to 2 tablets, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Keep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "a89e74addc957d65": {
+   "groupKey": "씨메탈시정|A02AH|50밀리그램|정",
+   "title": "Cimetalsi Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for stomach pain, heartburn, food stagnation, and nausea.",
+   "usage": "Adults aged 15 to under 80 years: take 2 tablets at a time. If needed, take 2 tablets at 4-hour intervals, up to 3 times daily. Do not exceed 3 times (6 tablets) per day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to histamine H2-receptor antagonists; patients on dialysis; blood disorders; kidney or liver disease; stomach or duodenal disease; immune-system diseases such as asthma or rheumatism; a history of blood abnormalities such as decreased red blood cells, decreased platelets, or decreased white blood cells; pregnant or possibly pregnant women and breastfeeding women; children under 15 years and elderly aged 80 years or older; patients taking steroids, antibiotics, anticancer agents, or azole antifungals.\n\nConsult a pharmacist before taking this medicine if any of the following applies: elderly aged 65 years or older; a history of hypersensitivity to medicines; sore throat, cough, high fever, unexplained weight loss, or abdominal pain; a history of kidney disease. If symptoms do not improve after 3 days of use, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take together with steroids, antibiotics, anticancer agents, azole antifungals, or other stomach medicines. Consult a pharmacist before using together with bronchodilators (such as theophylline), anticoagulants (such as warfarin), antiepileptics (such as phenytoin), benzodiazepines (such as diazepam or triazolam), tricyclic antidepressants (such as imipramine), medicines for angina or high blood pressure (such as the beta-blocker propranolol), calcium antagonists (such as nifedipine), antiarrhythmics (such as mexiletine), macrolide antibiotics (such as tetracycline), new quinolone antibacterials (such as ofloxacin), or tetracycline antibiotics. Avoid alcoholic beverages while taking this medicine.\n\nIf severe symptoms appear over the skin, mouth, or eye mucous membranes throughout the body — such as hives, swelling, and chest tightness together with pallor, cold hands and feet, cold sweat, shortness of breath, and a high fever accompanied by rash, redness, and blistering edema — or if allergic symptoms (rash, flushing, itching, swelling), constipation, diarrhea, headache, fever, fatigue, weakness, cold-like symptoms, submucosal bleeding of the legs, numbness and stiffness of the limbs, palpitations, jaundice, generalized edema, or blood in the urine occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves stomach pain, heartburn, food stagnation, and nausea",
+    "Main symptoms": "Stomach pain, heartburn, food stagnation, nausea"
+   }
+  },
+  "7b6fe68d4df970e9": {
+   "groupKey": "닥터베아제정|A09A|80밀리그램|정",
+   "title": "Dr. Bearse Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Adults: take 1 tablet, 3 times daily after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if the following applies: children aged 7 years or younger.\n\nConsult a pharmacist before taking this medicine if any of the following applies: allergic constitution; pregnant or possibly pregnant women; hypersensitivity to this medicine or to Yellow No. 4. If symptoms do not improve after about 2 weeks of use, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Promotes digestion and relieves indigestion and related stomach symptoms",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  }
+ }
+}

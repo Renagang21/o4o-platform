@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "시알딘정|A02AH|125밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "e9b5ec76-6984-060d-7581-69c1e38c35b4",
+  "anomalies": [],
+  "targetMasters": 13,
+  "koFingerprintKinds": 1,
+  "builtLen": 3992,
+  "builtMd5": "29fd6cec2fa19b49081f82201be7b4d9",
+  "existingEnCanonical": 13,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 13,
+    "STEP2_flip": 13,
+    "total": 26
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
