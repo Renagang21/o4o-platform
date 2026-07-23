@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "케토진첩부제",
+ "slugbase": "keto-patch-ketozin",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a785b25210656840",
+   "n": 5
+  },
+  {
+   "fp": "f98e833dd090a6f4",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 9,
+ "koWrite": 36,
+ "enWrite": 18
+}
