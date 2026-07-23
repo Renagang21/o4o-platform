@@ -105,4 +105,62 @@
 - rollback manifest: 배치별 (OS temp `hff-apply-manifests/` 하위, 세션 산출물).
 - 공용 파이프(select/generate/compose/apply): 무편집 read-only 실행.
 
-**결론**: B(장·대사·면역) 복합형 190 신규 STORE canonical LIVE. canonicalDup 0 · A/C 교집합 0 · drift 0 · basis 무결성 보존 · 복합 기능성 전량 유지. 중지 조건 해당 없음.
+**결론(1차 패스)**: B(장·대사·면역) 복합형 190 신규 STORE canonical LIVE. canonicalDup 0 · A/C 교집합 0 · drift 0 · basis 무결성 보존 · 복합 기능성 전량 유지. 중지 조건 해당 없음.
+
+---
+
+## 9. 2차 패스 — sweep 기반 CLEAN_REGISTERED 소진 (동일 WO 후속)
+
+> 1차 census §6의 "생산가능 소진" 판정은 **census select-gate 한정**이었다. 등록 원료(NUTRIENT_META+FUNCTIONAL_META) 조합의 CLEAN_REGISTERED signature 를 `hff-combo-select --exclude-taken` 로 **전수 재-sweep** 하니 census select-gate 가 놓친 안전 후보가 추가로 발굴됨. 별도 태그 네임스페이스 `batch:combo-b-*` 로 격리 생산.
+
+- 시작: 2026-07-23T06:40Z 경 · 종료: 2026-07-23T07:xxZ (2차)
+- 기준선: 1차 종료 시점(combo-b- 태그 0)
+- CLEAN_REGISTERED:B signature sweep: **152 sig** (select+generate, DB write 0)
+- sweep 결과: PASS **246 units** / auto-HOLD 2 / error 0
+- A 도메인(MSM·글루코사민) 조합 제외(도메인 경계)
+- **apply COMMIT: 88 신규 마스터** (SPD 176 ko 88 + en 88) · 총 DB write **352** (masters 88 + candidate update 88 + SPD 176)
+- gate-fail 43 sig: dry-run→apply 사이 Agent C 동시선점(ALREADY_PROMOTED) — 트랜잭션 재검증으로 안전 skip, **bad write 0**
+- 레이스 43 sig 복구 시도(fresh `--exclude-taken` 재생성 후 재-apply): 전량 이미 승격 → **복구 yield 0** (동시선점 소진 확정, 반복 racing 중단)
+
+### 2차 독립검증 (`hff-combo-b-verify.ts`, 별도 연결·read-only)
+
+| 항목 | 값 |
+|------|---:|
+| myMasters (batch:combo-b-*) | 88 |
+| myKo / myEn (STORE canonical) | 88 / 88 |
+| candidatesLinked (approved_new_master) | 88 |
+| canonicalDup | 0 |
+| permitDup | 0 |
+| crossPermitWithOthers (비-combo-b 마스터와 permit 충돌) | 0 |
+| barcodeNonNull / wrongRegType / wrongSourceType | 0 / 0 / 0 |
+| **PASS** | ✅ |
+
+### 1차↔2차 격리 재확인 (DB 직접 쿼리)
+
+- `single-nutrient-combo-b-*`(1차 190) ∩ `combo-b-*`(2차 88) 마스터 교집합 = **0**
+- 두 패밀리 간 cross-permit 충돌 = **0** → 완전 disjoint(중복 생산 0)
+
+### 2차 basis / 복합 기능성
+
+- 2차도 `composeCombo` 가 각 원료 **표시량(추출물 mg)** 만 임베드(지표성분 HCA 아님) · G-MULTI-AMOUNT-SOURCE 가드로 원료 귀속 검증. 1차와 동일 무결성.
+- 가르시니아 계열(체지방) + 비타민/미네랄 부원료 조합이 다수 — 공식 기능성 전량 병기 유지.
+
+### 2차 산출물 (B 전용, 무편집 공용 파이프 재사용)
+
+- `apps/api-server/src/scripts/hff-combo-b-sweep.ts` — CLEAN_REGISTERED sweep 드라이버(공용 select/generate read-only 호출).
+- `apps/api-server/src/scripts/hff-combo-b-apply.ts` — sweep PASS target 이중게이트 apply 드라이버(공용 `hff-sf-apply` 무편집 재사용, A 도메인 제외).
+- `apps/api-server/src/scripts/hff-combo-b-verify.ts` — 독립검증(별도 연결).
+
+---
+
+## 최종 결론 (WO 종료)
+
+| 패스 | 태그 | 신규 마스터 | DB write | 검증 |
+|------|------|---:|---:|:---:|
+| 1차 census | `batch:single-nutrient-combo-b-*` | 190 | 760 | PASS |
+| 2차 sweep | `batch:combo-b-*` | 88 | 352 | PASS |
+| **합계** | — | **278** | **1,112** | **PASS** |
+
+- 교집합 0 · cross-permit 0 · canonicalDup 0 · A/C 교집합 0 · drift 0 · basis 무결성 보존 · 복합 기능성 전량 유지.
+- 레이스 복구 yield 0 확인 → **현 파이프·registry 기준 생산가능 안전 후보 소진(B-10 최종 충족)**.
+- 잔여: 식이섬유·차전자피·이눌린 계열(`X g 이상` grounding HOLD) 및 B_NEW_EXTENDABLE(키토산·옥타코사놀 등 미등록 원료)은 별도 저작 규격/registry 확장(B-03 Phase 2) 필요 — 현 파이프 범위 외. 중지 조건 해당 없음.
