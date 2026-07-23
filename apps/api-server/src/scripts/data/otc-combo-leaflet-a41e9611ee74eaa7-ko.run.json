@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "바로코민정|A11JA|50밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "454a675e-906d-eff1-e1f5-2a1a18dafa09",
+  "expected": 6,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/6"
+  ],
+  "fetched": 6,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 6,
+  "anyCanonical": 6,
+  "existingAuthoredCanonical": 6,
+  "htmlLen": 1954,
+  "htmlMd5": "462879cb605c3648866eaff09af53090",
+  "summary": "비타민 B1, B2, B6, C, E의 보급과 말초혈행장애·갱년기 증상, 신경통·근육통·관절통, 각기·눈의 피로의 완화",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 6,
+    "STEP_B_authored_flip": 6,
+    "audit": 6
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

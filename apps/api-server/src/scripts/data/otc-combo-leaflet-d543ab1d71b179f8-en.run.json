@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "벤포액티브프리미엄정|A11DB|300밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "41e4380e-2d7b-a79c-314f-b09794eb12f6",
+  "anomalies": [],
+  "targetMasters": 6,
+  "koFingerprintKinds": 1,
+  "builtLen": 2349,
+  "builtMd5": "b0292f80a6145b32bf6020eaf4492e25",
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_flip": 6,
+    "total": 12
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

@@ -470,103 +470,103 @@
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "비맥스제트정|A11JC|100밀리그램|정",
    "targetFp": "97dd638435894019",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "벤포타임정|A11DB|300밀리그램|정",
    "targetFp": "994118018e19ec77",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "비백큐골드정|A11EX|108.7밀리그램|정",
    "targetFp": "9eb53fcaa2ff8a2e",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "비맥스골드정|A11JC|200밀리그램|정",
    "targetFp": "a0eede5423c04cd9",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "바로코민정|A11JA|50밀리그램|정",
    "targetFp": "a41e9611ee74eaa7",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "토코토닉연질캡슐|A11JA|500밀리그램|연질캡슐",
    "targetFp": "a63a78448575d800",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "엑세라민비정|A11EX|50밀리그램|정",
    "targetFp": "b154ff542edbf5e8",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "속쿨엔이중정|A09AA|40밀리그램|정",
    "targetFp": "b954b025f8d3a50e",
    "sourceType": "mfds_drug_otc",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "벤포타정|A11DB|300밀리그램|정",
    "targetFp": "c0b0ebef6a08b049",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "벤포액티브프리미엄정|A11DB|300밀리그램|정",
    "targetFp": "d543ab1d71b179f8",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch9 claim (2026-07-23)"
+   "note": "GA-V5 batch9 KO+EN LIVE (2026-07-23)"
   }
  ]
 }

@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "속쿨엔이중정|A09AA|40밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "efba3d6f-dbd3-805e-a8dc-d41c71b96a9d",
+  "expected": 6,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/6"
+  ],
+  "fetched": 6,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 6,
+  "anyCanonical": 6,
+  "existingAuthoredCanonical": 6,
+  "htmlLen": 1387,
+  "htmlMd5": "94ad22494f784c444e46d51ccde12fc8",
+  "summary": "소화를 도와 소화불량과 이에 따른 위 증상을 완화",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 6,
+    "STEP_B_authored_flip": 6,
+    "audit": 6
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

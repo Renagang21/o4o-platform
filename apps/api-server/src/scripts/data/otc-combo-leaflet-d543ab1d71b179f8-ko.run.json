@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "벤포액티브프리미엄정|A11DB|300밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "41e4380e-2d7b-a79c-314f-b09794eb12f6",
+  "expected": 6,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/6"
+  ],
+  "fetched": 6,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 6,
+  "anyCanonical": 6,
+  "existingAuthoredCanonical": 6,
+  "htmlLen": 1467,
+  "htmlMd5": "4b5c76c7a71573113b42b15c56aafb66",
+  "summary": "비타민 B1 및 B6 결핍으로 인한 신경계 질환의 개선",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 6,
+    "STEP_B_authored_flip": 6,
+    "audit": 6
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "엑세라민비정|A11EX|50밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "ec7c3f3e-1334-77ed-f901-a541d3090302",
+  "anomalies": [],
+  "targetMasters": 6,
+  "koFingerprintKinds": 1,
+  "builtLen": 4577,
+  "builtMd5": "2659495e16d6b4dd69704e76d6450d47",
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_flip": 6,
+    "total": 12
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
