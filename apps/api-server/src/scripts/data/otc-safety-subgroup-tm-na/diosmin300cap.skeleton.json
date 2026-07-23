@@ -4,7 +4,7 @@
   "subgroups": 2,
   "masters": 7,
   "metaAuthored": false,
-  "missingLineCount": 15,
+  "missingLineCount": 14,
   "missingLines": [
     {
       "h8": "5fb9cd38",
@@ -23,12 +23,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "소화장애 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
-    },
-    {
-      "h8": "2d8e85a8",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감하십시오."
     },
     {
       "h8": "3c4921cd",

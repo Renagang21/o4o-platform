@@ -4,7 +4,7 @@
   "subgroups": 9,
   "masters": 19,
   "metaAuthored": false,
-  "missingLineCount": 43,
+  "missingLineCount": 42,
   "missingLines": [
     {
       "h8": "a8124762",
@@ -53,12 +53,6 @@
       "freq": 3,
       "fields": "caution",
       "ko": "테오필린, 리토나비르와 함께 복용하지 마십시오."
-    },
-    {
-      "h8": "21eb341d",
-      "freq": 2,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감합니다."
     },
     {
       "h8": "4ba9a7e6",

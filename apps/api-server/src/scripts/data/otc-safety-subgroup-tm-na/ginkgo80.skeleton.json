@@ -4,19 +4,13 @@
   "subgroups": 1,
   "masters": 4,
   "metaAuthored": false,
-  "missingLineCount": 10,
+  "missingLineCount": 9,
   "missingLines": [
     {
       "h8": "0259de86",
       "freq": 1,
       "fields": "usage",
       "ko": "기질성 뇌기능장애에 성인은 1회 1/2~1정(40~80 mg)씩, 1일 3회 또는 1회 1.5정(120 mg)씩, 1일 2회 복용합니다."
-    },
-    {
-      "h8": "21eb341d",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감합니다."
     },
     {
       "h8": "256fc8f2",

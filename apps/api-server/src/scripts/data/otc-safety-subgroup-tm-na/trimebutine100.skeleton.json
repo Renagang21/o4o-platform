@@ -4,14 +4,8 @@
   "subgroups": 11,
   "masters": 61,
   "metaAuthored": false,
-  "missingLineCount": 30,
+  "missingLineCount": 29,
   "missingLines": [
-    {
-      "h8": "21eb341d",
-      "freq": 7,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감합니다."
-    },
     {
       "h8": "bee542ff",
       "freq": 6,

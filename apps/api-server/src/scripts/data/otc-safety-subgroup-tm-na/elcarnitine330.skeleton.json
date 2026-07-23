@@ -4,7 +4,7 @@
   "subgroups": 9,
   "masters": 24,
   "metaAuthored": false,
-  "missingLineCount": 32,
+  "missingLineCount": 30,
   "missingLines": [
     {
       "h8": "61a8bef8",
@@ -43,12 +43,6 @@
       "ko": "이 약은 1차성, 2차성 카르니틴결핍증과 허혈성심질환에 의한 심근대사장애(협심증, 급성심근경색)에 사용합니다."
     },
     {
-      "h8": "21eb341d",
-      "freq": 2,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감합니다."
-    },
-    {
       "h8": "7a5a8dc9",
       "freq": 2,
       "fields": "caution",
@@ -71,12 +65,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "이 약을 복용하기 전에 임부 또는 수유부는 의사 또는 약사와 상의하십시오."
-    },
-    {
-      "h8": "2d8e85a8",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감하십시오."
     },
     {
       "h8": "35151ace",

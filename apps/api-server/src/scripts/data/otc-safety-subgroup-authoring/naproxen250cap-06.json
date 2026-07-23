@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "naproxen250cap-06",
+  "order": 506,
+  "groupKey": "나프록센|250밀리그램|연질캡슐",
+  "safetyFp": "14df201139bad2be",
+  "sourceRef": "3f8cd156-1f93-4123-87cf-235a1306e533",
+  "sensitive": false,
+  "title": "나프록센 250mg 연질캡슐 (소염진통제)",
+  "expectEasyMd5": "31f86d5a",
+  "masterIds": [
+    "3be0fc9d-db5d-44ea-a1bd-52cf79735996",
+    "6e1febef-abe8-4bc4-9340-122d9cd645c8",
+    "85dc56cf-e8cb-44aa-b758-a3e3c9a30b5f"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "31f86d5a",
+    "names": [
+      "이지페인록센연질캡슐(나프록센)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 류마티양 관절염, 골관절염 (퇴행성 관절염), 강직성 척추염, 건염 (힘줄염), 급성통풍, 월경곤란증에 사용합니다.\n\n이 약은 삠, 타박상, 상처, 허리통증 등의 골격근장애, 활액낭염, 수술후 통증, 편두통, 발치후 통증에 사용합니다.",
+    "usage": "류마티양 관절염, 강직성 척추염에는 성인은 1회 1~2캡슐씩, 1일 2회 (12시간마다) 복용합니다.\n\n급성통풍에는 성인은 초회량으로 3캡슐을 복용하고, 발작이 소실될 때까지 8시간 간격으로 1캡슐을 복용합니다.\n\n골격근장애, 수술후 통증, 발치후 통증, 월경곤란증, 힘줄염, 활액낭염에는 성인은 초회량으로 2캡슐을 복용한 후, 6~8시간 간격으로 1캡슐씩 복용합니다.\n\n편두통에는 성인은 초회량으로 3캡슐을 복용합니다. 필요 시 1일 1~2캡슐을 더 복용할 수 있으며, 초회량 복용 30분 후에 복용합니다. 1일 총용량이 5캡슐을 초과하지 마십시오.\n\n나이, 증상에 따라 적절히 증감하십시오.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용 시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증, 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수있습니다.\n\n임부 (임신말기), 2세 이하의 영아, 소화성궤양 환자, 심한 혈액이상, 간장애, 심기능부전, 신장애, 고혈압 환자, 이 약의 성분 또는 아스피린 등 비스테로이드성 소염진통제 과민증 환자, 아스피린이나 다른 비스테로이드성 소염진통제에 의한 천식, 비염, 코의 용종, 두드러기, 알레르기 반응 환자 또는 경험자, 관상동맥 우회로술 전후 발생하는 통증 치료는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임신하고 있을 가능성이 있는 부인, 소아, 노인, 혈액이상, 간장애, 신장애 환자 또는 경험자, 소화성궤양 경험자, 출혈경향 환자, 심기능장애, 고혈압, 기관지천식, 전신홍반성루프스, 혼합결합조직질환 환자, 과민증 경험자, 황색5호·선셋옐로우FCF 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.\n\n다른 비스테로이드성 소염진통제 및 나프록센 유도체, 고용량 메토트렉세이트와 함께 복용하지 마십시오.\n\n히단토인계 항간질제, 설파제, 설포닐요소계 혈당강하제, 프로프라놀롤 및 다른 베타차단제, 캅토프릴 등의 ACE 억제제, 루프계 이뇨제 및 티아자이드계 이뇨제, 프로베네시드, 리튬, 저용량 메토트렉세이트, 와파린 등의 쿠마린계 항응혈제, 지도부딘, 에녹사신 등의 뉴퀴놀론계 항생물질을 복용하는 환자는 의사 또는 약사와 상의하십시오.\n\n이명, 청각장애, 시각장애, 때때로 발진, 가려움, 위부불쾌감, 위통, 복통, 구역, 구토, 식욕부진, 소화불량, 가슴쓰림, 설사, 변비, 구내염, 졸음, 인식기능장애, 습진, 발한, 자주색 반점, 부종, 호흡곤란 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n드물게 호흡곤란, 혈압강하, 서맥, 식은땀, 부종 등의 쇽증상, 호산구증가를 수반하는 폐침윤으로 발열, 숨을 쌕쌕거거리는 천명, 기침, 가래 등을 동반하는 PIE 증후군, 광과민증, 탈모, 충혈되어 붉어지는 발적, 괴사성용해, 여러 모양 붉은 반점의 다형성홍반, 피부점막안증후군 (스티븐스-존슨증후군), 두드러기, 표피수포증, 호산구 증가 및 전신 증상 동반 약물 반응, 고정약물발진 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "나프록센 250밀리그램",
+      "작용": "비스테로이드성 소염진통제(NSAID)로 염증·통증·발열을 완화합니다.",
+      "주요 증상": "류마티양 관절염·골관절염·강직척추염·건염·급성통풍·월경곤란증·활액낭염, 삠·타박상·허리통증 등 골격근장애, 수술 후·발치 후 통증, 편두통",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "관절염·통풍·생리통·편두통 등 폭넓은 통증·염증에 쓰는 비스테로이드성 소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Naproxen 250 mg Soft Capsules (Anti-inflammatory Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for rheumatoid-type arthritis, osteoarthritis (degenerative arthritis), ankylosing spondylitis, tendinitis, acute gout, and dysmenorrhea. This medicine is used for musculoskeletal disorders such as sprains, bruises, wounds, and low back pain, bursitis, post-operative pain, migraine, and pain after tooth extraction.",
+    "usage": "For rheumatoid-type arthritis and ankylosing spondylitis, adults take 1 to 2 capsules per dose, 2 times a day (every 12 hours). For acute gout, adults take 3 capsules as the first dose, then 1 capsule every 8 hours until the attack subsides. For musculoskeletal disorders, post-operative pain, pain after tooth extraction, dysmenorrhea, tendinitis, and bursitis, adults take 2 capsules as the first dose, then 1 capsule every 6 to 8 hours. For migraine, adults take 3 capsules as the first dose. If needed, 1 to 2 more capsules per day may be taken, 30 minutes after the first dose. Do not exceed a total of 5 capsules in 1 day. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic reactions, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Do not take this medicine if you are pregnant (late pregnancy); are an infant 2 years old or younger; have peptic ulcers, severe blood abnormalities, liver impairment, heart failure, kidney impairment, or hypertension; are hypersensitive to an ingredient of this medicine or to aspirin or other nonsteroidal anti-inflammatory drugs; have or have experienced asthma, rhinitis, nasal polyps, hives, or allergic reactions caused by aspirin or other nonsteroidal anti-inflammatory drugs; or need treatment of pain occurring around coronary artery bypass graft surgery. Before taking this medicine, consult a doctor or pharmacist if you may be pregnant; are a child or elderly; have or have had blood abnormalities, liver impairment, or kidney impairment; have experienced peptic ulcers; have a bleeding tendency; have heart function impairment, hypertension, or bronchial asthma; have systemic lupus erythematosus or mixed connective tissue disease; have experienced hypersensitivity; or have or have experienced hypersensitivity to Yellow No. 5 (Sunset Yellow FCF). Do not take this medicine together with other nonsteroidal anti-inflammatory drugs, naproxen derivatives, or high-dose methotrexate. Consult a doctor or pharmacist if you are taking hydantoin antiepileptics, sulfonamides, sulfonylurea hypoglycemics, propranolol and other beta-blockers, ACE inhibitors such as captopril, loop and thiazide diuretics, probenecid, lithium, low-dose methotrexate, coumarin anticoagulants such as warfarin, zidovudine, or new-quinolone antibiotics such as enoxacin. If ringing in the ears, hearing disturbance, visual disturbance, or sometimes rash, itching, stomach discomfort, stomach pain, abdominal pain, nausea, vomiting, loss of appetite, indigestion, heartburn, diarrhea, constipation, stomatitis, drowsiness, cognitive impairment, eczema, sweating, purple spots, swelling, or difficulty breathing occur, stop taking this medicine immediately and consult a doctor or pharmacist. Rarely shock symptoms such as difficulty breathing, drop in blood pressure, slow pulse, cold sweat, and swelling; PIE syndrome (pulmonary infiltration with eosinophilia, accompanied by fever, wheezing, cough, and sputum); photosensitivity, hair loss, redness, necrolysis, erythema multiforme, Stevens-Johnson syndrome, hives, epidermolysis bullosa, drug reaction with eosinophilia and systemic symptoms, or fixed drug eruption — if any of these occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Naproxen 250 mg",
+      "How it works": "A nonsteroidal anti-inflammatory drug (NSAID) that relieves inflammation, pain, and fever.",
+      "Main symptoms": "Rheumatoid-type arthritis, osteoarthritis, ankylosing spondylitis, tendinitis, acute gout, dysmenorrhea, bursitis; musculoskeletal disorders such as sprains, bruises, and low back pain; pain after surgery or tooth extraction; migraine",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "A nonsteroidal anti-inflammatory pain reliever for a wide range of pain and inflammation, including arthritis, gout, menstrual pain, and migraine."
+    }
+  }
+}

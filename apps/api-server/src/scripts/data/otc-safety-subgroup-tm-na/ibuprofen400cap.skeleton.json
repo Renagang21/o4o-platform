@@ -4,7 +4,7 @@
   "subgroups": 11,
   "masters": 24,
   "metaAuthored": false,
-  "missingLineCount": 70,
+  "missingLineCount": 69,
   "missingLines": [
     {
       "h8": "ca6bd379",
@@ -35,12 +35,6 @@
       "freq": 7,
       "fields": "usage",
       "ko": "류마티양 관절염, 골관절염, 강직성 척추염, 연조직손상, 비관절 류마티스질환, 급성통풍, 건선성 관절염에 성인은 1회 1/2 캡슐~1.5캡슐(200~600 mg), 1일 3~4회 복용하며 1일 최고 8캡슐(3,200 mg)까지 복용할 수 있습니다."
-    },
-    {
-      "h8": "2d8e85a8",
-      "freq": 6,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감하십시오."
     },
     {
       "h8": "858e0aaf",

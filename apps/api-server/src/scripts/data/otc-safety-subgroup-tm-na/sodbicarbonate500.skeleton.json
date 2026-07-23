@@ -4,7 +4,7 @@
   "subgroups": 4,
   "masters": 11,
   "metaAuthored": false,
-  "missingLineCount": 23,
+  "missingLineCount": 22,
   "missingLines": [
     {
       "h8": "8cb5591e",
@@ -23,12 +23,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "이 약의 소화관내·체액의 pH 상승에 의해 병용약물의 흡수·배설에 영향을 줄 수 있으므로 신중히 투여합니다.다량의 우유, 칼슘제제와 함께 복용 시 우유 알칼리 증후군(고칼슘혈증, 고질소혈증, 알카리증 등)이 나타날 수 있으므로 의사 또는 약사와 상의하십시오."
-    },
-    {
-      "h8": "21eb341d",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감합니다."
     },
     {
       "h8": "285e7a89",
