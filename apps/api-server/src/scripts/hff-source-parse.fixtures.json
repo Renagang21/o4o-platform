@@ -1,0 +1,162 @@
+{
+  "_doc": "WO-O4O-HFF-SOURCE-PARSER-EXPANSION-C-V2 — parseFiberSources 회귀/단위 fixture. C 소유. base/fn 은 실원문(fiber-*) 또는 파서 단위검증용(da-*, 코퍼스 부재 포맷 포함). expect: sources(합집합), bySource(원료별 대표 표시량), generic/aggregate(존재·값), mustNotSource(금지), crossLink(교차연결 금지 검증).",
+  "fiber": [
+    {
+      "case": "프락토올리고당-라벨직접(줄바꿈형·타원료동반 공통)",
+      "base": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 분말 \n②조단백질 : 표시량(14 g/30 g)의 80~120%\n③칼슘 : 표시량(230 mg/30 g)의 80~150%\n④마그네슘 : 표시량(110 mg/30 g)의 80~150%\n⑤아연 : 표시량(3.4 mg/30 g)의 80~150%\n⑥프락토올리고당 : 표시량(3,700 mg/30 g)의 80~120%\n⑦납(mg/kg) : 1.0 이하\n⑧대장균군 : 음성",
+      "fn": "[단백질] ①근육…[프락토올리고당] ①장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음\n[칼슘] ①뼈와 치아 형성에 필요",
+      "expect": {
+        "sources": ["프락토올리고당"],
+        "bySource": { "프락토올리고당": { "value": 3700, "unit": "mg", "basisAmount": 30, "basisUnit": "g" } },
+        "genericCount": 0,
+        "mustNotSource": ["차전자피", "난소화성말토덱스트린", "폴리덱스트로스"]
+      }
+    },
+    {
+      "case": "차전자단독(일반라벨+fn식별, X%이상)",
+      "base": "1) 성상 : 이미, 이취가 없고 고유의 색택,향미가 있는 흐린 황갈색의 분말\n2) 식이섬유 : 표시량(8,000 mg/10,000 mg)의 80% 이상\n3) 대장균군 : 음성",
+      "fn": "[차전자피 식이섬유]\n(1) 혈중 콜레스테롤 개선･배변활동 원활에 도움을 줄 수 있음",
+      "expect": {
+        "sources": ["차전자피"],
+        "bySourceEmpty": true,
+        "genericCount": 1,
+        "generic0": { "value": 8000, "unit": "mg", "basisAmount": 10000, "basisUnit": "mg", "ratioIncludes": "이상" },
+        "fnSources": ["차전자피"],
+        "mustNotSource": ["프락토올리고당", "난소화성말토덱스트린"]
+      }
+    },
+    {
+      "case": "난소화성단독(ml기준+X%이상, 일반라벨+fn식별)",
+      "base": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 갈색 또는 흑갈색의 액상\n2) 비타민B6: 1.5mg/100ml (표시량의 80~150%)\n3) 식이섬유: 4200mg/100ml (표시량의 80% 이상)\n4) 대장균군 : 음성\n5) 일반세균 : 1ml당 100 이하",
+      "fn": "난소화성말토덱스트린\n① 식후 혈당상승 억제에 도움을 줄 수 있음\n② 배변활동 원활에 도움을 줄 수 있음\n\n비타민B6\n① 단백질 및 아미노산 이용에 필요",
+      "expect": {
+        "sources": ["난소화성말토덱스트린"],
+        "bySourceEmpty": true,
+        "genericCount": 1,
+        "generic0": { "value": 4200, "unit": "mg", "basisAmount": 100, "basisUnit": "ml" },
+        "fnSources": ["난소화성말토덱스트린"],
+        "mustNotSource": ["차전자피", "프락토올리고당"]
+      }
+    },
+    {
+      "case": "generic만(생산제외 — 특정원료 없음)",
+      "base": "- 단백질: 표시량 20 g /42g (표시량의 80~120%)\n- 칼슘: 표시량 300 mg/42g (표시량의 80~150%)\n- 식이섬유: 4.6 g/42 g (표시량의 80% 이상)\n- 성상: 고",
+      "fn": "",
+      "expect": {
+        "sources": [],
+        "bySourceEmpty": true,
+        "genericMin": 1,
+        "generic0": { "value": 4.6, "unit": "g", "basisAmount": 42, "basisUnit": "g" },
+        "mustNotSource": ["차전자피", "난소화성말토덱스트린", "프락토올리고당", "폴리덱스트로스", "귀리"]
+      }
+    },
+    {
+      "case": "㎎표기(프락토 라벨직접)",
+      "base": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 미백색의 분말\n2. 프락토올리고당 : 표시량(3,000 ㎎/4,000 ㎎)의 80~120%\n3. 프로바이오틱스 : 표시량(100,000,000 CFU/4,000 ㎎) 이상\n4. 아연 : 표시량(8.5 ㎎/4,000 ㎎)의 80~150%\n5. 셀레늄 : 표시량(55 ㎍/4,000 ㎎)의 80~150%\n6. 납(㎎/㎏) : 1.0 이하",
+      "fn": "① 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
+      "expect": {
+        "sources": ["프락토올리고당"],
+        "bySource": { "프락토올리고당": { "value": 3000, "unit": "mg", "basisAmount": 4000, "basisUnit": "mg" } },
+        "mustNotSource": ["차전자피", "난소화성말토덱스트린"]
+      }
+    },
+    {
+      "case": "다원료동반(프락토+난소화성 원료별보존, ml기준, 일반라인 공존)",
+      "base": "단백질 : 16.0 g/250 ml (표시량의 80 ~ 120%)\n프락토올리고당 : 7.0 g/250 ml (표시량의 80 ~ 120%)\n식이섬유 : 11.0 g/250 ml (표시량의 80% 이상)\n난소화성말토덱스트린 : 2.5 g/250 ml (표시량의 80% 이상)\n비타민C : 100 mg/250 ml (표시량의 80 ~ 150%)",
+      "fn": "식이섬유 : 식이섬유 보충\n난소화성말토덱스트린 : 배변활동 원활에 도움을 줄 수 있음\n프락토올리고당 : 장내 유익균 증식 및 배변활동 원활에 도움",
+      "expect": {
+        "sources": ["프락토올리고당", "난소화성말토덱스트린"],
+        "bySource": {
+          "프락토올리고당": { "value": 7, "unit": "g", "basisAmount": 250, "basisUnit": "ml" },
+          "난소화성말토덱스트린": { "value": 2.5, "unit": "g", "basisAmount": 250, "basisUnit": "ml" }
+        },
+        "genericCount": 1,
+        "generic0": { "value": 11, "unit": "g", "basisAmount": 250, "basisUnit": "ml" },
+        "crossLink": [
+          { "source": "프락토올리고당", "valueNot": [2.5, 11, 16] },
+          { "source": "난소화성말토덱스트린", "valueNot": [7, 11, 16] }
+        ]
+      }
+    },
+    {
+      "case": "폴리덱스트로스단독(base일반라벨, 원료는 fn에서만)",
+      "base": "1) 성상 : 밝은 노란 주황색의 점조성이 있는 액상\n 2) 식이섬유 : 표시량(4.5 g/15g)의 80% 이상 \n 3) 락추로스 : 표시량(740 mg/15g)의 80% ~ 120%\n 4) 납(mg/kg) : 0.5 이하",
+      "fn": "폴리덱스트로스 : 배변활동 원활에 도움을 줄 수 있음\n락추로스파우더 : 유익균 증식, 유해균 억제에 도움을 줄 수 있습니다.",
+      "expect": {
+        "sources": ["폴리덱스트로스"],
+        "bySourceEmpty": true,
+        "genericCount": 1,
+        "generic0": { "value": 4.5, "unit": "g", "basisAmount": 15, "basisUnit": "g" },
+        "fnSources": ["폴리덱스트로스"],
+        "mustNotSourceInBySource": ["폴리덱스트로스"]
+      }
+    },
+    {
+      "case": "총량+개별(귀리; 총·영양소는 aggregate 분리)",
+      "base": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 갈색의 과립\n2) 대장균군 : 음성\n3) 총식이섬유: 13.4g/34g의 80% 이상\n4) 영양소식이섬유: 7.4g/34g의 80% 이상 (총식이섬유-귀리식이섬유의 값)\n5) 귀리식이섬유: 6g/34g의 80% 이상 (총식이섬유-영양소식이섬유의 값)",
+      "fn": "[식이섬유]①식이섬유 보충\r\n[귀리식이섬유 제품]식후혈당상승 억제에 도움을 줄 수 있음",
+      "expect": {
+        "sources": ["귀리"],
+        "bySource": { "귀리": { "value": 6, "unit": "g", "basisAmount": 34, "basisUnit": "g" } },
+        "aggregateLabelsInclude": ["총식이섬유", "영양소식이섬유"],
+        "mustNotSource": ["차전자피", "난소화성말토덱스트린", "프락토올리고당"]
+      }
+    }
+  ],
+  "displayAmount": [
+    {
+      "case": "da-원료명뒤수치(정상)",
+      "base": "프락토올리고당 : 표시량(5,000 mg/8,000 mg)의 80~120%",
+      "fn": "",
+      "expect": { "sources": ["프락토올리고당"], "bySource": { "프락토올리고당": { "value": 5000, "unit": "mg", "basisAmount": 8000, "basisUnit": "mg" } } }
+    },
+    {
+      "case": "da-원료명앞수치(일반라인 뒤에 나오는 특정원료명을 표시량에 귀속하지 않음)",
+      "base": "식이섬유 : 표시량(4 g/10 g)의 80% 이상. 원료로 프락토올리고당 사용",
+      "fn": "",
+      "expect": { "sources": [], "bySourceEmpty": true, "genericCount": 1, "generic0": { "value": 4, "unit": "g", "basisAmount": 10, "basisUnit": "g" }, "mustNotSourceInBySource": ["프락토올리고당"] }
+    },
+    {
+      "case": "da-표형식(코퍼스부재 — 무붕괴·허위원료 0)",
+      "base": "식이섬유 | 5,000 | mg | 8,000 | mg | 80% 이상",
+      "fn": "",
+      "expect": { "sources": [], "bySourceEmpty": true, "genericCount": 0 }
+    },
+    {
+      "case": "da-반복행(같은 원료 2행 모두 보존)",
+      "base": "프락토올리고당 : 표시량(3,000 mg/5,000 mg)의 80~120%\n프락토올리고당 : 표시량(1,000 mg/5,000 mg)의 80~120%",
+      "fn": "",
+      "expect": { "sources": ["프락토올리고당"], "bySourceCount": { "프락토올리고당": 2 }, "bySourceValues": { "프락토올리고당": [3000, 1000] } }
+    },
+    {
+      "case": "da-지표성분과 표시량 공존(지표수치를 표시량으로 오인하지 않음)",
+      "base": "프락토올리고당 : 표시량(4,000 mg/6,000 mg)의 80~120%. 지표성분 프락토올리고당 3,200 mg 이상",
+      "fn": "",
+      "expect": { "sources": ["프락토올리고당"], "bySource": { "프락토올리고당": { "value": 4000, "unit": "mg", "basisAmount": 6000, "basisUnit": "mg" } }, "crossLink": [ { "source": "프락토올리고당", "valueNot": [3200] } ] }
+    },
+    {
+      "case": "da-총내용량·1일섭취량과 표시량 공존(섭취량을 원료 표시량으로 오인하지 않음)",
+      "base": "총 내용량 : 300 g. 1일 섭취량 : 10 g. 식이섬유 : 표시량(4 g/10 g)의 80% 이상",
+      "fn": "",
+      "expect": { "sources": [], "genericCount": 1, "generic0": { "value": 4, "unit": "g", "basisAmount": 10, "basisUnit": "g" }, "crossLink": [ { "generic": 0, "valueNot": [300, 10] } ] }
+    },
+    {
+      "case": "da-잘린행(불완전 기준량 — 매칭 안 함, 허위원료 0)",
+      "base": "식이섬유 : 표시량(6,000 mg/1",
+      "fn": "",
+      "expect": { "sources": [], "bySourceEmpty": true, "genericCount": 0 }
+    },
+    {
+      "case": "da-긴괄호 혼합라벨(2종 이상 → 특정원료 추정 금지, generic)",
+      "base": "식이섬유(차전자피 및 난소화성말토덱스트린 혼합) : 표시량(8,000 mg/10,000 mg)의 80% 이상",
+      "fn": "",
+      "expect": { "sources": [], "bySourceEmpty": true, "genericCount": 1, "generic0": { "value": 8000, "unit": "mg", "basisAmount": 10000, "basisUnit": "mg" }, "mustNotSourceInBySource": ["차전자피", "난소화성말토덱스트린"] }
+    },
+    {
+      "case": "da-한글영문병기(자일로올리고당/Xylooligosaccharide)",
+      "base": "자일로올리고당(Xylooligosaccharide) : 표시량(700 mg/2,000 mg)의 80~120%",
+      "fn": "",
+      "expect": { "sources": ["자일로올리고당"], "bySource": { "자일로올리고당": { "value": 700, "unit": "mg", "basisAmount": 2000, "basisUnit": "mg" } } }
+    }
+  ]
+}

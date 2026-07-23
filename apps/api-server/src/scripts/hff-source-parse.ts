@@ -201,3 +201,103 @@ export function parseFnAttribution(mainFn: string): FnParse {
   const unattributed = all.filter((f) => !attributed.has(f));
   return { mode: byKey.size ? 'inline' : 'none', byKey, unattributed, unknownLabels };
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// 식이섬유 하위 원료 구조 보존 (WO-O4O-HFF-SOURCE-PARSER-EXPANSION-C-V2)
+//
+// 배경: `classify`/`CLS` 는 차전자피·난소화성말토덱스트린·프락토올리고당·폴리덱스트로스·
+//   자일로올리고당·이눌린·치커리·귀리를 **단일 키 `식이섬유`** 로 흡수한다. 그 결과
+//     ① 여러 식이섬유 원료가 함께 있으면 `parseSpecs` 의 `if(byKey.has(k))continue` 로 **두 번째부터 소실**,
+//     ② 특정 원료(프락토올리고당 등)가 일반 `식이섬유` 로 **일반화**된다.
+//   또 `SPEC_RE`/`LOOSE_SPEC_RE` 는 `X% 이상`(하한 백분율)·`ml` 기준량을 매칭하지 못해
+//   해당 제품의 표시량이 전량 누락된다(실측: 차전자단독/난소화성단독/다원료동반/폴리덱스트로스단독/총량+개별).
+//
+// 정책(WO): **완전 additive** — 기존 export(`parseSpecs`/`classify`/`CLS`/`SPEC_RE`) 는 **무변경**하여
+//   기존 소비처 22곳의 출력을 바이트 동일하게 보존한다. 식이섬유 하위 원료 해석은 **오직 본 신규 함수**에서 수행.
+//   - 원료 표시량은 **자기 라벨과 같은 매치(같은 라인)** 에서만 캡처 → 타 원료 수치 교차연결 불가.
+//   - 일반 `식이섬유` 표기는 특정 원료로 **추정하지 않는다**(generic 버킷).
+//   - `총식이섬유`/`영양소식이섬유` 등 **합계·차감 라벨**은 원료가 아니므로 aggregate 로 분리(합산 방지).
+// ════════════════════════════════════════════════════════════════════════════
+
+/** 식이섬유 하위 원료 분류(구체적 원료만). 일반 `식이섬유`·미특정 라벨은 null(호출부에서 generic 처리). */
+export const FIBER_SUB: Array<{ k: string; re: RegExp }> = [
+  { k: '차전자피', re: /차전자/ },
+  { k: '난소화성말토덱스트린', re: /난소화성/ },
+  { k: '프락토올리고당', re: /프락토올리고/ },
+  { k: '폴리덱스트로스', re: /폴리덱스트로스/ },
+  { k: '자일로올리고당', re: /자일로올리고/ },
+  { k: '이눌린', re: /이눌린/ },
+  { k: '치커리', re: /치커리/ },
+  { k: '귀리', re: /귀리/ },
+];
+/** 라벨 → 단일 식이섬유 원료. **2종 이상 매칭 시 null**(임의 택일 금지 — 혼합 라벨은 generic 처리). */
+export function classifyFiberSource(label: string): string | null {
+  const hit = FIBER_SUB.filter((s) => s.re.test(label)).map((s) => s.k);
+  return hit.length === 1 ? hit[0] : null;
+}
+
+/** 식이섬유 관련 라인 판별(라벨에 식이섬유/원료 키워드). */
+const FIBER_ANY = /식이섬유|차전자|난소화성|프락토올리고|폴리덱스트로스|자일로올리고|이눌린|치커리|귀리/;
+/** 합계·차감 라벨(개별 원료가 아님 — 총식이섬유 = 영양소 + 원료). */
+const FIBER_AGG = /총\s*식이섬유|영양소\s*식이섬유/;
+
+/** 식이섬유 하위 원료 표시량 매처.
+ *  라벨(내부 공백 1회 허용) : [표시량] [(] 값 단위 / 기준량 기준단위 [)] [비율(선택)]
+ *  - 기준단위에 `ml|mL|㎖|l|L` 추가(액상 제품). `/kg`(오염물 라인)은 단위집합 제외로 자동 배제.
+ *  - 비율 tail 은 **선택**(원료 식별·표시량 보존이 목적이라 비율 미기재도 캡처). 오탐은 FIBER_ANY 라벨 필터로 억제.
+ *  - `X% 이상`(하한 백분율) · `X~Y%`(범위) · 접미 `이상` 모두 허용. */
+const FIBER_SPEC_RE = new RegExp(
+  '([가-힣A-Za-z0-9·\\-]{1,20}(?:\\([^)]{0,30}\\))?(?:\\s[가-힣A-Za-z0-9()\\-·]{1,12})?)' + // 라벨(짧은 괄호주석·공백 1회 허용)
+  '\\s*[:：]\\s*(?:표시량\\s*)?\\(?\\s*' +
+  '([\\d][\\d,.]*)\\s*(mg|g|μg|mcg|IU)' +                                  // 값 + 단위
+  '\\s*/\\s*([\\d][\\d,.]*)\\s*(mg|g|ml|mL|㎖|l|L)' +                       // 기준량 + 기준단위(ml 허용)
+  '\\s*\\)?' +
+  '(?:\\s*[(의]?\\s*(?:표시량의\\s*)?' +
+  '(?:([\\d.]+\\s*[~∼\\-]\\s*[\\d.]+)\\s*%|([\\d.]+)\\s*%\\s*이상|이상)\\s*\\)?)?', // 비율(선택): 범위% | X%이상 | 이상
+  'gi',
+);
+const bunitNorm = (u: string): string => { const x = u.replace(/\s/g, '').toLowerCase(); if (x === 'ml' || x === '㎖') return 'ml'; if (x === 'l') return 'l'; return x === 'g' ? 'g' : 'mg'; };
+
+export interface FiberSpec extends Spec { source: string | null; label: string; aggregate: boolean }
+export interface FiberParse {
+  /** 특정 원료 라벨을 가진 표시량 라인(원료별). */
+  bySource: Map<string, FiberSpec[]>;
+  /** 일반 `식이섬유` 라벨 라인(특정 원료로 추정하지 않음). */
+  generic: FiberSpec[];
+  /** `총식이섬유`/`영양소식이섬유` 등 합계·차감 라인(원료 아님). */
+  aggregate: FiberSpec[];
+  /** MAIN_FNCTN 에서 명시된 식이섬유 원료(표시량 없음 · 식별 신호). */
+  fnSources: string[];
+  /** 구체 원료 라벨 + fn 원료의 합집합(생산 후보 판정용). */
+  sources: string[];
+}
+
+/**
+ * 식이섬유 하위 원료 구조 보존 파서.
+ * @param base BASE_STANDARD(규격) 원문
+ * @param fn   MAIN_FNCTN(기능성) 원문(선택) — BASE 라벨이 일반 `식이섬유` 여도 원료 식별 신호로 사용(수치 귀속 아님).
+ */
+export function parseFiberSources(base: string, fn = ''): FiberParse {
+  const b = normalizeSpecText(base);
+  const bySource = new Map<string, FiberSpec[]>();
+  const generic: FiberSpec[] = []; const aggregate: FiberSpec[] = [];
+  FIBER_SPEC_RE.lastIndex = 0; let m: RegExpExecArray | null;
+  while ((m = FIBER_SPEC_RE.exec(b)) !== null) {
+    const label = m[1].trim();
+    if (NONFUNC.test(label) || !FIBER_ANY.test(label)) continue; // 식이섬유 라인만
+    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%`
+      : m[7] ? `${m[7].replace(/\s/g, '')}% 이상` : '표시량 이상';
+    const spec: FiberSpec = {
+      value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: bunitNorm(m[5]),
+      ratio, evidence: m[0].trim(), label, source: classifyFiberSource(label), aggregate: FIBER_AGG.test(label),
+    };
+    if (spec.aggregate) aggregate.push(spec);
+    else if (spec.source) bySource.set(spec.source, [...(bySource.get(spec.source) ?? []), spec]);
+    else generic.push(spec); // 일반 `식이섬유` — 특정 원료 추정 금지
+  }
+  // MAIN_FNCTN 에서 명시된 식이섬유 원료(수치 없이 식별만). BASE 라벨이 일반이어도 원료 존재를 알 수 있다.
+  const fnNorm = normalizeSpecText(fn);
+  const fnSources = FIBER_SUB.filter((s) => s.re.test(fnNorm)).map((s) => s.k);
+  const sources = [...new Set([...bySource.keys(), ...fnSources])];
+  return { bySource, generic, aggregate, fnSources, sources };
+}
