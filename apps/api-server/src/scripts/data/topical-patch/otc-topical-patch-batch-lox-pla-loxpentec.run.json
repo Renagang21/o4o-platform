@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "록펜텍플라스타",
+ "slugbase": "lox-pla-loxpentec",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "0f0fd35ea142e623",
+   "n": 7
+  },
+  {
+   "fp": "700e8ebc986df398",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "노펜24센카타플라스마",
+ "slugbase": "lox-pap-nofen24sen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5a8fa5668c10c0cd",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

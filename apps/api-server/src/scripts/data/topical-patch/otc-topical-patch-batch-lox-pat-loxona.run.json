@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "록소나첩부제",
+ "slugbase": "lox-pat-loxona",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "dc1555a4f90132b1",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

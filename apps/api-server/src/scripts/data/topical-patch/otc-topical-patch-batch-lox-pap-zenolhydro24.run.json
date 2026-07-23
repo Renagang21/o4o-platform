@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "제놀하이드로24카타플라스마",
+ "slugbase": "lox-pap-zenolhydro24",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "97b70ad00b83c577",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "록소크린플라스타",
+ "slugbase": "lox-pla-loxocrin",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "082b8e87297b39e8",
+   "n": 4
+  },
+  {
+   "fp": "89972b0972e100cf",
+   "n": 2
+  },
+  {
+   "fp": "14d652069d29ba9e",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

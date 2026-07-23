@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "에프벡스카타플라스마",
+ "slugbase": "lox-pap-fvex",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a74065443f7af110",
+   "n": 3
+  },
+  {
+   "fp": "6502431fa7fad305",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

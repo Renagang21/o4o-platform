@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "록소프로펜나트륨",
+ "form": "록소케어카타플라스마",
+ "slugbase": "lox-pap-loxocare",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "191e98e5e4de98c4",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}
