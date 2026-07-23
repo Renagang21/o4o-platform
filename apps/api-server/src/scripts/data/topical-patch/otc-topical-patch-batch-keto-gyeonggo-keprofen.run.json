@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "케프로펜경고제",
+ "slugbase": "keto-gyeonggo-keprofen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c44de157be2b683a",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

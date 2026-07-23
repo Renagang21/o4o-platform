@@ -57,6 +57,7 @@ function patchFormOf(name: string): string | null {
   if (/카타플라스마|파프/.test(name)) return '파프(카타플라스마)';
   if (/패치|패취/.test(name)) return '패치';
   if (/첩부/.test(name)) return '첩부제';
+  if (/경고제/.test(name)) return '경고제'; // 경고제(硬膏劑)=plaster 계열 첩부 제형
   return null;
 }
 function routeSig(name: string): string {
@@ -68,7 +69,7 @@ function routeSig(name: string): string {
   if (/점안|안연고/.test(name)) return 'ophthalmic';
   if (/점이액|귀에/.test(name)) return 'otic';
   if (/점비|비강|나잘|나살/.test(name)) return 'nasal';
-  if (/크림|연고|로션|로숀|겔$|겔\(|겔제|젤$|젤\(|플라스타|플라스터|첩부|카타플|패취|패치|파스|파프|스왑|스틱|거즈|탈지면|솜|네일라카|라카|외용|도포|스프레이|에어로솔|에어졸|소독|폼$|폼\(|워시|카타플라스마/.test(name)) return 'topical';
+  if (/크림|연고|로션|로숀|겔$|겔\(|겔제|젤$|젤\(|플라스타|플라스터|첩부|카타플|패취|패치|파스|파프|스왑|스틱|거즈|탈지면|솜|네일라카|라카|외용|도포|스프레이|에어로솔|에어졸|소독|폼$|폼\(|워시|카타플라스마|경고제/.test(name)) return 'topical';
   if (/정$|정\d|정\(|정밀리|정\[|캡슐|캅셀|시럽|현탁|과립|산제|산\(|트로키|츄어|씹|저작|드링크|내복|환$|환\(|액$|액\(|액\[|물약|시럽제/.test(name)) return 'oral';
   return 'unknown';
 }

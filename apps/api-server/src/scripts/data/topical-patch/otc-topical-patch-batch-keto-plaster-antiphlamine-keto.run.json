@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "안티푸라민케토플라스타",
+ "slugbase": "keto-plaster-antiphlamine-keto",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "dc754ab753b9a51c",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

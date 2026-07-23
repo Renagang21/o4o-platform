@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "케로팝경고제",
+ "slugbase": "keto-gyeonggo-keropop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c44de157be2b683a",
+   "n": 8
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}
