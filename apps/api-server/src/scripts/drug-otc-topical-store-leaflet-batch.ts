@@ -54,6 +54,9 @@ function formOf(name: string): string {
 function routeSig(name: string): string {
   if (/질정|질좌|질내정|질\s?삽입/.test(name)) return 'vaginal';
   if (/좌약|좌제/.test(name)) return 'rectal';
+  if (/주사|수액|펜주|프리필드/.test(name)) return 'injection';
+  if (/투석|관류/.test(name)) return 'dialysis';
+  if (/가글|양치/.test(name)) return 'gargle';
   if (/점안|안연고/.test(name)) return 'ophthalmic';
   if (/점이액|귀에/.test(name)) return 'otic';
   if (/점비|비강|나잘|나살/.test(name)) return 'nasal';
@@ -106,6 +109,10 @@ interface Row { id: string; name: string; spec: string; content: string; easyId:
 
 async function main(): Promise<void> {
   const INGREDIENT = arg('ingredient'), FORM = arg('form'), TITLE = arg('title'), EN_FILE = arg('en'), SLUGBASE = arg('slugbase');
+  // --assume-route topical: routeSig가 'unknown'을 반환한 경우에만 지정 route로 간주한다.
+  // 양성 분류(ophthalmic/oral/injection/dialysis/gargle/vaginal/rectal/otic/nasal)는 절대 override하지 않는다.
+  const ASSUME_ROUTE = arg('assume-route', '');
+  if (ASSUME_ROUTE && ASSUME_ROUTE !== 'topical') throw new Error('--assume-route는 topical만 허용');
   const EFFKEYS = arg('effkey').split(',').map((s) => s.trim()).filter(Boolean);
   const MAX = parseInt(arg('max', '9999'), 10);
   const APPLY = process.argv.includes('--apply') && process.env.TOPICAL_APPLY_CONFIRM === 'YES';
@@ -119,7 +126,7 @@ async function main(): Promise<void> {
   if (!WO_ID) throw new Error('WO ID 필요: --wo-id 또는 EN config의 woId/wo 또는 env TOPICAL_WO_ID 중 하나를 지정하십시오');
   const ds = new DataSource({ type: 'postgres', host: process.env.PROXY_HOST ?? '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5455', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { statement_timeout: 120000 } });
   await ds.initialize();
-  const summary: any = { wo: WO_ID, ingredient: INGREDIENT, form: FORM, slugbase: SLUGBASE, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
+  const summary: any = { wo: WO_ID, ingredient: INGREDIENT, form: FORM, slugbase: SLUGBASE, assumeRoute: ASSUME_ROUTE || null, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
   try {
     const coarse: Row[] = await ds.query(`SELECT pm.id::text id, pm.name, pm.specification spec, es.content, es.id::text "easyId"
       FROM product_masters pm JOIN LATERAL (SELECT id, content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type=$3 AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
@@ -128,7 +135,11 @@ async function main(): Promise<void> {
       ORDER BY pm.id`, [INGREDIENT, FORM, EASY]);
     const withFp = coarse.map((r) => ({ ...r, ...fingerprintOf(r.name, r.spec, r.content) }));
     const byFp = new Map<string, Row[]>();
-    for (const r of withFp) { if (r.route !== 'topical') continue; if (!byFp.has(r.fp)) byFp.set(r.fp, []); byFp.get(r.fp)!.push(r as Row); }
+    for (const r of withFp) {
+      const effRoute = r.route === 'unknown' && ASSUME_ROUTE ? ASSUME_ROUTE : r.route;
+      if (effRoute !== 'topical') continue;
+      if (!byFp.has(r.fp)) byFp.set(r.fp, []); byFp.get(r.fp)!.push(r as Row);
+    }
     const fps = [...byFp.entries()].sort((a, b) => b[1].length - a[1].length);
     let done = 0;
     for (const [fp, rows] of fps) {

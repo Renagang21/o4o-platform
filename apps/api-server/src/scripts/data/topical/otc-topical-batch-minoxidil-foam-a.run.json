@@ -1,0 +1,18 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "미녹시딜",
+ "form": "미녹시폼",
+ "slugbase": "minoxidil-foam-a",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e8455ea0a99549cf",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

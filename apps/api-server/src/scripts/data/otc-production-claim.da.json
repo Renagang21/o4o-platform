@@ -137,10 +137,10 @@
     {
       "groupKey": "미녹시딜|겔·스프레이·액(외용)",
       "sourceType": "o4o_drug_otc_topical",
-      "masters": 36,
+      "masters": 155,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "V6 재선점 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 68fp/155 (액2% 3fp/7 + 액3% 18fp/33 + 겔3% 1fp/2 + 액5% 33fp/79 + 겔5% 8fp/16 + 폼 5fp/18). 5% 계열=남성전용(여성형 효능 0 확인). 폼=여성 최소기간 3~4개월형/3~6개월형 분리. routeSig unknown → --assume-route topical(양성 분류 override 불가) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "시클로피록스|네일라카·외용액",
