@@ -1,0 +1,6602 @@
+[
+ {
+  "statementNo": "200400170211602",
+  "name": "뉴트리티지 산양유 단백질",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021971",
+  "name": "이지맘 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099187",
+  "name": "겟라이트234",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020001160",
+  "name": "스쿨오브 홍",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004445",
+  "name": "초록이 쓰리데이즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007391",
+  "name": "더블바이옴 3500 플러스 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353142",
+  "name": "Veganery 3-in-1 Body Balance Jelly Dietary Supplement",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000939498",
+  "name": "초록이 액티브 클린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020002913",
+  "name": "가르시니아-맥스커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236326",
+  "name": "상쾌한 차전자피 식이섬유 다이렉트",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020010309",
+  "name": "STOP(에스탑)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211454",
+  "name": "휘게클렌즈 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351486",
+  "name": "뺄리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046656",
+  "name": "푸응 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352482",
+  "name": "이지 슬리밍(Easy Slimming)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370254",
+  "name": "오늘부터 슬림에이드 자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246631",
+  "name": "올 케어 유산균 & 비타민C 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020038189",
+  "name": "컨트롤D",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015110921",
+  "name": "힐스토리 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211958",
+  "name": "삼성 굿모닝 쾌변 슬림 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052325",
+  "name": "설렘 다이어트 버닝",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020008537",
+  "name": "프리아스코르빈산",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150832009",
+  "name": "한미 비움-나이트",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017106362",
+  "name": "다다슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032410",
+  "name": "에브리어트 젤리컷 2800",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002690",
+  "name": "스킨케어 SKIN CARE",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202400280808",
+  "name": "에스(S)라인다이어트식이섬유-커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083145",
+  "name": "키드큐 쾌변젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201262",
+  "name": "닥터리본 비피더스 앤 프리 패밀리 케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071026",
+  "name": "락토바이오5000신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000047844",
+  "name": "플랜틴 스위치온",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352393",
+  "name": "이너 클린 화이버",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001298",
+  "name": "닥터이지스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082304",
+  "name": "화이버 쾌변 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170351098",
+  "name": "닥터에스더 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046590",
+  "name": "지큐랩(gQlab) 장건강 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808085",
+  "name": "오늘도 쾌변",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20200016052212",
+  "name": "닥터바른 다이너티 올인원 이뮨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831117",
+  "name": "프리미엄 프로바이오틱스 앤 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023674",
+  "name": "로이델 디아세틸키틴 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002000255",
+  "name": "프리바이오 파이브스타",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "200400200022785",
+  "name": "멀티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483400",
+  "name": "텅장환",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2024002808018",
+  "name": "트루락 프리바이오틱스 프락토올리고당, 아연, 셀렌 업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351473",
+  "name": "유기농 프리바이오틱스 패밀리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162341",
+  "name": "셀티바 SYN(신) 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016252117",
+  "name": "빨강이 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020000474625",
+  "name": "뷰트리 프로틴 포커스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200023892",
+  "name": "라이트 포켓 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031677",
+  "name": "야미푸(yummy & poo)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000124464",
+  "name": "다이어트 & 유산균 19종 3종복합기능성",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001507232",
+  "name": "해피플러스핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080101",
+  "name": "다이어트∙쾌변엔 가르시니아 차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032842",
+  "name": "위슬로 차전자피 식이섬유",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200022312",
+  "name": "올데이컷플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006222",
+  "name": "프락토올리고당해피올리고O",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032035",
+  "name": "프리락토 마이크로바이옴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110790",
+  "name": "SYN 프리바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022282",
+  "name": "맘편한 키즈푸푸 쾌변젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015107925",
+  "name": "린시아마이클렌즈",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "202100186812",
+  "name": "김소형 공비 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352439",
+  "name": "여에스더 산양유 초유 단백질 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20180012174173",
+  "name": "보령 장위한 넥스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021853",
+  "name": "웰메가 명장 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106433",
+  "name": "마크로비우 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278192",
+  "name": "월러스바이오 슬림부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001635456",
+  "name": "내몸가벼움 다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022360",
+  "name": "종근당건강프리바이오틱스FOS에프오에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015070497",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015245",
+  "name": "닥터에스 멀티 포스트바이오틱스(닥터S 멀티 포스트바이오틱스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107611",
+  "name": "청정미인",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106757",
+  "name": "슬림웰 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007666",
+  "name": "핑크포뮬러 다이어트 워터믹스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023675",
+  "name": "원더라이너에스컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001868123",
+  "name": "하루비움 리모닝",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "202400280803",
+  "name": "애터미 차전자피 식이섬유",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015070419",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009002002046",
+  "name": "청인 장건강하나로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010409",
+  "name": "장루트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220021067105",
+  "name": "엔지엔 뭉글뭉글 퐁 식이섬유 60포",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002375",
+  "name": "장건강 포스트 솔루션",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017038166",
+  "name": "장건강엔 닥터유산균19",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001137040",
+  "name": "비움의 기적 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2011001701633",
+  "name": "케이에세르 장박사",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130017122122",
+  "name": "글루코 밸런스 발사믹비니거맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2023002876652",
+  "name": "테이스티 쾌변 다이어트엔 차전자피 가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020728",
+  "name": "신바이오틱스 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020028202",
+  "name": "식이섬유 화이버크린캡",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020013298",
+  "name": "화애락 이너제틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099320",
+  "name": "컷 3 (CUT 3)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352180",
+  "name": "빌드 프리바이오틱스 비타C 에이드 자두맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193244",
+  "name": "보명장플러스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20190009483305",
+  "name": "메가 프로바이오틱스 플러스 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201093",
+  "name": "마이해빗 프로틴 쉐이크 산양유 초유 분리대두 유청",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021906",
+  "name": "프리바이오틱스 플러스 FOS(에프오에스) 5000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032103",
+  "name": "락토미인 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001231075",
+  "name": "프라미스 프락토바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022566",
+  "name": "제이톡",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612210",
+  "name": "신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107397",
+  "name": "웰파인다이어트식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351292",
+  "name": "jw중외제약 코어 신바이오틱스 프리바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020966",
+  "name": "데이랩 면역 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151101190",
+  "name": "쇼킹쾌변",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2004001508169",
+  "name": "포스트바이오틱스 L",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023667",
+  "name": "기분전환 클렌즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200900200677",
+  "name": "알브이엘 오비엑스 플러스(RVL Ob-X Plus)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2004001507230",
+  "name": "구구팔팔다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236288",
+  "name": "핏스프레소 더 블랙 2.0",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017017882",
+  "name": "듀오락 혈당컨트롤",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020703",
+  "name": "프리바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041377",
+  "name": "유산균 다이어트 트리플 에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083035",
+  "name": "데이즈 핏핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046567",
+  "name": "원더락토 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013002002475",
+  "name": "비타민워터젤리사과맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040016020148",
+  "name": "네이처드림 장에 좋은 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193382",
+  "name": "원광 한방(one shot) 닥터 밸런스톡스(talk's)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831689",
+  "name": "프리미엄 빨간다이어트",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017062132",
+  "name": "장세움 포스트바이오틱스 마이크로바이옴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001335",
+  "name": "가르시니아 다이어트 슬림락",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141628",
+  "name": "닥터 큐 쾌변",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20100016005328",
+  "name": "바이오캡 락티 F에프",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017068268",
+  "name": "마이크로바이옴 프로·프리바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071057",
+  "name": "띵똥 차전자피 가르시니아 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009001504756",
+  "name": "레인보우 신바이오틱스 멀티유산균 R",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831442",
+  "name": "해피바바 HAPPYBABA 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831439",
+  "name": "에스디엣 컷 (SDIET CUT)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000948355",
+  "name": "온가족 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020714",
+  "name": "쁘띠앤프리바이오 제트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031946",
+  "name": "쾌변화이바 플러스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200023935",
+  "name": "혈당관리젤리 복숭아맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020036144",
+  "name": "테티스 다이어트 젤리스틱",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20080015058117",
+  "name": "엘스핏",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2015001201283",
+  "name": "삭비움 5day 클렌즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236166",
+  "name": "프리바이오틱스 FOS(에프오에스) 플러스 아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193203",
+  "name": "데일리 신바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170171185",
+  "name": "나를 위한 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150832135",
+  "name": "한미 면역 비움 - night(나이트)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020722",
+  "name": "슈퍼프리바이오틱스패밀리",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211234",
+  "name": "7일:컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162244",
+  "name": "슈퍼파워 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006637",
+  "name": "해우초 플러스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020020968",
+  "name": "이엑스바이옴 프로바이오틱스 패밀리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352686",
+  "name": "헬시허그 쾌변차전자피&다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20180012174231",
+  "name": "액티브솔루션 장건강",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023095",
+  "name": "퍼스트바이오틱스17",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509027",
+  "name": "하이뮨 프로틴 밸런스 고소한맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020676",
+  "name": "프로바이오틱스 패밀리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246643",
+  "name": "Ssol파더 퍼펙트 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020719",
+  "name": "오늘도 가볍게 프리바이오틱스 FOS(에프오에스) 솔루션",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110846",
+  "name": "슈퍼프리바이오틱스 에프오에스(FOS) 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370209",
+  "name": "오늘부터 버닝워터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831088",
+  "name": "선택하라 프리바이오틱스 장건강 솔루션 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278137",
+  "name": "디센큐 에스(dixenQ S)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012160",
+  "name": "아티니카 스트롱 에어(Atinika Strong Air)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831284",
+  "name": "신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200062057",
+  "name": "듀얼스틱 장케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015389",
+  "name": "하루푸푸",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013002002470",
+  "name": "스키니랩 시크릿 가르시니아 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002889416",
+  "name": "슬림라인 트리플 다이어트 핑크",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104229",
+  "name": "프락토올리고당분말",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020010368",
+  "name": "동마니",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022588",
+  "name": "미즈본",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211428",
+  "name": "연세헬스케어 멀티바이오틱스 면역플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001625250",
+  "name": "슈퍼에이지",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170352304",
+  "name": "엠뉴 시크릿 제로컷 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023129",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170171062",
+  "name": "마이크로바이옴 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002126",
+  "name": "플래티넘 신바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002376",
+  "name": "지큐랩(gQlab) 에스(S) 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202200211982",
+  "name": "테이크핏 당케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046603",
+  "name": "장포유 유산균 차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010392",
+  "name": "에스화이버",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023398",
+  "name": "데일리 다이어트젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083244",
+  "name": "우먼올핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071053",
+  "name": "빠져서 좋아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351615",
+  "name": "세브란스케어 멀티바이오틱스 면역플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023646",
+  "name": "오늘푸푸",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20220021067104",
+  "name": "쾌변포유 차전자피 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150832142",
+  "name": "변신 차전자피 가르시니아 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002556",
+  "name": "트루락 생 프리바이오틱스 프락토올리고당, 아연, 셀렌",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211300",
+  "name": "슬림온 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104176",
+  "name": "장엔Q큐",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021905",
+  "name": "슈퍼프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022628",
+  "name": "프리바이오틱스FOS에프오에스트리플",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351213",
+  "name": "Hawaiian Noni",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400150831221",
+  "name": "매일습관 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352092",
+  "name": "슬림미 다이어트 클렌즈 스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000609215",
+  "name": "김소형원방 다이어트카페 리얼 MUKAVE",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200023336",
+  "name": "콜레올로지 컷팅젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001701388",
+  "name": "녹십초프로틴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001508165",
+  "name": "포스트바이오틱스 B",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041394",
+  "name": "변하게 하는 가차환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022986",
+  "name": "셀로맥스 셸위댄스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024139",
+  "name": "듀얼액션 화이버 프리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200082194",
+  "name": "프리+프로 바이오틱스 (Pre+Pro Biotics)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006791",
+  "name": "클린플러스차전자피식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004528",
+  "name": "셀로맥스 셸위댄스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012215",
+  "name": "장큐프리(free)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082695",
+  "name": "프리벤트라 애플사이다비니거맛 쾌변 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2014002001249",
+  "name": "비우다 장선생",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001261",
+  "name": "알로에 라이트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020014799",
+  "name": "디투",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202200211981",
+  "name": "테이크핏 케어 당 제로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072312",
+  "name": "매일먹는 E:M이엠 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023760",
+  "name": "오마키드 프리미엄 뉴트리션 스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023983",
+  "name": "아프리카망고 젤리 슬림 핏",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040017059166",
+  "name": "락토필듀오 멀티액션 에스(LACTOPHILDUO MULTIACTION S)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017286000753",
+  "name": "디투오브",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041490",
+  "name": "퓨로틴 초코맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353150",
+  "name": "마그네슘 식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071241",
+  "name": "혈당케어 프로틴",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200700170351920",
+  "name": "키즈텐 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483594",
+  "name": "닥터케라피 그린 포뮬러 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200081959",
+  "name": "상쾌한 하루 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2006001532625",
+  "name": "쾌변 클렌즈 다이어트 올인원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351254",
+  "name": "슈퍼유산균 신바이오틱스 액티브",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020915",
+  "name": "마이크로바이옴 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015070229",
+  "name": "지근억비피더스프로G",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808090",
+  "name": "로그네이처 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061777",
+  "name": "데일리젤리스틱 알로에 이뮨 & 슈가컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001201277",
+  "name": "5일에이드클렌즈 5 DAYS AID 복숭아맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110835",
+  "name": "장건강 365 프리바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002638",
+  "name": "지큐랩 프로 프리 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236387",
+  "name": "라라파워리커버리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041259",
+  "name": "잇츠톡 파인",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020682",
+  "name": "신바이오틱스 에스(SYNBIOTICS S)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023740",
+  "name": "슬림핏젤리ZERO",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032848",
+  "name": "슈가컷 애플 발포다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220010222149",
+  "name": "바이옴핏 골드 프로 앤 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831453",
+  "name": "유산균56",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200033213",
+  "name": "Dr.blet Cleanse Fiber Sticks",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080144",
+  "name": "바나바오트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104454",
+  "name": "파랑물 부스팅 워터",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211323",
+  "name": "가르시니아 슬림 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20210016229119",
+  "name": "매일푸푸 쾌변&마그네슘 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031640",
+  "name": "프리바이오틱스 플러스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017021841",
+  "name": "프리바이오틱스 + 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019336",
+  "name": "명품 닥터톡스(Dr.talk's) 수(秀)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082050",
+  "name": "쾌변 건강 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353171",
+  "name": "홀드잇 JELLY 그린포켓젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007637",
+  "name": "케이파이 장이나",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007742",
+  "name": "장 건강 프리바이오틱스 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2011001701622",
+  "name": "에세르 클린 닥터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351669",
+  "name": "신터액트 시니어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001407",
+  "name": "내몸밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099284",
+  "name": "금단미인 해우소",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072317",
+  "name": "릭앤케어 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193235",
+  "name": "비피젠 듀얼 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170171345",
+  "name": "듀오락 더 퍼스트 클래스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352394",
+  "name": "비움 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015162284",
+  "name": "프리바이오틱스 프락토올리고당 플러스 아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352085",
+  "name": "아토앤힐스 쾌변엔 순삭이지 뼈건강플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352882",
+  "name": "탄탄 슬리밍 트리플 부스터 샷 5일+2일",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012139",
+  "name": "한인 차전자피가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080110",
+  "name": "라이블링 뺄리핏 차전자피",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "201900160247",
+  "name": "프리바이오틱스 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072056",
+  "name": "제이앤 그린팩터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020633",
+  "name": "메가 액티브 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483203",
+  "name": "슬림 클렌즈 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201199",
+  "name": "퓨리카핏 버닝",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20150010018158",
+  "name": "초록이 카테킨&프리바이오틱스 쾌변 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211625",
+  "name": "콜레올로지 티 PRO 하비탈출(Hobby Escape)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831030",
+  "name": "프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20060020003702",
+  "name": "슬림 바디컷 부스터",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "202100033723",
+  "name": "클린24시간 레드박스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061129",
+  "name": "빼빼젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351459",
+  "name": "n*Lite (Dietary supplement)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400151101278",
+  "name": "리얼업 프리바이오틱스 FOS 4500 이뮨 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106472",
+  "name": "하루3포 슬림 밸런스 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020008589",
+  "name": "렛디엣다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001703554",
+  "name": "쎈 쾌변",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015094214",
+  "name": "김소형원방 공비다이어트 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000047468",
+  "name": "허브앤비타 프리바이오틱스 프락토올리고당",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20190016403219",
+  "name": "Appetite Balance",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007485",
+  "name": "차전자피 가르시니아 슬리밍 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007633",
+  "name": "큐라에스 더블컷팅",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001507231",
+  "name": "턴유슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020774",
+  "name": "엠티스트(EMPTIST)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20220021067123",
+  "name": "여에스더 프리바이오틱스 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001157",
+  "name": "오늘부터 슬림젤리 제로sugar",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351393",
+  "name": "에이드핏 이지클렌즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002191",
+  "name": "프리락토 종근당 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022861",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 프로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351397",
+  "name": "하이뮨 프리&프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351618",
+  "name": "가르시니아 2,800mg 젤리 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509023",
+  "name": "하이뮨 프로틴 밸런스 근력케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032786",
+  "name": "다이트 데이팩",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220010222106",
+  "name": "프로바이오엑스 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024450",
+  "name": "올인원 라인부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200012016131",
+  "name": "면역탄탄플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831482",
+  "name": "한미양행 프리바이오틱스 FOS 4100 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107639",
+  "name": "비센장사랑다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032599",
+  "name": "아이비웰 더블컷 샤인머스캣맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001602444",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 프로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000609212",
+  "name": "리얼원샷 다이어트 클렌즈",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170351994",
+  "name": "닥터에스더 프리바이오틱스 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104177",
+  "name": "장쾌력 플러스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2023000229678",
+  "name": "프리바이오틱스 4000",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200201130",
+  "name": "쁘띠앤 락토제트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351898",
+  "name": "비타포뮬러 프리프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000609213",
+  "name": "컷핏 다이어트 나이트",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200600200032151",
+  "name": "커브스 슬림원 씬",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831168",
+  "name": "유산균엔 19종 락토사랑",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002365",
+  "name": "오직 포스트바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211297",
+  "name": "비움다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2016001227897",
+  "name": "원광쾌변데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351222",
+  "name": "프리앤프로 더블 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130017122111",
+  "name": "리비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072362",
+  "name": "굿모닝혼합유산균 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001217418",
+  "name": "벨기에 유산균 다이어트 트리플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017278206860",
+  "name": "뉴다운케어슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200033034",
+  "name": "당이락",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021753",
+  "name": "생생 프리바이오틱스 FOS(에프오에스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009105117",
+  "name": "살바이다이어트젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020694",
+  "name": "슈퍼프리바이오틱스FOS(에프오에스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082731",
+  "name": "엄마가 지켜줄게 쾌변젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400170211556",
+  "name": "니아르 베리바디",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061632",
+  "name": "푸응 올데이버닝 티",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2004001510440",
+  "name": "장(腸) 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040016020215",
+  "name": "장안에 올리고 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2004002002542",
+  "name": "마이크로바이옴 생 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020711",
+  "name": "프라임 프리바이오틱스 스페셜",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236231",
+  "name": "그린핏 차전자피 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022564",
+  "name": "데이즈온 프리바이오틱스 키즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080322",
+  "name": "상쾌한 하루 클린화이버",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017021948",
+  "name": "프로비던스 포스트바이오틱스 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004593",
+  "name": "글램핏 코어컷 다이어트 워터믹스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013002002437",
+  "name": "리:듬 톡",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170352538",
+  "name": "에브리컷 2800",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352563",
+  "name": "장건강 프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020888",
+  "name": "신 프로바이오틱스 10억 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032892",
+  "name": "헬시 슬림 핏 다이어트 티 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106774",
+  "name": "Diet 비울땐 확실하게 차전자피식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021784",
+  "name": "닥터프리바이오틱스플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612211",
+  "name": "프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236195",
+  "name": "제대로근",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002889413",
+  "name": "신정애 싹빼 다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000161222",
+  "name": "건강프로젝트1",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202100200745",
+  "name": "악마다이어트아쿠아프리미엄7자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200062023",
+  "name": "소우코우 이소비텍신 클렌즈",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2013001702380",
+  "name": "한비움이너클린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052234",
+  "name": "벨라핏 이너뷰티 올인원 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352124",
+  "name": "온리비움",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20190009483677",
+  "name": "딥트 3일 사이언스 업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001201280",
+  "name": "리얼바디클렌즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246634",
+  "name": "일양 락토 프리프로바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024089",
+  "name": "맥스컷 다이어트 핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211445",
+  "name": "세담 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2016001212611",
+  "name": "매일 홍삼스틱",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20110020099141",
+  "name": "더다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220021067100",
+  "name": "프로틴&이뮨(Protein&Immune)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017031272",
+  "name": "메타그린 칼로리컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022187",
+  "name": "먹는히알루론산이너뷰티미완성젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107963",
+  "name": "키토 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023595",
+  "name": "프리미엄 올인원 혈당케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046111",
+  "name": "주러스(ZURUS)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200073104",
+  "name": "화이버솔 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032421",
+  "name": "쾌변직빵 변 비엔나",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "201400200141",
+  "name": "효성난소화성말토덱스트린",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2018001246628",
+  "name": "트리플+프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009002004736",
+  "name": "엠프로(MPRO) 피부",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000611915",
+  "name": "푸른차전자피분말",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "200400150831035",
+  "name": "닥터헬스케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017062155",
+  "name": "헬스뱅 프리프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022275",
+  "name": "다이어트 가르시니아 젤리 순케이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200012016126",
+  "name": "빼빼어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000161223",
+  "name": "건강프로젝트 2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151129",
+  "name": "골드 케어톡스(Talk's)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483631",
+  "name": "아이엠바이오틱스 쾌변&장건강",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001519120",
+  "name": "레몬맛 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023579",
+  "name": "톡스올로지 클렌즈 비움 PRO (Talksology Cleanse Vium PRO)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015094264",
+  "name": "김오곤원장의 한방(One Punch) 다이어트 블랙(커피맛)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20110017019108",
+  "name": "젬무브 생생 이너핏 신바이오틱스(GEMMOVE SAENG SAENG INNER FIT SYNBIOTICS)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000939484",
+  "name": "분홍이 화이버 컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236416",
+  "name": "초록핏 식후2알",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017278206857",
+  "name": "메틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017068264",
+  "name": "신바이오틱스 프리미엄 5케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001601185",
+  "name": "조아 장건강",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "201000190041172",
+  "name": "벨라미 다이어트 젤리 청포도맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831292",
+  "name": "글램디바이오 2주 습관 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023730",
+  "name": "에너씨슬 다이어트샷 Zero",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162236",
+  "name": "닥터비 패밀리 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900093949",
+  "name": "주홍이 11플러스 키토산 팻아웃",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023310",
+  "name": "비우밍(Biuming)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012108",
+  "name": "쾌변습관 차전자피 식이섬유",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20090016001155",
+  "name": "상쾌한 식이섬유 젤리 사과맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400150831816",
+  "name": "로얄 뷰티 박스(Royal Beauty Box)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107985",
+  "name": "헬씨허그슬림다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071000",
+  "name": "프로힘 프로틴 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015102126",
+  "name": "발포차전자가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024425",
+  "name": "화이버 다이어트 젤리 애플사이다비니거맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020835",
+  "name": "다이어트 앤 착한 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162507",
+  "name": "디비딥",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020013357",
+  "name": "프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015162227",
+  "name": "뺄리오 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000948369",
+  "name": "건국신바이오틱3000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352068",
+  "name": "고투클린 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023094",
+  "name": "쏙빠지는 악마다이어트 화이바 5000 자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020225",
+  "name": "바디톡에스파인골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001706170",
+  "name": "닥터프리바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200081392",
+  "name": "장밸런스 파워 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024017",
+  "name": "메타그린 젤리 더블컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001150",
+  "name": "감비다원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900107961",
+  "name": "성균관 밸런스 닥터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352290",
+  "name": "100억 소리나는 프로+프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023437",
+  "name": "아름T",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000611919",
+  "name": "변한day",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831218",
+  "name": "장앤바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351885",
+  "name": "원데이 이너엔젤 (oneday INNER&JELL)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2006001532626",
+  "name": "셀로맥스 알로푸룬쾌변주스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015110953",
+  "name": "포스트 자일로프로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012204",
+  "name": "슬림핏밸런스 차전자피 가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099200",
+  "name": "슬림한 이유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831203",
+  "name": "닥터 프리바이오틱스 365",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236204",
+  "name": "비움보감",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200081002",
+  "name": "클렌즈 다이어트 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110017019116",
+  "name": "종근당건강 프리바이오틱스 FOS 에프오에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023810",
+  "name": "포포젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170352531",
+  "name": "프리미엄 프로틴 데일리 오트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201107",
+  "name": "다이어트 상쾌한 변화 Plus(플러스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022000481847",
+  "name": "메타스무스 플러스(Meta smooth Plus)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032750",
+  "name": "더더탱글 식이섬유 청포도맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020046576",
+  "name": "레모나프렌즈 프리바이오틱스 톡",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20140020012109",
+  "name": "바이래빗Lv2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002161",
+  "name": "장올리고 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020918",
+  "name": "비오즌:디 마스터바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000612720",
+  "name": "바이오스 라이프 비 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202100185429",
+  "name": "칼로-컷앤리셋",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061846",
+  "name": "맥스컷 컷팅 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352019",
+  "name": "스킨 밸런스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007370",
+  "name": "더 퍼스트 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024493",
+  "name": "데일리컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612212",
+  "name": "메가멀티비타",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020693",
+  "name": "메이플트리 신 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831391",
+  "name": "세리컷 알파 카페",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020003162",
+  "name": "초당플러스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2023002952519",
+  "name": "유한 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211593",
+  "name": "슬리비티 슬리닝 티(SLIVITEE SLINING TEA)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061166",
+  "name": "와일드 컷 망고",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046112",
+  "name": "풍덩한 하루",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002003869",
+  "name": "식이섬유알파",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20240028080552",
+  "name": "프리바이오틱스 GXF(Gut health X-cellence Formula)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200600200031259",
+  "name": "스마트프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020707",
+  "name": "프리바이오틱스 3500",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032901",
+  "name": "눈꽃 차전자피 카테킨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001114",
+  "name": "D톡스슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061560",
+  "name": "포포 쾌변젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040017021595",
+  "name": "프락토올리고당-프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352174",
+  "name": "빌드 프리바이오틱스 비타C 에이드 파인애플맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200033055",
+  "name": "혈당컷 이너슬리밍",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017062107",
+  "name": "프라임 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071143",
+  "name": "비티진 장다비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20100019004763",
+  "name": "빼빼 다이어트 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032376",
+  "name": "신바이오플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072319",
+  "name": "김소형 공비 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20100019004983",
+  "name": "프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019322",
+  "name": "연세 닥터톡스(Dr.talk's) 수(秀) 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001079629",
+  "name": "혈당컷타임",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20120017002204",
+  "name": "장 건강 세븐바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082424",
+  "name": "유기농 프리바이오틱스 키즈",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020020980",
+  "name": "333프로젝트 크린업(스텝1)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20120019007689",
+  "name": "워터믹스 제로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014626",
+  "name": "벨기에 유산균+다이어트 트리플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202200213272",
+  "name": "장다비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061481",
+  "name": "뉴알로에쾌변 화이베라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352005",
+  "name": "워터 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288023692",
+  "name": "장건강 프리바이오틱스 FOS(에프오에스)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2011001507119",
+  "name": "푸르밀 드림 닥터 밸런스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021574",
+  "name": "프리앤프로 생유산균 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020013459",
+  "name": "이너제틱 항산화·클렌즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020732",
+  "name": "그린핏유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082715",
+  "name": "프리바이오틱스 FOS 프락토올리고당 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021786",
+  "name": "유산균이 함유된 식이섬유 항이와 장이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220010222107",
+  "name": "배가쏙",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020592",
+  "name": "셀티바 SYN(신)프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031632",
+  "name": "트루락 생 프리바이오틱스 프락토올리고당, 아연, 셀렌",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020894",
+  "name": "락포유 생유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022506",
+  "name": "The Last Fit 더라스트핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351502",
+  "name": "오늘컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211653",
+  "name": "악마다이어트 아쿠아 프로 핑크피치맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022272",
+  "name": "눈꽃 차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20180012174100",
+  "name": "10억 생 유산균 + 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110844",
+  "name": "동영제 장건강 프리바이오틱스 스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002568",
+  "name": "트루락 프리바이오틱스 프락토올리고당, 아연, 셀렌 업(UP)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032965",
+  "name": "방탄젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2017286000760",
+  "name": "온리바이옴 듀얼 케어 100억 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023850",
+  "name": "트리플 클린샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024168",
+  "name": "팻다운 샷 올인원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007818",
+  "name": "당이락",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001201276",
+  "name": "5일에이드클렌즈 5 DAYS AID 망고맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020275",
+  "name": "자희쾌변석류맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200600200032139",
+  "name": "닥터피엔티 비오프리 엑스오",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015039147",
+  "name": "엑스-팻다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110936",
+  "name": "면역엔N포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151137",
+  "name": "다이어트 젤리 베르가못맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002830210",
+  "name": "김소형원방 혈당+다이어트 공비단",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351897",
+  "name": "알파 제타 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024441",
+  "name": "벨라미 다이어트 젤리 파인애플맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020705",
+  "name": "아임더 닥터 프리바이오틱스 정",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001622971",
+  "name": "미네르 혈당컷 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211379",
+  "name": "츄이듀이 오렌지레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352060",
+  "name": "에버핏 프로틴 밸런스 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211562",
+  "name": "바나당 블링핏 다이어트 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023694",
+  "name": "닥터리본 슈가컷 슬림핏 브이 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2017288023685",
+  "name": "프리바이오틱스 트리플 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352214",
+  "name": "리퀴드클렌즈 플러스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2023002928465",
+  "name": "더블액션 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001626133",
+  "name": "원데이 헬스 케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106427",
+  "name": "프리미엄 프로바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020784",
+  "name": "비피도락 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020010326",
+  "name": "명품프로테인",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2019000948310",
+  "name": "에띠힐 금빛슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015039163",
+  "name": "프락토골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023970",
+  "name": "콜레올로지 컷팅 젤리 키위맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014001711638",
+  "name": "있나요 쾌변푸쉬 차전자피 식이섬유",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200022555",
+  "name": "데이즈온 프리바이오틱스 우먼",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2024002808062",
+  "name": "뷰트리 슬림에이드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200072557",
+  "name": "그린팩터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071250",
+  "name": "순환365",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014641",
+  "name": "장 쾌변 케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106449",
+  "name": "장쾌원 프리미엄",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "200400200061631",
+  "name": "밸런스업 자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083187",
+  "name": "트리플 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020000474666",
+  "name": "웨이크맥스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032686",
+  "name": "싸바싸바 슬림애플컷 다이어트 스틱",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2018001246616",
+  "name": "더블액션 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052124",
+  "name": "뿡빼 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104420",
+  "name": "프리락토 마이크로바이옴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007740",
+  "name": "시원쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082704",
+  "name": "프리바이오틱스 FOS 에프오에스 트리플",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001622931",
+  "name": "아름다움은 너의것",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104137",
+  "name": "박경호의 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831170",
+  "name": "슈퍼 프리바이오틱스 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002100",
+  "name": "프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351456",
+  "name": "프리바이오틱스 프로바이오틱스 다이어트&유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020295",
+  "name": "바디톡에스파인골드플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211285",
+  "name": "신바이오틱스 스위치온 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20150010018152",
+  "name": "콜레올로지 티 PRO 하비탈출(Hobby Escape)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061568",
+  "name": "프로&프리바이오틱스 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023937",
+  "name": "이뮨스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041062",
+  "name": "트리플 포스트 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017006988",
+  "name": "셀티바 SYN신프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106710",
+  "name": "쿨비어다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031151",
+  "name": "상쾌한 하루 클린화이버",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20150010018150",
+  "name": "Coleology Drink Mix Pro(콜레올로지 드링크 믹스 프로)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202100183351",
+  "name": "장사랑 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211718",
+  "name": "악마다이어트 아쿠아프로 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246650",
+  "name": "빼고빼고 카페 스위트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202300288946",
+  "name": "김소형원방 온감 환 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007654",
+  "name": "레디톡스(Ready-Talks)710",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001128",
+  "name": "슬림업 플러스 뷰티",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162283",
+  "name": "프리바이오틱스 프락토올리고당 에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022593",
+  "name": "채움미슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023093",
+  "name": "쏙빠지는 악마다이어트 화이바 5000 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201500060927",
+  "name": "빼자까페더블컷다이어트",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400170061274",
+  "name": "해피트루 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032878",
+  "name": "쾌변메이트 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041475",
+  "name": "안먹은걸로 다이어트 가르시니아 차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211757",
+  "name": "프리바이오틱스 FOS 에프오에스 트리플",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170171054",
+  "name": "듀오락 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023130",
+  "name": "프리미엄 제이컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061920",
+  "name": "DNN 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612260",
+  "name": "면역의힘",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052185",
+  "name": "바디이룸",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024279",
+  "name": "힘찬닥터스 쾌변",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2004001519121",
+  "name": "바디체인지스키니다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022381",
+  "name": "치팅데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020679",
+  "name": "장안에화제 넥스트 패밀리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023673",
+  "name": "넌 나의 혈당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509016",
+  "name": "프로틴 밸런스 &바디",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352905",
+  "name": "락티브 베베&키즈 쾌변 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001393",
+  "name": "피부면역락",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831026",
+  "name": "슈퍼프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002246",
+  "name": "마이해빗 이지케어 혈당 컷",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017039633",
+  "name": "핏핏",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2012001900773",
+  "name": "슬림핏다이어트커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001107",
+  "name": "광동 다이어트 클렌즈 6",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20070017035823",
+  "name": "프라미스 프락토바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020013463",
+  "name": "이너제틱 항산화·클렌즈 로얄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000948390",
+  "name": "엔케이365포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211499",
+  "name": "피트니엘 블링핏 다이어트 프리미엄(Fitny-L bling fit diet Premium)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010401",
+  "name": "굿포유다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004366",
+  "name": "뷰셀리온 다이어트&필",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023995",
+  "name": "HYOJO 슬림컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000910538",
+  "name": "프리프로 바이오틱스 3000 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061825",
+  "name": "유투바이옴 프리바이오틱스 O 올리고",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020020756",
+  "name": "행복한 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014640",
+  "name": "대장 크린식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352452",
+  "name": "에스라이프 데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352887",
+  "name": "온리추얼 슬리밍컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370167",
+  "name": "오늘부터 슬림에이드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099138",
+  "name": "슬렌스타",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000939499",
+  "name": "올 뉴 초록이 시즌4",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009001504757",
+  "name": "허니코 프리미엄 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106760",
+  "name": "올라이티플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023936",
+  "name": "풉팝퐁 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200062010",
+  "name": "비피움 혈당&다이어트 커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046556",
+  "name": "닥터비 프리바이오틱스 트리플 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001702372",
+  "name": "COLO-엔스페셜",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483215",
+  "name": "대장업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024191",
+  "name": "아임오 풋사과 식이섬유 밸런스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020020887",
+  "name": "굿모닝 액티브 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162456",
+  "name": "단백질 프로틴 플러스업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278112",
+  "name": "에스에스(SS)쾌변데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015070357",
+  "name": "이든포스트바이오틱스M(엠)2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162231",
+  "name": "프리바이오틱스 프락토올리고당 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352432",
+  "name": "부르릉 슬림 가르시니아 Max 2,800mg(Brrrr Slim Garcinia Max 2,800mg)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351891",
+  "name": "포라이프 가르씬이아 젤리(4Life GarTHINia Jelly)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831355",
+  "name": "프리미엄 프리바이오틱스 5000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014001711635",
+  "name": "쉐이크베이비 다이어트 워터믹스 자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351924",
+  "name": "굿헬스톡 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202100114701",
+  "name": "화이버리스트L(난소화성말토덱스트린L)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400170061674",
+  "name": "프뉴 엠티솔루션 쾌변젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110893",
+  "name": "한미 신프리앤프로 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001201281",
+  "name": "클렌즈 7 데이즈",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20070017035496",
+  "name": "화이버비츠 플러스",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "200400200201464",
+  "name": "다이어트 UP 상쾌한 변화",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020997",
+  "name": "숨바디수(秀) 다이어트 액상",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141290",
+  "name": "데이제로",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2020001612213",
+  "name": "홍삼옥타코사놀",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2004001704656",
+  "name": "웰리브 당컨트롤",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20120019007555",
+  "name": "차전자피 식이섬유 에스라인 쾌변 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002889415",
+  "name": "활력쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001508167",
+  "name": "포스트바이오틱스A",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211208",
+  "name": "장건강N뉴랜드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032806",
+  "name": "다이트 모닝팩",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001306",
+  "name": "라인워터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020491",
+  "name": "엠에스 FOS(에프오에스)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200023681",
+  "name": "클린부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002127",
+  "name": "일양 프로프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020678",
+  "name": "내몸애 장건강 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021951",
+  "name": "프리바이오틱스 이뮨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201423",
+  "name": "마이핏 ORIGIN 퍼스트바이오틱스 17",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032638",
+  "name": "아이비웰 더블업 애플망고맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017031269",
+  "name": "신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023623",
+  "name": "세라핏 다이어트",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20130020024415",
+  "name": "가르시니아 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015326",
+  "name": "내몸엔 메가바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001387",
+  "name": "밸런스핏 장케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000948367",
+  "name": "광동 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020642",
+  "name": "네오랩 비움케어",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20172880236293",
+  "name": "멀티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041304",
+  "name": "잇츠 톡",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023175",
+  "name": "뷰티마스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020028361",
+  "name": "변해라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061572",
+  "name": "프리바이오틱스 코어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041436",
+  "name": "엔앰씨(NMC) 멀티 프로 프리 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808021",
+  "name": "트루락 생 프리바이오틱스 프락토올리고당, 아연, 셀렌",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001622958",
+  "name": "슬림바디컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031131",
+  "name": "닥터프로그램 마더스프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017015134",
+  "name": "프리미엄 닥터 톡(Premium Dr. Talk)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162361",
+  "name": "네이처팩토리 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009002004740",
+  "name": "엠프로(MPRO) 면역",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002114",
+  "name": "슈퍼프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2024002808029",
+  "name": "닥터프로그램 마더스프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020020702",
+  "name": "프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041493",
+  "name": "대장사랑 비움 유산균 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211047",
+  "name": "이케어 프로바이오틱스 프리미엄19유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288023647",
+  "name": "루트칸 프리바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021867",
+  "name": "비오팜 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021980",
+  "name": "뷰티습관 신뷰티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001701384",
+  "name": "녹십초바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200033159",
+  "name": "새미 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2004001900520",
+  "name": "메가선 골드",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2019001079616",
+  "name": "드림밸런스닥터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353084",
+  "name": "아일로 슬림컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831245",
+  "name": "팜엔탑 장에 좋은 프로바이오틱스 프리바이오틱스 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020761",
+  "name": "퍼펙트 10억 생유산균 + 프리바이오틱스 마이크로바이옴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041400",
+  "name": "래피드 솔루션 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001702353",
+  "name": "락토 멀티포뮬러",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032964",
+  "name": "앤더랩 바이오틱스 포뮬라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352119",
+  "name": "비건 다이어트 젤리 톡톡슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002165",
+  "name": "프라임 마이크로바이옴 프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211381",
+  "name": "츄이듀이 자몽허니블랙티 맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001635453",
+  "name": "올케어 유산균&아연 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236236",
+  "name": "쏙핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002645",
+  "name": "보성 옴니아 포스트바이오틱스 (Omnia Postbiotics)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2008001505876",
+  "name": "슬림조이",
+  "reason": "REVIEW:E-NAME-DERIVED-GROUNDED-002"
+ },
+ {
+  "statementNo": "20130020024488",
+  "name": "서흥 클렌즈샷",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170351424",
+  "name": "신바이오틱스 프로바이오틱스&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370148",
+  "name": "콜레우스 티 프로 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200800150585",
+  "name": "굿 차전자피분말",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "2015001201284",
+  "name": "다이어트 비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020407",
+  "name": "바디엔화이바(body&fiber)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288023648",
+  "name": "프리바이오틱스 FOS(에프오에스) 4500",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022141",
+  "name": "코르셋라인다이어트젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141252",
+  "name": "빠져도좋아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236211",
+  "name": "바이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013002002476",
+  "name": "비타민워터젤리자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020697",
+  "name": "폴리시아 프리바이오틱스FOS(에프오에스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032817",
+  "name": "커트그램 더라스트핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211082",
+  "name": "포스트바이오틱스 프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201446",
+  "name": "리얼업 프리바이오틱스 FOS 4500 이뮨 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023745",
+  "name": "뉴칸 슬림 클렌즈 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106770",
+  "name": "킬리셔스 차전자피 & 가르시니아 다이어트 애플맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007306",
+  "name": "스타프리프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001702373",
+  "name": "세컨랩스다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001515196",
+  "name": "슬리비티 슬리닝 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900107969",
+  "name": "덩티다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071110",
+  "name": "센트디 10일다이어트 클렌즈",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017062110",
+  "name": "더웰 슈퍼프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201222",
+  "name": "엠에스 슬림수",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351974",
+  "name": "락토러브 멀티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020716",
+  "name": "락티브 프리바이오틱스 앤 아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2016001227882",
+  "name": "톡톡지움다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200081930",
+  "name": "액시트5 (Acxit5)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020004615",
+  "name": "닥터케라피 레디톡스 (Ready-Talks) PLUS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001704678",
+  "name": "미코스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278147",
+  "name": "디센큐 에이치(dixenQ H)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001213",
+  "name": "로지엘",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211902",
+  "name": "드림 퓨어(Dream Pure) 쾌변 헬퍼(HELPER) Ⅱ",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006865",
+  "name": "해우초",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20130017122121",
+  "name": "글루코웰 애플사이다비니거맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400170211392",
+  "name": "프로틴 부스터",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017021876",
+  "name": "신바이오틱스 스위치온",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162287",
+  "name": "3중케어 닥터 프로프리움 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483373",
+  "name": "차전자피 카테킨 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002876625",
+  "name": "PN4(피엔포)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162447",
+  "name": "다이어트 보조제 빼르메스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211652",
+  "name": "악마다이어트 아쿠아 프로 파인애플맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040016020189",
+  "name": "프리미엄 프리바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353000",
+  "name": "탄탄 슬리밍 C3G 다이어트 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019327",
+  "name": "연세 닥터톡스(Dr.talk's)프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002889410",
+  "name": "다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014606",
+  "name": "경남 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021877",
+  "name": "닥터원프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000161229",
+  "name": "프리&프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353013",
+  "name": "키즈텐유산균 딸기요거트맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080541",
+  "name": "눈꽃 차전자피 카테킨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002111",
+  "name": "액티브프리바이오틱스아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001217484",
+  "name": "장건강 365 프리바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020813",
+  "name": "프리바이오틱스 FOS(에프오에스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246637",
+  "name": "일동 오늘도 프로틴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046100",
+  "name": "닥터웰화이버포르테",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023971",
+  "name": "콜레올로지 컷팅 젤리 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236222",
+  "name": "당(糖)+장(腸) 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202500287594",
+  "name": "락토생유산균17플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083038",
+  "name": "장 건강 프리바이오틱스 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052410",
+  "name": "푸푸랩(POOPOOLAB)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110017019136",
+  "name": "프리바이오틱스 트리플",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201466",
+  "name": "혈당+다이어트 쾌변명장",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162302",
+  "name": "프리바이오틱스 면역 임팩트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001515128",
+  "name": "듀썸헬씨 썸바디 쏙톡",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010380",
+  "name": "쾌변 다이어트 솔루션",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020735",
+  "name": "신바이오틱스 듀얼",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020771",
+  "name": "휴먼네이처 SYN(신) 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019393",
+  "name": "장이싹싹",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831236",
+  "name": "장건강 SYN(신)바이오틱 프리바이오틱스+프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017286000732",
+  "name": "나다비(nadabi) 가르시니아+차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080493",
+  "name": "케어포랩 밸런스미",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002160",
+  "name": "플래티넘 포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021436",
+  "name": "닥터아쿠아트리플샷모닝아몬드맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020998",
+  "name": "10억 생유산균 프리바이오틱스 프로바이오틱스 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352070",
+  "name": "올키 듀얼 젤리 장 튼튼",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20130017122123",
+  "name": "제니스칼 글루코웰 발사믹비니거맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200600200032952",
+  "name": "글로우 슬림라이트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040016037334",
+  "name": "셀로맥스 셸위댄스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000612715",
+  "name": "바이오스 라이프 7",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808068",
+  "name": "쾌변메이트 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020673",
+  "name": "트리플케어 플러스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023661",
+  "name": "에버슬림 애플 다이어트 10일",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831081",
+  "name": "프리바이오틱스아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014002001276",
+  "name": "30일 에이드 클렌즈 30 DAYS AID 푸룬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162505",
+  "name": "아락핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001625298",
+  "name": "매일푸푸 쾌변젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015102206",
+  "name": "쇼킹쾌변",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200141482",
+  "name": "GC녹십자 마이크로바이옴 퍼스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107987",
+  "name": "다이어트 플러스 트리플케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024055",
+  "name": "젤리하나 다이어트",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400150831702",
+  "name": "한미양행 프로틴 밸런스업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080140",
+  "name": "단백채움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032972",
+  "name": "칼로컷 슬림스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031853",
+  "name": "한방(One shot) 슬림 다이어트 카페",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483674",
+  "name": "딥트3일 스트롱플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046103",
+  "name": "해우심 채움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001244615",
+  "name": "차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130017122130",
+  "name": "닥터당케어톡스(talk's)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041345",
+  "name": "다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017286000724",
+  "name": "바순슬림다이어트 아메리카노맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002539",
+  "name": "트루락 프리바이오틱스 트리오",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061808",
+  "name": "시드물 애사비맛 라이트 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2024002808099",
+  "name": "헬시 슬림 핏 다이어트 티 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010349",
+  "name": "닥터라메드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031223",
+  "name": "슬림에이드(SLIM AID)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024529",
+  "name": "어퍼바딧",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020658",
+  "name": "올데이 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083122",
+  "name": "식후혈당 & 배변활동 맛있는 식이섬유 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020028273",
+  "name": "선밸런스",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200072308",
+  "name": "3중케어 닥터 프로프리움 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001519128",
+  "name": "패밀리 슬림다이어트 겔",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002928440",
+  "name": "퍼펙트 혈당앤유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002569",
+  "name": "마이크로바이옴 신바이오틱스 코어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201800124665",
+  "name": "웰업 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061943",
+  "name": "맛있는 차전자피 텅쾌함",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110789",
+  "name": "프리바이오틱스 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020935",
+  "name": "4중케어 닥터 프로프리움 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150832107",
+  "name": "온가족 분리유청 초유 산양유 단백질 쉐이크 8중기능성",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082427",
+  "name": "유기농 프리바이오틱스 스트롱",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200700170352038",
+  "name": "신바이오틱스 이뮨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022780",
+  "name": "스키니 에너지업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061752",
+  "name": "프리바이오틱스 FOS 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061636",
+  "name": "야쿠르트 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021756",
+  "name": "프리바이오틱스FOS프락토올리고당플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236193",
+  "name": "데이제로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017068205",
+  "name": "장에존 프리바이오틱스 4000",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200600200032803",
+  "name": "바이브이펙트 두잇 퍼펙트워터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020772",
+  "name": "신바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246624",
+  "name": "편안해질 시너지 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020647",
+  "name": "마이크로바이옴 프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220010222103",
+  "name": "맥스컷 다이어트 핏3.1",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021911",
+  "name": "엔바이탈 프리바이오틱스 FOS에프오에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020794",
+  "name": "휴먼네이처 대장슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001201692",
+  "name": "인 더 나잇 클리어티",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022292",
+  "name": "익스트리밍 가르시니아 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236199",
+  "name": "쾌변 쏙 차전자피 가르시니아 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021542",
+  "name": "고은다이어트슬림식이섬유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041476",
+  "name": "대장사랑 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352017",
+  "name": "맥스케어 마이크로바이옴 100억 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017062131",
+  "name": "프리바이오틱스 프락토올리고당 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021783",
+  "name": "악마다이어트아쿠아프리미엄7레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000948399",
+  "name": "하모네 프리미엄 뉴(NEW)포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020000997228",
+  "name": "커피맛 다이어트에 빠지소서",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370168",
+  "name": "딥트3일 스트롱 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024398",
+  "name": "쓰리컷 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013002002496",
+  "name": "팻다운 파워번 파이버",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202300092643",
+  "name": "혈당케어 밸런스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006223",
+  "name": "프락토올리고당해피올리고S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020751",
+  "name": "락토퓨어 SYN 신 프로바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024290",
+  "name": "칼로커트 부스터 워터 2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001712286",
+  "name": "상쾌한 차전자피 식이섬유",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "200600200033078",
+  "name": "에브리어트 혈당 젤리컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010398",
+  "name": "천시원 상쾌한장",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201100170166",
+  "name": "바라크플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20070017035967",
+  "name": "유산균플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509031",
+  "name": "하이뮨 프로틴 밸런스 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032630",
+  "name": "에스(S)라인다이어트식이섬유-커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006221",
+  "name": "프락토올리고당해피올리고G",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020896",
+  "name": "굿포유 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170061899",
+  "name": "비비온 슬림컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017059293",
+  "name": "자일로 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400150831092",
+  "name": "프리미엄프리바이오틱스 FOS 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190004553414",
+  "name": "엠프로 M.PRO 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017068219",
+  "name": "마이크로바이옴 프로·프리바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032881",
+  "name": "푸응 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831415",
+  "name": "영웅제약 장건강 철벽방어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001170",
+  "name": "프리미엄 닥터클린톡S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015070431",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS제로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031935",
+  "name": "프로 프리 바이오틱스 마이크로바이옴 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024445",
+  "name": "MightyGut",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2022002106744",
+  "name": "장포유 유산균 차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612231",
+  "name": "면역의힘프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110944",
+  "name": "면역7 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020789",
+  "name": "프리바이오틱스 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246613",
+  "name": "더블액션 프리바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001516297",
+  "name": "곡물보감S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061300",
+  "name": "메타 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041491",
+  "name": "퓨로틴 곡물맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151146",
+  "name": "이너비 슬리밍 쾌변 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099111",
+  "name": "리얼모닝",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083022",
+  "name": "원데이올인원 프리바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041285",
+  "name": "YNH 먹어도 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352064",
+  "name": "프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201079",
+  "name": "장엔신바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052126",
+  "name": "UBIRIS 장다콜",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201247",
+  "name": "그린밸런스 슬림드링크",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200071980",
+  "name": "일양리프레시알파",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170351836",
+  "name": "오늘컷 맥스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211005",
+  "name": "장&신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162326",
+  "name": "닥터루트 프리바이오틱스 아연 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220011370353",
+  "name": "내나다 슬림 루틴 에이드 레몬맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201227",
+  "name": "컷팅블록커 가르시니아 2800 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041489",
+  "name": "프로틴 올인원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020721",
+  "name": "프리바이오틱스 3300",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020020864",
+  "name": "셀티바 프로 & 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130017122124",
+  "name": "제니스칼 팻아웃 발사믹비니거맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024001",
+  "name": "아이마음 인덱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351247",
+  "name": "에프오에스 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012155",
+  "name": "딥트3일 스트롱 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017013104",
+  "name": "쾌변 생유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220021067124",
+  "name": "유산균+다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141610",
+  "name": "쑤욱 빠지네",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024385",
+  "name": "올인원 다이어트 부스터샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023000229691",
+  "name": "리앨리 슬림 헤이즐넛향",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001612217",
+  "name": "멀티비타민&미네랄.키즈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014002001234",
+  "name": "슬림 장-프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000910523",
+  "name": "바이탈 프로크린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061795",
+  "name": "스타트윈",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020004541",
+  "name": "초록이 쓰리데이즈3",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020002914",
+  "name": "가르시니아-맥스레몬맛트위스트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352775",
+  "name": "리셋보틀 ResetBottle",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001109",
+  "name": "식이섬유",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "202500287593",
+  "name": "신프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014632",
+  "name": "리얼닥터 프로프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083272",
+  "name": "테이스티 통쾌변 차전자피+마그네슘",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110822",
+  "name": "한미 프리바이오틱스 프락토올리고당 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071323",
+  "name": "수월환 차전자피 가르시니아 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2006001510961",
+  "name": "솔빛 신바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831398",
+  "name": "엑소바이오틱쇼코라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151101157",
+  "name": "닥터케라피 레디톡스(Ready-Talks) 710 PLUS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000611914",
+  "name": "클린차전자피분말",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "20040017021777",
+  "name": "프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020001294",
+  "name": "이지 워터 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141419",
+  "name": "하늘마음 트리플바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162342",
+  "name": "셀티바 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002889417",
+  "name": "슬림라인 트리플 다이어트 블루",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107403",
+  "name": "슬림&스마일",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080123",
+  "name": "닥터피엔티 비오프리 엑스오",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20190009105337",
+  "name": "온케어 장건강 프리바이오틱스 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162232",
+  "name": "뉴 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201500022173",
+  "name": "닥터365",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211948",
+  "name": "가인핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483197",
+  "name": "슈퍼 마이크로바이옴 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020698",
+  "name": "이너바이오 프리바이오틱스 FOS 에프오에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031840",
+  "name": "트루락 생 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014002001283",
+  "name": "슬림 장-플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000939485",
+  "name": "초록이 화이버 아웃",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022285",
+  "name": "인테라 엠지투에이 포스 핏 버닝 티",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071010",
+  "name": "차전자피 가르시니아 쾌변&다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023181",
+  "name": "블러드마스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200012016134",
+  "name": "김태희 클렌즙",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046110",
+  "name": "변해봐",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278107",
+  "name": "장다비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061592",
+  "name": "리포르테 슬림엔 시네트롤",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2004001508166",
+  "name": "포스트바이오틱스 P",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031497",
+  "name": "신미보 신(信) 트리플 바이오틱스 케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023943",
+  "name": "이뮨데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211400",
+  "name": "톡플레저 체리석류맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006710",
+  "name": "슬림메이트워터솔르블",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024253",
+  "name": "하루비움 쾌변 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020020626",
+  "name": "스마일렌 프리앤프로바이오틱스 19",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082428",
+  "name": "유기농 프리바이오틱스 패밀리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022246",
+  "name": "비오비타 우리가족 쾌변젤리 골드",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015094218",
+  "name": "에버봄 하루비움 티",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023184",
+  "name": "장N365",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071156",
+  "name": "리디혈",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483312",
+  "name": "김소형원방 슬림핏 다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200081079",
+  "name": "레몬버베나 애프터샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352857",
+  "name": "탄탄 젤리 더블컷 다이어트 자두맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022441",
+  "name": "젤리컷업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808078",
+  "name": "칼로리카노 블랜디드 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021984",
+  "name": "피오씨 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201105",
+  "name": "다이어트 상쾌한 변화",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001152",
+  "name": "광동 다이어트 클렌즈 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001602440",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015278",
+  "name": "프리바이오틱스 프락토올리고당 에스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200083114",
+  "name": "액티브솔루션 장건강",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351742",
+  "name": "제타바이오 알파(Zeta bio α)",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "2022002106741",
+  "name": "다이어트&차전자피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352417",
+  "name": "비거너리 다이어트 젤리 4200mg(샤인머스캣맛) Veganery Diet Jelly 4200mg(Shine Muscat)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015039148",
+  "name": "팻빼로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351718",
+  "name": "내몸에 밸런스 레시피 루트칸 다이어트 젤리스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082839",
+  "name": "우리아이 쾌변젤리 사과맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200600200032620",
+  "name": "프리바이오 자일로부스터",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017106444",
+  "name": "프리미엄 프로바이오틱스 엠엠",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483313",
+  "name": "다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071233",
+  "name": "Diet 비울땐확실하게",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201000190041230",
+  "name": "벨라미 다이어트 젤리 복숭아맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236439",
+  "name": "아름다운 너 매일 가볍게",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022987",
+  "name": "BALANCE PROTEIN HIGH SELL SLIM 밸런스프로틴 하이셀 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211398",
+  "name": "쏘리 낫쏘리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021933",
+  "name": "스킨 올인원 케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014001711630",
+  "name": "쉐이크베이비 다이어트 워터믹스 커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201200190071238",
+  "name": "워터믹스 제로 샤인머스켓맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900160248",
+  "name": "프리앤프로 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162208",
+  "name": "프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001605274",
+  "name": "쏙싹 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352028",
+  "name": "닥터에스더 차전자피 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106391",
+  "name": "닥터패밀리FOS(에프오에스)프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019335",
+  "name": "퓨리젠 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211433",
+  "name": "퍼펙트 데이",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000221712",
+  "name": "닥터헬스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509029",
+  "name": "하이뮨 프로틴 밸런스 L",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193245",
+  "name": "보명장마이너스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040015162433",
+  "name": "모어네이처 이지슬림 차전자피 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2006001532624",
+  "name": "직빵",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509032",
+  "name": "하이뮨 프로틴 밸런스 면역케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001507236",
+  "name": "슬림굿",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201100170167",
+  "name": "클라라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107516",
+  "name": "화이버슬림라인",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023410",
+  "name": "바이탈에버 혈당·장건강",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002179",
+  "name": "마이코드 프로&프리바이오틱스 액티브",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351747",
+  "name": "팜얼라이브 프로바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020861",
+  "name": "트리플 솔루션 앤 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200141183",
+  "name": "뉴랜드 신 바이오틱스 알파",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023140",
+  "name": "장이가벼워지지",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483181",
+  "name": "밸런스톡 차전자피&가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831483",
+  "name": "나나네이처 포스트바이오틱스 락토스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000609220",
+  "name": "세리컷 프레소 V2",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200022925",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021988",
+  "name": "프로비던스 올인원 유산균 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032393",
+  "name": "데일리부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106771",
+  "name": "비움 차전자피 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031653",
+  "name": "프리&프로 더블액션",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015094199",
+  "name": "이지에스 새론나",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014599",
+  "name": "리얼닥터 슈퍼 멀티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018000391567",
+  "name": "폴리시아 프리바이오틱스 FOS (에프오에스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201500060924",
+  "name": "빼자모닝",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001201279",
+  "name": "푸푸잘싸",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002184",
+  "name": "일양 포스트바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2011001701630",
+  "name": "케이 에세르(K ESER)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022723",
+  "name": "프리바이오틱스&프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483845",
+  "name": "올 뉴 초록이 시즌4",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200900200675",
+  "name": "오비엑스워터믹스(ObX WaterMix)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20190009483196",
+  "name": "하루틴 마이크로바이옴 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211335",
+  "name": "빼고빼고카페스트롱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211172",
+  "name": "신바이오틱스 스위치온 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151125",
+  "name": "쾌변직빵",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2009001504754",
+  "name": "레인보우 신바이오틱스 멀티유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351630",
+  "name": "슬림핏6앰플",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020008545",
+  "name": "이너슬림 차전자피 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041458",
+  "name": "대장사랑 비움 유산균 오리지널",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082481",
+  "name": "판도라 슬리밍 컷",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211567",
+  "name": "슬림톡 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041374",
+  "name": "프리바이오틱스 액트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20100016005368",
+  "name": "프리로바이오틱스 1.2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000910589",
+  "name": "코오롱 프로바이옴 생유산균17",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107398",
+  "name": "사포눌린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020038114",
+  "name": "클린웰",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200700170351632",
+  "name": "유기농 프리바이오틱스 에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200081260",
+  "name": "이너비 슬리밍 스타터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061287",
+  "name": "내몸애(愛)유산균 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009105358",
+  "name": "온케어 쏙빼고다이어트&유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019321",
+  "name": "연세닥터톡스(Dr.talk's)플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021893",
+  "name": "다이어트 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236433",
+  "name": "데이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080100",
+  "name": "헬시 슬림 핏 다이어트 티 커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211307",
+  "name": "삼성 프리미엄 쾌변 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20150010018154",
+  "name": "초록이 액티브 클린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046568",
+  "name": "굿모닝프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020746",
+  "name": "락토퓨어 프리바이오틱스 앤 아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007288",
+  "name": "슬림다이어트-S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031416",
+  "name": "트루락 프리바이오틱스 프락토올리고당, 아연, 셀렌 업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020038159",
+  "name": "장미",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001701379",
+  "name": "프로프리 신바이오틱스 생유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007642",
+  "name": "비움상자",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20210016229107",
+  "name": "HCA 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020780",
+  "name": "라인다이어트프로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831334",
+  "name": "핫콩바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017014649",
+  "name": "튼튼장케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024030",
+  "name": "쏙쏙젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002096",
+  "name": "가족사랑 상쾌한 아침",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236294",
+  "name": "차전자피 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351148",
+  "name": "슈퍼유산균 신바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020972",
+  "name": "케어유 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061245",
+  "name": "비오비타 우리아이 쾌변젤리 골드",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2022000481846",
+  "name": "뉴 메타클린업(New Meta Cleanup)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015467",
+  "name": "살뺄라카노티 자스민향",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001244624",
+  "name": "누다 이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004595",
+  "name": "단국엔올인원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020398",
+  "name": "왕비바디톡스(Talk's)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017013101",
+  "name": "프로프리 바이오틱스 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880193152",
+  "name": "슬림웰티",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024199",
+  "name": "시너핏 다이어트 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2004001508153",
+  "name": "라인 핏",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400170211313",
+  "name": "프로뮬라(PROMULA)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015107950",
+  "name": "장건강 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211440",
+  "name": "퓨어리셋",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170171094",
+  "name": "듀오락 포스트바이오틱스7",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110946",
+  "name": "이너랩 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021925",
+  "name": "프리바이오틱스FOS(에프오에스) 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162350",
+  "name": "프리바이오틱스 FOS(에프오에스) 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017046117",
+  "name": "금세비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041540",
+  "name": "이뮨&프로틴 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808049",
+  "name": "푸응 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353116",
+  "name": "슬림라인샷",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040017015362",
+  "name": "클린C",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246672",
+  "name": "오브슬로 1896 헤리티지 슬림브루 오브클 에디션 (OVCL Edition)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015104131",
+  "name": "퀸즈 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009394107",
+  "name": "초록이 카테킨 & 프리바이오틱스 쾌변 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162185",
+  "name": "장가드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190004553322",
+  "name": "아임비타 슬림샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808030",
+  "name": "뉴트리메이드 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352908",
+  "name": "알로에이뮨&슈가컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023339",
+  "name": "차차나아지겠지2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020855",
+  "name": "엠에스 다이어트 상쾌한 변화 Plus(플러스)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021784",
+  "name": "악마다이어트아쿠아프리미엄7자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201236",
+  "name": "식이섬유 청포도맛 스틱 (Fiber Green Grape Flavored Stick)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040015162354",
+  "name": "장의신(神)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000611918",
+  "name": "나오미 365 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082925",
+  "name": "풉팝퐁 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001519176",
+  "name": "닥터클린헬스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211346",
+  "name": "본초미 장 비우미 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015128",
+  "name": "닥터웰빙",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2013001702360",
+  "name": "뺌",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017006933",
+  "name": "셀티바 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024413",
+  "name": "이뮨 부스터 · 21",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000612726",
+  "name": "Hawaiian Noni",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170211969",
+  "name": "드림(Dream) 쾌변 헬퍼(HELPER)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002158",
+  "name": "프리바이오틱스 프락토올리고당 3600",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020420",
+  "name": "리셋프로다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000161225",
+  "name": "건강프로젝트 3",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083160",
+  "name": "미에로화이바 데이톡",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "201200190071067",
+  "name": "차전자피 & 가르시니아 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211546",
+  "name": "디자인포 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022730",
+  "name": "뷰셀리온 다이어트&필",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2011001701632",
+  "name": "클라라골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082426",
+  "name": "유기농 프리바이오틱스 에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211729",
+  "name": "혈당박사 울트라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001507385",
+  "name": "장건강 혈당청",
+  "reason": "BLOCKED:G-WATER-UNGROUNDED-003"
+ },
+ {
+  "statementNo": "20040017068201",
+  "name": "신바이오틱스3000골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041525",
+  "name": "인플샷 가르시니아 커피맛 헤이즐넛향",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211315",
+  "name": "날씬하게 변:한순간",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020229",
+  "name": "레드프락토",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022000481857",
+  "name": "슬로비움(SLOW:VIUM)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483160",
+  "name": "하루틴 팻-아웃(FAT-OUT)다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041480",
+  "name": "안먹은걸로 쓱 옐로우",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900091058",
+  "name": "락토생유산균17플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236225",
+  "name": "선택하라 프리바이오틱스 장건강 솔루션 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020008556",
+  "name": "굿모닝 슬림 바디컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202100200748",
+  "name": "악마다이어트아쿠아프로 핑크피치맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023573",
+  "name": "젤리푸푸",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004002002547",
+  "name": "원데이 마이크로바이옴 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001244632",
+  "name": "미에덴팜 퍼플 투케어 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020041567",
+  "name": "웨이크 슬림컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002928495",
+  "name": "다비옥스 슬림컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020016617",
+  "name": "프로바이오틱스다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170061789",
+  "name": "엠티솔루션 쾌변젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001508168",
+  "name": "포스트바이오틱스 BB",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017006992",
+  "name": "쾌변 잘크톤",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000609210",
+  "name": "컷핏 다이어트",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "202100200744",
+  "name": ": BE++ER CUX",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020617",
+  "name": "올데이 액티브 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001079628",
+  "name": "프리미엄밸런스톡스(PREMIUM BALANCE TALK’S)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061954",
+  "name": "푸응 티톡스(talks)다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2014002001272",
+  "name": "코오롱 올인원 멀티바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015000611917",
+  "name": "장쾌환365플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020939",
+  "name": "신프로바이오틱스 + 아연 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352081",
+  "name": "쉐르파미 맛있는 쾌변 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "201900094831",
+  "name": "김오곤원장의 한방(One Punch) 다이어트 카페",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2018001246622",
+  "name": "베지프로틴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023637",
+  "name": "콜레올로지 쾌변 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032711",
+  "name": "애터미 차전자피 식이섬유",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20160012278190",
+  "name": "채움건강 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211337",
+  "name": "굿모닝 황금 쾌변 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020667",
+  "name": "락티브 프리바이오틱스 5000 앤 아연",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021393",
+  "name": "이디투스슬림다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020733",
+  "name": "슈퍼 FORCE(포스) 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001622981",
+  "name": "칼로리 컷&푸푸 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278148",
+  "name": "날위한시간",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200062079",
+  "name": "바이오리브 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2023002928469",
+  "name": "더블액션 프리바이오틱스 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151132",
+  "name": "쾌변비워 스피드액 푸룬맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "2019000910534",
+  "name": "뉴 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20130020008388",
+  "name": "필라테스 더블유",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20240028080105",
+  "name": "가인핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110863",
+  "name": "한미 신바이오틱스 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020028142",
+  "name": "한일슬리밍쉐이크(망고맛)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040017021801",
+  "name": "뉴본라이프 슬리밍 클린",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040016036154",
+  "name": "감비책 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017068190",
+  "name": "신바이오틱스3000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2020001605287",
+  "name": "어게인 뷰티풀 바디",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020757",
+  "name": "에버핏 더블액션 프로&프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831527",
+  "name": "겟잇뉴트리 리얼 프리바이오틱스 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020846",
+  "name": "이너바이오 프로스트바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020613",
+  "name": "더나은 액티브 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236219",
+  "name": "슈퍼하트 리셋카페",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023658",
+  "name": "After Before, Cleanse Diet 에버앤에버 ABC 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211044",
+  "name": "빼고빼고 카페",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110017019102",
+  "name": "신바이오틱스 네오부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020773",
+  "name": "셀티바 SYN(신)프리바이오틱스 트리플업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021159",
+  "name": "가르시니아-맥스석류맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2021001622974",
+  "name": "디에스 슬림컷 올인원",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020930",
+  "name": "아임헬씨 프로바이오틱스 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021909",
+  "name": "안심프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022562",
+  "name": "HYTAMIX 하이타믹스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032891",
+  "name": "헬시 슬림 핏 다이어트 티 커피맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190004553176",
+  "name": "룩 킬팻 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288023614",
+  "name": "삭비움 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20150010018162",
+  "name": "장비",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "202000124468",
+  "name": "프리바이오틱스에프오에스(FOS)4300",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017278206830",
+  "name": "메디바이오프리바이오틱스스틱",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352769",
+  "name": "탄탄 젤리 더블컷 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032575",
+  "name": "하루식이섬유",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200700170351309",
+  "name": "리얼닥터 프로프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211797",
+  "name": "서른번의 슬림샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021832",
+  "name": "프리미엄 비움 플러스컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021989",
+  "name": "프로비던스 포스트바이오틱스 데일리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2016001227885",
+  "name": "쉬움-비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032683",
+  "name": "락토핏 프리바이오틱스 츄어블",
+  "reason": "SERVING_PARSE_FAILED"
+ },
+ {
+  "statementNo": "200400200024027",
+  "name": "셀럽워터 바디라이너",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236285",
+  "name": "김오곤 원장의 한방(One Punch) 다이어트 환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200082041",
+  "name": "이너케어 프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200700170352271",
+  "name": "닥터에스더 단백질 프리미엄 곡물맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236319",
+  "name": "파랑물 부스팅 워터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023198",
+  "name": "톡스올로지 클렌즈 비움 (Talksology Cleanse Vium)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020812",
+  "name": "셀티바 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015149",
+  "name": "여우밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002230",
+  "name": "프로&프리바이오틱스 액티브",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211399",
+  "name": "톡플레저 라즈베리블랙티맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2024002808020",
+  "name": "프리바이오 자일로부스터",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20140017002495",
+  "name": "YDY 포스트바이오틱스 GX(YDY Postbiotics GX)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "2020001612215",
+  "name": "멀티비타민&미네랄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022617",
+  "name": "헬시핏 와일드망고 다이어트 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130015151127",
+  "name": "닷티젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2015001001878",
+  "name": "배가쏘옥",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001701382",
+  "name": "뉴미인애아침",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024002",
+  "name": "INDEX 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140017002664",
+  "name": "유바이오틱스 포커스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400151071163",
+  "name": "혈당Q 카페라떼맛",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040020028299",
+  "name": "대자인 세로자임",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007543",
+  "name": "차전자피 쾌변 슬림 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061640",
+  "name": "킬팻 스피드 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015232",
+  "name": "뉴 프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483316",
+  "name": "슬림레시피",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009001600128",
+  "name": "닥터클린톡S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015110962",
+  "name": "멀티바이오틱스 면역플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001509030",
+  "name": "하이뮨 프로틴 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120019007320",
+  "name": "신바이오틱스 울트라",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353045",
+  "name": "비긴 (Nutrilite begin)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032211",
+  "name": "슈퍼라인 대장습관",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023668",
+  "name": "멜팅 슬림핏 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020643",
+  "name": "신바이오틱스 프리프로",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201022",
+  "name": "프로케어 단백질 쉐이크 산양유 초유 분리대두 유청",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201100170169",
+  "name": "해피클린(Happy clean)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352097",
+  "name": "락피더스 프리바이오틱스 구미",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211395",
+  "name": "악마 다이어트 아쿠아 슬림 피치맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352794",
+  "name": "라이필 비움샷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831854",
+  "name": "BALANCE PROTEIN HIGH SELL SLIM 밸런스프로틴 하이셀 슬림",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211694",
+  "name": "콜레우스 단백부스터",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020028507",
+  "name": "비엘에이(BLA)프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021833",
+  "name": "엠아이비(MIB) 비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20160012278145",
+  "name": "쉬움-비움Q",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052371",
+  "name": "장다콜2 밸런스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020685",
+  "name": "생유산균17종 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020621",
+  "name": "장(腸)편한 프리바이오틱스 4000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202000161226",
+  "name": "건강프로젝트 5",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "202100186817",
+  "name": "김소형원방 슬림핏 다이어트 환 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211227",
+  "name": "엘릭솔 마이크로바이옴 톡톡",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022569",
+  "name": "활력단백질",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020696",
+  "name": "더나은 생생프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353220",
+  "name": "INDEX 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200031184",
+  "name": "비우자",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20220011370240",
+  "name": "오늘부터 루트컷",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200700170352979",
+  "name": "장플랜 90",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211837",
+  "name": "아이스번",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831317",
+  "name": "홍트리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200024078",
+  "name": "식이섬유 앤 다이어트 젤리 사과맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2010001800217",
+  "name": "프리미엄 밸런스톡스(Talk's)",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200081214",
+  "name": "더블 액션 다이어트 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015271",
+  "name": "웰러스폴리시아포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211529",
+  "name": "모던풀 다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483173",
+  "name": "포스트 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032704",
+  "name": "The 쏘옥 다이어트 젤리 청포도맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001602479",
+  "name": "락토미인 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20120017002174",
+  "name": "장건강 마이크로바이옴 메가바이오틱스 프로&프리바이오틱스 생유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236345",
+  "name": "세리번 오아시스 라인컷 V2",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20200016052237",
+  "name": "탄수컷 다이어트 나나환",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017006985",
+  "name": "셀티바 신SYN프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "202500178682",
+  "name": "황금구렁이 데일리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "201900091059",
+  "name": "신프로&프리바이오틱스5000",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020674",
+  "name": "락티브 신포스트바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020010385",
+  "name": "엠쁘띠",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020695",
+  "name": "프리미엄 프리바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170351703",
+  "name": "jw중외제약 신(SYN) 퍼스트바이오틱스 프리바이오틱스 프로바이오틱스 100억 유산균",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211325",
+  "name": "빼고빼고카페마일드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021978",
+  "name": "이너락토플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009394108",
+  "name": "초록이 쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211152",
+  "name": "콜레올로지 티 하비탈출(Hobby Escape)",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200201217",
+  "name": "다빔 혈당+다이어트 쾌변비결",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190004553472",
+  "name": "가르시니아 하루비움 LAB",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020700",
+  "name": "프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022245",
+  "name": "아락소프트핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288023652",
+  "name": "프리바이오틱스 FOS 에프오에스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400150831089",
+  "name": "보령 프리바이오틱스 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20090016001178",
+  "name": "가비채 가볍고",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021904",
+  "name": "장의신(神) 프로바이오틱스앤프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024175",
+  "name": "서흥 팻다운샷 콜레우스+가르시니아",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200081949",
+  "name": "듀얼스틱 장케어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046574",
+  "name": "멀티프리바이오틱스 프락토올리고당",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022001022214",
+  "name": "맥스컷 다이어트 핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352702",
+  "name": "엔바이탈 눈꽃 차전자피 가르시니아 슬림핏",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20150010018159",
+  "name": "초록이 슬림밸런스&쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483770",
+  "name": "쾌변 다이어트 차전자피 카테킨",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20220010222117",
+  "name": "푸응 7 Days 데일리버닝",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020046596",
+  "name": "셀티바 대장비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020785",
+  "name": "프리바이오틱스 FOS(에프오에스) 코어",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2017288019312",
+  "name": "감비천 비움 더블액션",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017015440",
+  "name": "살뺄라카노",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200021958",
+  "name": "판타스틱M",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20172880236210",
+  "name": "골드워터 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024284",
+  "name": "칼로-슬림다운",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170353022",
+  "name": "탄탄 젤리 더블컷 다이어트 애플유자맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000910560",
+  "name": "유산균대장",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2022002106720",
+  "name": "장건강 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001407159",
+  "name": "슬림쏙 플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001536231",
+  "name": "늘비움",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017021763",
+  "name": "굿모닝쾌변다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2009001702319",
+  "name": "커브스 슬림원 씬",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20190009483840",
+  "name": "초록이 슬림&쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20130020024412",
+  "name": "에브리컷",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352623",
+  "name": "눈꽃 차전자피 쾌변 & 다이어트 S",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200061827",
+  "name": "칼로커트 부스터 워터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200023934",
+  "name": "혈당관리젤리 자몽맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200201254",
+  "name": "허리쏘옥 다이어트 자몽허니블랙티맛",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200022725",
+  "name": "닥터프로그램마더스프리바이오틱스",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400200081749",
+  "name": "튼튼닷컴 프리바이오틱스 FOS",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040017106275",
+  "name": "속편한 하루 프리미엄",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "200400170061844",
+  "name": "방탄젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20120017002181",
+  "name": "뉴메이트 포스트바이오틱스 마이크로바이옴",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019000939496",
+  "name": "초록이 슬림밸런스&쾌변",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020720",
+  "name": "7일만 클린다이어트",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200700170352904",
+  "name": "하루비움 클린업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200600200032597",
+  "name": "칼로리카노 블랜디드 프리미엄",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020264",
+  "name": "당 골드",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040017046113",
+  "name": "비울핏 화이버",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040015162329",
+  "name": "네이처드림 장에좋은 프리바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20140020012158",
+  "name": "딥트3일 사이언스 업",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400170211050",
+  "name": "광동 마이크로바이옴 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020020778",
+  "name": "프리앤프로 신바이오틱스 골드",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2004001507233",
+  "name": "해피플러스센스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020006721",
+  "name": "폴리덱스화이버식이섬유",
+  "reason": "FN_EN_PENDING"
+ },
+ {
+  "statementNo": "20040020010400",
+  "name": "아이러브 화이버 베이직",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2023002876634",
+  "name": "리몬데이톡(Talk)",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "200400200201007",
+  "name": "장가드 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20110020099199",
+  "name": "겟라이트234 젤리",
+  "reason": "LIQUID"
+ },
+ {
+  "statementNo": "20040017068206",
+  "name": "바디팻 신바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20210016229121",
+  "name": "혈당 컷 푸푸 쾌변&마그네슘 젤리",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "2019001602448",
+  "name": "일양 장쾌변 슬림 콜레스테롤 쓰리플러스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "20040020004392",
+  "name": "닥터에스더 L-카르니틴 부스터",
+  "reason": "PARTNER_COMBO_ROUTE"
+ },
+ {
+  "statementNo": "200400200083197",
+  "name": "프리바이오틱스 and 프로바이오틱스",
+  "reason": "PARTNER_COMBO_ROUTE"
+ }
+]
