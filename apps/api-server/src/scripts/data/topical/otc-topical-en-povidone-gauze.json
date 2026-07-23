@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V5",
+ "slug": "povidone-gauze",
+ "translation": {
+  "groupKey": "포비돈요오드|gauze",
+  "title": "Povidone-Iodine Medicated gauze ball",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for the germicidal disinfection of torn wounds, burns and wounds, the germicidal disinfection of ulcers and abscesses, the disinfection of infected skin surfaces, the germicidal disinfection of surgical sites, and the disinfection of injection and catheter sites.",
+  "usage": "Apply an appropriate amount to the affected area several times a day.",
+  "caution": "Do not use this medicine if you are hypersensitive to it, if you have thyroid dysfunction (especially nodular goiter, endemic goiter or Hashimoto's thyroiditis) or kidney failure, if you have dermatitis herpetiformis, before or after radioactive iodine treatment, or in newborns and infants under 6 months. Before using it, consult a doctor or pharmacist if you are severely ill (such as burn patients), if you have experienced thyroid disease or kidney failure, or if you are pregnant or may be pregnant, or breastfeeding. Do not use it in the eyes or take it by mouth. Be careful not to let it get into the eyes; if it does, rinse them immediately with clean water. Do not mix it with other preparations. Soaps weaken the germicidal action of this medicine, so wash them off thoroughly before use. Wash the affected area clean and disinfect it. When using it on severe wounds, use distilled water for injection or sterile purified water as the diluent — do not use tap water or ordinary purified water. Do not use it together with hydrogen peroxide; consult a doctor or pharmacist when using it with lithium preparations, chlorhexidine, silver sulfadiazine compounds, alkalis, mercury-containing preparations or enzyme-based wound treatments. Stop use immediately and consult a doctor or pharmacist if adverse reactions occur, such as rare shock symptoms (difficulty breathing, flushing, hives and itching, swelling, and heartburn together with a pale face, cold hands and feet, cold sweat or shortness of breath), iodine eruptions (iododerma), occasional pain, irritation, a rash, redness or dermatitis, and rarely a burning feeling, skin ulcers, contact dermatitis or skin discoloration.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Povidone-iodine",
+   "Form": "Medicated gauze ball"
+  }
+ }
+}

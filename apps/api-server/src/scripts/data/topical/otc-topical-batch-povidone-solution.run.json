@@ -1,0 +1,79 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V4",
+ "ingredient": "포비돈요오드",
+ "form": "액",
+ "slugbase": "povidone-solution",
+ "mode": "APPLY",
+ "producedFps": [],
+ "heldFps": [
+  {
+   "fp": "bb0294b822c0d594",
+   "n": 2,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "7c85970586da3438",
+   "n": 2,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내(입안) 살균소독, 인두염, 후두염, 구내염(입안염), 발"
+  },
+  {
+   "fp": "53b790dae9f8e2f5",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 수술부위의 살균소독에 사용합니다."
+  },
+  {
+   "fp": "ca62a115839b8127",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "067beba9837e61d5",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 수술부위의 살균소독에 사용합니다."
+  },
+  {
+   "fp": "bcc7f57268c88698",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "331f6f82fdde8304",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "c08b8ca200a78e86",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 수술부위의 살균소독에 사용합니다."
+  },
+  {
+   "fp": "949c28efeed49dd5",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "ccfad201309e47c3",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 구강내 살균소독, 인두염, 후두염, 구내염, 발치후 및 구내수술"
+  },
+  {
+   "fp": "35a24b59f370dcda",
+   "n": 1,
+   "reason": "HOLD_EFF_MISMATCH",
+   "effSample": "이 약은 수술부위의 살균소독에 사용합니다."
+  }
+ ],
+ "masters": 0,
+ "koWrite": 0,
+ "enWrite": 0
+}

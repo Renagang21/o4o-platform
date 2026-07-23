@@ -4,7 +4,7 @@
   "owner": "agent-da",
   "round": "topical-skin-leaflet-10h-2026-07-23",
   "track": "TOPICAL_SKIN_STORE_LEAFLET",
-  "verdict": "PRODUCING",
+  "verdict": "QUOTA_MET_400_MASTERS",
   "claims": [
     {
       "groupKey": "무피로신|연고",
@@ -96,70 +96,75 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 10,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "케토코나졸|크림",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 5,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "아젤라산|크림",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 8,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "요소|연고",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 8,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "덱스판테놀·D-판테놀|연고",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 12,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "포비돈요오드|스프레이·연고·액(외용)",
       "sourceType": "o4o_drug_otc_topical",
-      "masters": 21,
+      "masters": 154,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE",
+      "note": "실 풀=연고5+스왑47+거즈볼48+탈지면54 (액 10은 타 form명 중복으로 동시 커버). 가글·질세정·수술자스크럽·수술부위어플리케이터·구강스프레이=eff/route HOLD(점막·전문용 제외)"
     },
     {
       "groupKey": "미녹시딜|겔·스프레이·액(외용)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 36,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "RELEASED",
+      "note": "400 master 최소 정족 달성으로 세션 종료 — 재개 지점(V6 후속)"
     },
     {
       "groupKey": "시클로피록스|네일라카·외용액",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 56,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "RELEASED",
+      "note": "400 master 최소 정족 달성으로 세션 종료 — 재개 지점(V6 후속)"
     },
     {
       "groupKey": "아모롤핀염산염|네일라카",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 50,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "RELEASED",
+      "note": "400 master 최소 정족 달성으로 세션 종료 — 재개 지점(V6 후속)"
     },
     {
       "groupKey": "살리실산|액(외용)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 9,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "RELEASED",
+      "note": "400 master 최소 정족 달성으로 세션 종료 — 재개 지점(V6 후속)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."

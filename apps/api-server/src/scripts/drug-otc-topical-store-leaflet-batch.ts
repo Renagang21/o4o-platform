@@ -73,10 +73,11 @@ function fingerprintOf(name: string, spec: string, content: string): { fp: strin
 const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 설명입니다. 사용 전·후 궁금한 점이나 이상이 있으면 매장 내 약사 등 전문가와 상담하세요.';
 /** V5: 원문 전체 맥락이 피부 외용으로 명확('외용으로만/외용으로 사용' 명시)한 경우에 한해, 원문 데이터의 경구 오기(복용하지 마십시오/복용을 중지)를 외용 표현으로 정규화. 그 외 경구 표현은 기존 가드(HOLD_KO) 유지. */
 function normalizeOralMisphrase(text: string, fullContent: string): string {
-  if (!/외용으로만|외용으로 사용/.test(stripTags(fullContent || ''))) return text;
+  if (!/외용으로만|외용으로 사용|도포|바르|바릅|발라/.test(stripTags(fullContent || ''))) return text; // '도포'·'바르-'(활용형 바릅/발라 포함)=외용 적용 명시(경구제 원문에는 등장하지 않음)
   return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
-    .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록'); // 외용전용 지시(의미 보존 재표현)
+    .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록') // 외용전용 지시(의미 보존 재표현)
+    .replace(/내복용/g, '먹는 용도'); // '내복용으로 사용하지 마십시오' 등 외용전용 경고(의미 보존 재표현)
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }
