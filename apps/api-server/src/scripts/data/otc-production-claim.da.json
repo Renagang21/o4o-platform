@@ -253,6 +253,62 @@
       "op": "KO_EN",
       "status": "DONE",
       "note": "V6 완결 2fp/4 = 유락신연고+타미락신연고(동일 문구, EN 1형 공유·단일 서브런 form=연고). 급성 루푸스성 피부염 금기·안과용 금지 보존. ko4=en4·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "무피로신|연고",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 박트리안연고 4=1 원문형. 점막·중앙정맥 삽관부위 금지 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "세르타코나졸질산염|크림",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 더모픽스크림 4=1 원문형. 백선·칸디다증·어우러기 효능 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "아모롤핀염산염|크림",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 로마릴크림2+로세릴크림2=2 원문형(로마릴=프로필렌글리콜 상담·30℃, 로세릴=25℃). 네일라카와 별개 크림 풀 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "케토코나졸|외용액",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 댄스탑외용액 4=1 원문형(비듬·지루피부염·어루러기, 샴푸형 도포 후 헹굼) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "뮤코폴리사카리드폴리설페이트|겔",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 히루도이드포르테겔 4=1 원문형. 헤파린 과민·혈소판감소증 금기 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "우레아|연고",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 4,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 베이덤연고 4=1 원문형(각피증·어린선·아토피피부) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "히알루론산나트륨|겔·크림(코네티비나)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 6,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 코네티비나겔4+코네티비나크림2=2 원문형(무통성 상처). 히아로겔·치아로겔=치은 구강 점막 제외, 코네티비나거즈 5=거즈 제형 제외, 아시클로버=구순·생식기 포진 점막 인접 후순위 보류 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
