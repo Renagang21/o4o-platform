@@ -1,0 +1,30 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 클로닉신리시네이트 125mg 정 그룹 TM 저작(10줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "클로닉신리시네이트|125밀리그램|정",
+  "meta": {
+    "titleKo": "클로닉신리시네이트 125mg 정 (진통제)",
+    "titleEn": "Clonixin Lysinate 125 mg Tablets (Analgesic)",
+    "ingKo": "클로닉신리시네이트 125밀리그램",
+    "ingEn": "Clonixin lysinate 125 mg",
+    "actionKo": "통증을 일으키는 물질의 생성을 억제하여 경증·중등도 통증을 완화하는 비스테로이드성 진통제입니다.",
+    "actionEn": "A non-steroidal analgesic that relieves mild to moderate pain by inhibiting the production of pain-causing substances."
+  },
+  "effSummaries": {
+    "968cf605": { "symKo": "근육통·신경통·외상후/수술후 통증·두통·치통·귀통증의 경증 또는 중등도 통증", "symEn": "Mild or moderate pain: muscle pain, neuralgia, post-traumatic and post-operative pain, headache, toothache, ear pain", "pointKo": "경증·중등도 통증 완화에 쓰는 클로닉신 진통제입니다.", "pointEn": "A clonixin analgesic for relieving mild to moderate pain." }
+  },
+  "cauSummaries": {
+    "94cd03ef": { "watchKo": "소화성궤양·과민증·아스피린/NSAID 천식 경험·CABG 전후 통증·임부(가능성 포함)·심한 간/신장애·심한 심부전·염증성 장질환은 복용 금지, 소화성궤양 경험자·소아/고령자·고혈압·심부전·기관지천식·간/신장애(경험 포함)는 복용 전 상담", "watchEn": "Do not use with peptic ulcer, hypersensitivity, aspirin/NSAID-induced asthma history, CABG-related pain, pregnancy (or possible), severe liver/kidney disorders, severe heart failure, or inflammatory bowel disease; consult before use with peptic ulcer history, for children and the elderly, or with hypertension, heart failure, bronchial asthma, or liver/kidney disorders (including history)" }
+  },
+  "en": {
+    "968cf605": "This medicine is used to relieve mild or moderate pain: muscle pain, neuralgia, post-traumatic and post-operative pain, headache, toothache, and ear pain.",
+    "8ad7fce9": "Adults take 1 to 2 tablets (125 to 250 mg) per dose, 3 times a day.",
+    "d400605f": "Adults take 1 to 2 tablets (125 to 250 mg) per dose, 3 times a day.",
+    "94cd03ef": "Do not take this medicine if you have a peptic ulcer or drug-induced gastric or duodenal disturbance; are hypersensitive to this medicine; have experienced asthma, hives, or allergic reactions to aspirin or other non-steroidal anti-inflammatory drugs (including COX-2 inhibitors); are being treated for pain before or after coronary artery bypass graft (CABG) surgery; are pregnant or may be pregnant; or have severe liver disorders, severe kidney disorders, severe heart failure, or inflammatory bowel disease such as Crohn's disease or ulcerative colitis. Before taking this medicine, consult a doctor or pharmacist if you have experienced a peptic ulcer; for children and the elderly; or if you have hypertension, fluid retention or heart failure, bronchial asthma, or liver or kidney disorders, or have experienced them.",
+    "aa880ae4": "Do not take this medicine if you have a peptic ulcer or drug-induced gastric or duodenal disturbance; are hypersensitive to this medicine; have experienced asthma, hives, or allergic reactions to aspirin or other non-steroidal anti-inflammatory drugs (including COX-2 inhibitors); are being treated for pain before or after coronary artery bypass graft (CABG) surgery; are pregnant, may be pregnant, or are breastfeeding; have severe liver disorders, severe kidney disorders, severe heart failure, or inflammatory bowel disease such as Crohn's disease or ulcerative colitis; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "e58bdae1": "Before taking this medicine, consult a doctor or pharmacist if you have experienced a peptic ulcer; for children and the elderly; if you have hypertension, fluid retention or heart failure, bronchial asthma, or liver or kidney disorders, or have experienced them; or if you are hypersensitive to Yellow No. 4 or have experienced allergic reactions to it.",
+    "c8d1876f": "Before taking this medicine, consult a doctor or pharmacist if you are also being treated for a peptic ulcer with misoprostol or similar medicines.",
+    "d1abc475": "While taking this medicine, do not take other non-steroidal anti-inflammatory drugs, ACE inhibitors or angiotensin II receptor antagonists, aspirin, diuretics, lithium, methotrexate, coumarin anticoagulants (such as warfarin), cyclosporine and tacrolimus, antiplatelet agents and selective serotonin reuptake inhibitors (SSRIs), or corticosteroids together with it.",
+    "550b3e95": "While taking this medicine, do not take other non-steroidal anti-inflammatory drugs, ACE inhibitors or angiotensin II receptor antagonists, aspirin, diuretics, lithium, methotrexate, coumarin anticoagulants (such as warfarin), cyclosporine and tacrolimus, antiplatelet agents and selective serotonin reuptake inhibitors (SSRIs), or corticosteroids together with it. Before taking this medicine, consult a doctor or pharmacist if you are also being treated for a peptic ulcer with misoprostol or similar medicines.",
+    "88a01364": "If nausea, vomiting, diarrhea, constipation, abdominal pain, gastrointestinal bleeding, peptic ulcer and perforation, or, in rare cases, shock, rash, itching, anemia, elevated AST and ALT, drowsiness, headache, dizziness, cold sweats, chills, or unusual euphoria occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "clonixin125-01",
+  "order": 1501,
+  "groupKey": "클로닉신리시네이트|125밀리그램|정",
+  "safetyFp": "620fa22b08df9b0d",
+  "sourceRef": "3563da9c-b4c0-4e92-8a03-c14faf59b60e",
+  "sensitive": false,
+  "title": "클로닉신리시네이트 125mg 정 (진통제)",
+  "expectEasyMd5": "57428761",
+  "masterIds": [
+    "00af8365-0851-411d-9c34-f160988dc031",
+    "066de9ab-9f0d-4b12-8038-d9205b72cc2e",
+    "1151a83f-6ddd-4efe-b402-cefc415791e6",
+    "20c256f0-220f-44f6-8b96-f28b42a7281f",
+    "37d923f3-cb0d-4aef-8c42-dab21af76063",
+    "46d2eddc-0818-48d3-bbf7-7f259b3833d3",
+    "61702b78-7164-4a42-8545-ff152ebb000d",
+    "66cc32cd-f72f-4265-a242-ebde879e0948",
+    "6bdad241-f815-4455-938a-833584cd24da",
+    "708d046f-e5b1-4fec-a21a-b555bfd34caf",
+    "95a4f0ce-2766-407f-8a0d-9159d896cf98",
+    "96a34f84-959e-4223-a76e-dcf64fc8a8d0",
+    "a7bfffca-4e71-4ba1-acf7-11273f54bed5",
+    "caaa9b81-0286-4df3-bf35-789e57df5d08",
+    "cbb15b01-9646-4224-83c3-439b94c6fe54",
+    "e06d5274-bada-463c-8454-debaac47142f",
+    "e3dc15f6-a1c1-4cd0-ab7b-3e6bf740a035",
+    "eb21a4dd-d22c-4e9e-b7ae-2e22f24a2090",
+    "f552ae70-7275-4fd6-a3ec-420056171693",
+    "fcbde015-3bf1-46e5-b9a3-9e6472e5a651"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "57428761",
+    "names": [
+      "디크로닉정(클로닉신리시네이트)",
+      "바로닉신정125밀리그램(클로닉신리시네이트)",
+      "바르젠정(클로닉신리시네이트)",
+      "크로낙정(클로닉신리시네이트)",
+      "페릭신정(클로닉신리시네이트)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 80,
+    "en": 40,
+    "total": 120
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 근육통, 신경통, 외상후 및 수술후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화에 사용합니다.",
+    "usage": "성인은 1회 1~2정(125∼250 mg), 1일 3회 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "소화성궤양 환자, 약물에 기인하여 위·십이지장에 동요 발현시, 이 약에 과민증 환자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 억제제 포함)에 천식, 두드러기 또는 알레르기 반응 경험자, 관상동맥 우회로술(CABG) 전후에 발생하는 통증의 치료 환자, 임부 또는 임신하고 있을 가능성이 있는 여성, 심한 간장애, 심한 신장애, 심한 심부전, 크론병 또는 궤양성 대장염과 같은 염증성 장질환 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 소화성궤양의 경험자, 소아 및 고령자, 고혈압, 체액저류 또는 심부전, 기관지천식 환자, 간장애, 신장애 환자 또는 경험자는 의사 또는 약사와 상의하십시오.\n\n이 약을 복용하는 동안 다른 비스테로이드성 소염진통제, ACE 억제제 또는 안지오텐신Ⅱ 수용체 길항제, 아스피린, 이뇨제, 리튬, 메토트렉세이트, 쿠마린계 항응고제(와파린 등), 시클로스포린 및 타크로리무스, 항혈소판제 및 선택적 세로토닌 재흡수 억제제(SSRI), 코르티코스테로이드를 함께 복용하지 마십시오.이 약을 복용하기 전에 미소프로스톨 등으로 소화성궤양 치료를 병행하고 있는 환자는 의사 또는 약사와 상의하십시오.\n\n구역, 구토, 설사, 변비, 복통, 위장출혈, 소화성궤양 및 천공, 드물게 쇼크, 발진, 가려움, 빈혈, AST와 ALT의 상승, 졸음, 두통, 어지러움, 식은땀, 한기, 이상황홀감 등이 나타나면 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "클로닉신리시네이트 125밀리그램",
+      "작용": "통증을 일으키는 물질의 생성을 억제하여 경증·중등도 통증을 완화하는 비스테로이드성 진통제입니다.",
+      "주요 증상": "근육통·신경통·외상후/수술후 통증·두통·치통·귀통증의 경증 또는 중등도 통증",
+      "주의 대상": "소화성궤양·과민증·아스피린/NSAID 천식 경험·CABG 전후 통증·임부(가능성 포함)·심한 간/신장애·심한 심부전·염증성 장질환은 복용 금지, 소화성궤양 경험자·소아/고령자·고혈압·심부전·기관지천식·간/신장애(경험 포함)는 복용 전 상담",
+      "선택 포인트": "경증·중등도 통증 완화에 쓰는 클로닉신 진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Clonixin Lysinate 125 mg Tablets (Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to relieve mild or moderate pain: muscle pain, neuralgia, post-traumatic and post-operative pain, headache, toothache, and ear pain.",
+    "usage": "Adults take 1 to 2 tablets (125 to 250 mg) per dose, 3 times a day.",
+    "caution": "Do not take this medicine if you have a peptic ulcer or drug-induced gastric or duodenal disturbance; are hypersensitive to this medicine; have experienced asthma, hives, or allergic reactions to aspirin or other non-steroidal anti-inflammatory drugs (including COX-2 inhibitors); are being treated for pain before or after coronary artery bypass graft (CABG) surgery; are pregnant or may be pregnant; or have severe liver disorders, severe kidney disorders, severe heart failure, or inflammatory bowel disease such as Crohn's disease or ulcerative colitis. Before taking this medicine, consult a doctor or pharmacist if you have experienced a peptic ulcer; for children and the elderly; or if you have hypertension, fluid retention or heart failure, bronchial asthma, or liver or kidney disorders, or have experienced them. While taking this medicine, do not take other non-steroidal anti-inflammatory drugs, ACE inhibitors or angiotensin II receptor antagonists, aspirin, diuretics, lithium, methotrexate, coumarin anticoagulants (such as warfarin), cyclosporine and tacrolimus, antiplatelet agents and selective serotonin reuptake inhibitors (SSRIs), or corticosteroids together with it. Before taking this medicine, consult a doctor or pharmacist if you are also being treated for a peptic ulcer with misoprostol or similar medicines. If nausea, vomiting, diarrhea, constipation, abdominal pain, gastrointestinal bleeding, peptic ulcer and perforation, or, in rare cases, shock, rash, itching, anemia, elevated AST and ALT, drowsiness, headache, dizziness, cold sweats, chills, or unusual euphoria occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Clonixin lysinate 125 mg",
+      "How it works": "A non-steroidal analgesic that relieves mild to moderate pain by inhibiting the production of pain-causing substances.",
+      "Main symptoms": "Mild or moderate pain: muscle pain, neuralgia, post-traumatic and post-operative pain, headache, toothache, ear pain",
+      "Caution for": "Do not use with peptic ulcer, hypersensitivity, aspirin/NSAID-induced asthma history, CABG-related pain, pregnancy (or possible), severe liver/kidney disorders, severe heart failure, or inflammatory bowel disease; consult before use with peptic ulcer history, for children and the elderly, or with hypertension, heart failure, bronchial asthma, or liver/kidney disorders (including history)",
+      "Why this one": "A clonixin analgesic for relieving mild to moderate pain."
+    }
+  }
+}

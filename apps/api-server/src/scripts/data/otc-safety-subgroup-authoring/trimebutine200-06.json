@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "trimebutine200-06",
+  "order": 1406,
+  "groupKey": "트리메부틴말레산염|200밀리그램|정",
+  "safetyFp": "da200d65248ea621",
+  "sourceRef": "c607066b-588b-4646-8ced-dc885a993c8d",
+  "sensitive": false,
+  "title": "트리메부틴말레산염 200mg 정 (위장운동조절제)",
+  "expectEasyMd5": "ab798e23",
+  "masterIds": [
+    "a689f5ca-5525-47ff-9f77-44d1a477a805",
+    "f7866ddc-0a47-4921-adba-d98bbd2d1996"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "ab798e23",
+    "names": [
+      "제이부틴더블정(트리메부틴말레산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 식도역류 및 열공(구멍)헤르니아(탈장), 위·십이지장염, 위·십이지장궤양에 있어서의 소화기능이상 (복통(배아픔), 소화불량, 구역, 구토), 과민성대장증후군 및 경련성 결장, 소아 질환으로 습관성 구토, 비감염성 장관통과장애(변비, 설사)에 사용합니다.",
+    "usage": "성인은 1회 1/2~1정씩(100-200 mg), 1일 3회 식전에 복용합니다.\n\n연령, 증상에 따라 적절히 증감합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "황색4호에 과민증 환자 또는 경험자, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부 또는 수유부는 의사 또는 약사와 상의하십시오.\n\n드물게 변비, 설사, 복명(창자 가스소리), 구역, 구토, 소화장애, 목마름, 입안 마비감, 심계항진(두근거림), 피로감, 졸음, 현기(어지러움), 권태감, 두통, GOT, GPT상승, 발진 등이 나타날 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "트리메부틴말레산염 200밀리그램",
+      "작용": "위장관 운동을 조절하여 소화기능 이상과 과민성대장증후군 증상을 개선하는 위장운동조절제입니다.",
+      "주요 증상": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애",
+      "주의 대상": "황색4호 과민증(경험 포함)·갈락토오스 불내성 등 유전적 문제 복용 금지",
+      "선택 포인트": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Trimebutine Maleate 200 mg Tablets (Gastrointestinal Motility Regulator)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal (opening) hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and, as childhood conditions, for habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea).",
+    "usage": "Adults take 1/2 to 1 tablet (100 to 200 mg) per dose, 3 times a day, before meals. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you are hypersensitive to Yellow No. 4 or have experienced hypersensitivity to it, or if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding. In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, thirst, numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Trimebutine maleate 200 mg",
+      "How it works": "A gastrointestinal motility regulator that improves digestive function abnormalities and irritable bowel syndrome symptoms by regulating gut movement.",
+      "Main symptoms": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders",
+      "Caution for": "Do not use with Yellow No. 4 hypersensitivity (including history) or hereditary problems such as galactose intolerance",
+      "Why this one": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms."
+    }
+  }
+}

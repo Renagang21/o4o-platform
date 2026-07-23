@@ -1,0 +1,52 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 트리메부틴말레산염 200mg 정 그룹 TM 저작(26줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "트리메부틴말레산염|200밀리그램|정",
+  "meta": {
+    "titleKo": "트리메부틴말레산염 200mg 정 (위장운동조절제)",
+    "titleEn": "Trimebutine Maleate 200 mg Tablets (Gastrointestinal Motility Regulator)",
+    "ingKo": "트리메부틴말레산염 200밀리그램",
+    "ingEn": "Trimebutine maleate 200 mg",
+    "actionKo": "위장관 운동을 조절하여 소화기능 이상과 과민성대장증후군 증상을 개선하는 위장운동조절제입니다.",
+    "actionEn": "A gastrointestinal motility regulator that improves digestive function abnormalities and irritable bowel syndrome symptoms by regulating gut movement."
+  },
+  "effSummaries": {
+    "75fd1ca8": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "18714f6b": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "3802dfc4": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "82a761dd": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "d3d3be9f": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." }
+  },
+  "cauSummaries": {
+    "48e8c38f": { "watchKo": "갈락토오스 불내성 등 유전적 문제 복용 금지, 임부(가능성 포함)·수유부·황색4호 과민증(경험 포함)은 복용 전 상담", "watchEn": "Do not use with hereditary problems such as galactose intolerance; consult before use if pregnant (or possibly), breastfeeding, or hypersensitive to Yellow No. 4 (including history)" },
+    "d76cae40": { "watchKo": "황색4호 과민증(경험 포함)·갈락토오스 불내성 등 유전적 문제 복용 금지", "watchEn": "Do not use with Yellow No. 4 hypersensitivity (including history) or hereditary problems such as galactose intolerance" },
+    "e2114f4c": { "watchKo": "황색4호 과민증(경험 포함)·임부(가능성 포함)·수유부는 복용 전 상담", "watchEn": "Consult before use with Yellow No. 4 hypersensitivity (including history), if pregnant (or possibly), or breastfeeding" }
+  },
+  "en": {
+    "75fd1ca8": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and for childhood conditions (habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea)).",
+    "18714f6b": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal (opening) hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and for childhood conditions (habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea)).",
+    "3802dfc4": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal (opening) hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and, as childhood conditions, for habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea).",
+    "82a761dd": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and for childhood conditions (habitual vomiting and non-infectious intestinal transit disorders such as constipation and diarrhea).",
+    "6d56a7ba": "This medicine is used for digestive function abnormalities in esophageal reflux and hiatal (opening) hernia, gastritis and duodenitis, and gastric and duodenal ulcers, and for irritable bowel syndrome and spastic colon.",
+    "6e3b4051": "This medicine is used for habitual vomiting in children and for non-infectious intestinal transit disorders (constipation, diarrhea).",
+    "e3820fa0": "Adults take 0.5 to 1 tablet (100 to 200 mg) per dose, 3 times a day, before meals.",
+    "a620c3ef": "Adults take 0.5 to 1 tablet (100 to 200 mg) per dose, 3 times a day, before meals. Adjust appropriately according to age and symptoms.",
+    "1dc76b29": "Adults take 1/2 to 1 tablet (100 to 200 mg) per dose, 3 times a day, before meals.",
+    "563d4418": "Adults take 1/2 to 1 tablet (100 to 200 mg) per dose, 3 times a day, before meals. Adjust appropriately according to age and symptoms.",
+    "7910027f": "Adults take 100 to 200 mg per 1 dose, orally 3 times a day, before meals.",
+    "dc7bb617": "Adults take 100 to 200 mg per 1 dose, 3 times a day, before meals.",
+    "1921a596": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding.",
+    "31e037e3": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding, or if you are hypersensitive to Yellow No. 4 or have experienced allergic reactions to it.",
+    "544fc0f4": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, are breastfeeding, or are hypersensitive to Yellow No. 4 or have experienced allergic reactions to it.",
+    "b6f77c45": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, are breastfeeding, or are hypersensitive to Yellow No. 4 or have experienced allergic reactions to it.",
+    "e5350794": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, are breastfeeding, or are hypersensitive to Yellow No. 4 or have experienced hypersensitivity to it.",
+    "e2114f4c": "Before taking this medicine, consult a doctor or pharmacist if you are hypersensitive to Yellow No. 4 or have experienced hypersensitivity to it, or if you are pregnant, may be pregnant, or are breastfeeding.",
+    "48e8c38f": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, are breastfeeding, or are hypersensitive to Yellow No. 4 or have experienced hypersensitivity to it.",
+    "d76cae40": "Do not take this medicine if you are hypersensitive to Yellow No. 4 or have experienced hypersensitivity to it, or if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "44b29d67": "If a breastfeeding woman must take this medicine, stop breastfeeding.",
+    "1a1c1a85": "If constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "1aaf134e": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, thirst, numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "699e077b": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "2353f19c": "In rare cases, if rash or similar symptoms occur, stop taking this medicine immediately and consult a doctor or pharmacist. In rare cases, constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, and elevated GOT and GPT may occur.",
+    "2d2761a4": "In rare cases, constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, and elevated GOT and GPT may occur."
+  }
+}

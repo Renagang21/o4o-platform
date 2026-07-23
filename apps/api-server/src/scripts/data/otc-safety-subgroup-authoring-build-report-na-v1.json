@@ -3,91 +3,121 @@
   "agent": "나",
   "built": [
     {
-      "slug": "fexofenadine120-01",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "2f318ff7d7ad1095",
-      "T": 5,
-      "order": 1301,
-      "sourceRef": "fe84f261-847a-40a4-8648-91fd6c704fc8",
-      "koHtmlLen": 2083,
-      "enHtmlLen": 3675
-    },
-    {
-      "slug": "fexofenadine120-02",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "342888e0806a95c7",
-      "T": 5,
-      "order": 1302,
-      "sourceRef": "3c425976-8aa7-42b2-81ab-84ab0e0fb24d",
-      "koHtmlLen": 2077,
-      "enHtmlLen": 3706
-    },
-    {
-      "slug": "fexofenadine120-03",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "548624cb0959a55e",
-      "T": 5,
-      "order": 1303,
-      "sourceRef": "66519e2c-a8c7-43e5-8a31-006c70a916fb",
-      "koHtmlLen": 2096,
-      "enHtmlLen": 3695
-    },
-    {
-      "slug": "fexofenadine120-04",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "e5addac2c49668ad",
+      "slug": "ibuprofen400cap-01",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "5e2f26e21e181fdf",
       "T": 4,
-      "order": 1304,
-      "sourceRef": "75788d3e-e948-45c5-86ed-67f3d4a6c580",
-      "koHtmlLen": 2084,
-      "enHtmlLen": 3675
+      "order": 1601,
+      "sourceRef": "25d32744-17e5-4471-8fea-2811fe8a6b8f",
+      "koHtmlLen": 3902,
+      "enHtmlLen": 8282
     },
     {
-      "slug": "fexofenadine120-05",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "d5df80b3da7acf6b",
-      "T": 3,
-      "order": 1305,
-      "sourceRef": "5577bbb2-e5ea-4a80-81a6-1eaf671ddd26",
-      "koHtmlLen": 2086,
-      "enHtmlLen": 3859
-    },
-    {
-      "slug": "fexofenadine120-06",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "e3b53055edb6cc22",
-      "T": 3,
-      "order": 1306,
-      "sourceRef": "e14b3144-2a02-49a2-8e8b-001acd480d5f",
-      "koHtmlLen": 2177,
-      "enHtmlLen": 3842
-    },
-    {
-      "slug": "fexofenadine120-07",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "1a04b4adf4bf56e0",
+      "slug": "ibuprofen400cap-02",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "05ec893c634dfdfd",
       "T": 2,
-      "order": 1307,
-      "sourceRef": "4bbf5888-f53a-4d3a-8b7f-d501a372ae4c",
-      "koHtmlLen": 2177,
-      "enHtmlLen": 3822
+      "order": 1602,
+      "sourceRef": "44b5d375-b73c-472f-88a5-c7a07ba98fde",
+      "koHtmlLen": 4061,
+      "enHtmlLen": 8645
     },
     {
-      "slug": "fexofenadine120-08",
-      "groupKey": "펙소페나딘염산염|120밀리그램|정",
-      "safetyFp": "9e2531477eb37832",
+      "slug": "ibuprofen400cap-03",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "05f4850ed56be04d",
       "T": 2,
-      "order": 1308,
-      "sourceRef": "9f5dd223-44d3-4f93-8fdf-5c3ca396b3f2",
-      "koHtmlLen": 2018,
-      "enHtmlLen": 3650
+      "order": 1603,
+      "sourceRef": "8d494d51-38aa-4e2a-81df-0ab26c29c036",
+      "koHtmlLen": 3981,
+      "enHtmlLen": 8443
+    },
+    {
+      "slug": "ibuprofen400cap-04",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "15e0e5b630405162",
+      "T": 2,
+      "order": 1604,
+      "sourceRef": "4f1d3234-41d5-4918-8341-5d0d211314a8",
+      "koHtmlLen": 4281,
+      "enHtmlLen": 8817
+    },
+    {
+      "slug": "ibuprofen400cap-05",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "68d4ca1b48a76541",
+      "T": 2,
+      "order": 1605,
+      "sourceRef": "248b3583-3813-43aa-8812-fff8c19d27df",
+      "koHtmlLen": 4364,
+      "enHtmlLen": 9159
+    },
+    {
+      "slug": "ibuprofen400cap-06",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "879c0bd18cfaa3ff",
+      "T": 2,
+      "order": 1606,
+      "sourceRef": "3f9ff102-58ab-4052-8ad4-2199ed0fe031",
+      "koHtmlLen": 4024,
+      "enHtmlLen": 8571
+    },
+    {
+      "slug": "ibuprofen400cap-07",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "909bc35a7eef3638",
+      "T": 2,
+      "order": 1607,
+      "sourceRef": "466ead97-3475-48a2-8be6-e0ec6bb94c8b",
+      "koHtmlLen": 4074,
+      "enHtmlLen": 8728
+    },
+    {
+      "slug": "ibuprofen400cap-08",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "d9be0d0f5c773340",
+      "T": 2,
+      "order": 1608,
+      "sourceRef": "13bc78c4-21f2-4d4b-894e-ab4bb7142b3b",
+      "koHtmlLen": 3972,
+      "enHtmlLen": 8440
+    },
+    {
+      "slug": "ibuprofen400cap-09",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "da9b98ecc856c54f",
+      "T": 2,
+      "order": 1609,
+      "sourceRef": "2e65f59c-5a19-4f7f-8b86-0f9a69e404e2",
+      "koHtmlLen": 4135,
+      "enHtmlLen": 8671
+    },
+    {
+      "slug": "ibuprofen400cap-10",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "dd93b9215db9a863",
+      "T": 2,
+      "order": 1610,
+      "sourceRef": "65d26a61-6831-4b1b-853b-a0c9c11eee3e",
+      "koHtmlLen": 4340,
+      "enHtmlLen": 9149
+    },
+    {
+      "slug": "ibuprofen400cap-11",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "f97ef9ccfbc66b8b",
+      "T": 2,
+      "order": 1611,
+      "sourceRef": "ad1ed573-71d0-437c-87e9-da74f836073c",
+      "koHtmlLen": 4032,
+      "enHtmlLen": 8585
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 8,
-    "builtMasters": 29,
+    "builtFiles": 11,
+    "builtMasters": 24,
     "holds": 0,
     "missingTm": 0
   }

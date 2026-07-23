@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "ibuprofen400cap-06",
+  "order": 1606,
+  "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+  "safetyFp": "879c0bd18cfaa3ff",
+  "sourceRef": "3f9ff102-58ab-4052-8ad4-2199ed0fe031",
+  "sensitive": false,
+  "title": "이부프로펜 400mg 연질캡슐 (해열소염진통제)",
+  "expectEasyMd5": "2e91da99",
+  "masterIds": [
+    "2410ac93-b9a3-4565-8e4e-99f9ae212387",
+    "7da16e6d-463d-4836-b008-b46ee8cbdd35"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "2e91da99",
+    "names": [
+      "미가펜후레쉬연질캡슐(이부프로펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 감기로 인한 발열 및 동통(통증), 요(허리)통, 생리통, 류마티양 관절염, 연소성(어리거나 젊은 나이에 나타나는) 류마티양 관절염, 골(뼈)관절염(퇴행성 관절질환), 수술후 동통(통증)과 두통, 편두통, 치통, 근육통, 신경통, 강직성 척추염, 급성통풍, 건선(마른비늘증)성 관절염, 연조직손상(염좌(삠), 좌상(타박상)), 비관절 류마티스질환(건염(힘줄염), 건초염(힘줄윤활막염), 활액(윤활)낭염)에 사용합니다.",
+    "usage": "류마티양 관절염, 골관절염, 강직성 척추염, 연조직손상, 비관절 류마티스질환, 급성통풍, 건선성 관절염에 성인은 1회 1/2 캡슐~1.5캡슐(200~600 mg), 1일 3~4회 복용하며 1일 최고 8캡슐(3,200 mg)까지 복용할 수 있습니다.\n\n연소성 류마티양 관절염에는 1일 체중 kg당 30~40 mg을 3~4회 분할하여 복용하며, 경증 및 중등도의 동통이나 감기에는 성인 1회 1/2캡슐~1캡슐(200~400 mg), 1일 3~4회 복용합니다.\n\n편두통에 성인은 1회 1/2~1캡슐(200~400 mg)을 복용하고 24시간 동안 1캡슐(400 mg)을 초과하지 않도록 합니다.\n\n권장용량을 초과하여 복용하지 마십시오.\n\n연령, 증상에 따라 적절히 증감하십시오.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증, 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수 있습니다.\n\n이 약에 과민증 환자, 위장관궤양, 위장관 출혈 또는 경험자, 심한 혈액이상, 간장애, 신장장애, 심장기능부전, 고혈압, 기관지천식 환자 또는 경험자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 저해제 포함)에 알레르기 환자 또는 경험자, 관상동맥(심장동맥) 우회로술 전후 통증발생 환자, 임신 말기 3개월 기간에 해당하는 임부는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 과민증 경험자, 혈액이상 또는 경험자, 출혈경향이 있는 환자, 간경화 및 간장애 또는 경험자, 신장장애 또는 경험자, 심장기능부전 또는 심질환, 고혈압, 전신성홍반성루푸스 및 혼합 결합조직질환 환자, 궤양성대장염, 크론병, 고령자 및 소아, 임부, 수유부는 의사 또는 약사와 상의하십시오.\n\n권장용량을 초과하여 복용하지 마십시오.\n\n의사 또는 약사의 지시 없이 통증에 10일 이상(성인) 또는 5일 이상(소아) 복용하지 않고 발열에 3일 이상 복용하지 마십시오.\n\n다른 비스테로이드성 소염진통제, 고용량의 메토트렉세이트와 함께 복용하지 마십시오.\n\n저용량 아스피린, ACE 저해제, 리튬, 푸로세미드 및 티아지드계 이뇨제, 쿠마린계 항응혈제(와파린 등), 선택적 세로토닌 재흡수억제제와 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n쇽 증상(가슴쓰림, 오한, 호흡곤란, 혈압저하), 헤마토크릿 감소, 헤모글로빈 감소, 빈혈, 재생불량성빈혈, 용혈성빈혈, 무과립구증, 과립구감소, 백혈구감소, 혈소판감소, 혈소판기능저하(출혈시간 연장), 호산구증가 등의 혈액장애, 소화성궤양, 위장관궤양, 위장출혈, 천공(뚫림), 궤양성 대장염, 혈변, 위염, 췌장염, 혈액구토, 크론병, 식욕부진, 구역, 구토, 복통, 소화불량, 설사, 위부불쾌감, 상복부 통증, 구갈, 구내염, 복부팽만감, 구강궤양, 변비, 흑변, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군), 광민감 반응, 호산구 증가 및 전신 증후군을 동반한 약물 발진(DRESS 증후군), 혈관신경성 부종, 수포성피부염, 다형성 홍반, 반구진 발진, 피부 붉어짐, 물집, 발진, 탈락 피부염, 급성전신발진고름물집증, 간염, 황달, GOT, GPT, ALP의 상승 등과 같은 간기능이상, 간장애, 과민증 또는 아나필락시스 반응, 천식발작, 두드러기, 습진, 자반(자주색반점), 발진, 가려움증, 천식, 기관지수축, 호흡곤란 또는 쌕쌕거림, 시야불능부위 등 시각장애, 난청(귀먹음), 귀울림, 미각이상, 현기증, 졸음, 어지러움, 우울, 두통, 뇌혈관 사고 또는 신경질, 무균성 수막염 또는 수막염(심한 두통, 구역, 구토, 불면, 목이 뻣뻣함, 발열 또는 의식장애 등의 증상), 혈압저하, 혈압상승, 심계항진(두근거림), 심부전, 심근경색증 또는 협심증, 급성신부전, 핍뇨(소변감소), 혈뇨, 요단백, BUN, 혈중크레아티닌의 상승, 고칼륨혈증, 간질성 콩팥염, 콩팥염증후군, 콩팥유두괴사, 요량 감소, 전신부종 및 이에 수반하는 숨가쁨, 나른함, 눈주변 부기, 얼굴부기, 권태감, 발열, 코피, 말초부종 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "이부프로펜 400밀리그램",
+      "작용": "통증과 염증을 일으키는 물질의 생성을 억제하여 해열·소염·진통 작용을 나타내는 비스테로이드성 소염진통제입니다.",
+      "주요 증상": "감기 발열·통증, 요통, 생리통, 류마티양·연소성 류마티양 관절염, 골관절염, 수술후 통증, 두통·편두통·치통·근육통·신경통, 강직성 척추염, 급성통풍, 건선성 관절염, 연조직손상, 비관절 류마티스질환",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "발열과 여러 부위 통증·염증성 관절질환에 폭넓게 쓰는 이부프로펜 해열소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Ibuprofen 400 mg Soft Capsules (Antipyretic Anti-inflammatory Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for fever and pain from the common cold, low back pain, menstrual pain, rheumatoid arthritis, juvenile rheumatoid arthritis (appearing at a young age), osteoarthritis (degenerative joint disease), post-operative pain, and for headache, migraine, toothache, muscle pain, neuralgia, ankylosing spondylitis, acute gout, psoriatic arthritis, soft tissue injuries (sprains and bruises), and non-articular rheumatic diseases (tendinitis, tenosynovitis, and bursitis).",
+    "usage": "For rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injuries, non-articular rheumatic diseases, acute gout, and psoriatic arthritis, adults take 1/2 to 1.5 capsules (200 to 600 mg) per dose, 3 to 4 times a day, and may take up to 8 capsules (3,200 mg) per 1 day. For juvenile rheumatoid arthritis, take 30 to 40 mg per kg of body weight per 1 day, divided into 3 to 4 doses. For mild and moderate pain or the common cold, adults take 1/2 to 1 capsule (200 to 400 mg) per dose, 3 to 4 times a day. For migraine, adults take 1/2 to 1 capsule (200 to 400 mg) per dose, and do not exceed 1 capsule (400 mg) in 24 hours. Do not take more than the recommended dose. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic events, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Do not take this medicine if you are hypersensitive to it; have or have experienced gastrointestinal ulcer or gastrointestinal bleeding; have severe blood abnormalities, liver disorders, kidney disorders, heart failure, or hypertension; have or have experienced bronchial asthma; have or have experienced allergies to aspirin or other non-steroidal anti-inflammatory drugs (including COX-2 inhibitors); have pain occurring before or after coronary artery bypass graft surgery; or are in the last 3 months of pregnancy. Before taking this medicine, consult a doctor or pharmacist if you have experienced hypersensitivity; have or have experienced blood abnormalities; have a bleeding tendency; have or have experienced liver cirrhosis or liver disorders; have or have experienced kidney disorders; have heart failure or heart disease, hypertension, systemic lupus erythematosus, or mixed connective tissue disease; have ulcerative colitis or Crohn's disease; for the elderly and children; or if you are pregnant or breastfeeding. Do not take more than the recommended dose. Without instructions from a doctor or pharmacist, do not take this medicine for more than 10 days (adults) or 5 days (children) for pain, and do not take it for more than 3 days for fever. Do not take other non-steroidal anti-inflammatory drugs or high-dose methotrexate together with this medicine. Consult a doctor or pharmacist when taking low-dose aspirin, ACE inhibitors, lithium, furosemide and thiazide diuretics, coumarin anticoagulants (such as warfarin), or selective serotonin reuptake inhibitors together with this medicine. If shock symptoms (heartburn, chills, difficulty breathing, drop in blood pressure), blood disorders such as decreased hematocrit, decreased hemoglobin, anemia, aplastic anemia, hemolytic anemia, agranulocytosis, decreased granulocytes, decreased white blood cells, decreased platelets, reduced platelet function (prolonged bleeding time), and increased eosinophils, peptic ulcer, gastrointestinal ulcer, gastrointestinal bleeding, perforation, ulcerative colitis, bloody stool, gastritis, pancreatitis, vomiting blood, Crohn's disease, loss of appetite, nausea, vomiting, abdominal pain, indigestion, diarrhea, stomach discomfort, upper abdominal pain, thirst, stomatitis, abdominal bloating, mouth ulcers, constipation, black stool, oculomucocutaneous syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell syndrome), photosensitivity reactions, drug rash with eosinophilia and systemic symptoms (DRESS syndrome) of unknown frequency, angioneurotic edema, bullous dermatitis, erythema multiforme, maculopapular rash, skin redness, blisters, rash, exfoliative dermatitis, acute generalized exanthematous pustulosis, liver function abnormalities such as hepatitis, jaundice, and elevated GOT, GPT, and ALP, liver disorders, hypersensitivity or anaphylactic reactions, asthma attacks, hives, eczema, purpura (purple spots), rash, itching, asthma, bronchoconstriction, difficulty breathing or wheezing, visual disturbances such as blind spots in the visual field, hearing loss, ringing in the ears, taste abnormalities, vertigo, drowsiness, dizziness, depression, headache, cerebrovascular accidents or nervousness, aseptic meningitis or meningitis (symptoms such as severe headache, nausea, vomiting, sleeplessness, stiff neck, fever, or impaired consciousness), drop in blood pressure, increased blood pressure, palpitations, heart failure, myocardial infarction or angina, acute kidney failure, oliguria (decreased urine), bloody urine, urine protein, elevated BUN and blood creatinine, hyperkalemia, interstitial nephritis, nephritic syndrome, renal papillary necrosis, decreased urine volume, generalized edema with accompanying shortness of breath, listlessness, swelling around the eyes, facial swelling, malaise, fever, nosebleeds, or peripheral edema occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Ibuprofen 400 mg",
+      "How it works": "A non-steroidal anti-inflammatory drug that reduces fever, inflammation, and pain by inhibiting the production of substances that cause pain and inflammation.",
+      "Main symptoms": "Cold-related fever and pain, low back pain, menstrual pain, rheumatoid and juvenile rheumatoid arthritis, osteoarthritis, post-operative pain, headache/migraine/toothache/muscle pain/neuralgia, ankylosing spondylitis, acute gout, psoriatic arthritis, soft tissue injuries, non-articular rheumatic diseases",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "An ibuprofen antipyretic anti-inflammatory analgesic used broadly for fever, various types of pain, and inflammatory joint diseases."
+    }
+  }
+}
