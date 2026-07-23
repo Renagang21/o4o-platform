@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "diphenhydramine50cap-02",
+  "order": 2602,
+  "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+  "safetyFp": "65130d5d7ee91d9f",
+  "sourceRef": "7aa96de8-da2f-48e0-8099-8cce3f10e230",
+  "sensitive": false,
+  "title": "디펜히드라민염산염 50mg 연질캡슐 (수면유도제)",
+  "expectEasyMd5": "ac0e03cc",
+  "masterIds": [
+    "79940cc6-738b-4af1-9d32-0f19814d0c34",
+    "b8490e05-5483-470a-a47b-33978467a2e1"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "ac0e03cc",
+    "names": [
+      "드림굿연질캡슐(디펜히드라민염산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 일시적 불면증의 완화에 사용합니다.",
+    "usage": "성인은 1회 1정씩, 1일 1회 취침 전에 복용합니다.\n\n개인에 따라 50 mg 복용 시 과도한 진정작용이 나타날 경우 25 mg를 복용할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 천식발작, 폐기종, 만성기관지염에 의한 호흡곤란 환자, 녹내장 환자, 전립선 비대 등 하부 요로 폐색성 질환 환자, 뇌전증 등의 경련성 질환, 크롬친화세포종 환자, 수유부, 15세 미만의 소아, 일상적으로 불면인 환자, 불면증 진단을 받은 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 중증 근무력증 환자, 고령자, 알레르기 체질, 약에 의한 알러지 증상 경험자, 임부, 임신하고 있을 가능성이 있는 사람은 의사 또는 약사와 상의하십시오.\n\n계속 복용하거나 장기 복용하지 마십시오.\n\n이 약을 복용한 때부터 복용 다음날까지 졸음이 계속되고 나른함을 느끼는 경우에는 이러한 증상이 사라질 때까지 운전 또는 기계조작을 하지 마십시오.\n\n2~3회 복용하여도 증상이 나아지지 않는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 약을 복용한 후 2주 이상 불면증이 지속될 때에는 의사와 상담하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n이 약을 복용하는 동안 이 약과 동일한 성분을 함유하고 있는 다른 제제, 다른 최면진정제, MAO 억제제, 감기약, 해열진통제, 진해거담약, 항히스타민제를 함유하는 내복약을 복용하지 마십시오.\n\n이 약을 복용하는 동안 음주하지 마십시오.\n\n발진 및 충혈되어 붉어지는 발적, 가려움, 목마름, 위통, 구역 및 구토, 식욕부진, 설사, 어지러움, 두통, 기상시의 머리무거움, 활동중의 졸음, 불쾌감, 신경과민, 주의력의 저하, 잠이 덜 깨는 증상, 판단력의 저하, 말이나 행동의 이상 등의 일시적인 의식장애, 두근거림, 권태감, 배뇨곤란, 시야혼란, 폐쇄각 녹내장 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "디펜히드라민염산염 50밀리그램",
+      "작용": "항히스타민 성분으로 일시적 불면증을 완화하는 수면유도제입니다.",
+      "주요 증상": "일시적 불면증의 완화",
+      "주의 대상": "과민증, 호흡곤란·녹내장·전립선 비대, 경련성 질환, 크롬친화세포종, 수유부, 15세 미만, 일상적 불면·불면증 진단자 복용 금지",
+      "선택 포인트": "일시적 불면증 완화에 쓰는 수면유도제입니다."
+    }
+  },
+  "en": {
+    "title": "Diphenhydramine Hydrochloride 50 mg Soft Capsules (Sleep Aid)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to relieve temporary insomnia.",
+    "usage": "Adults take 1 tablet per dose, 1 time a day, before bedtime. If excessive sedation occurs in some individuals when taking 50 mg, 25 mg may be taken.",
+    "caution": "Do not take this medicine if you are hypersensitive to it; have asthma attacks, emphysema, or breathing difficulty due to chronic bronchitis; have glaucoma or lower urinary tract obstructive disease such as an enlarged prostate; have seizure disorders such as epilepsy or pheochromocytoma; are breastfeeding; are a child under 15 years of age; or have habitual insomnia or have been diagnosed with insomnia. Before taking this medicine, consult a doctor or pharmacist if you have myasthenia gravis, are an older adult, have an allergic constitution, have experienced allergic symptoms caused by medicines, or are pregnant or may be pregnant. Do not take this medicine continuously or for a long period. If drowsiness continues from the time you take this medicine until the next day and you feel sluggish, do not drive or operate machinery until these symptoms disappear. If symptoms do not get better even after taking this medicine 2 to 3 times, stop taking it immediately and consult a doctor or pharmacist. If insomnia continues for more than 2 weeks after taking this medicine, consult a doctor. Follow the prescribed dosage and administration carefully. While taking this medicine, do not take other preparations containing the same ingredient as this medicine, other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines. Do not drink alcohol while taking this medicine. If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rash or flushing redness, itching, thirst, stomach pain, nausea and vomiting, loss of appetite, diarrhea, dizziness, headache, heavy-headed feeling on waking, drowsiness during activity, discomfort, nervousness, temporary disturbance of consciousness such as reduced attention, not fully waking up, reduced judgment, or unusual speech or behavior, palpitations, fatigue, difficulty urinating, blurred vision, or angle-closure glaucoma. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Diphenhydramine hydrochloride 50 mg",
+      "How it works": "An antihistamine-based sleep aid that relieves temporary insomnia.",
+      "Main symptoms": "Relief of temporary insomnia",
+      "Caution for": "Do not use with hypersensitivity, breathing difficulty, glaucoma, enlarged prostate, seizure disorders, pheochromocytoma, while breastfeeding, under 15, or with habitual insomnia or diagnosed insomnia",
+      "Why this one": "A sleep aid for relief of temporary insomnia."
+    }
+  }
+}

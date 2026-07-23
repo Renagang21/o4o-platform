@@ -4,19 +4,13 @@
   "subgroups": 2,
   "masters": 9,
   "metaAuthored": false,
-  "missingLineCount": 12,
+  "missingLineCount": 11,
   "missingLines": [
     {
       "h8": "51ff6760",
       "freq": 2,
       "fields": "usage",
       "ko": "폴산결핍증 예방 및 폴산의 요구량이 증대하는 각종 질환에 성인 및 24개월 이상 소아는 1일 0.1~0.25 mg을 복용합니다."
-    },
-    {
-      "h8": "67902d25",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "87717f96",

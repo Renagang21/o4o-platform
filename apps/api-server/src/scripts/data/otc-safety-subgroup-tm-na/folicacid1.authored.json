@@ -1,0 +1,31 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 폴산 1mg 정 그룹 TM 저작(11줄, 2 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "폴산|1밀리그램|정",
+  "meta": {
+    "titleKo": "폴산 1mg 정 (엽산 보급제)",
+    "titleEn": "Folic Acid 1 mg Tablets (Folate Supplement Medicine)",
+    "ingKo": "폴산 1밀리그램",
+    "ingEn": "Folic acid 1 mg",
+    "actionKo": "폴산(엽산) 결핍의 예방·치료와 결핍이 관여하는 빈혈에 쓰는 보급제입니다.",
+    "actionEn": "A supplement medicine for preventing and treating folic acid (folate) deficiency and for anemias involving folate deficiency."
+  },
+  "effSummaries": {
+    "87717f96": { "symKo": "폴산결핍증의 예방·치료, 소모성 질환·임부·수유부의 폴산 보급, 악성빈혈 보조요법, 영양결핍성·임신성·소아빈혈, 항전간제로 인한 빈혈, 알코올중독·간질환 관련 거대적아구성빈혈", "symEn": "Prevention and treatment of folate deficiency; folate supply in wasting diseases and in pregnancy and breastfeeding; adjuvant therapy for pernicious anemia; nutritional, pregnancy, and childhood anemia; anemia from antiepileptic drugs; megaloblastic anemia related to alcoholism and liver disease", "pointKo": "폴산 결핍의 예방·치료와 관련 빈혈에 쓰는 엽산 제제입니다.", "pointEn": "A folate medicine for folate deficiency and related anemias." }
+  },
+  "cauSummaries": {
+    "e335a3cf": { "watchKo": "과민증, 비타민 B12 결핍에 의한 악성빈혈·거대적아구성빈혈, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, pernicious or megaloblastic anemia due to vitamin B12 deficiency, or hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "87717f96": "This medicine is used for prevention and treatment of folate deficiency; for folate supply when demand increases in wasting diseases and in pregnant and breastfeeding women and dietary intake is insufficient; as adjuvant therapy for pernicious anemia (excluding anemia due to vitamin B12 deficiency); for nutritional deficiency anemia, pregnancy anemia, and childhood anemia; for anemia caused by antiepileptic drugs when folate deficiency or metabolic disturbance is presumed to be involved; and for megaloblastic anemia related to alcoholism and liver disease.",
+    "51ff6760": "For prevention of folate deficiency and for various conditions with increased folate requirements, adults and children 24 months and older take 0.1 to 0.25 mg per 1 day.",
+    "4d643abf": "For treatment of folate deficiency and deficiency caused by taking other medicines, adults and children 24 months and older take 0.25 to 1 mg per 1 day.",
+    "6649d615": "For treatment of folate deficiency and deficiency caused by taking other medicines, adults and children 24 months and older take 0.25 to 1 mg per 1 day.",
+    "e335a3cf": "Do not take this medicine if you are hypersensitive to it, have pernicious anemia or megaloblastic anemia due to vitamin B12 deficiency, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "bcbc9439": "Before taking this medicine, consult a doctor or pharmacist if you are under a doctor's care or have pernicious anemia.",
+    "e366faf8": "Before taking this medicine, consult a doctor or pharmacist if you have pernicious anemia.",
+    "1449af17": "Consult a doctor or pharmacist when taking this medicine together with aminosalicylic acid, oral contraceptives, dihydrofolate reductase inhibitors (such as methotrexate or trimethoprim), hydantoin antiepileptics such as phenytoin, sulfasalazine, or cholestyramine.",
+    "91f73839": "Consult a doctor or pharmacist if you are taking aminosalicylic acid, oral contraceptives, dihydrofolate reductase inhibitors (such as methotrexate or trimethoprim), hydantoin antiepileptics such as phenytoin, sulfasalazine, or cholestyramine.",
+    "744b7d44": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: allergic symptoms such as redness (erythema), skin rash, itching, general fatigue, or difficulty breathing, and anaphylactic reactions; loss of appetite, nausea and vomiting, edema, weight loss, gastrointestinal disorders; or central nervous system disturbances such as sleep changes, poor concentration, hyperactivity, irritability, excitement, depression, confusion, or impaired judgment.",
+    "886dab90": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: allergic symptoms such as redness (erythema), skin rash, itching, general fatigue, or difficulty breathing, and anaphylactic reactions; loss of appetite, nausea and vomiting, edema, weight loss, gastrointestinal disorders; or central nervous system disturbances such as sleep changes, poor concentration, hyperactivity, irritability, excitement, depression, confusion, or impaired judgment."
+  }
+}

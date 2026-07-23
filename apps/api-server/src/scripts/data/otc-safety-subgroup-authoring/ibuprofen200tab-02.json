@@ -1,0 +1,66 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "ibuprofen200tab-02",
+  "order": 2902,
+  "groupKey": "이부프로펜|200밀리그램|정",
+  "safetyFp": "8a09bf39fedbcc81",
+  "sourceRef": "136490e7-fee0-4a85-855f-1c92d11a044e",
+  "sensitive": false,
+  "title": "이부프로펜 200mg 정 (해열·소염진통제)",
+  "expectEasyMd5": "daa1e6b8",
+  "masterIds": [
+    "009d75f9-953a-4b06-896f-7a30820b6074",
+    "0430092f-8ae5-4653-9c37-33fc795843c1",
+    "1bb6b9ad-173c-4bf3-943b-c61eebed6a6f",
+    "34a8b330-26ba-4583-9ed4-b2d1ce77f97a"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "daa1e6b8",
+    "names": [
+      "애드빌정(이부프로펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 16,
+    "en": 8,
+    "total": 24
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 감기로 인한 발열 및 동통, 요통, 생리통, 류마티양 관절염, 연소성 류마티양 관절염, 골관절염(퇴행성 관절질환), 수술후 동통과 두통, 치통, 근육통, 신경통, 강직성 척추염, 급성통풍, 건선성 관절염, 연조직손상(염좌, 좌상), 비관절 류마티스질환(건염, 건초염, 활액낭염)에 사용합니다.",
+    "usage": "성인은 류마티양 관절염, 골관절염, 강직성 척추염, 연조직손상, 비관절 류마티스질환, 급성통풍, 건선성 관절염에는 1회 1~3정(200~600 mg) 1일 3~4회 1일 최고 16정(3,200 mg)까지 투여할 수 있으며, 연소성 류마티양 관절염에는 1일 체중 kg당 30~40 mg을 3~4회 분할 경구 투여, 경증 및 중등도의 동통이나 감기에는 성인 1회 1~2정(200~400 mg) 1일 3~4회 복용합니다.\n\n11~14세는 1회 200~250 mg, 7~10세는 1회 150~200 mg, 3~ 6세는 1회 100~150 mg, 1~ 2세는 1회 50~100 mg을 1일 3~4회 복용합니다.\n\n체중이 30kg미만인 어린이는 1일량이 500 mg을 초과해서는 안되며 공복시 투여는 피하는 것이 바람직합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 위장관 궤양, 위장관 출혈환자 또는 경험자, 심한 혈액이상, 심한 간장애, 심한 신장장애, 심한 심장기능부전, 심한 고혈압, 기관지천식 또는 경험자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 저해제 포함)에 대하여 천식, 두드러기, 알레르기 반응과 같은 과민증 또는 경험자, 관상동맥(심장동맥) 우회로술 전후 통증 환자, 임신 말기 3개월 기간에 해당하는 임부 또는 수유부, 항암요법으로 고용량 메토트렉세이트를 투여중인 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 혈액이상 또는 경험자, 출혈경향이 있는 환자, 간경화, 간장애 또는 경험자, 신장장애 또는 경험자, 심장기능부전 또는 심질환, 고혈압, 전신성홍반성루푸스 및 혼합결합조직질환 환자, 궤양성대장염, 크론병, 고령자 및 소아, 임부는 의사 또는 약사와 상의하십시오.\n\n다른 비스테로이드성 소염진통제(NSAIDs), 고용량 메토트렉세이트와 함께 복용하지 마십시오.\n\n저용량 아스피린, 저용량의 메토트렉세이트, ACE 저해제, 리튬, 푸로세미드 및 티아지드계 이뇨제, 쿠마린계 항응혈제(와파린 등), 선택적 세로토닌 재흡수억제제와 함께 사용 시 의사 또는 약사와 상의하십시오.\n\n쇽 증상(가슴쓰림, 오한, 호흡곤란, 혈압저하 등), 헤마토크릿 감소, 헤모글로빈 감소, 빈혈, 재생불량성빈혈, 용혈성빈혈, 무과립구증, 과립구감소, 백혈구감소, 혈소판감소, 혈소판기능저하 (출혈시간 연장), 호산구증가 등의 혈액장애, 소화성궤양, 위장관궤양, 위장출혈, 천공(뚫림), 궤양성대장염, 혈변, 위염, 췌장염, 토혈(혈액구토), 크론병, 식욕부진, 구역, 구토, 복통, 소화불량, 설사, 위부불쾌감, 상복부통증, 구갈, 구내염, 복부팽만감, 구강궤양, 변비, 흑변, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사증(리엘증후군), 급성전신발진고름물집증, 광민감 반응(빈도불명), 빈도불명의 호산구 증가 및 전신 증후군을 동반한 약물 발진(DRESS 증후군), 혈관신경성 부종, 수포성피부염, 다형성 홍반, 반구진 발진, 피부 붉어짐, 수포(물집), 발진, 탈락 피부염, 간염, 황달, GOT, GPT, 알칼라인 포스파타제(ALP)의 상승 등과 같은 간기능이상, 간장애, 과민증 또는 아나필락시스 반응, 천식발작, 두드러기, 습진, 자반(자주색반점), 발진, 가려움증, 천식, 기관지수축, 호흡곤란 또는 쌕쌕거림, 시야불능부위 등 시각장애, 귀먹음, 귀울림, 미각이상, 현기증, 졸음, 어지러움, 우울, 두통, 뇌혈관사고 또는 신경질, 무균성수막염 또는 수막염(심한 두통, 구역, 구토, 불면, 목이 뻣뻣함, 발열 또는 의식장애 등의 증상), 혈압저하, 혈압상승, 두근거림, 심부전, 심근경색증 또는 협심증, 급성신부전, 소변감소, 혈뇨, 요단백, BUN, 혈중크레아티닌의 상승, 고칼륨혈증, 간질성 콩팥염, 콩팥염증후군, 콩팥유두괴사, 요량감소, 전신부종 및 이에 수반하는 숨가쁨, 나른함, 눈주변 부기, 얼굴부기, 권태감, 발열, 코피, 부기, 말초부종 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "이부프로펜 200밀리그램",
+      "작용": "비스테로이드성 소염진통제로 발열과 관절염·요통·두통·치통 등 다양한 통증을 완화합니다.",
+      "주요 증상": "감기로 인한 발열·동통, 요통, 생리통, 류마티양 관절염, 연소성 류마티양 관절염, 골관절염, 수술후 동통, 두통, 치통, 근육통, 신경통, 강직성 척추염, 급성통풍, 건선성 관절염, 연조직손상, 비관절 류마티스질환",
+      "주의 대상": "과민증, 위장관 궤양·출혈, 심한 혈액·간·신장·심장·고혈압, 기관지천식, 아스피린·NSAIDs 과민 반응 경험, CABG 전후 통증, 임신 말기 3개월·수유부, 고용량 메토트렉세이트 투여 중 복용 금지",
+      "선택 포인트": "발열·생리통·관절염·두통·치통 등 광범위한 통증에 쓰는 소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Ibuprofen 200 mg Tablets (Fever Reducer and Anti-inflammatory Pain Reliever)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for fever and pain from colds, back pain, menstrual pain, rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), pain after surgery and headache, toothache, muscle pain, nerve pain, ankylosing spondylitis, acute gout, psoriatic arthritis, soft tissue injury (sprains, bruises), and non-articular rheumatic diseases (tendinitis, tenosynovitis, bursitis).",
+    "usage": "For rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic diseases, acute gout, and psoriatic arthritis, adults may be given 1 to 3 tablets (200 to 600 mg) per dose, 3 to 4 times a day, up to a maximum of 16 tablets (3,200 mg) per 1 day; for juvenile rheumatoid arthritis, give 30 to 40 mg per kg of body weight per 1 day by mouth divided into 3 to 4 doses; for mild and moderate pain or colds, adults take 1 to 2 tablets (200 to 400 mg) per dose, 3 to 4 times a day. Children 11 to 14 years old take 200 to 250 mg per dose; 7 to 10 years old, 150 to 200 mg per dose; 3 to 6 years old, 100 to 150 mg per dose; and 1 to 2 years old, 50 to 100 mg per dose, 3 to 4 times a day. For children weighing less than 30 kg, the amount per 1 day must not exceed 500 mg, and it is advisable to avoid taking this medicine on an empty stomach.",
+    "caution": "Do not take this medicine if you are hypersensitive to it; have or have had gastrointestinal ulcers or gastrointestinal bleeding; have severe blood abnormalities, severe liver disorders, severe kidney disorders, severe heart failure, or severe high blood pressure; have or have had bronchial asthma; have or have had hypersensitivity such as asthma, hives, or allergic reactions to aspirin or other nonsteroidal anti-inflammatory drugs (including COX-2 inhibitors); have pain before or after coronary artery bypass graft surgery; are in the last 3 months of pregnancy or are breastfeeding; or are receiving high-dose methotrexate as anticancer therapy. Before taking this medicine, consult a doctor or pharmacist if you have or have had blood abnormalities, have a tendency to bleed, have or have had liver cirrhosis or liver disorders, have or have had kidney disorders, have heart failure or heart disease, high blood pressure, systemic lupus erythematosus or mixed connective tissue disease, ulcerative colitis, or Crohn's disease, are an older adult or child, or are pregnant. Do not take this medicine together with other nonsteroidal anti-inflammatory drugs (NSAIDs) or high-dose methotrexate. Consult a doctor or pharmacist when using this medicine together with low-dose aspirin, low-dose methotrexate, ACE inhibitors, lithium, furosemide and thiazide diuretics, coumarin anticoagulants (such as warfarin), or selective serotonin reuptake inhibitors. If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: shock symptoms (heartburn, chills, difficulty breathing, lowered blood pressure, etc.); blood disorders such as decreased hematocrit, decreased hemoglobin, anemia, aplastic anemia, hemolytic anemia, agranulocytosis, granulocytopenia, leukopenia, thrombocytopenia, reduced platelet function (prolonged bleeding time), or eosinophilia; peptic ulcers, gastrointestinal ulcers, gastrointestinal bleeding, perforation, ulcerative colitis, bloody stools, gastritis, pancreatitis, vomiting blood, Crohn's disease, loss of appetite, nausea, vomiting, abdominal pain, indigestion, diarrhea, stomach discomfort, upper abdominal pain, dry mouth, stomatitis, abdominal bloating, mouth ulcers, constipation, or black stools; Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome), acute generalized exanthematous pustulosis, photosensitivity reactions (frequency unknown), drug rash with eosinophilia and systemic symptoms (DRESS syndrome, frequency unknown), angioneurotic edema, bullous dermatitis, erythema multiforme, maculopapular rash, skin redness, blisters, rash, or exfoliative dermatitis; liver function abnormalities such as hepatitis, jaundice, or elevated GOT, GPT, or alkaline phosphatase (ALP), and liver disorders; hypersensitivity or anaphylactic reactions, asthma attacks, hives, eczema, purpura (purple spots), rash, itching, asthma, bronchoconstriction, difficulty breathing or wheezing; visual disturbances such as blind spots in the visual field, deafness, ringing in the ears, taste abnormalities, vertigo, drowsiness, dizziness, depression, headache, cerebrovascular accident or nervousness, aseptic meningitis or meningitis (symptoms such as severe headache, nausea, vomiting, insomnia, stiff neck, fever, or disturbance of consciousness); lowered blood pressure, raised blood pressure, palpitations, heart failure, myocardial infarction or angina; acute renal failure, decreased urine, blood in urine, protein in urine, elevated BUN or blood creatinine, hyperkalemia, interstitial nephritis, nephritic syndrome, renal papillary necrosis, reduced urine output; generalized edema with accompanying shortness of breath, sluggishness, swelling around the eyes, facial swelling, fatigue, fever, nosebleeds, swelling, or peripheral edema. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Ibuprofen 200 mg",
+      "How it works": "A nonsteroidal anti-inflammatory drug that relieves fever and a wide range of pain including arthritis, back pain, headache, and toothache.",
+      "Main symptoms": "Fever and pain from colds, back pain, menstrual pain, rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis, post-surgery pain, headache, toothache, muscle pain, nerve pain, ankylosing spondylitis, acute gout, psoriatic arthritis, soft tissue injury, and non-articular rheumatic diseases",
+      "Caution for": "Do not use with hypersensitivity, gastrointestinal ulcers or bleeding, severe blood, liver, kidney, heart, or blood pressure problems, bronchial asthma, aspirin or NSAID hypersensitivity reactions, pain around CABG surgery, in the last 3 months of pregnancy or while breastfeeding, or during high-dose methotrexate therapy",
+      "Why this one": "An anti-inflammatory pain reliever for fever, menstrual pain, arthritis, headache, toothache, and more."
+    }
+  }
+}

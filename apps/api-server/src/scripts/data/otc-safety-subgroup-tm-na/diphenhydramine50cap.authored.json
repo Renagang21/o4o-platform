@@ -1,0 +1,57 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 디펜히드라민염산염 50mg 연질캡슐 그룹 TM 저작(34줄, 5 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+  "meta": {
+    "titleKo": "디펜히드라민염산염 50mg 연질캡슐 (수면유도제)",
+    "titleEn": "Diphenhydramine Hydrochloride 50 mg Soft Capsules (Sleep Aid)",
+    "ingKo": "디펜히드라민염산염 50밀리그램",
+    "ingEn": "Diphenhydramine hydrochloride 50 mg",
+    "actionKo": "항히스타민 성분으로 일시적 불면증을 완화하는 수면유도제입니다.",
+    "actionEn": "An antihistamine-based sleep aid that relieves temporary insomnia."
+  },
+  "effSummaries": {
+    "9f20f923": { "symKo": "일시적 불면증의 완화", "symEn": "Relief of temporary insomnia", "pointKo": "일시적 불면증 완화에 쓰는 수면유도제입니다.", "pointEn": "A sleep aid for relief of temporary insomnia." }
+  },
+  "cauSummaries": {
+    "3a2b90d1": { "watchKo": "과민증, 호흡곤란·녹내장·전립선 비대, 경련성 질환, 크롬친화세포종, 수유부, 15세 미만, 일상적 불면·불면증 진단자 복용 금지", "watchEn": "Do not use with hypersensitivity, breathing difficulty, glaucoma, enlarged prostate, seizure disorders, pheochromocytoma, while breastfeeding, under 15, or with habitual insomnia or diagnosed insomnia" },
+    "40b0a7e0": { "watchKo": "과민증, 호흡곤란·녹내장·전립선 비대, 협착성 궤양·유문십이지장 폐색, 15세 미만, 경련성 질환, 크롬친화성세포종, 수유부, 불면증 진단, 갈락토오스 불내성 등 유전적 문제 복용 금지", "watchEn": "Do not use with hypersensitivity, breathing difficulty, glaucoma, enlarged prostate, stenosing peptic ulcer or pyloroduodenal obstruction, under 15, seizure disorders, pheochromocytoma, while breastfeeding, diagnosed insomnia, or hereditary problems such as galactose intolerance" },
+    "c4daa83e": { "watchKo": "과민증, 호흡곤란·녹내장·하부 요로 폐색성 질환, 협착성 궤양·유문십이지장 폐색, 15세 미만, 경련성 질환, 크롬친화성세포종, 수유부, 일상적 불면·불면증 진단자 복용 금지", "watchEn": "Do not use with hypersensitivity, breathing difficulty, glaucoma, lower urinary tract obstruction, stenosing peptic ulcer or pyloroduodenal obstruction, under 15, seizure disorders, pheochromocytoma, while breastfeeding, or with habitual or diagnosed insomnia" },
+    "dcb01d88": { "watchKo": "과민증, 호흡곤란·녹내장·전립선 비대, 협착성 궤양·유문십이지장 폐색, 15세 미만, 경련성 질환, 크롬친화성세포종, 일상적 불면·불면증 진단자, 수유부 복용 금지", "watchEn": "Do not use with hypersensitivity, breathing difficulty, glaucoma, enlarged prostate, stenosing peptic ulcer or pyloroduodenal obstruction, under 15, seizure disorders, pheochromocytoma, habitual or diagnosed insomnia, or while breastfeeding" }
+  },
+  "en": {
+    "9f20f923": "This medicine is used to relieve temporary insomnia.",
+    "44e4162f": "Adults take 1 capsule (50 mg) per dose, 1 time a day, before bedtime.",
+    "1e9ec604": "Adults take 1 tablet (50 mg) per dose, 1 time a day, before bedtime.",
+    "a5cf7a12": "Adults take 1 tablet per dose, 1 time a day, before bedtime.",
+    "d52421af": "Adults take 2 capsules (50 mg) per 1 dose, 1 time a day, before bedtime.",
+    "031b8c1a": "If excessive sedation occurs in some individuals, take 1/2 tablet (25 mg) per dose.",
+    "092e2420": "If excessive sedation occurs in some individuals when taking 50 mg, 25 mg may be taken.",
+    "176ac949": "If excessive sedation occurs in some individuals when taking 1 capsule (50 mg), take 1/2 capsule (25 mg) before bedtime.",
+    "467a0275": "If excessive sedation occurs in some individuals, take 1 capsule (25 mg) per dose.",
+    "c72a4add": "If excessive sedation occurs in some individuals when taking 1 capsule (50 mg), take half a capsule (25 mg) before bedtime.",
+    "c4daa83e": "Do not take this medicine if you are hypersensitive to it; have asthma attacks, emphysema, or breathing difficulty due to chronic bronchitis; have glaucoma, lower urinary tract obstructive disease (such as an enlarged prostate), stenosing peptic ulcer, or pyloroduodenal obstruction; are a child under 15 years of age; have seizure disorders (such as epilepsy) or pheochromocytoma; are breastfeeding; or have habitual insomnia or have been diagnosed with insomnia.",
+    "3a2b90d1": "Do not take this medicine if you are hypersensitive to it; have asthma attacks, emphysema, or breathing difficulty due to chronic bronchitis; have glaucoma or lower urinary tract obstructive disease such as an enlarged prostate; have seizure disorders such as epilepsy or pheochromocytoma; are breastfeeding; are a child under 15 years of age; or have habitual insomnia or have been diagnosed with insomnia.",
+    "40b0a7e0": "Do not take this medicine if you are hypersensitive to it; have asthma attacks, emphysema, or breathing difficulty due to chronic bronchitis; have glaucoma or lower urinary tract obstructive disease such as an enlarged prostate; have stenosing peptic ulcer or pyloroduodenal obstruction; are a child under 15 years of age; have seizure disorders such as epilepsy or pheochromocytoma; are breastfeeding; have habitual insomnia or have been diagnosed with insomnia; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "dcb01d88": "Do not take this medicine if you are hypersensitive to it; have asthma attacks, emphysema, or breathing difficulty due to chronic bronchitis; have glaucoma or lower urinary tract obstructive disease such as an enlarged prostate; have stenosing peptic ulcer or pyloroduodenal obstruction; are a child under 15 years of age; have seizure disorders such as epilepsy or pheochromocytoma; have habitual insomnia or have been diagnosed with insomnia; or are breastfeeding.",
+    "6fce5185": "Before taking this medicine, consult a doctor or pharmacist if you have myasthenia gravis, are an older adult, have an allergic constitution, have experienced allergic symptoms caused by medicines, or are pregnant or may be pregnant.",
+    "0d4ac195": "Before taking this medicine, consult a doctor or pharmacist if you have myasthenia gravis, are an older adult, have an allergic constitution, have experienced allergic symptoms caused by medicines, or are pregnant or may be pregnant.",
+    "e13b01b7": "Before taking this medicine, consult a doctor or pharmacist if you have myasthenia gravis, are an older adult, have an allergic constitution, have experienced allergic symptoms caused by medicines, or are pregnant or may be pregnant.",
+    "3769d621": "While taking this medicine, do not take other preparations containing the same ingredient as this medicine, other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines.",
+    "603a3146": "Do not take this medicine together with other preparations containing the same ingredient as this medicine, other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines (oral rhinitis medicines, motion sickness medicines, allergy medicines).",
+    "b0bb018b": "Do not take this medicine together with other preparations of the same ingredient as this medicine, other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines (oral rhinitis medicines, motion sickness medicines, allergy medicines).",
+    "ca843a0a": "Do not take this medicine together with other preparations containing the same ingredient as this medicine, other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines (oral rhinitis medicines, motion sickness medicines, allergy medicines).",
+    "af0d2fde": "Do not take this medicine together with other hypnotic sedatives, MAO inhibitors, cold medicines, fever reducers and pain relievers, cough and phlegm medicines, or oral medicines containing antihistamines (oral rhinitis medicines, motion sickness medicines, allergy medicines).",
+    "1d11015b": "Do not drink alcohol while taking this medicine.",
+    "19ddb373": "Drowsiness may occur after taking this medicine, so use caution when driving or operating machinery.",
+    "c7895c47": "Drowsiness may occur after taking this medicine, so use caution when driving or operating machinery.",
+    "681c5cfe": "If drowsiness continues from the time you take this medicine until the next day and you feel sluggish, do not drive or operate machinery until these symptoms disappear.",
+    "a64b4478": "Do not take this medicine continuously or for a long period.",
+    "fc94b526": "Do not take this medicine continuously or for a long period.",
+    "592b7183": "If symptoms do not improve even after taking this medicine 2 to 3 times, stop taking it immediately and consult a doctor or pharmacist.",
+    "16bb1126": "If symptoms do not get better even after taking this medicine 2 to 3 times, stop taking it immediately and consult a doctor or pharmacist.",
+    "05b2da3b": "If insomnia continues for more than 2 weeks after taking this medicine, consult a doctor.",
+    "d35e31df": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rash, redness, itching, dry mouth, stomach pain, nausea and vomiting, loss of appetite, diarrhea, dizziness, headache, heavy-headed feeling on waking, drowsiness during activity, discomfort, nervousness, temporary disturbance of consciousness (reduced attention, not fully waking up, reduced judgment, unusual speech or behavior), palpitations, fatigue, difficulty urinating, blurred vision, or angle-closure glaucoma.",
+    "f55ad617": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rash, redness, itching, dry mouth, stomach pain, nausea and vomiting, loss of appetite, diarrhea, dizziness, headache, heavy-headed feeling on waking, drowsiness during activity, discomfort, nervousness, temporary disturbance of consciousness (reduced attention, not fully waking up, reduced judgment, unusual speech or behavior), palpitations, fatigue, difficulty urinating, blurred vision, or angle-closure glaucoma.",
+    "33fd9775": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rash or flushing redness, itching, thirst, stomach pain, nausea and vomiting, loss of appetite, diarrhea, dizziness, headache, heavy-headed feeling on waking, drowsiness during activity, discomfort, nervousness, temporary disturbance of consciousness such as reduced attention, not fully waking up, reduced judgment, or unusual speech or behavior, palpitations, fatigue, difficulty urinating, blurred vision, or angle-closure glaucoma."
+  }
+}

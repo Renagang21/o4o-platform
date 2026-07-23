@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "folicacid1-02",
+  "order": 2802,
+  "groupKey": "폴산|1밀리그램|정",
+  "safetyFp": "43e8a2a2600c6ff5",
+  "sourceRef": "5022fa8d-77e7-4d26-8ad4-a5b85bf2fe6c",
+  "sensitive": false,
+  "title": "폴산 1mg 정 (엽산 보급제)",
+  "expectEasyMd5": "331bc1e6",
+  "masterIds": [
+    "6af72220-e55c-462d-ae16-3b11073646fc",
+    "dce3bdef-fda4-4224-9f06-77019db10ac5"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "331bc1e6",
+    "names": [
+      "폴스원정(폴산)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 폴산결핍증의 예방 및 치료, 소모성 질환, 임부 및 수유부에서 폴산의 수요가 증대하여 식사로부터 섭취가 불충분한 경우의 보급, 악성빈혈의 보조요법(비타민 B12 결핍으로 인한 빈혈 제외), 영양결핍성빈혈, 임신성빈혈, 소아빈혈, 항전간제 투여로 인한 빈혈 중 폴산의 결핍 또는 대사장애가 관여한다고 추정되는 경우, 알코올중독 및 간질환에 관련된 거대적아구성빈혈에 사용합니다.",
+    "usage": "폴산결핍증 및 다른 약물 투여로 인한 결핍증 치료에 성인 및 24개월 이상 소아는 1일 0.25~1 mg을 복용합니다.\n\n폴산결핍증 예방 및 폴산의 요구량이 증대하는 각종 질환에 성인 및 24개월 이상 소아는 1일 0.1~0.25 mg을 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 비타민 B12 결핍으로 인한 악성빈혈 또는 거대적아구성빈혈, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 의사의 치료를 받고 있는 환자, 악성빈혈 환자는 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.\n\n1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n아미노살리실산, 경구용 피임제, 디하이드로폴레이트 환원효소 저해제(메토트렉세이트, 트리메토프림 등), 페니토인 같은 히단토인계 항전간제, 설파살라진, 콜레스티라민을 복용 중인 환자는 의사 또는 약사와 상의하십시오.\n\n홍반, 피부발진, 가려움, 전신권태, 호흡곤란 등의 알레르기 증상 및 아나필락시스 반응, 식욕부진, 구역ㆍ구토, 부종, 체중감소, 위장관장애, 수면변화, 집중부족, 과잉행동, 과민성, 흥분, 우울증, 혼란, 판단력 장애 등 중추신경장애 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "폴산 1밀리그램",
+      "작용": "폴산(엽산) 결핍의 예방·치료와 결핍이 관여하는 빈혈에 쓰는 보급제입니다.",
+      "주요 증상": "폴산결핍증의 예방·치료, 소모성 질환·임부·수유부의 폴산 보급, 악성빈혈 보조요법, 영양결핍성·임신성·소아빈혈, 항전간제로 인한 빈혈, 알코올중독·간질환 관련 거대적아구성빈혈",
+      "주의 대상": "과민증, 비타민 B12 결핍에 의한 악성빈혈·거대적아구성빈혈, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지",
+      "선택 포인트": "폴산 결핍의 예방·치료와 관련 빈혈에 쓰는 엽산 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Folic Acid 1 mg Tablets (Folate Supplement Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for prevention and treatment of folate deficiency; for folate supply when demand increases in wasting diseases and in pregnant and breastfeeding women and dietary intake is insufficient; as adjuvant therapy for pernicious anemia (excluding anemia due to vitamin B12 deficiency); for nutritional deficiency anemia, pregnancy anemia, and childhood anemia; for anemia caused by antiepileptic drugs when folate deficiency or metabolic disturbance is presumed to be involved; and for megaloblastic anemia related to alcoholism and liver disease.",
+    "usage": "For treatment of folate deficiency and deficiency caused by taking other medicines, adults and children 24 months and older take 0.25 to 1 mg per 1 day. For prevention of folate deficiency and for various conditions with increased folate requirements, adults and children 24 months and older take 0.1 to 0.25 mg per 1 day.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, have pernicious anemia or megaloblastic anemia due to vitamin B12 deficiency, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are under a doctor's care or have pernicious anemia. Follow the prescribed dosage and administration carefully. When giving this medicine to children, do so under the guidance and supervision of a guardian. If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist. Consult a doctor or pharmacist if you are taking aminosalicylic acid, oral contraceptives, dihydrofolate reductase inhibitors (such as methotrexate or trimethoprim), hydantoin antiepileptics such as phenytoin, sulfasalazine, or cholestyramine. If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: allergic symptoms such as redness (erythema), skin rash, itching, general fatigue, or difficulty breathing, and anaphylactic reactions; loss of appetite, nausea and vomiting, edema, weight loss, gastrointestinal disorders; or central nervous system disturbances such as sleep changes, poor concentration, hyperactivity, irritability, excitement, depression, confusion, or impaired judgment. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Folic acid 1 mg",
+      "How it works": "A supplement medicine for preventing and treating folic acid (folate) deficiency and for anemias involving folate deficiency.",
+      "Main symptoms": "Prevention and treatment of folate deficiency; folate supply in wasting diseases and in pregnancy and breastfeeding; adjuvant therapy for pernicious anemia; nutritional, pregnancy, and childhood anemia; anemia from antiepileptic drugs; megaloblastic anemia related to alcoholism and liver disease",
+      "Caution for": "Do not use with hypersensitivity, pernicious or megaloblastic anemia due to vitamin B12 deficiency, or hereditary problems such as galactose intolerance",
+      "Why this one": "A folate medicine for folate deficiency and related anemias."
+    }
+  }
+}

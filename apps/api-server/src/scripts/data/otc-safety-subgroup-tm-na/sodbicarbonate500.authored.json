@@ -1,0 +1,48 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 탄산수소나트륨 500mg 정 그룹 TM 저작(22줄, 4 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "탄산수소나트륨|500밀리그램|정",
+  "meta": {
+    "titleKo": "탄산수소나트륨 500mg 정 (제산제)",
+    "titleEn": "Sodium Bicarbonate 500 mg Tablets (Antacid)",
+    "ingKo": "탄산수소나트륨 500밀리그램",
+    "ingEn": "Sodium bicarbonate 500 mg",
+    "actionKo": "위산을 중화하는 제산제로, 산증 개선과 요산배설 촉진·통풍발작 예방에도 쓰는 약입니다.",
+    "actionEn": "An antacid that neutralizes stomach acid, also used to improve acidosis, promote uric acid excretion, and prevent gout attacks."
+  },
+  "effSummaries": {
+    "8fc85eeb": { "symKo": "위·십이지장궤양, 위염, 위산과다의 제산작용 및 증상 개선, 산증 개선, 요산배설 촉진, 통풍발작 예방", "symEn": "Antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid; improvement of acidosis; promotion of uric acid excretion; prevention of gout attacks", "pointKo": "위산과다·위염·궤양의 제산과 산증·통풍발작 예방에 쓰는 약입니다.", "pointEn": "An antacid for excess stomach acid, gastritis, and ulcers, also for acidosis and gout attack prevention." },
+    "95f98778": { "symKo": "위·십이지장궤양, 위염, 위산과다와 산증의 개선, 요산배설 촉진, 통풍발작 예방", "symEn": "Improvement of stomach and duodenal ulcers, gastritis, excess stomach acid, and acidosis; promotion of uric acid excretion; prevention of gout attacks", "pointKo": "위산과다·위염·궤양의 제산과 산증·통풍발작 예방에 쓰는 약입니다.", "pointEn": "An antacid for excess stomach acid, gastritis, and ulcers, also for acidosis and gout attack prevention." },
+    "c0957f2a": { "symKo": "위·십이지장궤양, 위염, 위산과다의 제산작용 및 증상 개선, 산증 개선, 요산배설 촉진, 통풍발작 예방", "symEn": "Antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid; improvement of acidosis; promotion of uric acid excretion; prevention of gout attacks", "pointKo": "위산과다·위염·궤양의 제산과 산증·통풍발작 예방에 쓰는 약입니다.", "pointEn": "An antacid for excess stomach acid, gastritis, and ulcers, also for acidosis and gout attack prevention." },
+    "d053174b": { "symKo": "위·십이지장궤양, 위염, 위산과다의 제산작용 및 증상 개선, 산증 개선, 요산배설 촉진, 통풍발작 예방", "symEn": "Antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid; improvement of acidosis; promotion of uric acid excretion; prevention of gout attacks", "pointKo": "위산과다·위염·궤양의 제산과 산증·통풍발작 예방에 쓰는 약입니다.", "pointEn": "An antacid for excess stomach acid, gastritis, and ulcers, also for acidosis and gout attack prevention." }
+  },
+  "cauSummaries": {
+    "10e6bda1": { "watchKo": "나트륨 섭취 제한 필요 환자(고나트륨혈증·부종·임신중독증·방광결석·고혈압 등) 복용 금지 · 궤양·신·심·폐기능장애·전해질실조·울혈성심부전·감뇨·무뇨 상의", "watchEn": "Do not use if sodium restriction is needed (hypernatremia, edema, preeclampsia, bladder stones, high blood pressure); consult with severe ulcers, kidney, heart, or lung dysfunction, electrolyte imbalance, congestive heart failure, or reduced or no urine output" },
+    "358bda9e": { "watchKo": "나트륨 섭취 제한 필요 환자·갈락토오스 불내성 등 유전적 문제 복용 금지 · 궤양·신·심·폐기능장애·전해질실조·울혈성심부전·감뇨·무뇨 상의", "watchEn": "Do not use if sodium restriction is needed or with hereditary problems such as galactose intolerance; consult with severe ulcers, kidney, heart, or lung dysfunction, electrolyte imbalance, congestive heart failure, or reduced or no urine output" },
+    "3cbd3a5c": { "watchKo": "나트륨 섭취 제한 필요 환자(고나트륨혈증·부종·임신중독증·방광결석·고혈압 등), 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use if sodium restriction is needed (hypernatremia, edema, preeclampsia, bladder stones, high blood pressure) or with hereditary problems such as galactose intolerance" },
+    "c6703068": { "watchKo": "나트륨 섭취 제한 필요 환자(고나트륨혈증·부종·임신중독증·방광결석·고혈압 등), 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use if sodium restriction is needed (hypernatremia, edema, preeclampsia, bladder stones, high blood pressure) or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "8fc85eeb": "This medicine is used for antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid, for improvement of acidosis, for promotion of uric acid excretion, and for prevention of gout attacks.",
+    "95f98778": "This medicine is used to improve stomach and duodenal ulcers, gastritis, excess stomach acid, and acidosis, to promote uric acid excretion, and to prevent gout attacks.",
+    "c0957f2a": "This medicine is used for antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid, for improvement of acidosis, for promotion of uric acid excretion, and for prevention of gout attacks.",
+    "d053174b": "This medicine is used for antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid, for improvement of acidosis, for promotion of uric acid excretion, and for prevention of gout attacks.",
+    "5804c2b5": "Adults take 0.5 to 1 g of sodium bicarbonate per 1 dose, 3 to 5 g per 1 day. Also adjust the dose appropriately according to age and symptoms.",
+    "8b221822": "Adults take 1 to 2 tablets (0.5 to 1 g) per dose, 6 to 10 tablets (3 to 5 g) per 1 day. Adjust the dose appropriately according to age and symptoms.",
+    "b57b9dd2": "Adults take 1 to 2 tablets (0.5 to 1 g) per dose, 3 to 5 g per 1 day. Adjust the dose appropriately according to age and symptoms.",
+    "ffadbb65": "Adults take 1 to 2 tablets (0.5 to 1 g) per dose, 6 to 10 tablets (3 to 5 g) per 1 day.",
+    "10e6bda1": "Do not take this medicine if you need to restrict sodium intake (such as with hypernatremia, edema (swelling), preeclampsia, bladder stones, or high blood pressure). Before taking this medicine, consult a doctor or pharmacist if you have severe digestive tract ulcers, kidney disorders, heart function disorders, lung function disorders, or electrolyte imbalance such as hypochloremic alkalosis, or have congestive heart failure, edema, or sodium retention, as well as reduced urine output (oliguria) or no urine output (anuria).",
+    "358bda9e": "Do not take this medicine if you need to restrict sodium intake (such as with hypernatremia, edema, preeclampsia, bladder stones, or high blood pressure), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have severe digestive tract ulcers, kidney disorders, heart function disorders, lung function disorders, electrolyte imbalance such as hypochloremic alkalosis, congestive heart failure, edema, sodium retention, reduced urine output (oliguria), or no urine output (anuria).",
+    "3cbd3a5c": "Do not take this medicine if you need to restrict sodium intake (such as with hypernatremia, edema, preeclampsia, bladder stones, or high blood pressure), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "c6703068": "Do not take this medicine if you need to restrict sodium intake (such as with hypernatremia, edema (swelling), preeclampsia, bladder stones, or high blood pressure), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "cb696d77": "Before taking this medicine, consult a doctor or pharmacist if you have severe digestive tract ulcers, kidney disorders, heart function disorders, lung function disorders, electrolyte imbalance such as hypochloremic alkalosis, congestive heart failure, edema, sodium retention, reduced urine output (oliguria), or no urine output (anuria).",
+    "851900a0": "This medicine should be used with caution in patients with severe digestive tract ulcers, kidney disorders, heart function disorders, lung function disorders, or electrolyte imbalance such as hypochloremic alkalosis.",
+    "c7a0f915": "Use this medicine with caution in patients with congestive heart failure, edema (swelling), or sodium retention, as well as reduced urine output (oliguria) or no urine output (anuria). When taking it for excess stomach acid, take it on an empty stomach before meals, and to reduce irritation from carbon dioxide gas, take it combined with other antacids.",
+    "1c1c5e61": "This medicine raises the pH of the digestive tract and body fluids, which may affect the absorption and excretion of medicines taken together, so use it with caution. Taking it with large amounts of milk or calcium preparations may cause milk-alkali syndrome (hypercalcemia, azotemia, alkalosis, etc.), so consult a doctor or pharmacist.",
+    "8cb5591e": "Taking this medicine with large amounts of milk or calcium preparations may cause milk-alkali syndrome (hypercalcemia, azotemia, alkalosis, etc.), so consult a doctor or pharmacist.",
+    "78730db0": "If alkalosis or edema due to sodium accumulation occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "fef664e3": "If alkalosis or edema due to sodium accumulation occurs, stop taking this medicine immediately and consult a doctor or pharmacist. Sometimes stomach bloating and belching, and rarely rebound secretion of stomach acid, may occur.",
+    "4ceafaf8": "Consult a doctor or pharmacist if metabolic abnormalities such as alkalosis or edema (swelling) due to sodium accumulation occur, or if sometimes stomach bloating and belching, or rarely rebound secretion of stomach acid, occurs.",
+    "285e7a89": "Sometimes stomach bloating and belching, and rarely rebound secretion of stomach acid, may occur.",
+    "52694c9b": "Edema, sometimes stomach bloating and belching, and rarely rebound secretion of stomach acid may occur."
+  }
+}

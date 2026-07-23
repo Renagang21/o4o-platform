@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "sodbicarbonate500-02",
+  "order": 2702,
+  "groupKey": "탄산수소나트륨|500밀리그램|정",
+  "safetyFp": "a9499ae312376500",
+  "sourceRef": "602598c3-c833-4915-85c1-975402d80323",
+  "sensitive": false,
+  "title": "탄산수소나트륨 500mg 정 (제산제)",
+  "expectEasyMd5": "e74d4684",
+  "masterIds": [
+    "1a02fba5-2986-4b65-8f64-c6f0e959634c",
+    "26025f55-8d9b-46c6-9b9b-8efe090553b5",
+    "5312415e-b304-4afa-a7c3-cf6756e28c64"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "e74d4684",
+    "names": [
+      "발란시드정(탄산수소나트륨)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 위・십이지장궤양, 위염, 위산과다의 제산작용 및 증상의 개선과 산증의 개선 및 요산배설의 촉진, 통풍발작의 예방에 사용합니다.",
+    "usage": "성인은 1회 1~2정(0.5~1 g) 씩, 1일 6~10정(3~5 g)을 복용합니다.연령, 증상에 따라 적절히 증감합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "나트륨 섭취 제한을 필요로 하는 환자(고나트륨혈증, 부종, 임신중독증, 방광결석, 고혈압 등), 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 심한 소화관궤양, 신장애, 심기능장애, 폐기능장애, 저클로르성알카리증등의 전해질실조, 울혈성심부전, 부종, 나트륨정체, 감뇨증, 무뇨증 환자는 의사 또는 약사와 상의하십시오.\n\n다량의 우유, 칼슘제제와 함께 복용 시 우유 알칼리 증후군(고칼슘혈증, 고질소혈증, 알카리증 등)이 나타날 수 있으므로 의사 또는 약사와 상의하십시오.\n\n알카리증, 나트륨 축적에 의한 부종 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.때때로 위부팽만, 트림, 드물게 위산의 반동성 분비 등이 나타날 수 있습니다.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "탄산수소나트륨 500밀리그램",
+      "작용": "위산을 중화하는 제산제로, 산증 개선과 요산배설 촉진·통풍발작 예방에도 쓰는 약입니다.",
+      "주요 증상": "위·십이지장궤양, 위염, 위산과다의 제산작용 및 증상 개선, 산증 개선, 요산배설 촉진, 통풍발작 예방",
+      "주의 대상": "나트륨 섭취 제한 필요 환자·갈락토오스 불내성 등 유전적 문제 복용 금지 · 궤양·신·심·폐기능장애·전해질실조·울혈성심부전·감뇨·무뇨 상의",
+      "선택 포인트": "위산과다·위염·궤양의 제산과 산증·통풍발작 예방에 쓰는 약입니다."
+    }
+  },
+  "en": {
+    "title": "Sodium Bicarbonate 500 mg Tablets (Antacid)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid, for improvement of acidosis, for promotion of uric acid excretion, and for prevention of gout attacks.",
+    "usage": "Adults take 1 to 2 tablets (0.5 to 1 g) per dose, 6 to 10 tablets (3 to 5 g) per 1 day. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you need to restrict sodium intake (such as with hypernatremia, edema, preeclampsia, bladder stones, or high blood pressure), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have severe digestive tract ulcers, kidney disorders, heart function disorders, lung function disorders, electrolyte imbalance such as hypochloremic alkalosis, congestive heart failure, edema, sodium retention, reduced urine output (oliguria), or no urine output (anuria). Taking this medicine with large amounts of milk or calcium preparations may cause milk-alkali syndrome (hypercalcemia, azotemia, alkalosis, etc.), so consult a doctor or pharmacist. If alkalosis or edema due to sodium accumulation occurs, stop taking this medicine immediately and consult a doctor or pharmacist. Sometimes stomach bloating and belching, and rarely rebound secretion of stomach acid, may occur. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Sodium bicarbonate 500 mg",
+      "How it works": "An antacid that neutralizes stomach acid, also used to improve acidosis, promote uric acid excretion, and prevent gout attacks.",
+      "Main symptoms": "Antacid action and symptom improvement in stomach and duodenal ulcers, gastritis, and excess stomach acid; improvement of acidosis; promotion of uric acid excretion; prevention of gout attacks",
+      "Caution for": "Do not use if sodium restriction is needed or with hereditary problems such as galactose intolerance; consult with severe ulcers, kidney, heart, or lung dysfunction, electrolyte imbalance, congestive heart failure, or reduced or no urine output",
+      "Why this one": "An antacid for excess stomach acid, gastritis, and ulcers, also for acidosis and gout attack prevention."
+    }
+  }
+}
