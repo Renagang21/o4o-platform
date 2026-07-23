@@ -315,8 +315,8 @@
    "sourceType": "o4o_drug_otc_topical",
    "masters": 5,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ 잔여트랙: 덱사톱크림 5=1 원문형(습진·피부염군 피부 외용 스테로이드). 이벤탁·이바나파·페리덱스=구내염·치은염 구강 점막 제외. 코네티비나겔 철자변형 1 추가완결(ha-gel-connettivina2) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 5fp/5 master LIVE(덱사톱크림, 습진·피부염군 피부 외용 스테로이드). 검증 PASS·no-op 0. + ha-gel-connettivina2 철자변형 1 master LIVE(검증 PASS·no-op 0). 구강 점막 제외=이벤탁(치은염)·이바나파·페리덱스(구내염·설염) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   }
  ],
  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."

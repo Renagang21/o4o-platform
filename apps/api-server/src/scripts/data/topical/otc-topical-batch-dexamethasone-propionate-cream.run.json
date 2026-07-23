@@ -1,0 +1,34 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "덱사메타손프로피오네이트",
+ "form": "덱사톱크림",
+ "slugbase": "dexamethasone-propionate-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "02e315cfc020df50",
+   "n": 1
+  },
+  {
+   "fp": "32096df3fc29dc06",
+   "n": 1
+  },
+  {
+   "fp": "cec7cbc15186b890",
+   "n": 1
+  },
+  {
+   "fp": "b548c71a12a5c3da",
+   "n": 1
+  },
+  {
+   "fp": "bbfb849ec5e42694",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}
