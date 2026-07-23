@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "록소프로펜나트륨수화물",
+ "form": "록소앤겔",
+ "slugbase": "loxoprofen-gel-a",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "45af2a5d2c0f43d6",
+   "n": 2
+  },
+  {
+   "fp": "562a50a7724c4292",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

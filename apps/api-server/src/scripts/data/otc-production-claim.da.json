@@ -203,16 +203,16 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 7,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 바이겔크림 7=1 원문형. 플라스타·파프 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 6fp/7 = 바이겔크림 1 원문형(EN 1형: 14세 미만 금기·무균성뇌막염·건선악화). 플라스타·파프 제외. ko7=en7·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "록소프로펜나트륨수화물|겔",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 5,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 록소앤겔3+제놀록소파워겔2=2 원문형. 플라스타·파프·정제 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 3fp/5 = 록소앤겔 3(2fp)+제놀록소파워겔 2(1fp), EN 2형(15세 미만 금기·2g/50g/2주 제한 보존). 플라스타·파프·정제 제외. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",

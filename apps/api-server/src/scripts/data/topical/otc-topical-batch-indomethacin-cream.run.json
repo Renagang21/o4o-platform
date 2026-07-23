@@ -1,0 +1,38 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "인도메타신",
+ "form": "바이겔크림",
+ "slugbase": "indomethacin-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a4a8644731a8ca87",
+   "n": 2
+  },
+  {
+   "fp": "d5a0f18a9fbc369c",
+   "n": 1
+  },
+  {
+   "fp": "52a064fc58a9dba0",
+   "n": 1
+  },
+  {
+   "fp": "b8c1fdabb80e7a1f",
+   "n": 1
+  },
+  {
+   "fp": "6ef1e90f54499a8a",
+   "n": 1
+  },
+  {
+   "fp": "4788082a67de7934",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 7,
+ "koWrite": 28,
+ "enWrite": 14
+}
