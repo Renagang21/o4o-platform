@@ -1,0 +1,21 @@
+{
+  "_doc": "WO-O4O-HFF-REMAINDER-BULK-PRODUCTION-C-V1 — shard hash=FNV-1a stableHash(statementNo)%3==2 (에이전트 C). read-only census 2026-07-23. taken=canonical STORE o4o_hff_generated.",
+  "baseline": { "hffCandidates": 41261, "shardDist_all": [13743, 13751, 13767], "taken": 11362, "shard2_notTaken_notPromoted": 9957 },
+  "tracks": {
+    "combo": { "harvestEligibleFresh": 39, "generateTarget": 25, "autoHold": 14, "live": 25 },
+    "nutrient": {
+      "eligibleAllCorpus": { "비타민C": 787, "비타민D": 465, "아연": 190, "마그네슘": 150, "비타민E": 147, "칼슘": 123, "비오틴": 88, "철": 65, "엽산": 55, "비타민A": 43, "셀레늄": 39, "나이아신": 37, "비타민K": 21, "비타민B1": 14, "비타민B6": 13, "비타민B12": 13, "판토텐산": 12, "구리": 9, "비타민B2": 9, "요오드": 7, "망간": 3, "크롬": 0, "몰리브덴": 0 },
+      "shard2NotTaken": { "비타민C": 226, "비타민D": 22 },
+      "note": "shard2 잔여는 비타민C·D 에 집중 — 나머지 영양소는 병렬 세션 선행 캠페인으로 shard2 전량 taken.",
+      "generateTarget": 247, "autoHold": 1, "live": 247
+    },
+    "singleFunctional": {
+      "registryProducibleAllShards": { "포스파티딜세린": 11, "바나바잎추출물": 5, "히알루론산": 4, "헤마토코쿠스추출물": 3, "홍국": 2, "쏘팔메토열매추출물": 0 },
+      "shard2Target": { "포스파티딜세린": 3 }, "live": 3,
+      "note": "프로바이오틱스(269)·홍경천추출물·회화나무열매·대두이소플라본은 SF_INGREDIENTS 레지스트리 외 → SF 트랙 대상 아님. 홍경천 EN PENDING."
+    },
+    "probiotics_ownTrack": { "shard2Ready": 18, "generateTarget": 0, "note": "18 READY 전량 B-SPEC-MINMAX-003(CFU min/max grounding) auto-HOLD → 생산 0." }
+  },
+  "produced": { "combo": 25, "nutrient": 247, "singleFunctional": 3, "totalLive": 275, "dbWriteRows": 1100 },
+  "remaining_nonProducible": "≈9682 shard2 not-taken = 액상·다원료 미등록 기능성·parse-hard·CFU min-max HOLD·SF 레지스트리 외 원료·EN 미매핑. 기존 파이프라인 상한 도달(공용 parser/registry 무수정 원칙)."
+}

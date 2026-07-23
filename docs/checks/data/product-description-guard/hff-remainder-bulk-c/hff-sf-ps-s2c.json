@@ -1,0 +1,38 @@
+{
+  "tag": "batch:single-functional-ps-s2c",
+  "createdMasters": [
+    "0a1165d2-a106-4968-b6b2-1d0b4cd81e5d",
+    "284c2aeb-80e8-4193-984d-4022e5698fe9",
+    "2436a71a-51fb-4907-9b14-2e642be3e3a0"
+  ],
+  "createdSpd": [
+    "e3b8f649-1860-43b5-88bc-1671f70a2e31",
+    "2cc9534c-681b-4b75-9c73-48e00bfd8996",
+    "a772e87b-8862-4f3d-bdbb-d258fe731673",
+    "ae268752-8e3a-4e07-820f-9d2907200c93",
+    "b84ec73d-21c1-412e-86e4-8a6b1e5156d6",
+    "c0ab4376-e917-4eba-867c-85ca79db1684"
+  ],
+  "candIds": [
+    "5ea7e33e-147e-4539-adec-f25e81e88de9",
+    "61c0ef63-b717-452e-9cb7-b85652236a5e",
+    "63c412eb-1df6-45c4-a44c-9fee19f7b335"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "5ea7e33e-147e-4539-adec-f25e81e88de9",
+      "stmt": "2021001622959",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "61c0ef63-b717-452e-9cb7-b85652236a5e",
+      "stmt": "200400200082856",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "63c412eb-1df6-45c4-a44c-9fee19f7b335",
+      "stmt": "200400151071317",
+      "prev_status": "pending"
+    }
+  ]
+}

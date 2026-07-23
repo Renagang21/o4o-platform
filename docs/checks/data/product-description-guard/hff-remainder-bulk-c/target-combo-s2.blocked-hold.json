@@ -1,0 +1,86 @@
+[
+ {
+  "statementNo": "200700170352228",
+  "productName": "데이팩 헬씨본",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "statementNo": "2004001601153",
+  "productName": "스트롱조인트",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "H-COUNT-MISMATCH-001"
+ },
+ {
+  "statementNo": "201000190041389",
+  "productName": "잇츠 브이 포 우먼",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040020013278",
+  "productName": "유플러스골드",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040017068229",
+  "productName": "칼마디아연망간 프리미엄",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "statementNo": "20040017015435",
+  "productName": "제이엠 릴렉스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20220011370288",
+  "productName": "생생셀렌효모플러스",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200400200141245",
+  "productName": "스킨뷰스터",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040016020213",
+  "productName": "프리미엄  큐텐 쎄쎄",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "B-SUPERLATIVE-001"
+ },
+ {
+  "statementNo": "20040017021628",
+  "productName": "비타민C1000 골드",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "statementNo": "20040020001266",
+  "productName": "흡수가좋은칼슘비타민D",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "statementNo": "200700170352356",
+  "productName": "VIKlab 20mg 특허형 루테인 30's (VIKlab 20mg Patented Lutein 30's)",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "D-CLAIM-UNGROUNDED-001,D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "statementNo": "201200190071246",
+  "productName": "올인원 브레인아이 샷",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040015107981",
+  "productName": "써큐파워",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ }
+]
