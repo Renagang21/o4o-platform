@@ -3,161 +3,181 @@
   "agent": "나",
   "built": [
     {
-      "slug": "acetaminophen650-01",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "7ddb34dd7159584e",
-      "T": 8,
-      "order": 601,
-      "sourceRef": "21744a31-5178-43c9-8cfd-e7115f91c927",
-      "koHtmlLen": 2782,
-      "enHtmlLen": 5560
-    },
-    {
-      "slug": "acetaminophen650-02",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "7c4e68555a9ffe18",
-      "T": 7,
-      "order": 602,
-      "sourceRef": "895888b2-c996-4ac6-8015-eb6d5955add4",
-      "koHtmlLen": 2945,
-      "enHtmlLen": 5696
-    },
-    {
-      "slug": "acetaminophen650-03",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "72a7ed6b45bdcb5f",
+      "slug": "diosmin600-01",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "16163a9e441311fc",
       "T": 6,
-      "order": 603,
-      "sourceRef": "66b03384-d669-4f57-836c-9f27ff313810",
-      "koHtmlLen": 2652,
-      "enHtmlLen": 5039
+      "order": 901,
+      "sourceRef": "73c55697-f156-4c20-817b-a5f70a28ff8d",
+      "koHtmlLen": 1876,
+      "enHtmlLen": 3392
     },
     {
-      "slug": "acetaminophen650-04",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "e997b71c716ae591",
-      "T": 6,
-      "order": 604,
-      "sourceRef": "93693f70-ef4c-42a3-8cff-be97028c7d57",
-      "koHtmlLen": 2841,
-      "enHtmlLen": 5485
-    },
-    {
-      "slug": "acetaminophen650-05",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "4a20df65b36323dd",
+      "slug": "diosmin600-02",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "4626ec4963997004",
       "T": 5,
-      "order": 605,
-      "sourceRef": "6113c317-db53-4b40-8b9a-ff5845c5db93",
-      "koHtmlLen": 2702,
-      "enHtmlLen": 5395
+      "order": 902,
+      "sourceRef": "92838b2e-27a5-42e4-8d09-8c46cac39398",
+      "koHtmlLen": 1839,
+      "enHtmlLen": 3197
     },
     {
-      "slug": "acetaminophen650-06",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "a6c4246a12c29e90",
+      "slug": "diosmin600-03",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "e1e66c9bed3b5ab6",
       "T": 5,
-      "order": 606,
-      "sourceRef": "c0f7d093-b8af-4c29-87fb-6ecdee5ee4ad",
-      "koHtmlLen": 2902,
-      "enHtmlLen": 5599
+      "order": 903,
+      "sourceRef": "85c906f1-6229-41c0-8ae3-1d649445ef66",
+      "koHtmlLen": 1944,
+      "enHtmlLen": 3525
     },
     {
-      "slug": "acetaminophen650-07",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "35554d979d6c7474",
+      "slug": "diosmin600-04",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "4e0cc3122c0618d0",
       "T": 4,
-      "order": 607,
-      "sourceRef": "05b32ad9-0e42-44a5-8c06-c7d779362bd8",
-      "koHtmlLen": 2773,
-      "enHtmlLen": 5339
+      "order": 904,
+      "sourceRef": "920c6cb5-9783-4898-8ee6-9a6a4e5a873b",
+      "koHtmlLen": 1994,
+      "enHtmlLen": 3670
     },
     {
-      "slug": "acetaminophen650-08",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "7140ad4c299c090b",
+      "slug": "diosmin600-05",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "637fe405e55560c3",
       "T": 4,
-      "order": 608,
-      "sourceRef": "67eb5bcd-cf76-494d-86e1-4ec76cddaa69",
-      "koHtmlLen": 2871,
-      "enHtmlLen": 5563
+      "order": 905,
+      "sourceRef": "8585b779-f45e-4e6c-8eb8-47e258a488dc",
+      "koHtmlLen": 1782,
+      "enHtmlLen": 3132
     },
     {
-      "slug": "acetaminophen650-09",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "9601dd11c3f269b5",
-      "T": 4,
-      "order": 609,
-      "sourceRef": "67301ac6-3dcb-4093-8c7a-2fa02919eab7",
-      "koHtmlLen": 2944,
-      "enHtmlLen": 5645
-    },
-    {
-      "slug": "acetaminophen650-10",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "ac400b733ed79295",
-      "T": 4,
-      "order": 610,
-      "sourceRef": "6c3c3f08-c986-4310-84c1-a3bef14a3af6",
-      "koHtmlLen": 2648,
-      "enHtmlLen": 5103
-    },
-    {
-      "slug": "acetaminophen650-11",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "c91ecec875de9064",
-      "T": 4,
-      "order": 611,
-      "sourceRef": "833e9c1c-eac4-4abd-8ab6-ef2b41c22fc0",
-      "koHtmlLen": 2805,
-      "enHtmlLen": 5405
-    },
-    {
-      "slug": "acetaminophen650-12",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "cd133b3d6d67ddb0",
-      "T": 4,
-      "order": 612,
-      "sourceRef": "d631a004-1b58-4e22-8040-66e524534b48",
-      "koHtmlLen": 2760,
-      "enHtmlLen": 5342
-    },
-    {
-      "slug": "acetaminophen650-13",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "e9dda62d0dec3cb0",
-      "T": 4,
-      "order": 613,
-      "sourceRef": "c698474b-acad-48d1-8213-155f9a770737",
-      "koHtmlLen": 2656,
-      "enHtmlLen": 5102
-    },
-    {
-      "slug": "acetaminophen650-14",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "18f4141c1739f06c",
+      "slug": "diosmin600-06",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "6a72bdb2f01ab01e",
       "T": 3,
-      "order": 614,
-      "sourceRef": "73db35b3-93bc-4c87-8416-f9dcf068e46f",
-      "koHtmlLen": 2772,
-      "enHtmlLen": 5339
+      "order": 906,
+      "sourceRef": "acad62a7-3c44-4a31-8f49-c03e5e6d99a3",
+      "koHtmlLen": 1786,
+      "enHtmlLen": 3109
     },
     {
-      "slug": "acetaminophen650-15",
-      "groupKey": "아세트아미노펜|650밀리그램|정",
-      "safetyFp": "8d934d3331a50984",
+      "slug": "diosmin600-07",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "860a98c429235edc",
       "T": 3,
-      "order": 615,
-      "sourceRef": "d66b6994-3cb3-4996-8975-ef8d13a14e7c",
-      "koHtmlLen": 2621,
-      "enHtmlLen": 5081
+      "order": 907,
+      "sourceRef": "f119f0c0-f4f6-4dd3-8c34-061df84a9f27",
+      "koHtmlLen": 1789,
+      "enHtmlLen": 3116
+    },
+    {
+      "slug": "diosmin600-08",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "923c7a7ffab2bd83",
+      "T": 3,
+      "order": 908,
+      "sourceRef": "f3afd9d3-e216-4357-86d1-aca59b7f8e28",
+      "koHtmlLen": 1833,
+      "enHtmlLen": 3214
+    },
+    {
+      "slug": "diosmin600-09",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "b062737b9efd072f",
+      "T": 3,
+      "order": 909,
+      "sourceRef": "55fbd285-b9c7-4c62-8496-4a406986fae3",
+      "koHtmlLen": 1925,
+      "enHtmlLen": 3561
+    },
+    {
+      "slug": "diosmin600-10",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "b1b8d0d3a6b4714b",
+      "T": 3,
+      "order": 910,
+      "sourceRef": "dd374ef2-fe0d-470c-8aae-3849ea742bc7",
+      "koHtmlLen": 1801,
+      "enHtmlLen": 3175
+    },
+    {
+      "slug": "diosmin600-11",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "dba8fd2dd1679830",
+      "T": 3,
+      "order": 911,
+      "sourceRef": "089edd7c-a737-4bc3-878e-c4741c012fd3",
+      "koHtmlLen": 1856,
+      "enHtmlLen": 3253
+    },
+    {
+      "slug": "diosmin600-12",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "e047b476c7cd7808",
+      "T": 3,
+      "order": 912,
+      "sourceRef": "1764a641-0c4f-4fe6-807b-37ef5319ee76",
+      "koHtmlLen": 1831,
+      "enHtmlLen": 3178
+    },
+    {
+      "slug": "diosmin600-13",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "f111ec8fd295f45c",
+      "T": 3,
+      "order": 913,
+      "sourceRef": "09eed9d2-c386-472f-830d-8fd6d84bff03",
+      "koHtmlLen": 1803,
+      "enHtmlLen": 3189
+    },
+    {
+      "slug": "diosmin600-14",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "20380f76af10acb0",
+      "T": 2,
+      "order": 914,
+      "sourceRef": "1a92d062-de5a-422b-873b-54276c6f3685",
+      "koHtmlLen": 1824,
+      "enHtmlLen": 3206
+    },
+    {
+      "slug": "diosmin600-15",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "a4302c49e04ffe29",
+      "T": 2,
+      "order": 915,
+      "sourceRef": "ee3ab4df-643d-45a4-8e8a-fccac3c83983",
+      "koHtmlLen": 1916,
+      "enHtmlLen": 3481
+    },
+    {
+      "slug": "diosmin600-16",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "eb472c50ae10c57c",
+      "T": 2,
+      "order": 916,
+      "sourceRef": "cce86668-8b75-45a9-8d39-98b134c8932f",
+      "koHtmlLen": 1754,
+      "enHtmlLen": 3070
+    },
+    {
+      "slug": "diosmin600-17",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "eccbf92b92e9c388",
+      "T": 2,
+      "order": 917,
+      "sourceRef": "138f6c79-f90b-462d-8026-7d703c16a8b6",
+      "koHtmlLen": 1804,
+      "enHtmlLen": 3177
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 15,
-    "builtMasters": 71,
+    "builtFiles": 17,
+    "builtMasters": 56,
     "holds": 0,
     "missingTm": 0
   }

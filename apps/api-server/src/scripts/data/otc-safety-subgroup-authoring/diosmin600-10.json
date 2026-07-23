@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "diosmin600-10",
+  "order": 910,
+  "groupKey": "디오스민|600밀리그램|정",
+  "safetyFp": "b1b8d0d3a6b4714b",
+  "sourceRef": "dd374ef2-fe0d-470c-8aae-3849ea742bc7",
+  "sensitive": false,
+  "title": "디오스민 600mg 정 (정맥순환개선제)",
+  "expectEasyMd5": "30c85409",
+  "masterIds": [
+    "46b8e593-e252-4cd7-aec7-caf3ac225065",
+    "66e26b93-0bf7-4279-87cc-2e747a24c2c6",
+    "9d26c003-c608-4ced-b29e-ea46641dcc74"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "30c85409",
+    "names": [
+      "푸레파센600정(디오스민)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 정맥부전과 관련된 증상(다리 중압감, 통증)의 개선, 모세혈관 취약증에 의한 장애의 보조치료, 치질과 관련된 징후의 치료에 사용합니다.",
+    "usage": "정맥 부전은 1회 1정(600 mg)씩, 1일 1회를 식사 시, 치질은 1회 1정(600 mg)씩, 1일 2~3회(1,200~1,800 mg)를 식사 시 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 수유부는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부는 의사 또는 약사와 상의하십시오.\n\n증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n소화장애 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "디오스민 600밀리그램",
+      "작용": "정맥 혈관의 긴장도를 높여 정맥부전 관련 증상과 치질 관련 징후를 개선합니다.",
+      "주요 증상": "정맥부전 관련 증상(다리 중압감·통증), 모세혈관 취약증 장애의 보조치료, 치질 관련 징후",
+      "주의 대상": "이 약 과민증 환자·수유부 복용 금지",
+      "선택 포인트": "다리 무거움·통증 등 정맥부전 증상과 치질 관련 징후에 쓰는 디오스민 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Diosmin 600 mg Tablets (Venous Circulation Improver)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to improve symptoms related to venous insufficiency (heaviness in the legs, pain), as adjunctive treatment for disorders caused by capillary fragility, and to treat signs related to hemorrhoids.",
+    "usage": "For venous insufficiency, take 1 tablet (600 mg) per dose, 1 time a day with a meal; for hemorrhoids, take 1 tablet (600 mg) per dose, 2 to 3 times a day (1,200 to 1,800 mg), with meals.",
+    "caution": "Do not take this medicine if you are hypersensitive to it or are breastfeeding. Before taking this medicine, consult a doctor or pharmacist if you are pregnant. If symptoms do not improve, stop taking this medicine immediately and consult a doctor or pharmacist. If digestive disturbances or similar symptoms occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Diosmin 600 mg",
+      "How it works": "Improves venous tone to relieve symptoms of venous insufficiency and signs related to hemorrhoids.",
+      "Main symptoms": "Symptoms of venous insufficiency (leg heaviness, pain); adjunctive treatment for disorders from capillary fragility; signs related to hemorrhoids",
+      "Caution for": "Do not use if hypersensitive to this medicine or while breastfeeding",
+      "Why this one": "A diosmin preparation for venous insufficiency symptoms such as leg heaviness and pain, and hemorrhoid-related signs."
+    }
+  }
+}

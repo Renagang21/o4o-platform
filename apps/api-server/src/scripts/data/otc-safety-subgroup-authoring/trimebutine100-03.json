@@ -1,0 +1,71 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "trimebutine100-03",
+  "order": 803,
+  "groupKey": "트리메부틴말레산염|100밀리그램|정",
+  "safetyFp": "99b588004fcd6ade",
+  "sourceRef": "7e5c7e7f-d4f6-47ee-8b1e-4401472c2820",
+  "sensitive": false,
+  "title": "트리메부틴말레산염 100mg 정 (위장운동조절제)",
+  "expectEasyMd5": "1657d754",
+  "masterIds": [
+    "23cfe27e-3fa5-4ec1-b56b-ee861f745eaf",
+    "31528988-7448-4322-b65d-336819080061",
+    "3e33a9f1-6148-41da-b3f7-b4b392433f35",
+    "4e4bd48f-88b9-4e93-b47e-f10976bc01e3",
+    "55fd1024-8ecd-43e0-ba44-a736467d0920",
+    "68dbc98f-ae43-45db-bb36-c4b6f3adb004",
+    "b54398a4-5dff-49d2-b25e-72c5657acd74",
+    "c4b183c7-17c4-467a-90cf-bf47f3ab6f88",
+    "d1357e21-d74b-4548-8b50-76f75b6fe937"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "1657d754",
+    "names": [
+      "리메부틴정(트리메부틴말레산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 36,
+    "en": 18,
+    "total": 54
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 식도역류 및 열공헤르니아, 위 십이지장염, 위ㆍ십이지장궤양에 있어서의 소화기능이상 (복통, 소화불량,구역, 구토), 과민성대장증후군 및 경련성 결장, 소아 질환(습관성 구토, 비감염성 장관통과장애 (변비, 설사))에 사용합니다.",
+    "usage": "성인은 1회 1~2정(100-200mg) 1일 3회 식전에 복용합니다.연령, 증상에 따라 적절히 증감합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.\n\n드물게 변비, 설사, 복명, 구역, 구토, 소화장애, 구갈, 구내마비감, 심계항진, 피로감, 졸음, 현기, 권태감, 두통, GOT, GPT상승이 나타날 수 있습니다.드물게 발진 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "트리메부틴말레산염 100밀리그램",
+      "작용": "위장관 운동을 조절하여 소화기능이상과 과민성대장증후군 증상을 완화합니다.",
+      "주요 증상": "식도역류·열공헤르니아·위십이지장염·위십이지장궤양의 소화기능이상(복통·소화불량·구역·구토), 과민성대장증후군·경련성 결장, 소아 습관성 구토·비감염성 장관통과장애(변비·설사)",
+      "주의 대상": "갈락토오스 관련 유전 문제 환자 복용 금지, 임부·임신 가능성 여성·수유부는 복용 전 상담",
+      "선택 포인트": "위장관 운동을 조절해 복통·소화불량·구역·구토와 과민성대장증후군 증상을 완화합니다."
+    }
+  },
+  "en": {
+    "title": "Trimebutine Maleate 100 mg Tablets (Gastrointestinal Motility Regulator)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for digestive dysfunction (abdominal pain, indigestion, nausea, vomiting) associated with esophageal reflux and hiatal hernia, gastroduodenitis, and gastric or duodenal ulcers; for irritable bowel syndrome and spastic colon; and for pediatric conditions (habitual vomiting, non-infectious intestinal transit disorders (constipation, diarrhea)).",
+    "usage": "Adults take 1 to 2 tablets (100 to 200 mg) per dose, 3 times a day, before meals. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding. In rare cases, constipation, diarrhea, borborygmus, nausea, vomiting, digestive disturbances, dry mouth, numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, and elevated GOT and GPT may occur. In rare cases, if a rash or similar symptoms appear, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Trimebutine maleate 100 mg",
+      "How it works": "Regulates gastrointestinal motility to relieve digestive dysfunction and symptoms of irritable bowel syndrome.",
+      "Main symptoms": "Digestive dysfunction (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux, hiatal hernia, gastroduodenitis, gastric/duodenal ulcers; irritable bowel syndrome and spastic colon; pediatric habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea)",
+      "Caution for": "Do not use with hereditary galactose-related problems; consult before use if pregnant, possibly pregnant, or breastfeeding",
+      "Why this one": "Regulates gastrointestinal motility to relieve abdominal pain, indigestion, nausea, vomiting, and irritable bowel symptoms."
+    }
+  }
+}

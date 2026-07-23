@@ -1,0 +1,68 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "bromelain100-04",
+  "order": 704,
+  "groupKey": "브로멜라인|100밀리그램|정",
+  "safetyFp": "8790edd4c0bf60f8",
+  "sourceRef": "b7a8ec4c-53c0-45bd-8372-b2bb622be51f",
+  "sensitive": false,
+  "title": "브로멜라인 100mg 정 (소염효소제)",
+  "expectEasyMd5": "434ef384",
+  "masterIds": [
+    "14aa966d-ea51-4f05-bc7d-1162b7aff0e9",
+    "152160ec-85e1-43c8-81c6-9a28afcc622c",
+    "4c45d348-2704-453c-b15c-2b51c81b663c",
+    "be8ca2a2-6a46-40b5-ab87-b387b2eb1aea",
+    "d12d9b7f-bc04-4579-afeb-683390bd777c",
+    "f1ead1d2-bdbc-496a-ad43-de49d5138718"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "434ef384",
+    "names": [
+      "노바멜라인장용정100밀리그램(브로멜라인)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 24,
+    "en": 12,
+    "total": 36
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 상처 또는 수술 후의 부기 및 부종을 동반한 염증 증상의 완화에 사용합니다.",
+    "usage": "성인 및 12세 이상의 소아는 1회 1정씩, 1일 2회 식사 30분 전에 물과 함께 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "임부 및 수유부, 12세 미만의 소아, 혈우병 등의 심한 혈액응고이상, 심한 간질환, 혈액투석환자 등의 심한 신장질환 환자, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 황색5호·선셋옐로우FCF 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.\n\n항응고제 또는 혈소판응집억제제를 투여 중인 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 테트라사이클린 등의 항생제를 투여하고 있는 환자는 의사 또는 약사와 상의하십시오.\n\n드물게 과민반응, 위통, 설사 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "브로멜라인 100밀리그램",
+      "작용": "단백분해효소인 브로멜라인이 부종(부기)을 동반한 염증 증상을 완화합니다.",
+      "주요 증상": "상처·수술 후 부기, 부종을 동반한 염증 증상",
+      "주의 대상": "임부·수유부, 12세 미만, 혈우병 등 심한 혈액응고이상, 심한 간질환, 혈액투석 등 심한 신장질환, 갈락토오스 관련 유전 문제 환자 복용 금지",
+      "선택 포인트": "부기를 동반한 염증과 상처·수술 후 부종 완화에 쓰는 브로멜라인 소염효소제입니다."
+    }
+  },
+  "en": {
+    "title": "Bromelain 100 mg Tablets (Anti-inflammatory Enzyme)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to relieve swelling after wounds or surgery and inflammatory symptoms accompanied by edema.",
+    "usage": "Adults and children 12 years and older take 1 tablet per dose, 2 times a day, 30 minutes before meals, with water.",
+    "caution": "Do not take this medicine if you are pregnant or breastfeeding; are a child under 12 years old; have severe blood coagulation disorders such as hemophilia; have severe liver disease; have severe kidney disease such as patients on hemodialysis; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have or have experienced hypersensitivity to Yellow No. 5 (Sunset Yellow FCF). Do not take this medicine if you are being treated with anticoagulants or antiplatelet agents. Before taking this medicine, consult a doctor or pharmacist if you are taking antibiotics such as tetracycline. In rare cases, hypersensitivity reactions, stomach pain, diarrhea, or similar symptoms may occur; if they do, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Bromelain 100 mg",
+      "How it works": "Bromelain, a proteolytic enzyme, relieves inflammatory symptoms accompanied by swelling (edema).",
+      "Main symptoms": "Swelling after wounds or surgery; inflammatory symptoms with edema",
+      "Caution for": "Do not use during pregnancy/breastfeeding, under 12 years, with severe blood coagulation disorders (e.g., hemophilia), severe liver disease, severe kidney disease (e.g., hemodialysis), or hereditary galactose-related problems",
+      "Why this one": "A bromelain anti-inflammatory enzyme preparation used to relieve inflammation with swelling and edema after injury or surgery."
+    }
+  }
+}

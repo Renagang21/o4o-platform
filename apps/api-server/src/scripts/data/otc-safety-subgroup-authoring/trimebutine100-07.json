@@ -1,0 +1,66 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "trimebutine100-07",
+  "order": 807,
+  "groupKey": "트리메부틴말레산염|100밀리그램|정",
+  "safetyFp": "bed768635945c599",
+  "sourceRef": "d0bab0f3-d5de-4349-89fc-d9b145a0ccb9",
+  "sensitive": false,
+  "title": "트리메부틴말레산염 100mg 정 (위장운동조절제)",
+  "expectEasyMd5": "39eb35ab",
+  "masterIds": [
+    "10c6bb65-bc06-4ac7-b63f-5a03edfbc5b9",
+    "a49c51d1-d900-4e97-91b1-a43d8b67a353",
+    "cd91df90-5c07-4eaf-9e08-4cc9c124e92b",
+    "e3584966-8d2c-4ab3-acd3-bbaf781f789b"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "39eb35ab",
+    "names": [
+      "바이메틴정(트리메부틴말레산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 16,
+    "en": 8,
+    "total": 24
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 식도역류 및 열공헤르니아, 위·십이지장염, 위·십이지장궤양에 있어서의 소화기능이상(복통, 소화불량, 구역, 구토)과 과민성대장증후군 및 경련성 결장과 소아 질환(습관성 구토, 비감염성 장관통과장애(변비, 설사))에 사용합니다.",
+    "usage": "성인은 1회 1~2정(100~200 mg)씩, 1일 3회 식전에 복용합니다.\n\n연령, 증상에 따라 적절히 증감합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.\n\n드물게 변비, 설사, 창자 가스소리, 구역, 구토, 소화장애, 목마름, 입안마비감, 심계항진, 피로감, 졸음, 어지러움, 권태감, 두통, GOT, GPT상승이 나타날 수 있습니다.\n\n드물게 발진 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "트리메부틴말레산염 100밀리그램",
+      "작용": "위장관 운동을 조절하여 소화기능이상과 과민성대장증후군 증상을 완화합니다.",
+      "주요 증상": "식도역류·열공헤르니아·위십이지장염·위십이지장궤양의 소화기능이상(복통·소화불량·구역·구토), 과민성대장증후군·경련성 결장, 소아 습관성 구토·비감염성 장관통과장애(변비·설사)",
+      "주의 대상": "임부 또는 임신 가능성이 있는 여성, 수유부는 복용 전 의사·약사와 상담",
+      "선택 포인트": "위장관 운동을 조절해 복통·소화불량·구역·구토와 과민성대장증후군 증상을 완화합니다."
+    }
+  },
+  "en": {
+    "title": "Trimebutine Maleate 100 mg Tablets (Gastrointestinal Motility Regulator)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for digestive dysfunction (abdominal pain, indigestion, nausea, vomiting) associated with esophageal reflux and hiatal hernia, gastroduodenitis, and gastric or duodenal ulcers; for irritable bowel syndrome and spastic colon; and for pediatric conditions (habitual vomiting, non-infectious intestinal transit disorders (constipation, diarrhea)).",
+    "usage": "Adults take 1 to 2 tablets (100 to 200 mg) per dose, 3 times a day, before meals. Adjust the dose appropriately according to age and symptoms.",
+    "caution": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding. In rare cases, constipation, diarrhea, bowel gas sounds, nausea, vomiting, digestive disturbances, thirst, numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, and elevated GOT and GPT may occur. In rare cases, if a rash or similar symptoms appear, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Trimebutine maleate 100 mg",
+      "How it works": "Regulates gastrointestinal motility to relieve digestive dysfunction and symptoms of irritable bowel syndrome.",
+      "Main symptoms": "Digestive dysfunction (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux, hiatal hernia, gastroduodenitis, gastric/duodenal ulcers; irritable bowel syndrome and spastic colon; pediatric habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea)",
+      "Caution for": "Consult a doctor or pharmacist before use if pregnant, possibly pregnant, or breastfeeding",
+      "Why this one": "Regulates gastrointestinal motility to relieve abdominal pain, indigestion, nausea, vomiting, and irritable bowel symptoms."
+    }
+  }
+}
