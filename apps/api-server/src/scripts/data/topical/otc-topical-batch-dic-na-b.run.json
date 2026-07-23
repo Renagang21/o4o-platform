@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "디클로페낙나트륨",
+ "form": "스팅겔",
+ "slugbase": "dic-na-b",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "fd37b502c69a3880",
+   "n": 1
+  },
+  {
+   "fp": "27488d8ad19e18eb",
+   "n": 1
+  },
+  {
+   "fp": "04cd96c6177d684b",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

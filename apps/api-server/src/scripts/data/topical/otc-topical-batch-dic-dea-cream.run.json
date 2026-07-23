@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "나바론크림",
+ "slugbase": "dic-dea-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "117ee33fd2c42f29",
+   "n": 1
+  },
+  {
+   "fp": "f9af1cf2f2e26f40",
+   "n": 1
+  },
+  {
+   "fp": "0f650be6566cb46d",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

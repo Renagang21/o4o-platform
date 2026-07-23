@@ -82,7 +82,8 @@ function normalizeOralMisphrase(text: string, fullContent: string): string {
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록') // 외용전용 지시(의미 보존 재표현)
     .replace(/내복용/g, '먹는 용도') // '내복용으로 사용하지 마십시오' 등 외용전용 경고(의미 보존 재표현)
-    .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우'); // 상호작용 병용 안내(복용→사용, 의미 보존: 먹는 약 포함 전체 약물로 확장)
+    .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우') // 상호작용 병용 안내(복용→사용, 의미 보존: 먹는 약 포함 전체 약물로 확장)
+    .replace(/함께 복용 시/g, '함께 사용 시'); // 상호작용 '…약물과 함께 복용 시 상의' 병용 안내(복용→사용, 의미 보존 확장 — 디클로페낙 스팅겔·디페낙겔형)
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }

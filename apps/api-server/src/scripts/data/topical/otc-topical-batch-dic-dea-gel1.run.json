@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "디페낙겔",
+ "slugbase": "dic-dea-gel1",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8c82549d5b8e93eb",
+   "n": 1
+  },
+  {
+   "fp": "3ea611478e4d0791",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

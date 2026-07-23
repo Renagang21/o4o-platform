@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "볼타렌에멀겔",
+ "slugbase": "dic-dea-emulgel",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "604bf5a390ea7537",
+   "n": 1
+  },
+  {
+   "fp": "ce79dc9a2dc4e6a0",
+   "n": 1
+  },
+  {
+   "fp": "f053d5559fbca11c",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}
