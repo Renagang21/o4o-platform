@@ -38,17 +38,44 @@ const B_COMPONENT: Array<[RegExp, string]> = [
   [/^간\s*건강$/, 'liver health'],
   [/^체지방\s*감소$/, 'reducing body fat'],
   [/^면역력\s*증진$/, 'boosting immunity'],
+  // B-BASIS-UNLOCK: GROUNDING_PENDING_EN false-negative 보완. 전부 MFDS 공식 단일 기능성의 표준 영문(임의생성 0).
+  // 공식 문구 파서(콤마/중점/(가)(나)) 미분해로 미매핑되던 grounded 기능성만 anchored-exact 로 정적 보강.
+  [/^식후\s*혈당\s*상승\s*억제$/, 'suppressing the rise in blood sugar after meals'],
+  [/^식후\s*혈당상승\s*억제$/, 'suppressing the rise in blood sugar after meals'],
+  [/^혈중\s*중성지질\s*개선$/, 'improving blood triglyceride levels'],
+  [/^유산균\s*증식$/, 'the growth of lactic acid bacteria'],
+  [/^장내\s*유익균의?\s*증식$/, 'the growth of beneficial intestinal bacteria'],
+  [/^유익균의?\s*증식$/, 'the growth of beneficial bacteria'],
+  [/^혈중\s*콜레스테롤\s*개선$/, 'improving blood cholesterol'],
+  // B-BASIS-UNLOCK discovery(대사): CLA·폴리코사놀·솔잎증류농축액 공식 기능성(MFDS 표준 영문, 임의생성 0)
+  [/^과체중인?\s*성인의?\s*체지방\s*감소$/, 'reducing body fat in overweight adults'],
+  [/^(?:높은\s*)?혈중\s*콜레스테롤\s*수치의?\s*개선$/, 'improving blood cholesterol levels'],
+  [/^건강한\s*혈당의?\s*유지$/, 'maintaining healthy blood sugar levels'],
 ];
 function bJoin(a: string[]): string { return a.length <= 1 ? (a[0] ?? '') : a.length === 2 ? `${a[0]} and ${a[1]}` : `${a.slice(0, -1).join(', ')}, and ${a[a.length - 1]}`; }
 function mapComponentB(ko: string): string | null { const c = ko.replace(/\s+/g, ' ').trim(); for (const [re, en] of B_COMPONENT) if (re.test(c)) return en; return null; }
-/** 공용 mapFunctionEn 1차 시도 → 미매핑 시 '및/·' 분해 + B_COMPONENT 로 정적 보강. 전 컴포넌트 매핑 성공시만 반환(임의생성 0). */
+/**
+ * 공용 mapFunctionEn 1차 → 미매핑 시 공식 기능성 문구를 fragment 분해 + B_COMPONENT anchored-exact 정적 매핑.
+ * 각 fragment 는 반드시 B_COMPONENT 정규식에 정확히 일치해야 하며, 하나라도 미매핑이면 전체 null(pending) — **임의 EN 생성 0**.
+ * 분해 규칙: MFDS 분류 꼬리표((기타기능II)/고시형)·따옴표·(가)(나) 라벨 제거 후, '…에 도움을 줄 수 있음' 완결구를
+ * 경계(콤마화)로 치환하고 콤마/중점/및/과/와 로 분해. false-negative(grounded 기능성 미분해) 만 복구.
+ */
 function mapFunctionEnB(ko: string): string | null {
   const direct = mapFunctionEn(ko); if (direct) return direct;
-  const m = ko.replace(/\s+/g, ' ').trim().match(/^(.*?)에?\s*도움을?\s*(?:줄\s*수\s*있(?:음|습니다)|줌|주는)/);
-  if (!m) return null;
-  const parts = m[1].split(/[·･・‧]|\s*및\s*/).map((b) => b.trim()).filter(Boolean);
+  const cleaned = ko.replace(/\s+/g, ' ').trim()
+    .replace(/[""“”]/g, '')
+    .replace(/\s*\((?:기타기능\s*[IViv]+|고시형|개별인정형)\)\s*/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+  // 단일 공식 기능성(완결구 없이 fnNormalize 로 이미 추출된 경우) 즉시 매핑
+  const dc = mapComponentB(cleaned.replace(/^\s*\((?:가|나|다|라)\)\s*/, '')); if (dc) return `May help with ${dc}`;
+  // 다중 클로즈: '…에 도움을 줄 수 있음' 완결구를 콤마 경계로 치환 → (가)(나) 다항 기능성 모두 보존
+  const zone = cleaned.replace(/에?\s*도움을?\s*(?:줄\s*수\s*있(?:음|습니다)|줌|주는)\s*/g, ',');
+  // 분해자: 콤마/중점/및 만(‘과/와’ 는 과체중 등 어절 내부를 오분할하므로 제외 — 미분해 fragment 는 pending 유지, 오생성 0)
+  const parts = zone.split(/[·･・‧•∙․,，、]|\s*및\s*/)
+    .map((b) => b.replace(/^\s*\((?:가|나|다|라)\)\s*/, '').trim()).filter(Boolean);
+  if (!parts.length) return null;
   const mapped = parts.map(mapComponentB);
-  if (mapped.length && mapped.every((x) => x != null)) return `May help with ${bJoin(mapped as string[])}`;
+  if (mapped.every((x) => x != null)) return `May help with ${bJoin(mapped as string[])}`;
   return null;
 }
 /** 공용 resolveFunctions 대체(B). KO=공용 extractFunctionsKo grounded, EN=mapFunctionEnB(공용 1차 + B 정적 보강). 미매핑=pending. */
@@ -102,4 +129,8 @@ export const B_INGREDIENTS: Record<string, SfIngredient> = {
   '풋사과추출물애플페논': { key: '풋사과추출물애플페논', slug: 'green-apple-applephenon', displayKo: '풋사과 추출물 애플페논', displayEn: 'Green apple extract (Applephenon)', labelRe: /풋사과/, allowClassified: true, statusHint: 'READY' },
   '홍국': { key: '홍국', slug: 'red-yeast-rice', displayKo: '홍국', displayEn: 'Red yeast rice', labelRe: /홍국/, allowClassified: true, statusHint: 'READY' },
   '미역등복합추출물': { key: '미역등복합추출물', slug: 'xanthigen', displayKo: '미역등복합추출물(잔티젠)', displayEn: 'Undaria/pomegranate complex extract (Xanthigen)', labelRe: /잔티젠|미역등복합/, allowClassified: true, statusHint: 'READY' },
+  // B-BASIS-UNLOCK discovery(대사): A/C 미청구·own-track 아님. CLA=체지방(대사), 폴리코사놀·솔잎=콜레스테롤/혈당(대사).
+  '공액리놀레산': { key: '공액리놀레산', slug: 'conjugated-linoleic-acid', displayKo: '공액리놀레산', displayEn: 'Conjugated linoleic acid (CLA)', labelRe: /공액리놀레산|공액\s*리놀레산/, allowClassified: true, statusHint: 'READY' },
+  '폴리코사놀': { key: '폴리코사놀', slug: 'policosanol', displayKo: '폴리코사놀', displayEn: 'Policosanol', labelRe: /폴리코사놀/, allowClassified: true, statusHint: 'READY' },
+  '솔잎증류농축액': { key: '솔잎증류농축액', slug: 'pine-needle-distillate', displayKo: '솔잎증류농축액', displayEn: 'Pine needle distillate concentrate', labelRe: /솔잎증류농축액|솔잎\s*증류/, allowClassified: true, statusHint: 'READY' },
 };
