@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "제놀롱플라스타",
+ "slugbase": "diclo-pla-zenol-long",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "47dbdd6eca464b04",
+   "n": 2
+  },
+  {
+   "fp": "a6f48b32e7aa35d1",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

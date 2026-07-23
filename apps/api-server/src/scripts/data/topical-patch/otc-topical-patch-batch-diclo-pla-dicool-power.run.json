@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "디쿨파워플라스타",
+ "slugbase": "diclo-pla-dicool-power",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e2b9703e88375d42",
+   "n": 3
+  },
+  {
+   "fp": "da3b5aba04cfcb33",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

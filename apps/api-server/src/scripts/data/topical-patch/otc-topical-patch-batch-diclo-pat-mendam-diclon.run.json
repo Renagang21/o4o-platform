@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "맨담디클론첩부제",
+ "slugbase": "diclo-pat-mendam-diclon",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "580fb25d89139791",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

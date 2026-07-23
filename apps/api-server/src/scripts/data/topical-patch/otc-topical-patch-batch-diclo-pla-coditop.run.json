@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "코디톱플라스타",
+ "slugbase": "diclo-pla-coditop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "7e5b30df88e4358b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

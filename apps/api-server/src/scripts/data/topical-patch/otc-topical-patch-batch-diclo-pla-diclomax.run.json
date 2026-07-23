@@ -1,0 +1,29 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "디클로맥스플라스타",
+ "slugbase": "diclo-pla-diclomax",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "6056b8416366775b",
+   "n": 3
+  },
+  {
+   "fp": "e752354edd7a498c",
+   "n": 2
+  },
+  {
+   "fp": "d2ab1df1b9fce56c",
+   "n": 2
+  },
+  {
+   "fp": "b5bd0267c66aae98",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 9,
+ "koWrite": 36,
+ "enWrite": 18
+}

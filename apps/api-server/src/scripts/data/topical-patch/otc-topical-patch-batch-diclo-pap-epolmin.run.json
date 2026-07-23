@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙에폴아민",
+ "form": "에폴민카타플라스마",
+ "slugbase": "diclo-pap-epolmin",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5b3efbfa77f7c936",
+   "n": 3
+  },
+  {
+   "fp": "b2d33f82d00f8173",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

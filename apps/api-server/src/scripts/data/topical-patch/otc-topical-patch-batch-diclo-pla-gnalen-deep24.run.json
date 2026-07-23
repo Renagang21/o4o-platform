@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "그날엔딥24플라스타",
+ "slugbase": "diclo-pla-gnalen-deep24",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a6f48b32e7aa35d1",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

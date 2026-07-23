@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "류펜프리플라스타",
+ "slugbase": "diclo-pla-ryupenfree",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a6f48b32e7aa35d1",
+   "n": 5
+  },
+  {
+   "fp": "47dbdd6eca464b04",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

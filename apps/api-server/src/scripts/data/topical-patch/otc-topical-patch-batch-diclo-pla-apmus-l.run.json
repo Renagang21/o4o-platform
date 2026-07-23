@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "아프머스엘플라스타",
+ "slugbase": "diclo-pla-apmus-l",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "13cb5913f2d83e9b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

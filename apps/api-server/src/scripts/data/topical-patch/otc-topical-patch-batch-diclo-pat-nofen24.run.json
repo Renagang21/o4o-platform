@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙디에틸암모늄",
+ "form": "노펜24첩부제",
+ "slugbase": "diclo-pat-nofen24",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "908838420aeba1ae",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

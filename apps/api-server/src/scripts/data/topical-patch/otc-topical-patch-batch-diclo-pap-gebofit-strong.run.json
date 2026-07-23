@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "게보핏스트롱카타플라스마",
+ "slugbase": "diclo-pap-gebofit-strong",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "aea487cf5fa534be",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

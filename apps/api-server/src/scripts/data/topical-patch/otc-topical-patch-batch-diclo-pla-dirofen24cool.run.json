@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "디로펜24쿨플라스타",
+ "slugbase": "diclo-pla-dirofen24cool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a6f48b32e7aa35d1",
+   "n": 7
+  },
+  {
+   "fp": "47dbdd6eca464b04",
+   "n": 7
+  }
+ ],
+ "heldFps": [],
+ "masters": 14,
+ "koWrite": 56,
+ "enWrite": 28
+}

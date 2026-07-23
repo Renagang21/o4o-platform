@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "류마스탑파워플라스타",
+ "slugbase": "diclo-pla-rheumastop-power",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e0e286aa237e43a9",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

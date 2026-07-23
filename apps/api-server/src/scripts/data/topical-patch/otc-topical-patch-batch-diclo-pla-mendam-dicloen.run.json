@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "맨담디클로엔플라스타",
+ "slugbase": "diclo-pla-mendam-dicloen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "47dbdd6eca464b04",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

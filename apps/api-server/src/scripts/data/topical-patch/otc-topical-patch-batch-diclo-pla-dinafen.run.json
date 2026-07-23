@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "디나펜플라스타",
+ "slugbase": "diclo-pla-dinafen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "91e95e6a03c85a21",
+   "n": 5
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "사라펜쿨카타플라스마",
+ "slugbase": "diclo-pap-sarafen-cool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8a707f10c58bb68f",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

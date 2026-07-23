@@ -95,7 +95,8 @@ function normalizeOralMisphrase(text: string, fullContent: string): string {
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록')
     .replace(/내복용/g, '먹는 용도')
     .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우')
-    .replace(/함께 복용 시/g, '함께 사용 시');
+    .replace(/함께 복용 시/g, '함께 사용 시')
+    .replace(/병용\(함께 복용,? ?\(?사용\)?\)/g, '병용(함께 사용)'); // '병용(함께 복용, 사용)'/'병용(함께 복용(사용))' 괄호 주해 정규화 — 사용은 복용을 포괄(약화 아님)
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }

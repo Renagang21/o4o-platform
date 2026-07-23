@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "디클로페낙나트륨",
+ "form": "디센플러스카타플라스마",
+ "slugbase": "diclo-pap-dicenplus",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c4141ea4409324df",
+   "n": 5
+  },
+  {
+   "fp": "8a707f10c58bb68f",
+   "n": 5
+  },
+  {
+   "fp": "b9a02d20a3716f8b",
+   "n": 5
+  }
+ ],
+ "heldFps": [],
+ "masters": 15,
+ "koWrite": 60,
+ "enWrite": 30
+}
