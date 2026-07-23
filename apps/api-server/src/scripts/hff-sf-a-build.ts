@@ -41,8 +41,12 @@ interface IngCfg {
 // 콜라겐 지표(콜라겐/펩타이드 서열)에 표시량·함량 마커가 붙어 있는지 — 부원료가 아닌 유효 원료 확인용.
 function colHasAmount(base: string): boolean {
   const t = String(base);
-  return /콜라겐[^\n]{0,30}(표시량|㎎|mg|g\/|%|이상)/i.test(t)
-    || /(Gly\s*-?\s*Pro\s*-?\s*Hyp|하이드록시프롤린|hydroxyprolyl|hydroxyproline)[^\n]{0,30}(표시량|㎍|㎎|mg|%|이상)/i.test(t);
+  if (/콜라겐[^\n]{0,30}(표시량|㎎|mg|g\/|%|이상)/i.test(t)) return true;
+  if (/(Gly\s*-?\s*Pro\s*-?\s*Hyp|하이드록시프롤린|hydroxyprolyl|hydroxyproline)[^\n]{0,30}(표시량|㎍|㎎|mg|%|이상)/i.test(t)) return true;
+  // 저분자콜라겐펩타이드 개별인정 지표 서열(Gly-Pro-Val-Gly-Pro-Ser · Gly-Ala-Val-Gly-Pro-Ala 등 3+ 아미노산 사슬) + 표시량.
+  // 서열 뒤 (%)·(mg/g) 등 단위 표기가 끼어들 수 있어 표시량/수치+단위까지 30자 허용.
+  if (/(?:[A-Z][a-z]{2}\s*-\s*){2,}[A-Z][a-z]{2}[^\n]{0,30}(표시량|\d[\d.,\s]*(?:㎎|㎍|mg))/.test(t)) return true;
+  return false;
 }
 
 const COMMON_OTHER_FN = /장\s*건강|배변|혈중\s*콜레스테롤|혈중\s*중성지방|콜레스테롤\s*개선|기억력|인지|눈\s*건강|망막|혈행|혈압|혈당|체지방|간\s*건강|피로개선|면역|항산화\s*작용|칼슘\s*흡수|뼈\s*건강|골밀도|전립선|요로|위\s*점막|긴장\s*완화|수면|갱년기|월경|정자|운동수행|근력|손발\s*시림|잇몸/;
@@ -194,6 +198,18 @@ function splitList(sec: string, koMode: boolean): string[] {
     .map((x) => x.trim().replace(/^[-•*\s:：]+/, '').replace(/[.。\s]+$/, '').trim())
     .filter((x) => koMode ? (x.length >= 4 && /도움|개선|유지|보습|완화|증진|보호/.test(x)) : (x.length >= 5 && /May|help|maintain|improve|support/i.test(x)));
 }
+// 복합형 방어: MAIN_FNCTN 이 원료별 (국문)/(영문) 블록을 여러 개 가질 때 sections()는 첫 (영문) 앞만 ko로
+// 잡아 2번째 이후 원료의 비-콜라겐 기능성(체지방/갱년 등)을 놓친다. 모든 (국문) 블록의 기능성 문구를 수집한다.
+// (국문) 마커가 1개 이하이면 기존 koList 로 충분하므로 [] 반환(추가검사 불요·기존 동작 무변경).
+function allKoFuncs(fn: string): string[] {
+  const t = String(fn).replace(/\r/g, '');
+  const blocks: string[] = [];
+  const re = /\(국\s*문\)([\s\S]*?)(?=\(영\s*문\)|\(English\)|\(국\s*문\)|$)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(t)) !== null) blocks.push(m[1].replace(/\[[^\]]*\]/g, ' '));
+  if (blocks.length < 2) return [];
+  return [...new Set(blocks.flatMap((b) => splitList(b, true)))];
+}
 
 async function main(): Promise<void> {
   const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port: PROXY_PORT, username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { max: 2, statement_timeout: 300000 } });
@@ -225,6 +241,10 @@ async function main(): Promise<void> {
       if (cfg.fnNormalize) koList = [...new Set(koList.map(cfg.fnNormalize).filter((x) => x.length >= 4))];
       if (!koList.length) { funnel.baseNoMark++; continue; }
       if (koList.some((f) => cfg.otherFn.test(f))) { combo.push({ stmt: r.stmt, name: r.name.trim(), reason: 'OTHER_FN' }); funnel.baseCombo++; continue; }
+      // 다원료 (국문) 블록 전수 검사: 2번째 이후 원료가 콜라겐 집합 밖 기능성을 가지면 복합형 → 단일 콜라겐 오귀속 차단.
+      const koFull = allKoFuncs(r.fn);
+      const extraFns = koFull.filter((f) => !cfg.fnSet.some((cf) => cf.re.test(f)));
+      if (extraFns.length) { combo.push({ stmt: r.stmt, name: r.name.trim(), reason: 'MULTI_ING_FN', extraFns: extraFns.slice(0, 3) }); funnel.baseCombo++; continue; }
       if (!koList.every((f) => cfg.fnSet.some((cf) => cf.re.test(f)))) { funnel.baseNoMark++; continue; }
       funnel.fnSetPass++;
       const labels = baseLabels(r.base);
