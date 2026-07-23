@@ -29,6 +29,11 @@ const B_COMPONENT: Array<[RegExp, string]> = [
   [/^장\s*건강$/, 'intestinal health'],
   [/^피부\s*건강$/, 'skin health'],
   [/^혈중\s*콜레스테롤\s*개선$/, 'improving blood cholesterol'],
+  [/^콜레스테롤\s*개선$/, 'improving blood cholesterol'],
+  [/^유익균의?\s*증식$/, 'the growth of beneficial bacteria'],
+  [/^유해균의?\s*억제$/, 'inhibiting harmful bacteria'],
+  [/^배변활동$/, 'smooth bowel movements'],
+  [/^면역기능\s*증진$/, 'supporting immune function'],
 ];
 function bJoin(a: string[]): string { return a.length <= 1 ? (a[0] ?? '') : a.length === 2 ? `${a[0]} and ${a[1]}` : `${a.slice(0, -1).join(', ')}, and ${a[a.length - 1]}`; }
 function mapComponentB(ko: string): string | null { const c = ko.replace(/\s+/g, ' ').trim(); for (const [re, en] of B_COMPONENT) if (re.test(c)) return en; return null; }
@@ -57,6 +62,16 @@ export const B_INGREDIENTS: Record<string, SfIngredient> = {
   // B-06/07 안전 복구: 지표성분(무수바바로인) basis 는 Guard REVIEW 로 자동 제외되고, 원료 기준량 basis 만 PASS. 겔·액상은 LIQUID 제외.
   '알로에': { key: '알로에', slug: 'aloe', displayKo: '알로에', displayEn: 'Aloe', labelRe: /알로에/, allowClassified: true, statusHint: 'READY' },
   '키토산': { key: '키토산', slug: 'chitosan', displayKo: '키토산', displayEn: 'Chitosan', labelRe: /키토산/, allowClassified: true, statusHint: 'READY' },
+  // B-09/10 신규 발굴(장·대사·면역, 공용 mapFunctionEn 커버). displayEn=표준 영문명 정적 lookup. 기능성 EN=grounded(임의생성 0).
+  '콜레우스포스콜리': { key: '콜레우스포스콜리', slug: 'coleus-forskohlii', displayKo: '콜레우스포스콜리 추출물', displayEn: 'Coleus forskohlii extract', labelRe: /콜레우스\s*포스콜리/, allowClassified: true, statusHint: 'READY' },
+  '바나바잎': { key: '바나바잎', slug: 'banaba-leaf', displayKo: '바나바잎추출물', displayEn: 'Banaba leaf extract', labelRe: /바나바/, allowClassified: true, statusHint: 'READY' },
+  '레몬밤': { key: '레몬밤', slug: 'lemon-balm', displayKo: '레몬밤 추출물 혼합분말', displayEn: 'Lemon balm extract blend', labelRe: /레몬\s*밤/, allowClassified: true, statusHint: 'READY' },
+  '동결건조누에분말': { key: '동결건조누에분말', slug: 'silkworm-powder', displayKo: '동결건조누에분말', displayEn: 'Freeze-dried silkworm powder', labelRe: /누에분말/, allowClassified: true, statusHint: 'READY' },
+  '그린커피빈': { key: '그린커피빈', slug: 'green-coffee-bean', displayKo: '그린커피빈추출물', displayEn: 'Green coffee bean extract', labelRe: /그린\s*커피\s*빈/, allowClassified: true, statusHint: 'READY' },
+  'L-카르니틴': { key: 'L-카르니틴', slug: 'l-carnitine-tartrate', displayKo: 'L-카르니틴 타르트레이트', displayEn: 'L-carnitine tartrate', labelRe: /카르니틴/, allowClassified: true, statusHint: 'READY' },
+  '락토페린': { key: '락토페린', slug: 'lactoferrin', displayKo: '락토페린', displayEn: 'Lactoferrin', labelRe: /락토페린/, allowClassified: true, statusHint: 'READY' },
+  '돌외잎': { key: '돌외잎', slug: 'gynostemma-leaf', displayKo: '돌외잎주정추출분말', displayEn: 'Gynostemma pentaphyllum leaf extract', labelRe: /돌외잎/, allowClassified: true, statusHint: 'READY' },
+  '알콕시글리세롤상어간유': { key: '알콕시글리세롤상어간유', slug: 'alkoxyglycerol-shark-liver-oil', displayKo: '알콕시글리세롤 함유 상어간유', displayEn: 'Alkoxyglycerol-containing shark liver oil', labelRe: /알콕시글리세롤/, allowClassified: true, statusHint: 'READY' },
   // B-01 차전자피식이섬유 — 공식 기능성: 혈중 콜레스테롤 개선 · 배변활동 원활 (둘 다 mapFunctionEn HIT)
   '차전자피식이섬유': { key: '차전자피식이섬유', slug: 'psyllium-husk-fiber', displayKo: '차전자피식이섬유', displayEn: 'Psyllium husk dietary fiber', labelRe: /차전자피/, allowClassified: true, statusHint: 'READY' },
   // B-03 난소화성말토덱스트린 — 공식 기능성: 배변활동 원활 · 식후 혈당상승 억제 · 혈중 중성지질 개선 (전부 HIT)
@@ -68,4 +83,12 @@ export const B_INGREDIENTS: Record<string, SfIngredient> = {
   '오비엑스': { key: '오비엑스', slug: 'ob-x', displayKo: '오비엑스(Ob-X)', displayEn: 'Ob-X', labelRe: /오비엑스|Ob-?X/i, allowClassified: true, statusHint: 'READY' },
   '피니톨': { key: '피니톨', slug: 'pinitol', displayKo: '피니톨', displayEn: 'Pinitol', labelRe: /피니톨/, allowClassified: true, statusHint: 'READY' },
   '레시틴': { key: '레시틴', slug: 'lecithin', displayKo: '레시틴', displayEn: 'Lecithin', labelRe: /레시틴/, allowClassified: true, statusHint: 'READY' },
+  // B-10 프리바이오틱 올리고당·장·면역 계열 — 유익균 증식·유해균 억제·배변활동·면역기능 증진·콜레스테롤 EN 은 B_COMPONENT 정적 커버.
+  '자일로올리고당': { key: '자일로올리고당', slug: 'xylooligosaccharide', displayKo: '자일로올리고당', displayEn: 'Xylooligosaccharide', labelRe: /자일로\s*올리고당/, allowClassified: true, statusHint: 'READY' },
+  '라피노스': { key: '라피노스', slug: 'raffinose', displayKo: '라피노스', displayEn: 'Raffinose', labelRe: /라피노스/, allowClassified: true, statusHint: 'READY' },
+  '갈락토올리고당': { key: '갈락토올리고당', slug: 'galactooligosaccharide', displayKo: '갈락토올리고당', displayEn: 'Galactooligosaccharide', labelRe: /갈락토\s*올리고당/, allowClassified: true, statusHint: 'READY' },
+  '이소말토올리고당': { key: '이소말토올리고당', slug: 'isomaltooligosaccharide', displayKo: '이소말토올리고당', displayEn: 'Isomaltooligosaccharide', labelRe: /이소말토\s*올리고당/, allowClassified: true, statusHint: 'READY' },
+  '폴리덱스트로스': { key: '폴리덱스트로스', slug: 'polydextrose', displayKo: '폴리덱스트로스', displayEn: 'Polydextrose', labelRe: /폴리덱스트로스/, allowClassified: true, statusHint: 'READY' },
+  '키토올리고당': { key: '키토올리고당', slug: 'chitooligosaccharide', displayKo: '키토올리고당', displayEn: 'Chitooligosaccharide', labelRe: /키토올리고당/, allowClassified: true, statusHint: 'READY' },
+  '베타글루칸': { key: '베타글루칸', slug: 'beta-glucan', displayKo: '베타글루칸', displayEn: 'Beta-glucan', labelRe: /베타글루칸/, allowClassified: true, statusHint: 'READY' },
 };
