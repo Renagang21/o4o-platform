@@ -93,7 +93,8 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     //   공급자 소유 사이니지(YouTube 연결) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감.
     label: '디지털 사이니지',
     icon: MonitorSmartphone,
-    items: [{ label: '사이니지 콘텐츠', path: '/supplier/signage' }],
+    // 단일 항목 그룹은 item 라벨로 렌더되므로 라벨을 그룹명과 동일하게 유지.
+    items: [{ label: '디지털 사이니지', path: '/supplier/signage' }],
   },
   {
     // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
