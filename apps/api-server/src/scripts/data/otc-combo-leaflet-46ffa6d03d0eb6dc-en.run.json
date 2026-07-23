@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "위엔탈정|A02AX|100밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "05d36761-1377-2fe3-e58e-7fc109fe9b2f",
+  "anomalies": [],
+  "targetMasters": 6,
+  "koFingerprintKinds": 1,
+  "builtLen": 3683,
+  "builtMd5": "b1f30d141da0f867ba1325e77044fca8",
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_flip": 6,
+    "total": 12
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
