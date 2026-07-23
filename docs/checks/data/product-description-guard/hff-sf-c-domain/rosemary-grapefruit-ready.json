@@ -1,0 +1,94 @@
+[
+ {
+  "statementNo": "200400200141253",
+  "candidateId": "0c927aa3-563b-4e93-9522-98a3ba5cdbfc",
+  "shard": 2,
+  "ingredientKey": "로즈마리자몽추출복합물",
+  "productName": "더로즈마리자몽",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 -"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n - (국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n - (영문) May help to maintain skin health from skin damage by UV radiation",
+   "baseStandard": "① 성상 : 점박이가 있는 회황색의 장방형 제피정제\n② Carnosic acid와 carnosol의 합(mg/g) : 표시량(3.3 mg/500 mg)의 80~120%\n③ Naringin(mg/g) : 표시량(18.78 mg/500 mg)의 80~120%\n④ 납(mg/kg) : 0.5 이하\n⑤ 총비소(mg/kg) : 0.5 이하\n⑥ 카드뮴(mg/kg) : 0.05 이하\n⑦ 총수은(mg/kg) : 0.05 이하\n⑧ 대장균군 : 음성\n⑨ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1포(1정)를 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있는 점박이가 있는 회황색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 18개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n① 영·유아, 어린이, 임산부 및 수유부는 섭취에 주의\n② 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n④ 의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담"
+  }
+ },
+ {
+  "statementNo": "200400200141251",
+  "candidateId": "240fde87-6ca2-4e0f-8e45-3d4798856634",
+  "shard": 1,
+  "ingredientKey": "로즈마리자몽추출복합물",
+  "productName": "리얼 로즈마리자몽",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 -"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n - (국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n - (영문) May help to maintain skin health from skin damage by UV radiation",
+   "baseStandard": "① 성상 : 고유의 향미가 있는 분홍색의 제피정제\n② Carnosic acid와 carnosol의 합(mg/g) : 표시량(3.3 mg/500 mg)의 80~120%\n③ Naringin(mg/g) : 표시량(18.78 mg/500 mg) 의 80~120%\n④ 납(mg/kg) : 0.5 이하\n⑤ 총비소(mg/kg) : 0.5 이하\n⑥ 카드뮴(mg/kg) : 0.05 이하\n⑦ 총수은(mg/kg) : 0.05 이하\n⑧ 대장균군 : 음성\n⑨ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1포(1정)을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있는 분홍색의 제피정제",
+   "shelfLife": "제조일로부터 18개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n① 영·유아, 어린이, 임산부 및 수유부는 섭취에 주의\n② 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n④ 의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담"
+  }
+ },
+ {
+  "statementNo": "200400200141974",
+  "candidateId": "29f118c5-f2bc-44b0-b1c3-0c0d57d336dd",
+  "shard": 0,
+  "ingredientKey": "로즈마리자몽추출복합물",
+  "productName": "딥트3일 아이스 자몽 샤인업",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[로즈마리자몽추출복합물(Nutroxsun)]\n(국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n(영문) May help to maintain skin health from skin damage by UV radiation",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이가 있는 밝은 회황색 분말\n2. Carnosic acid와 carnosol의 합 : 표시량(3.3 mg/3,000 mg)의 80~120% \n3. Naringin : 표시량(18.78 mg/3,000 mg)의 80~120%\n4. 납(mg/kg) : 0.5 이하\n5. 비소(mg/kg) : 0.5 이하\n6. 카드뮴(mg/kg) : 0.05 이하\n7. 수은(mg/kg) : 0.05 이하\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포씩 입안에 녹여 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이가 있는 밝은 회황색 분말",
+   "shelfLife": "제조일부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[로즈마리자몽추출복합물(Nutroxsun)]\n1. 영·유아, 어린이, 임산부 및 수유부는 섭취에 주의\n2. 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의\n3. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n4. 의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담"
+  }
+ },
+ {
+  "statementNo": "200400200141317",
+  "candidateId": "87a66577-aa44-4a23-8967-d2b76a216436",
+  "shard": 2,
+  "ingredientKey": "로즈마리자몽추출복합물",
+  "productName": "로즈마리자몽",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 -"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n - (국문) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n - (영문) May help to maintain skin health from skin damage by UV radiation",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미∙이취가 없으며 점박이가 있는 회황색의 장방형 제피정제\n② Carnosic acid와 carnosol의 합 : 표시량(3.3 mg/500 mg)의 80~120%\n③ Naringin : 표시량(18.78 mg/500 mg)의 80~120%\n④ 납(mg/kg) : 0.5 이하\n⑤ 총비소(mg/kg) : 0.5 이하\n⑥ 카드뮴(mg/kg) : 0.05 이하\n⑦ 총수은(mg/kg) : 0.05 이하\n⑧ 대장균군 : 음성\n⑨ 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 1포(1정)를 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미∙이취가 없으며 점박이가 있는 회황색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 18개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[로즈마리자몽추출복합물(Nutroxsun)(제2019-25호)]\n① 영·유아, 어린이, 임산부 및 수유부는 섭취에 주의\n② 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n④ 의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담"
+  }
+ }
+]

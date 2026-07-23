@@ -1,0 +1,48 @@
+[
+ {
+  "statementNo": "20040017021875",
+  "candidateId": "0283d4e5-fe32-4c20-813f-2b8eb21acd09",
+  "shard": 0,
+  "ingredientKey": "허니부쉬추출발효분말",
+  "productName": "시크릿 클리어",
+  "manufacturer": "(주)비오팜",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[허니부쉬추출발효분말(제2017-3호)] 자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 이미, 이취가 없고 고유의 향미가 있는 분홍색의 제피정제\n②헤스페리딘 : 표시량(0.68mg/1,200mg)의 80 ~ 120% \n③납(mg/kg) : 1.0 이하\n④총비소(mg/kg) : 1.0 이하\n⑤카드뮴(mg/kg) : 0.1 이하\n⑥총수은(mg/kg) : 0.1 이하\n⑦대장균군 : 음성\n⑧붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 분홍색의 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오. ②어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "· 어린이, 임산부, 수유부는 섭취에 주의\n· 유당불내증이 있는 사람은 섭취에 주의"
+  }
+ },
+ {
+  "statementNo": "200700170351995",
+  "candidateId": "80a56321-9509-4851-9a5b-fce692c7f6d7",
+  "shard": 1,
+  "ingredientKey": "허니부쉬추출발효분말",
+  "productName": "에이드핏 유브이(UV) 컷",
+  "manufacturer": "코스맥스엔비티(주)",
+  "functionsKo": [
+   "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[허니부쉬추출발효분말(제2017-3호)] \n(국문) 자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음\n(영문) May help to maintain skin health from skin damage by UV radiation",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 노랑색의 장방형 코팅정제\n2. 헤스페리딘 : 표시량(0.68mg/1,000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 총비소(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 0.1 이하\n6. 총수은(mg/kg) : 0.1 이하\n7. 대장균군 : 음성\n8. 붕해시험 : 60분이내",
+   "intake": "1일 1회, 1회 1포(2정)를 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노랑색의 장방형 코팅정제",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "실온/ 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관 하십시오. 2) 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관 하십시오.3) 영ㆍ유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "caution": "어린이, 임산부, 수유부는 섭취에 주의\n유당불내증이 있는 사람은 섭취에 주의"
+  }
+ }
+]

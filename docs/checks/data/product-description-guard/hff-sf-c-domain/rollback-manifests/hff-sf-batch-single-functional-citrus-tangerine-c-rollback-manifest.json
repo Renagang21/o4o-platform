@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-citrus-tangerine-c",
+  "createdMasters": [
+    "04310dc9-aa1b-427a-a8e2-f1d458349f75"
+  ],
+  "createdSpd": [
+    "4cbbdec1-c6d7-4a75-9032-4066b4d1c418",
+    "e54f1dbc-fbb1-4794-8ad2-3332b9c803c1"
+  ],
+  "candIds": [
+    "a4bed29b-ef69-4b48-869b-052bf1e1e1dc"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "a4bed29b-ef69-4b48-869b-052bf1e1e1dc",
+      "stmt": "20172880236352",
+      "prev_status": "pending"
+    }
+  ]
+}

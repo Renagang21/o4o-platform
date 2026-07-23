@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-cantaloupe-melon-c",
+  "createdMasters": [
+    "0baced9f-d66c-4733-bdf2-98318fd2c0b2"
+  ],
+  "createdSpd": [
+    "bd072de8-91d9-4e4d-9172-1cfbde30d86c",
+    "05f3c6ca-6971-4b14-aa55-ae043b407fdf"
+  ],
+  "candIds": [
+    "64ca06d6-bb49-4e8b-89a4-ada3cb57b8cc"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "64ca06d6-bb49-4e8b-89a4-ada3cb57b8cc",
+      "stmt": "200400200082916",
+      "prev_status": "pending"
+    }
+  ]
+}

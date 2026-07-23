@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-agastache-c",
+  "createdMasters": [
+    "13b67254-26f5-4e1f-a9d9-e999f8473147",
+    "1aefddc9-3ad5-4b33-be56-574dce858c12"
+  ],
+  "createdSpd": [
+    "ed34f533-9f28-4c50-8fc5-a2b7d76617e1",
+    "ea05b71c-8e0b-400a-8fd6-92bf3365d7d9",
+    "4b43d57e-2590-4964-831c-3c794b6332ea",
+    "8d13497a-ffcd-44e5-9949-be61b277c827"
+  ],
+  "candIds": [
+    "05c107d6-dd04-4ce0-ac95-cf0d5993e9c2",
+    "38e060f8-c605-4249-895f-1dc4ff161679"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "05c107d6-dd04-4ce0-ac95-cf0d5993e9c2",
+      "stmt": "200700170351754",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "38e060f8-c605-4249-895f-1dc4ff161679",
+      "stmt": "200700170352475",
+      "prev_status": "pending"
+    }
+  ]
+}

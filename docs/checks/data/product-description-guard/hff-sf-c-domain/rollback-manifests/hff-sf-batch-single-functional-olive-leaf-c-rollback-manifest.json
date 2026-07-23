@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-olive-leaf-c",
+  "createdMasters": [
+    "7de4b805-1f4d-4f1d-90b3-59159d05e365"
+  ],
+  "createdSpd": [
+    "08831421-d3fc-4d86-98ac-5f9dafe820e2",
+    "6b9967ae-c923-4ea5-a1c3-5e8a0d270bb7"
+  ],
+  "candIds": [
+    "8aeefb03-da7b-48f6-bf9d-1c8f2627d5e7"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "8aeefb03-da7b-48f6-bf9d-1c8f2627d5e7",
+      "stmt": "200400200072576",
+      "prev_status": "pending"
+    }
+  ]
+}

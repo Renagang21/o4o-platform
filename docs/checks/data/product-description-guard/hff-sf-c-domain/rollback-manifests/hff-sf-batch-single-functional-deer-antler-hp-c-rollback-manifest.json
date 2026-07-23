@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-deer-antler-hp-c",
+  "createdMasters": [
+    "31f425fd-b9d8-414f-a50f-52f3457bba3a"
+  ],
+  "createdSpd": [
+    "28b4e48d-e65d-47ee-a571-0134bc279829",
+    "d317108a-978b-49cf-a17b-8631b4fbd824"
+  ],
+  "candIds": [
+    "9eee1d7d-4a91-41e6-8372-e223ca463af0"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "9eee1d7d-4a91-41e6-8372-e223ca463af0",
+      "stmt": "201200190071131",
+      "prev_status": "pending"
+    }
+  ]
+}

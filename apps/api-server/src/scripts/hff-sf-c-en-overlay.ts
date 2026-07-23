@@ -35,6 +35,9 @@ const ATOM_EN: Array<{ re: RegExp; en: string }> = [
   // 인지기능(PQQ·천마·참당귀 등) — 공식 '노화로 (인해) 저하된 인지기능 개선'
   { re: /^노화로(인해)?저하된인지기능개선/, en: 'improve cognitive function that declines with aging' },
   { re: /^자외선에의한피부손상로부터피부건강유지/, en: 'maintain skin health from UV-induced skin damage' },
+  // 칸탈로프멜론추출물(기능성원료인정 제2008-9호) 공식 3기능성 중 IMT·피부홍반 원자
+  { re: /IMT.*혈행개선|혈관벽두께.*혈행개선/, en: 'improve blood circulation by suppressing the increase in vascular wall thickness (intima-media thickness, IMT)' },
+  { re: /^자외선에의한피부홍반개선으로피부건강/, en: 'improve UV-induced skin erythema and support skin health' },
   { re: /^피부보습/, en: 'support skin moisturizing' },
   // 빌베리·헤마토코쿠스 눈 피로
   { re: /^눈의피로도?개선/, en: 'improve eye fatigue' },
@@ -43,11 +46,18 @@ const ATOM_EN: Array<{ re: RegExp; en: string }> = [
   { re: /^노화로인해감소될수있는황반색소밀도유지하여눈건강/, en: 'maintain macular pigment density that may decline with aging and support eye health' },
   // 혈행·혈중 지표(폴백 보강)
   { re: /^기억력개선/, en: 'improve memory' },
+  // 참당귀 추출분말(Nutragen, 제2014-44호) 신미보 — 공식 (영문) 원문 "maintain healthy joint" (단일원료 인지+관절 병기)
+  { re: /^관절건강(개선)?$|^관절건강에?/, en: 'maintain healthy joints' },
   { re: /^혈행개선/, en: 'improve blood circulation' },
   { re: /^식후혈중중성지질개선/, en: 'improve post-meal blood triglycerides' },
   { re: /^혈중중성지질개선/, en: 'improve blood triglycerides' },
   { re: /^(높은)?혈중콜레스테롤수치?개선/, en: 'improve blood cholesterol' },
   { re: /^혈압조절/, en: 'support blood pressure regulation' },
+  // 나토균배양분말(제2012-7호) — 공식 (영문) 원문 grounded
+  { re: /^혈압이높은사람/, en: 'support those with high blood pressure' },
+  { re: /혈소판응집억?제?.*혈행개선|혈소판응집.*혈액흐름/, en: 'improve blood circulation by inhibiting platelet aggregation' },
+  // 레시틴 제품 등 — 공식 '콜레스테롤 개선'(혈중 미명기)
+  { re: /^콜레스테롤개선$|^콜레스테롤수치개선/, en: 'improve cholesterol' },
   // 항산화
   { re: /^항산화작용을하여유해산소로부터세포를보호/, en: 'protect cells from reactive oxygen species through antioxidant activity' },
   { re: /^유해산소로부터세포를보호/, en: 'protect cells from reactive oxygen species' },
@@ -73,7 +83,7 @@ export function mapFunctionEnC(ko: string): string | null {
     .replace(/\(?\s*영문\s*\)?[\s\S]*$/, '')       // (영문)/영문 이후(영어 병기) 제거
     .replace(/\(?\s*국문\s*\)?\s*/g, '')            // (국문) 마커 제거
     .replace(/[“”"『』「」''`]/g, '')                // 따옴표류 제거
-    .replace(/^[^:：]{1,20}[:：]\s*/, '');           // '원료명 :' 접두 제거(예 '포스파티딜세린 : ...')
+    .replace(/^[^:：()（）]{1,20}[:：]\s*/, '');       // '원료명 :' 접두 제거(예 '포스파티딜세린 : ...'). 괄호 안 콜론(예 '(내중막 두께 : IMT)')은 제외
   const unified = cleaned.replace(/[･・‧∙•⋅․]/g, '·');
   const parts = unified.split(/·/).map((p) => p.trim()).filter((p) => p.length >= 2);
   if (parts.length < 1) return null;

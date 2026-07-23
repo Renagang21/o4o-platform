@@ -1,0 +1,65 @@
+{
+  "tag": "batch:single-functional-natto-culture-c",
+  "createdMasters": [
+    "066f8ce0-7454-40ec-a310-45b2d740eb20",
+    "ead3ae1d-e4d6-4fa4-ba0f-793da4719952",
+    "1d5c1ee8-e214-4982-98d4-2457938438e6",
+    "fad80c44-06d7-490d-8cc3-dd3afcdfe94a",
+    "1f806149-0bf8-43b4-8c59-9ad5c5076e08",
+    "a3156050-e680-4ec5-9c68-c9f328c98ec7"
+  ],
+  "createdSpd": [
+    "89d4ba1f-382f-41d0-8022-eabfe1831408",
+    "575d2c0e-c5de-4c11-aa65-a17a47fe143d",
+    "a7625eab-c039-4e10-936d-d5b91922e4be",
+    "e3270a33-5f17-4f1f-80d7-fe6447200c4d",
+    "94f5992f-c65d-425b-8128-381515f65938",
+    "050f11c7-8f47-475e-988e-9651081b6f5e",
+    "a1a79e4d-a145-41ee-95f7-e0760894aa92",
+    "f22b4606-5fbf-468b-bd8f-fac7ee934332",
+    "2e111cd2-cc23-458c-ae17-7f2e0f43a8dd",
+    "e8f0471b-0658-4267-a094-373a256eea2d",
+    "102d2613-5c94-4d86-9e43-2d38f73f3751",
+    "26d510bb-bb8c-4d96-a097-f50665e25890"
+  ],
+  "candIds": [
+    "210b5fa5-f6ed-455f-bb4a-9e73d1870a1c",
+    "3b6e3204-d68f-4da7-b970-5d246ee26d58",
+    "43217c95-dad2-417e-b1aa-f15048e77733",
+    "9d94945f-36bb-41ca-83ff-be09d348a7ac",
+    "9e9f804c-512d-4204-9770-bd89def124fe",
+    "eead62a3-90bb-43d9-909c-dd765cb34e4d"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "210b5fa5-f6ed-455f-bb4a-9e73d1870a1c",
+      "stmt": "200400200072838",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "3b6e3204-d68f-4da7-b970-5d246ee26d58",
+      "stmt": "201200190071240",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "43217c95-dad2-417e-b1aa-f15048e77733",
+      "stmt": "200400200072648",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9d94945f-36bb-41ca-83ff-be09d348a7ac",
+      "stmt": "201200190071242",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9e9f804c-512d-4204-9770-bd89def124fe",
+      "stmt": "200400200072961",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "eead62a3-90bb-43d9-909c-dd765cb34e4d",
+      "stmt": "200400200141615",
+      "prev_status": "pending"
+    }
+  ]
+}

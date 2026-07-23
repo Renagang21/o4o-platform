@@ -1,25 +1,27 @@
 [
  {
-  "statementNo": "201400170613",
-  "candidateId": "a13e7a50-e2b3-4df9-89b0-68f297f76aa2",
+  "statementNo": "200400200142031",
+  "candidateId": "f8b79096-e22b-4b02-865b-785e94f603de",
   "shard": 1,
   "ingredientKey": "참당귀추출분말",
-  "productName": "인지Q",
-  "manufacturer": "(주)뉴트라젠",
+  "productName": "신미보 신(信) 관절케어 & 인지 개선 플러스",
+  "manufacturer": "광동헬스바이오(주) 2공장",
   "functionsKo": [
-   "노화로 저하된 인지기능 개선에 도움을 줄 수 있음(생리활성기능 2등급)"
+   "노화로 저하된 인지기능 개선에 도움을 줄 수 있음",
+   "관절건강에 도움을 줄 수 있음"
   ],
   "functionsEn": [
-   "May help improve cognitive function that declines with aging."
+   "May help improve cognitive function that declines with aging.",
+   "May help maintain healthy joints."
   ],
   "source": {
-   "mainFunction": "[참당귀 추출분말(Nutragen)]노화로 저하된 인지기능 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
-   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐\r\n2. 데커신(㎎/1,000㎎): 표시량(100.8)의 80~120%.\r\n3. 납(㎎/㎏) : 1.0 이하.\r\n4. 총 비소(㎎/㎏) : 1.0 이하.\r\n5. 카드뮴(㎎/㎏) : 0.5 이하.\r\n6. 총 수은(㎎/㎏) : 0.5 이하.\r\n7. 대장균군: 음성.\r\n8. 붕해 : 적합(20분 이내)",
-   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
-   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐",
-   "shelfLife": "24개월",
-   "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 흡습될 수 있으므로 밀봉하여 보관하십시오.",
-   "caution": "-소화불량, 속쓰림 등이 나타날 수 있습니다.\r\n-혈액응고방지제 또는 혈당강하제를 복용하시는 분은 의사의 상당하에 사용하여 주십시오특정질환 있거나 특이체질, 알레르기 체질이신 분은 섭취 전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오."
+   "mainFunction": "[참당귀 추출분말(Nutragen)(제2014-44호)]\n(국문) 노화로 저하된 인지기능 개선에 도움을 줄 수 있음\n         관절건강에 도움을 줄 수 있음\n(영문) May help to improve cognitive function     \n          degraded by aging\n          May help to maintain healthy joint",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 회황색 또는 노란 회색의 장방형 제피정제\n2) 데커신(mg/g) : 표시량(100.8 mg/1,400 mg)의 80~120%\n3) 납(mg/kg) : 1.0 이하\n4) 총비소(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 0.5 이하\n6) 총수은(mg/kg) : 0.5 이하\n7) 대장균군 : 음성\n8) 붕해시험 : 60분 이내",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색 또는 노란 회색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "caution": "[참당귀 추출분말(Nutragen)(제2014-44호)]\n1. 소화불량, 속쓰림 등이 나타날 수 있습니다. \n2. 혈액응고방지제 또는 혈당강하제를 복용하시는 분은 의사의 상담 하에 사용하여 주십시오."
   }
  }
 ]

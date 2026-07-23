@@ -1,0 +1,27 @@
+[
+ {
+  "statementNo": "201200190071131",
+  "candidateId": "9eee1d7d-4a91-41e6-8372-e223ca463af0",
+  "shard": 1,
+  "ingredientKey": "녹각효소분해추출물HP",
+  "productName": "프리미엄 녹각정",
+  "manufacturer": "(주)한풍네이처팜",
+  "functionsKo": [
+   "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음",
+   "피부 보습에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help maintain skin health from UV-induced skin damage.",
+   "May help support skin moisturizing."
+  ],
+  "source": {
+   "mainFunction": "[녹각효소분해추출물HP(NP-2007)]\n(국문) ① 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음② 피부 보습에 도움을 줄 수 있음\n(영문) ① May help to maintain skin health from skin damage by UV radiation② May help to maintain skin moisturizing",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 회황색의 장방형 제피정제\n2. 시알산(Sialic acid) : 표시량(100ug/1000mg)의 80~120%\n3. Glycine-Proline-Hydroxyproline-Glycine-Proline-Alanine-Glycine-Proline-Arginine(Gly-Pro-Hyp-Gly-Pro-Ala-Gly-Pro-Arg) : 표시량(650ug/1000mg)의 80~120%\n4. 납(mg/kg) : 0.4 이하\n5. 비소(mg/kg) : 0.7 이하\n6. 카드뮴(mg/kg) : 0.1 이하\n7. 수은(mg/kg) : 0.1 이하\n8. 대장균군: 음성\n9. 붕해 : 적합 (제피정제 : 60분이내 붕해)",
+   "intake": "1일 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없고 점박이가 있는 회황색의 장방형 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "고온다습(30℃ 이상, 상대습도 75% 이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "caution": "1) 영유아, 어린이, 임산부 및 수유부는 섭취를 피하십시오\n2) 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의하십시오\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오\n4) 호르몬제 등 의약품 복용 시 전문가와 상담하십시오."
+  }
+ }
+]

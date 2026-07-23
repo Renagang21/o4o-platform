@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-honeybush-c",
+  "createdMasters": [
+    "4b52353f-0386-4549-a2ef-29b4a3db244e"
+  ],
+  "createdSpd": [
+    "00e1a2bb-6c37-48c9-88f4-226834d43e78",
+    "fd7b19ad-4694-431f-ba2c-812841fb4e14"
+  ],
+  "candIds": [
+    "0283d4e5-fe32-4c20-813f-2b8eb21acd09"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "0283d4e5-fe32-4c20-813f-2b8eb21acd09",
+      "stmt": "20040017021875",
+      "prev_status": "pending"
+    }
+  ]
+}

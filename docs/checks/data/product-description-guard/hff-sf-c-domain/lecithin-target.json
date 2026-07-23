@@ -1,0 +1,142 @@
+[
+ {
+  "candidateId": "0d4424f4-ba20-4f74-8434-0da55374a4b9",
+  "productName": "프리미엄레시틴",
+  "productNameEn": "프리미엄레시틴",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046376",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[레시틴 제품]①콜레스테롤 개선",
+   "baseStandard": "성상 : 적갈색의 연질 캡슐\r\n인지질 : 표시량(720mg/2,000mg)의 80~120% 이어야 한다.\r\n인지질 중 포스파티딜콜린 : 표시량(115mg/720mg)의 80~120% 이어야 한다. \r\n잔류용매(mg/kg) : 5.0 이하\r\n납(mg/kg) : 2.0 이하\r\n붕해시험 : 적합 이어야 한다\r\n대장균군 : 음성 이어야 한다.",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취 합니다.",
+   "caution": "[레시틴 제품]대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의① 대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의하시기 바랍니다.\r\n② 어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 아래 섭취하여 주시기 바랍니다.\r\n③ 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "적갈색의 연질 캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">레시틴 제품</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>프리미엄레시틴<small>레시틴 제품</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>레시틴 제품</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>레시틴 제품</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>적갈색의 연질 캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 적갈색의 연질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>레시틴 제품 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lecithin</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>프리미엄레시틴<small>Lecithin</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Lecithin</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Lecithin</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 적갈색의 연질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lecithin</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "8259491f-8c2b-4fd9-93dd-ddbf7b287463",
+  "productName": "플러스레시틴",
+  "productNameEn": "플러스레시틴",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046374",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[레시틴 제품]①콜레스테롤 개선",
+   "baseStandard": "성상 : 적갈색의 연질 캡슐\r\n인지질 : 표시량(720mg/2,000mg)의 80~120% 이어야 한다.\r\n인지질 중 포스파티딜콜린 : 표시량(115mg/720mg)의 80~120% 이어야 한다. \r\n잔류용매(mg/kg) : 5.0 이하\r\n납(mg/kg) : 2.0 이하\r\n붕해시험 : 적합 이어야 한다\r\n대장균군 : 음성 이어야 한다.",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취 합니다.",
+   "caution": "[레시틴 제품]대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의① 대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의하시기 바랍니다.\r\n② 어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 아래 섭취하여 주시기 바랍니다.\r\n③ 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "적갈색의 연질 캡슐",
+   "storage": "직사광선을 받지 않는 실온에 보관 한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">레시틴 제품</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>플러스레시틴<small>레시틴 제품</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>레시틴 제품</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>레시틴 제품</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>적갈색의 연질 캡슐 · 한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 적갈색의 연질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>레시틴 제품 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lecithin</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>플러스레시틴<small>Lecithin</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Lecithin</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Lecithin</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 적갈색의 연질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lecithin</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "94744d21-2cd0-49f3-82fc-13b9c96aef73",
+  "productName": "파워라이프",
+  "productNameEn": "파워라이프",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003144",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[레시틴 제품]①콜레스테롤 개선",
+   "baseStandard": "ⓛ성상 : 초코렛색의 연질캡슐\r\n②인지질 : 표시량(700mg/3000mg)의 80~120%\r\n③인지질 중 포스파티딜콜린 : 표시량(70mg/700mg)의 80~120%\r\n④납(mg/kg) : 2.0이하\r\n⑤대장균군 : 음성\r\n⑥붕해 : 20분 이내이어야 한다.",
+   "intake": "1일 3회, 1회 2캡슐을 물과 함께 섭취하십시오",
+   "caution": "[레시틴 제품]대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의\r\n1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 이제품은 대두를 사용한 제품과 같은 제조시설에서 제조하고 있습니다.\r\n3) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "초코렛색의 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">레시틴 제품</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>파워라이프<small>레시틴 제품</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>레시틴 제품</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>레시틴 제품</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>초코렛색의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 초코렛색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>레시틴 제품 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lecithin</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>파워라이프<small>Lecithin</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Lecithin</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Lecithin</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 초코렛색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lecithin</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "da8c3989-81c1-4c76-b752-ca503c2ded3c",
+  "productName": "레시틴프리미엄",
+  "productNameEn": "레시틴프리미엄",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "20040015107485",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[레시틴 제품]①콜레스테롤 개선",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 암적색 연질캡슐\r\n(2) 인지질(아세톤불용물로서) : 표시량 (750mg/2000mg)의 80~120%\r\n(3) 인지질 중 포스파티딜콜린 : 표시량(120mg/750mg)의 80~120% \r\n(4) 잔류용매 : 5.0(mg/kg) 이하\r\n(5) 납 : 2.0(mg/kg) 이하 \r\n(6) 붕해시험 : 적합하여야 함. \r\n(7) 대장균군 : 음성",
+   "intake": "500mg : 1일 2회, 2회 2캡슐을 물과 함께 섭취하십시오.\r\n1000mg : 1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[레시틴 제품]대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의\r\n① 알레르기 체질이신 경우 성분을 확인한 후 섭취 여부를 결정하십시오. \r\n② PTP포장의 경우 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연노랑색의 내용물을 함유한 암적색 연질캡슐",
+   "storage": "1. 직사광선을 피하여 서늘한 곳에 보관하십시오.\r\n2. 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">레시틴 제품</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>레시틴프리미엄<small>레시틴 제품</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>레시틴 제품</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>레시틴 제품</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 암적색 연질캡슐 · (주)유유헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 암적색 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피하여 서늘한 곳에 보관하십시오. 2. 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>레시틴 제품 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lecithin</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>레시틴프리미엄<small>Lecithin</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Lecithin</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Lecithin</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 내용물을 함유한 암적색 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선을 피하여 서늘한 곳에 보관하십시오. 2. 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lecithin</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "ea5c9567-00e0-4b70-8bcd-fcd64b048e8e",
+  "productName": "파워포르테",
+  "productNameEn": "파워포르테",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028198",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[레시틴 제품]①콜레스테롤 개선",
+   "baseStandard": "성상 : 초코렛색의 연질캅셀\r\n인지질(아세톤불용물로서) : 표시량(378mg/g)의 80-120%\r\n인지질중 포스타티딜콜린  : 표시량(37.8mg/378mg)의 80-120%\r\n납(mg/kg) : 2.0 이하\r\n대장균군 : 음성이어야한다\r\n붕해시험 : 20분이내",
+   "intake": "1일 2회, 1회 2캅셀씩 물과 함께 섭취하십시오.",
+   "caution": "[레시틴 제품]대두나 난황에 알레르기를 나타내는 사람은 섭취에 주의\r\n특정 또는 특이체질 등알러지체질의 경우 성분을 확인하신 후 섭취하십시오.\r\n섭취시 캅셀이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "초코렛색의 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">레시틴 제품</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>파워포르테<small>레시틴 제품</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>레시틴 제품</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>레시틴 제품</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>초코렛색의 연질캅셀 인지질(아세톤불용물로서) : 표시량(378mg/g)의 80-120% 인지질중 · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 초코렛색의 연질캅셀 인지질(아세톤불용물로서) : 표시량(378mg/g)의 80-120% 인지질중</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>레시틴 제품 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Lecithin</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>파워포르테<small>Lecithin</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Lecithin</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Lecithin</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cholesterol.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 초코렛색의 연질캅셀 인지질(아세톤불용물로서) : 표시량(378mg/g)의 80-120% 인지질중</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Lecithin</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

@@ -651,8 +651,11 @@ export function ruleE(input: GuardProductInput): GuardFinding[] {
     if (!nameRe.test(name)) continue;
     for (const [lang, text, field] of texts) {
       for (const m of matchAll(bodyRe, text)) {
-        // 공식 기능성(MAIN_FNCTN)에 해당 표현이 있으면 근거 있음
-        const grounded = new RegExp(m.text.slice(0, 4)).test(mainFn);
+        // 공식 기능성(MAIN_FNCTN)에 해당 표현이 있으면 근거 있음.
+        // EN 초안 매치(예 "memory")는 한국어 MAIN_FNCTN 에 문자적으로 존재할 수 없어 항상 미근거로 오판되던
+        // 구조적 false positive → 같은 행 bodyRe(ko+en 도메인 대안)를 공식 KO 원문에 재조회하여
+        // 도메인이 실제 인정 기능성에 있으면 근거 있음으로 판정(BLOCK→GROUNDED REVIEW, 완화 방향).
+        const grounded = new RegExp(m.text.slice(0, 4)).test(mainFn) || new RegExp(bodyRe.source, 'i').test(mainFn);
         out.push({
           ruleId: grounded ? 'E-NAME-DERIVED-GROUNDED-002' : 'E-NAME-DERIVED-001',
           severity: grounded ? 'WARNING' : 'ERROR',

@@ -1,0 +1,56 @@
+{
+  "tag": "batch:single-functional-lecithin-c",
+  "createdMasters": [
+    "2e032878-bd87-4870-974a-9b8d1bbc3a94",
+    "b7e8967c-d628-41e7-a4b9-3f1647d9fac2",
+    "113e666f-6e9a-44ad-82a8-636939b6d95a",
+    "3ccecc9c-34b4-4c12-9f16-3dbe220fc47d",
+    "0514753e-9fb6-4050-9f5b-ec51f6a7e957"
+  ],
+  "createdSpd": [
+    "0e2adb21-7c3c-49b5-bc2d-b2289345b8ac",
+    "9a299e43-c0ca-4278-ae1d-18be05625426",
+    "eb44f21b-0a6d-409d-9865-8ac1d95f3dc8",
+    "92b905dd-a8c9-4d69-b713-46c4d840184b",
+    "5d8406e3-39ef-4df6-9cbe-1de4c2a7ad93",
+    "f7d8d2be-abec-443a-9ceb-82ba55cacf6d",
+    "354e854d-a48c-4702-bc32-0cbb5262665a",
+    "1b6d4efc-d1c0-4f5a-adfe-dab362bfc17d",
+    "f57943e5-2acc-4ade-8241-f052adc53e44",
+    "66bc1e8a-c73b-4786-82ab-74e1a6972d80"
+  ],
+  "candIds": [
+    "0d4424f4-ba20-4f74-8434-0da55374a4b9",
+    "8259491f-8c2b-4fd9-93dd-ddbf7b287463",
+    "94744d21-2cd0-49f3-82fc-13b9c96aef73",
+    "da8c3989-81c1-4c76-b752-ca503c2ded3c",
+    "ea5c9567-00e0-4b70-8bcd-fcd64b048e8e"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "0d4424f4-ba20-4f74-8434-0da55374a4b9",
+      "stmt": "20040020046376",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8259491f-8c2b-4fd9-93dd-ddbf7b287463",
+      "stmt": "20040020046374",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "94744d21-2cd0-49f3-82fc-13b9c96aef73",
+      "stmt": "20040020003144",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "da8c3989-81c1-4c76-b752-ca503c2ded3c",
+      "stmt": "20040015107485",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "ea5c9567-00e0-4b70-8bcd-fcd64b048e8e",
+      "stmt": "20040020028198",
+      "prev_status": "pending"
+    }
+  ]
+}

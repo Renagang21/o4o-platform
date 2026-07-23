@@ -63,6 +63,19 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '칸탈로프멜론추출물': { key: '칸탈로프멜론추출물', slug: 'cantaloupe-melon', displayKo: '칸탈로프멜론추출물', displayEn: 'Cantaloupe melon extract', labelRe: /칸[탈타]로프멜론/, statusHint: 'READY' },
   '글로빈가수분해물': { key: '글로빈가수분해물', slug: 'globin-hydrolysate', displayKo: '글로빈 가수분해물', displayEn: 'Globin hydrolysate', labelRe: /글로빈/, statusHint: 'READY' },
   '영지버섯자실체추출물': { key: '영지버섯자실체추출물', slug: 'reishi-fruitbody', displayKo: '영지버섯자실체추출물', displayEn: 'Reishi mushroom fruiting body extract', labelRe: /영지버섯/, statusHint: 'READY' },
+  // ── C-10 discovery(WO-...COGNITIVE-REMAINDER-AND-DISCOVERY-C). 자외선 피부건강·피부보습·혈압·기억력 pure-single. 전원자 C overlay 매핑. 콜라겐/히알루론/프로바이오틱스(A·B·타도메인) 제외. labelRe=브래킷 유일식별.
+  '배초향추출물': { key: '배초향추출물', slug: 'agastache', displayKo: '배초향 추출물', displayEn: 'Agastache rugosa extract (Agatri®)', labelRe: /배초향/, statusHint: 'READY' },
+  '로즈마리자몽추출복합물': { key: '로즈마리자몽추출복합물', slug: 'rosemary-grapefruit', displayKo: '로즈마리자몽추출복합물', displayEn: 'Rosemary-grapefruit extract complex (Nutroxsun®)', labelRe: /로즈마리자몽/, statusHint: 'READY' },
+  '장미꽃잎추출물': { key: '장미꽃잎추출물', slug: 'rose-petal', displayKo: '장미꽃잎추출물', displayEn: 'Rose petal extract (NOVAROSE®)', labelRe: /장미꽃잎/, statusHint: 'READY' },
+  '허니부쉬추출발효분말': { key: '허니부쉬추출발효분말', slug: 'honeybush', displayKo: '허니부쉬추출발효분말', displayEn: 'Fermented honeybush extract powder', labelRe: /허니부쉬/, statusHint: 'READY' },
+  '곤약감자추출분말': { key: '곤약감자추출분말', slug: 'konjac', displayKo: '곤약감자추출분말', displayEn: 'Konjac potato extract powder', labelRe: /곤약감자/, statusHint: 'READY' },
+  '녹각효소분해추출물HP': { key: '녹각효소분해추출물HP', slug: 'deer-antler-hp', displayKo: '녹각효소분해추출물HP', displayEn: 'Enzyme-hydrolyzed deer antler extract (NP-2007)', labelRe: /녹각효소분해/, statusHint: 'READY' },
+  '당귤농축분말': { key: '당귤농축분말', slug: 'citrus-tangerine', displayKo: '당귤농축분말', displayEn: 'Tangerine concentrate powder', labelRe: /당귤농축/, statusHint: 'READY' },
+  '구기자추출물': { key: '구기자추출물', slug: 'goji-berry', displayKo: '구기자추출물', displayEn: 'Goji berry (Lycium) extract', labelRe: /구기자/, statusHint: 'READY' },
+  '올리브잎주정추출물': { key: '올리브잎주정추출물', slug: 'olive-leaf', displayKo: '올리브잎주정추출물', displayEn: 'Olive leaf ethanol extract', labelRe: /올리브잎/, statusHint: 'READY' },
+  // ── C-10 잔여(혈압·혈행·콜레스테롤) — 공식 (영문) 원문 grounded overlay.
+  '나토균배양분말': { key: '나토균배양분말', slug: 'natto-culture', displayKo: '나토균배양분말', displayEn: 'Natto bacteria culture powder', labelRe: /나토균배양/, statusHint: 'READY' },
+  '레시틴제품': { key: '레시틴제품', slug: 'lecithin', displayKo: '레시틴 제품', displayEn: 'Lecithin', labelRe: /레시틴/, statusHint: 'READY' },
 };
 
 /** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/문장종결 경계 구분.

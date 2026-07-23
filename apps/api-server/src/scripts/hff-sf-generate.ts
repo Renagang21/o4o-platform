@@ -10,6 +10,10 @@ import { composeSf, type SfSeed } from './hff-sf-compose.js';
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const ING = arg('ingredient'); const DIR = arg('dir'); const SHARD = arg('shard');
+// C 도메인 전용: 공식 KO 기능성에 근거가 확인된 네임토큰(E-NAME-DERIVED-GROUNDED-002)만이 유일한
+// 비-PASS 사유인 항목을 target 으로 승격한다(BLOCKED 는 절대 승격 안 함). 명시적 opt-in 이라 타 에이전트 무영향.
+const ACCEPT_GROUNDED_NAME = process.argv.includes('--accept-grounded-name');
+const GROUNDED_NAME_RULE = 'E-NAME-DERIVED-GROUNDED-002';
 if (!ING || !SF_INGREDIENTS[ING]) throw new Error('--ingredient 필요'); if (!DIR) throw new Error('--dir 필요');
 const ing = SF_INGREDIENTS[ING];
 const allReady = JSON.parse(fs.readFileSync(path.join(DIR, `${ing.slug}-ready.json`), 'utf8')) as Array<SfSeed & { shard: number }>;
@@ -26,7 +30,14 @@ for (const seed of ready) {
   const r = runGuard(gi as never, { phase: 'all' });
   const b = r.findings.filter((f) => f.status === 'BLOCKED');
   if (b.length) { blocked++; reviewLater.push({ statementNo: seed.statementNo, reason: `BLOCKED:${b.map((f) => f.ruleId).join(',')}` }); continue; }
-  if (r.overallStatus === 'REVIEW_REQUIRED') { review++; for (const f of r.findings.filter((f) => f.status === 'REVIEW_REQUIRED')) reviewRules[f.ruleId] = (reviewRules[f.ruleId] ?? 0) + 1; reviewLater.push({ statementNo: seed.statementNo, reason: `REVIEW:${r.findings.filter((f) => f.status === 'REVIEW_REQUIRED').map((f) => f.ruleId).join(',')}` }); continue; }
+  if (r.overallStatus === 'REVIEW_REQUIRED') {
+    const revFindings = r.findings.filter((f) => f.status === 'REVIEW_REQUIRED');
+    const onlyGroundedName = ACCEPT_GROUNDED_NAME && revFindings.length > 0 && revFindings.every((f) => f.ruleId === GROUNDED_NAME_RULE);
+    if (!onlyGroundedName) {
+      review++; for (const f of revFindings) reviewRules[f.ruleId] = (reviewRules[f.ruleId] ?? 0) + 1; reviewLater.push({ statementNo: seed.statementNo, reason: `REVIEW:${revFindings.map((f) => f.ruleId).join(',')}` }); continue;
+    }
+    // GROUNDED-002(근거 있는 네임토큰)만 → 공식 기능성 근거 확인됨 → target 승격
+  }
   pass++; target.push(gi);
 }
 fs.writeFileSync(path.join(DIR, `${ing.slug}${outSuffix}.json`), JSON.stringify(target, null, 1));

@@ -1,0 +1,27 @@
+[
+ {
+  "statementNo": "20172880236352",
+  "candidateId": "a4bed29b-ef69-4b48-869b-052bf1e1e1dc",
+  "shard": 0,
+  "ingredientKey": "당귤농축분말",
+  "productName": "루비타 ROCH 듀얼",
+  "manufacturer": "주식회사 코스팜",
+  "functionsKo": [
+   "피부 보습에 도움을 줄 수 있음",
+   "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help support skin moisturizing.",
+   "May help maintain skin health from UV-induced skin damage."
+  ],
+  "source": {
+   "mainFunction": "[당귤농축분말]\n1) 피부 보습에 도움을 줄 수 있음\n2) 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 분말\n2) 헤스페리딘(Hesperidin)(%) : 표시량(8.68 mg/2 g)의 80 이상 120 이하\n3) 납(mg/kg) : 0.2 이하\n4) 비소(mg/kg) : 0.5 이하\n5) 카드뮴(mg/kg) : 0.1 이하\n6) 수은(mg/kg) : 0.1 이하\n7) 대장균군 : 음성\n8) 총 아플라톡신(B1, B2, G1 및 G2의 합)(μg/kg) : 15.0 이하(단, B1은 10.0 이하)",
+   "intake": "1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 분홍빛 회색의 분말",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+   "caution": "1) 영·유아, 어린이, 임산부 및 수유부는 섭취를 피하시기 바랍니다.\n2) 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의하시기 바랍니다.\n3) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다."
+  }
+ }
+]

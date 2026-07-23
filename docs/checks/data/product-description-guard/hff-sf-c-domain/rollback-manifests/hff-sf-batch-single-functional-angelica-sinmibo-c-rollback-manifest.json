@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-angelica-sinmibo-c",
+  "createdMasters": [
+    "89a37b62-5555-4032-8866-e4955a9c13bb"
+  ],
+  "createdSpd": [
+    "6c4b0009-cd0c-4f54-a306-7253a29289cb",
+    "6644cbe7-ff08-4ec7-80bf-7f9211485fe1"
+  ],
+  "candIds": [
+    "f8b79096-e22b-4b02-865b-785e94f603de"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "f8b79096-e22b-4b02-865b-785e94f603de",
+      "stmt": "200400200142031",
+      "prev_status": "pending"
+    }
+  ]
+}

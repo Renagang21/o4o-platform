@@ -1,0 +1,47 @@
+{
+  "tag": "batch:single-functional-rosemary-grapefruit-c",
+  "createdMasters": [
+    "bd3385d5-f29a-42bc-8d35-8fa564d80f90",
+    "a86135eb-aef9-40b2-951e-2cc3b7ad7cc0",
+    "6b9bf57e-2ef9-4bbe-844a-4538ca6eefca",
+    "5cd3d471-0d7f-4639-9644-26c950148826"
+  ],
+  "createdSpd": [
+    "cc7433bd-96b3-49b3-9c41-a7fde518b432",
+    "e58c2cff-bbf0-4ff8-a348-6ee1f2a7d27f",
+    "d8c378cd-d3bf-48c9-b5c9-a29e4c608154",
+    "ba94d653-7ab7-4142-bb78-ca78f74deb5a",
+    "07f6be78-4a9a-4681-bec7-3c31b7026973",
+    "e44795bd-7c38-4443-90ff-352c864218d1",
+    "ff9e94a3-ae88-4085-a1e7-683845a1d169",
+    "9ad45be3-eb70-4ae0-b3c4-83f678412a13"
+  ],
+  "candIds": [
+    "0c927aa3-563b-4e93-9522-98a3ba5cdbfc",
+    "240fde87-6ca2-4e0f-8e45-3d4798856634",
+    "29f118c5-f2bc-44b0-b1c3-0c0d57d336dd",
+    "87a66577-aa44-4a23-8967-d2b76a216436"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "0c927aa3-563b-4e93-9522-98a3ba5cdbfc",
+      "stmt": "200400200141253",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "240fde87-6ca2-4e0f-8e45-3d4798856634",
+      "stmt": "200400200141251",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "29f118c5-f2bc-44b0-b1c3-0c0d57d336dd",
+      "stmt": "200400200141974",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "87a66577-aa44-4a23-8967-d2b76a216436",
+      "stmt": "200400200141317",
+      "prev_status": "pending"
+    }
+  ]
+}

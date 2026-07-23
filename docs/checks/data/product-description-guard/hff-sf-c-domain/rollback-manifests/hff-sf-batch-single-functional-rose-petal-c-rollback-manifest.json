@@ -1,0 +1,38 @@
+{
+  "tag": "batch:single-functional-rose-petal-c",
+  "createdMasters": [
+    "d79424b9-3dd4-46f4-957e-f546b24bf066",
+    "c1e21e16-ce52-471e-9b5d-76b79186c1ab",
+    "937052e7-6620-45e8-b724-409af8c95b29"
+  ],
+  "createdSpd": [
+    "90de04ca-efab-4e48-b041-c01146f77841",
+    "acaa49e3-becb-4669-bbae-9519ad14f0c2",
+    "65fa53fa-e287-4c21-86b7-9c2d0ccba659",
+    "486686dd-f49d-49fc-a9e8-47212976e6c5",
+    "e8a2c173-7b33-41f7-9aea-e5de19e89c1f",
+    "91b8d55b-abea-4269-bc8d-cab51711ec9b"
+  ],
+  "candIds": [
+    "942dc7c5-b5a8-4f1e-880e-c66489c3e0d6",
+    "b265d624-8ecf-4ee7-997a-afe111e9661f",
+    "d0ce1387-e70a-498c-9e2f-beddaa2d7eee"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "942dc7c5-b5a8-4f1e-880e-c66489c3e0d6",
+      "stmt": "200400200083395",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b265d624-8ecf-4ee7-997a-afe111e9661f",
+      "stmt": "200400200083253",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d0ce1387-e70a-498c-9e2f-beddaa2d7eee",
+      "stmt": "200400200083437",
+      "prev_status": "pending"
+    }
+  ]
+}

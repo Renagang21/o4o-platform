@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-fibroin-bf7-c",
+  "createdMasters": [
+    "4935ddb5-a370-45ad-b07b-9de36a9287d6",
+    "ecc783d5-2b4a-4a72-b3f7-14823332d0db"
+  ],
+  "createdSpd": [
+    "b4eef954-9933-4cb5-8cfd-9db3a26642fa",
+    "d3deeda0-3992-454c-a49e-41e80da87718",
+    "24dd9352-cd5e-4805-b6fa-251aa533f709",
+    "d172e491-55af-4c98-8221-8bc62a32606c"
+  ],
+  "candIds": [
+    "a0602855-12a0-4cbd-a012-6f24732532c5",
+    "a15752eb-27d8-428c-8860-8cfde6f1ffe7"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "a0602855-12a0-4cbd-a012-6f24732532c5",
+      "stmt": "200400200071700",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a15752eb-27d8-428c-8860-8cfde6f1ffe7",
+      "stmt": "20040020002915",
+      "prev_status": "pending"
+    }
+  ]
+}

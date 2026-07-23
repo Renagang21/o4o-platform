@@ -1,1 +1,29 @@
-[]
+[
+ {
+  "statementNo": "200400200082916",
+  "candidateId": "64ca06d6-bb49-4e8b-89a4-ada3cb57b8cc",
+  "shard": 0,
+  "ingredientKey": "칸탈로프멜론추출물",
+  "productName": "바르통 혈관벽 SOD 컴플렉스",
+  "manufacturer": "주식회사 노바렉스",
+  "functionsKo": [
+   "산화스트레스로부터 인체를 보호하는데 도움을 줄 수 있습니다",
+   "혈관벽 두께(내중막 두께 : IMT) 증가 억제를 통한 혈행개선에 도움을 줄 수 있음",
+   "자외선에 의한 피부홍반개선으로 피부건강에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help protect the body from oxidative stress.",
+   "May help improve blood circulation by suppressing the increase in vascular wall thickness (intima-media thickness, IMT).",
+   "May help improve UV-induced skin erythema and support skin health."
+  ],
+  "source": {
+   "mainFunction": "[칸탈로프멜론추출물(기능성원료인정 제2008-9호)]\n산화스트레스로부터 인체를 보호하는데 도움을 줄 수 있습니다.\n혈관벽 두께(내중막 두께 : IMT) 증가 억제를 통한 혈행개선에 도움을 줄 수 있음\n자외선에 의한 피부홍반개선으로 피부건강에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 탁한 빨간색 장방형 제피 정제\n2. SOD활성 : 표시량(500IU/1000mg)이상\n3. 납(mg/kg) : 1.0 이하\n4. 비소(mg/kg) : 1.0 이하\n5. 카드뮴(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 2정(1정당 500mg)을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 탁한 빨간색 장방형 제피 정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[칸탈로프멜론추출물(기능성원료인정 제2008-9호)]\n밀 단백질에 알레르기를 나타내는 사람은 섭취에 주의"
+  }
+ }
+]

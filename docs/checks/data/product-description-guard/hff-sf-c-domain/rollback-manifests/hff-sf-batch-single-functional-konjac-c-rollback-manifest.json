@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-konjac-c",
+  "createdMasters": [
+    "75194bf8-f993-49b4-8244-1f1929b9a65c",
+    "25918d0a-559b-4f65-ae4b-cb5b8d1874ae"
+  ],
+  "createdSpd": [
+    "a842c78f-f013-4915-8070-92a412f7e092",
+    "88fb7d43-5cc8-4a0c-a81c-d9a2e0518125",
+    "2a63af1a-72b7-4e96-aa51-13d8a25f28b2",
+    "778401a4-f78b-4630-a43c-39df83882b2f"
+  ],
+  "candIds": [
+    "2639b04d-95d5-411b-899c-aafa1aa68f05",
+    "a75ee785-5c61-483f-8a30-97f66b62f4b6"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "2639b04d-95d5-411b-899c-aafa1aa68f05",
+      "stmt": "2012001900762",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "a75ee785-5c61-483f-8a30-97f66b62f4b6",
+      "stmt": "2012001900754",
+      "prev_status": "pending"
+    }
+  ]
+}
