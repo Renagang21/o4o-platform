@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "dexibuprofen300-18",
+  "order": 218,
+  "groupKey": "덱시부프로펜|300밀리그램|정",
+  "safetyFp": "d07b8f1356373d70",
+  "sourceRef": "b1262849-8992-42b6-806f-88c369d7bd24",
+  "sensitive": false,
+  "title": "덱시부프로펜 300mg 정 (소염진통제)",
+  "expectEasyMd5": "b77b037a",
+  "masterIds": [
+    "78b44376-006a-4b13-bc4d-62f8559bf5d6",
+    "ba78efce-4108-4d70-a8cc-2c1b1b430c89",
+    "c4684646-4359-480b-aeb0-45bbdc78e74a"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "b77b037a",
+    "names": [
+      "덱브펜정300밀리그램(덱시부프로펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 만성 다발성관절염, 류마티스관절염, 관절증, 강직척추염, 외상 및 수술 후 통증성 부종 또는 염증 그리고 염증, 통증 및 발열을 수반하는 감염증의 치료보조에 사용합니다.",
+    "usage": "성인은 1회 1정(300 mg), 1일 2~4회 복용합니다. 단, 1일 4정(1,200 mg)을 초과하지 않습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증, 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수 있습니다.\n\n이 약에 과민증 환자, 위장관궤양, 위장관이나 뇌혈관 또는 다른 부위의 출혈이 있는 환자, 심한 혈액이상, 심한 간장애, 심한 신장애, 심한 심부전, 심한 고혈압, 기관지천식, 아스피린 또는 다른 소염진통제에 의한 천식, 두드러기, 알레르기 경험 환자, 심장동맥 우회로술 전후 통증 치료 환자, 임신 6개월 이상의 임부, 수유부, 크론병, 궤양성대장염, 비스테로이드성 소염진통제로 인해 위장관출혈 또는 천공이 발생한 병력이 있는 환자, 갈락토오스불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 혈액이상, 출혈경향, 간장애, 신장애, 체액저류, 심부전, 고혈압, 전신홍반루푸스, 혼합결합조직질환, 노인, 6세 미만의 어린이, 위암, 알코올중독, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 허혈심장병, 말초동맥질환, 뇌혈관질환, 심혈관질환의 위험인자가 있는 환자, 간성 포르피린증, 혈액부족을 초래한 중대한 외과수술을 받은 환자는 의사 또는 약사와 상의하십시오.\n\n이 약 복용 후 어지러움 또는 피로가 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오.\n\n급성질환에 장기 복용할 경우 원칙적으로 5일 이내로 합니다.\n\n이 약을 복용하는 동안 아스피린, 다른 비스테로이드성 소염진통제, 항암요법으로 사용하는 고용량(15 mg/주 이상)의 메토트렉세이트를 사용하지 마십시오.\n\n이 약을 복용하기 전에 코르티코스테로이드, 알코올, 디곡신, 페니토인, 프로베네시드, 설핀피라존, 설포닐우레아제, ACE 억제제, 안지오텐신Ⅱ 수용체 길항제, 이뇨제, 리튬, 쿠마린계 항응고제(와르파린 등), 바클로펜, 면역억제제(시클로스포린, 타크로리무스, 시롤리무스), 혈전용해제, 티클로피딘, 항혈전제, 혈중 칼륨농도를 증가시키는 약물(트리메토프림, 헤파린 등), CYP2C8, CYP2C9의 유도제(예, 리팜피신, 페노바르비탈), 저용량(15 mg/주 미만)의 메토트렉세이트, 항혈소판제 및 선택적 세로토닌 재흡수 억제제를 사용하는 환자는 의사 또는 약사와 상의하십시오.\n\n드물게 쇽 증상(호흡곤란, 혈압저하 등), 재생불량성빈혈, 용혈성빈혈, 무과립구증, 과립구감소, 백혈구감소, 혈소판감소, 혈소판 기능 저하 (출혈시간 연장), 호산구증가 등의 혈액장애, 소화불량, 복부팽만, 속쓰림, 상복부의 통증, 설사나 변비, 때때로 식욕부진, 구역, 구토, 복통, 위부불쾌감이나 드물게 식도염, 식도협착, 게실악화, 비특이성출혈성대장염, 궤양성대장염 또는 크론병, 소화성궤양 위장출혈, 천공, 혈변, 위염, 췌장염, 매우 드물게 구갈, 구내염, 다형홍반, 전신홍반루프스, 탈모, 때때로 혈관부종, 드물게 피부점막안증후군(스티븐스-존슨증후군) 및 독성표피괴사용해(리엘증후군), 빈도불명의 호산구 증가 및 전신 증후군을 동반한 약물 발진(DRESS 증후군), 급성전신발진고름물집증, 발진, 두드러기, 가려움, 자색반, 드물게 천식발작, 습진, 아나필락시스 반응, 광민감반응, 황달, ALT 상승, AST 상승, ALP 상승, 간기능이상, 간염, 때때로 비염, 기관지경련, 드물게 심부전 환자의 경우에 급성폐렴의 위험, 앞이 보이지 않음, 암침 등의 시각장애, 난청, 이명, 미각이상, 피로, 졸음, 두통, 어지러움, 때때로 불안, 안절부절, 착란, 우울증, 드물게 무균성수막염, 혈압저하, 혈압상승, 심계항진, 급성신부전, 핍뇨, 혈뇨 등의 증상 및 요단백, BUN, 혈중 크레아티닌의 상승, 고칼륨혈증, 말초부종, 여성의 생식능력 감소, 안와주위부종, 매우 드물게 권태감, 발열, 코피, 염증악화 등이 나타나는 경우 즉각 복용을 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "덱시부프로펜 300밀리그램",
+      "작용": "비스테로이드성 소염진통제(NSAID)로 염증·통증·발열을 완화합니다.",
+      "주요 증상": "만성 다발성 관절염·류마티스관절염·관절증·강직척추염, 외상·수술 후 통증성 부종·염증, 염증·통증·발열 동반 감염증(치료보조)",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "관절염과 염증을 동반한 통증·발열에 쓰는 비스테로이드성 소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Dexibuprofen 300 mg Tablets (Anti-inflammatory Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for chronic polyarthritis, rheumatoid arthritis, arthrosis, ankylosing spondylitis, painful swelling or inflammation after trauma and surgery, and as an adjunct in the treatment of infections accompanied by inflammation, pain, and fever.",
+    "usage": "Adults take 1 tablet (300 mg) per dose, 2 to 4 times a day. Do not exceed 4 tablets (1,200 mg) per day.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic events, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Do not take this medicine if you are hypersensitive to it; have gastrointestinal ulcers; have bleeding in the gastrointestinal tract, brain vessels, or elsewhere; have severe blood disorders, severe liver impairment, severe kidney impairment, severe heart failure, or severe hypertension; have bronchial asthma; have experienced asthma, hives, or allergies caused by aspirin or other anti-inflammatory analgesics; need treatment of pain around coronary artery bypass surgery; are 6 or more months pregnant; are breastfeeding; have Crohn's disease or ulcerative colitis; have a history of gastrointestinal bleeding or perforation caused by nonsteroidal anti-inflammatory drugs; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have blood abnormalities, a bleeding tendency, liver impairment, kidney impairment, fluid retention, heart failure, hypertension, systemic lupus erythematosus, or mixed connective tissue disease; are elderly; are a child under 6 years old; have stomach cancer; have alcoholism; are pregnant, may be pregnant, or are breastfeeding; have ischemic heart disease, peripheral arterial disease, cerebrovascular disease, or risk factors for cardiovascular disease; have hepatic porphyria; or have undergone major surgery causing blood loss. Dizziness or fatigue may occur after taking this medicine, so use caution when driving or operating machinery. When used for an acute condition, limit use to within 5 days as a rule. While taking this medicine, do not use aspirin, other nonsteroidal anti-inflammatory drugs, or high-dose methotrexate (15 mg/week or more) used in anticancer therapy. Before taking this medicine, consult a doctor or pharmacist if you use corticosteroids, alcohol, digoxin, phenytoin, probenecid, sulfinpyrazone, sulfonylureas, ACE inhibitors, angiotensin II receptor antagonists, diuretics, lithium, coumarin anticoagulants (such as warfarin), baclofen, immunosuppressants (cyclosporine, tacrolimus, sirolimus), thrombolytics, ticlopidine, antithrombotics, drugs that raise blood potassium levels (trimethoprim, heparin, etc.), inducers of CYP2C8 or CYP2C9 (e.g., rifampicin, phenobarbital), low-dose methotrexate (under 15 mg/week), or antiplatelet agents and selective serotonin reuptake inhibitors. Stop taking this medicine immediately and consult a doctor or pharmacist if any of the following occur: rarely shock symptoms (difficulty breathing, drop in blood pressure, etc.), blood disorders such as aplastic anemia, hemolytic anemia, agranulocytosis, granulocytopenia, leukopenia, thrombocytopenia, reduced platelet function (prolonged bleeding time), or eosinophilia; indigestion, abdominal bloating, heartburn, upper abdominal pain, diarrhea or constipation; sometimes loss of appetite, nausea, vomiting, abdominal pain, or stomach discomfort; rarely esophagitis, esophageal stricture, worsening of diverticula, nonspecific hemorrhagic colitis, ulcerative colitis or Crohn's disease, peptic ulcer with gastrointestinal bleeding, perforation, bloody stool, gastritis, or pancreatitis; very rarely dry mouth, stomatitis, erythema multiforme, systemic lupus erythematosus, or hair loss; sometimes angioedema; rarely Stevens-Johnson syndrome or toxic epidermal necrolysis (Lyell syndrome); drug rash with eosinophilia and systemic symptoms (DRESS syndrome) of unknown frequency; acute generalized exanthematous pustulosis; rash, hives, itching, or purpura; rarely asthma attacks, eczema, anaphylactic reactions, photosensitivity reactions, jaundice, elevated ALT, elevated AST, elevated ALP, abnormal liver function, or hepatitis; sometimes rhinitis or bronchospasm; rarely a risk of acute pneumonia in patients with heart failure; visual disturbances such as loss of vision or dark spots before the eyes, hearing loss, tinnitus, or taste abnormalities; fatigue, drowsiness, headache, or dizziness; sometimes anxiety, restlessness, confusion, or depression; rarely aseptic meningitis; drop in blood pressure, rise in blood pressure, or palpitations; acute renal failure, oliguria, or blood in urine, with elevated protein in urine, BUN, or blood creatinine, and hyperkalemia; peripheral edema; reduced fertility in women; periorbital edema; and very rarely malaise, fever, nosebleed, or worsening of inflammation. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Dexibuprofen 300 mg",
+      "How it works": "A nonsteroidal anti-inflammatory drug (NSAID) that relieves inflammation, pain, and fever.",
+      "Main symptoms": "Chronic polyarthritis, rheumatoid arthritis, arthrosis, ankylosing spondylitis; painful swelling or inflammation after injury or surgery; adjunct for infections with inflammation, pain, and fever",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "A nonsteroidal anti-inflammatory pain reliever for arthritis and for pain and fever with inflammation."
+    }
+  }
+}

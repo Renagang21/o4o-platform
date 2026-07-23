@@ -4,7 +4,7 @@
   "subgroups": 9,
   "masters": 19,
   "metaAuthored": false,
-  "missingLineCount": 46,
+  "missingLineCount": 45,
   "missingLines": [
     {
       "h8": "a8124762",
@@ -107,12 +107,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인 및 6세 이상의 소아는 1회 1캡슐(10 mg)씩, 1일 1회 취침 전에 복용합니다."
-    },
-    {
-      "h8": "23c3a042",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "기타 자세한 사항은 허가사항 상세정보를 확인하십시오."
     },
     {
       "h8": "2c7d4b66",
