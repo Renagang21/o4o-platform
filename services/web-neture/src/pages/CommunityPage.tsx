@@ -255,12 +255,6 @@ function NetureHero() {
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <Link
-            to="/supplier"
-            className="px-5 py-2.5 bg-white text-primary-700 font-semibold rounded-lg hover:bg-white/90 transition-colors no-underline text-sm"
-          >
-            공급자로 참여하기
-          </Link>
-          <Link
             to="/market-trial"
             className="px-5 py-2.5 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-400 border border-white/30 transition-colors no-underline text-sm"
           >

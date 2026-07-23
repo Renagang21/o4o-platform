@@ -102,33 +102,23 @@ export default function SupplierLandingPage() {
             <br />
             공급자는 제품과 콘텐츠를 등록하고 매장과 파트너를 통해 판매를 확장할 수 있습니다.
           </p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            {isSupplier ? (
+          {!isSupplier && (
+            <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
-                to="/account/supplier"
+                to="/register"
                 className="inline-flex items-center px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
               >
-                Supplier Dashboard
+                공급자 등록
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
-            ) : (
-              <>
-                <Link
-                  to="/register"
-                  className="inline-flex items-center px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  공급자 등록
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-                <button
-                  onClick={() => openLoginModal('/supplier')}
-                  className="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  공급자 로그인
-                </button>
-              </>
-            )}
-          </div>
+              <button
+                onClick={() => openLoginModal('/supplier')}
+                className="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
+              >
+                공급자 로그인
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
