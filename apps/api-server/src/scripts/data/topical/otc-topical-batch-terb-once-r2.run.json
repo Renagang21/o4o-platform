@@ -1,0 +1,18 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "염산테르비나핀",
+ "form": "라미실원스외용액",
+ "slugbase": "terb-once-r2",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "093796c088e3cff8",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 1,
+ "koWrite": 4,
+ "enWrite": 2
+}

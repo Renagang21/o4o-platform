@@ -187,8 +187,8 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 12,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 라미실덤겔1%(테르비나핀)6+라미실크림1% 1+라미실외용액3+라미실원스외용액2=4 원문형. V5 '테르비나핀염산염' 41과 성분 문자열 상이로 별도 풀 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 8fp/12 = 덤겔 6(3fp)+크림 1+외용액 3(3fp)+원스 2(2fp) — EN 4형(1일1회 겔/질환별 기간 크림/1~2회 액/1회 필름 15세 금기). 함정 수정: coarse '%(성분%)'→'%(성분)%'(용량 접미 30mL·10g·1튜브 변형 누락 해소+성분 토큰 정확화), ingredientOf 마지막 (성분) 그룹 허용 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",

@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "염산테르비나핀",
+ "form": "라미실외용액",
+ "slugbase": "terb-sol-r2",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "08a73048fbfb80f7",
+   "n": 1
+  },
+  {
+   "fp": "99c21f5b8edfa5bd",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

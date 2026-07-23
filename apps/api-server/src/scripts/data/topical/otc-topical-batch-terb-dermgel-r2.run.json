@@ -1,0 +1,18 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "테르비나핀",
+ "form": "라미실덤겔",
+ "slugbase": "terb-dermgel-r2",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "76fc2bc9dd98baa5",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 1,
+ "koWrite": 4,
+ "enWrite": 2
+}

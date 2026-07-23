@@ -64,7 +64,7 @@ function routeSig(name: string): string {
   if (/정$|정\d|정\(|정밀리|정\[|캡슐|캅셀|시럽|현탁|과립|산제|산\(|트로키|츄어|씹|저작|드링크|내복|환$|환\(|액$|액\(|액\[|물약|시럽제/.test(name)) return 'oral';
   return 'unknown';
 }
-const ingredientOf = (name: string): string => (name.match(/\(([^()]+)\)\s*$/)?.[1] || '').trim();
+const ingredientOf = (name: string): string => (name.match(/\(([^()]+)\)(?=[^()]*$)/)?.[1] || '').trim(); // 마지막 (성분) 그룹 — '…(성분)30mL' 같은 용량 접미 변형 허용
 const strengthOf = (spec: string): string => (spec || '').split(' / ')[0].trim();
 function fingerprintOf(name: string, spec: string, content: string): { fp: string; route: string; form: string; ingredient: string } {
   let sec = easySections(content || ''); if (Object.keys(sec).length === 0) sec = freeSections(content || '');
@@ -132,7 +132,7 @@ async function main(): Promise<void> {
   try {
     const coarse: Row[] = await ds.query(`SELECT pm.id::text id, pm.name, pm.specification spec, es.content, es.id::text "easyId"
       FROM product_masters pm JOIN LATERAL (SELECT id, content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type=$3 AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
-      WHERE pm.name LIKE '%('||$1||'%)' AND pm.name LIKE '%'||$2||'%' AND pm.name NOT LIKE '%수출%'
+      WHERE pm.name LIKE '%('||$1||')%' AND pm.name LIKE '%'||$2||'%' AND pm.name NOT LIKE '%수출%'
         AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions a WHERE a.master_id=pm.id AND a.source_type IN ('mfds_drug_otc','nutrition_combo','o4o_drug_otc_topical') AND a.description_type='STORE' AND a.status='canonical' AND a.deleted_at IS NULL)
       ORDER BY pm.id`, [INGREDIENT, FORM, EASY]);
     const withFp = coarse.map((r) => ({ ...r, ...fingerprintOf(r.name, r.spec, r.content) }));
