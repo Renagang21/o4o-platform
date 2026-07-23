@@ -27,6 +27,8 @@ const B_COMPONENT: Array<[RegExp, string]> = [
   [/^칼슘\s*흡수$/, 'calcium absorption'],
   [/^배변활동\s*원활$/, 'smooth bowel movements'],
   [/^장\s*건강$/, 'intestinal health'],
+  [/^피부\s*건강$/, 'skin health'],
+  [/^혈중\s*콜레스테롤\s*개선$/, 'improving blood cholesterol'],
 ];
 function bJoin(a: string[]): string { return a.length <= 1 ? (a[0] ?? '') : a.length === 2 ? `${a[0]} and ${a[1]}` : `${a.slice(0, -1).join(', ')}, and ${a[a.length - 1]}`; }
 function mapComponentB(ko: string): string | null { const c = ko.replace(/\s+/g, ' ').trim(); for (const [re, en] of B_COMPONENT) if (re.test(c)) return en; return null; }
@@ -52,6 +54,9 @@ export function resolveFunctionsB(ing: SfIngredient, mainFn: string): { ko: stri
 export const B_INGREDIENTS: Record<string, SfIngredient> = {
   // B-CURRENT 프락토올리고당 — 공식 기능성: 장내 유익균 증식 및 배변활동 원활 (공용 mapFunctionEn 미커버 → resolveFunctionsB 정적 보강)
   '프락토올리고당': { key: '프락토올리고당', slug: 'fructooligosaccharide', displayKo: '프락토올리고당', displayEn: 'Fructooligosaccharide', labelRe: /프락토\s*올리고당/, allowClassified: true, statusHint: 'READY' },
+  // B-06/07 안전 복구: 지표성분(무수바바로인) basis 는 Guard REVIEW 로 자동 제외되고, 원료 기준량 basis 만 PASS. 겔·액상은 LIQUID 제외.
+  '알로에': { key: '알로에', slug: 'aloe', displayKo: '알로에', displayEn: 'Aloe', labelRe: /알로에/, allowClassified: true, statusHint: 'READY' },
+  '키토산': { key: '키토산', slug: 'chitosan', displayKo: '키토산', displayEn: 'Chitosan', labelRe: /키토산/, allowClassified: true, statusHint: 'READY' },
   // B-01 차전자피식이섬유 — 공식 기능성: 혈중 콜레스테롤 개선 · 배변활동 원활 (둘 다 mapFunctionEn HIT)
   '차전자피식이섬유': { key: '차전자피식이섬유', slug: 'psyllium-husk-fiber', displayKo: '차전자피식이섬유', displayEn: 'Psyllium husk dietary fiber', labelRe: /차전자피/, allowClassified: true, statusHint: 'READY' },
   // B-03 난소화성말토덱스트린 — 공식 기능성: 배변활동 원활 · 식후 혈당상승 억제 · 혈중 중성지질 개선 (전부 HIT)
