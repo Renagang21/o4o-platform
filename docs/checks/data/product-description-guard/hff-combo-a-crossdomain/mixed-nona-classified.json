@@ -1,0 +1,5074 @@
+{
+ "A_LED": [],
+ "B_LED": [
+  {
+   "stmt": "200700170352538",
+   "name": "에브리컷 2800",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200073401",
+   "name": "굿셀 뉴골드",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023891",
+   "name": "글로우핏 듀얼",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007253",
+   "name": "금단미인 급S",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190009105264",
+   "name": "닥터 쎈 히알바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200012016129",
+   "name": "달심 히알프로바이오",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20220010222137",
+   "name": "둘다",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200201011",
+   "name": "락토톡 생유산균+피부",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020016618",
+   "name": "락토핏 생유산균 뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001367",
+   "name": "루틴피부앤다이어트케어",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351718",
+   "name": "내몸에 밸런스 레시피 루트칸 다이어트 젤리스틱",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040015107711",
+   "name": "람노피",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352363",
+   "name": "랩트리션 리스펙타 모이스처 플러스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017046102",
+   "name": "레이나 이너케어",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20100016005330",
+   "name": "마이락토 스킨 앤 프로바이오틱스(MYLACTO SKIN & PROBIOTICS)",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20100016005390",
+   "name": "마이락토 스킨(MYLACTO SKIN)",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015162146",
+   "name": "닥터콜라핏280",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061658",
+   "name": "드시모네 플러스 히알루론산",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022187",
+   "name": "먹는히알루론산이너뷰티미완성젤리",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015107863",
+   "name": "먹으면티나",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023224",
+   "name": "면역력 증진 홍삼젤리",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200072497",
+   "name": "바디&컷 다이어트톡",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052185",
+   "name": "바디이룸",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2012001900768",
+   "name": "뷰티앤슬림다이어트",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022784",
+   "name": "뷰티플러스 홍삼젤리",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001148",
+   "name": "뷰티홍삼",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022588",
+   "name": "미즈본",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "식이섬유(장·혈당)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200141747",
+   "name": "새로날씬",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023175",
+   "name": "뷰티마스터",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061129",
+   "name": "빼빼젤리",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2011002005620",
+   "name": "뼈관절88 시니어+",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022780",
+   "name": "스키니 에너지업",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061590",
+   "name": "스킨 & 프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20180012174494",
+   "name": "스킨글로우 에피바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020020870",
+   "name": "스킨밸런스앤 프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015107379",
+   "name": "수다이어트",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400150831146",
+   "name": "식물성 MSM 진생골드",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007430",
+   "name": "셀럽워터뷰티라이너",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040015162289",
+   "name": "신비감플러스골드",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2021001622931",
+   "name": "아름다움은 너의것",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20130020024412",
+   "name": "에브리컷",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200141150",
+   "name": "에너핏21",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020020917",
+   "name": "엠에스 장건강 스킨",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022805",
+   "name": "에스테티칼 프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017015236",
+   "name": "슬림레시피뷰티플러스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200083247",
+   "name": "슬림웨이 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061595",
+   "name": "에프비 - 11422",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351502",
+   "name": "오늘컷",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351836",
+   "name": "오늘컷 맥스",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553408",
+   "name": "원미션 히알퓨어 히알루론산 젤리스틱",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170211569",
+   "name": "우먼스 더블로케어",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017059275",
+   "name": "우먼스 더블로케어",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2012001900796",
+   "name": "위나 더블 파워",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022922",
+   "name": "유산균&뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200071980",
+   "name": "일양리프레시알파",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "201600100115",
+   "name": "제이웰 레드퀸",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022566",
+   "name": "제이톡",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052165",
+   "name": "지셀라 멀티케어 W",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 8,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20180012174403",
+   "name": "이너뷰티 히알프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "202000124465",
+   "name": "저스트 피부 유산균",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023367",
+   "name": "촉촉피부 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "201600100114",
+   "name": "천년황칠 미인",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20130020008518",
+   "name": "컷앤핏 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023402",
+   "name": "젤리컷 플러스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022441",
+   "name": "젤리컷업",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20130020024284",
+   "name": "칼로-슬림다운",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015162286",
+   "name": "컷앤핏 트리플 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553160",
+   "name": "케어에버 슬림가르시니아&식이섬유&히알루론산",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352857",
+   "name": "탄탄 젤리 더블컷 다이어트 자두맛",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352889",
+   "name": "탄탄 슬리밍 올데이 컷",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352769",
+   "name": "탄탄 젤리 더블컷 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200700170353022",
+   "name": "탄탄 젤리 더블컷 다이어트 애플유자맛",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400151071270",
+   "name": "탱수니힐",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553258",
+   "name": "포뮬라인 테라핏앰플 THERA-FIT AMPULE",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)"
+   ],
+   "nonAFnCount": 9,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2004001509016",
+   "name": "프로틴 밸런스 &바디",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023266",
+   "name": "프로틴바 액티브",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020041491",
+   "name": "퓨로틴 곡물맛",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020041490",
+   "name": "퓨로틴 초코맛",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200201171",
+   "name": "프로바이오틱스 프리미엄, 스킨 밸런스(Probiotics Premium, Skin Balance)",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2020001244611",
+   "name": "피부케어 유산균",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170211499",
+   "name": "피트니엘 블링핏 다이어트 프리미엄(Fitny-L bling fit diet Premium)",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023274",
+   "name": "핏앤프로틴 초콜릿향",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020028358",
+   "name": "해피아알지플러스엠에스엠",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023130",
+   "name": "프리미엄 제이컷",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2011002009951",
+   "name": "홍삼조인트MSM",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200012016145",
+   "name": "히알글로우바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352400",
+   "name": "화온비",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553422",
+   "name": "활력관",
+   "aIngs": [
+    "뮤코다당·단백"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200201200",
+   "name": "히알루론산 바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2017286000730",
+   "name": "히알루론산 우먼스 프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017059235",
+   "name": "히알바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015070414",
+   "name": "히알비피더스바이오틱스 골드",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200012016133",
+   "name": "히알프로바이오",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015094144",
+   "name": "관절만보",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015070434",
+   "name": "비피젠 프리미엄 실버",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170171043",
+   "name": "듀오락 채움뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170171245",
+   "name": "듀오랩 시너지 뷰티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020031490",
+   "name": "관절엔굿",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040015110931",
+   "name": "메이킷 브라이트 프로바이오틱스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351885",
+   "name": "원데이 이너엔젤 (oneday INNER&JELL)",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553148",
+   "name": "꾸안꾸 피부미인 다이어트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2020001244634",
+   "name": "슈퍼케라믹 피부케어 유산균",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351940",
+   "name": "누본셀 멀티뷰타민",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007737",
+   "name": "헬퓨 I데이팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 12,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007752",
+   "name": "헬퓨 J데이팩",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)"
+   ],
+   "nonAFnCount": 11,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017038154",
+   "name": "K 흑삼",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022506",
+   "name": "The Last Fit 더라스트핏",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020006871",
+   "name": "가르시니아2030젤리",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2023002876646",
+   "name": "고려원 眞生人秀 진생인수",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2023002876643",
+   "name": "고려원 생기력 프리미엄",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020028301",
+   "name": "고려원 홍관정 프리미엄",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B"
+   ],
+   "nonaLabels": [
+    "홍삼/면역"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  }
+ ],
+ "C_LED": [
+  {
+   "stmt": "20120019007962",
+   "name": "관절혈행보감",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200073201",
+   "name": "올케어5.0",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006255",
+   "name": "글루코사민 플러스 오메가3",
+   "aIngs": [
+    "글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2004001508146",
+   "name": "글루코사민 플러스 오메가3",
+   "aIngs": [
+    "글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061544",
+   "name": "글루코사민+오메가-3 900mg",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2017286000755",
+   "name": "닥터바른 올인원 두관보 이뮨",
+   "aIngs": [
+    "MSM",
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023414",
+   "name": "더마뷰티 스킨부스터",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352734",
+   "name": "듀얼소닉 뷰티루틴 모닝샷",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2004002001367",
+   "name": "루마큐 골드",
+   "aIngs": [
+    "초록입홍합"
+   ],
+   "aFuncsDeclared": [
+    "jointOnly"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2024002023365",
+   "name": "눈ㆍ관절ㆍ기억력개선 N 뉴랜드",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001378",
+   "name": "로젠빈",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2009001702352",
+   "name": "뷰티스틱 히알루C",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200141538",
+   "name": "뷰티스틱 히알루C",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006329",
+   "name": "뷰티인",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20070017035522",
+   "name": "보령 글루마 D",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061672",
+   "name": "브이푸드 우먼 프로그램",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20130020024491",
+   "name": "비거너리 멀티비타민 앤 뷰티 플러스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352706",
+   "name": "비거너리 수면 스트레스 케어 앤 뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190009483507",
+   "name": "세라마이드",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200032960",
+   "name": "센트룸 원데이팩 우먼 2030",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200032959",
+   "name": "센트룸 원데이팩 우먼 50+",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200072205",
+   "name": "세라필업",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190009483359",
+   "name": "스킨솔루션 세라마이드",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200141966",
+   "name": "스킨솔루션 세라마이드",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061548",
+   "name": "셀럽팩뷰티라이너",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061015",
+   "name": "셀티바 우먼스 릴리프",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20130020024296",
+   "name": "아미네 보떼 8",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006647",
+   "name": "아쿠아촉촉 세라마이드",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553285",
+   "name": "어쎔코드 DI",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200073315",
+   "name": "에스지 데일리 멀티팩 파워",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "폴리코사놀(콜레스테롤)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020014757",
+   "name": "에이스",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061533",
+   "name": "에이엠 데일리 멀티팩 멀티비타민",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006900",
+   "name": "에이엠 데일리 멀티팩 한팩비타민",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061600",
+   "name": "엠에스 - 11423",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061312",
+   "name": "오스떼 데일리 멀티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 8,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061696",
+   "name": "에이엠 데일리 멀티팩이전",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006716",
+   "name": "에이엠 멀티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061934",
+   "name": "에이엠데일리멀티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061598",
+   "name": "에프에스 - 11423",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200071711",
+   "name": "우먼스베스트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553206",
+   "name": "연세헬스케어 닥터 올인원 DR. All in one",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "폴리코사놀(콜레스테롤)"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200082836",
+   "name": "영라뉴 나이트 컷 솔루션",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023097",
+   "name": "옐로킹타임",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "폴리코사놀(콜레스테롤)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006380",
+   "name": "오메가글루코사민",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190009483188",
+   "name": "오메가글루코사민",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006651",
+   "name": "우건비 피부보습건강",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001180",
+   "name": "우먼데일리",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017031278",
+   "name": "우먼밸런스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20040017031260",
+   "name": "우먼밸런스 글로우",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200062102",
+   "name": "위클리 스킨핏",
+   "aIngs": [
+    "콜라겐"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023364",
+   "name": "오에핏 트리플케어 3 in 1",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170351989",
+   "name": "올인원 우먼팩Ⅰ",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061359",
+   "name": "원이즈올",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170353188",
+   "name": "이뮨듀오 올인원 포우먼 멀티비타민팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200072638",
+   "name": "이너뷰티 포 우먼",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061418",
+   "name": "촉촉한 나",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352252",
+   "name": "체레미 마카 펨감마리놀렌산 리퀴드",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "2007001603030",
+   "name": "탱글",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006853",
+   "name": "하나면 충분해 우먼 WOMAN",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017038203",
+   "name": "피부 & 항산화를 모아담다 모듬팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061911",
+   "name": "피부 & 항산화를 모아담다 모듬팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200073210",
+   "name": "피부 & 항산화를 모아담다 모듬팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023200",
+   "name": "피부N365",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023446",
+   "name": "피부보습엔 히알부스터",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023577",
+   "name": "피부엔 로즈마리 히알루론산",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020020841",
+   "name": "히알루론산캅셀",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20160012278114",
+   "name": "혈행 눈 뼈 관절 지킴이",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200021124",
+   "name": "히알루론산뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061259",
+   "name": "멀티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 8,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061729",
+   "name": "멀티팩 포우먼",
+   "aIngs": [
+    "MSM",
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 9,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553269",
+   "name": "어쎔코드 D",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553275",
+   "name": "어쎔코드 DE",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "폴리코사놀(콜레스테롤)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553293",
+   "name": "어쎔코드 DG",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2024002023363",
+   "name": "에이스비오팜",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553286",
+   "name": "어쎔코드 DH",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061054",
+   "name": "올인원 솔루션",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400150831066",
+   "name": "나다운날",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400151071013",
+   "name": "올인원 솔루션",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040017006786",
+   "name": "수분채움",
+   "aIngs": [
+    "세라마이드"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052293",
+   "name": "나의 엄마,아빠 하나로 올인케어(My Mom, Dad All-in-care)",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": true
+  },
+  {
+   "stmt": "20120019007749",
+   "name": "헬퓨 L데이팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 5,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001412",
+   "name": "로젠빈 우먼밸런스",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "혈행/월경전"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007869",
+   "name": "호관원 관절 더하기 혈행",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400170061502",
+   "name": "브이팩 여성용",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 8,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20172880236243",
+   "name": "브이팩 여성용",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 9,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20172880236451",
+   "name": "브이팩 여성용+",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 9,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061680",
+   "name": "브이푸드 골드 프로그램",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  }
+ ],
+ "AMBIGUOUS": [
+  {
+   "stmt": "20040020004586",
+   "name": "근력 관절 근:강한 커큐민&NAG 플러스",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200073197",
+   "name": "관절살리도 프리미엄 터마신+콘드로이친 뮤코다당단백",
+   "aIngs": [
+    "뮤코다당·단백"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020004582",
+   "name": "근력 관절 근:강한 커큐민&NAG",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052212",
+   "name": "닥터바른 다이너티 올인원 이뮨",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)",
+    "은행잎/인지",
+    "간/기타"
+   ],
+   "nonAFnCount": 7,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061834",
+   "name": "데일리 뷰티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020001357",
+   "name": "리우먼 골드",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170353057",
+   "name": "맨즈 맥스팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)",
+    "간/기타"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200061744",
+   "name": "멀티 위드 이너뷰티",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 13,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "2013002002447",
+   "name": "백수오궁 액상 진",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200081327",
+   "name": "백세온담",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "홍삼/면역",
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352284",
+   "name": "백세일만보",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052234",
+   "name": "벨라핏 이너뷰티 올인원 부스터",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "가르시니아(체지방)",
+    "은행잎/인지",
+    "간/기타"
+   ],
+   "nonAFnCount": 8,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200022641",
+   "name": "비닷나이트",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)",
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200033123",
+   "name": "애터미 스포츠 멀티팩",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 13,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20240028080348",
+   "name": "액티브 조인트",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200033094",
+   "name": "애터미 리바이탈 멀티팩",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)",
+    "간/기타"
+   ],
+   "nonAFnCount": 15,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553274",
+   "name": "어쎔코드 AD",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553279",
+   "name": "어쎔코드 BD",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "폴리코사놀(콜레스테롤)",
+    "간/기타"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553284",
+   "name": "어쎔코드 CD",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "간/기타"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200083148",
+   "name": "여행감(A Sense of Travel)",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "홍삼/면역",
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170353182",
+   "name": "우먼맥스팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)",
+    "간/기타"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200700170352279",
+   "name": "올인원 우먼팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)",
+    "간/기타"
+   ],
+   "nonAFnCount": 14,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200033013",
+   "name": "올인원 포 우먼 멀티팩",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "C",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "루테인(눈)",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)",
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20200016052347",
+   "name": "올인원 헬스팩",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)",
+    "간/기타"
+   ],
+   "nonAFnCount": 10,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20130020024513",
+   "name": "이알하나 ERr731 프리미엄 앰플 샷",
+   "aIngs": [
+    "콜라겐"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "가르시니아(체지방)",
+    "루테인(눈)",
+    "은행잎/인지",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200072984",
+   "name": "조인머스트",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint",
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20110020099267",
+   "name": "커큐민 젤리 플러스",
+   "aIngs": [
+    "뮤코다당·단백"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200032983",
+   "name": "타마플렉스 멀티팩",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200023100",
+   "name": "퍼플퀸타임",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 6,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200032444",
+   "name": "하루엔진 포 우먼",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "프로바이오틱스(장)",
+    "녹차(체지방)",
+    "은행잎/인지"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20040020013416",
+   "name": "화애락 글로우 부스터",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist",
+    "skinUV"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "홍삼/면역",
+    "루테인(눈)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200032988",
+   "name": "관절닥터 타마본 5Days",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20240028080439",
+   "name": "관절닥터 타마본 5Days",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20240028080162",
+   "name": "애터미 터마신 MSM",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200031462",
+   "name": "애터미 터마신 MSM",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200033163",
+   "name": "관절마스터 타마플렉스&듀얼포뮬러",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20240028080206",
+   "name": "관절마스터 타마플렉스&듀얼포뮬러",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20060020008970",
+   "name": "관절에쎈크릴",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [],
+   "aAttrOk": false,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200081270",
+   "name": "관절엔 프라임",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [],
+   "aAttrOk": false,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200600200081283",
+   "name": "매일보궁",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [],
+   "aAttrOk": false,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20110020099270",
+   "name": "관절보 파워근력",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 1,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20190004553290",
+   "name": "어쎔코드 DF",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [
+    "skinMoist"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "녹차(체지방)",
+    "오메가3(혈행·중성지질)"
+   ],
+   "nonAFnCount": 2,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "20120019007741",
+   "name": "헬퓨 G데이팩",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "홍삼/면역",
+    "간/기타"
+   ],
+   "nonAFnCount": 9,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "20240028080502",
+   "name": "밸런스:관절건강",
+   "aIngs": [
+    "MSM"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "AMBIG"
+   ],
+   "nonaLabels": [
+    "간/기타"
+   ],
+   "nonAFnCount": 0,
+   "nonAMappable": false,
+   "produced": false
+  },
+  {
+   "stmt": "200400200083441",
+   "name": "관절혈통",
+   "aIngs": [
+    "히알루론산"
+   ],
+   "aFuncsDeclared": [],
+   "aAttrOk": false,
+   "nonaDomains": [
+    "C"
+   ],
+   "nonaLabels": [
+    "은행잎/인지",
+    "오메가3(혈행·중성지질)",
+    "항산화(Q10/아스타잔틴)"
+   ],
+   "nonAFnCount": 3,
+   "nonAMappable": true,
+   "produced": false
+  },
+  {
+   "stmt": "202000161225",
+   "name": "건강프로젝트 3",
+   "aIngs": [
+    "N아세틸글루코사민"
+   ],
+   "aFuncsDeclared": [
+    "joint"
+   ],
+   "aAttrOk": true,
+   "nonaDomains": [
+    "B",
+    "C"
+   ],
+   "nonaLabels": [
+    "식이섬유(장·혈당)",
+    "루테인(눈)"
+   ],
+   "nonAFnCount": 4,
+   "nonAMappable": false,
+   "produced": false
+  }
+ ]
+}
