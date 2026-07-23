@@ -155,8 +155,8 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 50,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "V6 재선점 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 9fp/50 — 전 제품 동일 요법(주1~2회·줄+패드+스파툴라·손톱6개월/발톱9~12개월)로 단일 EN 그룹. 금기=영유아·소아/조갑주위염증/혈액순환장애/영양실조/알코올중독/임부·수유부. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "살리실산|액(외용)",

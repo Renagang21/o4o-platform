@@ -1,0 +1,50 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "아모롤핀",
+ "form": "네일라카",
+ "slugbase": "amorolfine-lacquer",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "d9c2916b2c3e25ba",
+   "n": 22
+  },
+  {
+   "fp": "33ff5be32d4ac628",
+   "n": 12
+  },
+  {
+   "fp": "93f20c4ac38f2991",
+   "n": 6
+  },
+  {
+   "fp": "027f96d1494a0401",
+   "n": 4
+  },
+  {
+   "fp": "12da9c38a132c3fa",
+   "n": 2
+  },
+  {
+   "fp": "abd4cd7cad8c400b",
+   "n": 1
+  },
+  {
+   "fp": "74703082a4d2d563",
+   "n": 1
+  },
+  {
+   "fp": "ed95746f7afa1049",
+   "n": 1
+  },
+  {
+   "fp": "549e7611ee34bd12",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 50,
+ "koWrite": 200,
+ "enWrite": 100
+}
