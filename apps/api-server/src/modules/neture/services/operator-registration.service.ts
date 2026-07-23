@@ -181,17 +181,19 @@ export class OperatorRegistrationService {
             ? JSON.stringify({ zipCode, detailAddress: businessAddressDetail })
             : null;
 
-          // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
-          // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
+          // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+          // 회원 가입 승인 = 공급자 승인(하나의 인지된 승인). 승인 시 바로 ACTIVE로 생성한다.
+          // 프로필 정보(대표자명/담당자명/담당자 연락처)는 승인 후 보완하는 프로필 완성 상태로만 관리.
+          // (기존 WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1의 PENDING 이중 승인 구조 폐기)
           // WO-O4O-NETURE-SUPPLIER-APPROVAL-INSERT-FIX-V1:
           // business_number, business_address 컬럼은 migration 20260327000300으로 삭제됨.
           // 해당 값은 organizations 테이블(org SSOT)에 저장한다.
           const [insertedSupplier] = await queryRunner.query(
             `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, manager_name, manager_phone, business_type, tax_invoice_email, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'PENDING', NULL, NULL, NOW(), NOW())
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'ACTIVE', $10, NOW(), NOW(), NOW())
              ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail],
+            [userId, slug, contactEmail, contactPhone, representativeName, managerName, managerPhone, businessType, taxInvoiceEmail, approvedBy],
           );
 
           // organization 연동 (businessName이 있는 경우) — business_number, address org SSOT에 저장
@@ -220,14 +222,29 @@ export class OperatorRegistrationService {
             }
           }
 
-          logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (PENDING) — awaiting supplier approval`);
+          logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (ACTIVE) — approval unified`);
         } else {
-          // 이미 존재하면 상태 유지 (별도 공급 승인 흐름에서 처리)
-          await queryRunner.query(
-            `UPDATE neture_suppliers SET updated_at = NOW()
-             WHERE user_id = $1 AND status = 'PENDING'`,
-            [userId],
+          // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+          // 이미 존재하는 PENDING 공급자는 회원 승인과 함께 ACTIVE로 전이.
+          // REJECTED/INACTIVE는 건드리지 않는다(거절·이용정지 상태 보존).
+          const activated = await queryRunner.query(
+            `UPDATE neture_suppliers
+             SET status = 'ACTIVE', approved_by = $2, approved_at = NOW(), updated_at = NOW()
+             WHERE user_id = $1 AND status = 'PENDING'
+             RETURNING id, organization_id`,
+            [userId, approvedBy],
           );
+          // TypeORM queryRunner UPDATE...RETURNING → [rows, count]
+          const activatedRow = Array.isArray(activated?.[0]) ? activated[0][0] : activated?.[0];
+          if (activatedRow?.organization_id) {
+            await queryRunner.query(
+              `UPDATE organizations SET "isActive" = true, "updatedAt" = NOW() WHERE id = $1`,
+              [activatedRow.organization_id],
+            );
+          }
+          if (activatedRow?.id) {
+            logger.info(`[Registration] Existing PENDING supplier activated with member approval for user ${userId}`);
+          }
         }
       }
 

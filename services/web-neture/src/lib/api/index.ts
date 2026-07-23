@@ -134,7 +134,8 @@ export {
   adminPartnerSettlementApi,
   type NetureOperatorInfo,
   type AdminSupplier,
-  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1
+  PROFILE_FIELD_LABELS,
   ACTIVATION_FIELD_LABELS,
   type SupplierApproveResult,
   type AdminProduct,

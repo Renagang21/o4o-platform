@@ -117,19 +117,10 @@ export class NetureSupplierService {
       if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
       if (supplier.status !== SupplierStatus.PENDING) return { success: false, error: 'INVALID_STATUS' };
 
-      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1:
-      // ACTIVE 전환은 기본 사업자/담당자 정보만 요구. 사업자등록증·정산정보는 판매전/정산전 게이트로 이동.
-      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-      // 누락 필드를 구조화(missingFields)해서 반환 — 문자열 파싱 의존 제거.
-      const missingActivationFields = this.getMissingActivationFields(supplier);
-      if (missingActivationFields.length > 0) {
-        return {
-          success: false,
-          error: 'ONBOARDING_INCOMPLETE',
-          missingFields: missingActivationFields,
-        };
-      }
-
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+      // 승인은 서비스 이용 자격만 판단한다. 대표자명/담당자명/담당자 연락처 등 프로필 정보는
+      // 승인 후 보완하는 프로필 완성 상태(profileComplete/missingProfileFields)로만 노출하며
+      // 승인을 차단하지 않는다 (기존 ONBOARDING_INCOMPLETE 게이트 제거).
       supplier.status = SupplierStatus.ACTIVE;
       supplier.approvedBy = approvedByUserId;
       supplier.approvedAt = new Date();
@@ -338,11 +329,15 @@ export class NetureSupplierService {
     mailOrderSalesStatus: string | null;
     mailOrderSalesRegistrationNumber: string | null;
     mailOrderSalesDocumentId: string | null;
-    // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-    // 활성화 가능 여부의 단일 권위 — 프론트는 이 값을 그대로 사용(필드 중복 계산 금지).
+    // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+    // 프로필 완성 상태의 단일 권위 — 승인과 무관한 정보성 필드. 프론트 재계산 금지.
     managerName: string | null;
     managerPhone: string | null;
+    profileComplete: boolean;
+    missingProfileFields: string[];
+    /** @deprecated profileComplete 사용 (승인 게이트 아님) */
     activationReady: boolean;
+    /** @deprecated missingProfileFields 사용 (승인 게이트 아님) */
     missingActivationFields: string[];
     createdAt: Date;
     updatedAt: Date;
@@ -374,7 +369,7 @@ export class NetureSupplierService {
       return suppliers.map((s) => {
         const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
-        const missing = this.getMissingActivationFields(s);
+        const missing = this.getMissingProfileFields(s);
         return {
           id: s.id, name: org?.name ?? '', slug: s.slug, status: s.status,
           contactEmail: s.contactEmail || '',
@@ -394,9 +389,12 @@ export class NetureSupplierService {
           mailOrderSalesStatus: s.mailOrderSalesStatus || null,
           mailOrderSalesRegistrationNumber: s.mailOrderSalesRegistrationNumber || null,
           mailOrderSalesDocumentId: s.mailOrderSalesDocumentId || null,
-          // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1
+          // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1
           managerName: s.managerName || null,
           managerPhone: s.managerPhone || null,
+          profileComplete: missing.length === 0,
+          missingProfileFields: missing,
+          // deprecated 호환 별칭 (승인 게이트 아님)
           activationReady: missing.length === 0,
           missingActivationFields: missing,
           createdAt: s.createdAt,
@@ -596,17 +594,20 @@ export class NetureSupplierService {
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       const addrDetail = org?.address_detail;
 
-      // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-      // 공급자 본인 화면(대시보드 배너)이 활성화 가능 여부를 단일 권위로 받도록 포함.
-      const missingActivationFields = this.getMissingActivationFields(supplier);
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+      // 프로필 완성 상태(정보성) — 승인 여부(status)와 분리. 프론트는 이 값을 그대로 사용.
+      const missingProfileFields = this.getMissingProfileFields(supplier);
 
       return {
         id: supplier.id,
         name: org?.name ?? '',
         slug: supplier.slug,
         status: supplier.status,
-        activationReady: missingActivationFields.length === 0,
-        missingActivationFields,
+        profileComplete: missingProfileFields.length === 0,
+        missingProfileFields,
+        // deprecated 호환 별칭 (승인 게이트 아님)
+        activationReady: missingProfileFields.length === 0,
+        missingActivationFields: missingProfileFields,
         // Business profile — org-primary with supplier + prefill fallback
         businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,
@@ -1215,8 +1216,12 @@ export class NetureSupplierService {
   //   IR-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-AUDIT-V1: 서류·정산 6항목은 정산/상품/주문
   //   로직에서 미소비(컴플라이언스 보관용)이므로 ACTIVE 게이트에서 제거하고 판매전/정산전으로 이동.
 
-  /** 공급 승인(ACTIVE 전환) 필수 — 기본 사업자/담당자 정보만. 서류·정산은 후단계. */
-  private getMissingActivationFields(supplier: NetureSupplier): string[] {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+   * 프로필 완성 판정(정보성) — 승인(ACTIVE 전환)을 차단하지 않는다.
+   * 승인 후 보완 안내(모달·배너·운영자 '정보 미완료' 표시)에만 사용.
+   */
+  private getMissingProfileFields(supplier: NetureSupplier): string[] {
     const missing: string[] = [];
     if (!supplier.representativeName?.trim()) missing.push('representativeName');
     if (!supplier.managerName?.trim()) missing.push('managerName');

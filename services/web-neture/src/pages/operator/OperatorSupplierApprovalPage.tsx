@@ -31,16 +31,19 @@ import {
 } from '@o4o/operator-ux-core';
 import { ActionBar, BulkResultModal, BaseDetailDrawer } from '@o4o/ui';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { operatorSupplierApi, type AdminSupplier, ACTIVATION_FIELD_LABELS } from '../../lib/api';
+import { operatorSupplierApi, type AdminSupplier, PROFILE_FIELD_LABELS } from '../../lib/api';
 import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
 
-function activationLabels(s: AdminSupplier): string[] {
-  return (s.missingActivationFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+// 프로필 완성 상태는 정보성 표시(정보 미완료 배지)로만 사용 — 승인 버튼을 비활성화하지 않는다.
+function profileMissingLabels(s: AdminSupplier): string[] {
+  const missing = s.missingProfileFields ?? s.missingActivationFields ?? [];
+  return missing.map((f) => PROFILE_FIELD_LABELS[f] || f);
 }
 
-// backend 단일 권위. 구버전 payload(activationReady undefined) 대비 representativeName fallback.
-function isActivationReady(s: AdminSupplier): boolean {
-  return s.activationReady ?? !!s.representativeName;
+// backend 단일 권위. 구버전 payload 대비 representativeName fallback.
+function isProfileComplete(s: AdminSupplier): boolean {
+  return s.profileComplete ?? s.activationReady ?? !!s.representativeName;
 }
 
 // WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1:
@@ -181,8 +184,9 @@ export default function OperatorSupplierApprovalPage() {
   const handlePage = (p: number) => { clearSelection(); setPage(p); };
 
   const selectedItems = suppliers.filter((s) => selectedIds.has(s.id));
-  const selectedNotReady = selectedItems.filter((s) => !isActivationReady(s));
-  const approveDisabled = selectedItems.length === 0 || selectedNotReady.length > 0;
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+  // 프로필 미완료는 승인을 차단하지 않는다 — 선택 유무로만 판단.
+  const approveDisabled = selectedItems.length === 0;
 
   // 드로어를 다시 열 때(다른 공급자 선택) 편집 모드 초기화
   useEffect(() => {
@@ -250,12 +254,9 @@ export default function OperatorSupplierApprovalPage() {
       return;
     }
     let text = '승인에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-    if (result.code === 'ONBOARDING_INCOMPLETE') {
-      const labels = (result.missingFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
-      text = labels.length
-        ? `${labels.join(', ')}이(가) 비어 있어 승인할 수 없습니다. 공급자가 해당 정보를 입력해야 합니다.`
-        : '필수 정보가 비어 있어 승인할 수 없습니다.';
-    } else if (result.code === 'INVALID_STATUS') {
+    // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+    // ONBOARDING_INCOMPLETE 게이트 제거 — 프로필 미완료는 승인을 차단하지 않는다.
+    if (result.code === 'INVALID_STATUS') {
       text = '이미 처리된 공급자입니다. 목록을 새로고침합니다.';
       setDrawer(null);
       refetch();
@@ -336,15 +337,20 @@ export default function OperatorSupplierApprovalPage() {
       render: (_v, s) => <span className="text-sm text-slate-600">{s.businessNumber || '-'}</span>,
     },
     {
-      key: 'activationReady',
-      header: '승인 준비',
+      key: 'profileComplete',
+      header: '프로필 정보',
       width: '200px',
       render: (_v, s) => {
-        const ready = isActivationReady(s);
-        const missing = activationLabels(s);
-        return (
-          <div className={`text-sm ${ready ? 'text-emerald-700' : 'text-amber-700'}`}>
-            {ready ? '승인 가능' : `누락: ${missing.join(', ') || '필수 정보'}`}
+        const complete = isProfileComplete(s);
+        const missing = profileMissingLabels(s);
+        return complete ? (
+          <div className="text-sm text-emerald-700">완료</div>
+        ) : (
+          <div className="text-sm">
+            <span className="inline-block rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-700">
+              정보 미완료
+            </span>
+            <div className="mt-0.5 text-xs text-slate-500">미입력: {missing.join(', ') || '기본 정보'}</div>
           </div>
         );
       },
@@ -374,7 +380,8 @@ export default function OperatorSupplierApprovalPage() {
   ];
 
   // ─── Drawer footer 액션 (PENDING 만) ───
-  const drawerReady = drawer ? isActivationReady(drawer) : false;
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+  // 프로필 미완료여도 승인 버튼은 항상 활성 — 프로필은 승인 후 보완 항목.
   const drawerActions =
     drawer && drawer.status === 'PENDING'
       ? [
@@ -385,10 +392,10 @@ export default function OperatorSupplierApprovalPage() {
             disabled: actionLoading === drawer.id,
           },
           {
-            label: drawerReady ? '승인' : '승인 불가',
+            label: '승인',
             onClick: () => handleApproveSingle(drawer),
             variant: 'primary' as const,
-            disabled: !drawerReady || actionLoading === drawer.id,
+            disabled: actionLoading === drawer.id,
             loading: actionLoading === drawer.id,
           },
         ]
@@ -464,9 +471,7 @@ export default function OperatorSupplierApprovalPage() {
               icon: <CheckCircle size={14} />,
               loading: batch.loading,
               disabled: approveDisabled,
-              tooltip: approveDisabled && selectedNotReady.length > 0
-                ? '필수 정보가 누락된 공급자가 포함되어 있어 승인할 수 없습니다'
-                : '선택된 공급자를 일괄 승인합니다',
+              tooltip: '선택된 공급자를 일괄 승인합니다 (프로필 미완료는 승인 후 보완)',
             },
             {
               key: 'reject',
@@ -479,11 +484,6 @@ export default function OperatorSupplierApprovalPage() {
               tooltip: '선택된 공급자를 일괄 거절합니다',
             },
           ]}
-          statusInfo={
-            selectedNotReady.length > 0
-              ? `${selectedNotReady.length}건은 필수 정보 누락으로 승인할 수 없습니다.`
-              : undefined
-          }
         />
       )}
 
@@ -635,8 +635,8 @@ function SupplierDetailBody({
   onCancelEdit: () => void;
   onSaveEdit: () => void;
 }) {
-  const ready = isActivationReady(s);
-  const missing = activationLabels(s);
+  const complete = isProfileComplete(s);
+  const missing = profileMissingLabels(s);
   const deferred = getDeferredItems(s);
 
   const Row = ({ label, value }: { label: string; value: ReactNode }) => (
@@ -725,13 +725,13 @@ function SupplierDetailBody({
         <Row label="등록일" value={new Date(s.createdAt).toLocaleDateString('ko-KR')} />
       </div>
 
-      {/* 승인 준비 상태 */}
-      <div className={`mb-5 rounded-lg border p-3 ${ready ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
-        <div className={`font-medium ${ready ? 'text-emerald-700' : 'text-amber-700'}`}>
-          {ready ? '승인 가능 (기본 정보 완료)' : '승인 불가 — 필수 정보 누락'}
+      {/* 프로필 정보 상태 — 승인 차단 아님 (승인 후 보완 항목) */}
+      <div className={`mb-5 rounded-lg border p-3 ${complete ? 'border-emerald-200 bg-emerald-50' : 'border-sky-200 bg-sky-50'}`}>
+        <div className={`font-medium ${complete ? 'text-emerald-700' : 'text-sky-700'}`}>
+          {complete ? '프로필 정보 완료' : '정보 미완료 — 승인은 가능하며, 승인 후 공급자가 보완합니다'}
         </div>
-        {!ready && missing.length > 0 && (
-          <div className="text-xs text-amber-700 mt-1">누락: {missing.join(', ')}</div>
+        {!complete && missing.length > 0 && (
+          <div className="text-xs text-sky-700 mt-1">미입력: {missing.join(', ')}</div>
         )}
         {deferred.length > 0 && (
           <div className="text-xs text-slate-500 mt-1">{describeDeferred(deferred)}</div>

@@ -8,7 +8,7 @@ import { Router } from 'express';
 import type { Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { createRequireActiveSupplier, createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
+import { createRequireLinkedSupplier } from '../middleware/neture-identity.middleware.js';
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
 import logger from '../../../utils/logger.js';
@@ -24,7 +24,6 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
   const netureService = new NetureService();
   const onboardingService = new SupplierOnboardingService(dataSource);
   const regulatedCategoryService = new SupplierRegulatedCategoryService(dataSource);
-  const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   const requireLinkedSupplier = createRequireLinkedSupplier(dataSource);
 
   // POST /supplier/register
@@ -401,7 +400,11 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
   });
 
   // PATCH /supplier/profile
-  router.patch('/profile', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+  // requireActiveSupplier → requireLinkedSupplier. 프로필 저장은 승인 상태와 무관한 자기 정보 보완이며,
+  // ACTIVE 게이트를 걸면 승인 전 공급자가 안내받은 정보를 스스로 입력할 수 없는 교착이 생긴다
+  // (GET /profile · PATCH /onboarding 과 동일 레벨로 정합화).
+  router.patch('/profile', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const {

@@ -21,7 +21,7 @@ import {
   type SupplierProduct,
   type SupplierStoreDescriptionDraft,
 } from '../../lib/api';
-import { ACTIVATION_FIELD_LABELS } from '../../lib/api';
+import { PROFILE_FIELD_LABELS } from '../../lib/api';
 import SupplierStoreDescriptionEditorDrawer from './SupplierStoreDescriptionEditorDrawer';
 
 const PROFILE_PATH = '/mypage/business-profile';
@@ -36,7 +36,8 @@ const DRAFT_STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 function missingLabels(profile: SupplierProfile | null): string[] {
-  return (profile?.missingActivationFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
+  const missing = profile?.missingProfileFields ?? profile?.missingActivationFields ?? [];
+  return missing.map((f) => PROFILE_FIELD_LABELS[f] || f);
 }
 
 export default function SupplierStoreDescriptionsPage() {
@@ -219,21 +220,21 @@ export default function SupplierStoreDescriptionsPage() {
         </div>
       ) : (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
-          <h2 className="text-lg font-bold">공급자 승인 후 사용 가능합니다</h2>
+          {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+              차단 사유는 승인 상태뿐 — 프로필 필드를 승인 조건처럼 요구하지 않는다. */}
+          <h2 className="text-lg font-bold">
+            {status === 'REJECTED'
+              ? '공급자 가입이 거절되었습니다'
+              : status === 'INACTIVE'
+                ? '공급자 이용이 정지되었습니다'
+                : '공급자 승인 후 사용 가능합니다'}
+          </h2>
           <p className="mt-2 text-sm">
-            매장용 설명서 작성은 공급자 활성화(승인) 이후 이용할 수 있습니다. 대시보드 열람과 프로필 작성은
-            지금도 가능합니다.
+            {status === 'REJECTED' || status === 'INACTIVE'
+              ? '자세한 사항은 운영자에게 문의해 주세요.'
+              : '매장용 설명서 작성은 운영자 승인 이후 이용할 수 있습니다. 대시보드 열람과 프로필 작성은 지금도 가능합니다.'}
           </p>
-          {labels.length > 0 && (
-            <p className="mt-2 text-sm font-medium">현재 누락된 정보: {labels.join(', ')}</p>
-          )}
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link
-              to={PROFILE_PATH}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-            >
-              담당자 정보 입력하러 가기
-            </Link>
             <Link
               to={PRODUCTS_PATH}
               className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
@@ -242,6 +243,22 @@ export default function SupplierStoreDescriptionsPage() {
             </Link>
           </div>
           {status && !active && <p className="mt-3 text-xs text-amber-700">현재 상태: {status}</p>}
+        </div>
+      )}
+
+      {/* 승인 완료 + 프로필 미완료 → 보완 안내(정보성, 차단 아님) */}
+      {!loading && active && labels.length > 0 && (
+        <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sky-900">
+          <p className="text-sm font-semibold">공급자 정보를 등록해 주세요</p>
+          <p className="mt-1 text-sm">
+            미입력: <span className="font-medium">{labels.join(', ')}</span>
+          </p>
+          <Link
+            to={PROFILE_PATH}
+            className="mt-2 inline-block rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            공급자 정보 등록
+          </Link>
         </div>
       )}
 

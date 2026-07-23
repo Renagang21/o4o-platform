@@ -111,21 +111,27 @@ export interface AdminSupplier {
   // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
   // backend(getAllSuppliers)는 userId 를 내려주나 타입에 누락돼 있던 것을 명시 (회원 목록 매핑용).
   userId?: string;
-  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-  // 활성화 가능 여부의 단일 권위 — backend(getMissingActivationFields) 산출. 프론트 재계산 금지.
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+  // 프로필 완성 상태의 단일 권위 — backend(getMissingProfileFields) 산출. 승인 게이트 아님. 프론트 재계산 금지.
   managerName?: string | null;
   managerPhone?: string | null;
+  profileComplete?: boolean;
+  missingProfileFields?: string[];
+  /** @deprecated profileComplete 사용 */
   activationReady?: boolean;
+  /** @deprecated missingProfileFields 사용 */
   missingActivationFields?: string[];
 }
 
-// WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-// 활성화 필드 코드 → 한글 라벨 (운영자/공급자 화면 공용)
-export const ACTIVATION_FIELD_LABELS: Record<string, string> = {
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+// 프로필 필드 코드 → 한글 라벨 (운영자/공급자 화면 공용 — 승인 차단이 아닌 보완 안내용)
+export const PROFILE_FIELD_LABELS: Record<string, string> = {
   representativeName: '대표자명',
   managerName: '담당자명',
   managerPhone: '담당자 연락처',
 };
+/** @deprecated PROFILE_FIELD_LABELS 사용 */
+export const ACTIVATION_FIELD_LABELS = PROFILE_FIELD_LABELS;
 
 export interface SupplierApproveResult {
   success: boolean;

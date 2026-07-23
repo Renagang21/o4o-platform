@@ -336,9 +336,13 @@ export interface SupplierProfile {
   name: string;
   slug: string;
   status?: string;
-  // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-  // 활성화 가능 여부의 단일 권위(backend 산출). 공급자 대시보드 배너/상품등록 게이트에서 사용.
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+  // 프로필 완성 상태의 단일 권위(backend 산출) — 승인 여부(status)와 분리된 정보성 필드.
+  profileComplete?: boolean;
+  missingProfileFields?: string[];
+  /** @deprecated profileComplete 사용 */
   activationReady?: boolean;
+  /** @deprecated missingProfileFields 사용 */
   missingActivationFields?: string[];
   // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
   businessNumber: string | null;

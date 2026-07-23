@@ -239,28 +239,26 @@ function NetureDeleteFlow({
   );
 }
 
-// ─── 2단계 승인 안내 + 공급 승인 대기 CTA ────────────────────
-// WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
-//   IR-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-STATE-AUDIT-V1 결론 반영.
-//   회원 가입 승인(1단계, 이 화면)과 공급자 프로필 승인(2단계, /operator/suppliers)은 별개 축이다.
-//   상단 "대기" 통계는 1단계(service_memberships.status) 기준이므로, 2단계(neture_suppliers PENDING)
-//   대기 작업이 "대기 0" 으로 가려 보이는 혼동을 안내 문구 + 이동 동선으로 해소한다.
-//   (집계/승인 API/로그인 정책은 변경하지 않음 — 표시·동선만 보강)
+// ─── 공급자 승인 안내 + 공급 승인 대기 CTA ────────────────────
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+//   회원 가입 승인 = 공급자 승인(하나의 인지된 승인). 이 화면에서 승인하면 공급자도 함께 활성화된다.
+//   프로필 정보(대표자명/담당자)는 승인 조건이 아니라 승인 후 공급자가 보완하는 정보.
+//   이전 구조에서 남은 공급 승인 대기 건은 공급자 승인 관리에서 처리한다.
 function SupplierTwoStepGuide({ pendingSupplierCount }: { pendingSupplierCount: number }) {
   return (
     <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex items-start gap-2">
         <Info size={16} className="mt-0.5 shrink-0 text-slate-400" />
         <p className="flex-1 text-xs leading-relaxed text-slate-600">
-          Neture 공급자는 <b>2단계</b>로 활성화됩니다. <b>1단계 회원 가입 승인</b>은 이 화면에서,{' '}
-          <b>2단계 공급자 프로필 승인</b>은 <b>공급자 승인 관리</b>에서 처리합니다. 상단 “대기” 통계는
-          1단계(회원 가입) 기준이며, 공급자 프로필 승인대기는 아래 별도 안내로 표시됩니다.
+          Neture 공급자는 이 화면의 <b>회원 가입 승인 한 번</b>으로 활성화됩니다. 대표자·담당자 등{' '}
+          <b>공급자 프로필 정보는 승인 후 공급자가 보완</b>하며 승인을 막지 않습니다. 아직 공급 승인
+          대기(이전 구조 잔여) 상태인 공급자는 아래 안내로 표시됩니다.
         </p>
       </div>
       {pendingSupplierCount > 0 && (
         <div className="mt-2 flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
           <span className="text-xs font-medium text-amber-800">
-            공급 승인 대기 {pendingSupplierCount}건 — 회원 가입은 완료되었고 공급자 프로필 승인(2단계)이 필요합니다.
+            공급 승인 대기 {pendingSupplierCount}건 — 공급자 승인 관리에서 승인하면 바로 활성화됩니다.
           </span>
           <Link
             to="/operator/suppliers"
@@ -369,13 +367,12 @@ export default function UsersManagementPage() {
               </span>
             );
             if (st === 'PENDING') {
-              // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
-              //   PENDING 행에 "공급 승인 →" 명시 액션을 노출한다. 승인 처리는 이 화면이 아니라
-              //   /operator/suppliers(2단계 공급 승인)에서 수행 — 링크로 이동만 제공한다.
+              // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+              //   이전 구조 잔여 PENDING 행 — 공급자 승인 관리에서 승인 한 번으로 활성화된다.
               return (
                 <Link
                   to="/operator/suppliers"
-                  title="회원 가입은 승인됨 · 공급자 프로필 승인(2단계)이 필요합니다. 공급자 승인 관리 화면에서 처리하세요."
+                  title="공급 승인 대기 상태입니다. 공급자 승인 관리에서 승인하면 바로 활성화됩니다 (프로필 정보는 승인 후 보완)."
                   className="group inline-flex items-center gap-1 no-underline"
                 >
                   {badge}

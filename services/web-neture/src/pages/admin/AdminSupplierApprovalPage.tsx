@@ -6,13 +6,15 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { adminSupplierApi, type AdminSupplier, ACTIVATION_FIELD_LABELS } from '../../lib/api';
+import { adminSupplierApi, type AdminSupplier, PROFILE_FIELD_LABELS } from '../../lib/api';
 import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
 
-// WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1:
-// 활성화 가능 여부는 backend(activationReady/missingActivationFields)가 단일 권위.
-function activationLabels(s: AdminSupplier): string[] {
-  return (s.missingActivationFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+// 프로필 완성 상태는 backend(profileComplete/missingProfileFields)가 단일 권위.
+// 정보성 배지로만 사용 — 승인 버튼을 비활성화하지 않는다.
+function profileMissingLabels(s: AdminSupplier): string[] {
+  const missing = s.missingProfileFields ?? s.missingActivationFields ?? [];
+  return missing.map((f) => PROFILE_FIELD_LABELS[f] || f);
 }
 
 const statusLabels: Record<string, string> = {
@@ -97,12 +99,9 @@ export default function AdminSupplierApprovalPage() {
       return;
     }
     let text = '활성화에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-    if (result.code === 'ONBOARDING_INCOMPLETE') {
-      const labels = (result.missingFields ?? []).map((f) => ACTIVATION_FIELD_LABELS[f] || f);
-      text = labels.length
-        ? `${labels.join(', ')}이(가) 비어 있어 활성화할 수 없습니다. 공급자가 해당 정보를 입력해야 합니다.`
-        : '필수 정보가 비어 있어 활성화할 수 없습니다.';
-    } else if (result.code === 'INVALID_STATUS') {
+    // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
+    // ONBOARDING_INCOMPLETE 게이트 제거 — 프로필 미완료는 승인을 차단하지 않는다.
+    if (result.code === 'INVALID_STATUS') {
       text = '이미 처리된 공급자입니다. 목록을 새로고침합니다.';
       await loadSuppliers();
     } else if (result.code === 'SUPPLIER_NOT_FOUND') {
@@ -254,8 +253,8 @@ export default function AdminSupplierApprovalPage() {
             <tbody className="divide-y divide-slate-100">
               {filtered.map((s) => {
                 const deferred = getDeferredItems(s);
-                const activationReady = s.activationReady ?? !!s.representativeName;
-                const missingActivation = activationLabels(s);
+                const profileComplete = s.profileComplete ?? s.activationReady ?? !!s.representativeName;
+                const missingProfile = profileMissingLabels(s);
                 return (
                 <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
@@ -272,10 +271,10 @@ export default function AdminSupplierApprovalPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
                     <div className="space-y-1">
-                      <div className={activationReady ? 'text-emerald-700' : 'text-amber-700'}>
-                        {activationReady
-                          ? '승인 가능 (기본 정보 완료)'
-                          : `활성화 불가 — 누락: ${missingActivation.join(', ')}`}
+                      <div className={profileComplete ? 'text-emerald-700' : 'text-sky-700'}>
+                        {profileComplete
+                          ? '프로필 정보 완료'
+                          : `정보 미완료 — 미입력: ${missingProfile.join(', ')} (승인 가능, 승인 후 보완)`}
                       </div>
                       {deferred.length > 0 && (
                         <div className="text-xs text-amber-600">{describeDeferred(deferred)}</div>
@@ -340,8 +339,7 @@ export default function AdminSupplierApprovalPage() {
                       <>
                         <button
                           onClick={() => setApproveConfirmId(s.id)}
-                          disabled={actionLoading === s.id || !activationReady}
-                          title={!activationReady ? `누락: ${missingActivation.join(', ')}` : undefined}
+                          disabled={actionLoading === s.id}
                           className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
                         >
                           {actionLoading === s.id ? '처리중...' : '승인'}
