@@ -53,27 +53,9 @@ function getPrimaryRole(u: UserData): string {
   return NETURE_PARTICIPANT_ROLES.find((r) => t.has(r) || t.has(`neture:${r}`)) ?? 'general';
 }
 
-// "운영 권한" 컬럼용. 관리자 > 운영자 우선순위. bare/namespaced 모두 인정(대시보드 로직과 동일).
-function getOperatorRole(u: UserData): '관리자' | '운영자' | null {
-  const t = netureTokens(u);
-  if (t.has('platform:super_admin') || t.has('neture:admin') || t.has('admin')) return '관리자';
-  if (t.has('neture:operator') || t.has('operator')) return '운영자';
-  return null;
-}
-
-// WO-O4O-NETURE-SUPPLIER-DASHBOARD-ENTRY-AND-MEMBER-LIST-CLEANUP-V1
-function getDashboardAccessLabels(u: UserData): string[] {
-  const tokens = netureTokens(u);
-  const labels: string[] = [];
-  if (tokens.has('platform:super_admin') || tokens.has('neture:admin') || tokens.has('admin')) {
-    labels.push('관리자 대시보드');
-  }
-  // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1: "운영 대시보드" → "운영자 대시보드"
-  if (tokens.has('neture:operator') || tokens.has('operator')) labels.push('운영자 대시보드');
-  if (tokens.has('neture:supplier') || tokens.has('supplier')) labels.push('공급자 대시보드');
-  if (tokens.has('neture:partner') || tokens.has('partner')) labels.push('파트너 대시보드');
-  return labels;
-}
+// WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1:
+// "운영 권한"·"대시보드 접근" 컬럼 제거(getOperatorRole/getDashboardAccessLabels 삭제).
+// 공급자는 개인 이름보다 회사명이 중요하므로 "회사명" 컬럼을 추가(neture_suppliers.name).
 
 // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
 // customer → consumer 매핑 제거 — Neture 는 "소비자" 회원 유형을 사용하지 않는다.
@@ -298,16 +280,19 @@ export default function UsersManagementPage() {
   // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
   // 회원 목록에 "공급자 프로필 상태"를 함께 보여주기 위해 neture_suppliers 상태를 userId→status 로 1회 로드.
   // 표시 보강용 — 실패해도 회원 목록 자체에는 영향 없음(컬럼만 '—' 로 표시).
-  const [supplierStatusMap, setSupplierStatusMap] = useState<Map<string, string>>(new Map());
+  // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1: 회사명 컬럼 표시를 위해 name 도 함께 매핑.
+  const [supplierStatusMap, setSupplierStatusMap] = useState<
+    Map<string, { status: string; companyName?: string }>
+  >(new Map());
   useEffect(() => {
     let cancelled = false;
     operatorSupplierApi
       .getSuppliers()
       .then((suppliers) => {
         if (cancelled) return;
-        const m = new Map<string, string>();
+        const m = new Map<string, { status: string; companyName?: string }>();
         for (const s of suppliers) {
-          if (s.userId) m.set(s.userId, s.status);
+          if (s.userId) m.set(s.userId, { status: s.status, companyName: s.name });
         }
         setSupplierStatusMap(m);
       })
@@ -323,7 +308,7 @@ export default function UsersManagementPage() {
   //   공급 승인 대기(neture_suppliers.status === 'PENDING') 건수 — 안내 배너 CTA 표시용.
   //   supplierStatusMap 은 전체 공급자 기준 1회 로드(페이지네이션 무관)이라 총 대기 건수를 반영한다.
   const pendingSupplierCount = useMemo(
-    () => Array.from(supplierStatusMap.values()).filter((s) => s === 'PENDING').length,
+    () => Array.from(supplierStatusMap.values()).filter((s) => s.status === 'PENDING').length,
     [supplierStatusMap],
   );
 
@@ -351,21 +336,15 @@ export default function UsersManagementPage() {
       roleColumnHeader="회원 유형"
       extraColumns={[
         {
-          key: 'operatorRole',
-          header: '운영 권한',
-          width: '120px',
+          // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1:
+          // 공급자는 개인 이름보다 회사명이 중요 — neture_suppliers.name 표시.
+          key: 'companyName',
+          header: '회사명',
+          width: '160px',
           render: (_v, user) => {
-            const op = getOperatorRole(user);
-            if (!op) return <span className="text-xs text-slate-400">일반 회원</span>;
-            const cls =
-              op === '관리자'
-                ? 'bg-rose-50 border-rose-200 text-rose-700'
-                : 'bg-violet-50 border-violet-200 text-violet-700';
-            return (
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full border text-xs font-medium ${cls}`}>
-                {op}
-              </span>
-            );
+            const companyName = supplierStatusMap.get(user.id)?.companyName;
+            if (!companyName) return <span className="text-xs text-slate-300">—</span>;
+            return <span className="text-sm font-medium text-slate-900">{companyName}</span>;
           },
         },
         {
@@ -376,7 +355,7 @@ export default function UsersManagementPage() {
           header: '공급자 프로필',
           width: '120px',
           render: (_v, user) => {
-            const st = supplierStatusMap.get(user.id);
+            const st = supplierStatusMap.get(user.id)?.status;
             if (!st) return <span className="text-xs text-slate-300">—</span>;
             const meta = SUPPLIER_STATUS_META[st] ?? {
               label: st,
@@ -407,26 +386,6 @@ export default function UsersManagementPage() {
               );
             }
             return badge;
-          },
-        },
-        {
-          key: 'dashboardAccess',
-          header: '대시보드 접근',
-          width: '200px',
-          render: (_v, user) => {
-            const labels = getDashboardAccessLabels(user);
-            if (labels.length === 0) {
-              return <span className="text-xs text-slate-400">접근 불가</span>;
-            }
-            return (
-              <div className="flex flex-wrap gap-1">
-                {labels.map((label) => (
-                  <span key={label} className="px-1.5 py-0.5 rounded text-xs bg-slate-100 text-slate-700">
-                    {label}
-                  </span>
-                ))}
-              </div>
-            );
           },
         },
       ]}

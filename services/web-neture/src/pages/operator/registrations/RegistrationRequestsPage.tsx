@@ -327,7 +327,7 @@ export default function RegistrationRequestsPage() {
   const columns: ListColumnDef<Record<string, any>>[] = [
     { key: 'select', header: '', width: '48px', align: 'center' },
     { key: 'applicant', header: '신청자', width: '28%' },
-    { key: 'company', header: '회사 / 면허', width: '18%' },
+    { key: 'company', header: '면허 / 사업자번호', width: '18%' },
     { key: 'date', header: '신청일', width: '14%' },
     { key: 'status', header: '상태', width: '14%', align: 'center' },
     { key: 'actions', header: '', width: '18%' },
@@ -345,18 +345,32 @@ export default function RegistrationRequestsPage() {
         onClick={(e) => e.stopPropagation()}
       />
     ),
+    // WO-O4O-NETURE-OPERATOR-MEMBERS-TABLE-COLUMN-SIMPLIFY-V1:
+    // 공급자는 개인 이름보다 회사명이 중요 — 회사명이 있으면 회사명을 굵은 1행으로,
+    // 신청자 개인 이름은 보조 행으로 표시한다.
     applicant: (
       <div>
-        <div className="font-medium text-gray-900">{request.name}</div>
+        <div className="font-medium text-gray-900">
+          {request.companyName || request.name}
+        </div>
+        {request.companyName && (
+          <div className="text-sm text-gray-600">{request.name}</div>
+        )}
         <div className="text-sm text-gray-600">{roleLabels[request.role]}</div>
         <div className="text-sm text-gray-500">{request.email}</div>
       </div>
     ),
     company: (
       <div className="text-sm text-gray-900">
-        {request.companyName || request.licenseNumber || '-'}
-        {request.businessNumber && (
-          <div className="text-sm text-gray-500 mt-1">{request.businessNumber}</div>
+        {request.licenseNumber || request.businessNumber ? (
+          <>
+            {request.licenseNumber && <div>{request.licenseNumber}</div>}
+            {request.businessNumber && (
+              <div className="text-sm text-gray-500 mt-1">{request.businessNumber}</div>
+            )}
+          </>
+        ) : (
+          '-'
         )}
       </div>
     ),
