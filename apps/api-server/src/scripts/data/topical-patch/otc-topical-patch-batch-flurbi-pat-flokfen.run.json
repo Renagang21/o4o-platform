@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "플록펜첩부제",
+ "slugbase": "flurbi-pat-flokfen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f5a4af745a2b0ab4",
+   "n": 3
+  },
+  {
+   "fp": "6f5ef46d1f67e14e",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

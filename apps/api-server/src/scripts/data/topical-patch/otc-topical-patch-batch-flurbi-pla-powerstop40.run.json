@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "파워스탑플라스타40밀리그램",
+ "slugbase": "flurbi-pla-powerstop40",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e919e46190d07749",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

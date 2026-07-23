@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "제일탑첩부제",
+ "slugbase": "flurbi-pat-jeiltop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "40581f54ebd843e1",
+   "n": 7
+  },
+  {
+   "fp": "efdfa6aa91c36262",
+   "n": 4
+  },
+  {
+   "fp": "b9ff724d7c6351d5",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 12,
+ "koWrite": 48,
+ "enWrite": 24
+}

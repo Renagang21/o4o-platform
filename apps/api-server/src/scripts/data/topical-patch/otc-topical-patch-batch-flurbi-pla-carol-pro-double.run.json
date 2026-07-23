@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "캐롤프로더블파워플라스타",
+ "slugbase": "flurbi-pla-carol-pro-double",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b3d22cd07e24222a",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

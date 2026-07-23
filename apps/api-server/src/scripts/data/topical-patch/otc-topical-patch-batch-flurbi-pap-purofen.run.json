@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "푸로펜카타플라스마",
+ "slugbase": "flurbi-pap-purofen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "08c3f5c868549512",
+   "n": 2
+  },
+  {
+   "fp": "25690f1758d84d6b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

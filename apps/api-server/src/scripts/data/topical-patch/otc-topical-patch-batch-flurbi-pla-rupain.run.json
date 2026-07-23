@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "루페인플라스타",
+ "slugbase": "flurbi-pla-rupain",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "02de8cab761121ab",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

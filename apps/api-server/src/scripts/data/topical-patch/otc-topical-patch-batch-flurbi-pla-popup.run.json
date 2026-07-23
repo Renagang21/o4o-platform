@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "팝업플라스타",
+ "slugbase": "flurbi-pla-popup",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "02de8cab761121ab",
+   "n": 3
+  },
+  {
+   "fp": "371f5ff9d3408502",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

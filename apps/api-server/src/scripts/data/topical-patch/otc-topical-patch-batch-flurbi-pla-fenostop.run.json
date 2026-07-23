@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "페노스탑플라스타",
+ "slugbase": "flurbi-pla-fenostop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "938c496c5bdcefe7",
+   "n": 5
+  },
+  {
+   "fp": "8de80c9891a2ca20",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

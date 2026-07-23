@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "조인업첩부제",
+ "slugbase": "flurbi-pat-joinup",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "6263bda62c2a36f9",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

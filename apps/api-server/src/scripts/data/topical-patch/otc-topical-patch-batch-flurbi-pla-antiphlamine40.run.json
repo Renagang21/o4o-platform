@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "안티푸라민40플라스타",
+ "slugbase": "flurbi-pla-antiphlamine40",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a1fc16641283b6f5",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

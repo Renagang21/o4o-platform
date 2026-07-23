@@ -1,0 +1,33 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "페노크린첩부제스트롱",
+ "slugbase": "flurbi-pat-fenocrin-strong",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "84c597001941a329",
+   "n": 5
+  },
+  {
+   "fp": "1058bc8641f35efe",
+   "n": 4
+  },
+  {
+   "fp": "f13b864f22c67e8d",
+   "n": 4
+  },
+  {
+   "fp": "4df4e6bb3a982dc7",
+   "n": 4
+  },
+  {
+   "fp": "6bcb257a26fcfa1d",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 21,
+ "koWrite": 84,
+ "enWrite": 42
+}

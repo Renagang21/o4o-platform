@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "게보핏맥스플라스타",
+ "slugbase": "flurbi-pla-gebofit-max",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f147d81adf65e9e1",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

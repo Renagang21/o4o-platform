@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "투어펜플라스타",
+ "slugbase": "flurbi-pla-tourfen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "56a4bef55942a7e6",
+   "n": 7
+  },
+  {
+   "fp": "764c0b27582e6a07",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 9,
+ "koWrite": 36,
+ "enWrite": 18
+}

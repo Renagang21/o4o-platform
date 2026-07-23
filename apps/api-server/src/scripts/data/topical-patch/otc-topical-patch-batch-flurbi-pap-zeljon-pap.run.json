@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "젤존팝카타플라스마",
+ "slugbase": "flurbi-pap-zeljon-pap",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c755b124b5e65d58",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

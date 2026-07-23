@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "제일빅파프카타플라스마",
+ "slugbase": "flurbi-pap-jeil-bigpap",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "102310d2571f63a8",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

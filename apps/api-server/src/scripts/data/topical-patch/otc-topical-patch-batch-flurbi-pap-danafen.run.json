@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "다나펜카타플라스마",
+ "slugbase": "flurbi-pap-danafen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "49e08db4ca6d81d4",
+   "n": 8
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

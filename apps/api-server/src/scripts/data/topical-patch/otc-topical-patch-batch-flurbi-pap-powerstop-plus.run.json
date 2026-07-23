@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "파워스탑플러스카타플라스마",
+ "slugbase": "flurbi-pap-powerstop-plus",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "ed30604f267bf1d4",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

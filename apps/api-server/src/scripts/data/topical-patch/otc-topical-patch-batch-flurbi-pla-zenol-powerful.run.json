@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "제놀파워풀플라스타",
+ "slugbase": "flurbi-pla-zenol-powerful",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b3d22cd07e24222a",
+   "n": 10
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

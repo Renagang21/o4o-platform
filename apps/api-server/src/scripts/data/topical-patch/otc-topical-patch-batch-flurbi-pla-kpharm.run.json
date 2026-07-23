@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "케이팜플라스타",
+ "slugbase": "flurbi-pla-kpharm",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "02de8cab761121ab",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

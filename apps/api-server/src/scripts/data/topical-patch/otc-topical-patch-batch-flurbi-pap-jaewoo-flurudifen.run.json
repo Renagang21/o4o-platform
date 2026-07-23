@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "재우스팜후루디펜카타플라스마",
+ "slugbase": "flurbi-pap-jaewoo-flurudifen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c755b124b5e65d58",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 1,
+ "koWrite": 4,
+ "enWrite": 2
+}

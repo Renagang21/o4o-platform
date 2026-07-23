@@ -58,6 +58,7 @@ function patchFormOf(name: string): string | null {
   if (/패치|패취/.test(name)) return '패치';
   if (/첩부/.test(name)) return '첩부제';
   if (/경고제/.test(name)) return '경고제'; // 경고제(硬膏劑)=plaster 계열 첩부 제형
+  if (/팝\(/.test(name)) return '파프(카타플라스마)'; // 조아팝(…) 등 '…팝(성분)' 브랜드=파프 계열 (팝업플라스타는 위 플라스타 선매칭)
   return null;
 }
 function routeSig(name: string): string {
@@ -69,7 +70,7 @@ function routeSig(name: string): string {
   if (/점안|안연고/.test(name)) return 'ophthalmic';
   if (/점이액|귀에/.test(name)) return 'otic';
   if (/점비|비강|나잘|나살/.test(name)) return 'nasal';
-  if (/크림|연고|로션|로숀|겔$|겔\(|겔제|젤$|젤\(|플라스타|플라스터|첩부|카타플|패취|패치|파스|파프|스왑|스틱|거즈|탈지면|솜|네일라카|라카|외용|도포|스프레이|에어로솔|에어졸|소독|폼$|폼\(|워시|카타플라스마|경고제/.test(name)) return 'topical';
+  if (/크림|연고|로션|로숀|겔$|겔\(|겔제|젤$|젤\(|플라스타|플라스터|첩부|카타플|패취|패치|파스|파프|스왑|스틱|거즈|탈지면|솜|네일라카|라카|외용|도포|스프레이|에어로솔|에어졸|소독|폼$|폼\(|워시|카타플라스마|경고제|팝\(/.test(name)) return 'topical';
   if (/정$|정\d|정\(|정밀리|정\[|캡슐|캅셀|시럽|현탁|과립|산제|산\(|트로키|츄어|씹|저작|드링크|내복|환$|환\(|액$|액\(|액\[|물약|시럽제/.test(name)) return 'oral';
   return 'unknown';
 }
@@ -89,6 +90,7 @@ const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 �
 function normalizeOralMisphrase(text: string, fullContent: string): string {
   if (!/외용으로만|외용으로 사용|도포|바르|바릅|발라|붙이|붙입|부착|첩부/.test(stripTags(fullContent || ''))) return text;
   return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
+    .replace(/복용하기 전에/g, '사용하기 전에')
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우')
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록')
     .replace(/내복용/g, '먹는 용도')

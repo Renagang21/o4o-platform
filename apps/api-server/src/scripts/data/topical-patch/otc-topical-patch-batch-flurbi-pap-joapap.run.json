@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "플루르비프로펜",
+ "form": "조아팝(",
+ "slugbase": "flurbi-pap-joapap",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "49e08db4ca6d81d4",
+   "n": 7
+  }
+ ],
+ "heldFps": [],
+ "masters": 7,
+ "koWrite": 28,
+ "enWrite": 14
+}
