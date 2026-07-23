@@ -365,6 +365,30 @@
    "op": "KO_EN",
    "status": "DONE",
    "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "구아이아즐렌|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 1,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "note": "우선순위⑤ batch9(싱글 소진전): 케어번연고 1. 제외=바렌굿겔(비매품)·코모졸크림(베트남/캄보디아)·소프티아연고(베트남) 국가명/비매품 괄호 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "디클로페낙디에칠암모늄|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 1,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "note": "우선순위⑤ batch9(싱글 소진전): 나바론크림 1. 제외=바렌굿겔(비매품)·코모졸크림(베트남/캄보디아)·소프티아연고(베트남) 국가명/비매품 괄호 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "피록시캄|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 1,
+   "op": "KO_EN",
+   "status": "CLAIMED",
+   "note": "우선순위⑤ batch9(싱글 소진전): 메디포럼피록시캄겔 1(명칭 말미 &nbsp; 변형). 제외=바렌굿겔(비매품)·코모졸크림(베트남/캄보디아)·소프티아연고(베트남) 국가명/비매품 괄호 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   }
  ],
  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
