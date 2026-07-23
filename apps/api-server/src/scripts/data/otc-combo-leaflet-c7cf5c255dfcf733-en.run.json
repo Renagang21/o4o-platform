@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "복합우루사연질캡슐|A13A|300밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "d4e0c975-2d53-6856-83d9-efd55992f2c9",
+  "anomalies": [],
+  "targetMasters": 11,
+  "koFingerprintKinds": 1,
+  "builtLen": 2748,
+  "builtMd5": "428c415e6feeb64e01d4a66b208b1eb1",
+  "existingEnCanonical": 11,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 11,
+    "STEP2_flip": 11,
+    "total": 22
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

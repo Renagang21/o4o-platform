@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "맥스타민콘드로800정|A11JC|800밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "8f2b36a9-118f-7412-7120-def9b4be52fa",
+  "anomalies": [],
+  "targetMasters": 9,
+  "koFingerprintKinds": 1,
+  "builtLen": 3312,
+  "builtMd5": "aa925b4450578ca58d828501019d7c94",
+  "existingEnCanonical": 9,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 9,
+    "STEP2_flip": 9,
+    "total": 18
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

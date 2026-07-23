@@ -1,0 +1,330 @@
+{
+ "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-EN-COMPLETION-GA-V4 — batch4 25그룹 EN 번역. 유일 원문=각 그룹 KO canonical(config-batch4 content_json과 동일 md5). KO에 없는 의료 사실 추가 0 · 수치/연령/횟수/질환명/상호작용 보존 · 강도 완화 0 · 마케팅 0. summaryTable은 KO 3축(분류/작용/주요 증상) 대응. 병용주의는 대상약물·조건·행동 직접 번역, 기전 신규 설명 0.",
+ "en": {
+  "27199ce41c48bd49": {
+   "groupKey": "판코타제정|A09AA|175밀리그램|정",
+   "title": "Pancotase Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults take 1 to 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution, or if you are hypersensitive to Yellow No. 4 or have experienced such a reaction. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "6a201750927fe1c9": {
+   "groupKey": "속이쿨정|A02AX|40밀리그램|정",
+   "title": "Sokicool Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite (poor appetite), overeating, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults take 2 tablets at a time, 3 times a day after each meal.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; children (under 15 years); pregnant women or women who may be pregnant; or breastfeeding women.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have experienced an allergic reaction, have kidney impairment or liver impairment, are hypersensitive to Yellow No. 4 or have experienced an allergic reaction to it, have high blood pressure or are elderly, or have a heart or kidney disorder or edema. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with gastrointestinal analgesics or antispasmodics. Consult a pharmacist before taking together with potassium-containing preparations, licorice-containing preparations, preparations containing glycyrrhizic acid or its salts, loop diuretics (furosemide, ethacrynic acid), or thiazide diuretics (trichlormethiazide).\n\nStop taking it immediately and consult a pharmacist if any of the following occur: allergic symptoms (rash, itching, etc.); rarely palpitations, drowsiness, dizziness, fatigue, headache, constipation, or dry mouth; rapid heartbeat; elevated GOT and GPT; decreased urine volume; swelling of the face, hands, or feet; heavy eyelids; stiff hands; rising blood pressure; headache; weakness; limb cramps; or paralysis.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite…",
+    "Main symptoms": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea"
+   }
+  },
+  "72f39b6277784954": {
+   "groupKey": "푸리타제정|A09AA|175밀리그램|정",
+   "title": "Puritase Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Those aged 15 or older and adults take 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; patients hypersensitive to soybean oil or those who have experienced an allergic reaction to it; or patients hypersensitive to soybeans or peanuts.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, if you are a patient who requires careful administration of lipid emulsions, if you have an allergic constitution, or if particular risk from fat overload is expected. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "9762db84f8d2dbae": {
+   "groupKey": "벤티브정|A11DB|300밀리그램|정",
+   "title": "Ventib Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for nervous system disorders caused by deficiency of vitamins B1 and B6.",
+   "usage": "Adults take 1 tablet once a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Pregnant and breastfeeding women should consult a pharmacist before taking this medicine. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with levodopa.\n\nStop taking it immediately and consult a pharmacist if hives, rash, itching, loss of appetite, abdominal bloating, nausea, vomiting, or loose stools occur. In newborns and infants, severe sedation, low blood pressure, and respiratory disorders (difficulty breathing, apnea) may occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Nervous system disorders caused by deficiency of vitamins B1 and B6",
+    "Main symptoms": "Nervous system disorders caused by deficiency of vitamins B1 and B6"
+   }
+  },
+  "c7cf5c255dfcf733": {
+   "groupKey": "복합우루사연질캡슐|A13A|300밀리그램|연질캡슐",
+   "title": "Combined Ursa Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for improvement of physical fatigue, nourishment and invigoration, and supply of vitamin B1 during and after illness.",
+   "usage": "Those aged 15 or older and adults take 1 capsule at a time, 2 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine, or hypersensitivity or a history of allergic reaction to soybean oil, soybeans, or peanuts.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, if you are a patient who requires careful administration of lipid emulsions, if you are hypersensitive to Yellow No. 5 or have experienced an allergic reaction to it, or if particular risk from fat overload is expected. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nConsult a pharmacist when taking together with intravenous lipid preparations.\n\nStop taking it immediately and consult a pharmacist if nausea, vomiting, loose stools, rash, or diarrhea occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improvement of physical fatigue, nourishment and invigoration, supply of vitamin B1 during and after illness",
+    "Main symptoms": "Improvement of physical fatigue, nourishment and invigoration, supply of vitamin B1 during and after illness"
+   }
+  },
+  "ddc9eba946c3ec2b": {
+   "groupKey": "베스타제포르테정|A09AA02|15밀리그램|정",
+   "title": "Bestase Forte Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults (aged 15 or older) take 1 tablet at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "e55b1edb8a3d1297": {
+   "groupKey": "알파우루사연질캡슐|A05AA|50밀리그램|연질캡슐",
+   "title": "Alpha Ursa Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for improvement of liver function in chronic liver disease, and for improvement of physical fatigue and general malaise caused by impaired liver function.",
+   "usage": "Adults take 1 capsule at a time, 3 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine; severe biliary obstruction; fulminant hepatitis; pregnant women, women who may be pregnant, or breastfeeding women; children; intestinal disease of the large and small intestine such as Crohn's disease; radiolucent calcified gallstones; non-functioning gallbladder; acute cholecystitis; kidney disease; or peptic ulcer (acute gastric or duodenal ulcer).\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have severe pancreatic disease or gallstones.\n\nKeep strictly to the stated dosage and directions.\n\nWhile taking this medicine, do not take it together with oral antidiabetic agents (tolbutamide), cholestyramine, colestipol, medicinal charcoal, antacids containing magnesium or aluminum hydroxide, or drugs that increase cholesterol secretion in the liver (e.g., oral contraceptives containing estrogen, lipid-lowering drugs such as clofibrate).\n\nStop taking it immediately and consult a doctor or pharmacist if diarrhea, nausea, vomiting, abdominal pain, constipation, heartburn, stomach discomfort, itching, rash, general malaise, dizziness, calcification of gallstones, elevated liver enzyme levels, decreased white blood cells, or interstitial pneumonia (accompanied by fever, cough, difficulty breathing, or abnormal chest X-ray) occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improvement of liver function in chronic liver disease and improvement of physical fatigue and general malaise caused by impaired liver function",
+    "Main symptoms": "Improvement of liver function in chronic liver disease and improvement of physical fatigue and general malaise caused by impaired liver function"
+   }
+  },
+  "361bff6735ddce67": {
+   "groupKey": "베스타제당의정|A09AA02|75밀리그램|정",
+   "title": "Bestase Sugar-Coated Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults (aged 15 or older) take 2 tablets at a time; children aged 11 to under 15 take 1 to 2 tablets at a time; children aged 8 to under 11 take 1 tablet at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "4e0d1c310d822a1b": {
+   "groupKey": "마그칼연질캡슐|A12AX|590밀리그램|연질캡슐",
+   "title": "Magcal Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supply of vitamin D during pregnancy and breastfeeding, growth periods, and old age, and for poor development of bones and teeth and prevention of rickets.",
+   "usage": "Those aged 12 or older and adults take 1 capsule once a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months of age; hypercalcemia (a state of excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; kidney stones; or severe renal failure.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are a pregnant woman, a woman who may be pregnant, or a breastfeeding woman; a premature or young infant; a patient with cardiac or circulatory dysfunction, hypoproteinemia, or a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis; a patient who requires careful administration of lipid emulsions; a patient for whom particular risk from fat overload is expected; or hypersensitive to Yellow No. 5 or have experienced such a reaction.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, or antacids. Consult a pharmacist when using together with cardiac glycosides, anti-aldosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nStop taking it immediately and consult a pharmacist if nausea, vomiting, diarrhea, constipation, low blood pressure, facial flushing, irregular heartbeat, skin rash, red spots, cardiac arrest, or depressed central nervous system function occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supply of vitamin D during pregnancy and breastfeeding, growth periods, and old age; poor development of bones and teeth; prevention of rickets",
+    "Main symptoms": "Supply of vitamin D during pregnancy and breastfeeding, growth periods, and old age; poor development of bones and teeth; prevention of rickets"
+   }
+  },
+  "71865c4ef4f7a7fc": {
+   "groupKey": "헤파플러스연질캡슐|A05BA|200밀리그램|연질캡슐",
+   "title": "Hepa Plus Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for chronic liver disease, liver cirrhosis, and toxic liver disease.",
+   "usage": "Adults take 1 capsule at a time, 3 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine or to soybean oil, soybeans, or peanuts; severe biliary obstruction; or children aged 12 or under.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are a pregnant woman, a woman who may be pregnant, or a breastfeeding woman; a patient with a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis; a patient who requires careful administration of lipid emulsions; or a patient for whom particular risk from fat overload is expected. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with levodopa. Consult a pharmacist when using together with intravenous lipid preparations.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Chronic liver disease, liver cirrhosis, toxic liver disease",
+    "Main symptoms": "Chronic liver disease, liver cirrhosis, toxic liver disease"
+   }
+  },
+  "7618210cb09be4bf": {
+   "groupKey": "레베스정|A13A|17밀리그램|정",
+   "title": "Rebes Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for nourishment and invigoration, weak constitution, physical fatigue, during and after illness, gastrointestinal disorders, nutritional disorders, febrile wasting diseases, and nutritional supply during pregnancy and breastfeeding.",
+   "usage": "Adolescents aged 15 or older and adults take 2 tablets at a time; children aged 7 to 14 take 1 tablet at a time, 1 to 2 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine; severe renal failure; children under 7 years of age; or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are pregnant or breastfeeding, or if you have a thrombotic predisposition.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.\n\nDo not take together with levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen.\n\nStop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, or loose stools occur. Menstruation may start earlier than expected or gradually become heavier, and prolonged bleeding may occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Nourishment and invigoration, weak constitution, physical fatigue, during and after illness, gastrointestinal disorders, nutritional disorders, febrile wasting diseases, nutritional supply during pregnancy and breastfeeding…",
+    "Main symptoms": "Nourishment and invigoration, weak constitution, physical fatigue, during and after illness, gastrointestinal disorders, nutritional disorders"
+   }
+  },
+  "8dd4267eca303bd0": {
+   "groupKey": "베스타제정|A09AA02|75밀리그램|정",
+   "title": "Bestase Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults (aged 15 or older) take 2 tablets at a time; children aged 11 to under 15 take 1 to 2 tablets at a time; children aged 8 to under 11 take 1 tablet at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution, or if you are hypersensitive to Yellow No. 5 or have experienced an allergic reaction to it. If symptoms do not improve after about 2 weeks of use, stop taking this medicine immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "0e4bf5a49d1ca8d2": {
+   "groupKey": "맥스타민콘드로800정|A11JC|800밀리그램|정",
+   "title": "Maxtamin Chondro 800 Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supply of vitamins D, B1, B2, and B6 during physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, growth periods, and old age. Through the vitamins it contains, this medicine is also used to relieve neuralgia, muscle pain, joint pain symptoms such as low back pain and stiff shoulders, beriberi, and eye fatigue.",
+   "usage": "Adults aged 19 or older take 1 tablet once a day after a meal.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine; infants under 3 months of age; hypercalcemia; sarcoidosis; kidney disease; kidney stones; or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are a pregnant woman or a woman who may be pregnant, a breastfeeding woman, a premature or young infant, or a person with a history of kidney stones. If symptoms do not improve after about 1 month of use, stop taking this medicine immediately and consult a pharmacist. Patients deficient in folic acid should consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take levodopa while taking this medicine.\n\nStop taking this medicine immediately and consult a pharmacist if nausea, vomiting, diarrhea, loose stools, stomatitis, constipation, loss of appetite, erythema, hives, eczema, rash, maculopapular rash, itching, edema, or fluid retention in patients with renal failure or heart failure occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, growth periods, supply of vitamins D and B1 in old age…",
+    "Main symptoms": "Physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, growth periods, supply of vitamins D and B1 in old age"
+   }
+  },
+  "0fa07b07cf5e6929": {
+   "groupKey": "프리아제정|A09AA|175밀리그램|정",
+   "title": "Priase Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Those aged 15 or older and adults take 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or those hypersensitive to soybean oil, soybeans, or peanuts or who have experienced an allergic reaction to them.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, if you are a patient who requires careful administration of lipid emulsions, if you have an allergic constitution, or if particular risk from fat overload is expected. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nConsult a pharmacist when taking together with intravenous lipid preparations.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "2f8069c9185dee14": {
+   "groupKey": "윈탈정|A02AX|40밀리그램|정",
+   "title": "Wintal Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite (poor appetite), overeating, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults take 2 tablets at a time, 3 times a day after each meal.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients on dialysis; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; children (under 15 years); pregnant women or women who may be pregnant; or breastfeeding women.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are hypersensitive to this medicine, have kidney impairment, liver impairment, or low phosphate levels, are hypersensitive to Yellow No. 4 or have experienced such a reaction, have high blood pressure, are elderly, or have a heart disorder or edema.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with gastrointestinal analgesics or antispasmodics. Consult a pharmacist before taking together with potassium-containing preparations, licorice-containing preparations, preparations containing glycyrrhizic acid or its salts, loop diuretics (furosemide, ethacrynic acid), or thiazide diuretics (trichlormethiazide).\n\nStop taking it immediately and consult a pharmacist if any of the following occur: allergic symptoms (rash, itching, etc.); palpitations, drowsiness, dizziness, fatigue, headache, constipation, or dry mouth; decreased urine volume; swelling of the face, hands, or feet; heavy eyelids; stiff hands; rising blood pressure; or myopathy (weakness, limb cramps, paralysis, etc.). Rarely, rapid heartbeat and elevated GOT and GPT may occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite…",
+    "Main symptoms": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea"
+   }
+  },
+  "75641df8bd1939fb": {
+   "groupKey": "스피자임정|A09AA|25밀리그램|정",
+   "title": "Spizyme Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and upper abdominal bloating caused by indigestion.",
+   "usage": "Those aged 15 or older and adults take 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; patients hypersensitive to soybean oil or those who have experienced an allergic reaction to it; or patients hypersensitive to soybeans or peanuts.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, if you are a patient who requires careful administration of lipid emulsions, if you have an allergic constitution, or if you are a patient with fat overload concerns. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, upper abdominal bloating caused by indigestion"
+   }
+  },
+  "a7f9118e8f468669": {
+   "groupKey": "헤모맘플러스캡슐|B03AE01|76.09밀리그램|캡슐",
+   "title": "Hemomom Plus Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for the prevention and treatment of iron-deficiency anemia.",
+   "usage": "Adults take 1 capsule once a day.\nKeep to the stated dose and directions.",
+   "caution": "Warning: an overdose in children aged 6 or under can cause fatal iron poisoning, so keep this medicine out of the reach of children.\n\nDo not take this medicine if any of the following applies: patients hypersensitive to this medicine; infants under 12 months of age; hemochromatosis (a disease in which iron deposits in the liver and pancreas due to abnormal iron metabolism); hemosiderosis; non-iron-deficiency anemia; patients deficient in folic acid; or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis, or regional colitis, or if you have cardiac or circulatory dysfunction, kidney disorder, or hypoproteinemia.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a pharmacist before taking together with anti-aldosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nStop taking it immediately and consult a pharmacist if hives, itching, photosensitivity reactions, abdominal or stomach pain, cramps, vomiting, diarrhea, fever, or coma occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Prevention and treatment of iron-deficiency anemia",
+    "Main symptoms": "Prevention and treatment of iron-deficiency anemia"
+   }
+  },
+  "cd3ac6e371f70757": {
+   "groupKey": "라니탄큐정|A02AX|100밀리그램|정",
+   "title": "Ranitan-Q Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite (poor appetite), overeating, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Adults take 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years; pregnant women, women who may be pregnant, or breastfeeding women; or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have experienced allergic symptoms (rash, redness (flushing), itching, etc.), are elderly, have high blood pressure, kidney impairment, liver impairment, a heart disorder, or edema (swelling), or are hypersensitive to Yellow No. 4 or have experienced such a reaction. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with gastrointestinal analgesics or antispasmodics. Consult a pharmacist before taking together with potassium-containing preparations, licorice-containing preparations, preparations containing glycyrrhizic acid or its salts, loop diuretics (furosemide, ethacrynic acid), or thiazide diuretics (trichlormethiazide).\n\nStop taking it immediately and consult a pharmacist if any of the following occur: decreased urine volume; swelling of the face, hands, or feet; heavy eyelids; stiff hands; rising blood pressure; headache; myopathy (weakness, limb cramps, paralysis, etc.); rash; itching; or, rarely, palpitations (pounding heartbeat), drowsiness, dizziness, fatigue, constipation, or dry mouth. Rarely, rapid heartbeat (pounding) and elevated GOT and GPT may occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea, vomiting, stomach pain, sour belching, indigestion, loss of appetite…",
+    "Main symptoms": "Gastric hyperacidity, heartburn, stomach discomfort, abdominal bloating, food stagnation, nausea"
+   }
+  },
+  "e50a95d13e729606": {
+   "groupKey": "파자임-95밀리그램이중정|A09AA02|95밀리그램|정",
+   "title": "Pazyme 95 mg Double-Layer Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion, and gas removal.",
+   "usage": "Adults take 1 tablet at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under, or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nIf you are taking other medicines, consult a pharmacist before taking this medicine.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion, gas removal",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "0d1a6fe94d1d6e9e": {
+   "groupKey": "헤몰빈큐플러스캡슐|B03AE01|326.1밀리그램|캡슐",
+   "title": "Hemolbin-Q Plus Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for the prevention and treatment of iron-deficiency anemia.",
+   "usage": "Adults take 1 capsule once a day.\nKeep to the stated dose and directions.",
+   "caution": "Warning: an overdose in children aged 6 or under can cause fatal iron poisoning, so keep this medicine out of the reach of children.\n\nDo not take this medicine if any of the following applies: patients hypersensitive to this medicine; infants under 12 months of age; hemochromatosis (a disease in which iron deposits in the liver and pancreas due to abnormal iron metabolism); hemosiderosis (a state of increased iron content (as hemosiderin) in tissues, locally or systemically, without causing tissue damage); non-iron-deficiency anemia (e.g., megaloblastic anemia caused by vitamin B12 deficiency); or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis, or regional colitis, cardiac or circulatory dysfunction, kidney impairment, or hypoproteinemia, if you are pregnant or breastfeeding, if you are hypersensitive to Yellow No. 5 or have experienced such a reaction, or if you are deficient in folic acid.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with phosphates, calcium salts, oral tetracycline antibiotics, or antacids. Consult a pharmacist before taking together with anti-aldosterone agents, triamterene, or 200 mg or more of ascorbic acid (vitamin C). Avoid tannin-containing teas such as green tea and black tea, as well as milk and dairy products, while taking this medicine and around the time of taking it.\n\nStop taking it immediately and consult a pharmacist if any of the following occur: occasionally erythema (red spots), skin disorders, itching, general malaise, allergic symptoms such as bronchial breathing difficulty, hives, photosensitivity of the skin to sunlight, abdominal or stomach pain, stomach cramps, vomiting, diarrhea, fever, coma, nausea, loss of appetite, weight loss, swelling, constipation, black stools, or stomach discomfort.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Prevention and treatment of iron-deficiency anemia",
+    "Main symptoms": "Prevention and treatment of iron-deficiency anemia"
+   }
+  },
+  "0ffc328c9a5760f9": {
+   "groupKey": "토파제정|A09AA|175밀리그램|정",
+   "title": "Topase Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, and abdominal bloating caused by indigestion.",
+   "usage": "Those aged 15 or older and adults take 2 tablets at a time, 3 times a day after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 or under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; patients hypersensitive to soybean oil or those who have experienced an allergic reaction to it; or patients hypersensitive to soybeans or peanuts.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have an allergic constitution, a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, if you are a patient who requires careful administration of lipid emulsions, or if you are a patient with fat overload concerns. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nConsult a pharmacist when taking together with other intravenous lipid preparations.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion",
+    "Main symptoms": "Indigestion, loss of appetite (poor appetite), overeating, food stagnation, promotion of digestion, abdominal bloating caused by indigestion"
+   }
+  },
+  "281182dd947d02e1": {
+   "groupKey": "경남비타민씨정|A11GA01|1031밀리그램|정",
+   "title": "Kyungnam Vitamin C Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for the prevention and treatment of scurvy; for wasting diseases in which the requirement for vitamin C increases, such as lowered physical strength and physical fatigue during pregnancy, breastfeeding, and during or after illness; for capillary bleeding such as gum bleeding, nosebleeds, and blood in the urine; for pigmentation (freckles and dark spots) caused by sunlight or skin conditions; and for cases of presumed vitamin C deficiency such as malabsorption.",
+   "usage": "Adults take 1/2 to 1 tablet (500 to 1,000 mg) once a day or in several divided doses. Take with plenty of water.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine; hyperoxaluria (a state in which excessive oxalate is excreted in the urine); thalassemia; gout; cystinuria; glucose-6-phosphate dehydrogenase (G6PD) deficiency; or oxalate kidney stones.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are pregnant or breastfeeding, a smoker, or a person who chronically consumes alcohol.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.\n\nAvoid excessive drinking and smoking. Before taking this medicine, consult a pharmacist if you are taking oral anticoagulants (coumarin drugs), salicylates, aspirin, iron preparations, phenytoin or certain antiepileptic drugs, oral contraceptives containing estrogen, tetracycline antibiotics, fluphenazine, orlistat, barbiturate derivatives, or corticosteroids.\n\nStop taking it immediately and consult a pharmacist if nausea, vomiting, diarrhea, heartburn, facial flushing, headache, insomnia, kidney stones due to overdose, acidification of the urine, or precipitation of oxalate stones occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Prevention and treatment of scurvy; lowered physical strength and physical fatigue during pregnancy, breastfeeding, and during or after illness…",
+    "Main symptoms": "Prevention and treatment of scurvy; wasting diseases with increased vitamin C requirement such as lowered physical strength and physical fatigue during pregnancy, breastfeeding, and during or after illness; capillary bleeding such as gum bleeding, nosebleeds, and blood in the urine"
+   }
+  },
+  "3f16a67375d24ea3": {
+   "groupKey": "헵타마인플러스연질캡슐|A05BA|200밀리그램|연질캡슐",
+   "title": "Heptamine Plus Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as adjuvant treatment for chronic liver disease, liver cirrhosis, and toxic liver disease.",
+   "usage": "Adults take 1 capsule at a time, 3 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine or to soybean oil, soybeans, or peanuts; severe biliary obstruction; or children aged 12 or under.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are a pregnant woman, a woman who may be pregnant, or a breastfeeding woman; a patient with a lipid metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis; a patient who requires careful administration of lipid emulsions; or a patient for whom particular risk from fat overload is expected. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with levodopa. Consult a pharmacist when using together with intravenous lipid preparations.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Adjuvant treatment for chronic liver disease, liver cirrhosis, and toxic liver disease",
+    "Main symptoms": "Adjuvant treatment for chronic liver disease, liver cirrhosis, and toxic liver disease"
+   }
+  },
+  "508599f77edaddd1": {
+   "groupKey": "아로나민씨플러스정|A11JB|618.56밀리그램|정",
+   "title": "Aronamin C Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supply of vitamins B1, B2, B6, C, and E during physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, and old age; for relief of neuralgia, muscle pain, joint pain (low back pain, stiff shoulders, etc.), beriberi, eye fatigue, and pigmentation (freckles and dark spots) caused by sunlight or skin conditions; for prevention of gum bleeding and nosebleeds; and for supply of zinc.",
+   "usage": "Children aged 12 or older and adults take 2 tablets once a day, or 1 tablet 2 times a day.\nKeep to the stated dose and directions.",
+   "caution": "Warning: an overdose in children aged 6 or under can cause fatal iron poisoning, so keep this medicine out of the reach of children.\n\nDo not take this medicine if any of the following applies: patients hypersensitive to this medicine; hemochromatosis (a disease in which iron deposits in the liver and pancreas due to abnormal iron metabolism); hemosiderosis; non-iron-deficiency anemia; or patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you have hyperoxaluria (a state in which excessive oxalate is excreted in the urine), a thrombotic (blood vessel blockage) predisposition, or folic acid deficiency; if you are a pregnant woman or a woman who may be pregnant, a breastfeeding woman, or a premature or young infant; if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis, or regional colitis; cardiac or circulatory dysfunction, kidney disorder, hypoproteinemia, gout, or kidney stones; folic acid deficiency; or hypersensitivity or a history of allergic reaction to Yellow No. 4 or Yellow No. 5. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nWhen giving this medicine to children, administer it under the guidance and supervision of a guardian.\n\nThis medicine may interfere with the detection of blood glucose in various urine tests and may turn the urine yellow, affecting laboratory test values.\n\nDo not use together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Before taking this medicine, consult a pharmacist when using together with oral contraceptives containing estrogen, anti-aldosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nStop taking it immediately and consult a pharmacist if any of the following occur: stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, stomatitis (mouth inflammation), loss of appetite, abdominal bloating, hives, itching, photosensitivity reactions, abdominal or stomach pain, cramps, fever, coma, dermatitis, odor in sweat or breath, hair loss, restlessness, gastrointestinal disorders, digestive disorders, upper abdominal pain, low blood pressure, pulmonary edema, menstruation starting earlier than expected or gradually becoming heavier, or prolonged bleeding.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supply of vitamins B1, B2, B6 during physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, and old age…",
+    "Main symptoms": "Supply of vitamins B1, B2, B6 during physical fatigue, pregnancy and breastfeeding, lowered physical strength during or after illness, and old age"
+   }
+  },
+  "54db3ad7bdabdca0": {
+   "groupKey": "액티넘이엑스플러스정|A11DB|36.39밀리그램|정",
+   "title": "Actinum EX Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supply of vitamins B1, B6, and B12 during physical fatigue, lowered physical strength during or after illness, and pregnancy and breastfeeding, and for relief of eye fatigue, muscle pain, joint pain (stiff shoulders, low back pain, frozen shoulder, etc.), neuralgia, and numbness of the hands and feet.",
+   "usage": "Those aged 15 or older take 2 to 3 tablets at a time, once a day right after a meal; swallow without chewing.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients hypersensitive to this medicine, or children under 15 years of age.\n\nConsult a pharmacist before taking. Before taking this medicine, consult a pharmacist if you are a pregnant woman or a woman who may be pregnant, or a breastfeeding woman. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nKeep strictly to the stated dosage and directions.\n\nDo not take together with levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen.\n\nStop taking it immediately and consult a pharmacist if stomach discomfort, diarrhea, constipation, rash, redness, itching, nausea, vomiting, loose stools, stomatitis, menstruation starting earlier than expected or gradually becoming heavier, or prolonged bleeding occur.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supply of vitamins B1, B6, and B12 during physical fatigue, lowered physical strength during or after illness, and pregnancy and breastfeeding; eye fatigue…",
+    "Main symptoms": "Supply of vitamins B1, B6, and B12 during physical fatigue, lowered physical strength during or after illness, and pregnancy and breastfeeding; eye fatigue and muscle pain"
+   }
+  }
+ }
+}

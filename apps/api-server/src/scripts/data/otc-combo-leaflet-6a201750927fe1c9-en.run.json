@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "속이쿨정|A02AX|40밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "8fc61627-a4d7-d9c4-47e1-e6b1ed5ffa87",
+  "anomalies": [],
+  "targetMasters": 11,
+  "koFingerprintKinds": 1,
+  "builtLen": 3581,
+  "builtMd5": "229daf990d9a13af8bbfbd560af5828d",
+  "existingEnCanonical": 11,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 11,
+    "STEP2_flip": 11,
+    "total": 22
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

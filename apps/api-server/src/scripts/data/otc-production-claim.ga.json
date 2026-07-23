@@ -13,7 +13,7 @@
     { "groupKey": "엑세라민에이스정|A11AA|50밀리그램|정", "targetFp": "0c9f8cf9cd9f4d24", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" },
     { "groupKey": "쎌레타민정|A11JC|100밀리그램|정", "targetFp": "10b3d08d29374834", "sourceType": "mfds_drug_otc_nutrition_combo", "masters": 3, "op": "KO_EN", "status": "DONE" },
     { "groupKey": "헤모글루탑연질캡슐|B03AE10|200밀리그램|연질캡슐", "targetFp": "10c78d7cf8373260", "sourceType": "mfds_drug_otc", "masters": 3, "op": "KO_EN", "status": "DONE" },
-    { "groupKey": "batch3 결정론 KO 15그룹 271 master (config otc-oral-combo-leaflet-config-batch3.ga.json)", "sourceType": "mfds_drug_otc/nutrition_combo", "masters": 271, "op": "KO_EN", "status": "EN_PRODUCING", "note": "결정론 composer 신규저작 KO LIVE. EN 저작·apply 진행(WO-…-EN-COMPLETION-GA-V4)." },
-    { "groupKey": "batch4 결정론 KO 25그룹 238 master (config otc-oral-combo-leaflet-config-batch4.ga.json)", "sourceType": "mfds_drug_otc/nutrition_combo", "masters": 238, "op": "KO_EN", "status": "EN_PRODUCING", "note": "결정론 composer 신규저작 KO LIVE. EN 저작·apply 진행(WO-…-EN-COMPLETION-GA-V4). 세션누계 47그룹 530master(GA canonical_replaced 530·dup0)." }
+    { "groupKey": "batch3 결정론 KO+EN 15그룹 271 master (config otc-oral-combo-leaflet-config-batch3.ga.json)", "sourceType": "mfds_drug_otc/nutrition_combo", "masters": 271, "op": "KO_EN", "status": "DONE", "note": "EN canonical 271 LIVE(2T write 542·KO 변경 0·no-op 확인). WO-…-EN-COMPLETION-GA-V4." },
+    { "groupKey": "batch4 결정론 KO+EN 25그룹 238 master (config otc-oral-combo-leaflet-config-batch4.ga.json)", "sourceType": "mfds_drug_otc/nutrition_combo", "masters": 238, "op": "KO_EN", "status": "DONE", "note": "EN canonical 238 LIVE(2T write 476·KO 변경 0·no-op 확인). 40그룹 스윕 en509/ko509/nr0/dup0. WO-…-EN-COMPLETION-GA-V4 — GA 세션누계 47그룹 530master KO+EN 완결." }
   ]
 }

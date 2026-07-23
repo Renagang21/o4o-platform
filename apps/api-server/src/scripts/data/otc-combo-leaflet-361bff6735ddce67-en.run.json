@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "베스타제당의정|A09AA02|75밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "7422b57b-c191-1baa-a0c8-08a6957da6ed",
+  "anomalies": [],
+  "targetMasters": 10,
+  "koFingerprintKinds": 1,
+  "builtLen": 2625,
+  "builtMd5": "e06c35d7fdaae6ab837417ac1c141d63",
+  "existingEnCanonical": 10,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 10,
+    "STEP2_flip": 10,
+    "total": 20
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

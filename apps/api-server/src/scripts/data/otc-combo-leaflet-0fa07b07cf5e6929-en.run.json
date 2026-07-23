@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "프리아제정|A09AA|175밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "90515a8f-26f6-c1a0-7ff3-87a85a29cb49",
+  "anomalies": [],
+  "targetMasters": 9,
+  "koFingerprintKinds": 1,
+  "builtLen": 2734,
+  "builtMd5": "fa90abb985bca4a67c7195c2f35d8d27",
+  "existingEnCanonical": 9,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 9,
+    "STEP2_flip": 9,
+    "total": 18
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

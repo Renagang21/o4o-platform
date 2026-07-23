@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "액티넘이엑스플러스정|A11DB|36.39밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "7f26ad48-587e-0347-6a40-354ab48ffbc7",
+  "anomalies": [],
+  "targetMasters": 8,
+  "koFingerprintKinds": 1,
+  "builtLen": 3052,
+  "builtMd5": "91e60bb3468575f3908fbec78ffb59e3",
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_flip": 8,
+    "total": 16
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

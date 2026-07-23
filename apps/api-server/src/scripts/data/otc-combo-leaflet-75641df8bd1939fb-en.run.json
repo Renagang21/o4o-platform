@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "스피자임정|A09AA|25밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d29a6658-065d-e6f5-0f8c-815793699374",
+  "anomalies": [],
+  "targetMasters": 9,
+  "koFingerprintKinds": 1,
+  "builtLen": 2799,
+  "builtMd5": "9c734ba83b1fdec9a30287d1d13150da",
+  "existingEnCanonical": 9,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 9,
+    "STEP2_flip": 9,
+    "total": 18
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
