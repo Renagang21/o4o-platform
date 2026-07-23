@@ -1,0 +1,385 @@
+{
+ "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5 batch11 — 경구 복합성분 매장용 설명서 KO. easy 원문 grounding. 에이전트 가.",
+ "groups": {
+  "27b9a80026fea472": {
+   "key": "마이파워정|A13A|17밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "27b9a80026fea472",
+   "target_master_ids": [
+    "24fbb32e-ab74-4a00-b75e-7eba3dbc3ddd",
+    "25b94dfe-6894-4fd2-b068-198e0367f329",
+    "350fc78e-a165-4ee7-9ea5-267b2a1f1a70",
+    "3e339f86-51b2-4283-ab2e-10d01a86b427",
+    "d31a7327-31a7-4dfa-96cb-b80306a732f1"
+   ],
+   "title": "마이파워정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "자양강장과 영양보급으로 허약체질·육체피로 회복을 돕습니다",
+     "주요 증상": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모성질환, 임신수유기 등의 영양보급"
+    },
+    "efficacy": "자양강장, 허약체질, 육체피로, 병중병후(병을 앓는 동안이나 회복 후), 위장장해, 영양장해, 발열성소모성질환, 임신수유기 등의 경우의 영양보급에 사용하는 일반의약품입니다.",
+    "usage": "15세 이상 및 성인은 1회 2정, 7세~14세의 소아는 1회 1정씩, 1일 1~2회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증이 있는 분, 7세 미만 소아, 중증의 신부전, 갈락토오스 불내성·Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 분.\n\n복용 전 약사와 상의하세요. 임부 및 수유부, 혈전성 소인이 있는 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n레보도파와 함께 복용하지 마세요. 에스트로겐을 포함한 경구용 피임제와 함께 복용 시 약사와 상의하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적, 구역, 구토, 묽은 변, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "마이파워정|A13A|17밀리그램|정",
+    "title": "My Power Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for nutritional supply in cases of general weakness (invigoration), weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance, febrile wasting disease, and pregnancy or breastfeeding.",
+    "usage": "Adults and those aged 15 and older: take 2 tablets per dose. Children aged 7 to 14: take 1 tablet per dose. Take 1 to 2 times daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 7 years of age; severe renal failure; hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking: pregnant or breastfeeding women; patients with a thrombotic (blood-clot) tendency.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian.\n\nDo not take together with levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen.\n\nIf stomach discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supports recovery from weak constitution and physical fatigue through invigoration and nutritional supply",
+     "Main symptoms": "Invigoration, weak constitution, physical fatigue, during and after illness, gastrointestinal disturbance, nutritional disturbance, febrile wasting disease, nutritional supply during pregnancy and breastfeeding"
+    }
+   }
+  },
+  "284b4ad4aa99265f": {
+   "key": "맥셀디정|A11CC55|12.449밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "284b4ad4aa99265f",
+   "target_master_ids": [
+    "3baeae26-4ba9-478c-8a0b-16ed35f629cc",
+    "67261429-4702-4aa1-86ac-842907316552",
+    "74bca32b-391b-4602-a34a-46b58a07ad3d",
+    "d84e685d-55cb-410e-a43d-59ac6decc4ef",
+    "e952735d-3e67-4e7e-b498-7878e560fcc9"
+   ],
+   "title": "맥셀디정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 D와 셀레늄을 보급하고 뼈·이의 발육불량과 구루병을 예방합니다",
+     "주요 증상": "임신수유기·발육기·노년기 비타민 D 보급, 뼈·이의 발육불량, 구루병 예방, 셀레늄 보급"
+    },
+    "efficacy": "임신·수유기, 발육기, 노년기의 비타민 D의 보급, 뼈, 이의 발육불량, 구루병의 예방, 셀레늄의 보급에 사용하는 일반의약품입니다.",
+    "usage": "만 8세 이상 및 성인은 1회 1정씩, 1일 1회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증이 있는 분, 고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태) 환자, 유육종증(원인을 알 수 없는 전신 염증질환), 신장질환 환자, 만 12개월 미만의 젖먹이, 신장결석 환자, 갈락토오스 불내성·Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 분.\n\n복용 전 약사와 상의하세요. 만 1세 미만의 젖먹이, 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 소화성궤양·만성궤양성대장염·국한성대장염 등의 위장질환 환자, 심장·순환기계기능 장애, 신장 장애 환자, 저단백혈증, 신장결석 환자 또는 경험자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 설사, 피부염, 땀·호흡 시 악취, 탈모, 조급증, 위장관장애, 소화장애, 상복부통증, 저혈압, 폐부종 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "맥셀디정|A11CC55|12.449밀리그램|정",
+    "title": "Maxel D Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamin D during pregnancy and breastfeeding, growth periods, and old age, to prevent poor development of bones and teeth and rickets, and to supply selenium.",
+    "usage": "Adults and those aged 8 and older: take 1 tablet per dose, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; infants under 12 months of age; kidney stones; hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking: infants under 1 year of age; children who get plenty of sunlight and eat a normal diet; women who are pregnant or may be pregnant; breastfeeding women; premature or young infants; patients with gastrointestinal diseases such as peptic ulcer, chronic ulcerative colitis, or regional colitis; patients with cardiac or circulatory function disorders; kidney disorders; hypoproteinemia; patients with kidney stones or a history of them.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian. If symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, or antacids. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nIf nausea, vomiting, diarrhea, dermatitis, odor in sweat or breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, or pulmonary edema occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamin D and selenium and helps prevent poor development of bones and teeth and rickets",
+     "Main symptoms": "Vitamin D supply during pregnancy/breastfeeding, growth periods, and old age; poor development of bones and teeth; prevention of rickets; selenium supply"
+    }
+   }
+  },
+  "318155c6d375b9a0": {
+   "key": "신일겔정|A02AH|200밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "318155c6d375b9a0",
+   "target_master_ids": [
+    "46ea0a82-d42d-4e86-a4ee-c6fc4f93bbbd",
+    "4c008671-399a-4842-a1d3-2fee2ffc9c0a",
+    "b7d240ed-0a85-42a0-9bdc-a0630be3c244",
+    "c5e790bb-9796-4656-a9fe-b4a8e2d56a6c",
+    "dd760c08-bb07-4a39-8601-c6a4e5a01f8c"
+   ],
+   "title": "신일겔정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "위산을 중화하여 위산과다·속쓰림 등 위 증상을 완화합니다",
+     "주요 증상": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림"
+    },
+    "efficacy": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정 1일 3회, 만 8세 이상 15세 미만은 1회 1정 1일 3회를 식간(식사 때와 식사 때 사이) 및 취침 시 복용합니다.\n복용 간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 투석요법을 받고 있는 환자, 만 7세 이하의 어린이.\n\n복용 전 약사와 상의하세요. 신장장애 환자, 다른 약물을 복용하고 있는 분, 나트륨 제한 식이를 하는 분.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n테트라사이클린계 항생제를 함께 복용하지 마세요.\n\n변비 또는 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "신일겔정|A02AH|200밀리그램|정",
+    "title": "Shinil Gel Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for hyperacidity, heartburn, stomach discomfort, stomach bloating, indigestion from overeating, nausea, vomiting, stomach pain, and sour belching.",
+    "usage": "Adults and those aged 15 and older: take 2 tablets per dose, 3 times daily. Children aged 8 to under 15: take 1 tablet per dose, 3 times daily. Take between meals and at bedtime.\nAllow at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: patients on dialysis; children aged 7 or younger.\n\nConsult a pharmacist before taking: patients with kidney disorders; those taking other medicines; those on a sodium-restricted diet.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian.\n\nDo not take together with tetracycline antibiotics.\n\nIf constipation or diarrhea occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Neutralizes stomach acid to relieve hyperacidity, heartburn, and other stomach symptoms",
+     "Main symptoms": "Hyperacidity, heartburn, stomach discomfort, stomach bloating, indigestion from overeating, nausea, vomiting, stomach pain, sour belching"
+    }
+   }
+  },
+  "367799c299c3d5d8": {
+   "key": "동성비오틴정|A11HA05|5밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "367799c299c3d5d8",
+   "target_master_ids": [
+    "216719e8-999a-4cbe-b3cf-e43e328ee784",
+    "41878aa6-bac6-4b90-9100-4c31ac837c83",
+    "65787992-0f68-4867-aeab-f20cfabfb080",
+    "682d2e8a-8aab-44ec-83ad-b1b56c9811ad",
+    "d1bb3bed-941c-49e5-a34b-2fb819ce9b11"
+   ],
+   "title": "동성비오틴정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비오틴을 보급하여 손·발톱과 모발 성장 장애를 개선합니다",
+     "주요 증상": "비오틴 결핍으로 인한 손·발톱 또는 모발 성장 장애"
+    },
+    "efficacy": "비오틴 결핍으로 인한 손·발톱 또는 모발 성장 장애에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1정씩, 1일 1회 식사 전에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증이 있는 분, 3개월 미만의 영아, 갈락토오스 불내성·Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 분.\n\n복용 전 약사와 상의하세요. 임부 및 수유부.\n\n정해진 용법과 용량을 잘 지키세요.\n\n날계란과 함께 복용하지 마세요. 카르바마제핀, 페니토인, 페노바르비탈, 항생제와 함께 복용 시 약사와 상의하세요.\n\n두드러기, 위장장애 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "동성비오틴정|A11HA05|5밀리그램|정",
+    "title": "Dongsung Biotin Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for growth disorders of the fingernails, toenails, or hair caused by biotin deficiency.",
+    "usage": "Adults: take 1 tablet per dose, once daily before a meal.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants under 3 months of age; hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking: pregnant or breastfeeding women.\n\nKeep to the stated dose and directions.\n\nDo not take together with raw eggs. Consult a pharmacist before taking together with carbamazepine, phenytoin, phenobarbital, or antibiotics.\n\nIf hives or gastrointestinal disturbance occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies biotin to improve growth disorders of the nails and hair",
+     "Main symptoms": "Growth disorders of the fingernails, toenails, or hair caused by biotin deficiency"
+    }
+   }
+  },
+  "391039070a7b3041": {
+   "key": "맥타정|A11JA|66.6밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "391039070a7b3041",
+   "target_master_ids": [
+    "1477cdc1-cd95-456e-99f0-fbfcf5804f8c",
+    "452ca157-67ac-4351-b899-493efe7297f8",
+    "9b044aa3-f443-4659-8776-1620261cf0c7",
+    "cf7f52cc-c1c2-44a6-a532-a4b6de7a4bd8",
+    "e7e7d132-d501-474a-a0b6-da8f24cfa6c8"
+   ],
+   "title": "맥타정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "허리통증·수족저림·신경통·어깨목결림 증상을 완화합니다",
+     "주요 증상": "요(허리)통, 수족저림, 신경통, 어깨·목 결림 증상의 완화"
+    },
+    "efficacy": "요(허리)통, 수족저림, 신경통, 어깨·목 결림 증상의 완화에 사용하는 일반의약품입니다.",
+    "usage": "15세 이상 및 성인은 1회 1정씩, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증이 있는 분, 15세 미만의 어린이.\n\n복용 전 약사와 상의하세요. 임부 및 수유부, 혈전(혈관 막힘)성 소인이 있는 환자, 폴산이 부족한 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n레보도파와 함께 복용하지 마세요. 에스트로겐을 포함한 경구용 피임제와 함께 복용 시 약사와 상의하세요.\n\n발진, 발적(충혈되어 붉어짐), 가려움, 식욕부진, 구역, 구토, 구내염(입안염), 복부(배 부분)팽만감, 위부불쾌감, 묽은 변, 변비, 설사, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "맥타정|A11JA|66.6밀리그램|정",
+    "title": "Macta Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to relieve lower back pain, numbness of the hands and feet, neuralgia, and stiffness of the shoulders and neck.",
+    "usage": "Adults and those aged 15 and older: take 1 tablet per dose, 3 times daily after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 15 years of age.\n\nConsult a pharmacist before taking: pregnant or breastfeeding women; patients with a thrombotic (blood-clot) tendency; patients deficient in folic acid.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian.\n\nDo not take together with levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen.\n\nIf rash, redness (flushing), itching, loss of appetite, nausea, vomiting, mouth sores (stomatitis), abdominal bloating, stomach discomfort, loose stools, constipation, diarrhea, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves lower back pain, numbness of the hands and feet, neuralgia, and shoulder and neck stiffness",
+     "Main symptoms": "Lower back pain, numbness of the hands and feet, neuralgia, relief of shoulder and neck stiffness"
+    }
+   }
+  },
+  "404ac4b22ba9297f": {
+   "key": "파워비큐정|A11EX|100밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "404ac4b22ba9297f",
+   "target_master_ids": [
+    "245696dc-eab4-44b1-8a47-9bda4b843f7c",
+    "5759c282-7774-4e63-be43-10e0d8c9edc4",
+    "792acc22-5c72-4e26-b313-8a74f5127be6",
+    "92704911-f4d2-4076-8bb7-960bcc0b7930",
+    "f5fe0dd4-3d9a-4b41-b72a-94c0265a104c"
+   ],
+   "title": "파워비큐정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 B1·B2·B6·C·D·E와 아연을 보급하고 신경통·근육통·관절통과 입·피부 염증을 완화하며 뼈·이의 발육불량과 구루병을 예방합니다",
+     "주요 증상": "육체피로·임신수유기·병중병후·발육기·노년기 비타민 보급, 뼈·이의 발육불량, 구루병 예방, 각기, 눈의 피로, 신경통, 근육통, 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염, 아연 보급"
+    },
+    "efficacy": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 B1, B2, B6, C, D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방, 각기, 눈의 피로, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+    "usage": "만 12세 이상 청소년 및 성인은 1회 1정, 1일 1회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 고칼슘혈증, 유육종증, 신장질환, 이 약에 과민증이 있는 분, 만 12개월 미만의 젖먹이, 신장결석, 갈락토오스 불내성·Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 분.\n\n복용 전 약사와 상의하세요. 고옥살산뇨증, 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 심장·순환기계기능 장애, 신장장애, 저단백혈증, 통풍, 신장결석 환자, 폴산이 부족한 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약은 각종 요검사 시에 혈당의 검출을 방해할 수 있으며, 요(소변)를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제, 레보도파와 함께 복용하지 마세요. 에스트로겐을 포함한 경구용 피임제, 항알도스테론제, 트리암테렌과 함께 복용 시 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 설사, 위부불쾌감, 변비, 발진, 발적(충혈되어 붉어짐), 복부팽만감, 묽은 변, 위장관장애, 소화장애, 상복부통증, 식욕부진, 저혈압, 폐부종, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "파워비큐정|A11EX|100밀리그램|정",
+    "title": "Power B-Q Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamins B1, B2, B6, C, D, and E during physical fatigue, pregnancy and breastfeeding, reduced strength during and after illness, growth periods, and old age; to prevent poor development of bones and teeth and rickets; to relieve beriberi, eye strain, neuralgia, muscle pain, joint pain (lower back pain, shoulder stiffness, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and to supply zinc.",
+    "usage": "Adolescents aged 12 and older and adults: take 1 tablet per dose, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypercalcemia; sarcoidosis; kidney disease; hypersensitivity to this medicine; infants under 12 months of age; kidney stones; hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking: hyperoxaluria; women who are pregnant or may be pregnant; breastfeeding women; premature or young infants; cardiac or circulatory function disorders; kidney disorders; hypoproteinemia; gout; kidney stones; patients deficient in folic acid.\n\nKeep to the stated dose and directions.\n\nThis medicine may interfere with glucose detection in urine tests and may turn urine yellow, which can affect laboratory test values. If symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nIf nausea, vomiting, diarrhea, stomach discomfort, constipation, rash, redness (flushing), abdominal bloating, loose stools, gastrointestinal disorders, indigestion, upper abdominal pain, loss of appetite, low blood pressure, pulmonary edema, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamins B1, B2, B6, C, D, E and zinc; relieves neuralgia, muscle and joint pain and mouth/skin inflammation; helps prevent poor bone and tooth development and rickets",
+     "Main symptoms": "Vitamin supply during fatigue, pregnancy/breastfeeding, illness recovery, growth, and old age; poor development of bones and teeth; rickets prevention; beriberi; eye strain; neuralgia; muscle pain; joint pain; angular cheilitis; cheilitis; stomatitis; glossitis; eczema; dermatitis; zinc supply"
+    }
+   }
+  },
+  "45561d76fcf67c0e": {
+   "key": "임팩타민시그니처정|A11JC|100밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "45561d76fcf67c0e",
+   "target_master_ids": [
+    "48e1aa98-3a50-4930-9173-e1f27b316092",
+    "5b2f7200-8f25-4ed2-bd50-238c7c9db154",
+    "6472fb06-35b5-4457-8917-e1e1c8c278a5",
+    "78d1894d-34f4-4709-9284-9d28f8279f39",
+    "d3c40507-767d-4057-ba2d-be5dc526c898"
+   ],
+   "title": "임팩타민시그니처정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 D·E·B1·B2·B6와 아연을 보급하고 신경통·근육통·관절통과 입·피부 염증을 완화하며 뼈·이의 발육불량과 구루병을 예방합니다",
+     "주요 증상": "육체피로·임신수유기·병중병후·발육기·노년기 비타민 보급, 뼈·이의 발육불량, 구루병 예방, 신경통, 근육통, 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염, 각기, 눈의 피로, 아연 보급"
+    },
+    "efficacy": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+    "usage": "만 8세 이상 및 성인은 1일 1회, 1회 1정을 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태), 유육종증(원인을 알 수 없는 전신 염증질환), 신장질환, 이 약에 과민증이 있는 분, 만 12개월 미만의 젖먹이, 신장결석, 심한 증상의 신부전, 대두유에 과민증이 있는 분, 알레르기 경험자, 콩 또는 땅콩에 과민증이 있는 분.\n\n복용 전 약사와 상의하세요. 만 1세 미만의 젖먹이, 의사의 치료를 받고 있는 환자, 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 임부 및 임신하고 있을 가능성이 있는 여성 및 수유부, 미숙아, 유아, 소화성궤양·만성궤양성대장염·국한성대장염 등의 위장질환, 심장·순환기계 기능 장애, 신장(콩팥)장애, 저단백혈증, 신장(콩팥)결석, 고지단백혈증·당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 또는 지질성 유제를 신중히 투여해야 하거나 지방과부하로 특별한 위험이 예상되는 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상담하세요. 어린이에게 사용할 경우 보호자의 지도 감독하에 사용하세요. 이 약은 요(소변)를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제, 레보도파와 함께 복용하지 마세요. 에스트로겐을 포함한 경구용 피임제와 함께 복용 시 약사와 상의하세요. 항알도스테론제, 트리암테렌과 병용(함께 복용) 투여 시 고칼륨혈증을 일으킬 수 있으므로 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 설사, 위부불쾌감, 변비, 발진, 발적(충혈되어 붉어짐), 묽은 변, 식욕부진, 복부 팽만감, 붉은 반점, 부전수축(심장박동정지), 중추신경계 기능저하, 피부염, 땀·호흡 시 악취, 탈모, 조급증, 위장관장애, 소화장애, 상복부통증, 저혈압, 폐부종, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 증상이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "임팩타민시그니처정|A11JC|100밀리그램|정",
+    "title": "Impactamin Signature Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamins D, E, B1, B2, and B6 during physical fatigue, pregnancy and breastfeeding, reduced strength during and after illness, growth periods, and old age; to prevent poor development of bones and teeth and rickets; to relieve neuralgia, muscle pain, joint pain (lower back pain, shoulder stiffness, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and to supply relief of beriberi and eye strain and to supply zinc.",
+    "usage": "Adults and those aged 8 and older: take 1 tablet per dose, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; hypersensitivity to this medicine; infants under 12 months of age; kidney stones; severe renal failure; hypersensitivity to soybean oil; those with a history of allergies; hypersensitivity to soybeans or peanuts.\n\nConsult a pharmacist before taking: infants under 1 year of age; patients under a doctor's care; children who get plenty of sunlight and eat a normal diet; women who are pregnant or may be pregnant and breastfeeding women; premature or young infants; gastrointestinal diseases such as peptic ulcer, chronic ulcerative colitis, or regional colitis; cardiac or circulatory function disorders; kidney disorders; hypoproteinemia; kidney stones; patients with fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, patients requiring careful administration of lipid emulsions, or patients at particular risk from fat overload.\n\nKeep to the stated dose and directions.\n\nIf symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist. When giving to children, do so under the supervision of a guardian. This medicine may turn urine yellow, which can affect laboratory test values.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Consult a pharmacist before taking together with oral contraceptives containing estrogen. Taking together with antialdosterone agents or triamterene may cause hyperkalemia, so consult a pharmacist. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nIf nausea, vomiting, diarrhea, stomach discomfort, constipation, rash, redness (flushing), loose stools, loss of appetite, abdominal bloating, red spots, asystole (cardiac arrest), reduced central nervous system function, dermatitis, odor in sweat or breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, pulmonary edema, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamins D, E, B1, B2, B6 and zinc; relieves neuralgia, muscle and joint pain and mouth/skin inflammation; helps prevent poor bone and tooth development and rickets",
+     "Main symptoms": "Vitamin supply during fatigue, pregnancy/breastfeeding, illness recovery, growth, and old age; poor development of bones and teeth; rickets prevention; neuralgia; muscle pain; joint pain; angular cheilitis; cheilitis; stomatitis; glossitis; eczema; dermatitis; beriberi; eye strain; zinc supply"
+    }
+   }
+  },
+  "46800f2742d6b25d": {
+   "key": "메가트루파워정|A11AB|100밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "46800f2742d6b25d",
+   "target_master_ids": [
+    "73cd200a-448e-46c7-b83a-0a73e7cf428c",
+    "a0c71841-f5ec-4b66-bdc6-a809bebeb188",
+    "e339dbd2-b984-4745-a9bf-9c4edd9249a3",
+    "f15aa26d-7db6-4d44-b925-2068e436b198",
+    "f780dc35-3c4e-4147-8ba6-91ed796a767f"
+   ],
+   "title": "메가트루파워정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 D·B1·B2·B6·C와 아연을 보급하고 신경통·근육통·관절통과 입·피부 염증을 완화하며 뼈·이의 발육불량과 구루병을 예방합니다",
+     "주요 증상": "육체피로·임신수유기·병중병후·발육기·노년기 비타민 보급, 뼈·이의 발육불량, 구루병 예방, 신경통, 근육통, 관절통, 각기, 눈의 피로, 구각염, 구순염, 구내염, 설염, 습진, 피부염, 아연 보급"
+    },
+    "efficacy": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+    "usage": "만 8세 이상 및 성인은 1회 1정씩, 1일 1회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 고칼슘혈증, 유육종증, 신장질환, 이 약에 과민증이 있는 분, 만 12개월 미만의 젖먹이, 신장결석, 심한 증상의 신부전 환자.\n\n복용 전 약사와 상의하세요. 만 1세 미만의 젖먹이, 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 고옥살산뇨증, 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 소화성궤양·만성궤양성대장염·국한성대장염 등의 위장질환, 심장·순환기계기능 장애, 신장장애, 저단백혈증, 통풍 환자, 신장결석 환자 또는 경험자, 폴산이 부족한 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요. 이 약은 요(소변)를 황색으로 변하게 하여 임상검사치에 영향을 주거나 요검사 시에 혈당의 검출을 방해할 수 있습니다. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제, 레보도파와 함께 복용하지 마세요. 항알도스테론제, 트리암테렌과 함께 복용 시 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 설사, 묽은 변, 붉은 반점, 부전수축(심장박동정지), 중추신경계 기능저하, 피부염, 땀·호흡 시 악취, 탈모, 조급증, 위장관장애, 소화장애, 상복부(배 부분)통증, 저혈압, 폐부종(부기) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "메가트루파워정|A11AB|100밀리그램|정",
+    "title": "Megatrue Power Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamins D, B1, B2, B6, and C during physical fatigue, pregnancy and breastfeeding, reduced strength during and after illness, growth periods, and old age; to prevent poor development of bones and teeth and rickets; to relieve neuralgia, muscle pain, joint pain (lower back pain, shoulder stiffness, etc.), beriberi, eye strain, angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and to supply zinc.",
+    "usage": "Adults and those aged 8 and older: take 1 tablet per dose, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypercalcemia; sarcoidosis; kidney disease; hypersensitivity to this medicine; infants under 12 months of age; kidney stones; severe renal failure.\n\nConsult a pharmacist before taking: infants under 1 year of age; children who get plenty of sunlight and eat a normal diet; hyperoxaluria; women who are pregnant or may be pregnant; breastfeeding women; premature or young infants; gastrointestinal diseases such as peptic ulcer, chronic ulcerative colitis, or regional colitis; cardiac or circulatory function disorders; kidney disorders; hypoproteinemia; gout; patients with kidney stones or a history of them; patients deficient in folic acid.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian. This medicine may turn urine yellow, which can affect laboratory test values, and may interfere with glucose detection in urine tests. If symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, antacids, or levodopa. Consult a pharmacist before taking together with antialdosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nIf nausea, vomiting, diarrhea, loose stools, red spots, asystole (cardiac arrest), reduced central nervous system function, dermatitis, odor in sweat or breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, or pulmonary edema (swelling) occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamins D, B1, B2, B6, C and zinc; relieves neuralgia, muscle and joint pain and mouth/skin inflammation; helps prevent poor bone and tooth development and rickets",
+     "Main symptoms": "Vitamin supply during fatigue, pregnancy/breastfeeding, illness recovery, growth, and old age; poor development of bones and teeth; rickets prevention; neuralgia; muscle pain; joint pain; beriberi; eye strain; angular cheilitis; cheilitis; stomatitis; glossitis; eczema; dermatitis; zinc supply"
+    }
+   }
+  },
+  "4e96f086e3c16590": {
+   "key": "액티브큐텐연질캡슐|A11JC|500밀리그램|연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "4e96f086e3c16590",
+   "target_master_ids": [
+    "758612fe-77cb-4c2b-836f-1f0e17531fe6",
+    "855b7824-1d95-4bb0-af5b-3b75b18ad817",
+    "8ef8828a-2806-4369-a5f1-3bae770d8e73",
+    "b93e5eb3-f0fa-44be-9a6d-a4696d227e6b",
+    "de50a1bf-7eb4-4e71-88ee-da283ea2661c"
+   ],
+   "title": "액티브큐텐연질캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 A·E·B1·C를 보급하고 눈·피부·혈행 관련 증상과 갱년기 증상을 완화합니다",
+     "주요 증상": "육체피로·임신수유기·병중병후·노년기 비타민 보급, 눈의 건조감, 야맹증, 색소침착(기미·주근깨) 완화, 잇몸출혈·비출혈 예방, 말초혈행장애, 갱년기 시 어깨·목결림, 수족저림, 수족냉증"
+    },
+    "efficacy": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, E, B1, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸 출혈·비출혈(코피) 예방, 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화에 사용하는 일반의약품입니다.",
+    "usage": "만 12세 이상 및 성인은 1회 1캡슐씩, 1일 1회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임신 3개월 이내 또는 임신하고 있을 가능성이 있는 여성(비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다), 이 약 또는 대두유, 콩, 땅콩에 과민증이 있는 분, 만 12개월 미만의 젖먹이.\n\n복용 전 약사와 상의하세요. 고옥살산뇨증(요 중에 과량의 수산염이 배설되는 상태), 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 소화성궤양·만성궤양성대장염·국한성대장염 등의 위장질환, 심장·순환기계기능 장애, 신장장애, 저단백혈증, 통풍 또는 신장결석, 고지단백혈증·당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 환자 또는 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자, 혈전(혈관 막힘)성 소인이 있는 환자, 황색5호에 과민증이 있는 분 또는 경험자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요. 이 약은 각종 요검사 시에 혈당의 검출을 방해할 수 있습니다. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마세요. 에스트로겐을 포함한 경구(먹는)용 피임제, 항알도스테론제, 트리암테렌, 정주용 지질제와 함께 복용 시 약사와 상의하세요. 녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하세요.\n\n구역, 구토, 가려움, 건조하고 거친 피부, 통증성 관절부기, 위부불쾌감, 설사, 변비, 발진, 발적(충혈되어 붉어짐), 묽은 변, 구내염(입안염), 피부염, 땀·호흡 시 악취, 탈모, 조급증, 위장관장애, 소화장애, 상복부통증, 저혈압, 폐부종, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 증상이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "액티브큐텐연질캡슐|A11JC|500밀리그램|연질캡슐",
+    "title": "Active Q-Ten Soft Cap.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamins A, E, B1, and C during physical fatigue, pregnancy and breastfeeding, reduced strength during and after illness, and old age; to relieve dry eyes and night blindness; to relieve pigmentation (freckles and dark spots) caused by sunlight or skin disease; to help prevent gum bleeding and nosebleeds; and to relieve peripheral circulation disorders and, during menopause, shoulder and neck stiffness, numbness of the hands and feet, and cold hands and feet.",
+    "usage": "Adults and those aged 12 and older: take 1 capsule per dose, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: women within the first 3 months of pregnancy or who may be pregnant (taking 5,000 IU or more of vitamin A per day may cause congenital malformations); hypersensitivity to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months of age.\n\nConsult a pharmacist before taking: hyperoxaluria (excess oxalate excreted in the urine); women who are pregnant or may be pregnant; breastfeeding women; premature or young infants; gastrointestinal diseases such as peptic ulcer, chronic ulcerative colitis, or regional colitis; cardiac or circulatory function disorders; kidney disorders; hypoproteinemia; gout or kidney stones; patients with fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, patients requiring careful administration of lipid emulsions, or patients at particular risk from fat overload; patients with a thrombotic (blood-clot) tendency; those with hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian. This medicine may interfere with glucose detection in urine tests. If symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist.\n\nDo not take together with phosphates, calcium salts, oral tetracycline preparations, or antacids. Consult a pharmacist before taking together with oral contraceptives containing estrogen, antialdosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea while taking this medicine and around the time of taking it.\n\nIf nausea, vomiting, itching, dry rough skin, painful joint swelling, stomach discomfort, diarrhea, constipation, rash, redness (flushing), loose stools, mouth sores (stomatitis), dermatitis, odor in sweat or breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, pulmonary edema, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamins A, E, B1, and C and relieves eye, skin, circulation, and menopause-related symptoms",
+     "Main symptoms": "Vitamin supply during fatigue, pregnancy/breastfeeding, illness recovery, and old age; dry eyes; night blindness; pigmentation (freckles, dark spots); prevention of gum bleeding and nosebleeds; peripheral circulation disorders; menopausal shoulder/neck stiffness, numbness of hands and feet, cold hands and feet"
+    }
+   }
+  },
+  "5da79a5d0f8019b6": {
+   "key": "비타비스정|A11JA|7밀리그램|정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "targetFp": "5da79a5d0f8019b6",
+   "target_master_ids": [
+    "13111447-f16e-4511-a409-791c589c8e55",
+    "26bccbd3-4319-44a5-87e0-1e67a1097099",
+    "469f6058-ab0a-456f-a7fe-d5e71d5c1685",
+    "9a902963-c2e4-4a67-8d3c-574131b3fe6c",
+    "a7a0be93-6a2d-4e88-a3dc-0b5103ef4f8c"
+   ],
+   "title": "비타비스정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비타민 E·B1·B2·B6·C를 보급하고 신경통·근육통·관절통과 입·피부 염증, 각기, 눈의 피로를 완화합니다",
+     "주요 증상": "육체피로·임신수유기·병중병후·노년기 비타민 보급, 신경통, 근육통, 관절통(요통·어깨결림 등), 구각염, 구순염, 구내염, 설염, 습진, 피부염, 각기, 눈의 피로"
+    },
+    "efficacy": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 각기, 눈의 피로 증상의 완화에 사용하는 일반의약품입니다.",
+    "usage": "만 8세 이상 및 성인은 1회 2정씩, 1일 2회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증이 있는 분, 만 3개월 미만의 젖먹이, 갈락토오스 불내성·Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 분.\n\n복용 전 약사와 상의하세요. 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 미숙아, 유아, 고옥살산뇨증(요 중에 과량의 수산염이 배설되는 상태), 통풍 또는 신장결석 환자, 혈전(혈관 막힘)성 소인이 있는 환자, 폴산이 부족한 환자.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요. 이 약은 각종 요검사 시에 혈당의 검출을 방해할 수 있으며, 요(소변)를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n구역, 구토, 설사, 묽은 변, 식욕부진, 복부팽만감, 위부불쾌감, 변비, 발진, 발적, 생리가 예정보다 빨라지거나 양이 점점 많아지거나 출혈이 오래 지속되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "groupKey": "비타비스정|A11JA|7밀리그램|정",
+    "title": "Vitavis Tab.",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to supply vitamins E, B1, B2, B6, and C during physical fatigue, pregnancy and breastfeeding, reduced strength during and after illness, and old age, and to relieve neuralgia, muscle pain, joint pain (lower back pain, shoulder stiffness, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, dermatitis, beriberi, and eye strain.",
+    "usage": "Adults and those aged 8 and older: take 2 tablets per dose, 2 times daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants under 3 months of age; hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking: women who are pregnant or may be pregnant; breastfeeding women; premature or young infants; hyperoxaluria (excess oxalate excreted in the urine); gout or kidney stones; patients with a thrombotic (blood-clot) tendency; patients deficient in folic acid.\n\nKeep to the stated dose and directions.\n\nWhen giving to children, do so under the supervision of a guardian. This medicine may interfere with glucose detection in urine tests and may turn urine yellow, which can affect laboratory test values. If symptoms do not improve after about 1 month of use, stop taking immediately and consult a pharmacist.\n\nIf nausea, vomiting, diarrhea, loose stools, loss of appetite, abdominal bloating, stomach discomfort, constipation, rash, redness, or menstrual changes (earlier periods, gradually heavier flow, or prolonged bleeding) occur, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supplies vitamins E, B1, B2, B6, and C and relieves neuralgia, muscle and joint pain, mouth/skin inflammation, beriberi, and eye strain",
+     "Main symptoms": "Vitamin supply during fatigue, pregnancy/breastfeeding, illness recovery, and old age; neuralgia; muscle pain; joint pain (lower back pain, shoulder stiffness, etc.); angular cheilitis; cheilitis; stomatitis; glossitis; eczema; dermatitis; beriberi; eye strain"
+    }
+   }
+  }
+ }
+}
