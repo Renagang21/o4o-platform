@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "캐롤쿨링더블파워카타플라스마",
+ "slugbase": "keto-pap-carol-cooling",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "31fa95f542837cb8",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

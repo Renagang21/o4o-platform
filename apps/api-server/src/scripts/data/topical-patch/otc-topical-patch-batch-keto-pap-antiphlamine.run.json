@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "안티푸라민케토카타플라스마",
+ "slugbase": "keto-pap-antiphlamine",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "760b88d57fe089c5",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

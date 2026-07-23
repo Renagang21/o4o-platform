@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "트라스트핑거플라스타",
+ "slugbase": "keto-plaster-trast-finger",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "cefc5c542a869a9f",
+   "n": 5
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

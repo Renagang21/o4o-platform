@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "노펜스트롱카타플라스마",
+ "slugbase": "keto-pap-nopain-strong",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "d9f3205498b36111",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "제놀탑에스카타플라스마",
+ "slugbase": "keto-pap-zenol-top-s",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a7af9b5ae3bb4772",
+   "n": 6
+  },
+  {
+   "fp": "6860f381727050b4",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 9,
+ "koWrite": 36,
+ "enWrite": 18
+}

@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "아이파프케어팝카타플라스마",
+ "slugbase": "keto-pap-ipapcare",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a2d238b93759a0ae",
+   "n": 4
+  },
+  {
+   "fp": "9cbe217937cdc34f",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 7,
+ "koWrite": 28,
+ "enWrite": 14
+}
