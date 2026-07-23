@@ -4,14 +4,8 @@
   "subgroups": 6,
   "masters": 21,
   "metaAuthored": false,
-  "missingLineCount": 32,
+  "missingLineCount": 31,
   "missingLines": [
-    {
-      "h8": "e5ac61bb",
-      "freq": 4,
-      "fields": "caution",
-      "ko": "갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오."
-    },
     {
       "h8": "33dcecb9",
       "freq": 2,

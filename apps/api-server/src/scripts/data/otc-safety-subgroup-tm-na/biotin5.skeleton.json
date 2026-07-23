@@ -4,14 +4,8 @@
   "subgroups": 4,
   "masters": 13,
   "metaAuthored": false,
-  "missingLineCount": 17,
+  "missingLineCount": 16,
   "missingLines": [
-    {
-      "h8": "1f01d015",
-      "freq": 3,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
-    },
     {
       "h8": "b8081805",
       "freq": 3,

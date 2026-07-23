@@ -4,7 +4,7 @@
   "subgroups": 11,
   "masters": 64,
   "metaAuthored": false,
-  "missingLineCount": 43,
+  "missingLineCount": 42,
   "missingLines": [
     {
       "h8": "a9af16f1",
@@ -119,12 +119,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인 및 12세 이상의 소아는 1회 100 mg, 1일 2회 복용합니다. 식사 30분 전에 물과 함께 복용합니다."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "1fbb0de8",

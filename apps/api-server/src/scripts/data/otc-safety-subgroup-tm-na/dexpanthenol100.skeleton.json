@@ -4,19 +4,13 @@
   "subgroups": 4,
   "masters": 12,
   "metaAuthored": false,
-  "missingLineCount": 16,
+  "missingLineCount": 15,
   "missingLines": [
     {
       "h8": "1ced5600",
       "freq": 4,
       "fields": "usage",
       "ko": "성인은 1회 1정씩, 1일 3회 복용합니다."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 4,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "60059adf",

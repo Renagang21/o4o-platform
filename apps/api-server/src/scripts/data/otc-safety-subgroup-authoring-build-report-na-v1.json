@@ -3,271 +3,161 @@
   "agent": "나",
   "built": [
     {
-      "slug": "naproxen250cap-01",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "545163103c30adef",
+      "slug": "acetaminophen650-01",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7ddb34dd7159584e",
+      "T": 8,
+      "order": 601,
+      "sourceRef": "21744a31-5178-43c9-8cfd-e7115f91c927",
+      "koHtmlLen": 2782,
+      "enHtmlLen": 5560
+    },
+    {
+      "slug": "acetaminophen650-02",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7c4e68555a9ffe18",
       "T": 7,
-      "order": 501,
-      "sourceRef": "5f999203-566b-42f9-8c8f-9ed7f9a295b0",
-      "koHtmlLen": 3620,
-      "enHtmlLen": 7043
+      "order": 602,
+      "sourceRef": "895888b2-c996-4ac6-8015-eb6d5955add4",
+      "koHtmlLen": 2945,
+      "enHtmlLen": 5696
     },
     {
-      "slug": "naproxen250cap-02",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "3b957785c21b4799",
+      "slug": "acetaminophen650-03",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "72a7ed6b45bdcb5f",
       "T": 6,
-      "order": 502,
-      "sourceRef": "d6ce0295-cef7-427e-8df5-d21baf7849af",
-      "koHtmlLen": 3978,
-      "enHtmlLen": 7804
+      "order": 603,
+      "sourceRef": "66b03384-d669-4f57-836c-9f27ff313810",
+      "koHtmlLen": 2652,
+      "enHtmlLen": 5039
     },
     {
-      "slug": "naproxen250cap-03",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "f8d59317189a91fa",
+      "slug": "acetaminophen650-04",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "e997b71c716ae591",
       "T": 6,
-      "order": 503,
-      "sourceRef": "2165549e-8fc1-4fee-871c-d1a05bbf9792",
-      "koHtmlLen": 3901,
-      "enHtmlLen": 7649
+      "order": 604,
+      "sourceRef": "93693f70-ef4c-42a3-8cff-be97028c7d57",
+      "koHtmlLen": 2841,
+      "enHtmlLen": 5485
     },
     {
-      "slug": "naproxen250cap-04",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "9548a69a51079527",
+      "slug": "acetaminophen650-05",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "4a20df65b36323dd",
       "T": 5,
-      "order": 504,
-      "sourceRef": "d041e192-08b2-4157-8fe2-94e03c7cf8dc",
-      "koHtmlLen": 3910,
-      "enHtmlLen": 7892
+      "order": 605,
+      "sourceRef": "6113c317-db53-4b40-8b9a-ff5845c5db93",
+      "koHtmlLen": 2702,
+      "enHtmlLen": 5395
     },
     {
-      "slug": "naproxen250cap-05",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "03cadfae0442af56",
+      "slug": "acetaminophen650-06",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "a6c4246a12c29e90",
+      "T": 5,
+      "order": 606,
+      "sourceRef": "c0f7d093-b8af-4c29-87fb-6ecdee5ee4ad",
+      "koHtmlLen": 2902,
+      "enHtmlLen": 5599
+    },
+    {
+      "slug": "acetaminophen650-07",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "35554d979d6c7474",
       "T": 4,
-      "order": 505,
-      "sourceRef": "78f1442b-e425-493e-8ce0-65e954134fd7",
-      "koHtmlLen": 3881,
-      "enHtmlLen": 7589
+      "order": 607,
+      "sourceRef": "05b32ad9-0e42-44a5-8c06-c7d779362bd8",
+      "koHtmlLen": 2773,
+      "enHtmlLen": 5339
     },
     {
-      "slug": "naproxen250cap-06",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "14df201139bad2be",
+      "slug": "acetaminophen650-08",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7140ad4c299c090b",
+      "T": 4,
+      "order": 608,
+      "sourceRef": "67eb5bcd-cf76-494d-86e1-4ec76cddaa69",
+      "koHtmlLen": 2871,
+      "enHtmlLen": 5563
+    },
+    {
+      "slug": "acetaminophen650-09",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "9601dd11c3f269b5",
+      "T": 4,
+      "order": 609,
+      "sourceRef": "67301ac6-3dcb-4093-8c7a-2fa02919eab7",
+      "koHtmlLen": 2944,
+      "enHtmlLen": 5645
+    },
+    {
+      "slug": "acetaminophen650-10",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "ac400b733ed79295",
+      "T": 4,
+      "order": 610,
+      "sourceRef": "6c3c3f08-c986-4310-84c1-a3bef14a3af6",
+      "koHtmlLen": 2648,
+      "enHtmlLen": 5103
+    },
+    {
+      "slug": "acetaminophen650-11",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "c91ecec875de9064",
+      "T": 4,
+      "order": 611,
+      "sourceRef": "833e9c1c-eac4-4abd-8ab6-ef2b41c22fc0",
+      "koHtmlLen": 2805,
+      "enHtmlLen": 5405
+    },
+    {
+      "slug": "acetaminophen650-12",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "cd133b3d6d67ddb0",
+      "T": 4,
+      "order": 612,
+      "sourceRef": "d631a004-1b58-4e22-8040-66e524534b48",
+      "koHtmlLen": 2760,
+      "enHtmlLen": 5342
+    },
+    {
+      "slug": "acetaminophen650-13",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "e9dda62d0dec3cb0",
+      "T": 4,
+      "order": 613,
+      "sourceRef": "c698474b-acad-48d1-8213-155f9a770737",
+      "koHtmlLen": 2656,
+      "enHtmlLen": 5102
+    },
+    {
+      "slug": "acetaminophen650-14",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "18f4141c1739f06c",
       "T": 3,
-      "order": 506,
-      "sourceRef": "3f8cd156-1f93-4123-87cf-235a1306e533",
-      "koHtmlLen": 3321,
-      "enHtmlLen": 6701
+      "order": 614,
+      "sourceRef": "73db35b3-93bc-4c87-8416-f9dcf068e46f",
+      "koHtmlLen": 2772,
+      "enHtmlLen": 5339
     },
     {
-      "slug": "naproxen250cap-07",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "a66baf9a1882a2d7",
+      "slug": "acetaminophen650-15",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "8d934d3331a50984",
       "T": 3,
-      "order": 507,
-      "sourceRef": "26a58150-015a-4ca5-81bf-a87c004e6055",
-      "koHtmlLen": 3893,
-      "enHtmlLen": 7774
-    },
-    {
-      "slug": "naproxen250cap-08",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "09738795aec0ddc1",
-      "T": 2,
-      "order": 508,
-      "sourceRef": "7c4895a4-1143-47dd-8941-bc83b2785376",
-      "koHtmlLen": 3890,
-      "enHtmlLen": 7613
-    },
-    {
-      "slug": "naproxen250cap-09",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "102ff4fb95600899",
-      "T": 2,
-      "order": 509,
-      "sourceRef": "1619078d-d878-4c8f-831b-eb150a0f30a8",
-      "koHtmlLen": 4383,
-      "enHtmlLen": 8392
-    },
-    {
-      "slug": "naproxen250cap-10",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "1e878c94dcead915",
-      "T": 2,
-      "order": 510,
-      "sourceRef": "6befd6a3-8f26-47dd-8f30-44f98c772dbd",
-      "koHtmlLen": 3890,
-      "enHtmlLen": 7613
-    },
-    {
-      "slug": "naproxen250cap-11",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "2716ede1a0f10b64",
-      "T": 2,
-      "order": 511,
-      "sourceRef": "131bbae4-deb2-4fdc-8dc6-27525d439fbc",
-      "koHtmlLen": 3914,
-      "enHtmlLen": 8093
-    },
-    {
-      "slug": "naproxen250cap-12",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "2c6f48170f7e7387",
-      "T": 2,
-      "order": 512,
-      "sourceRef": "9132b156-bde6-443f-8b62-c428353822b3",
-      "koHtmlLen": 3904,
-      "enHtmlLen": 7649
-    },
-    {
-      "slug": "naproxen250cap-13",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "4c29322aa1c0eea8",
-      "T": 2,
-      "order": 513,
-      "sourceRef": "add132b1-092d-421b-8504-49f41ac2f87a",
-      "koHtmlLen": 3988,
-      "enHtmlLen": 7779
-    },
-    {
-      "slug": "naproxen250cap-14",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "4c94fbc92efaafa3",
-      "T": 2,
-      "order": 514,
-      "sourceRef": "b945327c-a367-480a-85ad-15fa3ad8c045",
-      "koHtmlLen": 3893,
-      "enHtmlLen": 7613
-    },
-    {
-      "slug": "naproxen250cap-15",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "4e482d4a3f589405",
-      "T": 2,
-      "order": 515,
-      "sourceRef": "5d99e887-3c90-47ff-8013-9449c11fb010",
-      "koHtmlLen": 4152,
-      "enHtmlLen": 8433
-    },
-    {
-      "slug": "naproxen250cap-16",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "52af741225b42dd3",
-      "T": 2,
-      "order": 516,
-      "sourceRef": "6cc4a7b5-793c-4409-8859-8cf38e465357",
-      "koHtmlLen": 3892,
-      "enHtmlLen": 7589
-    },
-    {
-      "slug": "naproxen250cap-17",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "5ceb2bbf240077ec",
-      "T": 2,
-      "order": 517,
-      "sourceRef": "d166936b-b2f2-47fc-87ea-017dac7d730a",
-      "koHtmlLen": 4132,
-      "enHtmlLen": 8168
-    },
-    {
-      "slug": "naproxen250cap-18",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "60c38a87a203762f",
-      "T": 2,
-      "order": 518,
-      "sourceRef": "38bdedb1-82d6-4290-8cf1-e82603e9da98",
-      "koHtmlLen": 3901,
-      "enHtmlLen": 7649
-    },
-    {
-      "slug": "naproxen250cap-19",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "6913564359dd9622",
-      "T": 2,
-      "order": 519,
-      "sourceRef": "c5f559a6-8cad-42d4-80e2-81c8d4850848",
-      "koHtmlLen": 3929,
-      "enHtmlLen": 7717
-    },
-    {
-      "slug": "naproxen250cap-20",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "72a14d6982859f6b",
-      "T": 2,
-      "order": 520,
-      "sourceRef": "d5491e07-1ae2-4b31-8b11-0ee06548be15",
-      "koHtmlLen": 3908,
-      "enHtmlLen": 7651
-    },
-    {
-      "slug": "naproxen250cap-21",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "7f7c8cf6607907c7",
-      "T": 2,
-      "order": 521,
-      "sourceRef": "1a1ae6da-0fec-44bb-8863-3f4f899cd9c7",
-      "koHtmlLen": 3892,
-      "enHtmlLen": 7613
-    },
-    {
-      "slug": "naproxen250cap-22",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "8aa2226ed0aec378",
-      "T": 2,
-      "order": 522,
-      "sourceRef": "0f75b67c-4fa1-4310-85c9-4ee01adffddc",
-      "koHtmlLen": 3885,
-      "enHtmlLen": 7587
-    },
-    {
-      "slug": "naproxen250cap-23",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "8f2aaf630a3780d0",
-      "T": 2,
-      "order": 523,
-      "sourceRef": "48cee869-e180-4f39-89a1-02988e0886da",
-      "koHtmlLen": 3901,
-      "enHtmlLen": 7649
-    },
-    {
-      "slug": "naproxen250cap-24",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "c442636cfb7b54e7",
-      "T": 2,
-      "order": 524,
-      "sourceRef": "19fd0a6f-df1a-4ec8-8234-d7aba0f0e620",
-      "koHtmlLen": 3887,
-      "enHtmlLen": 7613
-    },
-    {
-      "slug": "naproxen250cap-25",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "ca251b28a836032b",
-      "T": 2,
-      "order": 525,
-      "sourceRef": "7b636a7d-4ba2-44ee-8a23-3db326d56d24",
-      "koHtmlLen": 3833,
-      "enHtmlLen": 7921
-    },
-    {
-      "slug": "naproxen250cap-26",
-      "groupKey": "나프록센|250밀리그램|연질캡슐",
-      "safetyFp": "e51de413362bc63e",
-      "T": 2,
-      "order": 526,
-      "sourceRef": "b8cc09ca-b040-414d-81c9-ce34c269cb47",
-      "koHtmlLen": 3892,
-      "enHtmlLen": 7628
+      "order": 615,
+      "sourceRef": "d66b6994-3cb3-4996-8975-ef8d13a14e7c",
+      "koHtmlLen": 2621,
+      "enHtmlLen": 5081
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 26,
-    "builtMasters": 72,
+    "builtFiles": 15,
+    "builtMasters": 71,
     "holds": 0,
     "missingTm": 0
   }

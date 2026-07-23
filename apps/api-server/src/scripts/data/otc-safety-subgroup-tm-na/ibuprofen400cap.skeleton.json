@@ -4,7 +4,7 @@
   "subgroups": 11,
   "masters": 24,
   "metaAuthored": false,
-  "missingLineCount": 69,
+  "missingLineCount": 68,
   "missingLines": [
     {
       "h8": "ca6bd379",
@@ -77,12 +77,6 @@
       "freq": 3,
       "fields": "caution",
       "ko": "다른 비스테로이드성 소염진통제, 고용량의 메토트렉세이트와 함께 복용하지 마십시오."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "59a0f332",

@@ -4,7 +4,7 @@
   "subgroups": 3,
   "masters": 17,
   "metaAuthored": false,
-  "missingLineCount": 29,
+  "missingLineCount": 28,
   "missingLines": [
     {
       "h8": "a5501ace",
@@ -59,12 +59,6 @@
       "freq": 1,
       "fields": "efficacy",
       "ko": "이 약은 만성신부전, 부갑상선기능저하증, 비타민 D 저항성 구루병·골연화증에 있어서 비타민 D 대사이상에 수반되는 증상(저칼슘혈증, 테타니, 뼈의 통증, 뼈의 병변(변화) 등)의 개선과 골다공증에 사용합니다."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "1fe3176c",

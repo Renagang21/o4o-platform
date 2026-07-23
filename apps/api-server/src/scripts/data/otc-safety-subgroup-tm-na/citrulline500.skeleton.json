@@ -4,20 +4,8 @@
   "subgroups": 2,
   "masters": 8,
   "metaAuthored": false,
-  "missingLineCount": 12,
+  "missingLineCount": 10,
   "missingLines": [
-    {
-      "h8": "1f01d015",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
-    },
-    {
-      "h8": "245bbf91",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오."
-    },
     {
       "h8": "640406a5",
       "freq": 2,

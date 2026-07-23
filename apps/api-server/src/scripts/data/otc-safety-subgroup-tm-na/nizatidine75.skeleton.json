@@ -4,19 +4,13 @@
   "subgroups": 1,
   "masters": 3,
   "metaAuthored": false,
-  "missingLineCount": 11,
+  "missingLineCount": 10,
   "missingLines": [
     {
       "h8": "0d50c578",
       "freq": 1,
       "fields": "usage",
       "ko": "1일 2정(150 mg)을 초과하지 마십시오."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "1fdde0c0",

@@ -4,25 +4,13 @@
   "subgroups": 1,
   "masters": 4,
   "metaAuthored": false,
-  "missingLineCount": 10,
+  "missingLineCount": 8,
   "missingLines": [
-    {
-      "h8": "1f01d015",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
-    },
     {
       "h8": "1f83429e",
       "freq": 1,
       "fields": "efficacy",
       "ko": "이 약은 장내균총 이상(항생물질, 화학요법제 투여 등)에 의한 정장, 변비, 묽은 변, 복부 팽만감, 장내 이상발효의 개선에 사용합니다."
-    },
-    {
-      "h8": "245bbf91",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오."
     },
     {
       "h8": "47076d5e",

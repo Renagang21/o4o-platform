@@ -4,14 +4,8 @@
   "subgroups": 2,
   "masters": 4,
   "metaAuthored": false,
-  "missingLineCount": 14,
+  "missingLineCount": 11,
   "missingLines": [
-    {
-      "h8": "1f01d015",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
-    },
     {
       "h8": "60fda01a",
       "freq": 2,
@@ -37,12 +31,6 @@
       "ko": "1일 2~4캡슐(1,000~2,000 mg)씩. 1개월 중 10～20일간 복용합니다."
     },
     {
-      "h8": "245bbf91",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오."
-    },
-    {
       "h8": "26152e9f",
       "freq": 1,
       "fields": "caution",
@@ -65,12 +53,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "중증(심한 증상) 신기능 장애 및 간성혼수 환자, 6세 이하의 소아, 시스틴뇨증 환자, 대두유 과민증 또는 알레르기 경험자, 콩 또는 땅콩 과민증 환자는 이 약을 복용하지 마십시오."
-    },
-    {
-      "h8": "9d66cba5",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "어린이에게 투여할 경우 보호자의 지도 감독 하에 투여하십시오."
     },
     {
       "h8": "c0085c69",

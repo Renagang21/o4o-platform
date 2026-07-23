@@ -1,0 +1,69 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "acetaminophen650-02",
+  "order": 602,
+  "groupKey": "아세트아미노펜|650밀리그램|정",
+  "safetyFp": "7c4e68555a9ffe18",
+  "sourceRef": "895888b2-c996-4ac6-8015-eb6d5955add4",
+  "sensitive": false,
+  "title": "아세트아미노펜 650mg 정 (해열진통제)",
+  "expectEasyMd5": "a7ece332",
+  "masterIds": [
+    "10cd53c7-427f-495a-b113-03a26e792e41",
+    "3ee792ce-45b2-4043-9b10-0ba7aa5236f2",
+    "3fd2cb12-c7de-479a-bf16-16b0cee70604",
+    "4a816615-e28f-417c-9bad-921585177260",
+    "4ec3b4d8-671a-4c3a-90ea-f4f1c137276b",
+    "54ea2cd4-f19a-4ff7-b61a-1abf4196a9c5",
+    "7e14e999-a25e-480f-a3e7-eab8f8ea8645"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "a7ece332",
+    "names": [
+      "타세놀8시간이알서방정(아세트아미노펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 28,
+    "en": 14,
+    "total": 42
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 해열 및 감기에 의한 동통(통증)과 두통, 치통, 근육통, 허리동통(통증), 생리통, 관절통의 완화에 사용합니다.",
+    "usage": "12세 이상의 소아 및 성인은 매 8시간마다 2정씩 복용합니다.\n\n24시간 동안 6정을 초과하지 마십시오.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다.\n\n매우 드물게 치명적일 수 있는 급성전신발진고름물집증, 스티븐스- 존슨증후군, 독성표피괴사용해, 호산구 증가 및 전신 증상 동반 약물 반응(DRESS)와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 피부발진 또는 다른 과민반응의 징후가 나타나는 경우 즉시 복용을 중단하십시오.\n\n아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오. 간손상을 일으킬 수 있습니다. 아세트아미노펜을 포함하는 다른 제품과 함께 복용하지 마십시오.\n\n이 약에 과민증 환자, 소화성궤양, 심한 혈액이상, 심한 간장애, 심한 신장장애, 심한 심장기능저하, 아스피린 또는 다른 소염진통제에 의한 천식 경험 환자, 바르비탈계 약물, 삼환계 항우울제 복용한 환자, 알코올을 복용한 사람, 12세 미만의 소아는 이 약을 복용하지 마십시오.\n\n갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 간장애, 신장(콩팥)장애, 소화성궤양, 혈액이상, 출혈경향, 심장기능이상, 과민증 경험자, 기관지천식, 노인, 임부 또는 수유부는 의사 또는 약사와 상의하십시오.\n\n의사 또는 약사의 지시없이 통증에 10일 이상(성인) 또는 5일 이상(소아) 복용하지 않고 발열에 3일 이상 복용하지 않습니다.\n\n의사 또는 약사의 지시없이 고혈압 환자의 경우 상기 명시된 기간보다 더 길게 복용하지 않습니다.\n\n이 약은 서방형 제제이므로 정제를 으깨거나 씹거나 녹이지 말고 그대로 삼켜서 복용합니다.\n\n바르비탈계 약물, 삼환계 항우울제, 알코올, 다른 소염(항염)진통제와 함께 이 약을 복용하지 마십시오.\n\n와파린, 플루클록사실린과 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n쇽 증상(호흡곤란, 온몸이 붉어짐, 혈관부기, 두드러기 등), 천식발작, 혈소판감소, 과립구감소, 용혈성빈혈, 메트헤모글로빈혈증, 혈소판기능 저하(출혈시간 연장), 청색증, 구역, 구토, 식욕부진, 위장출혈, 소화성궤양, 천공(뚫림) 과민증상(얼굴부기, 땀이 남, 저혈압), 발진, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군), 고음이온차 대사성 산증, AST 상승, ALT 상승, 고정발진 등이 나타나는 경우 즉각 복용을 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "아세트아미노펜 650밀리그램",
+      "작용": "중추에 작용하는 해열진통제로 통증과 발열을 완화합니다.",
+      "주요 증상": "해열, 감기로 인한 통증, 두통·치통·근육통·허리통증·생리통·관절통",
+      "주의 대상": "매일 3잔 이상 정기 음주자는 간손상 위험이 있어 복용 전 상담 필요, 아세트아미노펜 포함 다른 제품과 병용 주의",
+      "선택 포인트": "해열과 여러 일상 통증 완화에 쓰는 아세트아미노펜 단일 성분 해열진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Acetaminophen 650 mg Tablets (Antipyretic Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to reduce fever and to relieve pain caused by colds, headache, toothache, muscle pain, low back pain, menstrual pain, and joint pain.",
+    "usage": "Children 12 years and older and adults take 2 tablets every 8 hours. Do not take more than 6 tablets in 24 hours.",
+    "caution": "If you regularly drink three or more alcoholic drinks every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics; it can cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalized exanthematous pustulosis, Stevens-Johnson syndrome, toxic epidermal necrolysis, and drug reaction with eosinophilia and systemic symptoms (DRESS), have been reported; if a skin rash or other signs of hypersensitivity appear after taking this medicine, stop taking it immediately. Do not take more than the maximum daily dose of acetaminophen (4,000 mg); it can cause liver damage. Do not take this medicine together with other products containing acetaminophen. Do not take this medicine if you are hypersensitive to it; have peptic ulcers, severe blood abnormalities, severe liver impairment, severe kidney impairment, or severe heart function impairment; have experienced asthma caused by aspirin or other anti-inflammatory analgesics; have taken barbiturates or tricyclic antidepressants; have consumed alcohol; or are a child under 12 years old. Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have liver impairment, kidney impairment, peptic ulcers, blood abnormalities, a bleeding tendency, or heart function abnormalities; have experienced hypersensitivity; have bronchial asthma; are elderly; or are pregnant or breastfeeding. Do not take this medicine for more than 10 days (adults) or 5 days (children) for pain, or more than 3 days for fever, without the direction of a doctor or pharmacist. If you have hypertension, do not take this medicine for longer than the period stated above without the direction of a doctor or pharmacist. This medicine is an extended-release formulation, so swallow the tablets whole without crushing, chewing, or dissolving them. Do not take this medicine together with barbiturates, tricyclic antidepressants, alcohol, or other anti-inflammatory (antiphlogistic) analgesics. Consult a doctor or pharmacist when taking this medicine together with warfarin or flucloxacillin. If shock symptoms (difficulty breathing, reddening of the whole body, angioedema, hives), asthma attack, thrombocytopenia, granulocytopenia, hemolytic anemia, methemoglobinemia, reduced platelet function (prolonged bleeding time), cyanosis, nausea, vomiting, loss of appetite, gastrointestinal bleeding, peptic ulcers, perforation, hypersensitivity symptoms (facial swelling, sweating, low blood pressure), rash, oculomucocutaneous syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell syndrome), high anion gap metabolic acidosis, elevated AST, elevated ALT, or fixed eruption occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Acetaminophen 650 mg",
+      "How it works": "An antipyretic analgesic that acts centrally to relieve pain and fever.",
+      "Main symptoms": "Fever reduction; pain caused by colds; headache, toothache, muscle pain, low back pain, menstrual pain, joint pain",
+      "Caution for": "Regular drinkers of three or more alcoholic drinks a day risk liver damage — consult before use; use caution with other products containing acetaminophen",
+      "Why this one": "A single-ingredient acetaminophen analgesic for fever reduction and relief of everyday aches and pains."
+    }
+  }
+}

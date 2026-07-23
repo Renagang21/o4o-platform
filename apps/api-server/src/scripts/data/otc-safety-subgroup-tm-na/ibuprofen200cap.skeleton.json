@@ -4,7 +4,7 @@
   "subgroups": 12,
   "masters": 39,
   "metaAuthored": false,
-  "missingLineCount": 68,
+  "missingLineCount": 67,
   "missingLines": [
     {
       "h8": "0cc25464",
@@ -71,12 +71,6 @@
       "freq": 3,
       "fields": "caution",
       "ko": "항암요법으로 고용량 메토트렉세이트를 투여중인 환자, 다른 비스테로이드성 소염진통제와 함께 이 약을 복용하지 마십시오."
-    },
-    {
-      "h8": "1f01d015",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "정해진 용법과 용량을 잘 지키십시오."
     },
     {
       "h8": "4da0205e",
