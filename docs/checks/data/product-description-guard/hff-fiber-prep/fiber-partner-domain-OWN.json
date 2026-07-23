@@ -1,0 +1,4710 @@
+[
+ {
+  "statementNo": "20180012174231",
+  "candidateId": "1e1f3837-a902-4a2e-910a-5084ee4107eb",
+  "name": "액티브솔루션 장건강",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200083114",
+  "candidateId": "b1003670-3aad-41e1-88ce-96b0a802fb07",
+  "name": "액티브솔루션 장건강",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 10,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200032964",
+  "candidateId": "7e0ad96b-42b2-46c7-a9ee-c04f32a239ab",
+  "name": "앤더랩 바이오틱스 포뮬라",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031677",
+  "candidateId": "0a0437b2-5d10-415e-9f4f-ca6c649d3352",
+  "name": "야미푸(yummy & poo)",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170061636",
+  "candidateId": "967040c6-149c-4fbe-8b3c-7912c511a00d",
+  "name": "야쿠르트 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020757",
+  "candidateId": "df7cedac-0d7a-4d19-96dc-f51f1b366d90",
+  "name": "에버핏 더블액션 프로&프리바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831398",
+  "candidateId": "a7a5e6d4-cdb4-42d3-bcaf-667a1dc8b935",
+  "name": "엑소바이오틱쇼코라",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020041436",
+  "candidateId": "7a3e787c-2d9b-4349-b816-049b34955c47",
+  "name": "엔앰씨(NMC) 멀티 프로 프리 바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000948390",
+  "candidateId": "6f0e89e3-1763-4747-9289-ba7cd1879a38",
+  "name": "엔케이365포스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211227",
+  "candidateId": "ec67efd7-ea3c-4460-9606-1a1dcd7f989c",
+  "name": "엘릭솔 마이크로바이옴 톡톡",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211428",
+  "candidateId": "21a44eeb-030a-4857-b6db-0d6c725a50ab",
+  "name": "연세헬스케어 멀티바이오틱스 면역플러스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831415",
+  "candidateId": "9eab971a-5841-49c5-ad10-8a3dc7eac988",
+  "name": "영웅제약 장건강 철벽방어",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009105358",
+  "candidateId": "be82cbb6-9a28-44d3-813d-14e476d76462",
+  "name": "온케어 쏙빼고다이어트&유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001246631",
+  "candidateId": "03245fa1-ff2b-457c-a5a3-84cc62a5c537",
+  "name": "올 케어 유산균 & 비타민C 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020617",
+  "candidateId": "d775138d-9c1e-4918-8170-da1cc0762827",
+  "name": "올데이 액티브 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2020001635453",
+  "candidateId": "7ee0fc11-8a83-4d37-9e64-b6bbaeeb086b",
+  "name": "올케어 유산균&아연 프리바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352005",
+  "candidateId": "599ab418-3f66-40a5-bbc2-edb2eabe16e7",
+  "name": "워터 바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004002002547",
+  "candidateId": "d4c568bd-22f4-46c7-88f6-0e43d3e7e6c9",
+  "name": "원데이 마이크로바이옴 신바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200083022",
+  "candidateId": "a11be02a-d008-4276-9513-4ae2d9eeaa5b",
+  "name": "원데이올인원 프리바이오틱스 유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017015271",
+  "candidateId": "ee26dec4-fb25-44b5-98bc-2a31686838f9",
+  "name": "웰러스폴리시아포스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020041377",
+  "candidateId": "165e7e29-845d-420f-a109-2fce4bd5519a",
+  "name": "유산균 다이어트 트리플 에스",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20220021067124",
+  "candidateId": "a413611f-c1ae-4596-8f95-953f28c1ee8e",
+  "name": "유산균+다이어트",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831453",
+  "candidateId": "2fd1fb59-1fbe-4b79-8342-2c80a8883b66",
+  "name": "유산균56",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000910560",
+  "candidateId": "f779daa2-1532-4515-981c-7630adbfe9ad",
+  "name": "유산균대장",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831168",
+  "candidateId": "3cb10be6-40e2-41a7-a89e-b00573666bc2",
+  "name": "유산균엔 19종 락토사랑",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021786",
+  "candidateId": "5a25e7c0-0a10-45bc-b22f-d0cf92421921",
+  "name": "유산균이 함유된 식이섬유 항이와 장이",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021978",
+  "candidateId": "f0e4685d-b8fd-4063-984a-75459c35cecb",
+  "name": "이너락토플러스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110946",
+  "candidateId": "c6842d8d-6642-4701-b8cb-e855d1bba569",
+  "name": "이너랩 신바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020846",
+  "candidateId": "dffb2a1f-e60e-4299-954b-fb6f6d210c28",
+  "name": "이너바이오 프로스트바이오틱스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020968",
+  "candidateId": "1da28c5c-ab3b-40ea-ab1c-96fdfcf5bc8f",
+  "name": "이엑스바이옴 프로바이오틱스 패밀리",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021971",
+  "candidateId": "0021407f-8a2d-4550-8a47-3ebc71bb6fb2",
+  "name": "이지맘 신바이오틱스",
+  "sig": "비타민D+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211047",
+  "candidateId": "7ae60029-3976-4d83-ab93-beee5ea92424",
+  "name": "이케어 프로바이오틱스 프리미엄19유산균",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001246634",
+  "candidateId": "46495332-3362-4af5-81ce-4bbdb98442d4",
+  "name": "일양 락토 프리프로바이오틱스 골드",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002184",
+  "candidateId": "ba2015f3-7a96-4140-8b42-1fb79d47fd08",
+  "name": "일양 포스트바이오틱스 골드",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002127",
+  "candidateId": "77997acd-db1f-4cb1-b046-efea761dd6a7",
+  "name": "일양 프로프리바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002204",
+  "candidateId": "58e5a8a9-9aab-41a8-b968-80de9f5e550c",
+  "name": "장 건강 세븐바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014641",
+  "candidateId": "6471af16-04a3-4d29-bf93-fd6169dee646",
+  "name": "장 쾌변 케어",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001510440",
+  "candidateId": "4089ef07-c15f-4225-9009-7adb687eeb85",
+  "name": "장(腸) 밸런스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200023184",
+  "candidateId": "af410844-d33c-4933-b0ca-6b73bdcd5e4c",
+  "name": "장N365",
+  "sig": "난소화성말토덱스트린+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당",
+   "난소화성말토덱스트린"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200201007",
+  "candidateId": "ff7169c2-39b2-49cd-a360-7e5ab3ac8b91",
+  "name": "장가드 프로바이오틱스",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001217484",
+  "candidateId": "87c21eea-5878-42f4-ba0c-f87788b3f1c4",
+  "name": "장건강 365 프리바이오틱스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831236",
+  "candidateId": "8b089190-7b66-453c-a145-cd6e60a21597",
+  "name": "장건강 SYN(신)바이오틱 프리바이오틱스+프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002174",
+  "candidateId": "ef6c12ab-5394-49c9-8405-dc6424d05d0b",
+  "name": "장건강 마이크로바이옴 메가바이오틱스 프로&프리바이오틱스 생유산균",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352563",
+  "candidateId": "4366f1ea-4360-4ed0-8402-cace93fd4804",
+  "name": "장건강 프로&프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015107950",
+  "candidateId": "c61f176e-feda-4a46-b170-b80f996ec314",
+  "name": "장건강 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211208",
+  "candidateId": "774147bf-e762-49d6-9b0b-ea3989dc99a5",
+  "name": "장건강N뉴랜드",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017038166",
+  "candidateId": "10612b1b-9b0a-4239-bec7-dd60ace92ec0",
+  "name": "장건강엔 닥터유산균19",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20200016052371",
+  "candidateId": "ec1d9295-9002-4fcb-aa81-f6b0280d2a8c",
+  "name": "장다콜2 밸런스",
+  "sig": "비오틴+비타민B1+셀레늄+차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [
+   "셀레늄",
+   "비타민B1",
+   "비오틴"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200081392",
+  "candidateId": "4ec51ed6-974b-4d9e-9278-2359efa8b9f1",
+  "name": "장밸런스 파워 프리미엄",
+  "sig": "비타민B1+비타민B2+비타민B6+비타민E+아연+자일로올리고당+판토텐산",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "비타민B1",
+   "비타민B2",
+   "판토텐산",
+   "비타민B6",
+   "비타민E",
+   "아연"
+  ],
+  "fnCount": 13,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017062132",
+  "candidateId": "175760d1-9185-4b9a-9ea6-010933107b29",
+  "name": "장세움 포스트바이오틱스 마이크로바이옴",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020679",
+  "candidateId": "6d0159a3-6638-4fe1-a9e0-589528bb02fe",
+  "name": "장안에화제 넥스트 패밀리",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831218",
+  "candidateId": "4faff6dd-6491-4dda-88f5-2d69591cbf12",
+  "name": "장앤바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200201079",
+  "candidateId": "a1872cac-f49e-4bae-ace6-02cb5fe9ec9c",
+  "name": "장엔신바이오틱스 플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015162354",
+  "candidateId": "cc64aa1f-7d60-4837-b5de-fa96484134eb",
+  "name": "장의신(神)",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021904",
+  "candidateId": "f2ede890-3de6-4c48-a309-69b8396f7b1b",
+  "name": "장의신(神) 프로바이오틱스앤프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200023140",
+  "candidateId": "b743489c-1569-46b4-81c5-c2d93e2c1674",
+  "name": "장이가벼워지지",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020046603",
+  "candidateId": "232200a8-ff58-41ba-96ce-3576eabc4952",
+  "name": "장포유 유산균 차전자피",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2022002106744",
+  "candidateId": "9fb0cc64-86b6-4427-8466-4cca5b18d5f3",
+  "name": "장포유 유산균 차전자피",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352979",
+  "candidateId": "ed6da6b6-66d6-474d-90c6-d8615b22b399",
+  "name": "장플랜 90",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20110017019108",
+  "candidateId": "4b66de71-6fca-4d7e-a65c-926ed55d7636",
+  "name": "젬무브 생생 이너핏 신바이오틱스(GEMMOVE SAENG SAENG INNER FIT SYNBIOTICS)",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017046111",
+  "candidateId": "48511058-333c-4bec-ab0b-4b6e33cddb35",
+  "name": "주러스(ZURUS)",
+  "sig": "가르시니아+차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015070229",
+  "candidateId": "2d459c28-cea3-40e8-87fe-afa126df175c",
+  "name": "지근억비피더스프로G",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20140017002638",
+  "candidateId": "2e138f5f-8129-4dbc-816c-8a73d224cdd5",
+  "name": "지큐랩 프로 프리 포스트바이오틱스",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20140017002376",
+  "candidateId": "22bd5b43-2a04-4ade-b075-6d159c6c4991",
+  "name": "지큐랩(gQlab) 에스(S) 신바이오틱스",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20172880236294",
+  "candidateId": "c2236ee1-98c9-400a-9d97-346ccc5ceee3",
+  "name": "차전자피 프로바이오틱스",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020972",
+  "candidateId": "c2fa7fb2-e74b-4ced-947d-1e8451c8df2a",
+  "name": "케어유 신바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "2014002001272",
+  "candidateId": "d817e36d-fa8d-451b-a6f5-9d7d03912e94",
+  "name": "코오롱 올인원 멀티바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000910589",
+  "candidateId": "bdaff6c9-1cd0-4a89-8f63-1c393404f70d",
+  "name": "코오롱 프로바이옴 생유산균17",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017013104",
+  "candidateId": "a3a77d74-46f4-466b-9e57-b0feab6f3639",
+  "name": "쾌변 생유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351920",
+  "candidateId": "2c511652-24d8-4a37-b5f4-ab821fa2ded3",
+  "name": "키즈텐 유산균",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015107963",
+  "candidateId": "476a763c-f9a4-434b-a0b7-81e3c452387a",
+  "name": "키토 다이어트",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031840",
+  "candidateId": "ac330b3e-b8de-4b1e-a641-4fbdc9e0b532",
+  "name": "트루락 생 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 1,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020861",
+  "candidateId": "b6ab648a-cf0a-4417-afa8-9877829431bf",
+  "name": "트리플 솔루션 앤 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "201000190041062",
+  "candidateId": "694aceff-4d6f-488e-9c88-4784f92a8072",
+  "name": "트리플 포스트 바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020673",
+  "candidateId": "8dc4dc77-d328-416a-8b97-30e2ee6a1e34",
+  "name": "트리플케어 플러스 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014649",
+  "candidateId": "c13ca820-fa98-4dc6-8f66-1bb8293e576a",
+  "name": "튼튼장케어",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351747",
+  "candidateId": "b69a87a4-49b9-4e58-b99d-cef84510a249",
+  "name": "팜얼라이브 프로바이오틱스 플러스",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D",
+   "셀레늄"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831245",
+  "candidateId": "7c742e55-7470-4480-aa70-0d674f6110ae",
+  "name": "팜엔탑 장에 좋은 프로바이오틱스 프리바이오틱스 4000",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200023095",
+  "candidateId": "1e57c12e-391e-4102-8486-722c0f63a3f4",
+  "name": "퍼스트바이오틱스17",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020761",
+  "candidateId": "7c76db40-465c-4a4a-9b92-0066fb50f327",
+  "name": "퍼펙트 10억 생유산균 + 프리바이오틱스 마이크로바이옴",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2023002928440",
+  "candidateId": "94afe586-9415-412e-b7d1-48a03fe6e94f",
+  "name": "퍼펙트 혈당앤유산균",
+  "sig": "귀리",
+  "fiberSources": [
+   "귀리"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483173",
+  "candidateId": "ef066329-db5e-40b1-b29f-660245eae12a",
+  "name": "포스트 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110953",
+  "candidateId": "50e9cd6d-1d44-4349-aaa2-0da700a9e713",
+  "name": "포스트 자일로프로",
+  "sig": "셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001508165",
+  "candidateId": "26ca8c33-f473-4e4e-b0ff-27069bbe48cf",
+  "name": "포스트바이오틱스 B",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001508168",
+  "candidateId": "d6e56c47-5c34-4b9f-82bc-dd16f76d65b4",
+  "name": "포스트바이오틱스 BB",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001508169",
+  "candidateId": "144c98c4-5043-4958-8577-a7c0cacaa174",
+  "name": "포스트바이오틱스 L",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001508166",
+  "candidateId": "ade3ee54-ab2a-4cf8-ab09-cd942f39df06",
+  "name": "포스트바이오틱스 P",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211082",
+  "candidateId": "8240531d-913a-44d9-bdbb-a685964df8d8",
+  "name": "포스트바이오틱스 프로&프리바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001508167",
+  "candidateId": "7728f891-7d9b-4246-bfa0-13f54580c966",
+  "name": "포스트바이오틱스A",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017046112",
+  "candidateId": "554bbf09-a3ec-4d7a-9faa-298c094f7361",
+  "name": "풍덩한 하루",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110863",
+  "candidateId": "de67862c-ce04-4a68-8820-1322d1fbabd2",
+  "name": "한미 신바이오틱스 프리미엄",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20070017035823",
+  "candidateId": "6eb990c8-8824-4e9b-8d01-ef50befbb18f",
+  "name": "프라미스 프락토바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001231075",
+  "candidateId": "12ce02b2-1259-4084-be43-c41513388858",
+  "name": "프라미스 프락토바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002165",
+  "candidateId": "7e948b8f-7401-4932-b6ac-22f5d64dd09b",
+  "name": "프라임 마이크로바이옴 프로&프리바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031935",
+  "candidateId": "9f77a82f-b5fb-4686-b8fb-03650cd140e9",
+  "name": "프로 프리 바이오틱스 마이크로바이옴 플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352064",
+  "candidateId": "a13c8066-e21b-4eb9-921c-896338beea99",
+  "name": "프로&프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200061568",
+  "candidateId": "68ca7632-98dd-40d2-a3db-832301f388ad",
+  "name": "프로&프리바이오틱스 알파",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002230",
+  "candidateId": "e60dbde4-05d8-405b-b647-7394c0a37c08",
+  "name": "프로&프리바이오틱스 액티브",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211313",
+  "candidateId": "c61ad670-cfcb-4c4d-aa77-a9fe539ab5ad",
+  "name": "프로뮬라(PROMULA)",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20220010222106",
+  "candidateId": "3a8924fc-39b9-480d-9e84-d236f77236d7",
+  "name": "프로바이오엑스 프리미엄",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020676",
+  "candidateId": "1ef44d62-2041-4733-8f00-982695f0f83c",
+  "name": "프로바이오틱스 패밀리",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021988",
+  "candidateId": "b88b1419-955d-4f8f-bcca-8ec845f1251e",
+  "name": "프로비던스 올인원 유산균 밸런스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021989",
+  "candidateId": "e40cda7e-72e6-4477-913c-0b31f47de985",
+  "name": "프로비던스 포스트바이오틱스 데일리",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021948",
+  "candidateId": "4298e015-dd2a-41d3-8815-441eca3ae3d4",
+  "name": "프로비던스 포스트바이오틱스 알파",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017013101",
+  "candidateId": "c43b83be-290a-448a-954f-74a1f278819b",
+  "name": "프로프리 바이오틱스 유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001701379",
+  "candidateId": "c083d22e-9b38-4d82-867e-3f5104a6154b",
+  "name": "프로프리 신바이오틱스 생유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031653",
+  "candidateId": "b932d178-217f-4acf-99ce-0af6abc86dae",
+  "name": "프리&프로 더블액션",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "202000161229",
+  "candidateId": "8665aa62-1d80-4141-949c-ebd74c72d1f2",
+  "name": "프리&프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200082194",
+  "candidateId": "2762c524-3128-4512-9974-72bd0bb9ffa4",
+  "name": "프리+프로 바이오틱스 (Pre+Pro Biotics)",
+  "sig": "아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200032035",
+  "candidateId": "0bb4d549-4d5f-46ab-b359-9309818dc290",
+  "name": "프리락토 마이크로바이옴",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015104420",
+  "candidateId": "675407eb-313a-4577-9036-2a07c878b217",
+  "name": "프리락토 마이크로바이옴",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20100016005368",
+  "candidateId": "bd5ccb9d-b32a-4f69-9f30-e3b1ab7254e7",
+  "name": "프리로바이오틱스 1.2",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200083197",
+  "candidateId": "fffccd06-6e79-4673-a90f-736871c64cc1",
+  "name": "프리바이오틱스 and 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017106427",
+  "candidateId": "61f2512e-c7ba-4e85-a453-9768e872809f",
+  "name": "프리미엄 프로바이오틱스 골드",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831117",
+  "candidateId": "06ea2b2f-819e-4050-94a6-9c1f765d4cc2",
+  "name": "프리미엄 프로바이오틱스 앤 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017106444",
+  "candidateId": "b22cbe20-f506-41b4-8aec-8730f9555101",
+  "name": "프리미엄 프로바이오틱스 엠엠",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021841",
+  "candidateId": "311305db-1449-4a47-8f70-c2a8464078cc",
+  "name": "프리바이오틱스 + 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200082704",
+  "candidateId": "678739fa-60f2-463a-b5f0-31397bf5ade2",
+  "name": "프리바이오틱스 FOS 에프오에스 트리플",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211757",
+  "candidateId": "6b4d3a7b-2243-4d9d-a2ff-87420e92d50e",
+  "name": "프리바이오틱스 FOS 에프오에스 트리플",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351456",
+  "candidateId": "685d974c-bf54-4d52-94cb-aa00985421bb",
+  "name": "프리바이오틱스 프로바이오틱스 다이어트&유산균",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022723",
+  "candidateId": "ba78ff67-a369-47d2-8b1d-06105f33690f",
+  "name": "프리바이오틱스&프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022628",
+  "candidateId": "2597dfdd-d069-4d5d-a070-c58510db36d1",
+  "name": "프리바이오틱스FOS에프오에스트리플",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351222",
+  "candidateId": "3dac712a-425a-4eba-a863-85063ccd1079",
+  "name": "프리앤프로 더블 바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021574",
+  "candidateId": "59e5e5cd-7a28-4910-8de1-434fb3ac992b",
+  "name": "프리앤프로 생유산균 플러스",
+  "sig": "비타민B1+비타민B6+비타민E+아연+자일로올리고당+판토텐산",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "비타민B1",
+   "판토텐산",
+   "비타민B6",
+   "비타민E",
+   "아연"
+  ],
+  "fnCount": 11,
+  "enOk": false
+ },
+ {
+  "statementNo": "201900160248",
+  "candidateId": "b38e5431-5b6a-4157-ac22-99e7ec7cb9b9",
+  "name": "프리앤프로 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020778",
+  "candidateId": "fde84571-7311-4e98-91cd-82022b725874",
+  "name": "프리앤프로 신바이오틱스 골드",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000910538",
+  "candidateId": "703b5280-2f54-45f2-a5d7-84b0c57402f8",
+  "name": "프리프로 바이오틱스 3000 플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002126",
+  "candidateId": "22793f01-11a9-4940-a1d8-7acbecd8084f",
+  "name": "플래티넘 신바이오틱스 유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002160",
+  "candidateId": "8b61ee3f-0fd9-4548-92f5-aa234db0bcd4",
+  "name": "플래티넘 포스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020001393",
+  "candidateId": "6dbd1cf3-b2eb-4e40-b863-a87b1417b771",
+  "name": "피부면역락",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200141419",
+  "candidateId": "a986d6be-6fc8-412c-bab7-1e0683011f64",
+  "name": "하늘마음 트리플바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110893",
+  "candidateId": "755239bd-7fea-4f87-b213-5976bb2fccd5",
+  "name": "한미 신프리앤프로 바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483196",
+  "candidateId": "bab3a8d1-b8f5-4f66-8012-573d9edcc4e8",
+  "name": "하루틴 마이크로바이옴 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000948399",
+  "candidateId": "9a27cb78-7f6e-40ab-8ba6-b0294686eec4",
+  "name": "하모네 프리미엄 뉴(NEW)포스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351397",
+  "candidateId": "399ecb46-829f-4bee-830b-bf26fcbeaa76",
+  "name": "하이뮨 프리&프로바이오틱스",
+  "sig": "비타민D+셀레늄+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 10,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831334",
+  "candidateId": "c0f946ea-72e7-4d3b-ba1e-b9cfe0fc27ea",
+  "name": "핫콩바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831442",
+  "candidateId": "191b6735-9c72-42f5-a093-9c876f8bb540",
+  "name": "해피바바 HAPPYBABA 포스트바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170061274",
+  "candidateId": "6ae30c41-ed03-450e-8082-d8365a4ba18c",
+  "name": "해피트루 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020756",
+  "candidateId": "703cec5c-8fe1-4f53-9365-30c5717bb39e",
+  "name": "행복한 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2009001504757",
+  "candidateId": "70c841e2-0b7e-4bca-b242-dc1ca537bf09",
+  "name": "허니코 프리미엄 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015107985",
+  "candidateId": "4d54869a-f2f8-4c7e-8082-1623d9e15c94",
+  "name": "헬씨허그슬림다이어트",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831317",
+  "candidateId": "edc93a89-4fdd-4c57-a67a-4cdd38c07f07",
+  "name": "홍트리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020771",
+  "candidateId": "8ad711aa-1849-4a06-8f0a-8b245952faa2",
+  "name": "휴먼네이처 SYN(신) 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020794",
+  "candidateId": "98837b38-a43d-4814-8a87-c18d9116c8f9",
+  "name": "휴먼네이처 대장슬림",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110921",
+  "candidateId": "039fa8c5-8d55-4885-8aef-4454aed919d7",
+  "name": "힐스토리 포스트바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "2009002002046",
+  "candidateId": "0faf1a6a-dc64-476f-8e02-afeb230306e3",
+  "name": "청인 장건강하나로",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002179",
+  "candidateId": "b647a98e-4b61-469b-b103-76a0024decc7",
+  "name": "마이코드 프로&프리바이오틱스 액티브",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022381",
+  "candidateId": "6ce3f3ee-4567-4e52-ad73-c234e2c218b4",
+  "name": "치팅데이",
+  "sig": "가르시니아+차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20172880236293",
+  "candidateId": "79d713fd-d469-4d35-9b49-aa3941b06fe0",
+  "name": "멀티바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352452",
+  "candidateId": "70477628-ec7a-433b-8983-8206e4c37ef4",
+  "name": "에스라이프 데이",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200081949",
+  "candidateId": "f32a7d62-5756-4af3-ad47-29f12a0a1a13",
+  "name": "듀얼스틱 장케어",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170353013",
+  "candidateId": "86b897e4-f2a2-435c-bb14-a4ffc6a03f00",
+  "name": "키즈텐유산균 딸기요거트맛",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020864",
+  "candidateId": "a31cdc20-f977-4fd7-b1fb-34b05133bfa1",
+  "name": "셀티바 프로 & 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017046117",
+  "candidateId": "c857d9e2-417e-41d7-9921-5308a0e6b84b",
+  "name": "금세비움",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352290",
+  "candidateId": "4f6a4ea1-bbb5-4452-8e40-17feaddedd26",
+  "name": "100억 소리나는 프로+프리바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D",
+   "셀레늄"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20180012174100",
+  "candidateId": "5b9e7c0b-54fa-4fe3-bb8b-0c20b63c7121",
+  "name": "10억 생 유산균 + 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020998",
+  "candidateId": "8b91b39d-a601-4d15-9ff0-39c3eb89e734",
+  "name": "10억 생유산균 프리바이오틱스 프로바이오틱스 다이어트",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015070357",
+  "candidateId": "72efcbb2-e41b-4e1f-9ca7-317546094b24",
+  "name": "이든포스트바이오틱스M(엠)2",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020894",
+  "candidateId": "5a5e9db3-f286-4a68-9e14-ab2883d372a1",
+  "name": "락포유 생유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2014002001276",
+  "candidateId": "8e05f0cc-bf5d-45a3-be69-0308c45b8e2c",
+  "name": "30일 에이드 클렌즈 30 DAYS AID 푸룬맛",
+  "sig": "나이아신+난소화성말토덱스트린+비타민B6+비타민C+판토텐산",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "비타민C"
+  ],
+  "fnCount": 10,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015162287",
+  "candidateId": "852cd4b7-0fe3-4127-bbc9-b890115c3100",
+  "name": "3중케어 닥터 프로프리움 유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200072308",
+  "candidateId": "946957a9-3205-4e78-8048-915cbd5c477b",
+  "name": "3중케어 닥터 프로프리움 유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020935",
+  "candidateId": "95c57bd6-9743-47d4-af85-6b2abb440ea2",
+  "name": "4중케어 닥터 프로프리움 유산균",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021984",
+  "candidateId": "b0276771-2ee8-45f0-a967-296d8c5e4ce9",
+  "name": "피오씨 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200201262",
+  "candidateId": "05649279-a723-4f2f-92e3-5762438e4e1d",
+  "name": "닥터리본 비피더스 앤 프리 패밀리 케어",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2020001612211",
+  "candidateId": "44358738-31f2-4701-a808-ce6c843a5fd7",
+  "name": "프로&프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020016617",
+  "candidateId": "d5b8e5dc-13e5-4282-9f15-2ba5af012214",
+  "name": "프로바이오틱스다이어트",
+  "sig": "가르시니아+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20140017002664",
+  "candidateId": "e7c224b4-65aa-435a-80aa-f358e030dbb4",
+  "name": "유바이오틱스 포커스",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020678",
+  "candidateId": "77adf143-da0c-4e4c-903c-33602fde0c31",
+  "name": "내몸애 장건강 프로바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017015245",
+  "candidateId": "0e3fe6f4-0c0d-4142-bde6-f9a2ea9ea2fe",
+  "name": "닥터에스 멀티 포스트바이오틱스(닥터S 멀티 포스트바이오틱스)",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017015326",
+  "candidateId": "78b40d9c-6b41-4e23-b81c-bc9246dc06dc",
+  "name": "내몸엔 메가바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352019",
+  "candidateId": "53c90aa5-e62b-4a90-983d-ed7b8f9635a9",
+  "name": "스킨 밸런스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831483",
+  "candidateId": "b821a234-f74c-46df-9e5a-9d7f84792353",
+  "name": "나나네이처 포스트바이오틱스 락토스틱",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "202300092643",
+  "candidateId": "9b30dcaf-a89c-4b2d-922e-7401960857e2",
+  "name": "혈당케어 밸런스 유산균",
+  "sig": "귀리",
+  "fiberSources": [
+   "귀리"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400151071156",
+  "candidateId": "af55d65e-9486-4199-bfbf-2e18176d4baf",
+  "name": "리디혈",
+  "sig": "귀리",
+  "fiberSources": [
+   "귀리"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200023129",
+  "candidateId": "221210dc-c3e3-4c42-8de8-efb2a0ec26c1",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019001602440",
+  "candidateId": "b0a8a4c1-1b0a-4ad2-8400-925ade424848",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022925",
+  "candidateId": "b861394d-5b1a-47a1-82b9-e5c7bb1964a7",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 슬림",
+  "sig": "가르시니아+난소화성말토덱스트린+판토텐산",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "가르시니아",
+   "판토텐산"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022861",
+  "candidateId": "397e1a4e-e9d5-42c8-8a73-bf86f8c8485f",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 프로",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019001602444",
+  "candidateId": "3ba756d9-0069-48a5-83ca-8a51bd4fd496",
+  "name": "GC녹십자 마이크로바이옴 맥스 바이오틱스 프로",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200141482",
+  "candidateId": "8fe6bf27-a94f-4121-9c62-658b226134ad",
+  "name": "GC녹십자 마이크로바이옴 퍼스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022562",
+  "candidateId": "e18854f0-fef4-43cd-bbee-63d67ec6b927",
+  "name": "HYTAMIX 하이타믹스 골드",
+  "sig": "나이아신+난소화성말토덱스트린+비타민B1+판토텐산",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "비타민B1",
+   "나이아신",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200024002",
+  "candidateId": "e7b22f9a-aab5-4f25-b843-d58fc5a0feb7",
+  "name": "INDEX 프로바이오틱스",
+  "sig": "난소화성말토덱스트린",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170353220",
+  "candidateId": "ed090abd-24dd-489a-82e0-ba814e35644e",
+  "name": "INDEX 프로바이오틱스",
+  "sig": "난소화성말토덱스트린",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211005",
+  "candidateId": "a23e0048-e6bf-4024-9b00-f6491212fd8b",
+  "name": "장&신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110835",
+  "candidateId": "2e00c51f-cd52-464e-98a4-332c042ed3c5",
+  "name": "장건강 365 프리바이오틱스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020001387",
+  "candidateId": "78bbe49a-d29b-4393-9aa8-18f1fe5d9bd3",
+  "name": "밸런스핏 장케어",
+  "sig": "자일로올리고당+판토텐산",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "판토텐산"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2017288019393",
+  "candidateId": "8adfb3bd-8292-4e04-b8c1-03693a122abc",
+  "name": "장이싹싹",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211050",
+  "candidateId": "fdcc1114-ecae-4d73-ac50-63f4f69d045a",
+  "name": "광동 마이크로바이옴 신바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483215",
+  "candidateId": "720e572f-6dcf-455a-b7b6-4d1416a48336",
+  "name": "대장업",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "202500287593",
+  "candidateId": "a665ac22-cb28-4cec-92ef-946899a4e007",
+  "name": "신프로&프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20100016005328",
+  "candidateId": "180b49c3-cd01-4876-9478-0146d169aa15",
+  "name": "바이오캡 락티 F에프",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017062155",
+  "candidateId": "49550606-610d-4df9-997a-e6857c68eb09",
+  "name": "헬스뱅 프리프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2022001022272",
+  "candidateId": "5b401cf3-671c-4677-a0a7-135a0e6f27c0",
+  "name": "눈꽃 차전자피",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020613",
+  "candidateId": "e02c61e0-565c-4a5c-a233-65d7e0def75d",
+  "name": "더나은 액티브 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110790",
+  "candidateId": "0bdaf873-224b-4a6f-a622-6b785afb6be1",
+  "name": "SYN 프리바이오틱스 유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001246643",
+  "candidateId": "1efea17d-7deb-4cd5-ba0b-f60a00924cac",
+  "name": "Ssol파더 퍼펙트 프리바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20200016052126",
+  "candidateId": "a1a5e940-633d-4ba0-a6fb-f92c4c27a38c",
+  "name": "UBIRIS 장다콜",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021867",
+  "candidateId": "7b441562-539b-41ae-80f9-0a982e0c0ae4",
+  "name": "비오팜 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351703",
+  "candidateId": "f0c954d3-a483-4606-9bec-c8f489d6aa5c",
+  "name": "jw중외제약 신(SYN) 퍼스트바이오틱스 프리바이오틱스 프로바이오틱스 100억 유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351292",
+  "candidateId": "13c0a8e9-f625-413e-8dac-903ed21a2fc9",
+  "name": "jw중외제약 코어 신바이오틱스 프리바이오틱스 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2023002928465",
+  "candidateId": "61001d5d-56de-4423-b52e-82b1c1f22c71",
+  "name": "더블액션 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200141183",
+  "candidateId": "b6c04fc1-856e-40b5-ba10-687c0dc4c47c",
+  "name": "뉴랜드 신 바이오틱스 알파",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001701382",
+  "candidateId": "e74950d0-ab81-4e28-9082-b4d8b5514d37",
+  "name": "뉴미인애아침",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021801",
+  "candidateId": "df462396-5c2c-4b3c-b528-2626595a1625",
+  "name": "뉴본라이프 슬리밍 클린",
+  "sig": "가르시니아+차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "202000161222",
+  "candidateId": "44f37c08-3e48-4e63-ae4e-8751d24abcd6",
+  "name": "건강프로젝트1",
+  "sig": "루테인+비타민C+비타민D+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "루테인",
+   "비타민C",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019000948369",
+  "candidateId": "4e714cbe-5843-4e55-ad3f-750943592802",
+  "name": "건국신바이오틱3000",
+  "sig": "셀레늄+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014606",
+  "candidateId": "862f5313-7d78-4469-b314-f9e593175750",
+  "name": "경남 포스트바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200072362",
+  "candidateId": "3dfed097-859b-499e-baa2-1deece6b1217",
+  "name": "굿모닝혼합유산균 프리미엄",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "202500178682",
+  "candidateId": "efea99d8-40dc-4156-b7b5-14cc198004f4",
+  "name": "황금구렁이 데일리",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120019007391",
+  "candidateId": "00b6e5fe-4b43-4da7-82ce-695f9fa442e6",
+  "name": "더블바이옴 3500 플러스 포스트바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020887",
+  "candidateId": "727e2827-319f-43af-8f29-4154ade79e19",
+  "name": "굿모닝 액티브 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211337",
+  "candidateId": "db28bf85-021f-4123-ad65-0ba93bb623c7",
+  "name": "굿모닝 황금 쾌변 유산균",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020732",
+  "candidateId": "59f10f72-9021-4a79-bc67-0e44fd40bfbc",
+  "name": "그린핏유산균",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170171185",
+  "candidateId": "1c1d32bc-cc78-475a-b12b-e3b95eb81ee6",
+  "name": "나를 위한 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170061287",
+  "candidateId": "be80145a-3904-4615-a20e-6ccda0a3ba2e",
+  "name": "내몸애(愛)유산균 플러스",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015162361",
+  "candidateId": "7a8ef9fe-65aa-4050-930f-4f5594f9229a",
+  "name": "네이처팩토리 프리바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001701384",
+  "candidateId": "7b9ce39a-ede1-4cf2-be22-2853181e4489",
+  "name": "녹십초바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120017002181",
+  "candidateId": "fbc85d14-f438-4ddc-b00e-5d22a39ddc76",
+  "name": "뉴메이트 포스트바이오틱스 마이크로바이옴",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "202000124464",
+  "candidateId": "0a68a1f9-5b0c-40fe-aac3-7c29efd4559f",
+  "name": "다이어트 & 유산균 19종 3종복합기능성",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020835",
+  "candidateId": "4dec1d85-49b2-422a-bc32-6a79692eb416",
+  "name": "다이어트 앤 착한 유산균",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015107987",
+  "candidateId": "8fedd32a-ff93-45c6-9836-4a31b938f1f0",
+  "name": "다이어트 플러스 트리플케어",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352028",
+  "candidateId": "b42972df-9bc8-487b-acfa-e9d6cb63bea4",
+  "name": "닥터에스더 차전자피 프로바이오틱스",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017046100",
+  "candidateId": "8841026c-6aba-45d2-82b3-b2aa1a0abc07",
+  "name": "닥터웰화이버포르테",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400151101157",
+  "candidateId": "a863d75e-2f90-441f-8b94-4988b05477cb",
+  "name": "닥터케라피 레디톡스(Ready-Talks) 710 PLUS",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20172880236222",
+  "candidateId": "88ab4a78-1f99-4cab-a0b7-6840fee1e6b0",
+  "name": "당(糖)+장(腸) 유산균",
+  "sig": "귀리",
+  "fiberSources": [
+   "귀리"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014640",
+  "candidateId": "70407a72-b24f-4f60-b7af-0e2f04c55741",
+  "name": "대장 크린식이섬유",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020041458",
+  "candidateId": "bc5a6e90-207c-4c0c-9c2b-9d994dbc9fcd",
+  "name": "대장사랑 비움 유산균 오리지널",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020041493",
+  "candidateId": "7ae4df4c-4f88-4e23-a805-7254bdf7340e",
+  "name": "대장사랑 비움 유산균 플러스",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120019007370",
+  "candidateId": "53ce647e-fe23-4aff-a3fa-d0315a08d183",
+  "name": "더 퍼스트 포스트바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001246616",
+  "candidateId": "65fdf1be-34bc-4bc3-9b35-337505d04c40",
+  "name": "더블액션 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001246613",
+  "candidateId": "a075f42f-da1b-434f-99e1-0d94e0ce0f92",
+  "name": "더블액션 프리바이오틱스 플러스",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "2023002928469",
+  "candidateId": "dda5b8bd-0ce6-439d-9e73-97c5ed5e9702",
+  "name": "더블액션 프리바이오틱스 플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20172880193203",
+  "candidateId": "1bd917fa-eead-4153-8a98-5fc66e731154",
+  "name": "데일리 신바이오틱스 플러스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200062057",
+  "candidateId": "202457dc-bc16-4018-87f0-ac2298ede6cf",
+  "name": "듀얼스틱 장케어",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170171094",
+  "candidateId": "c670936f-5e84-4809-8991-9ecf988d9e7a",
+  "name": "듀오락 포스트바이오틱스7",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017017882",
+  "candidateId": "16266b92-cae6-4ca6-9563-f140a23a4dff",
+  "name": "듀오락 혈당컨트롤",
+  "sig": "귀리",
+  "fiberSources": [
+   "귀리"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020780",
+  "candidateId": "c0f91113-c7c3-4b70-9deb-972ee43be59c",
+  "name": "라인다이어트프로",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2013001702353",
+  "candidateId": "7d82baca-c7de-4e6b-ba35-0b62ea519bd4",
+  "name": "락토 멀티포뮬러",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351974",
+  "candidateId": "83748b83-3595-4e2c-a6e8-8a94d7e94b12",
+  "name": "락토러브 멀티바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200032103",
+  "candidateId": "12b25cd9-b52f-47c9-b384-ec911b8dce70",
+  "name": "락토미인 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2019001602479",
+  "candidateId": "ef51a2ff-d198-4e1d-afcf-cf4015212f9b",
+  "name": "락토미인 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400151071026",
+  "candidateId": "056b6ab9-882c-410c-9165-5f2a8543453a",
+  "name": "락토바이오5000신바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "201900091058",
+  "candidateId": "d46c614c-d5c1-4f45-853a-f555909d954f",
+  "name": "락토생유산균17플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "202500287594",
+  "candidateId": "88cac87f-b40c-4006-a50e-d2c6ef6d07d8",
+  "name": "락토생유산균17플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020751",
+  "candidateId": "9b97af3f-c63f-46ae-b6a6-59d1fd0cd69f",
+  "name": "락토퓨어 SYN 신 프로바이오틱스 유산균",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 10,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017059166",
+  "candidateId": "2b347737-cdbb-485d-9602-6866a910463c",
+  "name": "락토필듀오 멀티액션 에스(LACTOPHILDUO MULTIACTION S)",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020674",
+  "candidateId": "f0504d1b-dc78-4f5a-9261-f805fb9a136a",
+  "name": "락티브 신포스트바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 10,
+  "enOk": false
+ },
+ {
+  "statementNo": "2009001504754",
+  "candidateId": "bbe38ff8-7b6c-4c12-a9d8-a15d92bd0ad5",
+  "name": "레인보우 신바이오틱스 멀티유산균",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2009001504756",
+  "candidateId": "190a490e-70f7-4618-99fc-302f7ca61295",
+  "name": "레인보우 신바이오틱스 멀티유산균 R",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2017288023647",
+  "candidateId": "7af4b30a-00b6-4845-8e0b-efcf47f569bc",
+  "name": "루트칸 프리바이오틱스 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020420",
+  "candidateId": "cf360d43-f4a3-422c-ac03-d4d07a5b918d",
+  "name": "리셋프로다이어트",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014599",
+  "candidateId": "b95f78aa-41c4-4794-92fd-bf5fe7945184",
+  "name": "리얼닥터 슈퍼 멀티바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "판토텐산",
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351309",
+  "candidateId": "e379f97e-2b00-4ff5-9c14-430ff1057541",
+  "name": "리얼닥터 프로프리바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014632",
+  "candidateId": "a6c4fa72-e9a0-435f-8b18-4aa6ba3385fc",
+  "name": "리얼닥터 프로프리바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20110020099111",
+  "candidateId": "a0fcc12a-feb1-46c8-8e33-d6f18cf7d89d",
+  "name": "리얼모닝",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200072317",
+  "candidateId": "3249ed83-d03d-47bb-adcf-9b33ea71686a",
+  "name": "릭앤케어 신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004002002542",
+  "candidateId": "40e50276-bf64-48cb-8dfd-cc8455edfe0b",
+  "name": "마이크로바이옴 생 신바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004002002569",
+  "candidateId": "94c9c1aa-5ca9-455b-b39a-abce6500004c",
+  "name": "마이크로바이옴 신바이오틱스 코어",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020647",
+  "candidateId": "975ef689-afdc-4412-a4c0-db99930dde2b",
+  "name": "마이크로바이옴 프로&프리바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068268",
+  "candidateId": "18988b64-8bd6-4c48-91d3-6ac1fb34010a",
+  "name": "마이크로바이옴 프로·프리바이오틱스 골드",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068219",
+  "candidateId": "9e67a8bb-7278-461d-b79e-84f2aefcedbf",
+  "name": "마이크로바이옴 프로·프리바이오틱스 유산균",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020915",
+  "candidateId": "2d386725-e436-4bef-80dd-b2cb412e2952",
+  "name": "마이크로바이옴 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200201423",
+  "candidateId": "77c5ccb5-a412-43ba-9e42-7a5f7eb2e1ce",
+  "name": "마이핏 ORIGIN 퍼스트바이오틱스 17",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017106433",
+  "candidateId": "0d88be3b-3252-46b1-91bf-fc78907a6c2c",
+  "name": "마크로비우 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200061943",
+  "candidateId": "95960f2e-2a8e-4eab-90c9-95b82fb25f7c",
+  "name": "맛있는 차전자피 텅쾌함",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200024089",
+  "candidateId": "466ef3bc-5969-4ea5-a609-43987577f6bb",
+  "name": "맥스컷 다이어트 핏",
+  "sig": "가르시니아+나이아신+난소화성말토덱스트린+비타민B1+비타민B6+판토텐산",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "가르시니아",
+   "비타민B1",
+   "비타민B6",
+   "나이아신",
+   "판토텐산"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352017",
+  "candidateId": "99abf573-d2e3-4fee-bcda-74465171ecc0",
+  "name": "맥스케어 마이크로바이옴 100억 유산균",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022785",
+  "candidateId": "08c406fa-3a5e-4ed9-93a9-8cfc93b360f9",
+  "name": "멀티바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110962",
+  "candidateId": "e8a02c12-6021-4114-afc7-a3073c9d0115",
+  "name": "멀티바이오틱스 면역플러스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020633",
+  "candidateId": "34ac7fe1-3b8e-4dba-8bdb-58d2796253d4",
+  "name": "메가 액티브 신바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483305",
+  "candidateId": "126edb81-67c3-4921-8f90-268f404469a4",
+  "name": "메가 프로바이오틱스 플러스 프리바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020693",
+  "candidateId": "5488ab37-4e26-49c7-adc2-97ddea2f1582",
+  "name": "메이플트리 신 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170061300",
+  "candidateId": "a0a6e9aa-1aa9-4d86-aa49-3a58423303f9",
+  "name": "메타 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2017278206857",
+  "candidateId": "4bd7a2a0-6503-43e1-9153-2dd85ca099ef",
+  "name": "메틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110944",
+  "candidateId": "a03ae608-ad4a-43e0-b6f9-0e9e0e781ec3",
+  "name": "면역7 바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015110936",
+  "candidateId": "5f0f5f47-9b9d-445f-9cf8-500124c8982c",
+  "name": "면역엔N포스트바이오틱스",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "2020001244632",
+  "candidateId": "d505db7c-10a3-4663-bfc4-257d5ee96966",
+  "name": "미에덴팜 퍼플 투케어 유산균",
+  "sig": "난소화성말토덱스트린",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022588",
+  "candidateId": "218ca8ae-8f93-4ba3-ac90-08f0270609e3",
+  "name": "미즈본",
+  "sig": "글루코사민+비타민D+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "글루코사민",
+   "비타민D"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2004001704678",
+  "candidateId": "83fc0a83-841f-4661-8e66-f0b3f32e9d89",
+  "name": "미코스",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200023410",
+  "candidateId": "b6072d67-967c-49d3-a4fe-49f8b10416bb",
+  "name": "바이탈에버 혈당·장건강",
+  "sig": "난소화성말토덱스트린+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당",
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020407",
+  "candidateId": "80d46a31-70f4-487e-8b1f-93b126e55e25",
+  "name": "바디엔화이바(body&fiber)",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068206",
+  "candidateId": "ffa2ab2d-cc7c-4553-ad3f-f31a342eaccf",
+  "name": "바디팻 신바이오틱스",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200032803",
+  "candidateId": "972d41ed-d19e-4b7d-a02b-8aa2d2b67991",
+  "name": "바이브이펙트 두잇 퍼펙트워터",
+  "sig": "가르시니아+나이아신+난소화성말토덱스트린+비타민C+판토텐산",
+  "fiberSources": [
+   "난소화성말토덱스트린"
+  ],
+  "partners": [
+   "가르시니아",
+   "비타민C",
+   "나이아신",
+   "판토텐산"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20220010222149",
+  "candidateId": "2fbcafd6-0b8b-464b-822e-7844fafd778f",
+  "name": "바이옴핏 골드 프로 앤 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "2015001001878",
+  "candidateId": "e70dfab0-f9fa-430c-b6a5-b6425c2bce61",
+  "name": "배가쏘옥",
+  "sig": "가르시니아+차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2018001217418",
+  "candidateId": "3e8f76c5-82fb-4d8f-ab70-ff2b07ceac24",
+  "name": "벨기에 유산균 다이어트 트리플러스",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017014626",
+  "candidateId": "596094dd-e069-4f92-a8a7-c72fb5c84330",
+  "name": "벨기에 유산균+다이어트 트리플러스",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20180012174173",
+  "candidateId": "0c6f025e-6f93-4b3b-9656-c85fbafd0ead",
+  "name": "보령 장위한 넥스트바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831089",
+  "candidateId": "f280e261-423e-4c73-a995-287518bd9b91",
+  "name": "보령 프리바이오틱스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020918",
+  "candidateId": "532ccbd2-5208-4e8e-8f9f-a54babf18dd8",
+  "name": "비오즌:디 마스터바이오틱스",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "2014002001249",
+  "candidateId": "29020fb5-e1cc-40af-848e-54cbd5adf2dc",
+  "name": "비우다 장선생",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017046113",
+  "candidateId": "fd8c68fb-cfb1-46bf-b99c-a65e68aede66",
+  "name": "비울핏 화이버",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2022001137040",
+  "candidateId": "106b82b8-f814-4bde-9c69-26ff22605491",
+  "name": "비움의 기적 프리미엄",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015070497",
+  "candidateId": "0e3ae600-b676-4080-a833-d71f9f75b55c",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS",
+  "sig": "아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015070419",
+  "candidateId": "0f8c3ba1-b200-4eda-894c-d5c976aa0ec4",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS 플러스",
+  "sig": "아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015070431",
+  "candidateId": "9f33ca12-cf32-4f78-89ab-c39ae2c355ec",
+  "name": "비피맥스 프리미엄 비피더스 100억 XOS제로",
+  "sig": "아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200201130",
+  "candidateId": "3c5a7bd1-2c8e-4d0e-9004-8699d1ba76a5",
+  "name": "쁘띠앤 락토제트",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015107398",
+  "candidateId": "bdf3f6d9-75b6-4a8c-b647-9212c384b09e",
+  "name": "사포눌린",
+  "sig": "이눌린",
+  "fiberSources": [
+   "이눌린"
+  ],
+  "partners": [],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020685",
+  "candidateId": "ec285c42-b277-470f-abdd-51a4376227e9",
+  "name": "생유산균17종 프로바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351615",
+  "candidateId": "23f0ee32-e0a7-4f59-a28f-889a8b962eb1",
+  "name": "세브란스케어 멀티바이오틱스 면역플러스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040015162341",
+  "candidateId": "09597a58-d955-4e7a-92be-6bc089d87a10",
+  "name": "셀티바 SYN(신) 프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020592",
+  "candidateId": "5a2ddaa9-7378-4c2e-b225-5576dc132752",
+  "name": "셀티바 SYN(신)프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020773",
+  "candidateId": "e0871922-8c49-4e39-aadc-e74bf397fa08",
+  "name": "셀티바 SYN(신)프리바이오틱스 트리플업",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017006988",
+  "candidateId": "69811785-11e4-4b17-9b42-04da7078354e",
+  "name": "셀티바 SYN신프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020046596",
+  "candidateId": "f50c5a2d-344f-4d53-898a-d7c8814b6682",
+  "name": "셀티바 대장비움",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017006985",
+  "candidateId": "efcc5432-c6e9-4ab7-9745-3ee55f4c5e81",
+  "name": "셀티바 신SYN프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "2006001510961",
+  "candidateId": "a76ee648-02d9-42aa-97ce-d0b04a3ea950",
+  "name": "솔빛 신바이오틱스 유산균",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020733",
+  "candidateId": "dbb750e3-42e5-43c2-bef3-e9d64c1e63cf",
+  "name": "슈퍼 FORCE(포스) 프로바이오틱스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483197",
+  "candidateId": "abe0e814-39a7-42d0-86bb-a8a0221c606e",
+  "name": "슈퍼 마이크로바이옴 신바이오틱스",
+  "sig": "아연+판토텐산+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "판토텐산"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351148",
+  "candidateId": "c2718dd6-aeb9-4279-8f05-c4d04368dee1",
+  "name": "슈퍼유산균 신바이오틱스 골드",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351254",
+  "candidateId": "2d34b922-f018-48ad-9f84-e242a38717ce",
+  "name": "슈퍼유산균 신바이오틱스 액티브",
+  "sig": "비타민D+셀레늄+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020626",
+  "candidateId": "aed8e1ef-61bd-445a-a5b6-761520b4ebaf",
+  "name": "스마일렌 프리앤프로바이오틱스 19",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031259",
+  "candidateId": "55a480fb-4ba8-45de-9c12-792601ac5c3f",
+  "name": "스마트프리미엄",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20140017002690",
+  "candidateId": "050c1e6b-7e88-4121-bac0-63379d76b4d4",
+  "name": "스킨케어 SKIN CARE",
+  "sig": "자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "2014002001234",
+  "candidateId": "a4f573ae-8a59-4edc-8e7d-9f4f52047f05",
+  "name": "슬림 장-프리바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "2014002001283",
+  "candidateId": "ac739c4e-bcf5-497b-b2b0-dda620d8ed92",
+  "name": "슬림 장-플러스",
+  "sig": "가르시니아+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "가르시니아"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20110020099200",
+  "candidateId": "511c04d4-05a9-49ef-bde8-e55ed1d8b6d5",
+  "name": "슬림한 이유",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068264",
+  "candidateId": "4c1e480d-087f-461d-9d88-dab87c1f96f7",
+  "name": "신바이오틱스 프리미엄 5케어",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020888",
+  "candidateId": "43b820c3-b019-4ba1-b9ef-ab282954d134",
+  "name": "신 프로바이오틱스 10억 유산균",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200031497",
+  "candidateId": "ae16bf11-1137-47b6-9aeb-cc344b0e91b3",
+  "name": "신미보 신(信) 트리플 바이오틱스 케어",
+  "sig": "비타민D+아연+자일로올리고당",
+  "fiberSources": [
+   "자일로올리고당"
+  ],
+  "partners": [
+   "비타민D",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400150831284",
+  "candidateId": "1fd8fc6b-3324-42f9-82a1-ddb039028b16",
+  "name": "신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "2020001612210",
+  "candidateId": "1370f952-9adc-4a32-a308-ef91e4b0ecbf",
+  "name": "신바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017031269",
+  "candidateId": "7820e27e-36aa-4c0c-9bc0-820e8315c55f",
+  "name": "신바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "20110017019102",
+  "candidateId": "e06f15ad-18f3-4506-b675-05f8073b9d0b",
+  "name": "신바이오틱스 네오부스터",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020735",
+  "candidateId": "8a6e368e-2ccc-4d19-94c3-2fbc198701a9",
+  "name": "신바이오틱스 듀얼",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017021876",
+  "candidateId": "84cf127d-aeed-4da3-803f-051fde0bb407",
+  "name": "신바이오틱스 스위치온",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211285",
+  "candidateId": "68ae3123-1a20-4964-a302-d6414843b3e7",
+  "name": "신바이오틱스 스위치온 골드",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400170211172",
+  "candidateId": "bb4c6bf4-13c0-4745-b27f-af7b4aa9cd91",
+  "name": "신바이오틱스 스위치온 플러스",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020728",
+  "candidateId": "1112211c-8d81-4f32-b8b7-03a72c5151b3",
+  "name": "신바이오틱스 알파",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020682",
+  "candidateId": "2ea1284e-3efc-475a-a762-eeff5115ced8",
+  "name": "신바이오틱스 에스(SYNBIOTICS S)",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20120019007320",
+  "candidateId": "e97f2830-74a6-4044-a971-67844170bfdd",
+  "name": "신바이오틱스 울트라",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 5,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170352038",
+  "candidateId": "96153738-3939-4aab-b06f-bfccb7f925d8",
+  "name": "신바이오틱스 이뮨",
+  "sig": "비타민D+셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ],
+  "fnCount": 8,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351424",
+  "candidateId": "805c3898-e43a-4b95-a9c7-73fc94ad3b17",
+  "name": "신바이오틱스 프로바이오틱스&프리바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "셀레늄"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020643",
+  "candidateId": "ea6eae89-171a-474c-8d39-37446da2810d",
+  "name": "신바이오틱스 프리프로",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020772",
+  "candidateId": "9736a23f-11cb-4543-bb55-585a63e60d88",
+  "name": "신바이오틱스 플러스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068190",
+  "candidateId": "df5eb43c-db3f-48b4-9b17-23b428287d79",
+  "name": "신바이오틱스3000",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040017068201",
+  "candidateId": "d37d878e-9cfb-4a1c-a16d-ae5b0a5038da",
+  "name": "신바이오틱스3000골드",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 4,
+  "enOk": false
+ },
+ {
+  "statementNo": "200600200032376",
+  "candidateId": "578a0fc4-09a4-4c43-8783-1f3c9720d759",
+  "name": "신바이오플러스",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 3,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351669",
+  "candidateId": "31c93545-4c97-4cf0-aa85-3b38e5268e6a",
+  "name": "신터액트 시니어",
+  "sig": "비타민D+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연",
+   "비타민D"
+  ],
+  "fnCount": 9,
+  "enOk": false
+ },
+ {
+  "statementNo": "201900091059",
+  "candidateId": "f021a5d2-a709-46f1-b111-315772fdc48b",
+  "name": "신프로&프리바이오틱스5000",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020939",
+  "candidateId": "d85a9aea-cbb4-421c-8d6f-07944e3363ff",
+  "name": "신프로바이오틱스 + 아연 프리미엄",
+  "sig": "아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "아연"
+  ],
+  "fnCount": 6,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200022245",
+  "candidateId": "f1edced8-cb10-4f9c-9afe-6d4d7b7c17f2",
+  "name": "아락소프트핏",
+  "sig": "차전자피",
+  "fiberSources": [
+   "차전자피"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "200400200024001",
+  "candidateId": "a341ddfd-8ac3-4259-ada6-c4f2441a1da6",
+  "name": "아이마음 인덱스 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20190009483631",
+  "candidateId": "4ad286f4-84d9-41e6-a4e2-44af44ddb78b",
+  "name": "아이엠바이오틱스 쾌변&장건강",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ },
+ {
+  "statementNo": "20040020020930",
+  "candidateId": "e12d82d0-87da-4e52-89cd-7a43412aa764",
+  "name": "아임헬씨 프로바이오틱스 프리바이오틱스",
+  "sig": "셀레늄+아연+프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [
+   "셀레늄",
+   "아연"
+  ],
+  "fnCount": 7,
+  "enOk": false
+ },
+ {
+  "statementNo": "200700170351897",
+  "candidateId": "5fc1376c-dc49-4835-9f1e-bd0536a285dc",
+  "name": "알파 제타 프로바이오틱스",
+  "sig": "프락토올리고당",
+  "fiberSources": [
+   "프락토올리고당"
+  ],
+  "partners": [],
+  "fnCount": 2,
+  "enOk": false
+ }
+]
