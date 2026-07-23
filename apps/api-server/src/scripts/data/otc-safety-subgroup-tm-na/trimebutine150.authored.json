@@ -1,0 +1,48 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 트리메부틴말레산염 150mg 정 그룹 TM 저작(24줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "트리메부틴말레산염|150밀리그램|정",
+  "meta": {
+    "titleKo": "트리메부틴말레산염 150mg 정 (위장운동조절제)",
+    "titleEn": "Trimebutine Maleate 150 mg Tablets (Gastrointestinal Motility Regulator)",
+    "ingKo": "트리메부틴말레산염 150밀리그램",
+    "ingEn": "Trimebutine maleate 150 mg",
+    "actionKo": "위장관 운동을 조절하여 소화기능 이상과 과민성대장증후군 증상을 개선하는 위장운동조절제입니다.",
+    "actionEn": "A gastrointestinal motility regulator that improves digestive function abnormalities and irritable bowel syndrome symptoms by regulating gut movement."
+  },
+  "effSummaries": {
+    "48ee14d1": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "54705f33": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "6b2e5073": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." },
+    "dcf25ea7": { "symKo": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애", "symEn": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders", "pointKo": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다.", "pointEn": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms." }
+  },
+  "cauSummaries": {
+    "a4049328": { "watchKo": "갈락토오스 불내성 등 유전적 문제가 있는 환자 복용 금지", "watchEn": "Do not use with hereditary problems such as galactose intolerance" },
+    "c3cd6f04": { "watchKo": "갈락토오스 불내성 등 유전적 문제가 있는 환자 복용 금지", "watchEn": "Do not use with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "54705f33": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal hernia, gastritis and duodenitis, and gastric and duodenal ulcers; for irritable bowel syndrome and spastic colon; and for habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea).",
+    "959e7880": "This medicine is used for digestive function abnormalities such as abdominal pain, indigestion, nausea, and vomiting caused by esophageal reflux and hiatal hernia, gastritis or duodenitis, and gastric or duodenal ulcers.",
+    "dc5acf44": "This medicine is used for irritable bowel syndrome and spastic colon.",
+    "6d9131b5": "This medicine is used for childhood conditions such as habitual vomiting and non-infectious intestinal transit disorders such as constipation and diarrhea.",
+    "3e4fd169": "This medicine is used for habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea) as childhood conditions.",
+    "c769dff9": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal hernia, gastritis and duodenitis, and gastric and duodenal ulcers, and for irritable bowel syndrome and spastic colon.",
+    "dcf25ea7": "This medicine is used for digestive function abnormalities (abdominal pain, indigestion, nausea, vomiting) in esophageal reflux and hiatal hernia, gastroduodenitis, and gastroduodenal ulcers; for irritable bowel syndrome and spastic colon; and for childhood conditions (habitual vomiting and non-infectious intestinal transit disorders (constipation, diarrhea)).",
+    "5bc5b139": "Adults take 100 to 200 mg of trimebutine maleate per 1 dose, 3 times a day, before meals.",
+    "b28dc8a3": "Adults take 100 to 200 mg of trimebutine maleate per 1 dose, 3 times a day, before meals.",
+    "bf953ac0": "Adults take 100 to 200 mg per 1 dose, 3 times a day, before meals.",
+    "a7ebccd8": "Adults take 1 tablet (150 mg) per dose, 3 times a day, before meals.",
+    "1b048854": "Adjust appropriately according to age and symptoms.",
+    "33dcecb9": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding.",
+    "3cf70236": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding.",
+    "1618fcd7": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding.",
+    "9eb39d8b": "If a breastfeeding woman must take this medicine, stop breastfeeding.",
+    "e099b5f8": "If a breastfeeding woman must take this medicine, stop breastfeeding.",
+    "a4049328": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "c3cd6f04": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "34853296": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT, elevated GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "93a94c2b": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "c9e2c6d8": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "f1266d8d": "In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT and GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "b8b37c2a": "In rare cases, constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, and elevated GOT and GPT may occur."
+  }
+}

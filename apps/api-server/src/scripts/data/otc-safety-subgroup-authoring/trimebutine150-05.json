@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "trimebutine150-05",
+  "order": 1805,
+  "groupKey": "트리메부틴말레산염|150밀리그램|정",
+  "safetyFp": "c8cf0baeeb8a32fc",
+  "sourceRef": "84122189-3d3c-424d-8c64-9a285871e56c",
+  "sensitive": false,
+  "title": "트리메부틴말레산염 150mg 정 (위장운동조절제)",
+  "expectEasyMd5": "a34b849f",
+  "masterIds": [
+    "70fad15b-77e4-4fd7-a079-41bd6bcb885c",
+    "8b543755-80db-4882-a0ae-46adcbfa3322",
+    "af2941f3-f0f5-401c-b0f7-e79f285cdb5c"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "a34b849f",
+    "names": [
+      "바이메틴정150밀리그램(트리메부틴말레산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 식도역류 및 열공헤르니아, 위 또는 십이지장염, 위 또는 십이지장궤양으로 인한 복통, 소화불량, 구역, 구토 등의 소화기능이상에 사용합니다.\n\n이 약은 과민성대장증후군 및 경련성 결장에 사용합니다.\n\n이 약은 습관성 구토, 변비나 설사와 같은 비감염성 장관통과 장애 등의 소아 질환에 사용합니다.",
+    "usage": "성인은 1회 100~200 mg씩, 1일 3회 식전에 복용합니다.\n\n연령 및 증상에 따라 적절히 증감할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.\n\n수유부가 부득이 복용하는 경우 수유를 중지하십시오.\n\n드물게 변비, 설사, 복명, 구역, 구토, 소화장애, 구갈, 구내마비감, 심계항진, 피로감, 졸음, 현기, 권태감, 두통, GOT 상승, GPT 상승, 발진 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "트리메부틴말레산염 150밀리그램",
+      "작용": "위장관 운동을 조절하여 소화기능 이상과 과민성대장증후군 증상을 개선하는 위장운동조절제입니다.",
+      "주요 증상": "식도역류·열공헤르니아, 위·십이지장염/궤양의 소화기능이상, 과민성대장증후군·경련성 결장, 소아 습관성 구토·장관통과장애",
+      "주의 대상": "갈락토오스 불내성 등 유전적 문제가 있는 환자 복용 금지",
+      "선택 포인트": "위장 운동을 조절해 소화기능 이상과 과민성대장 증상을 개선하는 트리메부틴 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Trimebutine Maleate 150 mg Tablets (Gastrointestinal Motility Regulator)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for digestive function abnormalities such as abdominal pain, indigestion, nausea, and vomiting caused by esophageal reflux and hiatal hernia, gastritis or duodenitis, and gastric or duodenal ulcers. This medicine is used for irritable bowel syndrome and spastic colon. This medicine is used for childhood conditions such as habitual vomiting and non-infectious intestinal transit disorders such as constipation and diarrhea.",
+    "usage": "Adults take 100 to 200 mg per 1 dose, 3 times a day, before meals. Adjust appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding. If a breastfeeding woman must take this medicine, stop breastfeeding. In rare cases, if constipation, diarrhea, borborygmus (bowel gas sounds), nausea, vomiting, digestive disturbances, dry mouth (thirst), numbness in the mouth, palpitations, fatigue, drowsiness, dizziness, malaise, headache, elevated GOT, elevated GPT, or rash occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Trimebutine maleate 150 mg",
+      "How it works": "A gastrointestinal motility regulator that improves digestive function abnormalities and irritable bowel syndrome symptoms by regulating gut movement.",
+      "Main symptoms": "Digestive abnormalities in esophageal reflux, hiatal hernia, gastroduodenitis and ulcers; irritable bowel syndrome and spastic colon; childhood habitual vomiting and intestinal transit disorders",
+      "Caution for": "Do not use with hereditary problems such as galactose intolerance",
+      "Why this one": "A trimebutine preparation that regulates gut motility to improve digestive abnormalities and irritable bowel symptoms."
+    }
+  }
+}

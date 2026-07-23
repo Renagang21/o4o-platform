@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "cetirizine10cap-09",
+  "order": 1909,
+  "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+  "safetyFp": "d605689d5fd9ea3f",
+  "sourceRef": "1e995eb3-079c-44e2-8d82-c0d0713d52e9",
+  "sensitive": false,
+  "title": "세티리진염산염 10mg 연질캡슐 (알레르기약)",
+  "expectEasyMd5": "cf2c4993",
+  "masterIds": [
+    "94d4ae5b-3205-46f3-9f6a-59128d1eaf51",
+    "c4a010d6-cf4e-4df1-86dd-6cdf760c9782"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "cf2c4993",
+    "names": [
+      "세노바퀵연질캡슐(세티리진염산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 계절성 및 다년성 알레르기성 비염(코염), 알레르기성 결막염, 만성 특발성(원인불명의) 두드러기, 피부 소양증(가려움증)에 사용합니다.",
+    "usage": "성인 및 6세 이상의 소아는 10 mg씩, 1일 1회 취침 전에 복용하고, 이상반응에 민감한 환자의 경우는 5 mg씩, 아침, 저녁에 복용합니다.\n\n연령, 증상에 따라 적절히 증감할 수 있습니다\n\n신장애 환자의 투여 간격은 환자의 신기능에 따라 조절되어야 하고, 신장애를 가진 소아 환자는 환자의 신 청소율과 체중을 고려하여 개별적으로 용량을 조절해야 하므로 자세한 사항은 허가사항을 참고하십시오.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약 및 히드록시진 또는 피페라진 유도체에 과민증 환자, 신부전 환자(크레아티닌 청소율 < 10 mL/min)\n\n이 약을 복용하기 전에 신장애, 간장애 환자, 노인, 간질 환자 및 발작 위험성이 있는 환자, 소변고임의 선행요인(척수 병변, 전립선 비대증)이 있는 환자, 임부, 수유부는 의사 또는 약사와 상의하십시오.\n\n테오필린, 리토나비어, 과량의 알코올과 함께 복용하지 마십시오.\n\n졸음, 두통, 때때로 권태감, 마비감, 무력증, 초조, 감각이상, 드물게 가볍고 일시적인 나른함, 피로, 어지러움, 머리무거움, 흥분, 경련, 운동이상, 근육긴장이상, 실신, 떨림, 공격성, 혼돈, 우울, 환각, 불면증, 틱 장애, 기억상실, 기억장애, 자살관념, 악몽, 때때로 목마름, 입술건조감, 구역, 식욕부진, 위부불쾌감, 소화불량, 복통, 위통, 복부불쾌감, 설사, 드물게 구토, 위장장애, 입술염, 미각이상, 식욕증진, 드물게 빠른맥, 부정맥, 혈압상승, 때때로 목마름, 입술건조감, 구역, 식욕부진, 위부불쾌감, 소화불량, 복통, 위통, 복부불쾌감, 설사, 드물게 구토, 위장장애, 입술염, 미각이상, 식욕증진, 빠른맥, 부정맥, 혈압상승, 때때로 두근거림, 혈관염, 때때로 백혈구 감소, 호중구 감소, 림프구 증가, 호산구 증가, 드물게 단구 증가, 혈소판 증가, 광과민증, 드물게 과민증 및 과민성 쇼크, 때때로 부기, 가려움, 발진, 드물게 두드러기, 혈관신경성부종, 고정약물발진, 급성 전신 발진농포증, 드물게 흐린 시력, 결막충혈, 안조절 장애, 전후축의 안구운동, 현기증, 때때로 AST, ALT, ALP, 총빌리루빈, -GTP, LDH의 상승 등 간기능 장애, 황달, 간염, 때때로 BUN 상승, 당뇨, 피섞인 소변, 드물게 배뇨 곤란, 야뇨증, 소변고임, 관절통, 인두염, 기침, 코피, 기관지경련, 청력이상, 시각이상, 때때로 가슴통증, 드물게 월경불순, 귀울림, 비염, 체중 증가가 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "세티리진염산염 10밀리그램",
+      "작용": "히스타민 작용을 차단하여 알레르기비염·결막염·두드러기·가려움증을 완화하는 항히스타민제입니다.",
+      "주요 증상": "계절성·다년성 알레르기비염, 알레르기성 결막염, 만성 특발성 두드러기, 피부 가려움증",
+      "주의 대상": "이 약·히드록시진·피페라진 유도체 과민증, 신부전(크레아티닌 청소율 10 미만) 복용 금지",
+      "선택 포인트": "알레르기비염·결막염·두드러기·가려움증에 쓰는 세티리진 항히스타민제입니다."
+    }
+  },
+  "en": {
+    "title": "Cetirizine Hydrochloride 10 mg Soft Capsules (Allergy Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic (of unknown cause) hives, and skin pruritus (itching).",
+    "usage": "Adults and children 6 years and older take 10 mg, 1 time a day, before bedtime. Patients sensitive to adverse reactions take 5 mg each in the morning and evening. The dose may be adjusted appropriately according to age and symptoms. The dosing interval for patients with kidney disorders should be adjusted according to their kidney function, and for pediatric patients with kidney disorders the dose should be adjusted individually considering renal clearance and body weight; refer to the approved product information for details.",
+    "caution": "Do not take this medicine if you are hypersensitive to it or to hydroxyzine or piperazine derivatives, or have kidney failure (creatinine clearance below 10 mL/min). Before taking this medicine, consult a doctor or pharmacist if you have kidney disorders or liver disorders; are elderly; have epilepsy or a risk of seizures; have predisposing factors for urinary retention (spinal cord lesions, enlarged prostate); or are pregnant or breastfeeding. Do not take theophylline, ritonavir, or excessive alcohol together with this medicine. If drowsiness, headache, sometimes malaise, numbness, weakness, restlessness, and abnormal sensations, rarely mild and temporary listlessness, fatigue, dizziness, heaviness of the head, excitement, convulsions, movement disorders, dystonia, fainting, tremor, aggression, confusion, depression, hallucinations, sleeplessness, tic disorders, amnesia, memory disorders, suicidal ideation, and nightmares, sometimes thirst, dry lips, nausea, loss of appetite, stomach discomfort, indigestion, abdominal pain, stomach pain, abdominal discomfort, and diarrhea, rarely vomiting, gastrointestinal disturbances, lip inflammation, taste abnormalities, and increased appetite, rarely rapid pulse, arrhythmia, and increased blood pressure, and again sometimes thirst, dry lips, nausea, loss of appetite, stomach discomfort, indigestion, abdominal pain, stomach pain, abdominal discomfort, and diarrhea, rarely vomiting, gastrointestinal disturbances, lip inflammation, taste abnormalities, increased appetite, rapid pulse, arrhythmia, and increased blood pressure, sometimes palpitations and vasculitis, sometimes decreased white blood cells, decreased neutrophils, increased lymphocytes, and increased eosinophils, rarely increased monocytes, increased platelets, and photosensitivity, rarely hypersensitivity and anaphylactic shock, sometimes swelling, itching, and rash, rarely hives, angioneurotic edema, fixed drug eruption, and acute generalized exanthematous pustulosis, rarely blurred vision, conjunctival redness, disturbances of eye accommodation, front-back axis eye movements, and vertigo, liver function disorders such as sometimes elevated AST, ALT, ALP, total bilirubin, gamma-GTP, and LDH, jaundice, hepatitis, sometimes elevated BUN, sugar in the urine, and blood-tinged urine, rarely difficulty urinating, bedwetting, and urinary retention, joint pain, pharyngitis, cough, nosebleeds, bronchospasm, hearing abnormalities, visual abnormalities, sometimes chest pain, or rarely menstrual irregularities, ringing in the ears, rhinitis, or weight gain occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Cetirizine hydrochloride 10 mg",
+      "How it works": "An antihistamine that relieves allergic rhinitis, conjunctivitis, hives, and itching by blocking the action of histamine.",
+      "Main symptoms": "Seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic hives, skin itching",
+      "Caution for": "Do not use with hypersensitivity to this medicine, hydroxyzine, or piperazine derivatives, or with kidney failure (creatinine clearance below 10)",
+      "Why this one": "A cetirizine antihistamine for allergic rhinitis, conjunctivitis, hives, and itching."
+    }
+  }
+}

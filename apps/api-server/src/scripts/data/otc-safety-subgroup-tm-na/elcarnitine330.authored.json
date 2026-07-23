@@ -1,0 +1,52 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 엘카르니틴 330mg 정 그룹 TM 저작(27줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "엘카르니틴|330밀리그램|정",
+  "meta": {
+    "titleKo": "엘카르니틴 330mg 정 (카르니틴 보충제)",
+    "titleEn": "L-Carnitine 330 mg Tablets (Carnitine Supplement Medicine)",
+    "ingKo": "엘카르니틴 330밀리그램",
+    "ingEn": "L-carnitine 330 mg",
+    "actionKo": "체내 카르니틴을 보충하여 카르니틴결핍증과 허혈성 심질환에 의한 심근대사장애를 개선하는 약입니다.",
+    "actionEn": "A medicine that replenishes carnitine in the body to improve carnitine deficiency and myocardial metabolic disorders caused by ischemic heart disease."
+  },
+  "effSummaries": {
+    "049ff1e3": { "symKo": "1차성·2차성 카르니틴결핍증, 허혈성 심질환(협심증·급성심근경색)에 의한 심근대사장애", "symEn": "Primary and secondary carnitine deficiency; myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction)", "pointKo": "카르니틴결핍증과 허혈성 심질환의 심근대사장애에 쓰는 엘카르니틴 제제입니다.", "pointEn": "An L-carnitine preparation for carnitine deficiency and myocardial metabolic disorders of ischemic heart disease." },
+    "512edab0": { "symKo": "1차성·2차성 카르니틴결핍증, 허혈성 심질환(협심증·급성심근경색)에 의한 심근대사장애", "symEn": "Primary and secondary carnitine deficiency; myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction)", "pointKo": "카르니틴결핍증과 허혈성 심질환의 심근대사장애에 쓰는 엘카르니틴 제제입니다.", "pointEn": "An L-carnitine preparation for carnitine deficiency and myocardial metabolic disorders of ischemic heart disease." },
+    "830554c9": { "symKo": "1차성·2차성 카르니틴결핍증, 허혈성 심질환(협심증·급성심근경색)에 의한 심근대사장애", "symEn": "Primary and secondary carnitine deficiency; myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction)", "pointKo": "카르니틴결핍증과 허혈성 심질환의 심근대사장애에 쓰는 엘카르니틴 제제입니다.", "pointEn": "An L-carnitine preparation for carnitine deficiency and myocardial metabolic disorders of ischemic heart disease." },
+    "a9e44f1b": { "symKo": "1차성·2차성 카르니틴결핍증, 허혈성 심질환(협심증·급성심근경색)에 의한 심근대사장애", "symEn": "Primary and secondary carnitine deficiency; myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction)", "pointKo": "카르니틴결핍증과 허혈성 심질환의 심근대사장애에 쓰는 엘카르니틴 제제입니다.", "pointEn": "An L-carnitine preparation for carnitine deficiency and myocardial metabolic disorders of ischemic heart disease." }
+  },
+  "cauSummaries": {
+    "35151ace": { "watchKo": "이 약·대두유(알레르기 경험 포함)·콩·땅콩 과민증 환자 복용 금지", "watchEn": "Do not use if hypersensitive to this medicine, soybean oil (including allergy history), soybeans, or peanuts" },
+    "3a242349": { "watchKo": "이 약 과민증 환자 복용 금지, 임부(가능성 포함)·수유부는 복용 전 상담", "watchEn": "Do not use if hypersensitive to this medicine; consult before use if pregnant (or possibly) or breastfeeding" },
+    "cbca700c": { "watchKo": "이 약·대두유·콩·땅콩 과민증 환자 복용 금지", "watchEn": "Do not use if hypersensitive to this medicine, soybean oil, soybeans, or peanuts" }
+  },
+  "en": {
+    "a9e44f1b": "This medicine is used for primary (type 1) and secondary (type 2) carnitine deficiency, and for myocardial metabolic disorders caused by ischemic heart disease such as angina and acute myocardial infarction.",
+    "049ff1e3": "This medicine is used for primary (type 1) and secondary (type 2) carnitine deficiency, and for myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction).",
+    "512edab0": "This medicine is used for primary (type 1) and secondary (type 2) carnitine deficiency, and for myocardial metabolic disorders caused by ischemic heart disease (angina, acute myocardial infarction).",
+    "830554c9": "This medicine is used for primary (type 1) and secondary (type 2) carnitine deficiency, and for myocardial metabolic disorders caused by ischemic heart disease such as angina and acute myocardial infarction.",
+    "94c2b79b": "Adults take 2 to 3 g per 1 day, divided into 2 to 3 doses a day.",
+    "05c0ca9a": "Adults take 2 to 3 g per 1 day, divided into 2 to 3 doses.",
+    "4dfd991b": "Adults take 2 to 3 g per 1 day, divided into 2 to 3 doses.",
+    "8a01e806": "Adults take 2 to 3 g per 1 day, divided into 2 to 3 doses a day. Adjust appropriately according to age and symptoms.",
+    "ce93d845": "Adults take 2 to 3 g per 1 day, divided into 2 to 3 doses.",
+    "d45d2ccf": "Adults take 6 to 9 tablets (2 to 3 g) per 1 day, divided into 2 to 3 doses.",
+    "f392cc87": "Adults take 2 to 3 g of L-carnitine per 1 day, divided into 2 to 3 oral doses.",
+    "35151ace": "Do not take this medicine if you are hypersensitive to it, have experienced hypersensitivity or allergic reactions to soybean oil, or are hypersensitive to soybeans or peanuts.",
+    "cbca700c": "Do not take this medicine if you are hypersensitive to it or to soybean oil, soybeans, or peanuts.",
+    "3a242349": "Do not take this medicine if you are hypersensitive to it. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding.",
+    "7a5a8dc9": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding.",
+    "aed87600": "Before taking this medicine, consult a doctor or pharmacist if you have fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or must use lipid emulsions with caution; if a particular risk from fat overload is expected; or if you are pregnant, may be pregnant, or are breastfeeding.",
+    "b997d7aa": "Before taking this medicine, consult a doctor or pharmacist if you have fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or must use lipid emulsions with caution; or if you are pregnant, may be pregnant, or are breastfeeding.",
+    "c91ec18e": "Consult a doctor or pharmacist when using intravenous lipid preparations together with this medicine.",
+    "8746747b": "Consult a doctor or pharmacist when using other intravenous lipid preparations together with this medicine.",
+    "d3c23ef6": "Temporary nausea, vomiting, abdominal pain, diarrhea, body odor, rash, hives, facial swelling, and mild muscle weakness (myasthenia) may occur.",
+    "e91df994": "Temporary nausea, vomiting, abdominal pain, diarrhea, body odor, rash, hives, facial swelling, and mild muscle weakness (myasthenia) may occur.",
+    "ca2da6d0": "Temporary nausea, vomiting, abdominal pain, diarrhea, body odor, rash, hives, facial swelling, and mild muscle weakness may occur.",
+    "42cc6b4a": "Temporary nausea and vomiting, abdominal pain, diarrhea, body odor, rash, hives, and facial swelling may occur.",
+    "879c9a8f": "Temporary nausea and vomiting, abdominal pain, diarrhea, body odor, rash, hives, and facial swelling may occur.",
+    "598e4b02": "Temporary nausea, vomiting, abdominal pain, diarrhea, body odor, rash, hives, and facial swelling may occur, and mild muscle weakness may occur in patients with uremia.",
+    "bb9fc0ac": "If mild muscle weakness occurs in patients with uremia, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "bd39fffe": "If temporary nausea and vomiting, abdominal pain, diarrhea, body odor, rash, hives, or facial swelling occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}
