@@ -227,16 +227,16 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 9,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 후시딘겔3+동화후시딘크림6=2 원문형(금기 문구 상이→EN 2형). 안과용·눈꺼풀 금지 문구 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 7fp/9 = 후시딘겔 3(3fp)+동화후시딘크림 6(4fp), EN 2형(겔=항생물질 과민 금기·크림=첨가제 알레르기 금기, 이상반응 서술 상이). 안과용·눈꺼풀 금지 문구 보존. ko9=en9·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "D-판테놀|크림",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 5,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 판테뉴크림2+판테올크림3=2 원문형(이상반응 서술 상이→EN 2형). 덱스판테놀 정제·나잘스프레이=경구·비강으로 제외 확정 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 5fp/5 = 판테뉴크림 2(2fp)+판테올크림 3(3fp), EN 2형(판테올=점막 경미 자극 이상반응 추가). 유두균열 수유 전 닦아내기 문구 보존. 덱스판테놀 정제·나잘스프레이=경구·비강으로 제외 확정. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."

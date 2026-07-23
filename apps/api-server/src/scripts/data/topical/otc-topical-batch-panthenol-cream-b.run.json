@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "D-판테놀",
+ "form": "판테올크림",
+ "slugbase": "panthenol-cream-b",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "ea84e9ec47cc2d85",
+   "n": 1
+  },
+  {
+   "fp": "04779a26a3e06b6d",
+   "n": 1
+  },
+  {
+   "fp": "fafa79854f442d18",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

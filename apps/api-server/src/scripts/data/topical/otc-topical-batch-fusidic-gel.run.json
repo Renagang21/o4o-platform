@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "퓨시드산수화물",
+ "form": "후시딘겔",
+ "slugbase": "fusidic-gel",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "2acff4b6160f38ce",
+   "n": 1
+  },
+  {
+   "fp": "6f03ed8c5c37f7a4",
+   "n": 1
+  },
+  {
+   "fp": "59c00ed01328d095",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

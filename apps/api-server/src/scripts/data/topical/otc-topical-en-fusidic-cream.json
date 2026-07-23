@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "slug": "fusidic-cream",
+ "translation": {
+  "groupKey": "퓨시드산수화물|크림(동화후시딘크림형)",
+  "title": "Fusidic Acid Cream",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for pyoderma (bacterial skin infections) caused by staphylococci, streptococci, Corynebacterium and Clostridium - including impetigo, infectious eczematoid dermatitis, acne vulgaris (common acne), folliculitis, boils and furunculosis, suppurative hidradenitis and impetiginous eczema - and for secondary infections of burns, wounds, sutured wounds and skin grafts.",
+  "usage": "Apply an appropriate amount gently to the affected area 3 to 4 times a day. If a dressing is used, it is advisable to reduce the frequency to about 1 to 2 times a day.",
+  "caution": "Do not use this medicine if you are hypersensitive to it, if you have an infection caused by non-susceptible bacteria (especially Pseudomonas aeruginosa), or if you are allergic to antibiotic ingredients or to any of the additives. Consult a doctor or pharmacist before use if you are pregnant or may be pregnant, if you are breastfeeding, or for premature and newborn babies. Use it only for the minimum period needed. Do not apply it over extensive areas of skin. Do not use it on the inner parts of the face such as the eyes or eyelids, and do not use it in the eyes (not for ophthalmic use). Adverse reactions may occur - a temporary burning sensation, and occasionally rash, mild pain and irritation; if any of these occur, stop use immediately and consult a doctor or pharmacist. Pain can occur when it is applied to patients with severe leg ulcers. Store at room temperature and keep out of reach of children.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Fusidic acid hydrate",
+   "Form": "Cream"
+  }
+ }
+}

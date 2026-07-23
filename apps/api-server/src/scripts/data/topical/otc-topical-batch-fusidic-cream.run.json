@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "퓨시드산수화물",
+ "form": "동화후시딘크림",
+ "slugbase": "fusidic-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5eadb44d3ee912d6",
+   "n": 2
+  },
+  {
+   "fp": "0909bcfbf86f7377",
+   "n": 2
+  },
+  {
+   "fp": "5b6b43f360fd8b3f",
+   "n": 1
+  },
+  {
+   "fp": "245cc239c04689ce",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}
