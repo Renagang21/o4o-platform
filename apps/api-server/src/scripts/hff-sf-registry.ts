@@ -7,6 +7,7 @@
  * 쏘팔메토: 공식 '전립선 건강의 유지' → 조사 '의' 최소 정규화 후 기존 '전립선 건강 유지' EN 재사용(의미 동일 보존).
  */
 import { mapFunctionEn } from './hff-nutrient-registry.js';
+import { mapFunctionEnC } from './hff-sf-c-en-overlay.js';
 import { normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
 
 export interface SfIngredient {
@@ -24,8 +25,8 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '쏘팔메토열매추출물': { key: '쏘팔메토열매추출물', slug: 'saw-palmetto', displayKo: '쏘팔메토열매추출물', displayEn: 'Saw palmetto fruit extract', labelRe: /쏘팔메토|톱야자/i,
     // 조사 '의' 정규화: '전립선 건강의 유지' → '전립선 건강 유지'(의미 동일, 기존 EN 매핑 재사용). 다른 기능성엔 무영향.
     fnNormalize: (ko) => ko.replace(/전립선\s*건강의\s*유지/g, '전립선 건강 유지'), statusHint: 'READY' },
-  '포스파티딜세린': { key: '포스파티딜세린', slug: 'phosphatidylserine', displayKo: '포스파티딜세린', displayEn: 'Phosphatidylserine', labelRe: /포스파티딜세린/, statusHint: 'PENDING' },
-  '헤마토코쿠스추출물': { key: '헤마토코쿠스추출물', slug: 'haematococcus', displayKo: '헤마토코쿠스추출물', displayEn: 'Haematococcus extract', labelRe: /헤마토코쿠스|아스타잔틴/i, indicatorRe: /아스타잔틴/, statusHint: 'PENDING' },
+  '포스파티딜세린': { key: '포스파티딜세린', slug: 'phosphatidylserine', displayKo: '포스파티딜세린', displayEn: 'Phosphatidylserine', labelRe: /포스파티딜세린/, statusHint: 'READY' },
+  '헤마토코쿠스추출물': { key: '헤마토코쿠스추출물', slug: 'haematococcus', displayKo: '헤마토코쿠스추출물', displayEn: 'Haematococcus extract', labelRe: /헤마토코쿠스|아스타잔틴/i, indicatorRe: /아스타잔틴/, statusHint: 'READY' },
   // ── MAX-POOL 통합(WO-...-MAX-POOL-INTEGRATION): 발굴 EN-HIT 원료. displayEn=표준 영문명 정적 lookup(§3), 기능성 EN=mapFunctionEn grounded.
   //    labelRe 는 브래킷 원료 유일식별(교차귀속 방지). 실제 EN 완전성은 resolveFunctions 가 제품별 검증 → 미충족 REVIEW_LATER.
   '뮤코다당단백': { key: '뮤코다당단백', slug: 'mucopolysaccharide-protein', displayKo: '뮤코다당·단백', displayEn: 'Mucopolysaccharide-protein', labelRe: /뮤코다당/, statusHint: 'READY' },
@@ -43,7 +44,7 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '은행잎추출물': { key: '은행잎추출물', slug: 'ginkgo-leaf', displayKo: '은행잎추출물', displayEn: 'Ginkgo leaf extract', labelRe: /은행잎/, allowClassified: true, statusHint: 'READY' },
   '마리골드꽃추출물': { key: '마리골드꽃추출물', slug: 'marigold-flower', displayKo: '마리골드꽃추출물', displayEn: 'Marigold flower extract', labelRe: /마리골드/, indicatorRe: /지아잔틴/, allowClassified: true, statusHint: 'READY' },
   '감마리놀렌산': { key: '감마리놀렌산', slug: 'gamma-linolenic-acid', displayKo: '감마리놀렌산', displayEn: 'Gamma-linolenic acid', labelRe: /감마리놀렌/, allowClassified: true, statusHint: 'READY' },
-  '빌베리추출물': { key: '빌베리추출물', slug: 'bilberry', displayKo: '빌베리추출물', displayEn: 'Bilberry extract', labelRe: /빌베리/, statusHint: 'PENDING' },
+  '빌베리추출물': { key: '빌베리추출물', slug: 'bilberry', displayKo: '빌베리추출물', displayEn: 'Bilberry extract', labelRe: /빌베리/, statusHint: 'READY' },
   '스피루리나': { key: '스피루리나', slug: 'spirulina', displayKo: '스피루리나', displayEn: 'Spirulina', labelRe: /스피루리나/, statusHint: 'READY' },
   '클로렐라': { key: '클로렐라', slug: 'chlorella', displayKo: '클로렐라', displayEn: 'Chlorella', labelRe: /클로렐라/, statusHint: 'READY' },
   // ── C-08 discovery HIT(도메인=항산화·혈행·인지, classify 미등재, mapFunctionEn 기존 커버). labelRe 는 브래킷 유일식별.
@@ -67,7 +68,8 @@ export function resolveFunctions(ing: SfIngredient, mainFn: string): { ko: strin
   const ko: string[] = [], en: string[] = []; let pending = false;
   for (const k of kos) {
     const norm = ing.fnNormalize ? ing.fnNormalize(k) : k;
-    const e = mapFunctionEn(norm);
+    // C 도메인 EN 정본 overlay 우선 조회(additive), 미해당이면 공용 mapFunctionEn 폴백.
+    const e = mapFunctionEnC(norm) ?? mapFunctionEn(norm);
     ko.push(k); en.push(e ?? '');
     if (e == null) pending = true;
   }

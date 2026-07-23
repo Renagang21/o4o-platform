@@ -52,7 +52,9 @@ async function main(): Promise<void> {
       if (rows.length === 0) break;
       for (const r of rows) {
         funnel.scanned++;
-        const t = normalizeSpecText(r.fn); const brackets = [...t.matchAll(/\[([^\]]{1,24})\]/g)].map((m) => m[1].trim());
+        // WO-...-UNLOCK-C: 브래킷 길이 cap(구 24자) 제거 — 긴 combo 브래킷(지표성분·인정번호 병기)이 누락돼
+        // 다항 기능성 제품이 pure-single 로 오인되던 문제 교정. 단일 긴 브래킷=1(유지), 다항만 combo 로 제외.
+        const t = normalizeSpecText(r.fn); const brackets = [...t.matchAll(/\[([^\]]+?)\]/g)].map((m) => m[1].trim()).filter((b) => b.length >= 2);
         if (brackets.length !== 1) continue; const label = brackets[0];
         if (!ing.labelRe.test(label)) continue;               // 본 원료 pure-single 만
         if (classify(label) && !ing.allowClassified) continue; // 기존 registry 등재 원료면 제외(교차 귀속 방지). allowClassified 원료(은행잎·감마리놀렌산·마리골드)는 pure-single 소유이므로 우회.

@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-garlic-c",
+  "createdMasters": [
+    "c1834d6c-f0e7-4fc0-9243-76965a7eac73"
+  ],
+  "createdSpd": [
+    "b436560d-307f-482c-949e-2e6ef5f29d73",
+    "db88068b-8a3a-455e-b406-49287f617b82"
+  ],
+  "candIds": [
+    "1be30296-2968-4384-9c84-97d6046cf0f4"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "1be30296-2968-4384-9c84-97d6046cf0f4",
+      "stmt": "200400150831475",
+      "prev_status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "tag": "batch:single-functional-haematococcus-c",
+  "createdMasters": [
+    "f4a67d49-6e2b-4d6b-a4fe-1eba3fccc5f1",
+    "13d5378e-cfa6-481b-912e-22e6e8c8978a",
+    "790d885c-de37-46a7-bdf3-ac1dfea1b9af",
+    "5b6b80bd-e3b2-4097-9338-5b49fe974b7a",
+    "1b2bc05c-551b-436f-91a2-e926054abb60"
+  ],
+  "createdSpd": [
+    "b81d80f1-8f27-4ce5-8cf8-4a41a1f32782",
+    "ce2a23fc-4998-4ae7-9175-95fec625e92d",
+    "febad18d-710f-42cd-9911-cb45a794c302",
+    "e7eceb69-2c2e-4208-88e2-341c455c7185",
+    "b027e22f-58c9-4c2d-8bdd-e616df934b50",
+    "bc28c7bc-850b-4d3a-b63c-ecac29950c9a",
+    "124aeebc-29be-4a94-84c0-ae0858ec11bd",
+    "6c836ceb-151c-4405-aa38-f056a5ff0512",
+    "a3b01b87-794f-46c4-9a0f-bddfa9f6ea18",
+    "5e870cee-719e-47e9-83b7-40e160c256be"
+  ],
+  "candIds": [
+    "3fd6372e-d4a8-4ec5-9109-b94f75304870",
+    "66eda03b-ecfb-4e8f-8672-e3255c903e8e",
+    "8070ab26-dfe3-4fa7-a6bf-b557cead5996",
+    "bfaabf1c-cc3e-4fc2-96e0-ef2e7f45b649",
+    "c2ea1f5d-118a-46be-ac3d-3a1230e3531b"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "3fd6372e-d4a8-4ec5-9109-b94f75304870",
+      "stmt": "201200190071175",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "66eda03b-ecfb-4e8f-8672-e3255c903e8e",
+      "stmt": "20040017006874",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "8070ab26-dfe3-4fa7-a6bf-b557cead5996",
+      "stmt": "2024002023359",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "bfaabf1c-cc3e-4fc2-96e0-ef2e7f45b649",
+      "stmt": "200400150832441",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c2ea1f5d-118a-46be-ac3d-3a1230e3531b",
+      "stmt": "201200190071214",
+      "prev_status": "pending"
+    }
+  ]
+}

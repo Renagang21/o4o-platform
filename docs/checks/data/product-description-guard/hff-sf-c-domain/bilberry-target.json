@@ -1,0 +1,226 @@
+[
+ {
+  "candidateId": "0c8a886d-ba61-4cc9-98e4-1c2c25be7d5b",
+  "productName": "눈눈",
+  "productNameEn": "눈눈",
+  "manufacturer": "(주)뉴팜",
+  "manufacturerEn": null,
+  "statementNo": "20040017014618",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리 추출물] 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "- 성상 : 고유의 향미가 있고 이미, 이취가 없는 노랑색 입자성의 알맹이를 가진 탁한 보라색의 분말\n- 총 안토시아노사이드 : 표시량 ( 50 mg / 4,000 mg)의 80~120%\n- 납(mg/kg) : 1.0 이하\n- 카드뮴(mg/kg) : 0.5 이하\n- 수은(mg/kg) : 0.5 이하\n- 비소(mg/kg) : 1.0 이하\n- 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포를 직접 또는 물과함께 섭취하십시오.",
+   "caution": "① 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.\n② 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.\n③ 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오.\n④ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n⑤ 섭취량 및 섭취방법을 확인하시고 섭취하여 주십시오.\n⑥ 유통기한이 경과된 제품은 섭취하지 않도록 주의 바랍니다.\n⑦ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노랑색 입자성의 알맹이를 가진 탁한 보라색의 분말",
+   "storage": "직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>눈눈<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)뉴팜 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑색 입자성의 알맹이를 가진 탁한 보라색의 분말 - 총 · (주)뉴팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑색 입자성의 알맹이를 가진 탁한 보라색의 분말 - 총</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>눈눈<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)뉴팜 · 2 times a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>2 times a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)뉴팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노랑색 입자성의 알맹이를 가진 탁한 보라색의 분말 - 총</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하여 서늘한 곳에 보존하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하여야 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "324b6961-c676-41d6-94ff-2f37e5831608",
+  "productName": "아이빌베리온",
+  "productNameEn": "아이빌베리온",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071265",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리 추출물] \n① 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말\n2. 총 안토시아노사이드 : 표시량(50mg/4,000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 비소(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 0.5 이하\n7. 대장균군 : 음성(적합)",
+   "intake": "1일 1회, 1회 1포를 물에 타서 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이빌베리온<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말 · (주)유유헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이빌베리온<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "6604fc16-186e-4e03-af44-d8f4b2cec87a",
+  "productName": "보라샷2.0",
+  "productNameEn": "보라샷2.0",
+  "manufacturer": "(주)유유헬스케어",
+  "manufacturerEn": null,
+  "statementNo": "200400151071229",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리추출물] ①눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말\n2. 총 안토시아노사이드 : 표시량(56mg/4,000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 비소(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 0.5 이하\n7. 대장균군 : 음성(적합)",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>보라샷2.0<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)유유헬스케어 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말 · (주)유유헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>보라샷2.0<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)유유헬스케어 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유유헬스케어</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 회보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "816026da-7d35-4eb7-ab30-bfedf93fac62",
+  "productName": "베리이지 아이케어 프리미엄 이태리 빌베리",
+  "productNameEn": "베리이지 아이케어 프리미엄 이태리 빌베리",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142177",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리추출물]\n① 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회보라색의 분말\n(2) 총 안토시아노사이드 : 표시량(72mg/4g)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 0.5 이하\n(5) 수은(mg/kg) : 0.5 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1포를 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회보라색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>베리이지 아이케어 프리미엄 이태리 빌베리<small>빌베리추출물</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회보라색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>베리이지 아이케어 프리미엄 이태리 빌베리<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · 2 times a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>2 times a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "a4ed294a-41e1-4838-99cd-ac183a1bcef3",
+  "productName": "눈의 정석 빌베리",
+  "productNameEn": "눈의 정석 빌베리",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082717",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리추출물]①눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 회보라색의 분말\n2. 총 안토시아노사이드 : 표시량(59.2mg/4000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 0.5 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(1포당 4000mg)를 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 회보라색의 분말",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>눈의 정석 빌베리<small>빌베리추출물</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 회보라색의 분말 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 회보라색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>눈의 정석 빌베리<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 회보라색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "dc9c2b04-1bcc-4f25-b3a8-3c7ab71a2f0c",
+  "productName": "아이리젠 프리미엄",
+  "productNameEn": "아이리젠 프리미엄",
+  "manufacturer": "(주)휴온스엔",
+  "manufacturerEn": null,
+  "statementNo": "20190016403157",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리 추출물] 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제\n2. 총 안토시아노사이드: 표시량(57㎎/1,200㎎)의 80~120%\n3. 납(㎎/㎏): 1.0 이하\n4. 카드뮴(㎎/㎏): 0.5 이하\n5. 수은(㎎/㎏): 0.5 이하\n6. 비소(㎎/㎏): 1.0 이하\n7. 대장균군: 음성\n8. 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 2정(1,200㎎)을 물과 함께 섭취하십시오.",
+   "caution": "※ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n※ 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제",
+   "storage": "고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이리젠 프리미엄<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)휴온스엔 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제 · (주)휴온스엔 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아이리젠 프리미엄<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)휴온스엔 · Once a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)휴온스엔</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "e593914c-b239-4ad5-9a6f-45fbfbf6e48d",
+  "productName": "로아납(LOANAB)",
+  "productNameEn": "로아납(LOANAB)",
+  "manufacturer": "(주)휴온스엔",
+  "manufacturerEn": null,
+  "statementNo": "20190016403210",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리 추출물] 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제\n2. 총 안토시아노사이드: 표시량(60㎎/1,200㎎)의 80~120%\n3. 납(㎎/㎏): 1.0 이하\n4. 카드뮴(㎎/㎏): 0.5 이하\n5. 수은(㎎/㎏): 0.5 이하\n6. 비소(㎎/㎏): 1.0 이하\n7. 대장균군: 음성\n8. 붕해시험: 60분 이내",
+   "intake": "1일 1회, 1회 2정(1,200㎎)을 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제",
+   "storage": "고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>로아납(LOANAB)<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)휴온스엔 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제 · (주)휴온스엔 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>로아납(LOANAB)<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)휴온스엔 · Once a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)휴온스엔</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 보라색 또는 검은 보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 장소와 직사광선을 피하여 서늘한 장소에 실온으로 보관하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "f93c999e-a466-4eed-969f-db210674b2b5",
+  "productName": "리얼그램 유기농100% 빌베리 아이케어",
+  "productNameEn": "리얼그램 유기농100% 빌베리 아이케어",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "manufacturerEn": null,
+  "statementNo": "200400200072475",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[빌베리추출물] 눈의 피로 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미 · 이취가 없는 흰색 점박이가 있는 검은 남색의 장방형 정제\n2) 총 안토시아노사이드 : 표시량의 80 ~ 120 % (표시량 : 72 mg / 1,800 mg)\n3) 납(mg/kg) : 1.0 이하\n4) 카드뮴(mg/kg) : 0.5 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 비소(mg/kg) : 1.0 이하\n7) 대장균군 : 음성\n8) 붕해 : 적합(30분 이내)",
+   "intake": "1일 3회, 1회 1정을 물과 함께 섭취하십시오.",
+   "caution": "유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미 · 이취가 없는 흰색 점박이가 있는 검은 남색의 장방형 정제",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">빌베리추출물</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>리얼그램 유기농100% 빌베리 아이케어<small>빌베리추출물</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 3회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>빌베리추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>빌베리추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미 · 이취가 없는 흰색 점박이가 있는 검은 남색의 장방형 정제 · (주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>눈의 피로 개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미 · 이취가 없는 흰색 점박이가 있는 검은 남색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>빌베리추출물 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Bilberry extract</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>리얼그램 유기농100% 빌베리 아이케어<small>Bilberry extract</small></h1><p class=\"sd-meta\">Made by (주)한국씨엔에스팜 · 3 times a day · 1 tablet per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Bilberry extract</b> as its functional ingredient. The official directions are <b>3 times a day, 1 tablet per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Bilberry extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국씨엔에스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve eye fatigue.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 tablet per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미 · 이취가 없는 흰색 점박이가 있는 검은 남색의 장방형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Bilberry extract</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

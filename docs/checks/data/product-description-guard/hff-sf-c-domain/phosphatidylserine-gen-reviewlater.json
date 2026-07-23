@@ -1,0 +1,46 @@
+[
+ {
+  "statementNo": "200400200083218",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "20190009483544",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "20040020006655",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "2021001622959",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "200400200082856",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "200400151071317",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "20172880236370",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "200400150832477",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "200400200082867",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ },
+ {
+  "statementNo": "200600200081176",
+  "reason": "BLOCKED:D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "statementNo": "20040020006502",
+  "reason": "BLOCKED:E-NAME-DERIVED-001"
+ }
+]

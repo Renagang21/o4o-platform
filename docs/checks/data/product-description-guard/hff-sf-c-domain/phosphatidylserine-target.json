@@ -1,0 +1,926 @@
+[
+ {
+  "candidateId": "03e21bcc-c0dc-45b7-a9f6-59884a8af8d5",
+  "productName": "EXO-BLACK TYPE A 엑소 블랙 타입 에이",
+  "productNameEn": "EXO-BLACK TYPE A 엑소 블랙 타입 에이",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211917",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 내용물을 함유한 투명색의 경질캡슐\n(2) 포스파티딜세린 : 표시량(300 mg/900 mg) 80~120%\t\n(3) 납(mg/kg) : 1.0 이하\t\n(4) 비소(mg/kg)\t: 1.0 이하\n(5) 카드뮴(mg/kg) : 1.0 이하\t\n(6) 수은(mg/kg) : 1.0 이하\t\n(7) 대장균군 : 음성\n(8) 붕해시험 : 적합 (물 20분 이내 붕해)",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 임산부와 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 내용물을 함유한 투명색의 경질캡슐",
+   "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>EXO-BLACK TYPE A 엑소 블랙 타입 에이<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 내용물을 함유한 투명색의 경질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>EXO-BLACK TYPE A 엑소 블랙 타입 에이<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 내용물을 함유한 투명색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "0528cec9-c939-423b-b1d4-870e57e540b7",
+  "productName": "인지력엔 포스파티딜세린",
+  "productNameEn": "인지력엔 포스파티딜세린",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041549",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]①노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 밝은 회황색의 내용물을 함유한 투명한 경질캡슐\n2) 대장균군 : 음성\n3) 붕해도 : 20분 이내\n4) 포스파티딜세린 : 표시량(300mg/500mg)의 80~120%\n5) 잔류용매\n(가) 헥산(mg/kg) : 5.0 이하\n6) 중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 1.0 이하\n(다) 수은(mg/kg) : 1.0 이하\n(라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[포스파티딜세린]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 밝은 회황색의 내용물을 함유한 투명한 경질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지력엔 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 밝은 회황색의 내용물을 함유한 투명한 경질캡슐 · 엔피케이(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 회황색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지력엔 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 회황색의 내용물을 함유한 투명한 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "153f6c50-e399-41dd-b361-b93c384970a1",
+  "productName": "바이탈리움 포스파티딜세린 인지력케어",
+  "productNameEn": "바이탈리움 포스파티딜세린 인지력케어",
+  "manufacturer": "주식회사 대현에벤에셀 당진지점",
+  "manufacturerEn": null,
+  "statementNo": "2025002875914",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] \n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상: 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐\n② 포스파티딜세린: 표시량(300mg/1000mg)의 80-120%\n③ 헥산(mg/kg): 5.0 이하(해당 용매를 사용한 경우)\n④ 아세톤(mg/kg): 10.0 이하(해당 용매를 사용한 경우)\n⑤ 납(mg/kg): 1.0 이하\n⑥ 카드뮴(mg/kg): 1.0 이하\n⑦ 수은(mg/kg): 1.0 이하\n⑧ 비소(mg/kg): 1.0 이하\n⑨ 대장균군: 음성\n⑩ 붕해도: 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "(1) 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n(3) 질환이 있거나 의약품 복용 시 전문가와 상담할 것\n(4) 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으니 주의할 것\n(5) 개봉 또는 섭취 시 포장재에 의해 상처가 나지 않도록 주의할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바이탈리움 포스파티딜세린 인지력케어<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 대현에벤에셀 당진지점 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐 · 주식회사 대현에벤에셀 당진지점 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>바이탈리움 포스파티딜세린 인지력케어<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 대현에벤에셀 당진지점 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 대현에벤에셀 당진지점</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "22f4694a-409e-46db-a7f6-2cdfdfbf6f4b",
+  "productName": "두뇌 인지력 개선.스마트PS",
+  "productNameEn": "두뇌 인지력 개선.스마트PS",
+  "manufacturer": "에스케이내추럴팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040017106466",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰분홍색 또는 분홍빛하얀색의 분말\n② 포스파티딜세린 : 표시량(300㎎/2.5g)의 80~120%\n③ 헥산(㎎/㎏) : 5.0 이하\n④ 아세톤(㎎/㎏) : 10.0 이하\n⑤ 납(㎎/㎏) : 1.0 이하\n⑥ 카드뮴(㎎/㎏) : 1.0 이하\n⑦ 수은(㎎/㎏) : 1.0 이하\n⑧ 비소(㎎/㎏) : 1.0 이하\n⑨ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 그대로 또는 물과 함께 섭취하십시오.",
+   "caution": "임산부와 수유부는 섭취에 주의\n과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰분홍색 또는 분홍빛하얀색의 분말",
+   "storage": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌 인지력 개선.스마트PS<small>포스파티딜세린</small></h1><p class=\"sd-meta\">에스케이내추럴팜(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰분홍색 또는 분홍빛하얀색의 분말 · 에스케이내추럴팜(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰분홍색 또는 분홍빛하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌 인지력 개선.스마트PS<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 에스케이내추럴팜(주) · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 에스케이내추럴팜(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰분홍색 또는 분홍빛하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "345bfb49-3246-433e-b97a-7cd3dae22c54",
+  "productName": "두뇌팔팔",
+  "productNameEn": "두뇌팔팔",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211575",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말\n ②포스파티딜세린(%) : 표시량(300 mg/2,000 mg)의 80~120% \n ③납(mg/kg) : 1.0이하 \n ④카드뮴(mg/kg) : 1.0이하\n ⑤수은(mg/kg) : 1.0이하 \n ⑥비소(mg/kg) : 1.0이하\n ⑦대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "(1) 임산부와 수유부는 섭취에 주의\n(2) 과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말",
+   "storage": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ②유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌팔팔<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ②유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌팔팔<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하여야 한다. ②유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "36f45922-bc2b-46c1-9b61-9d88ea892a73",
+  "productName": "이보다 두뇌건강",
+  "productNameEn": "이보다 두뇌건강",
+  "manufacturer": "(주)두루원",
+  "manufacturerEn": null,
+  "statementNo": "20040020010428",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상:고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제\n② 포스파티딜세린 : 표시량(300mg / 2,000mg)의 80~120%\n③ 납(mg/kg) :1.0 이하\n④ 비소(mg/kg) :1.0 이하\n⑤ 카드뮴(mg/kg) : 1.0 이하\n⑥ 수은(mg/kg) :1.0 이하\n⑦ 대장균군:음성\n⑧ 붕해: 60분 이내",
+   "intake": "1일 2회, 1회 2정(500mg×2정,1,000mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부 및 수유부는 섭취를 피할 것\n② 특정원료 또는 성분에 알레르기 체질이신 분은 원료 성분을 확인 후,섭취하십시오.\n③ 동봉된 방습제(실리카겔)는 섭취하지 마십시오.\n④ 이상사례 발생 시, 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지며, 이미·이취가 없는 점박이가 있는 흰 노란색의 장방형 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>이보다 두뇌건강<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)두루원 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제 · (주)두루원 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>이보다 두뇌건강<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)두루원 · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)두루원</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "3a14d7f0-39dd-4363-887b-c50cd0b20d5f",
+  "productName": "코그니테이트(Cognitate)",
+  "productNameEn": "코그니테이트(Cognitate)",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "20070017035726",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음 ②자외선에 의한 피부 손상으로부터 피부 건강 유지에 도움을 줄 수 있음\n③ 피부 보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미·이취가 없는 노랑의 점도가 있는 내용물을 함유한 흑갈색의 장방형 연질 캡슐\n2) 대장균군: 음성\n3) 붕해도: 20분 이내\n4) 포스파티딜세린: 표시량(300mg/1900mg)의 80~120%\n5) 납(mg/kg): 1.0이하\n6) 카드뮴(mg/kg): 1.0이하\n7) 총수은(mg/kg): 1.0이하\n8) 총비소(mg/kg): 1.0이하\n9) 헥산(mg/kg): 5.0이하\n10) 아세톤(mg/kg): 10.0이하",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린] ① 임산부와 수유부는 섭취에 주의② 과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 노랑의 점도가 있는 내용물을 함유한 흑갈색의 장방형 연질 캡슐",
+   "storage": "1. 직사광선 및 습한 장소을 피하고, 환기가 잘 되는 그늘진 곳에 보관하십시오. 2. 습도가 높은 곳을 피하여 보관하십시오. 3, 어린이의 손에 닿지 않는 곳에 보관하십시오",
+   "shelfLife": "제조일로부터24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코그니테이트(Cognitate)<small>포스파티딜세린</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 노랑의 점도가 있는 내용물을 함유한 흑갈색의 장방형 연질 캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강 유지에 도움을 줄 수 있음</li><li>피부 보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 노랑의 점도가 있는 내용물을 함유한 흑갈색의 장방형 연질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선 및 습한 장소을 피하고, 환기가 잘 되는 그늘진 곳에 보관하십시오. 2. 습도가 높은 곳을 피하여 보관하십시오. 3, 어린이의 손에 닿지 않는 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>코그니테이트(Cognitate)<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging.</li><li>May help maintain skin health from UV-induced skin damage.</li><li>May help support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 노랑의 점도가 있는 내용물을 함유한 흑갈색의 장방형 연질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 직사광선 및 습한 장소을 피하고, 환기가 잘 되는 그늘진 곳에 보관하십시오. 2. 습도가 높은 곳을 피하여 보관하십시오. 3, 어린이의 손에 닿지 않는 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "3c725e33-eb26-4918-b69c-da8fa046cb20",
+  "productName": "닥터언 프로 포스파티딜세린",
+  "productNameEn": "닥터언 프로 포스파티딜세린",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142085",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 밝은 회황색의 분말\n(2) 포스파티딜세린: 표시량(300mg/2g)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 수은(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 헥산(mg/kg) : 5.0 이하 \n(8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포(2g)를 충분한 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린]\n(1) 임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 밝은 회황색의 분말",
+   "storage": "1) 직사광선을 피하여 습기가 적은 서늘한 곳에 실온 보관하십시오. 2) 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터언 프로 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 밝은 회황색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선을 피하여 습기가 적은 서늘한 곳에 실온 보관하십시오. 2) 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터언 프로 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없으며 점박이가 있는 밝은 회황색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선을 피하여 습기가 적은 서늘한 곳에 실온 보관하십시오. 2) 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "43533898-821c-489c-851c-d6e02c37e4eb",
+  "productName": "아마레 엣지 플러스",
+  "productNameEn": "아마레 엣지 플러스",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370419",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "\"1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말\n2) 포스파티딜세린 : 표시량(300mg/3,750mg)의 80~120%\n3) 헥산(mg/kg) : 5.0 이하 (해당용매를 사용한 경우에 한함)\n4) 납(mg/kg) : 1.0 이하\n5) 카드뮴(mg/kg) : 1.0 이하\n6) 수은(mg/kg) : 1.0 이하\n7) 비소(mg/kg) : 1.0 이하\n8) 대장균군 : 음성\"",
+   "intake": "1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오",
+   "caution": "[포스파티딜세린]\n(1)임산부 및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말",
+   "storage": "고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관하십시오. 영,유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아마레 엣지 플러스<small>포스파티딜세린</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관하십시오. 영,유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>아마레 엣지 플러스<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관하십시오. 영,유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "4d9a59c3-aa53-4776-abbe-fcce8f9b5794",
+  "productName": "포스파티딜세린",
+  "productNameEn": "포스파티딜세린",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052411",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선⋅자외선에 의한 피부 손상으로부터 피부 건강 유지⋅피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 하얀색의 경질캡슐\n② 포스파티딜세린 : 표시량(300mg / 800mg)의 80 ~ 120%\n③ 헥산(mg/kg) : 5.0 이하\n④ 아세톤(mg/kg) : 10.0 이하\n⑤ 납(mg/kg) : 1.0 이하 \n⑥ 카드뮴(mg/kg) : 1.0 이하\n⑦ 수은(mg/kg) : 1.0 이하\n⑧ 비소(mg/kg) : 1.0 이하\n⑨ 대장균군 : 음성\n⑩ 붕해시험 : 20분이내",
+   "intake": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린] ① 임산부 및 수유부는 섭취를 피하십시오. ② 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 하얀색의 경질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 하얀색의 경질캡슐 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선⋅자외선에 의한 피부 손상으로부터 피부 건강 유지⋅피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 하얀색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 하얀색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "582166de-7052-4789-8270-d23c443b531d",
+  "productName": "헬시아민 두뇌·인지력엔 포스파티딜세린 PS",
+  "productNameEn": "헬시아민 두뇌·인지력엔 포스파티딜세린 PS",
+  "manufacturer": "한국바이오팜(주)",
+  "manufacturerEn": null,
+  "statementNo": "20220021067114",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상: 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말\n2) 포스파티딜세린: 표시량(300mg/2g)의 80~120% 이상\n3) 잔류용매(mg/kg) : 5.0 이하 (헥산)\n4) 납(mg/kg): 1.0 이하\n5) 카드뮴(mg/kg): 1.0 이하\n6) 수은(mg/kg): 1.0 이하\n7) 비소(mg/kg): 1.0 이하\n8) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "① 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n② 알레르기, 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.\n③ 임산부 및 수유부는 섭취를 피하십시오.\n④ 흡습의 우려가 있으니 개봉한 제품은 가급적 빨리 섭취하시기 바랍니다.\n⑤ 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말",
+   "storage": "직사광선을 받지 않는 실온에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>헬시아민 두뇌·인지력엔 포스파티딜세린 PS<small>포스파티딜세린</small></h1><p class=\"sd-meta\">한국바이오팜(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말 · 한국바이오팜(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>헬시아민 두뇌·인지력엔 포스파티딜세린 PS<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주) · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 실온에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "5d887192-3657-4e85-8046-612c72177636",
+  "productName": "케이에세르 메모리PS",
+  "productNameEn": "케이에세르 메모리PS",
+  "manufacturer": "(주)두루원",
+  "manufacturerEn": null,
+  "statementNo": "20040020010418",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상:고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제\n② 포스파티딜세린 : 표시량(300mg / 2,000mg)의 80~120%\n③ 납(mg/kg) :1.0 이하\n④ 비소(mg/kg) :1.0 이하\n⑤ 카드뮴(mg/kg) : 1.0 이하\n⑥ 수은(mg/kg) :1.0 이하\n⑦ 대장균군:음성\n⑧ 붕해: 60분 이내",
+   "intake": "1일 2회, 1회 2정(500mg×2정,1,000mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부 및 수유부는 섭취를 피할 것\n② 특정원료 또는 성분에 알레르기 체질이신 분은 원료 성분을 확인 후,섭취하십시오.\n③ 동봉된 방습제(실리카겔)는 섭취하지 마십시오.\n④ 이상사례 발생 시, 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지며, 이미·이취가 없는 점박이가 있는 흰 노란색의 장방형 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>케이에세르 메모리PS<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)두루원 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제 · (주)두루원 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>케이에세르 메모리PS<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)두루원 · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)두루원</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는흰 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "62d7ffd1-0e8b-4963-80e1-b2aedaddbe63",
+  "productName": "메모리 피에스(PS) 한스틱",
+  "productNameEn": "메모리 피에스(PS) 한스틱",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200082907",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 분말\n2. 포스파티딜세린 : 표시량(300mg/3000mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[포스파티딜세린] 임산부 및 수유부는 섭취를 피할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 흰 노란색의 분말",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메모리 피에스(PS) 한스틱<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰 노란색의 분말 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메모리 피에스(PS) 한스틱<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "7321d0e2-90de-49c8-baa7-f6540def3b0a",
+  "productName": "리필PS 인지력 포스파티딜세린",
+  "productNameEn": "리필PS 인지력 포스파티딜세린",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052249",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐\n② 포스파티딜세린 : 표시량(300mg/700mg)의 80~120%\n③ 헥산(mg/kg) : 5.0 이하\n④ 아세톤(mg/kg) : 10.0 이하\n⑤ 납(mg/kg) : 1.0 이하\n⑥ 카드뮴(mg/kg) : 1.0 이하\n⑦ 수은(mg/kg) : 1.0 이하\n⑧ 비소(mg/kg) : 1.0 이하\n⑨ 붕해시험 : 20분 이내\n⑩ 대장균군 : 음성",
+   "intake": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오",
+   "caution": "[포스파티딜세린] ①임산부와 수유부는 섭취에 주의하십시오 ②과잉섭취 시 위장장애나 불면증을 유발할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>리필PS 인지력 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>리필PS 인지력 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "78152211-0524-4bae-9b8e-99a650ea91a1",
+  "productName": "인지력엔 포스파티딜세린",
+  "productNameEn": "인지력엔 포스파티딜세린",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832463",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 백색 경질캡슐\n(2) 포스파티딜세린 : 표시량(300 ㎎/780 ㎎)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n[포스파티딜세린]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 백색 경질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지력엔 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 백색 경질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 백색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지력엔 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 백색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "8c7959d5-a73c-464d-831e-31d451b26b27",
+  "productName": "인지케어 PS 300",
+  "productNameEn": "인지케어 PS 300",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211950",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 햐양색의 장방형 제피정제\n(2) 포스파티딜세린 : 표시량(300 mg/2,000 mg)의 80~120% \n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 수은(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 붕해시험 : 60분 이내\n(8) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+   "caution": "(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 햐양색의 장방형 제피정제",
+   "storage": "실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지케어 PS 300<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 햐양색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 햐양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지케어 PS 300<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 햐양색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/(1) 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2) 유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "99f68d83-0506-417a-9c82-399482676616",
+  "productName": "포스파티딜세린 플러스",
+  "productNameEn": "포스파티딜세린 플러스",
+  "manufacturer": "코스맥스엔비티(주)",
+  "manufacturerEn": null,
+  "statementNo": "200700170351932",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흰색의 장방형 경질 캡슐\n2. 포스파티딜세린(%) : 표시량(300mg / 1,300mg)의 80%~120%\n3. 납 (mg/kg) : 1.0 이하\n4. 카드뮴 (mg/kg) : 1.0 이하\n5. 수은 (mg/kg) : 1.0 이하\n6. 비소 (mg/kg) : 1.0 이하\n7. 붕해시험 : 20분 이내\n8. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "1. 임산부와 수유부는 섭취에 주의\n2. 과잉섭취 시 위장장애나 불면증을 유발할 수 있음\n3. 이상증상이 생길 경우 섭취를 중단하고, 전문의와 상담하십시오.\n4. 유통기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n5. 알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흰색의 장방형 경질 캡슐",
+   "storage": "실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>포스파티딜세린 플러스<small>포스파티딜세린</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흰색의 장방형 경질 캡슐 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흰색의 장방형 경질 캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>포스파티딜세린 플러스<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 코스맥스엔비티(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스엔비티(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 회황색의 내용물을 함유한 흰색의 장방형 경질 캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 실온/ 1. 직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "9b715577-b0c0-4ec2-9328-8739ae370ade",
+  "productName": "포스파티딜세린300",
+  "productNameEn": "포스파티딜세린300",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141821",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회황색의 분말\n2. 포스파티딜세린 : 표시량(300 mg/2,000 mg)의 80 ~ 120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg)  : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 헥산(mg/kg) : 5.0 이하\n8. 아세톤(mg/kg) : 10.0 이하\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린]\n1. 임산부와 수유부는 섭취에 주의\n2. 과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회황색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>포스파티딜세린300<small>포스파티딜세린</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회황색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>포스파티딜세린300<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 회황색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "9e7f0592-9caf-44b5-aec7-9737d3301ffd",
+  "productName": "두뇌엔 닥터PS70",
+  "productNameEn": "두뇌엔 닥터PS70",
+  "manufacturer": "(주)네이처텍",
+  "manufacturerEn": null,
+  "statementNo": "20040020004609",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰노랑색의 분말\n2) 포스파티딜세린: 표시량(300mg/2,000mg)의 80~120%\n3) 납(mg/kg): 1.0 이하\n4) 카드뮴(mg/kg): 1.0 이하\n5) 수은(mg/kg): 1.0 이하\n6) 비소(mg/kg): 1.0 이하\n7) 아세톤(mg/kg): 10.0 이하\n8) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+   "caution": "1) 과잉섭취 시 위장장애나 불면증을 유발할 수 있습니다.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하세요.\n3) 영∙유아, 어린이, 임산부 및 수유부는 섭취에 주의하세요.\n4) 특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의하세요.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰노랑색의 분말",
+   "storage": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌엔 닥터PS70<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)네이처텍 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰노랑색의 분말 · (주)네이처텍 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌엔 닥터PS70<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)네이처텍 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)네이처텍</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰노랑색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "9f09079c-9d3a-4c57-b725-d46278160238",
+  "productName": "인지력 포스파티딜세린",
+  "productNameEn": "인지력 포스파티딜세린",
+  "manufacturer": "엔피케이(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "2021001622987",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]①노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 장방형 연질캡슐\n2) 대장균군 : 음성\n3) 붕해시험 : 20분 이내\n4) 포스파티딜세린 : 표시량(300mg/2,400mg)의 80~120%\n5) 중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 1.0 이하\n(다) 수은(mg/kg) : 1.0 이하\n(라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2캡슐 물과 함께 섭취",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[포스파티딜세린]\n 1) 임산부 및 수유부는 섭취를 피할 것\n 2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 장방형 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지력 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">엔피케이(주) 2공장 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 장방형 연질캡슐 · 엔피케이(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지력 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) 2공장 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 노랑색의 내용물을 함유한 검정색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a6942e23-c53b-4303-982c-5686236424cc",
+  "productName": "두뇌엔 포스파티딜세린 365",
+  "productNameEn": "두뇌엔 포스파티딜세린 365",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052274",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말\n② 포스파티딜세린 : 표시량(300mg/2,500mg)의 80 ~ 120%\n③ 헥산(mg/kg) : 5.0 이하\n④ 아세톤(mg/kg) : 10.0 이하\n⑤ 납(mg/kg) : 1.0 이하\n⑥ 카드뮴(mg/kg) : 1.0 이하\n⑦ 수은(mg/kg) : 1.0 이하\n⑧ 비소(mg/kg) : 1.0 이하\n⑨ 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 충분한 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린] ① 임산부와 수유부는 섭취에 주의하십시오. ② 과잉섭취 시 위장장애나 불면증을 유발할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌엔 포스파티딜세린 365<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌엔 포스파티딜세린 365<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "a95af981-85ea-43c1-bc72-90fbd6a84bd8",
+  "productName": "하루 1알 두뇌 인지력 포스파티딜세린 PS 맥스 300",
+  "productNameEn": "하루 1알 두뇌 인지력 포스파티딜세린 PS 맥스 300",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200142090",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미.이취가 없으며 흰 노랑의 내용물을 함유한 흰색 경질캡슐\n(2) 포스파티딜세린 : 표시량(300mg/700mg)의 80 ~ 120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 수은(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(1) 임산부 및 수유부는 섭취를 피하십시오.\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.\n(3) 특이체질, 알레르기 체질은 개인에 따라 드물게 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미.이취가 없으며 흰 노랑의 내용물을 함유한 흰색 경질캡슐",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루 1알 두뇌 인지력 포스파티딜세린 PS 맥스 300<small>포스파티딜세린</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미.이취가 없으며 흰 노랑의 내용물을 함유한 흰색 경질캡슐 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미.이취가 없으며 흰 노랑의 내용물을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>하루 1알 두뇌 인지력 포스파티딜세린 PS 맥스 300<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미.이취가 없으며 흰 노랑의 내용물을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a96989f9-0d08-4391-b65e-29e8d02e299c",
+  "productName": "아이러브 두뇌건강",
+  "productNameEn": "아이러브 두뇌건강",
+  "manufacturer": "(주)두루원",
+  "manufacturerEn": null,
+  "statementNo": "20040020010431",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상:고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제\n② 포스파티딜세린 : 표시량(300mg / 2,000mg)의 80~120%\n③ 납(mg/kg) :1.0 이하\n④ 비소(mg/kg) :1.0 이하\n⑤ 카드뮴(mg/kg) : 1.0 이하\n⑥ 수은(mg/kg) :1.0 이하\n⑦ 대장균군:음성\n⑧ 붕해: 60분 이내",
+   "intake": "1일 2회, 1회 2정(500mg×2정,1,000mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부 및 수유부는 섭취를 피할 것\n② 특정원료 또는 성분에 알레르기 체질이신 분은 원료 성분을 확인 후,섭취하십시오.\n③ 동봉된 방습제(실리카겔)는 섭취하지 마십시오.\n④ 이상사례 발생 시, 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 가지며, 이미·이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제",
+   "storage": "고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>아이러브 두뇌건강<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)두루원 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제 · (주)두루원 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>아이러브 두뇌건강<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)두루원 · 2 times a day · 2 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 2 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)두루원</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는 노란 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온 다습, 직사광선을 피하여 실온에서 보관,유통한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "ae0de51f-eec8-4380-89b0-306943bf40c0",
+  "productName": "두뇌엔 닥터PS 맥스",
+  "productNameEn": "두뇌엔 닥터PS 맥스",
+  "manufacturer": "(주)네이처텍",
+  "manufacturerEn": null,
+  "statementNo": "20040020004625",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노란 하얀색 알갱이가 섞인 흰 노란색의 분말\n2) 포스파티딜세린: 표시량(300mg/2,000mg)의 80~120%\n3) 납(mg/kg): 1.0 이하\n4) 카드뮴(mg/kg): 1.0 이하\n5) 수은(mg/kg): 1.0 이하\n6) 비소(mg/kg): 1.0 이하\n7) 헥산(mg/kg): 5.0 이하\n8) 대장균군: 음성",
+   "intake": "1일 1회, 1회 1포를 직접 또는 물과 함께 섭취하십시오.",
+   "caution": "(1) 임산부및 수유부는 섭취를 피할 것\n(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 노란 하얀색 알갱이가 섞인 흰 노란색의 분말",
+   "storage": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌엔 닥터PS 맥스<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)네이처텍 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 노란 하얀색 알갱이가 섞인 흰 노란색의 분말 · (주)네이처텍 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 하얀색 알갱이가 섞인 흰 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌엔 닥터PS 맥스<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)네이처텍 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)네이처텍</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 하얀색 알갱이가 섞인 흰 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "aefc0891-a0dd-4232-b4dd-4e38e78e1601",
+  "productName": "두뇌엔 아쿠아 PS",
+  "productNameEn": "두뇌엔 아쿠아 PS",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141849",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 하얀색의 분말\n2. 포스파티딜세린 : 표시량(300 mg/2,000 mg)의 80 ~ 120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg)  : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하\n7. 헥산(mg/kg) : 5.0 이하\n8. 아세톤(mg/kg) : 10.0 이하\n9. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린]\n1. 임산부와 수유부는 섭취에 주의\n2. 과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 하얀색의 분말",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌엔 아쿠아 PS<small>포스파티딜세린</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 하얀색의 분말 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌엔 아쿠아 PS<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "afb062b0-8f7c-445b-a47d-7a9cdb80232d",
+  "productName": "닥터에디션 두뇌엔PS",
+  "productNameEn": "닥터에디션 두뇌엔PS",
+  "manufacturer": "광동헬스바이오(주) 2공장",
+  "manufacturerEn": null,
+  "statementNo": "200400200141751",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회황색의 내용물을 함유한 흰색 경질캡슐\n2. 포스파티딜세린 함량: 표시량(300 mg/1,300 mg)의 80~120%\n3. 헥산(mg/kg): 5.0 이하\n4. 아세톤(mg/kg): 10.0 이하\n5. 납(mg/kg): 1.0 이하\n6. 카드뮴(mg/kg): 1.0 이하\n7. 수은(mg/kg): 1.0 이하\n8. 비소(mg/kg): 1.0 이하\n9. 대장균군: 음성\n10. 붕해시험: 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "[포스파티딜세린]\n1. 임산부 및 수유부는 섭취를 피할 것\n2. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회황색의 내용물을 함유한 흰색 경질캡슐",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터에디션 두뇌엔PS<small>포스파티딜세린</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회황색의 내용물을 함유한 흰색 경질캡슐 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회황색의 내용물을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터에디션 두뇌엔PS<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 광동헬스바이오(주) 2공장 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 광동헬스바이오(주) 2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없으며 점박이가 있는 밝은 회황색의 내용물을 함유한 흰색 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "ba966a8a-d865-413a-a157-76ed67c3d23e",
+  "productName": "메멘토 Memento",
+  "productNameEn": "메멘토 Memento",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "20120019007595",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노란 주황색 내용물을 함유한 빨간 검정색의 타원형 연질캡슐\n2. 포스파티딜세린 : 표시량(300mg/2,000mg)의 80~120%\n3. 헥산(mg/kg) : 5.0이하\n4. 납(mg/kg) : 1.0이하\n5. 카드뮴(mg/kg) : 1.0이하\n6. 수은(mg/kg) : 1.0이하\n7. 비소(mg/kg) : 1.0이하\n8. 대장균군 : 음성\n9. 붕해 : 적합(캡슐 : 20분이내 붕해)",
+   "intake": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특이체질, 알레르기 체질의 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.\n유통기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n임산부와 수유부는 섭취에 주의하십시오.\n과잉섭취 시 위장장애나 불면증을 유발할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 노란 주황색 내용물을 함유한 빨간 검정색의 타원형 연질캡슐",
+   "storage": "고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메멘토 Memento<small>포스파티딜세린</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 노란 주황색 내용물을 함유한 빨간 검정색의 타원형 연질캡슐 · (주)한풍네이처팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 주황색 내용물을 함유한 빨간 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메멘토 Memento<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 주황색 내용물을 함유한 빨간 검정색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습(30℃이상, 상대습도 75%이상) · 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "c6881034-0c51-4f72-8dbe-eee2272a2528",
+  "productName": "인지력케어 포스파티딜세린 플러스",
+  "productNameEn": "인지력케어 포스파티딜세린 플러스",
+  "manufacturer": "엔피케이(주)",
+  "manufacturerEn": null,
+  "statementNo": "201000190041321",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]①노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 분말을 함유한 하양색의 장방형 경질캡슐\n2) 대장균군 : 음성\n3) 붕해도 : 20분 이내\n4) 포스파티딜세린 : 표시량(300mg/880mg)의 80~120%\n5) 잔류용매(해당 용매를 사용한 경우에 한함)\n(가) 헥산(mg/kg) : 5.0 이하\n(나) 아세톤(mg/kg) : 10.0 이하\n6) 중금속\n(가) 납(mg/kg) : 1.0 이하\n(나) 카드뮴(mg/kg) : 1.0 이하\n(다) 수은(mg/kg) : 1.0 이하\n(라) 비소(mg/kg) : 1.0 이하",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오",
+   "caution": "1) 과량섭취 시 부작용이 있을 수 있음.\n2) 특정원료에 알레르기가 있거나 질병치료 약물투여 중인 분은 섭취 전 전문가와 상의하십시오.\n3) 소비기한이 경과된 제품은 섭취하지 마십시오.\n[포스파티딜세린]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 분말을 함유한 하양색의 장방형 경질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지력케어 포스파티딜세린 플러스<small>포스파티딜세린</small></h1><p class=\"sd-meta\">엔피케이(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 분말을 함유한 하양색의 장방형 경질캡슐 · 엔피케이(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 분말을 함유한 하양색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지력케어 포스파티딜세린 플러스<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 엔피케이(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 엔피케이(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 노란 하양색의 분말을 함유한 하양색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "cfa2d7ee-6219-456b-bc80-7bb65c8a8709",
+  "productName": "튼튼닷컴 포스파티딜세린",
+  "productNameEn": "튼튼닷컴 포스파티딜세린",
+  "manufacturer": "주식회사 노바렉스2공장",
+  "manufacturerEn": null,
+  "statementNo": "200600200081042",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐\n2. 포스파티딜세린 : 표시량(300mg/1600mg) 의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 비소(mg/kg) : 1.0 이하\n6. 수은(mg/kg) : 1.0 이하\n7. 대장균군 : 음성\n8. 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐 (1캡슐당 800mg)을 물과 함께 섭취하십시오.",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n[포스파티딜세린] 임산부 및 수유부는 섭취를 피할 것",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐",
+   "storage": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>튼튼닷컴 포스파티딜세린<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>튼튼닷컴 포스파티딜세린<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스2공장 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스2공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 점도가 있는 내용물을 함유한 갈흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "d7529752-88c7-46d6-ae07-cdbbe198937e",
+  "productName": "포스파티딜세린 PLUS+",
+  "productNameEn": "포스파티딜세린 PLUS+",
+  "manufacturer": "주식회사 상상바이오",
+  "manufacturerEn": null,
+  "statementNo": "20200016052229",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] ① 노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말\n② 포스파티딜세린 : 표시량(300mg/2,000mg)의 80 ~ 120%\n③ 헥산(mg/kg) : 5.0 이하\n④ 아세톤(mg/kg) : 10.0 이하\n⑤ 납(mg/kg) : 1.0이하\n⑥ 카드뮴(mg/kg) : 1.0이하\n⑦ 수은(mg/kg) : 1.0이하\n⑧ 비소(mg/kg) : 1.0이하\n⑨ 대장균군 : 음성",
+   "intake": "1일 1회,1회 1포 충분한 물과함께 섭취하십시오.",
+   "caution": "[포스파티딜세린]\n① 임산부와 수유부는 섭취에 주의하십시오.\n② 과잉섭취 시 위장장애나 불면증을 유발할 수 있습니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말",
+   "storage": "① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>포스파티딜세린 PLUS+<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선 ･ 자외선에 의한 피부 손상으로부터 피부 건강 유지 ･ 피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>포스파티딜세린 PLUS+<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 상상바이오 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 상상바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 노란 회색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "debc8d55-9875-4652-8453-b4d9446ab3c1",
+  "productName": "파마코PS70",
+  "productNameEn": "파마코PS70",
+  "manufacturer": "노비스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020041545",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n① 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 백색 장방형 경질캡슐\n(2) 포스파티딜세린 : 표시량(300mg/800mg)의 80~120%\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 수은(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(800mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 백색 장방형 경질캡슐",
+   "storage": "습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>파마코PS70<small>포스파티딜세린</small></h1><p class=\"sd-meta\">노비스바이오(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 백색 장방형 경질캡슐 · 노비스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 백색 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>파마코PS70<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 노비스바이오(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 노비스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 분말을 함유한 백색 장방형 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "e7feb805-da1a-4d40-bc66-36ec39cb824c",
+  "productName": "두뇌엔 포스파티딜세린 PS80",
+  "productNameEn": "두뇌엔 포스파티딜세린 PS80",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832461",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린]\n노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 투명 경질캡슐\n(2) 포스파티딜세린 : 표시량(300 ㎎/780 ㎎)의 80% 이상 120% 이하\n(3) 납(mg/kg) : 1.0 이하\n(4) 카드뮴(mg/kg) : 1.0 이하\n(5) 비소(mg/kg) : 1.0 이하\n(6) 수은(mg/kg) : 1.0 이하\n(7) 대장균군 : 음성\n(8) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인한 후 섭취하시기 바랍니다.\n[포스파티딜세린]\n(가) 임산부 및 수유부는 섭취를 피할 것\n(나) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 투명 경질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>두뇌엔 포스파티딜세린 PS80<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 투명 경질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>두뇌엔 포스파티딜세린 PS80<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 여러가지 색상의 입자가 있는 노란하얀색 또는 흰노란색의 분말을 함유한 투명 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "f2aa1a32-0749-4a2f-8429-757c0163d277",
+  "productName": "메모리 피에스(PS) 한스틱",
+  "productNameEn": "메모리 피에스(PS) 한스틱",
+  "manufacturer": "주식회사 코스팜",
+  "manufacturerEn": null,
+  "statementNo": "20172880236367",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[포스파티딜세린] \n1) 노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말\n2. 포스파티딜세린(%) : 표시량(300 mg / 3 g)의 80 이상 120 이하\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 1.0 이하\n6. 비소(mg/kg) : 1.0 이하 \n7. 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1포를 섭취하십시오.",
+   "caution": "1) 임산부 및 수유부는 섭취를 피하시기 바랍니다.\n2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말",
+   "storage": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">포스파티딜세린</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메모리 피에스(PS) 한스틱<small>포스파티딜세린</small></h1><p class=\"sd-meta\">주식회사 코스팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>포스파티딜세린</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>포스파티딜세린</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말 · 주식회사 코스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 인해 저하된 인지력 개선·자외선에 의한 피부 손상으로부터 피부 건강 유지·피부보습에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>포스파티딜세린 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Phosphatidylserine</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>메모리 피에스(PS) 한스틱<small>Phosphatidylserine</small></h1><p class=\"sd-meta\">Made by 주식회사 코스팜 · Once a day · 1 stick per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Phosphatidylserine</b> as its functional ingredient. The official directions are <b>Once a day, 1 stick per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Phosphatidylserine</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 코스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging, maintain skin health from UV-induced skin damage, support skin moisturizing.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 stick per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 흰 노란색의 분말</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 실온 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Phosphatidylserine</li><li>Those who prefer sticks</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]

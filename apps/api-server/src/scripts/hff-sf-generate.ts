@@ -30,6 +30,7 @@ for (const seed of ready) {
   pass++; target.push(gi);
 }
 fs.writeFileSync(path.join(DIR, `${ing.slug}${outSuffix}.json`), JSON.stringify(target, null, 1));
+fs.writeFileSync(path.join(DIR, `${ing.slug}${outSuffix.replace('-target','')}-gen-reviewlater.json`), JSON.stringify(reviewLater, null, 1));
 console.log('JSON_SF_GEN_BEGIN');
 console.log(JSON.stringify({ ingredient: ing.key, shard: SHARD || 'all', ready: ready.length, PASS: pass, REVIEW: review, BLOCKED: blocked, composeErr, reviewRules }, null, 2));
 console.log('JSON_SF_GEN_END');
