@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "slug": "mupirocin-oint",
+ "translation": {
+  "groupKey": "무피로신|연고",
+  "title": "Mupirocin Ointment",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for impetigo, folliculitis, furunculosis and infectious eczema infected by most bacteria that cause skin infections - such as Staphylococcus aureus (including methicillin-resistant strains), other staphylococci and streptococci - and by Gram-negative bacteria such as Escherichia coli and Haemophilus influenzae, and for bacterial skin infections of wounds and burns.",
+  "usage": "Apply a small amount to the infected area 2 to 3 times a day for 10 days. If needed, the applied area can be covered with a dressing or sealed.",
+  "caution": "Do not use this medicine if you are or have been hypersensitive to it or to other ointments containing polyethylene glycol, if you have kidney disease, or if you are pregnant, may be pregnant or are breastfeeding. Do not use it for a long period on open lacerated wounds or damaged skin. Be careful not to get it in your eyes. This medicine is for external use only. Do not use it on mucosal surfaces such as the eyes or nose. Do not use it on a site where central venous catheterization will be performed. Adverse reactions may occur - skin hypersensitivity reactions such as a burning sensation, stinging pain or pain, itching, rash and erythema (red patches), occasionally nausea, dry skin, tenderness, swelling, contact dermatitis and increased exudate, and rarely systemic allergic reactions; if any of these occur, stop use immediately and consult a doctor or pharmacist. Store at room temperature and keep out of reach of children.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Mupirocin",
+   "Form": "Ointment"
+  }
+ }
+}

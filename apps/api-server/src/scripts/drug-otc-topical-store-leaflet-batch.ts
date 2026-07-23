@@ -143,7 +143,11 @@ async function main(): Promise<void> {
       // 정·캡슐·시럽 등 강한 경구 신호가 있으면 절대 override하지 않는다.
       const strongOral = /정$|정\d|정\(|캡슐|캅셀|시럽|현탁|과립|산제|트로키|츄어|씹|저작|드링크|내복|환$|환\(/.test(r.name);
       const contentTopicalOnly = /외용으로만|외용으로 적용/.test(stripTags(r.content || ''));
-      const reclassifiable = r.route === 'unknown' || (r.route === 'oral' && !strongOral && contentTopicalOnly);
+      // 'ophthalmic' 판정이 제품명 내 '…안연고' substring 오탐(예: 박트리'안연고')에서 온 경우:
+      // 이름에 '점안'이 없고 '연고'가 있으며, 원문이 '외용으로만'을 명시하고 안과 사용 신호(점안/눈에 넣)가 전무할 때만 재분류를 허용한다.
+      const ophthaFalsePositive = r.route === 'ophthalmic' && !/점안/.test(r.name) && /연고/.test(r.name)
+        && contentTopicalOnly && !/점안|눈에\s*넣/.test(stripTags(r.content || ''));
+      const reclassifiable = r.route === 'unknown' || (r.route === 'oral' && !strongOral && contentTopicalOnly) || ophthaFalsePositive;
       const effRoute = reclassifiable && ASSUME_ROUTE ? ASSUME_ROUTE : r.route;
       if (effRoute !== 'topical') continue;
       if (!byFp.has(r.fp)) byFp.set(r.fp, []); byFp.get(r.fp)!.push(r as Row);

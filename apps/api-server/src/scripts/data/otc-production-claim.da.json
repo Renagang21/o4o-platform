@@ -1,315 +1,315 @@
 {
-  "_doc": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉. 트랙=피부 외용제(topical skin) ingredient×form 단위 선점.",
-  "schemaVersion": 1,
-  "owner": "agent-da",
-  "round": "topical-special-form-10h-2026-07-23",
-  "track": "TOPICAL_SKIN_STORE_LEAFLET",
-  "verdict": "PRODUCING",
-  "claims": [
-    {
-      "groupKey": "무피로신|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 39,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "퓨시드산나트륨|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 28,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "프레드니솔론발레로아세테이트|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 26,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "프레드니솔론발레로아세테이트|로션",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 5,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "티로트리신|겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 26,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "히드로퀴논|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 23,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "클로트리마졸|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 14,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "부테나핀염산염|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 13,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "구아야줄렌|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 17,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "구아야줄렌|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 14,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "프라목신염산염|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 17,
-      "op": "KO_EN",
-      "status": "HOLD",
-      "holdReason": "mucosa-adjacent(치질·항문부위 전용)=점막 인접 후순위(WO 리도카인 준용)"
-    },
-    {
-      "groupKey": "테르비나핀염산염|액(외용)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 41,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "이소코나졸질산염|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 10,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "케토코나졸|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 5,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "아젤라산|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "요소|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "덱스판테놀·D-판테놀|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 12,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "포비돈요오드|스프레이·연고·액(외용)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 154,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "실 풀=연고5+스왑47+거즈볼48+탈지면54 (액 10은 타 form명 중복으로 동시 커버). 가글·질세정·수술자스크럽·수술부위어플리케이터·구강스프레이=eff/route HOLD(점막·전문용 제외)"
-    },
-    {
-      "groupKey": "미녹시딜|겔·스프레이·액(외용)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 155,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 68fp/155 (액2% 3fp/7 + 액3% 18fp/33 + 겔3% 1fp/2 + 액5% 33fp/79 + 겔5% 8fp/16 + 폼 5fp/18). 5% 계열=남성전용(여성형 효능 0 확인). 폼=여성 최소기간 3~4개월형/3~6개월형 분리. routeSig unknown → --assume-route topical(양성 분류 override 불가) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "시클로피록스|네일라카·외용액",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 79,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 36fp/79 = 네일라카 56(매일형 19fp/50 + 로푸록스 주기감량형 1fp/3 + 티지풀큐어 1fp/3) + 올아민 두피세정액 14fp/21 + 로푸록스겔 2fp/2. 네일라카↔두피액↔겔 EN 완전 분리. '다른 약을 복용' 병용문구=사용 재표현 규칙 추가. 액(성분) 이름 oral 오분류=강경구신호 부재+원문 '외용으로만' 명시시에만 assume-route 재분류 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "아모롤핀염산염|네일라카",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 50,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 9fp/50 — 전 제품 동일 요법(주1~2회·줄+패드+스파툴라·손톱6개월/발톱9~12개월)로 단일 EN 그룹. 금기=영유아·소아/조갑주위염증/혈액순환장애/영양실조/알코올중독/임부·수유부. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "케토프로펜|겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 46,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 20fp/46 = 농도별형 3fp/3(케펨겔 3%·5% 횟수 분리) + 수회형 8fp/10(케프겔6+시푸로겔3% 4) + 1~4회형 9fp/33(아마프로겔3% 2+광역 31). 광과민증 2주 자외선 회피·fibrate/옥시벤존 교차과민·15세미만 금기 EN 3형 분리. 경고제 12=첩부제 계열 생산 제외. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "디클로페낙나트륨|겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 8fp/8 = 디펜겔 3fp/3+스포겔 2fp/2(동일 원문형·EN 공유)+스팅겔 3fp/3(EN 별도형). '함께 복용 시'→'함께 사용 시' 병용 rewrite 규칙 추가로 스팅겔 HOLD_KO 해소. 플라스타·패취 제외 drift 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "디클로페낙디에틸암모늄|크림·겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 10,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 10fp/10 = 나바론크림 3fp/3+볼타렌에멀겔 3fp/3(사용기간 7·14일 제한형)+디페낙겔1% 2fp/2+아티벡스겔 2fp/2 — EN 4형 분리(금기연령 12세 vs 6세·수유부, 기간제한, 흡연·화기, 넓은부위 전신반응 상이). 디페낙겔1%='겔1%(' 이름 form regex 미매칭→route unknown→--assume-route topical 필요(기존 겔3% 함정 동일). 염 상이로 나트륨과 별도 그룹, EN 크림/겔 분리 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "테르비나핀·염산테르비나핀|덤겔·크림·외용액(라미실계)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 12,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 8fp/12 = 덤겔 6(3fp)+크림 1+외용액 3(3fp)+원스 2(2fp) — EN 4형(1일1회 겔/질환별 기간 크림/1~2회 액/1회 필름 15세 금기). 함정 수정: coarse '%(성분%)'→'%(성분)%'(용량 접미 30mL·10g·1튜브 변형 누락 해소+성분 토큰 정확화), ingredientOf 마지막 (성분) 그룹 허용 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "가수과산화벤조일|겔(여드름)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 7,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 7fp/7 = 조아아크네겔 2fp/2+아크덤겔 2fp/2+파티마겔2.5% 3fp/3 — EN 3형(금기·이상반응 서술 상이: 아크덤=임신 마지막달 금기, 파티마=표백·감수성 이상반응 서술). '겔2.5%(' 이름=--assume-route topical. ko7=en7·dup0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "인도메타신|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 7,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 6fp/7 = 바이겔크림 1 원문형(EN 1형: 14세 미만 금기·무균성뇌막염·건선악화). 플라스타·파프 제외. ko7=en7·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "록소프로펜나트륨수화물|겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 5,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 3fp/5 = 록소앤겔 3(2fp)+제놀록소파워겔 2(1fp), EN 2형(15세 미만 금기·2g/50g/2주 제한 보존). 플라스타·파프·정제 제외. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 16,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 9fp/16 = 외용액 9(애크린형 3fp/3 + 2%형 유클리어톡·클리어틴·클리톡 3fp/6) + 겔 4(애크린겔 1fp/2 + 센스힐겔 1fp/2, 감량요법 문구별 EN 분리) + 팁스왑액 1fp/3. 전 제품 여드름 효능 — 각질·사마귀·티눈 후보는 현 풀에 없음. 재우스오라쿠고에이취플라스타 4=첩부제 → WO 지침대로 생산 제외(조사만). HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "퓨시드산수화물|겔·크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 9,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 7fp/9 = 후시딘겔 3(3fp)+동화후시딘크림 6(4fp), EN 2형(겔=항생물질 과민 금기·크림=첨가제 알레르기 금기, 이상반응 서술 상이). 안과용·눈꺼풀 금지 문구 보존. ko9=en9·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "D-판테놀|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 5,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 5fp/5 = 판테뉴크림 2(2fp)+판테올크림 3(3fp), EN 2형(판테올=점막 경미 자극 이상반응 추가). 유두균열 수유 전 닦아내기 문구 보존. 덱스판테놀 정제·나잘스프레이=경구·비강으로 제외 확정. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "폴리데옥시리보뉴클레오티드나트륨|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 10,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 10fp/10 = 리쥬비넥스크림 6(6fp)+더마그램피디알엔크림 4(4fp), EN 2형(더마그램=의사 지시·과민 상담 문구). PDRN 점안액=안과로 제외(form 크림명 타겟팅). ko10=en10·dup0·drift0(점안 포함 검사)·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "크로타미톤|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "V6 완결 2fp/4 = 유락신연고+타미락신연고(동일 문구, EN 1형 공유·단일 서브런 form=연고). 급성 루푸스성 피부염 금기·안과용 금지 보존. ko4=en4·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "무피로신|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 박트리안연고 4=1 원문형. 점막·중앙정맥 삽관부위 금지 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "세르타코나졸질산염|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 더모픽스크림 4=1 원문형. 백선·칸디다증·어우러기 효능 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "아모롤핀염산염|크림",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 로마릴크림2+로세릴크림2=2 원문형(로마릴=프로필렌글리콜 상담·30℃, 로세릴=25℃). 네일라카와 별개 크림 풀 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "케토코나졸|외용액",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 댄스탑외용액 4=1 원문형(비듬·지루피부염·어루러기, 샴푸형 도포 후 헹굼) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "뮤코폴리사카리드폴리설페이트|겔",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 히루도이드포르테겔 4=1 원문형. 헤파린 과민·혈소판감소증 금기 보존 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "우레아|연고",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 4,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 베이덤연고 4=1 원문형(각피증·어린선·아토피피부) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    },
-    {
-      "groupKey": "히알루론산나트륨|겔·크림(코네티비나)",
-      "sourceType": "o4o_drug_otc_topical",
-      "masters": 6,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "우선순위⑤: 코네티비나겔4+코네티비나크림2=2 원문형(무통성 상처). 히아로겔·치아로겔=치은 구강 점막 제외, 코네티비나거즈 5=거즈 제형 제외, 아시클로버=구순·생식기 포진 점막 인접 후순위 보류 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
-    }
-  ],
-  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
+ "_doc": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉. 트랙=피부 외용제(topical skin) ingredient×form 단위 선점.",
+ "schemaVersion": 1,
+ "owner": "agent-da",
+ "round": "topical-special-form-10h-2026-07-23",
+ "track": "TOPICAL_SKIN_STORE_LEAFLET",
+ "verdict": "PRODUCING",
+ "claims": [
+  {
+   "groupKey": "무피로신|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 39,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "퓨시드산나트륨|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 28,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "프레드니솔론발레로아세테이트|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 26,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "프레드니솔론발레로아세테이트|로션",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 5,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "티로트리신|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 26,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "히드로퀴논|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 23,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "클로트리마졸|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 14,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "부테나핀염산염|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 13,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "구아야줄렌|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 17,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "구아야줄렌|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 14,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "프라목신염산염|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 17,
+   "op": "KO_EN",
+   "status": "HOLD",
+   "holdReason": "mucosa-adjacent(치질·항문부위 전용)=점막 인접 후순위(WO 리도카인 준용)"
+  },
+  {
+   "groupKey": "테르비나핀염산염|액(외용)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 41,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "이소코나졸질산염|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 10,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "케토코나졸|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 5,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "아젤라산|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "요소|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "덱스판테놀·D-판테놀|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 12,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "포비돈요오드|스프레이·연고·액(외용)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 154,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "실 풀=연고5+스왑47+거즈볼48+탈지면54 (액 10은 타 form명 중복으로 동시 커버). 가글·질세정·수술자스크럽·수술부위어플리케이터·구강스프레이=eff/route HOLD(점막·전문용 제외)"
+  },
+  {
+   "groupKey": "미녹시딜|겔·스프레이·액(외용)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 155,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 68fp/155 (액2% 3fp/7 + 액3% 18fp/33 + 겔3% 1fp/2 + 액5% 33fp/79 + 겔5% 8fp/16 + 폼 5fp/18). 5% 계열=남성전용(여성형 효능 0 확인). 폼=여성 최소기간 3~4개월형/3~6개월형 분리. routeSig unknown → --assume-route topical(양성 분류 override 불가) (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "시클로피록스|네일라카·외용액",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 79,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 36fp/79 = 네일라카 56(매일형 19fp/50 + 로푸록스 주기감량형 1fp/3 + 티지풀큐어 1fp/3) + 올아민 두피세정액 14fp/21 + 로푸록스겔 2fp/2. 네일라카↔두피액↔겔 EN 완전 분리. '다른 약을 복용' 병용문구=사용 재표현 규칙 추가. 액(성분) 이름 oral 오분류=강경구신호 부재+원문 '외용으로만' 명시시에만 assume-route 재분류 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "아모롤핀염산염|네일라카",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 50,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 9fp/50 — 전 제품 동일 요법(주1~2회·줄+패드+스파툴라·손톱6개월/발톱9~12개월)로 단일 EN 그룹. 금기=영유아·소아/조갑주위염증/혈액순환장애/영양실조/알코올중독/임부·수유부. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "케토프로펜|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 46,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 20fp/46 = 농도별형 3fp/3(케펨겔 3%·5% 횟수 분리) + 수회형 8fp/10(케프겔6+시푸로겔3% 4) + 1~4회형 9fp/33(아마프로겔3% 2+광역 31). 광과민증 2주 자외선 회피·fibrate/옥시벤존 교차과민·15세미만 금기 EN 3형 분리. 경고제 12=첩부제 계열 생산 제외. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "디클로페낙나트륨|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 8fp/8 = 디펜겔 3fp/3+스포겔 2fp/2(동일 원문형·EN 공유)+스팅겔 3fp/3(EN 별도형). '함께 복용 시'→'함께 사용 시' 병용 rewrite 규칙 추가로 스팅겔 HOLD_KO 해소. 플라스타·패취 제외 drift 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "디클로페낙디에틸암모늄|크림·겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 10,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 10fp/10 = 나바론크림 3fp/3+볼타렌에멀겔 3fp/3(사용기간 7·14일 제한형)+디페낙겔1% 2fp/2+아티벡스겔 2fp/2 — EN 4형 분리(금기연령 12세 vs 6세·수유부, 기간제한, 흡연·화기, 넓은부위 전신반응 상이). 디페낙겔1%='겔1%(' 이름 form regex 미매칭→route unknown→--assume-route topical 필요(기존 겔3% 함정 동일). 염 상이로 나트륨과 별도 그룹, EN 크림/겔 분리 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "테르비나핀·염산테르비나핀|덤겔·크림·외용액(라미실계)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 12,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 8fp/12 = 덤겔 6(3fp)+크림 1+외용액 3(3fp)+원스 2(2fp) — EN 4형(1일1회 겔/질환별 기간 크림/1~2회 액/1회 필름 15세 금기). 함정 수정: coarse '%(성분%)'→'%(성분)%'(용량 접미 30mL·10g·1튜브 변형 누락 해소+성분 토큰 정확화), ingredientOf 마지막 (성분) 그룹 허용 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "가수과산화벤조일|겔(여드름)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 7,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 7fp/7 = 조아아크네겔 2fp/2+아크덤겔 2fp/2+파티마겔2.5% 3fp/3 — EN 3형(금기·이상반응 서술 상이: 아크덤=임신 마지막달 금기, 파티마=표백·감수성 이상반응 서술). '겔2.5%(' 이름=--assume-route topical. ko7=en7·dup0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "인도메타신|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 7,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 6fp/7 = 바이겔크림 1 원문형(EN 1형: 14세 미만 금기·무균성뇌막염·건선악화). 플라스타·파프 제외. ko7=en7·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "록소프로펜나트륨수화물|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 5,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 3fp/5 = 록소앤겔 3(2fp)+제놀록소파워겔 2(1fp), EN 2형(15세 미만 금기·2g/50g/2주 제한 보존). 플라스타·파프·정제 제외. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 16,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 9fp/16 = 외용액 9(애크린형 3fp/3 + 2%형 유클리어톡·클리어틴·클리톡 3fp/6) + 겔 4(애크린겔 1fp/2 + 센스힐겔 1fp/2, 감량요법 문구별 EN 분리) + 팁스왑액 1fp/3. 전 제품 여드름 효능 — 각질·사마귀·티눈 후보는 현 풀에 없음. 재우스오라쿠고에이취플라스타 4=첩부제 → WO 지침대로 생산 제외(조사만). HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "퓨시드산수화물|겔·크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 9,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 7fp/9 = 후시딘겔 3(3fp)+동화후시딘크림 6(4fp), EN 2형(겔=항생물질 과민 금기·크림=첨가제 알레르기 금기, 이상반응 서술 상이). 안과용·눈꺼풀 금지 문구 보존. ko9=en9·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "D-판테놀|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 5,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 5fp/5 = 판테뉴크림 2(2fp)+판테올크림 3(3fp), EN 2형(판테올=점막 경미 자극 이상반응 추가). 유두균열 수유 전 닦아내기 문구 보존. 덱스판테놀 정제·나잘스프레이=경구·비강으로 제외 확정. ko5=en5·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "폴리데옥시리보뉴클레오티드나트륨|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 10,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 10fp/10 = 리쥬비넥스크림 6(6fp)+더마그램피디알엔크림 4(4fp), EN 2형(더마그램=의사 지시·과민 상담 문구). PDRN 점안액=안과로 제외(form 크림명 타겟팅). ko10=en10·dup0·drift0(점안 포함 검사)·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "크로타미톤|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 완결 2fp/4 = 유락신연고+타미락신연고(동일 문구, EN 1형 공유·단일 서브런 form=연고). 급성 루푸스성 피부염 금기·안과용 금지 보존. ko4=en4·dup0·drift0·no-op0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "무피로신|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 1fp/4 master LIVE — routeSig '박트리안연고' 내 '안연고' substring ophthalmic 오탐 → runner ophthaFalsePositive guarded 재분류 추가+--assume-route topical로 해결. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "세르타코나졸질산염|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 1fp/4 master LIVE. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "아모롤핀염산염|크림",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 2fp/4 master LIVE (로마릴 a 2+로세릴 b 2). 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "케토코나졸|외용액",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 1fp/4 master LIVE. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "뮤코폴리사카리드폴리설페이트|겔",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 1fp/4 master LIVE. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "우레아|연고",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 1fp/4 master LIVE. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  },
+  {
+   "groupKey": "히알루론산나트륨|겔·크림(코네티비나)",
+   "sourceType": "o4o_drug_otc_topical",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "V6 DONE 2fp/4 master LIVE (겔 2+크림 2). 잔여 2=무괄호명 '코네티비나겔' 1+철자변형 '(히알우론산나트륨)' 1 — coarse 정당 미매칭, 잔여 후보. 검증 PASS (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+  }
+ ],
+ "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
 }

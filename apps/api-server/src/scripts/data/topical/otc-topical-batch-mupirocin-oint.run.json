@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "무피로신",
+ "form": "박트리안연고",
+ "slugbase": "mupirocin-oint",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a6f265577fd3e465",
+   "n": 1
+  },
+  {
+   "fp": "6dbba64f1cf98939",
+   "n": 1
+  },
+  {
+   "fp": "3e629d0b1cfd7fdc",
+   "n": 1
+  },
+  {
+   "fp": "3b05d681f745bdec",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

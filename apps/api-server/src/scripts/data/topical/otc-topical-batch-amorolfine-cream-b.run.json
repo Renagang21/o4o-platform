@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "아모롤핀염산염",
+ "form": "로세릴크림",
+ "slugbase": "amorolfine-cream-b",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "96b3e8713c74e3a4",
+   "n": 1
+  },
+  {
+   "fp": "bf10f5fb7917a505",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

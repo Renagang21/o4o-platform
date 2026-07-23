@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "세르타코나졸질산염",
+ "form": "더모픽스크림",
+ "slugbase": "sertaconazole-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "fbb94b40ebe4055b",
+   "n": 1
+  },
+  {
+   "fp": "560246bec0f63c69",
+   "n": 1
+  },
+  {
+   "fp": "a973fc9f8352d2b0",
+   "n": 1
+  },
+  {
+   "fp": "08ee1023928d594d",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

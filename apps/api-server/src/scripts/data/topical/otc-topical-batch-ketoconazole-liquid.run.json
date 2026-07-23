@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "케토코나졸",
+ "form": "댄스탑외용액",
+ "slugbase": "ketoconazole-liquid",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "4e64bf334c102a17",
+   "n": 1
+  },
+  {
+   "fp": "b4ca4327deff22e8",
+   "n": 1
+  },
+  {
+   "fp": "ee833302c6f10777",
+   "n": 1
+  },
+  {
+   "fp": "b4963b517a35de97",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

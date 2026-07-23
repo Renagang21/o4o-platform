@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "우레아",
+ "form": "베이덤연고",
+ "slugbase": "urea-oint",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5554d6083677a479",
+   "n": 1
+  },
+  {
+   "fp": "5b2c91107ab7eee9",
+   "n": 1
+  },
+  {
+   "fp": "d7c5bc5cca344e94",
+   "n": 1
+  },
+  {
+   "fp": "a0e495c4a19003c8",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}
