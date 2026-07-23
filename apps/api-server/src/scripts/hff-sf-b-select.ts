@@ -13,8 +13,7 @@ import * as path from 'node:path';
 import { DataSource } from 'typeorm';
 import { normalizeSpecText, classify } from './hff-source-parse.js';
 import { parseServing, parseBasis, isBulkMaterial } from '../modules/content-guard/source-grounding-parser.js';
-import { resolveFunctions } from './hff-sf-registry.js';
-import { B_INGREDIENTS as SF_INGREDIENTS } from './hff-sf-b-registry.js';
+import { B_INGREDIENTS as SF_INGREDIENTS, resolveFunctionsB as resolveFunctions } from './hff-sf-b-registry.js';
 
 const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--${n}`); return i >= 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const ING = arg('ingredient'); const OUTDIR = arg('out');
