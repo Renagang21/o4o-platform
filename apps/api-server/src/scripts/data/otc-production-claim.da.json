@@ -183,6 +183,14 @@
       "note": "V6 완결 10fp/10 = 나바론크림 3fp/3+볼타렌에멀겔 3fp/3(사용기간 7·14일 제한형)+디페낙겔1% 2fp/2+아티벡스겔 2fp/2 — EN 4형 분리(금기연령 12세 vs 6세·수유부, 기간제한, 흡연·화기, 넓은부위 전신반응 상이). 디페낙겔1%='겔1%(' 이름 form regex 미매칭→route unknown→--assume-route topical 필요(기존 겔3% 함정 동일). 염 상이로 나트륨과 별도 그룹, EN 크림/겔 분리 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
+      "groupKey": "테르비나핀·염산테르비나핀|덤겔·크림·외용액(라미실계)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 12,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 라미실덤겔1%(테르비나핀)6+라미실크림1% 1+라미실외용액3+라미실원스외용액2=4 원문형. V5 '테르비나핀염산염' 41과 성분 문자열 상이로 별도 풀 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 16,
