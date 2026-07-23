@@ -627,6 +627,66 @@
    "agent": "GA",
    "status": "DONE",
    "note": "GA-V5 batch10 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "targetFp": "27b9a80026fea472",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "284b4ad4aa99265f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "318155c6d375b9a0",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "367799c299c3d5d8",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "391039070a7b3041",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "404ac4b22ba9297f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "45561d76fcf67c0e",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "46800f2742d6b25d",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "4e96f086e3c16590",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
+  },
+  {
+   "targetFp": "5da79a5d0f8019b6",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "note": "GA-V5 batch11 claim (2026-07-23)"
   }
  ]
 }
