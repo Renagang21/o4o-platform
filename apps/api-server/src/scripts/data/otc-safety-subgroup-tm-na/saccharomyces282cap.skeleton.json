@@ -4,7 +4,7 @@
   "subgroups": 1,
   "masters": 4,
   "metaAuthored": false,
-  "missingLineCount": 8,
+  "missingLineCount": 6,
   "missingLines": [
     {
       "h8": "1f83429e",
@@ -17,18 +17,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인 및 12세 이상의 어린이는 1회 1~2캡슐씩 1일 2회 복용하십시오."
-    },
-    {
-      "h8": "57fd1de1",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "이 약을 복용하기 전에 3개월 미만의 영아는 의사 또는 약사와 상의하십시오."
-    },
-    {
-      "h8": "67902d25",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "9e135e96",

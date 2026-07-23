@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "nifuroxazide200-03",
+  "order": 2503,
+  "groupKey": "니푸록사지드|200밀리그램|캡슐",
+  "safetyFp": "4130f92476145435",
+  "sourceRef": "9c469c71-3502-41de-886a-df51121c0a9e",
+  "sensitive": false,
+  "title": "니푸록사지드 200mg 캡슐 (지사제)",
+  "expectEasyMd5": "0742754d",
+  "masterIds": [
+    "f3e4298f-186d-4f58-85d3-f60635e5935b",
+    "f902ec65-6355-415c-a19d-2045dd9185c2"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "0742754d",
+    "names": [
+      "레피즈캡슐(니푸록사지드)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 급성 세균성 설사에 사용합니다.",
+    "usage": "성인은 1회 1캡슐(200 mg)을 1일 4회 복용합니다.\n\n3일 이상 복용하지 않습니다.\n\n복용 기간 동안 수분을 공급하고 설사의 심각도, 환자의 나이와 상태에 따라 수분의 정도와 공급방법을 조절합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 만 18세 미만의 소아 및 청소년, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 황색5호에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.\n\n치료 후 2일이 지난 후에도 설사가 지속되는 경우 경구 또는 정맥 수분 보충을 고려하거나 의사 또는 약사와 상의하십시오.\n\n설사 중 생야채, 과일, 녹색채소, 매운 음식과 얼린 음식 및 음료를 피하고 가능한 익힌 음식(고기, 쌀)을 섭취하십시오.\n\n피부발진, 두드러기, 혈관부종, 아나필락시스 쇽 같은 과민반응이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "니푸록사지드 200밀리그램",
+      "작용": "장내 세균에 작용하여 급성 세균성 설사를 치료하는 지사제입니다.",
+      "주요 증상": "급성 세균성 설사",
+      "주의 대상": "과민증, 만 18세 미만 소아·청소년, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지",
+      "선택 포인트": "급성 세균성 설사에 쓰는 지사제입니다."
+    }
+  },
+  "en": {
+    "title": "Nifuroxazide 200 mg Capsules (Antidiarrheal Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for acute bacterial diarrhea.",
+    "usage": "Adults take 1 capsule (200 mg) per dose, 4 times a day. Do not take this medicine for more than 3 days. Provide fluids during the treatment period, and adjust the amount and method of fluid replacement according to the severity of the diarrhea and the patient's age and condition.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are a child or adolescent under 18 years of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or are hypersensitive to Yellow No. 5 (Sunset Yellow FCF) or have experienced reactions to it. If diarrhea continues even 2 days after treatment, consider oral or intravenous fluid replacement or consult a doctor or pharmacist. During diarrhea, avoid raw vegetables, fruit, green vegetables, spicy foods, and frozen foods and drinks, and eat cooked foods (meat, rice) whenever possible. If hypersensitivity reactions such as skin rash, hives, angioedema, or anaphylactic shock occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Nifuroxazide 200 mg",
+      "How it works": "An antidiarrheal medicine that acts on intestinal bacteria to treat acute bacterial diarrhea.",
+      "Main symptoms": "Acute bacterial diarrhea",
+      "Caution for": "Do not use with hypersensitivity, for children and adolescents under 18, or with hereditary problems such as galactose intolerance",
+      "Why this one": "An antidiarrheal medicine for acute bacterial diarrhea."
+    }
+  }
+}

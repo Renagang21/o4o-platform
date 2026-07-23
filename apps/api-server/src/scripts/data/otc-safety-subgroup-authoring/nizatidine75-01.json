@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "nizatidine75-01",
+  "order": 4401,
+  "groupKey": "니자티딘|75밀리그램|정",
+  "safetyFp": "4c4aebadf5222d98",
+  "sourceRef": "a818c80e-145e-4f33-8f23-e47dad69b4ff",
+  "sensitive": false,
+  "title": "니자티딘 75mg 정 (위산분비 억제제)",
+  "expectEasyMd5": "397ea76c",
+  "masterIds": [
+    "3b034fb4-d6c3-4c5c-9799-b7a4d3785788",
+    "b8e1b003-3973-4b4b-a430-ba60d0001517",
+    "c2cb402a-94fd-40a7-abf4-a8a79c94315e"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "397ea76c",
+    "names": [
+      "니타딘정(니자티딘)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 위산과다, 속쓰림, 신트림에 사용합니다.",
+    "usage": "성인(15세~79세)은 1일 1회 1정(75 mg)을 복용합니다.\n\n8시간 경과후에도 증상의 개선이 없을 경우 1정(75 mg)을 추가로 복용합니다.\n\n1일 2정(150 mg)을 초과하지 마십시오.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약 또는 다른 H2 수용체 길항제에 과민증 환자, 빈혈, 혈소판 감소, 백혈구 감소, 혈액질환, 간/신질환, 위·십이지장질환, 천식·류마티스, 15세 미만의 어린이, 80세 이상의 고령자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 알레르기 체질인 사람, 65세 이상의 고령자, 목의 통증, 기침 또는 고열, 원인 불명의 체중감소, 지속적인 복통, 중증의간 또는 신기능이 손상된 환자는 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n이 약을 복용하는 동안 다른 위장약, 스테로이드제, 항생물질, 항암제, 아졸계 항진균제, 고용량(3,900 mg)의 아스피린, 게피티니브, 프룰리플록사신 또는 아타나자비어를 복용하지 마십시오.\n\n복용 중에는 음주하지 마십시오.\n\n카페인, 초콜렛, 튀긴 음식을 복용 중에는 피하십시오.\n\n드물게 발진, 가려움, 기관지천식, 후두부종(후두부기), 혈압저하, 기관지경련, 인두부종(인두부기), 호흡곤란, 아나필락시스(과민성)모양 증상, 빈혈, 범(전체)혈구감소증, 무과립구증, 과립구감소 때때로 백혈구감소, 호중구증가, 드물게 혈소판감소 자색반(자주색반점), 호산구증가, (치명적)혈소판감소증, 때때로 변비, 설사, 구갈(목마름), 구역, 드물게 복부팽만감 등의 위장장애, ALT, AST, ALP, -GTP 상승 등의 간기능장애, 황달, 섬망, 방향감각장애, 가역적인 정신착란, 두통, 졸음, 어지럼, 무력증, 저림, 단기간의 무증상 심실성 빈맥, 여성형유방증, 발한(땀이 남), 두드러기, 발진, 박탈성 피부염, 통풍 또는 신석증과는 관련없는 고요산혈증(요산과다증), 발열, 흉통(가슴통증), 근육통, 비염(코염), 인두염, 기침, 혈관염, 관절통, 혈청병, 얼굴부기, 유즙분비, 간질 신장염, 피부점막안 증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군), 방실블록 등의 심블록, 불완전 수축, 횡문근융해증, 발기부전 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "니자티딘 75밀리그램",
+      "작용": "H2 수용체 길항제로 위산 분비를 줄여 위산과다·속쓰림·신트림을 완화합니다.",
+      "주요 증상": "위산과다, 속쓰림, 신트림",
+      "주의 대상": "H2 길항제 과민증, 혈액질환, 간·신질환, 위·십이지장질환, 천식·류마티스, 15세 미만, 80세 이상, 임부·수유부 복용 금지",
+      "선택 포인트": "위산과다·속쓰림·신트림에 쓰는 위산분비 억제제입니다."
+    }
+  },
+  "en": {
+    "title": "Nizatidine 75 mg Tablets (Acid Reducer)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for excess stomach acid, heartburn, and sour belching.",
+    "usage": "Adults (15 to 79 years old) take 1 tablet (75 mg) 1 time a day. If symptoms do not improve even after 8 hours, take 1 additional tablet (75 mg). Do not exceed 2 tablets (150 mg) per 1 day.",
+    "caution": "Do not take this medicine if you are hypersensitive to it or to other H2 receptor antagonists, or have anemia, decreased platelets, decreased white blood cells, blood disorders, liver or kidney disease, stomach or duodenal disease, or asthma or rheumatism, are a child under 15 years of age, are an older adult 80 years of age or older, or are pregnant, may be pregnant, or are breastfeeding. Before taking this medicine, consult a doctor or pharmacist if you have an allergic constitution, are an older adult 65 years of age or older, have throat pain, cough, or high fever, unexplained weight loss, or persistent abdominal pain, or have severely impaired liver or kidney function. Follow the prescribed dosage and administration carefully. While taking this medicine, do not take other stomach medicines, steroids, antibiotics, anticancer agents, azole antifungals, high-dose (3,900 mg) aspirin, gefitinib, prulifloxacin, or atazanavir. Do not drink alcohol while taking this medicine. Avoid caffeine, chocolate, and fried foods while taking this medicine. If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rarely, rash, itching, bronchial asthma, laryngeal edema (throat swelling), lowered blood pressure, bronchospasm, pharyngeal edema (pharynx swelling), difficulty breathing, or anaphylaxis-like (hypersensitivity) symptoms; anemia, pancytopenia (decrease of all blood cells), agranulocytosis, or granulocytopenia; sometimes leukopenia or neutrophilia; rarely thrombocytopenic purpura (purple spots), eosinophilia, or (fatal) thrombocytopenia; sometimes constipation, diarrhea, dry mouth (thirst), or nausea; rarely gastrointestinal disorders such as abdominal bloating; liver function disorders such as elevated ALT, AST, ALP, or gamma-GTP; jaundice; delirium, disorientation, reversible confusion, headache, drowsiness, dizziness, weakness, numbness, short asymptomatic ventricular tachycardia, gynecomastia (breast enlargement in men), sweating, hives, rash, exfoliative dermatitis, hyperuricemia (excess uric acid) unrelated to gout or kidney stones, fever, chest pain, muscle pain, rhinitis (nasal inflammation), pharyngitis, cough, vasculitis, joint pain, serum sickness, facial swelling, milk secretion, interstitial nephritis, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome), heart block such as atrioventricular block, incomplete contraction, rhabdomyolysis, or erectile dysfunction. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Nizatidine 75 mg",
+      "How it works": "An H2 receptor antagonist that reduces stomach acid to relieve acid excess, heartburn, and sour belching.",
+      "Main symptoms": "Excess stomach acid, heartburn, and sour belching",
+      "Caution for": "Do not use with H2 antagonist hypersensitivity, blood disorders, liver or kidney disease, stomach or duodenal disease, asthma or rheumatism, under 15, 80 or older, or if pregnant or breastfeeding",
+      "Why this one": "An acid reducer for excess stomach acid, heartburn, and sour belching."
+    }
+  }
+}

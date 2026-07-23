@@ -4,7 +4,7 @@
   "subgroups": 1,
   "masters": 3,
   "metaAuthored": false,
-  "missingLineCount": 9,
+  "missingLineCount": 8,
   "missingLines": [
     {
       "h8": "46a5b69b",
@@ -53,12 +53,6 @@
       "freq": 1,
       "fields": "caution",
       "ko": "피부시험 실시 약 48시간 전에는 이 약을 복용하지 마십시오."
-    },
-    {
-      "h8": "d3c1dfac",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "이 약을 복용하는 동안에는 수유를 피하십시오."
     }
   ],
   "missingEffSummaries": [

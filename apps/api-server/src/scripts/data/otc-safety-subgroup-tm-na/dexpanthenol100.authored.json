@@ -1,0 +1,36 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 덱스판테놀 100mg 정 그룹 TM 저작(15줄, 4 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "덱스판테놀|100밀리그램|정",
+  "meta": {
+    "titleKo": "덱스판테놀 100mg 정 (탈모 보조치료제)",
+    "titleEn": "Dexpanthenol 100 mg Tablets (Hair Loss Adjuvant Medicine)",
+    "ingKo": "덱스판테놀 100밀리그램",
+    "ingEn": "Dexpanthenol 100 mg",
+    "actionKo": "판토텐산 유도체로 탈모의 보조치료에 쓰는 약입니다.",
+    "actionEn": "A pantothenic acid derivative medicine used as adjuvant treatment for hair loss."
+  },
+  "effSummaries": {
+    "83509db8": { "symKo": "탈모의 보조치료", "symEn": "Adjuvant treatment of hair loss", "pointKo": "탈모의 보조치료에 쓰는 덱스판테놀 제제입니다.", "pointEn": "A dexpanthenol medicine for adjuvant treatment of hair loss." }
+  },
+  "cauSummaries": {
+    "314015eb": { "watchKo": "과민증, 19세 미만, 탈모증 이외의 사람, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, under 19, without hair loss, or with hereditary problems such as galactose intolerance" },
+    "ec616b8c": { "watchKo": "과민증, 19세 미만, 탈모증 이외의 사람, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, under 19, without hair loss, or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "83509db8": "This medicine is used as adjuvant treatment for hair loss.",
+    "1ced5600": "Adults take 1 tablet per 1 dose, 3 times a day.",
+    "60059adf": "The treatment period is 6 weeks.",
+    "314015eb": "Do not take this medicine if you are hypersensitive to it, are under 19 years of age, do not have hair loss (alopecia), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "ec616b8c": "Do not take this medicine if you are hypersensitive to it, are under 19 years of age, do not have hair loss (alopecia), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "2864265e": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or have experienced allergic symptoms caused by medicines.",
+    "d02b6027": "Before using this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or have experienced allergic symptoms caused by medicines.",
+    "ece8bac7": "To avoid drug interactions, tell your doctor or pharmacist about your recent treatments.",
+    "ab4c9874": "If skin allergic reactions such as redness (erythema) or hives occur, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "a9e14b66": "If skin allergies such as redness (erythema) or hives occur, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "4026787a": "If any problems occur while taking this medicine, stop taking it and consult a doctor or pharmacist.",
+    "22543bfc": "If symptoms do not improve even after taking this medicine for 6 weeks, stop taking it immediately and consult a doctor or pharmacist.",
+    "2df28bda": "If symptoms do not improve even after taking this medicine for 6 weeks, stop taking it immediately and consult a doctor or pharmacist.",
+    "403beae4": "If no improvement in symptoms is seen even after taking this medicine for 6 weeks, stop taking it immediately and consult a doctor or pharmacist.",
+    "60972e9b": "If symptoms do not improve even after taking this medicine for about 6 weeks, stop taking it immediately and consult a doctor or pharmacist."
+  }
+}

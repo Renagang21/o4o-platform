@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "clonixin125cap-01",
+  "order": 4501,
+  "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+  "safetyFp": "3d9107371f67f30b",
+  "sourceRef": "cb765371-1e43-417e-8a66-4adc8ca37699",
+  "sensitive": false,
+  "title": "클로닉신리시네이트 125mg 연질캡슐 (진통제)",
+  "expectEasyMd5": "fc47dab2",
+  "masterIds": [
+    "4085b2b3-0394-4a61-8993-9866b7b56993",
+    "cc7b9f5d-4419-4b20-aa0f-3441f4a5747b"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "fc47dab2",
+    "names": [
+      "이지페인클린연질캡슐(클로닉신리시네이트)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 근육통, 신경통, 외상 후 및 수술 후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화에 사용합니다.",
+    "usage": "성인은 1회 1~2캡슐(125∼250 mg)씩, 1일 3회 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용 시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증, 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수 있습니다.\n\n소화성궤양 환자, 약물에 기인하여 위·십이지장에 동요 발현시, 이 약에 과민증 환자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 억제제 포함)에 대하여 천식, 두드러기 또는 알레르기 반응 경험자, 관상동맥 우회로술(CABG) 전후에 발생하는 통증의 치료, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 심한 간장애, 신장애, 심부전, 크론병 또는 궤양성 대장염과 같은 염증성 장질환 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 소화성궤양 경험자, 소아 및 고령자, 고혈압, 체액저류 또는 심부전 환자, 이뇨제 또는 ACE 억제제를 투여 중인 환자, 기관지천식 환자, 간장애 또는 경험자, 신장애 또는 경험자, 과거 비스테로이드성 소염진통제의 장기투여로 인한 소화관 궤양이 있는 환자는 의사 또는 약사와 상의하십시오.\n\n다른 비스테로이드성 소염진통제, ACE 억제제 또는 안지오텐신Ⅱ 수용체 길항제, 아스피린, 이뇨제, 리튬, 메토트렉세이트, 쿠마린계 항응고제(와르파린 등), 시클로스포린 및 타크로리무스, 항혈소판제 및 선택적 세로토닌 재흡수 억제제(SSRI), 코르티코스테로이드와 함께 복용하지 마십시오.\n\n구역, 구토, 설사, 변비, 복통, 위장출혈, 소화성궤양 및 천공, 드물게 쇽, 발진, 가려움, 빈혈, AST, ALT의 상승, 졸음, 두통, 때때로 구역, 구토, 어지러움, 졸음, 두통, 식은땀, 한기, 이상황홀감 등이 나타나는 경우 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "클로닉신리시네이트 125밀리그램",
+      "작용": "비스테로이드성 소염진통제로 근육통·신경통·두통·치통 등 경증~중등도 통증을 완화합니다.",
+      "주요 증상": "근육통, 신경통, 외상 후·수술 후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "근육통·신경통·두통·치통 등 경증~중등도 통증에 쓰는 진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Clonixin Lysinate 125 mg Soft Capsules (Pain Reliever)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to relieve mild or moderate pain: muscle pain, nerve pain, pain after injury and after surgery, headache, toothache, and ear pain.",
+    "usage": "Adults take 1 to 2 capsules (125 to 250 mg) per 1 dose, 3 times a day.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic events, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Do not take this medicine if you have peptic ulcers or drug-induced stomach or duodenal upset; are hypersensitive to this medicine; have experienced asthma, hives, or allergic reactions to aspirin or other nonsteroidal anti-inflammatory drugs (including COX-2 inhibitors); need treatment of pain occurring before or after coronary artery bypass graft (CABG) surgery; are pregnant, may be pregnant, or are breastfeeding; or have severe liver disorders, kidney disorders, heart failure, or inflammatory bowel disease such as Crohn's disease or ulcerative colitis. Before taking this medicine, consult a doctor or pharmacist if you have experienced peptic ulcers, are a child or older adult, have high blood pressure, fluid retention, or heart failure, are taking diuretics or ACE inhibitors, have bronchial asthma, have or have had liver disorders, have or have had kidney disorders, or have digestive tract ulcers caused by past long-term use of nonsteroidal anti-inflammatory drugs. Do not take this medicine together with other nonsteroidal anti-inflammatory drugs, ACE inhibitors or angiotensin II receptor antagonists, aspirin, diuretics, lithium, methotrexate, coumarin anticoagulants (such as warfarin), cyclosporine and tacrolimus, antiplatelet agents and selective serotonin reuptake inhibitors (SSRIs), or corticosteroids. Consult a doctor or pharmacist if the following occur: nausea, vomiting, diarrhea, constipation, abdominal pain, gastrointestinal bleeding, peptic ulcers and perforation; rarely, shock, rash, itching, anemia, elevated AST or ALT, drowsiness, or headache; sometimes nausea, vomiting, dizziness, drowsiness, headache, cold sweats, chills, or unusual euphoria. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Clonixin lysinate 125 mg",
+      "How it works": "A nonsteroidal anti-inflammatory pain reliever for mild to moderate pain such as muscle pain, nerve pain, headache, and toothache.",
+      "Main symptoms": "Relief of mild or moderate pain: muscle pain, nerve pain, post-injury and post-surgery pain, headache, toothache, and ear pain",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "A pain reliever for mild to moderate muscle pain, nerve pain, headache, and toothache."
+    }
+  }
+}

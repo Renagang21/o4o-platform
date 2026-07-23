@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "doxylamine25-01",
+  "order": 2101,
+  "groupKey": "독시라민숙신산염|25밀리그램|정",
+  "safetyFp": "7ec149cc8167314a",
+  "sourceRef": "65c899b7-cfef-4ccf-8f80-2f64b525771c",
+  "sensitive": false,
+  "title": "독시라민숙신산염 25mg 정 (수면유도제)",
+  "expectEasyMd5": "9a30986c",
+  "masterIds": [
+    "78643a9b-74e3-48fc-9133-adae38953544",
+    "c71a5848-cb96-4db1-8e2c-0f4787c87460",
+    "e1d682ed-11b1-4474-ba04-3261b6ab4c06"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "9a30986c",
+    "names": [
+      "포린피아정(독시라민숙신산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 불면증의 보조치료 및 진정에 사용합니다.",
+    "usage": "성인은 1일 1회 1정(25 mg)을 반드시 수면 30분 전에 복용합니다.연령, 증상에 따라 적절히 증감할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "폐기종, 만성 기관지염 천식 등의 호흡장애, 녹내장, 전립선 비대 환자, 수유부, 15세 이하의 소아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 및 임신을 하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.복용 후 과도한 진정이 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오.의사 또는 약사와 상의 없이 2주 이상 복용하지 마십시오.\n\n이 약을 복용하는 동안 이미프라민계 항우울약, 항파킨슨제, 디소피라미드와 함께 복용하지 마십시오. 복용 중에는 음주하지 마십시오.\n\n때때로 항콜린작용이 나타날 수 있습니다.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "독시라민숙신산염 25밀리그램",
+      "작용": "항히스타민 성분으로 불면증의 보조치료 및 진정에 쓰는 수면유도제입니다.",
+      "주요 증상": "불면증의 보조치료 및 진정",
+      "주의 대상": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 유전적 문제 복용 금지 · 임부 상의 · 운전 주의 · 2주 초과 금지",
+      "선택 포인트": "불면증 보조치료와 진정에 쓰는 수면유도제입니다."
+    }
+  },
+  "en": {
+    "title": "Doxylamine Succinate 25 mg Tablets (Sleep Aid)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for adjuvant treatment of insomnia and for sedation.",
+    "usage": "Adults take 1 tablet (25 mg) 1 time a day, and be sure to take it 30 minutes before sleep. The dose may be adjusted appropriately according to age and symptoms.",
+    "caution": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, are a child 15 years old or younger, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are a woman who is pregnant or may be pregnant. Excessive sedation may occur after taking this medicine, so use caution when driving or operating machinery. Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist. While taking this medicine, do not take it together with imipramine-type antidepressants, anti-Parkinson agents, or disopyramide. Do not drink alcohol while taking this medicine. Sometimes anticholinergic effects may occur. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Doxylamine succinate 25 mg",
+      "How it works": "An antihistamine-based sleep aid used as adjuvant treatment for insomnia and for sedation.",
+      "Main symptoms": "Adjuvant treatment of insomnia and sedation",
+      "Caution for": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, or hereditary problems; consult if pregnant; caution when driving; no more than 2 weeks",
+      "Why this one": "A sleep aid for adjuvant treatment of insomnia and for sedation."
+    }
+  }
+}

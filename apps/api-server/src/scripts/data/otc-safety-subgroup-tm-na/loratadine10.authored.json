@@ -1,0 +1,28 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 로라타딘 10mg 정 그룹 TM 저작(8줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "로라타딘|10밀리그램|정",
+  "meta": {
+    "titleKo": "로라타딘 10mg 정 (알레르기약)",
+    "titleEn": "Loratadine 10 mg Tablets (Allergy Medicine)",
+    "ingKo": "로라타딘 10밀리그램",
+    "ingEn": "Loratadine 10 mg",
+    "actionKo": "졸음이 적은 2세대 항히스타민제로 알레르기성 비염과 만성 특발성 두드러기 증상을 완화합니다.",
+    "actionEn": "A second-generation antihistamine with less drowsiness that relieves allergic rhinitis and chronic idiopathic hives."
+  },
+  "effSummaries": {
+    "9f64cdab": { "symKo": "알레르기성 비염, 만성 특발성 두드러기", "symEn": "Allergic rhinitis and chronic idiopathic urticaria (hives)", "pointKo": "알레르기성 비염과 만성 두드러기에 쓰는 항히스타민제입니다.", "pointEn": "An antihistamine for allergic rhinitis and chronic hives." }
+  },
+  "cauSummaries": {
+    "46a5b69b": { "watchKo": "과민증, 6세 미만 소아, 임부·수유부, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, for children under 6, if pregnant or breastfeeding, or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "9f64cdab": "This medicine is used for allergic rhinitis and chronic idiopathic urticaria (hives).",
+    "96ded6d8": "Adults and children 12 years and older take 1 tablet per 1 dose, 1 time a day.",
+    "a5f85914": "Children 6 to under 12 years old take 1 tablet per 1 dose, 1 time a day if body weight is 30 kg or more, or 0.5 tablet per 1 dose, 1 time a day if body weight is less than 30 kg.",
+    "46a5b69b": "Do not take this medicine if you are hypersensitive to it, are a child under 6 years of age, are pregnant or breastfeeding, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "b5862eed": "Before taking this medicine, consult a doctor or pharmacist if you have liver disorders or renal failure.",
+    "c032621c": "While taking this medicine, do not take it together with cimetidine, erythromycin, ketoconazole, quinidine, fluconazole, or fluoxetine.",
+    "d18792c1": "Do not take this medicine for about 48 hours before a skin test.",
+    "9e565f8d": "If sedation, anticholinergic effects, headache, fainting, drowsiness, dry mouth or nausea, gastrointestinal disorders such as gastritis, increased appetite, rapid heartbeat, fatigue, or allergic reactions such as rash occur, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

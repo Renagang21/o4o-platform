@@ -1,0 +1,52 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 독시라민숙신산염 25mg 정 그룹 TM 저작(26줄, 6 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "독시라민숙신산염|25밀리그램|정",
+  "meta": {
+    "titleKo": "독시라민숙신산염 25mg 정 (수면유도제)",
+    "titleEn": "Doxylamine Succinate 25 mg Tablets (Sleep Aid)",
+    "ingKo": "독시라민숙신산염 25밀리그램",
+    "ingEn": "Doxylamine succinate 25 mg",
+    "actionKo": "항히스타민 성분으로 불면증의 보조치료 및 진정에 쓰는 수면유도제입니다.",
+    "actionEn": "An antihistamine-based sleep aid used as adjuvant treatment for insomnia and for sedation."
+  },
+  "effSummaries": {
+    "01ad12ee": { "symKo": "불면증의 보조치료 및 진정", "symEn": "Adjuvant treatment of insomnia and sedation", "pointKo": "불면증 보조치료와 진정에 쓰는 수면유도제입니다.", "pointEn": "A sleep aid for adjuvant treatment of insomnia and for sedation." },
+    "c98d4498": { "symKo": "불면증 보조치료 및 진정", "symEn": "Adjuvant treatment of insomnia and sedation", "pointKo": "불면증 보조치료와 진정에 쓰는 수면유도제입니다.", "pointEn": "A sleep aid for adjuvant treatment of insomnia and for sedation." }
+  },
+  "cauSummaries": {
+    "1fc7334c": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하 복용 금지 · 임부 상의 · 운전 주의 · 2주 초과 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, or age 15 or younger; consult if pregnant; caution when driving; no more than 2 weeks" },
+    "61561930": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 갈락토오스 불내성 등 유전적 문제, 대두유·콩·땅콩 과민증 복용 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, hereditary problems such as galactose intolerance, or soybean oil, soybean, or peanut hypersensitivity" },
+    "a346de91": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, or hereditary problems such as galactose intolerance" },
+    "a6ed645a": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, or hereditary problems such as galactose intolerance" },
+    "c4ad5af5": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 유전적 문제 복용 금지 · 임부 상의 · 운전 주의 · 2주 초과 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, or hereditary problems; consult if pregnant; caution when driving; no more than 2 weeks" },
+    "d8164f78": { "watchKo": "호흡장애·녹내장·전립선 비대, 수유부, 15세 이하, 유전적 문제 복용 금지 · 임부 상의 · 운전 주의 · 2주 초과 금지", "watchEn": "Do not use with breathing disorders, glaucoma, enlarged prostate, while breastfeeding, age 15 or younger, or hereditary problems; consult if pregnant; caution when driving; no more than 2 weeks" }
+  },
+  "en": {
+    "01ad12ee": "This medicine is used for adjuvant treatment of insomnia and for sedation.",
+    "c98d4498": "This medicine is used for adjuvant treatment of insomnia and for sedation.",
+    "5eeb2418": "Adults take 1 tablet (25 mg) per 1 dose, 1 time a day, and be sure to take it 30 minutes before sleep.",
+    "3562e337": "Adults take 1 tablet (25 mg) of doxylamine succinate 1 time a day by mouth, and be sure to take it 30 minutes before sleep.",
+    "7d0cacdf": "Adults take 1 tablet (25 mg) 1 time a day, and be sure to take it 30 minutes before sleep. The dose may be adjusted appropriately according to age and symptoms.",
+    "8d78deee": "Adults take 1 tablet (25 mg) 1 time a day, and be sure to take it 30 minutes before sleep. The dose may be increased appropriately according to age and symptoms.",
+    "9230d7e7": "Adults take 1 tablet (25 mg) 1 time a day, and be sure to take it 30 minutes before sleep. The dose may be adjusted appropriately according to age and symptoms.",
+    "1fc7334c": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, or are a child 15 years old or younger. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant. Excessive sedation may occur after taking this medicine, so use caution when driving or operating machinery. Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist.",
+    "61561930": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, are a child 15 years old or younger, have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption, are hypersensitive to soybean oil or have experienced allergic reactions to it, or are hypersensitive to soybeans or peanuts.",
+    "a346de91": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, are a child 15 years old or younger, or have hereditary problems such as galactose intolerance, Lapp lactase (milk sugar) deficiency, or glucose-galactose malabsorption.",
+    "a6ed645a": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, are a child 15 years old or younger, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "c4ad5af5": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate, are breastfeeding, are a child 15 years old or younger, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are a woman who is pregnant or may be pregnant. Excessive sedation may occur after taking this medicine, so use caution when driving or operating machinery. Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist.",
+    "d8164f78": "Do not take this medicine if you have breathing disorders such as emphysema, chronic bronchitis, or asthma, glaucoma, or an enlarged prostate (prostate gland), are breastfeeding, are a child 15 years old or younger, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant. Excessive sedation may occur after taking this medicine, so use caution when driving or operating machinery. Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist.",
+    "fdff5da2": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant.",
+    "f3fd56d9": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant; have fat metabolism disorders such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or must use lipid emulsions with caution; or have conditions related to fat overload.",
+    "4d401b5a": "Do not take this medicine together with imipramine-type antidepressants, anti-Parkinson agents, or disopyramide.",
+    "dc3bd648": "While taking this medicine, do not take it together with imipramine-type antidepressants, anti-Parkinson agents, or disopyramide. Do not drink alcohol while taking this medicine.",
+    "a212033c": "While taking this medicine, do not take it together with imipramine-type antidepressants, anti-Parkinson agents, or disopyramide. Do not drink alcohol while taking this medicine.",
+    "3c43226d": "Do not drink alcohol while taking this medicine.",
+    "7632fbde": "Do not drink alcohol while taking this medicine.",
+    "5db66e95": "Excessive sedation may occur after taking this medicine, so use caution when driving or operating machinery.",
+    "49e18e3d": "Excessive sedation may occur, so use caution when driving or operating machinery.",
+    "9be12787": "This medicine may cause drowsiness, so take it at bedtime; if daytime drowsiness occurs, reduce the dose.",
+    "2c4ed31c": "Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist.",
+    "bbbb1ff1": "Do not take this medicine for more than 2 weeks without consulting a doctor or pharmacist.",
+    "2a1abaca": "Sometimes anticholinergic effects may occur."
+  }
+}

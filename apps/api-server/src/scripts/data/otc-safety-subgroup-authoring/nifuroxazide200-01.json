@@ -1,0 +1,68 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "nifuroxazide200-01",
+  "order": 2501,
+  "groupKey": "니푸록사지드|200밀리그램|캡슐",
+  "safetyFp": "11ec34143e1eddb8",
+  "sourceRef": "0a089635-a377-4cc1-88a9-0dc228473b88",
+  "sensitive": false,
+  "title": "니푸록사지드 200mg 캡슐 (지사제)",
+  "expectEasyMd5": "54a53c2d",
+  "masterIds": [
+    "18783f29-2d80-449b-9907-568b902e5993",
+    "703ae46a-aac9-4bd3-8569-252028c61324",
+    "8b55cf6c-67c3-47a0-8ddb-bf65a0df1d6a",
+    "91fb9021-ab67-4397-8d9f-ab2c7e8a0e24",
+    "a65e116c-ba4d-4108-8d6f-a185fe5bf209",
+    "e253da3c-5904-420c-afd3-d697c65b231f"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "54a53c2d",
+    "names": [
+      "엔터폴캡슐(니푸록사지드)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 24,
+    "en": 12,
+    "total": 36
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 급성 세균성 설사에 사용합니다.",
+    "usage": "성인은 1회 1캡슐(200 mg)을 1일 4회 복용합니다.3일 이상 복용하지 않습니다.복용 기간 동안 수분을 공급하고 설사의 심각도, 환자의 나이와 상태에 따라 수분의 정도와 공급방법을 조절합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "심하고 지속적인 설사, 구토 혹은 먹는 것을 거부하는 경우 정맥 수분 보충을 고려해야 합니다.\n\n이 약 및 이 약의 유도체에 과민증 환자, 만 18세 미만의 소아 및 청소년은 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부는 의사 또는 약사와 상의하십시오.치료 후 2일이 지난 후에도 설사가 지속되는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 약을 복용하는 동안 설사 중에는 생야채, 과일, 녹색채소, 매운 음식과 얼린 음식 및 음료를 피하고 가능한 익힌 음식(고기, 쌀)을 섭취하십시오.\n\n피부발진, 두드러기, 혈관부종, 아나필락시스 쇽 같은 과민반응이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "니푸록사지드 200밀리그램",
+      "작용": "장내 세균에 작용하여 급성 세균성 설사를 치료하는 지사제입니다.",
+      "주요 증상": "급성 세균성 설사",
+      "주의 대상": "심하고 지속적인 설사·구토·먹기 거부 시 정맥 수분 보충 고려",
+      "선택 포인트": "급성 세균성 설사에 쓰는 지사제입니다."
+    }
+  },
+  "en": {
+    "title": "Nifuroxazide 200 mg Capsules (Antidiarrheal Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for acute bacterial diarrhea.",
+    "usage": "Adults take 1 capsule (200 mg) per dose, 4 times a day. Do not take this medicine for more than 3 days. Provide fluids during the treatment period, and adjust the amount and method of fluid replacement according to the severity of the diarrhea and the patient's age and condition.",
+    "caution": "For severe and persistent diarrhea, vomiting, or refusal to eat, intravenous fluid replacement should be considered. Do not take this medicine if you are hypersensitive to it or its derivatives, or are a child or adolescent under 18 years of age. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding. If diarrhea continues even 2 days after treatment, stop taking this medicine immediately and consult a doctor or pharmacist. While taking this medicine, during diarrhea, avoid raw vegetables, fruit, green vegetables, spicy foods, and frozen foods and drinks, and eat cooked foods (meat, rice) whenever possible. If hypersensitivity reactions such as skin rash, hives, angioedema, or anaphylactic shock occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Nifuroxazide 200 mg",
+      "How it works": "An antidiarrheal medicine that acts on intestinal bacteria to treat acute bacterial diarrhea.",
+      "Main symptoms": "Acute bacterial diarrhea",
+      "Caution for": "Consider intravenous fluid replacement for severe persistent diarrhea, vomiting, or refusal to eat",
+      "Why this one": "An antidiarrheal medicine for acute bacterial diarrhea."
+    }
+  }
+}

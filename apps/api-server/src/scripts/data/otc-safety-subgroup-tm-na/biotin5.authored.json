@@ -1,0 +1,36 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 비오틴 5mg 정 그룹 TM 저작(14줄, 4 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "비오틴|5밀리그램|정",
+  "meta": {
+    "titleKo": "비오틴 5mg 정 (손발톱·모발 영양제)",
+    "titleEn": "Biotin 5 mg Tablets (Nail and Hair Nutrient Medicine)",
+    "ingKo": "비오틴 5밀리그램",
+    "ingEn": "Biotin 5 mg",
+    "actionKo": "비오틴 결핍으로 인한 손·발톱과 모발의 성장 장애를 개선하는 약입니다.",
+    "actionEn": "A medicine that improves nail and hair growth disorders caused by biotin deficiency."
+  },
+  "effSummaries": {
+    "3c9ac064": { "symKo": "비오틴 결핍으로 인한 손·발톱 또는 모발 성장 장애", "symEn": "Nail or hair growth disorders caused by biotin deficiency", "pointKo": "비오틴 결핍에 의한 손발톱·모발 성장 장애에 쓰는 약입니다.", "pointEn": "A medicine for nail and hair growth disorders from biotin deficiency." },
+    "8114feec": { "symKo": "비오틴 결핍으로 인한 손톱·발톱 또는 모발 성장 장애", "symEn": "Fingernail, toenail, or hair growth disorders caused by biotin deficiency", "pointKo": "비오틴 결핍에 의한 손발톱·모발 성장 장애에 쓰는 약입니다.", "pointEn": "A medicine for nail and hair growth disorders from biotin deficiency." }
+  },
+  "cauSummaries": {
+    "cf97b383": { "watchKo": "과민증, 3개월 미만 영아, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, for infants under 3 months, or with hereditary problems such as galactose intolerance" },
+    "4d122d3f": { "watchKo": "과민증, 3개월 미만 영아, 유전적 문제 환자 복용 금지 · 임부·수유부 상의 · 용법·용량 준수", "watchEn": "Do not use with hypersensitivity, for infants under 3 months, or with hereditary problems; consult if pregnant or breastfeeding; follow the prescribed dosage" }
+  },
+  "en": {
+    "3c9ac064": "This medicine is used for fingernail, toenail, or hair growth disorders caused by biotin deficiency.",
+    "8114feec": "This medicine is used for fingernail, toenail, or hair growth disorders caused by biotin deficiency.",
+    "4073a272": "Take 1 tablet per 1 dose, 1 time a day, before a meal.",
+    "67234b85": "Take 1 tablet per 1 day, 1 time a day, before a meal.",
+    "6bfa0f1b": "Adults take 1 tablet per 1 dose, 1 time a day, before a meal.",
+    "cf97b383": "Do not take this medicine if you are hypersensitive to it, are an infant under 3 months of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "4d122d3f": "Do not take this medicine if you are hypersensitive to it, are an infant under 3 months of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding. Follow the prescribed dosage and administration carefully.",
+    "b8081805": "Do not take this medicine together with raw eggs.",
+    "34420de2": "Do not take this medicine together with raw eggs. Consult a doctor or pharmacist when taking this medicine together with carbamazepine, phenytoin, phenobarbital, or antibiotics.",
+    "22ead3e8": "Before taking this medicine, consult a doctor or pharmacist if you are taking anticonvulsants such as carbamazepine, phenytoin, or phenobarbital, or antibiotics.",
+    "50bb9a64": "Before taking this medicine, consult a doctor or pharmacist if you are taking anticonvulsants such as carbamazepine, phenytoin, or phenobarbital, or antibiotics.",
+    "7c0f293b": "Consult a doctor or pharmacist when taking this medicine together with carbamazepine, phenytoin, phenobarbital, or antibiotics.",
+    "1a4da9aa": "If hives or gastrointestinal disorders occur, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "2df4dea0": "If hives or gastrointestinal disorders occur, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

@@ -4,19 +4,13 @@
   "subgroups": 5,
   "masters": 11,
   "metaAuthored": false,
-  "missingLineCount": 35,
+  "missingLineCount": 34,
   "missingLines": [
     {
       "h8": "9f20f923",
       "freq": 5,
       "fields": "efficacy",
       "ko": "이 약은 일시적 불면증의 완화에 사용합니다."
-    },
-    {
-      "h8": "2ed571c8",
-      "freq": 4,
-      "fields": "caution",
-      "ko": "복용 중에는 음주하지 마십시오."
     },
     {
       "h8": "592b7183",

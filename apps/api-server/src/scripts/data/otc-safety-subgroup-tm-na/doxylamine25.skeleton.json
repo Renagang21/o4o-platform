@@ -4,7 +4,7 @@
   "subgroups": 6,
   "masters": 14,
   "metaAuthored": false,
-  "missingLineCount": 28,
+  "missingLineCount": 26,
   "missingLines": [
     {
       "h8": "2a1abaca",
@@ -29,12 +29,6 @@
       "freq": 2,
       "fields": "caution",
       "ko": "의사 또는 약사와 상의 없이 2주 이상 투여하지 마십시오."
-    },
-    {
-      "h8": "2ed571c8",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "복용 중에는 음주하지 마십시오."
     },
     {
       "h8": "5db66e95",
@@ -119,12 +113,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인은 1일 1회 1정(25 mg)을 반드시 수면 30분 전에 복용합니다.연령과 증상에 따라 적절히 증감할 수 있습니다."
-    },
-    {
-      "h8": "9f455664",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "정주용 지질제와 함께 복용 시 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "a212033c",

@@ -3,21 +3,41 @@
   "agent": "나",
   "built": [
     {
-      "slug": "erdosteine300-01",
-      "groupKey": "에르도스테인|300밀리그램|정",
-      "safetyFp": "ed0b9e1c34407e10",
+      "slug": "nifuroxazide200-01",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "11ec34143e1eddb8",
+      "T": 6,
+      "order": 2501,
+      "sourceRef": "0a089635-a377-4cc1-88a9-0dc228473b88",
+      "koHtmlLen": 1903,
+      "enHtmlLen": 3380
+    },
+    {
+      "slug": "nifuroxazide200-02",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "a1b42d0bd4cc9c57",
       "T": 4,
-      "order": 3801,
-      "sourceRef": "7638593b-9304-482a-84a0-fb3000ba25a5",
-      "koHtmlLen": 1807,
-      "enHtmlLen": 3180
+      "order": 2502,
+      "sourceRef": "38d8dcc6-7407-4098-8fdc-5aa452075e13",
+      "koHtmlLen": 1972,
+      "enHtmlLen": 3553
+    },
+    {
+      "slug": "nifuroxazide200-03",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "4130f92476145435",
+      "T": 2,
+      "order": 2503,
+      "sourceRef": "9c469c71-3502-41de-886a-df51121c0a9e",
+      "koHtmlLen": 1960,
+      "enHtmlLen": 3453
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 1,
-    "builtMasters": 4,
+    "builtFiles": 3,
+    "builtMasters": 12,
     "holds": 0,
     "missingTm": 0
   }

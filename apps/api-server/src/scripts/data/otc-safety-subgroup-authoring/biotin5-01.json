@@ -1,0 +1,69 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "biotin5-01",
+  "order": 2301,
+  "groupKey": "비오틴|5밀리그램|정",
+  "safetyFp": "b3a62e7e17e88136",
+  "sourceRef": "b49f79af-72c1-415a-80cb-4aed8522e302",
+  "sensitive": false,
+  "title": "비오틴 5mg 정 (손발톱·모발 영양제)",
+  "expectEasyMd5": "a13fab17",
+  "masterIds": [
+    "065c20ee-e32c-443a-8ef6-b733d87ae6d2",
+    "266f98d4-9230-4183-b70b-bce12a3b395a",
+    "4042dba0-2b4c-4181-8258-e1f1447df6b5",
+    "581eadd1-45a5-4a1a-b5f1-0b93f6057860",
+    "7b4ab94b-cd67-481c-b374-7f1e2a3154bd",
+    "ce9562b4-f366-4307-bf9b-f047e9daffc0"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "a13fab17",
+    "names": [
+      "니오틴정(비오틴)",
+      "알리코비오틴정5밀리그램(비오틴)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 24,
+    "en": 12,
+    "total": 36
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 비오틴 결핍으로 인한 손톱이나 발톱 또는 모발 성장 장애에 사용합니다.",
+    "usage": "1회 1정씩, 1일 1회 식사 전에 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 3개월 미만의 영아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n날계란과 함께 복용하지 마십시오.\n\n이 약을 복용하기 전에 카르바마제핀, 페니토인, 페노바르비탈 등의 항경련제 혹은 항생제 복용 환자는 의사 또는 약사와 상의하십시오.\n\n두드러기, 위장장애 등이 나타나는 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "비오틴 5밀리그램",
+      "작용": "비오틴 결핍으로 인한 손·발톱과 모발의 성장 장애를 개선하는 약입니다.",
+      "주요 증상": "비오틴 결핍으로 인한 손톱·발톱 또는 모발 성장 장애",
+      "주의 대상": "과민증, 3개월 미만 영아, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지",
+      "선택 포인트": "비오틴 결핍에 의한 손발톱·모발 성장 장애에 쓰는 약입니다."
+    }
+  },
+  "en": {
+    "title": "Biotin 5 mg Tablets (Nail and Hair Nutrient Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for fingernail, toenail, or hair growth disorders caused by biotin deficiency.",
+    "usage": "Take 1 tablet per 1 dose, 1 time a day, before a meal.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are an infant under 3 months of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or breastfeeding. Follow the prescribed dosage and administration carefully. Do not take this medicine together with raw eggs. Before taking this medicine, consult a doctor or pharmacist if you are taking anticonvulsants such as carbamazepine, phenytoin, or phenobarbital, or antibiotics. If hives or gastrointestinal disorders occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Biotin 5 mg",
+      "How it works": "A medicine that improves nail and hair growth disorders caused by biotin deficiency.",
+      "Main symptoms": "Fingernail, toenail, or hair growth disorders caused by biotin deficiency",
+      "Caution for": "Do not use with hypersensitivity, for infants under 3 months, or with hereditary problems such as galactose intolerance",
+      "Why this one": "A medicine for nail and hair growth disorders from biotin deficiency."
+    }
+  }
+}

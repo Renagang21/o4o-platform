@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "dexpanthenol100-03",
+  "order": 2403,
+  "groupKey": "덱스판테놀|100밀리그램|정",
+  "safetyFp": "fb0ac3a481ef17ac",
+  "sourceRef": "ed20f79b-4c31-4bd9-8020-ce15d60cac52",
+  "sensitive": false,
+  "title": "덱스판테놀 100mg 정 (탈모 보조치료제)",
+  "expectEasyMd5": "d9836d93",
+  "masterIds": [
+    "5952600a-9ddb-41c9-87da-48d3dc62ed8d",
+    "d8ea554a-bf0d-4c11-99ce-20bf9dd7afe0"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "d9836d93",
+    "names": [
+      "판덱스정(덱스판테놀)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 탈모의 보조치료에 사용합니다.",
+    "usage": "성인은 1회 1정씩, 1일 3회 복용합니다.\n\n치료기간은 6주입니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증, 19세 미만 환자, 탈모증 이외의 사람, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 약물에 의한 알레르기 증상 경험자는 의사 또는 약사와 상의하십시오.\n\n6주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n약물의 상호작용을 피하기 위하여 최근 치료 상황을 의사나 약사에게 알리십시오.\n\n홍진, 두드러기와 같은 피부 알레르기성 반응 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "덱스판테놀 100밀리그램",
+      "작용": "판토텐산 유도체로 탈모의 보조치료에 쓰는 약입니다.",
+      "주요 증상": "탈모의 보조치료",
+      "주의 대상": "과민증, 19세 미만, 탈모증 이외의 사람, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지",
+      "선택 포인트": "탈모의 보조치료에 쓰는 덱스판테놀 제제입니다."
+    }
+  },
+  "en": {
+    "title": "Dexpanthenol 100 mg Tablets (Hair Loss Adjuvant Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used as adjuvant treatment for hair loss.",
+    "usage": "Adults take 1 tablet per 1 dose, 3 times a day. The treatment period is 6 weeks.",
+    "caution": "Do not take this medicine if you are hypersensitive to it, are under 19 years of age, do not have hair loss (alopecia), or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or have experienced allergic symptoms caused by medicines. If symptoms do not improve even after taking this medicine for about 6 weeks, stop taking it immediately and consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. To avoid drug interactions, tell your doctor or pharmacist about your recent treatments. If skin allergic reactions such as redness (erythema) or hives occur, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Dexpanthenol 100 mg",
+      "How it works": "A pantothenic acid derivative medicine used as adjuvant treatment for hair loss.",
+      "Main symptoms": "Adjuvant treatment of hair loss",
+      "Caution for": "Do not use with hypersensitivity, under 19, without hair loss, or with hereditary problems such as galactose intolerance",
+      "Why this one": "A dexpanthenol medicine for adjuvant treatment of hair loss."
+    }
+  }
+}

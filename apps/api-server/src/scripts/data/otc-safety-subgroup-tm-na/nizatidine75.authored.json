@@ -1,0 +1,30 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 니자티딘 75mg 정 그룹 TM 저작(10줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "니자티딘|75밀리그램|정",
+  "meta": {
+    "titleKo": "니자티딘 75mg 정 (위산분비 억제제)",
+    "titleEn": "Nizatidine 75 mg Tablets (Acid Reducer)",
+    "ingKo": "니자티딘 75밀리그램",
+    "ingEn": "Nizatidine 75 mg",
+    "actionKo": "H2 수용체 길항제로 위산 분비를 줄여 위산과다·속쓰림·신트림을 완화합니다.",
+    "actionEn": "An H2 receptor antagonist that reduces stomach acid to relieve acid excess, heartburn, and sour belching."
+  },
+  "effSummaries": {
+    "5f18c0b8": { "symKo": "위산과다, 속쓰림, 신트림", "symEn": "Excess stomach acid, heartburn, and sour belching", "pointKo": "위산과다·속쓰림·신트림에 쓰는 위산분비 억제제입니다.", "pointEn": "An acid reducer for excess stomach acid, heartburn, and sour belching." }
+  },
+  "cauSummaries": {
+    "1fdde0c0": { "watchKo": "H2 길항제 과민증, 혈액질환, 간·신질환, 위·십이지장질환, 천식·류마티스, 15세 미만, 80세 이상, 임부·수유부 복용 금지", "watchEn": "Do not use with H2 antagonist hypersensitivity, blood disorders, liver or kidney disease, stomach or duodenal disease, asthma or rheumatism, under 15, 80 or older, or if pregnant or breastfeeding" }
+  },
+  "en": {
+    "5f18c0b8": "This medicine is used for excess stomach acid, heartburn, and sour belching.",
+    "8df03fa1": "Adults (15 to 79 years old) take 1 tablet (75 mg) 1 time a day.",
+    "b5f43df2": "If symptoms do not improve even after 8 hours, take 1 additional tablet (75 mg).",
+    "0d50c578": "Do not exceed 2 tablets (150 mg) per 1 day.",
+    "1fdde0c0": "Do not take this medicine if you are hypersensitive to it or to other H2 receptor antagonists, or have anemia, decreased platelets, decreased white blood cells, blood disorders, liver or kidney disease, stomach or duodenal disease, or asthma or rheumatism, are a child under 15 years of age, are an older adult 80 years of age or older, or are pregnant, may be pregnant, or are breastfeeding.",
+    "d69a029e": "Before taking this medicine, consult a doctor or pharmacist if you have an allergic constitution, are an older adult 65 years of age or older, have throat pain, cough, or high fever, unexplained weight loss, or persistent abdominal pain, or have severely impaired liver or kidney function.",
+    "b351098f": "While taking this medicine, do not take other stomach medicines, steroids, antibiotics, anticancer agents, azole antifungals, high-dose (3,900 mg) aspirin, gefitinib, prulifloxacin, or atazanavir.",
+    "2ed571c8": "Do not drink alcohol while taking this medicine.",
+    "b04a98a9": "Avoid caffeine, chocolate, and fried foods while taking this medicine.",
+    "2772a39c": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: rarely, rash, itching, bronchial asthma, laryngeal edema (throat swelling), lowered blood pressure, bronchospasm, pharyngeal edema (pharynx swelling), difficulty breathing, or anaphylaxis-like (hypersensitivity) symptoms; anemia, pancytopenia (decrease of all blood cells), agranulocytosis, or granulocytopenia; sometimes leukopenia or neutrophilia; rarely thrombocytopenic purpura (purple spots), eosinophilia, or (fatal) thrombocytopenia; sometimes constipation, diarrhea, dry mouth (thirst), or nausea; rarely gastrointestinal disorders such as abdominal bloating; liver function disorders such as elevated ALT, AST, ALP, or gamma-GTP; jaundice; delirium, disorientation, reversible confusion, headache, drowsiness, dizziness, weakness, numbness, short asymptomatic ventricular tachycardia, gynecomastia (breast enlargement in men), sweating, hives, rash, exfoliative dermatitis, hyperuricemia (excess uric acid) unrelated to gout or kidney stones, fever, chest pain, muscle pain, rhinitis (nasal inflammation), pharyngitis, cough, vasculitis, joint pain, serum sickness, facial swelling, milk secretion, interstitial nephritis, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome), heart block such as atrioventricular block, incomplete contraction, rhabdomyolysis, or erectile dysfunction."
+  }
+}

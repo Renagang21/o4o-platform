@@ -1,0 +1,27 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 포도엽건조엑스 180mg 캡슐 그룹 TM 저작(7줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+  "meta": {
+    "titleKo": "포도엽건조엑스 180mg 캡슐 (정맥순환 개선제)",
+    "titleEn": "Grape Leaf Dried Extract 180 mg Capsules (Venous Circulation Medicine)",
+    "ingKo": "포도엽건조엑스 180밀리그램",
+    "ingEn": "Grape leaf dried extract 180 mg",
+    "actionKo": "만성정맥부전으로 인한 다리 부종·무거움·통증을 개선하는 포도엽 제제입니다.",
+    "actionEn": "A grape leaf preparation that improves leg swelling, heaviness, and pain caused by chronic venous insufficiency."
+  },
+  "effSummaries": {
+    "4887aeb2": { "symKo": "만성정맥부전으로 인한 하지부종, 하지중압감, 통증의 개선", "symEn": "Improvement of lower-leg swelling, heaviness in the legs, and pain caused by chronic venous insufficiency", "pointKo": "만성정맥부전에 의한 다리 부종·무거움·통증에 쓰는 약입니다.", "pointEn": "A medicine for leg swelling, heaviness, and pain from chronic venous insufficiency." }
+  },
+  "cauSummaries": {
+    "bc9f9f55": { "watchKo": "과민증, 소아·청소년, 포도당-갈락토오스 흡수장애(캡슐제), 임부·임신 가능성 여성, 수유부 복용 금지", "watchEn": "Do not use with hypersensitivity, for children and adolescents, with glucose-galactose malabsorption (capsules), if pregnant or possibly pregnant, or while breastfeeding" }
+  },
+  "en": {
+    "4887aeb2": "This medicine is used to improve lower-leg swelling, a feeling of heaviness in the legs, and pain caused by chronic venous insufficiency.",
+    "d4ed593b": "Adults take 2 capsules (360 mg) per 1 dose, 1 time a day, before breakfast with water.",
+    "6ede8c9f": "Do not take this medicine for more than 3 months.",
+    "bc9f9f55": "Do not take this medicine if you are hypersensitive to it, are a child or adolescent, have glucose-galactose malabsorption (applies to capsules), are pregnant or may be pregnant, or are breastfeeding.",
+    "18eadd55": "Before taking this medicine, consult a doctor or pharmacist if you are a woman who may become pregnant.",
+    "b6415291": "Consult a doctor or pharmacist if the following occur: rarely, hives, skin rash with or without itching, skin hypersensitivity reactions on sun exposure, or eczema; very rarely, angioedema; rarely, gastrointestinal reactions such as stomach pain, nausea, or diarrhea, headache, or sudden unusual symptoms in one leg or severe pain, swelling, skin discoloration, tightness, or a feeling of warmth.",
+    "26a0091e": "If symptoms do not improve even after taking this medicine for about 6 weeks, stop taking it immediately and consult a doctor or pharmacist."
+  }
+}

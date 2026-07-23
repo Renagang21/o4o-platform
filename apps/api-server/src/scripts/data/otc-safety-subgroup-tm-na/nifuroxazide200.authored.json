@@ -1,0 +1,36 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 니푸록사지드 200mg 캡슐 그룹 TM 저작(15줄, 3 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "니푸록사지드|200밀리그램|캡슐",
+  "meta": {
+    "titleKo": "니푸록사지드 200mg 캡슐 (지사제)",
+    "titleEn": "Nifuroxazide 200 mg Capsules (Antidiarrheal Medicine)",
+    "ingKo": "니푸록사지드 200밀리그램",
+    "ingEn": "Nifuroxazide 200 mg",
+    "actionKo": "장내 세균에 작용하여 급성 세균성 설사를 치료하는 지사제입니다.",
+    "actionEn": "An antidiarrheal medicine that acts on intestinal bacteria to treat acute bacterial diarrhea."
+  },
+  "effSummaries": {
+    "fbce5beb": { "symKo": "급성 세균성 설사", "symEn": "Acute bacterial diarrhea", "pointKo": "급성 세균성 설사에 쓰는 지사제입니다.", "pointEn": "An antidiarrheal medicine for acute bacterial diarrhea." }
+  },
+  "cauSummaries": {
+    "688ef70c": { "watchKo": "과민증, 만 18세 미만 소아·청소년, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, for children and adolescents under 18, or with hereditary problems such as galactose intolerance" },
+    "8f389ffc": { "watchKo": "심하고 지속적인 설사·구토·먹기 거부 시 정맥 수분 보충 고려", "watchEn": "Consider intravenous fluid replacement for severe persistent diarrhea, vomiting, or refusal to eat" }
+  },
+  "en": {
+    "fbce5beb": "This medicine is used for acute bacterial diarrhea.",
+    "eab316da": "Adults take 1 capsule (200 mg) per dose, 4 times a day. Do not take this medicine for more than 3 days. Provide fluids during the treatment period, and adjust the amount and method of fluid replacement according to the severity of the diarrhea and the patient's age and condition.",
+    "5c696b7b": "Adults take 1 capsule (200 mg) per dose, 4 times a day.",
+    "da25a1f7": "Do not take this medicine for more than 3 days.",
+    "3e0021b2": "Provide fluids during the treatment period, and adjust the amount and method of fluid replacement according to the severity of the diarrhea and the patient's age and condition.",
+    "30ba7ff3": "Do not take this medicine if you are hypersensitive to it, are a child or adolescent under 18 years of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or are hypersensitive to Yellow No. 5 (Sunset Yellow FCF) or have experienced reactions to it. If diarrhea continues even 2 days after treatment, consider oral or intravenous fluid replacement or consult a doctor or pharmacist.",
+    "688ef70c": "Do not take this medicine if you are hypersensitive to it, are a child or adolescent under 18 years of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "ab537839": "Do not take this medicine if you are hypersensitive to it or its derivatives, or are a child or adolescent under 18 years of age. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding. If diarrhea continues even 2 days after treatment, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "fcaaf7d0": "Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding, or are hypersensitive to Yellow No. 5 (Sunset Yellow FCF) or have experienced reactions to it.",
+    "3bae5b15": "If diarrhea continues even 2 days after treatment, consider oral or intravenous fluid replacement or consult a doctor or pharmacist.",
+    "8f389ffc": "For severe and persistent diarrhea, vomiting, or refusal to eat, intravenous fluid replacement should be considered.",
+    "a8769c88": "During diarrhea, avoid raw vegetables, fruit, green vegetables, spicy foods, and frozen foods and drinks, and eat cooked foods (meat, rice) whenever possible.",
+    "cb7c58b7": "While taking this medicine, during diarrhea, avoid raw vegetables, fruit, green vegetables, spicy foods, and frozen foods and drinks, and eat cooked foods (meat, rice) whenever possible.",
+    "9bbd811b": "If hypersensitivity reactions such as skin rash, hives, angioedema, or anaphylactic shock occur, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "50d9f5c0": "If hypersensitivity reactions such as skin rash, hives, angioedema, or anaphylactic shock occur, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

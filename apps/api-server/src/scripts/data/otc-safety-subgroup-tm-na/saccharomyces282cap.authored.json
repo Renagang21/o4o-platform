@@ -1,0 +1,26 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 사카로마이세스보울라르디균 282.5mg 캡슐 그룹 TM 저작(6줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+  "meta": {
+    "titleKo": "사카로마이세스보울라르디균 282.5mg 캡슐 (정장제)",
+    "titleEn": "Saccharomyces boulardii 282.5 mg Capsules (Intestinal Health Medicine)",
+    "ingKo": "사카로마이세스보울라르디균 282.5밀리그램",
+    "ingEn": "Saccharomyces boulardii 282.5 mg",
+    "actionKo": "유익한 효모균으로 장내균총 이상에 의한 변비·묽은 변·복부 팽만감 등을 개선하는 정장제입니다.",
+    "actionEn": "A probiotic yeast medicine that improves constipation, loose stools, and abdominal bloating caused by intestinal flora imbalance."
+  },
+  "effSummaries": {
+    "1f83429e": { "symKo": "장내균총 이상(항생물질·화학요법제 투여 등)에 의한 정장, 변비, 묽은 변, 복부 팽만감, 장내 이상발효의 개선", "symEn": "Intestinal regulation and improvement of constipation, loose stools, abdominal bloating, and abnormal intestinal fermentation caused by intestinal flora imbalance (from antibiotics, chemotherapy agents, etc.)", "pointKo": "항생제 복용 등으로 흐트러진 장내 환경을 개선하는 정장제입니다.", "pointEn": "An intestinal health medicine that restores gut flora disturbed by antibiotics and similar causes." }
+  },
+  "cauSummaries": {
+    "b8a7744e": { "watchKo": "중심정맥 카테터 사용 중, 중환자·면역결핍환자, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use while using a central venous catheter, if critically ill or immunodeficient, or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "1f83429e": "This medicine is used for intestinal regulation and to improve constipation, loose stools, abdominal bloating, and abnormal intestinal fermentation caused by intestinal flora imbalance (such as from taking antibiotics or chemotherapy agents).",
+    "47076d5e": "Adults and children 12 years and older take 1 to 2 capsules per 1 dose, 2 times a day.",
+    "a0dfea33": "Children 3 to 12 years old take 1 capsule per 1 dose, 3 times a day.",
+    "c6c3c617": "Children under 3 years old take 1 capsule per 1 dose, 2 times a day.",
+    "b8a7744e": "Do not take this medicine if you are using a central venous catheter, are critically ill or immunodeficient, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "9e135e96": "If itching, hives, skin rash, angioedema, anaphylactic reactions, flatulence, constipation, or fungemia occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 알파칼시돌 1㎍ 연질캡슐 그룹 TM 저작(2줄, 나머지는 alfacalcidol05cap TM 공유). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+  "meta": {
+    "titleKo": "알파칼시돌 1㎍ 연질캡슐 (활성형 비타민 D 제제)",
+    "titleEn": "Alfacalcidol 1 microgram Soft Capsules (Active Vitamin D Medicine)",
+    "ingKo": "알파칼시돌 1마이크로그램",
+    "ingEn": "Alfacalcidol 1 microgram",
+    "actionKo": "체내에서 활성형 비타민 D로 전환되어 칼슘 흡수와 뼈 대사를 돕는 약입니다.",
+    "actionEn": "A medicine that converts to active vitamin D in the body to help calcium absorption and bone metabolism."
+  },
+  "effSummaries": {},
+  "cauSummaries": {},
+  "en": {
+    "aa2b1f5d": "For adults with chronic renal failure or osteoporosis, take 0.5 to 1 capsule (0.5 to 1 μg) per 1 dose, 1 time a day. For hypoparathyroidism and other conditions caused by vitamin D metabolism abnormalities, take 1 to 4 capsules (1 to 4 μg) per 1 dose, 1 time a day.",
+    "29e09be0": "For children with osteoporosis, take 0.01 to 0.03 μg per kg of body weight per 1 dose, 1 time a day. For other conditions, take 0.05 to 0.1 μg per kg of body weight per 1 dose, 1 time a day."
+  }
+}

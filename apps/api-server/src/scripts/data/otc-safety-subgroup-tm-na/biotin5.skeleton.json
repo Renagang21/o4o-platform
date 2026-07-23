@@ -4,7 +4,7 @@
   "subgroups": 4,
   "masters": 13,
   "metaAuthored": false,
-  "missingLineCount": 16,
+  "missingLineCount": 14,
   "missingLines": [
     {
       "h8": "b8081805",
@@ -17,12 +17,6 @@
       "freq": 3,
       "fields": "caution",
       "ko": "이 약에 과민증 환자, 3개월 미만의 영아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오."
-    },
-    {
-      "h8": "1618fcd7",
-      "freq": 2,
-      "fields": "caution",
-      "ko": "이 약을 복용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "1a4da9aa",
@@ -89,12 +83,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인 1회 1정씩, 1일 1회 식사전 복용합니다."
-    },
-    {
-      "h8": "7a5a8dc9",
-      "freq": 1,
-      "fields": "caution",
-      "ko": "이 약을 복용하기 전에 임부 및 수유부는 의사 또는 약사와 상의하십시오."
     },
     {
       "h8": "7c0f293b",

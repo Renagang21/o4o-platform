@@ -1,0 +1,25 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 플루벤다졸 500mg 정 그룹 TM 저작(5줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "플루벤다졸|500밀리그램|정",
+  "meta": {
+    "titleKo": "플루벤다졸 500mg 정 (구충제)",
+    "titleEn": "Flubendazole 500 mg Tablets (Anthelmintic Medicine)",
+    "ingKo": "플루벤다졸 500밀리그램",
+    "ingEn": "Flubendazole 500 mg",
+    "actionKo": "회충·요충·편충·십이지장충 감염을 치료하는 구충제입니다.",
+    "actionEn": "An anthelmintic (deworming) medicine that treats roundworm, pinworm, whipworm, and hookworm infections."
+  },
+  "effSummaries": {
+    "1dc4154e": { "symKo": "회충, 요충, 편충, 십이지장충의 감염 및 이들 혼합감염의 치료", "symEn": "Treatment of roundworm, pinworm, whipworm, and hookworm infections, and mixed infections of these", "pointKo": "회충·요충·편충·십이지장충 감염에 쓰는 구충제입니다.", "pointEn": "A deworming medicine for roundworm, pinworm, whipworm, and hookworm infections." }
+  },
+  "cauSummaries": {
+    "caef296c": { "watchKo": "과민증, 임부, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with hypersensitivity, if pregnant, or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "1dc4154e": "This medicine is used to treat infections of roundworms (Ascaris), pinworms, whipworms, and hookworms, and mixed infections of these.",
+    "9bd5f279": "Adults and children take 1 tablet (500 mg) as a single 1-time dose.",
+    "caef296c": "Do not take this medicine if you are hypersensitive to it, are pregnant, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "85e1161b": "Before taking this medicine, consult a doctor or pharmacist if the patient is an infant under 1 year of age, or you are pregnant, may be pregnant, or are breastfeeding.",
+    "1b6d5cec": "In rare cases, if transient nausea, abdominal pain, diarrhea, rash, hives, or angioedema occurs, stop taking this medicine immediately and consult a doctor or pharmacist."
+  }
+}

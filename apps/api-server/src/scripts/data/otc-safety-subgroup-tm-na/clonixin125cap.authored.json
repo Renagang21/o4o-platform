@@ -1,0 +1,24 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 클로닉신리시네이트 125mg 연질캡슐 그룹 TM 저작(6줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+  "meta": {
+    "titleKo": "클로닉신리시네이트 125mg 연질캡슐 (진통제)",
+    "titleEn": "Clonixin Lysinate 125 mg Soft Capsules (Pain Reliever)",
+    "ingKo": "클로닉신리시네이트 125밀리그램",
+    "ingEn": "Clonixin lysinate 125 mg",
+    "actionKo": "비스테로이드성 소염진통제로 근육통·신경통·두통·치통 등 경증~중등도 통증을 완화합니다.",
+    "actionEn": "A nonsteroidal anti-inflammatory pain reliever for mild to moderate pain such as muscle pain, nerve pain, headache, and toothache."
+  },
+  "effSummaries": {
+    "52f26693": { "symKo": "근육통, 신경통, 외상 후·수술 후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화", "symEn": "Relief of mild or moderate pain: muscle pain, nerve pain, post-injury and post-surgery pain, headache, toothache, and ear pain", "pointKo": "근육통·신경통·두통·치통 등 경증~중등도 통증에 쓰는 진통제입니다.", "pointEn": "A pain reliever for mild to moderate muscle pain, nerve pain, headache, and toothache." }
+  },
+  "cauSummaries": {},
+  "en": {
+    "52f26693": "This medicine is used to relieve mild or moderate pain: muscle pain, nerve pain, pain after injury and after surgery, headache, toothache, and ear pain.",
+    "c581257d": "Adults take 1 to 2 capsules (125 to 250 mg) per 1 dose, 3 times a day.",
+    "ed892344": "Do not take this medicine if you have peptic ulcers or drug-induced stomach or duodenal upset; are hypersensitive to this medicine; have experienced asthma, hives, or allergic reactions to aspirin or other nonsteroidal anti-inflammatory drugs (including COX-2 inhibitors); need treatment of pain occurring before or after coronary artery bypass graft (CABG) surgery; are pregnant, may be pregnant, or are breastfeeding; or have severe liver disorders, kidney disorders, heart failure, or inflammatory bowel disease such as Crohn's disease or ulcerative colitis.",
+    "3eeda04d": "Before taking this medicine, consult a doctor or pharmacist if you have experienced peptic ulcers, are a child or older adult, have high blood pressure, fluid retention, or heart failure, are taking diuretics or ACE inhibitors, have bronchial asthma, have or have had liver disorders, have or have had kidney disorders, or have digestive tract ulcers caused by past long-term use of nonsteroidal anti-inflammatory drugs.",
+    "b532c522": "Do not take this medicine together with other nonsteroidal anti-inflammatory drugs, ACE inhibitors or angiotensin II receptor antagonists, aspirin, diuretics, lithium, methotrexate, coumarin anticoagulants (such as warfarin), cyclosporine and tacrolimus, antiplatelet agents and selective serotonin reuptake inhibitors (SSRIs), or corticosteroids.",
+    "132a604f": "Consult a doctor or pharmacist if the following occur: nausea, vomiting, diarrhea, constipation, abdominal pain, gastrointestinal bleeding, peptic ulcers and perforation; rarely, shock, rash, itching, anemia, elevated AST or ALT, drowsiness, or headache; sometimes nausea, vomiting, dizziness, drowsiness, headache, cold sweats, chills, or unusual euphoria."
+  }
+}
