@@ -145,10 +145,10 @@
     {
       "groupKey": "시클로피록스|네일라카·외용액",
       "sourceType": "o4o_drug_otc_topical",
-      "masters": 56,
+      "masters": 79,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "V6 재선점 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 36fp/79 = 네일라카 56(매일형 19fp/50 + 로푸록스 주기감량형 1fp/3 + 티지풀큐어 1fp/3) + 올아민 두피세정액 14fp/21 + 로푸록스겔 2fp/2. 네일라카↔두피액↔겔 EN 완전 분리. '다른 약을 복용' 병용문구=사용 재표현 규칙 추가. 액(성분) 이름 oral 오분류=강경구신호 부재+원문 '외용으로만' 명시시에만 assume-route 재분류 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
       "groupKey": "아모롤핀염산염|네일라카",

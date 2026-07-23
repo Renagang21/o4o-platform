@@ -81,7 +81,8 @@ function normalizeOralMisphrase(text: string, fullContent: string): string {
   return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록') // 외용전용 지시(의미 보존 재표현)
-    .replace(/내복용/g, '먹는 용도'); // '내복용으로 사용하지 마십시오' 등 외용전용 경고(의미 보존 재표현)
+    .replace(/내복용/g, '먹는 용도') // '내복용으로 사용하지 마십시오' 등 외용전용 경고(의미 보존 재표현)
+    .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우'); // 상호작용 병용 안내(복용→사용, 의미 보존: 먹는 약 포함 전체 약물로 확장)
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }
@@ -136,7 +137,13 @@ async function main(): Promise<void> {
     const withFp = coarse.map((r) => ({ ...r, ...fingerprintOf(r.name, r.spec, r.content) }));
     const byFp = new Map<string, Row[]>();
     for (const r of withFp) {
-      const effRoute = r.route === 'unknown' && ASSUME_ROUTE ? ASSUME_ROUTE : r.route;
+      // 'oral' 판정이 오직 이름 말미 '액(...)' 패턴에서 온 약한 신호이고(강한 경구 신호 부재),
+      // 원문이 '외용으로만/외용으로 적용'을 명시하는 경우에 한해 --assume-route 재분류를 허용한다.
+      // 정·캡슐·시럽 등 강한 경구 신호가 있으면 절대 override하지 않는다.
+      const strongOral = /정$|정\d|정\(|캡슐|캅셀|시럽|현탁|과립|산제|트로키|츄어|씹|저작|드링크|내복|환$|환\(/.test(r.name);
+      const contentTopicalOnly = /외용으로만|외용으로 적용/.test(stripTags(r.content || ''));
+      const reclassifiable = r.route === 'unknown' || (r.route === 'oral' && !strongOral && contentTopicalOnly);
+      const effRoute = reclassifiable && ASSUME_ROUTE ? ASSUME_ROUTE : r.route;
       if (effRoute !== 'topical') continue;
       if (!byFp.has(r.fp)) byFp.set(r.fp, []); byFp.get(r.fp)!.push(r as Row);
     }

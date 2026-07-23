@@ -1,0 +1,70 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "시클로피록스올아민",
+ "form": "액",
+ "slugbase": "ciclopirox-olamine-scalp",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "24d64ff202404ce3",
+   "n": 5
+  },
+  {
+   "fp": "620a39bb948419e4",
+   "n": 4
+  },
+  {
+   "fp": "dc26b04230c2130b",
+   "n": 1
+  },
+  {
+   "fp": "d2af52d03739cdee",
+   "n": 1
+  },
+  {
+   "fp": "c4f94f7826164a9d",
+   "n": 1
+  },
+  {
+   "fp": "f0780ce3b947622e",
+   "n": 1
+  },
+  {
+   "fp": "6fe69396f8555bd6",
+   "n": 1
+  },
+  {
+   "fp": "fb9bec675b87a7bf",
+   "n": 1
+  },
+  {
+   "fp": "cac6df425153b540",
+   "n": 1
+  },
+  {
+   "fp": "488e0d985ce6ed68",
+   "n": 1
+  },
+  {
+   "fp": "2e524302813ff71c",
+   "n": 1
+  },
+  {
+   "fp": "5ceea969f1a8e3a5",
+   "n": 1
+  },
+  {
+   "fp": "746effc529ca5122",
+   "n": 1
+  },
+  {
+   "fp": "86d81540ee7be11b",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 21,
+ "koWrite": 84,
+ "enWrite": 42
+}

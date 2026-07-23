@@ -1,0 +1,13 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "시클로피록스",
+ "form": "네일라카",
+ "slugbase": "ciclopirox-lacquer-daily",
+ "assumeRoute": "topical",
+ "mode": "dry-run",
+ "producedFps": [],
+ "heldFps": [],
+ "masters": 0,
+ "koWrite": 0,
+ "enWrite": 0
+}
