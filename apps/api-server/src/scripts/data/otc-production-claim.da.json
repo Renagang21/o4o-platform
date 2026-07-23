@@ -167,6 +167,22 @@
       "note": "V6 완결 20fp/46 = 농도별형 3fp/3(케펨겔 3%·5% 횟수 분리) + 수회형 8fp/10(케프겔6+시푸로겔3% 4) + 1~4회형 9fp/33(아마프로겔3% 2+광역 31). 광과민증 2주 자외선 회피·fibrate/옥시벤존 교차과민·15세미만 금기 EN 3형 분리. 경고제 12=첩부제 계열 생산 제외. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
+      "groupKey": "디클로페낙나트륨|겔",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 8,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤ 추가 단일성분: 디펜겔·스포겔(1형)+스팅겔(1형)=2 원문형. 플라스타·패취 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
+      "groupKey": "디클로페낙디에틸암모늄|크림·겔",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 10,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 나바론크림3+볼타렌에멀겔3+디페낙겔1% 2+아티벡스겔2=4 원문형. 염 상이로 나트륨과 별도 그룹 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 16,
