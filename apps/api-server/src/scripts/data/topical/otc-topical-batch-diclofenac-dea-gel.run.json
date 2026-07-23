@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "디클로페낙디에틸아민염",
+ "form": "디클로겔",
+ "slugbase": "diclofenac-dea-gel",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "20e3271afda1b4e6",
+   "n": 1
+  },
+  {
+   "fp": "60dd9ccb3d28d2cb",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

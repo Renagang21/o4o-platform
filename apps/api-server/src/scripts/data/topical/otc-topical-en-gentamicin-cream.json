@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "slug": "gentamicin-cream",
+ "translation": {
+  "groupKey": "황산겐타마이신|크림",
+  "title": "Gentamicin Sulfate Cream",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for primary skin infections (impetigo contagiosa, superficial folliculitis, ecthyma, boils, sycosis) and secondary skin infections (infectious eczematoid dermatitis, pustular psoriasis, seborrheic dermatitis secondarily infected by pyogenic bacteria, contact dermatitis, wounds and pustular acne, and superinfection of fungal or viral infections).",
+  "usage": "Apply it to the affected area 1 to 4 times a day and rub in gently. Gauze may be applied over it if needed. For impetigo contagiosa, it is advisable to remove the crusts (scabs) before applying, taking care not to contaminate other healthy skin.",
+  "caution": "Do not use this medicine if you are hypersensitive to it, to other aminoglycoside antibiotics (streptomycin, kanamycin, gentamicin, neomycin) or to bacitracin, or for infants under 1 year of age. Consult a doctor or pharmacist before use if you are pregnant or may be pregnant, if you are breastfeeding, or if you are or have been hypersensitive or allergic to propylene glycol. Use it only for the minimum period necessary for treatment. Do not use this medicine in the eyes (not for ophthalmic use). Adverse reactions may occur - overgrowth of non-susceptible organisms, skin irritation (erythema, itching, etc.), hypersensitivity, superinfection, and signs of sensitization (redness, swelling, papules, small blisters); if any of these occur, stop use immediately and consult a doctor or pharmacist. Keep out of reach of children.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Gentamicin sulfate",
+   "Form": "Cream"
+  }
+ }
+}

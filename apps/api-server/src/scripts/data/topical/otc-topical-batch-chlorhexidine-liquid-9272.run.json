@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "클로르헥시딘글루콘산염액",
+ "form": "쓰리엠애바가드9272외용액",
+ "slugbase": "chlorhexidine-liquid-9272",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8616280e55833678",
+   "n": 1
+  },
+  {
+   "fp": "213068c526f0d3f9",
+   "n": 1
+  },
+  {
+   "fp": "8c569c6920d6f8f8",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

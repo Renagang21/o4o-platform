@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "테르비나핀염산염",
+ "form": "애니존크림",
+ "slugbase": "terbinafine-cream-anizone",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8585f535ddd157ee",
+   "n": 1
+  },
+  {
+   "fp": "665c4d2fe63aeb02",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

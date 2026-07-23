@@ -1,0 +1,22 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "황산겐타마이신",
+ "form": "신풍황산겐타마이신크림",
+ "slugbase": "gentamicin-cream",
+ "assumeRoute": null,
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "634bbce58b2b51d5",
+   "n": 1
+  },
+  {
+   "fp": "f33eca3d776a407d",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

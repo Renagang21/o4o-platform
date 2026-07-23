@@ -323,48 +323,48 @@
    "sourceType": "o4o_drug_otc_topical",
    "masters": 6,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 쓰리엠애바가드9272 3+9274 3=2 원문형(손 소독). 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 2fp/6 master LIVE (9272 3+9274 3). 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   },
   {
    "groupKey": "락트산암모늄액|로션",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 2,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 쿨락트암모늄로션12% 2=1 원문형. 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   },
   {
    "groupKey": "디클로페낙디에틸아민염|겔",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 2,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 디클로겔 2=1 원문형. 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   },
   {
    "groupKey": "테르비나핀염산염|크림(애니존)",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 2,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 애니존크림 2=1 원문형(명칭 말미 &nbsp; 변형). 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   },
   {
    "groupKey": "요소|크림(유그린)",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 2,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 유그린크림 2=1 원문형. 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   },
   {
    "groupKey": "황산겐타마이신|크림",
    "sourceType": "o4o_drug_otc_topical",
    "masters": 2,
    "op": "KO_EN",
-   "status": "CLAIMED",
-   "note": "우선순위⑤ batch8: 신풍황산겐타마이신크림 2=1 원문형. 리도카인 9.6% 계열=남성 성기용 보류 유지, 멘소래담로션=복합성분 제외 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+   "status": "DONE",
+   "note": "V6 DONE 1fp/2 master LIVE. 검증 PASS·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
   }
  ],
  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
