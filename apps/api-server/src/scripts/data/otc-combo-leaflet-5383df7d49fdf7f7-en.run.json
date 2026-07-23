@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "디카맥스디정|A12AX|250밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "d25d1bf4-05ac-110b-093a-42f5079e88d4",
+  "anomalies": [],
+  "targetMasters": 7,
+  "koFingerprintKinds": 1,
+  "builtLen": 3101,
+  "builtMd5": "85b2217e82b55f9a9ae15ace4da5d529",
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_flip": 7,
+    "total": 14
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

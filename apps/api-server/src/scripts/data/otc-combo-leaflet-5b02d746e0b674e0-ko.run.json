@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "소하자임플러스정|A02AX|50밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "4de0c7b3-2418-a212-de11-77ffdeb0b015",
+  "expected": 7,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/7"
+  ],
+  "fetched": 7,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 7,
+  "anyCanonical": 7,
+  "existingAuthoredCanonical": 7,
+  "htmlLen": 1947,
+  "htmlMd5": "22837ff05c5ceb64157cb9fd3e1b9c18",
+  "summary": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕부진, 과식, 소화촉진…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 7,
+    "STEP_B_authored_flip": 7,
+    "audit": 7
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

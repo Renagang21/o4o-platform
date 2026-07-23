@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "칼슈머정|A12AX|750밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "e638a633-1a47-a3cc-cdc3-2e00726a4dc1",
+  "expected": 7,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/7"
+  ],
+  "fetched": 7,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 7,
+  "anyCanonical": 7,
+  "existingAuthoredCanonical": 7,
+  "htmlLen": 1706,
+  "htmlMd5": "72672e9833b9a20f46f9cf2b6a7f7643",
+  "summary": "비타민D의 보급과 뼈, 이의 발육불량, 구루병의 예방 및 칼슘결핍 및 기타 칼슘의 보급…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 7,
+    "STEP_B_authored_flip": 7,
+    "audit": 7
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}
