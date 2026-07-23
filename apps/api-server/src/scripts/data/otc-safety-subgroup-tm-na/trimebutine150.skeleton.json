@@ -4,7 +4,7 @@
   "subgroups": 6,
   "masters": 21,
   "metaAuthored": false,
-  "missingLineCount": 35,
+  "missingLineCount": 34,
   "missingLines": [
     {
       "h8": "e5ac61bb",
@@ -113,12 +113,6 @@
       "freq": 1,
       "fields": "efficacy",
       "ko": "이 약은 식도역류 및 열공헤르니아, 위 또는 십이지장염, 위 또는 십이지장궤양으로 인한 복통, 소화불량, 구역, 구토 등의 소화기능이상에 사용합니다."
-    },
-    {
-      "h8": "9d270cc1",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감할 수 있습니다."
     },
     {
       "h8": "9eb39d8b",

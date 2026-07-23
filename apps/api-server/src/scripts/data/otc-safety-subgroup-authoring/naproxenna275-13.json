@@ -1,0 +1,65 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "naproxenna275-13",
+  "order": 313,
+  "groupKey": "나프록센나트륨|275밀리그램|정",
+  "safetyFp": "5b63f7934e7857fd",
+  "sourceRef": "c37d7558-2922-41fa-849a-8ce42d3c4e93",
+  "sensitive": false,
+  "title": "나프록센나트륨 275mg 정 (소염진통제)",
+  "expectEasyMd5": "c312f6a4",
+  "masterIds": [
+    "17e646e8-61f8-4424-bbe4-e7e4a35b7234",
+    "36f43fc1-faa5-44d8-a5da-42c882952030",
+    "b0d09e6e-0f06-4fea-9ec7-3cd31bbb9bd7"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "c312f6a4",
+    "names": [
+      "나프록소정(나프록센나트륨)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 12,
+    "en": 6,
+    "total": 18
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 류마티양 관절염, 골관절염(퇴행성 관절질환), 강직성 척추염, 건염(힘줄염), 급성통풍, 월경곤란증과 활액(윤활)낭염, 골격근장애(삠, 타박상, 상처, 허리통증), 수술 후 통증, 편두통, 발치 후 통증에 사용합니다.",
+    "usage": "류마티양 관절염, 골관절염, 강직성 척추염에 성인은 1회 1~2정(275~550 mg)씩, 1일 2회 12시간마다 복용합니다.\n\n급성통풍에 성인은 처음 복용량으로 3정(825 mg)을 복용하고, 발작이 없어질 때까지 8시간 간격으로 1정(275 mg)을 복용합니다.\n\n골격근장애, 수술후 통증, 발치 후 통증, 월경곤란증, 힘줄염, 활액(윤활)낭염에 성인은 처음 복용량으로 2정(550 mg)을 복용하고 6~8시간 간격으로 1정(275 mg)씩 투여합니다. 1일 총용량이 1,350 mg을 초과하지 않도록 합니다.\n\n편두통에 성인은 처음 복용량으로 3정(825 mg)을 복용합니다. 필요하면 1일 1~2정(275~550 mg)을 더 복용할 수 있으며 처음 복용량의 복용 30분 후에 복용합니다. 1일 총용량이 1,350 mg을 초과하지 않도록 합니다.\n\n연령, 증상에 따라 적절히 증감할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용 시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증 및 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수 있습니다.\n\n이 약 또는 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 저해제 포함)에 과민증 환자, 소화성궤양, 심한 혈액이상, 심한 간장애, 심한 심장기능부전, 심한 신장장애, 심한 고혈압, 관상동맥(심장동맥) 우회로술(CABG) 전후에 발행하는 통증의 치료 환자, 임부, 수유부, 2세 이하의 영아는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 임신하고 있을 가능성이 있는 부인, 소아, 고령자(노인), 소화성궤양 경험자, 혈액이상 또는 경험자, 출혈경향이 있는 환자, 간장애 또는 경험자, 신장애 또는 경험자, 신혈류량 저하, 심기능 장애, 고혈압 환자, 과민증 경험자, 기관지 천식, 전신성홍반성루푸스 및 혼합결합조직질환 환자는 의사 또는 약사와 상의하십시오.\n\n다른 비스테로이드성 소염진통제, 나프록센 유도체, 고용량의 메토트렉세이트와 함께 복용하지 마십시오.\n\n히단토인계 항뇌전증약, 설파제, 설포닐요소계 혈당강하제, 프로프라놀롤 및 다른 -차단제, ACE억제제(캅토프릴 등), 루프계 이뇨제 및 티아지드계 이뇨제, 프로베네시드, 아스피린, 리튬, 저용량의 메토트렉세이트, 쿠마린계 혈액응고저지제(와파린 등), 지도부딘, 뉴퀴놀론계 항생물질(에녹사신 등)과 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n드물게 쇽 증상(호흡곤란, 혈압강하, 느린 맥, 식은땀, 부기), PIE증후군(호산구증가를 수반하는 폐침윤: 발열, 숨을 쌕쌕거림, 기침, 가래를 동반함), 두드러기, 때때로 발진, 가려움 등의 과민증상, 혈액구토, 위장출혈, 소화성궤양, 뚫림, 무과립구증, 호산구증가, 백혈구감소, 혈소판감소, 재생불량성빈혈, 적혈구파괴성빈혈, 혈소판기능저하(출혈시간의 연장), 무균성 수막염(심한 두통, 구역, 구토, 불면, 목이 뻣뻣함, 발열 또는 의식장애 등), 습진, 땀이 남, 자주색 반점, 광과민증, 탈모, 발적(충혈되어 붉어짐), 괴사성용해, 여러 모양의 붉은 반점, 피부점막안증후군(스티븐스-존슨증후군), 두드러기, 표피 수포증, 호산구 증가 및 전신 증상 동반 약물 반응, 고정약물발진, 탈락성 피부염, 독성 표피괴사 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n때때로 위부불쾌감, 위통, 복통, 구역, 구토, 식욕부진, 소화불량, 가슴쓰림, 설사, 변비, 입안염, 드물게 복부팽만감, 흑변, 구갈, GOT, GPT 수치의 상승, 황달, 간염, 신장애, 사구체 신염, 혈뇨, 고칼륨 혈증, 간질성 신염, 신증후군, 콩팥 유두괴사, 단백질이 섞인 오줌, 신부전, 때때로 졸음, 인식기능장애, 드물게 어지러움, 두통, 수족저림, 정력감퇴, 피로, 우울, 비정상적인 꿈, 집중능력 상실, 방향감각장애, 불면, 근육통, 근쇠약, 귀울림, 청각장애, 시각장애, 부기, 호흡곤란, 두근거림, 근육무력증, 울혈성심부전, 호산구성 폐렴, 아나필락시양 반응, 월경장애, 오한(춥고 떨리는 증상)과 발열, 혈관염, 고혈당, 저혈당 등이 나타날 수 있습니다.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "나프록센나트륨 275밀리그램",
+      "작용": "비스테로이드성 소염진통제(NSAID)로 염증·통증·발열을 완화합니다.",
+      "주요 증상": "류마티양 관절염·골관절염·강직척추염·건염·급성통풍·월경곤란증·활액낭염, 삠·타박상·허리통증 등 골격근장애, 수술 후·발치 후 통증, 편두통",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "관절염·통풍·생리통·편두통 등 폭넓은 통증·염증에 쓰는 비스테로이드성 소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Naproxen Sodium 275 mg Tablets (Anti-inflammatory Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for rheumatoid-type arthritis, osteoarthritis (degenerative joint disease), ankylosing spondylitis, tendinitis, acute gout, dysmenorrhea and bursitis, musculoskeletal disorders (sprains, bruises, wounds, low back pain), post-operative pain, migraine, and pain after tooth extraction.",
+    "usage": "For rheumatoid-type arthritis, osteoarthritis, and ankylosing spondylitis, adults take 1 to 2 tablets (275 to 550 mg) per dose, 2 times a day, every 12 hours. For acute gout, adults take 3 tablets (825 mg) as the first dose, then 1 tablet (275 mg) every 8 hours until the attack subsides. For musculoskeletal disorders, post-operative pain, pain after tooth extraction, dysmenorrhea, tendinitis, and bursitis, adults take 2 tablets (550 mg) as the first dose, then 1 tablet (275 mg) every 6 to 8 hours. Do not exceed a total of 1,350 mg in 1 day. For migraine, adults take 3 tablets (825 mg) as the first dose. If needed, 1 to 2 more tablets (275 to 550 mg) per day may be taken, 30 minutes after the first dose. Do not exceed a total of 1,350 mg in 1 day. The dose may be adjusted appropriately according to age and symptoms.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic events, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Do not take this medicine if you are hypersensitive to it or to aspirin or other nonsteroidal anti-inflammatory drugs (including COX-2 inhibitors); have peptic ulcers, severe blood abnormalities, severe liver impairment, severe heart failure, severe kidney impairment, or severe hypertension; need treatment of pain occurring around coronary artery bypass graft (CABG) surgery; are pregnant or breastfeeding; or are an infant 2 years old or younger. Before taking this medicine, consult a doctor or pharmacist if you may be pregnant; are a child or elderly; have experienced peptic ulcers; have or have had blood abnormalities; have a bleeding tendency; have or have had liver impairment; have or have had kidney impairment; have reduced renal blood flow; have heart function impairment or hypertension; have experienced hypersensitivity; or have bronchial asthma, systemic lupus erythematosus, or mixed connective tissue disease. Do not take this medicine together with other nonsteroidal anti-inflammatory drugs, naproxen derivatives, or high-dose methotrexate. Consult a doctor or pharmacist when taking this medicine together with hydantoin antiepileptics, sulfonamides, sulfonylurea hypoglycemics, propranolol and other beta-blockers, ACE inhibitors (such as captopril), loop and thiazide diuretics, probenecid, aspirin, lithium, low-dose methotrexate, coumarin anticoagulants (such as warfarin), zidovudine, or new-quinolone antibiotics (such as enoxacin). Rarely shock symptoms (difficulty breathing, drop in blood pressure, slow pulse, cold sweat, swelling), PIE syndrome (pulmonary infiltration with eosinophilia, accompanied by fever, wheezing, cough, and sputum), or hives; sometimes hypersensitivity symptoms such as rash and itching; vomiting of blood, gastrointestinal bleeding, peptic ulcers, or perforation; agranulocytosis, eosinophilia, leukopenia, thrombocytopenia, aplastic anemia, hemolytic anemia, or reduced platelet function (prolonged bleeding time); aseptic meningitis (with severe headache, nausea, vomiting, insomnia, stiff neck, fever, or impaired consciousness); eczema, sweating, purple spots, photosensitivity, hair loss, redness, necrolysis, erythema multiforme, Stevens-Johnson syndrome, hives, epidermolysis bullosa, drug reaction with eosinophilia and systemic symptoms, fixed drug eruption, exfoliative dermatitis, or toxic epidermal necrosis — if any of these occur, stop taking this medicine immediately and consult a doctor or pharmacist. Sometimes stomach discomfort, stomach pain, abdominal pain, nausea, vomiting, loss of appetite, indigestion, heartburn, diarrhea, constipation, or stomatitis; rarely abdominal bloating, black stool, dry mouth, elevated GOT or GPT levels, jaundice, hepatitis, kidney impairment, glomerulonephritis, blood in urine, hyperkalemia, interstitial nephritis, nephrotic syndrome, renal papillary necrosis, protein in urine, or kidney failure; sometimes drowsiness or cognitive impairment; rarely dizziness, headache, numbness of the hands and feet, reduced libido, fatigue, depression, abnormal dreams, loss of concentration, disorientation, insomnia, muscle pain, muscle weakness, ringing in the ears, hearing disturbance, visual disturbance, swelling, difficulty breathing, palpitations, myasthenia, congestive heart failure, eosinophilic pneumonia, anaphylactoid reactions, menstrual disorders, chills and fever, vasculitis, high blood sugar, or low blood sugar may occur. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Naproxen sodium 275 mg",
+      "How it works": "A nonsteroidal anti-inflammatory drug (NSAID) that relieves inflammation, pain, and fever.",
+      "Main symptoms": "Rheumatoid-type arthritis, osteoarthritis, ankylosing spondylitis, tendinitis, acute gout, dysmenorrhea, bursitis; musculoskeletal disorders such as sprains, bruises, and low back pain; pain after surgery or tooth extraction; migraine",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "A nonsteroidal anti-inflammatory pain reliever for a wide range of pain and inflammation, including arthritis, gout, menstrual pain, and migraine."
+    }
+  }
+}

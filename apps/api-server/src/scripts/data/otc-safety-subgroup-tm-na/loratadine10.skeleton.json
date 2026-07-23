@@ -4,7 +4,7 @@
   "subgroups": 1,
   "masters": 3,
   "metaAuthored": false,
-  "missingLineCount": 10,
+  "missingLineCount": 9,
   "missingLines": [
     {
       "h8": "46a5b69b",
@@ -17,12 +17,6 @@
       "freq": 1,
       "fields": "usage",
       "ko": "성인 및 12세 이상의 소아는 1회 1정씩, 1일 1회 복용합니다."
-    },
-    {
-      "h8": "9d270cc1",
-      "freq": 1,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감할 수 있습니다."
     },
     {
       "h8": "9e565f8d",

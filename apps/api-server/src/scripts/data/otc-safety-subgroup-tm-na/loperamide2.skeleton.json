@@ -4,19 +4,13 @@
   "subgroups": 5,
   "masters": 14,
   "metaAuthored": false,
-  "missingLineCount": 34,
+  "missingLineCount": 33,
   "missingLines": [
     {
       "h8": "1b4d8341",
       "freq": 5,
       "fields": "caution",
       "ko": "퀴니딘, 리토나비르와 함께 복용 시 의사 또는 약사와 상의하십시오."
-    },
-    {
-      "h8": "9d270cc1",
-      "freq": 5,
-      "fields": "usage",
-      "ko": "연령, 증상에 따라 적절히 증감할 수 있습니다."
     },
     {
       "h8": "a8541b9b",
