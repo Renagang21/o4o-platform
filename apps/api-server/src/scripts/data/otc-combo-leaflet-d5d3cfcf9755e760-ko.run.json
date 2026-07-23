@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "아이플러스연질캡슐|A11JC|296.7밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "85b545f7-31b9-69b6-1e38-2c8f83eb1e00",
+  "expected": 8,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/8"
+  ],
+  "fetched": 8,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 8,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 8,
+  "htmlLen": 1759,
+  "htmlMd5": "85811d7dbff3fc7a732df30753d68eb0",
+  "summary": "눈 건조감의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 비타민 A, D 보급…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

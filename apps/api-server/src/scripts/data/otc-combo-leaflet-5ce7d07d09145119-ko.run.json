@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비오라민정|A11JA|72.2밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "fc65d2ed-91a4-6a61-461e-d82c3f12af2e",
+  "expected": 8,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/8"
+  ],
+  "fetched": 8,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 8,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 8,
+  "htmlLen": 1902,
+  "htmlMd5": "6fc681e240abd44c449dd9f439b6a638",
+  "summary": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C 보급…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

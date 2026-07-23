@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "dry-run",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "토코네슘연질캡슐|A11JB|500밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "b5b2732c-bd34-51ec-c415-e26b0bf89ce6",
+  "anomalies": [],
+  "targetMasters": 7,
+  "koFingerprintKinds": 1,
+  "builtLen": 3829,
+  "builtMd5": "af72c25dfed85cb7739167e2bccb61ca",
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_flip": 7,
+    "total": 14
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

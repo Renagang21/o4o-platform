@@ -1,172 +1,172 @@
 {
-  "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2 — 에이전트 가(GA) claim. 자기 소유 1개. path-specific commit. 타 claim(na·da) 미접촉. 경구 복합성분 매장용 설명서 공식 원문 근거 신규 저작(KO 교체 + EN 신규). source_ref=uuid(md5(targetFp)) 결정론 앵커.",
-  "schemaVersion": 1,
-  "owner": "agent-ga",
-  "round": "oral-multi-ingredient-ko-en-continuous-10h-2026-07-23",
-  "track": "ORAL_MULTI_INGREDIENT_STORE_LEAFLET",
-  "verdict": "PRODUCING",
-  "claims": [
-    {
-      "groupKey": "위엔스탈정|A02AX|100밀리그램|정",
-      "targetFp": "0273b8335509d44c",
-      "sourceType": "mfds_drug_otc",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "에스톰액|A16AX|20그램|액",
-      "targetFp": "01c0f11a99a2bee5",
-      "sourceType": "mfds_drug_otc",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "디케이정|A11JC|339.5밀리그램|정",
-      "targetFp": "068a42c85de1d073",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "마그온플러스연질캡슐|A11JC|250밀리그램|연질캡슐",
-      "targetFp": "0a6f44cbfe69f3d6",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "엑세라민에이스정|A11AA|50밀리그램|정",
-      "targetFp": "0c9f8cf9cd9f4d24",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "쎌레타민정|A11JC|100밀리그램|정",
-      "targetFp": "10b3d08d29374834",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "헤모글루탑연질캡슐|B03AE10|200밀리그램|연질캡슐",
-      "targetFp": "10c78d7cf8373260",
-      "sourceType": "mfds_drug_otc",
-      "masters": 3,
-      "op": "KO_EN",
-      "status": "DONE"
-    },
-    {
-      "groupKey": "batch3 결정론 KO+EN 15그룹 271 master (config otc-oral-combo-leaflet-config-batch3.ga.json)",
-      "sourceType": "mfds_drug_otc/nutrition_combo",
-      "masters": 271,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "EN canonical 271 LIVE(2T write 542·KO 변경 0·no-op 확인). WO-…-EN-COMPLETION-GA-V4."
-    },
-    {
-      "groupKey": "batch4 결정론 KO+EN 25그룹 238 master (config otc-oral-combo-leaflet-config-batch4.ga.json)",
-      "sourceType": "mfds_drug_otc/nutrition_combo",
-      "masters": 238,
-      "op": "KO_EN",
-      "status": "DONE",
-      "note": "EN canonical 238 LIVE(2T write 476·KO 변경 0·no-op 확인). 40그룹 스윕 en509/ko509/nr0/dup0. WO-…-EN-COMPLETION-GA-V4 — GA 세션누계 47그룹 530master KO+EN 완결."
-    },
-    {
-      "groupKey": "비오라민정|A11JA|72.2밀리그램|정",
-      "targetFp": "5ce7d07d09145119",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "포리그론연질캡슐|A11JC|296.7밀리그램|연질캡슐",
-      "targetFp": "71781c0d3e453f4e",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "비카페롤정|A12AX|250밀리그램|정",
-      "targetFp": "a88442d48964ad2f",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "훼리폴캡슐|B03AE01|326.1밀리그램|캡슐",
-      "targetFp": "c4a67c2b7b4694e1",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "아이플러스연질캡슐|A11JC|296.7밀리그램|연질캡슐",
-      "targetFp": "d5d3cfcf9755e760",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "임팩타민파워정|A11JB|50밀리그램|정",
-      "targetFp": "e14f4e8f623db876",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "다이제스칸정|A09AA|175밀리그램|정",
-      "targetFp": "f1dd2e29ada63fcf",
-      "sourceType": "mfds_drug_otc",
-      "masters": 8,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "토코네슘연질캡슐|A11JB|500밀리그램|연질캡슐",
-      "targetFp": "1bb416430e499cb3",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 7,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "한서헤파디프300캡슐|A05BA|300밀리그램|캡슐",
-      "targetFp": "23a69b585a57eee4",
-      "sourceType": "mfds_drug_otc",
-      "masters": 7,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    },
-    {
-      "groupKey": "애드민정|A11JA|5밀리그램|정",
-      "targetFp": "328cf8d37af1e361",
-      "sourceType": "mfds_drug_otc_nutrition_combo",
-      "masters": 7,
-      "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "GA-V5 batch5 (WO-O4O-OTC-ORAL-MULTI-INGREDIENT-KO-EN-CONTINUOUS-PRODUCTION-GA-V5)"
-    }
-  ]
+ "_doc": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2 — 에이전트 가(GA) claim. 자기 소유 1개. path-specific commit. 타 claim(na·da) 미접촉. 경구 복합성분 매장용 설명서 공식 원문 근거 신규 저작(KO 교체 + EN 신규). source_ref=uuid(md5(targetFp)) 결정론 앵커.",
+ "schemaVersion": 1,
+ "owner": "agent-ga",
+ "round": "oral-multi-ingredient-ko-en-continuous-10h-2026-07-23",
+ "track": "ORAL_MULTI_INGREDIENT_STORE_LEAFLET",
+ "verdict": "PRODUCING",
+ "claims": [
+  {
+   "groupKey": "위엔스탈정|A02AX|100밀리그램|정",
+   "targetFp": "0273b8335509d44c",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "에스톰액|A16AX|20그램|액",
+   "targetFp": "01c0f11a99a2bee5",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "디케이정|A11JC|339.5밀리그램|정",
+   "targetFp": "068a42c85de1d073",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "마그온플러스연질캡슐|A11JC|250밀리그램|연질캡슐",
+   "targetFp": "0a6f44cbfe69f3d6",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "엑세라민에이스정|A11AA|50밀리그램|정",
+   "targetFp": "0c9f8cf9cd9f4d24",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "쎌레타민정|A11JC|100밀리그램|정",
+   "targetFp": "10b3d08d29374834",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "헤모글루탑연질캡슐|B03AE10|200밀리그램|연질캡슐",
+   "targetFp": "10c78d7cf8373260",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "DONE"
+  },
+  {
+   "groupKey": "batch3 결정론 KO+EN 15그룹 271 master (config otc-oral-combo-leaflet-config-batch3.ga.json)",
+   "sourceType": "mfds_drug_otc/nutrition_combo",
+   "masters": 271,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "EN canonical 271 LIVE(2T write 542·KO 변경 0·no-op 확인). WO-…-EN-COMPLETION-GA-V4."
+  },
+  {
+   "groupKey": "batch4 결정론 KO+EN 25그룹 238 master (config otc-oral-combo-leaflet-config-batch4.ga.json)",
+   "sourceType": "mfds_drug_otc/nutrition_combo",
+   "masters": 238,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "EN canonical 238 LIVE(2T write 476·KO 변경 0·no-op 확인). 40그룹 스윕 en509/ko509/nr0/dup0. WO-…-EN-COMPLETION-GA-V4 — GA 세션누계 47그룹 530master KO+EN 완결."
+  },
+  {
+   "groupKey": "비오라민정|A11JA|72.2밀리그램|정",
+   "targetFp": "5ce7d07d09145119",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "포리그론연질캡슐|A11JC|296.7밀리그램|연질캡슐",
+   "targetFp": "71781c0d3e453f4e",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "비카페롤정|A12AX|250밀리그램|정",
+   "targetFp": "a88442d48964ad2f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "훼리폴캡슐|B03AE01|326.1밀리그램|캡슐",
+   "targetFp": "c4a67c2b7b4694e1",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "아이플러스연질캡슐|A11JC|296.7밀리그램|연질캡슐",
+   "targetFp": "d5d3cfcf9755e760",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "임팩타민파워정|A11JB|50밀리그램|정",
+   "targetFp": "e14f4e8f623db876",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "다이제스칸정|A09AA|175밀리그램|정",
+   "targetFp": "f1dd2e29ada63fcf",
+   "sourceType": "mfds_drug_otc",
+   "masters": 8,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "토코네슘연질캡슐|A11JB|500밀리그램|연질캡슐",
+   "targetFp": "1bb416430e499cb3",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "한서헤파디프300캡슐|A05BA|300밀리그램|캡슐",
+   "targetFp": "23a69b585a57eee4",
+   "sourceType": "mfds_drug_otc",
+   "masters": 7,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "groupKey": "애드민정|A11JA|5밀리그램|정",
+   "targetFp": "328cf8d37af1e361",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  }
+ ]
 }
