@@ -1,0 +1,47 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 아세트아미노펜 325mg 연질캡슐 그룹 TM 저작(25줄, 3 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+  "meta": {
+    "titleKo": "아세트아미노펜 325mg 연질캡슐 (해열진통제)",
+    "titleEn": "Acetaminophen 325 mg Soft Capsules (Fever Reducer and Pain Reliever)",
+    "ingKo": "아세트아미노펜 325밀리그램",
+    "ingEn": "Acetaminophen 325 mg",
+    "actionKo": "발열과 두통·근육통·생리통 등 다양한 통증을 완화하는 해열진통제입니다.",
+    "actionEn": "A fever reducer and pain reliever for fever and a wide range of pain including headache, muscle pain, and menstrual pain."
+  },
+  "effSummaries": {
+    "0e9e662b": { "symKo": "감기로 인한 발열·동통, 두통, 신경통, 근육통, 월경통, 염좌통, 치통, 관절통, 류마티양 동통", "symEn": "Fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, toothache, joint pain, and rheumatic pain", "pointKo": "발열과 두통·생리통·근육통 등 다양한 통증에 쓰는 해열진통제입니다.", "pointEn": "A fever reducer and pain reliever for fever, headache, menstrual pain, muscle pain, and more." },
+    "c3c15f35": { "symKo": "감기로 인한 발열·동통, 두통, 신경통, 근육통, 월경통, 염좌통, 치통, 관절통, 류마티양 동통", "symEn": "Fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, toothache, joint pain, and rheumatic pain", "pointKo": "발열과 두통·생리통·근육통 등 다양한 통증에 쓰는 해열진통제입니다.", "pointEn": "A fever reducer and pain reliever for fever, headache, menstrual pain, muscle pain, and more." },
+    "f2d2af67": { "symKo": "감기로 인한 발열·동통, 두통, 신경통, 근육통, 월경통(생리통), 염좌통, 치통, 관절통, 류마티양 동통", "symEn": "Fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, toothache, joint pain, and rheumatic pain", "pointKo": "발열과 두통·생리통·근육통 등 다양한 통증에 쓰는 해열진통제입니다.", "pointEn": "A fever reducer and pain reliever for fever, headache, menstrual pain, muscle pain, and more." }
+  },
+  "cauSummaries": {
+    "6efbaa5b": { "watchKo": "과민증, 소화성궤양, 심한 혈액이상·간장애·신장장애·심장기능저하, 아스피린 천식, 바르비탈계·삼환계 항우울제 복용자, 알코올 복용자 금지 · 간·신장·궤양·혈액·출혈경향·심장이상·천식·노인·임부·수유부 상담 · 증상 지속·악화·새 증상 시 상의", "watchEn": "Do not use with hypersensitivity, peptic ulcers, severe blood, liver, kidney, or heart problems, aspirin asthma, barbiturates or tricyclic antidepressants, or alcohol; consult with liver, kidney, ulcer, blood, bleeding tendency, heart, or asthma conditions, older adults, pregnancy or breastfeeding; consult if symptoms persist, worsen, or new symptoms appear" }
+  },
+  "en": {
+    "0e9e662b": "This medicine is used for fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, and toothache, joint pain, and rheumatic pain.",
+    "c3c15f35": "This medicine is used for fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, toothache, joint pain, and rheumatic pain.",
+    "f2d2af67": "This medicine is used for fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain (period pain), sprain pain, toothache, joint pain, and rheumatic pain.",
+    "0efd5756": "Do not take this medicine if you are hypersensitive to it, have peptic ulcers, severe blood abnormalities, severe liver disorders, severe kidney disorders, or severely reduced heart function, have or have had aspirin asthma (asthma attacks induced by nonsteroidal anti-inflammatory drugs), or have been drinking alcohol.",
+    "d40506c6": "Do not take this medicine if you are hypersensitive to it, have peptic ulcers, severe blood abnormalities, severe liver disorders, severe kidney disorders, or severely reduced heart function, or have or have had aspirin asthma (asthma attacks induced by nonsteroidal anti-inflammatory drugs).",
+    "1a21d075": "Do not take this medicine together with barbiturates, tricyclic antidepressants, alcohol, or other anti-inflammatory pain relievers.",
+    "221804ce": "Do not take this medicine together with barbiturates, tricyclic antidepressants, or other anti-inflammatory pain relievers.",
+    "23da71d1": "Do not take more than a maximum of 12 capsules (4 g) per 1 day.",
+    "c61bb44f": "Do not take more than a maximum of 12 capsules (4 g) per 1 day.",
+    "3c55afab": "Take this medicine at the lowest effective dose for the shortest possible duration.",
+    "cb4b06e0": "Take this medicine at the lowest effective dose for the shortest possible duration.",
+    "871b9658": "Children 12 years and older and adults take 2 capsules per 1 dose, 3 to 4 times a day, every 4 to 6 hours as needed.",
+    "93194f59": "Children 12 years and older and adults take 2 capsules per 1 dose, 3 to 4 times a day (every 4 to 6 hours) as needed.",
+    "d41938a4": "Children 12 years and older and adults take 2 capsules (650 mg) per 1 dose, 3 to 4 times a day (every 4 to 6 hours) as needed. Do not take more than a maximum of 12 capsules (4,000 mg) per 1 day.",
+    "8ca75fc2": "Without the direction of a doctor or pharmacist, do not take this medicine for more than 10 days (adults) or 5 days (children) for pain, or for more than 3 days for fever.",
+    "38ac96ee": "Before taking this medicine, consult a doctor or pharmacist if you have or have had liver disorders, have or have had kidney disorders, have had peptic ulcers, have or have had blood abnormalities, have a tendency to bleed, have heart function abnormalities, have hypersensitivity, have bronchial asthma, are an older adult, are pregnant or breastfeeding, or have a concurrent infection.",
+    "48d09f63": "Before taking this medicine, consult a doctor or pharmacist if you have or have had liver disorders, have or have had kidney disorders, have had peptic ulcers, have or have had blood abnormalities, have a tendency to bleed, have heart function abnormalities, have experienced hypersensitivity, have bronchial asthma, are an older adult, or are pregnant or breastfeeding.",
+    "6efbaa5b": "Do not take this medicine if you are hypersensitive to it, have peptic ulcers, severe blood abnormalities, severe liver disorders, severe kidney disorders, or severely reduced heart function, have or have had aspirin asthma (asthma attacks induced by nonsteroidal anti-inflammatory drugs), have taken barbiturates or tricyclic antidepressants, or have been drinking alcohol. Before taking this medicine, consult a doctor or pharmacist if you have liver disorders, kidney disorders, peptic ulcers, blood abnormalities, a tendency to bleed, or heart function abnormalities, have experienced hypersensitivity, have bronchial asthma, are an older adult, or are pregnant or breastfeeding. Consult a doctor or pharmacist if pain or fever symptoms persist or worsen, or if new symptoms appear.",
+    "6f6e89c0": "Consult a doctor or pharmacist if you are taking warfarin long-term.",
+    "7018a6d8": "Do not take this medicine together with other products containing acetaminophen, barbiturates, tricyclic antidepressants, or alcohol. Consult a doctor or pharmacist when taking it together with warfarin, lithium, thiazide diuretics, or other anti-inflammatory pain relievers.",
+    "def6b3ed": "Consult a doctor or pharmacist when taking this medicine together with warfarin (when taken long-term), lithium, or thiazide diuretics.",
+    "ff2232c8": "Consult a doctor or pharmacist when taking this medicine together with lithium or thiazide diuretics.",
+    "72fed5c3": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: shock symptoms (difficulty breathing, reddening of the whole body, swelling of blood vessels, hives, etc.); asthma attacks; decreased platelets, decreased granulocytes, hemolytic anemia (destruction of red blood cells), methemoglobinemia, reduced platelet function (prolonged bleeding time), cyanosis; facial swelling, sweating, low blood pressure; nausea, vomiting, loss of appetite; rash, allergic reactions, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome); and, very rarely, skin and subcutaneous tissue disorders, itchy rash, elevated AST, elevated ALT, or fixed drug eruption.",
+    "ac2126d6": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: shock symptoms (difficulty breathing, reddening of the whole body, angioedema, hives, asthma attacks, etc.); decreased platelets, decreased granulocytes, hemolytic anemia, methemoglobinemia, reduced platelet function (prolonged bleeding time), cyanosis; nausea, vomiting, loss of appetite; skin rash, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome), elevated AST, elevated ALT, itchy rash, or fixed drug eruption.",
+    "e4e087d3": "If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: shock or anaphylactoid symptoms (hypersensitivity-like symptoms: difficulty breathing, reddening of the whole body, swelling of blood vessels, hives, etc.); asthma attacks; decreased platelets, decreased granulocytes, hemolytic anemia (destruction of red blood cells), methemoglobinemia, reduced platelet function (prolonged bleeding time), cyanosis; hypersensitivity symptoms (facial swelling, sweating, low blood pressure, etc.); nausea, vomiting, loss of appetite; gastrointestinal adverse reactions with long-term use such as gastrointestinal bleeding, peptic ulcers, and perforation; rash, allergic reactions, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome); very rarely anaphylactic reactions, hypersensitivity, skin and subcutaneous tissue disorders; and very rarely hives, itchy rash, elevated AST, elevated ALT, or fixed drug eruption."
+  }
+}

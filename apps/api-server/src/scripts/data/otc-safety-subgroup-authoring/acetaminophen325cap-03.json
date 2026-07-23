@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "acetaminophen325cap-03",
+  "order": 3403,
+  "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+  "safetyFp": "759b9308b924f1ff",
+  "sourceRef": "d462b426-b43c-4f81-8528-4cca70dde5de",
+  "sensitive": false,
+  "title": "아세트아미노펜 325mg 연질캡슐 (해열진통제)",
+  "expectEasyMd5": "f2141ea3",
+  "masterIds": [
+    "404084bb-5ff1-432a-b72f-d853c0a72ed5",
+    "6e68dd7d-822d-4640-8af8-778315b5678d"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "f2141ea3",
+    "names": [
+      "타이로펜연질캡슐(아세트아미노펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 감기로 인한 발열 및 동통(통증), 두통, 신경통, 근육통, 월경통(생리통), 염좌통(삔 통증), 치통, 관절통, 류마티양 동통(통증)에 사용합니다.",
+    "usage": "만 12세 이상 소아 및 성인은 1회 2캡슐씩, 1일 3~4회 (4~6시간마다) 필요시 복용합니다.\n\n1일 최대 12캡슐(4 g)을 초과하여 복용하지 않습니다.\n\n이 약은 가능한 최단기간동안 최소 유효용량으로 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다.\n\n매우 드물게 치명적일 수 있는 급성전신발진고름물집증, 스티븐스-존슨증후군, 독성표피괴사용해와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 피부발진 또는 다른 과민반응의 징후가 나타나는 경우 즉시 복용을 중단하십시오.\n\n아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오. 간손상을 일으킬 수 있습니다. 아세트아미노펜을 포함하는 다른 제품과 함께 복용하지 마십시오.\n\n이 약에 과민증, 소화성궤양, 심한 혈액 이상, 심한 간장애, 심한 신장(콩팥)장애, 심한 심장기능저하, 아스피린 천식(비스테로이드성 소염(항염)제에 의한 천식발작 유발) 또는 경험자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 간장애 또는 경험자, 신장(콩팥)장애 또는 경험자, 소화성궤양 경험자, 혈액이상 또는 경험자, 출혈경향이 있는 환자, 심장기능이상이 있는 환자, 과민증 경험자, 기관지 천식 환자, 고령자(노인), 임부 또는 수유부는 의사 또는 약사와 상의하십시오.\n\n바르비탈계 약물, 삼환계 항우울제, 알코올, 다른 소염(항염)진통제와 함께 복용하지 마십시오.\n\n와파린(장기복용 시), 리튬, 치아짓계이뇨제와 함께 복용 시 의사 또는 약사와 상의하십시오.\n\n쇽, 아나필락시양 증상(과민성유사증상 : 호흡곤란, 온몸이 붉어짐, 혈관부기, 두드러기 등), 천식발작, 혈소판 감소, 과립구감소, 용혈성(적혈구 파괴성)빈혈, 메트헤모글로빈혈증, 혈소판기능 저하(출혈시간 연장), 청색증, 과민증상(얼굴부기, 땀이 남, 저혈압 등), 구역, 구토, 식욕부진, 장기복용시 위장출혈, 소화성궤양, 천공(뚫림) 등의 위장관계 이상반응, 발진, 알레르기 반응, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군), 매우 드물게 아나필락시스 반응, 과민증, 피부 및 피하(피부밑)조직 장애, 매우 드물게 두드러기, 소양성(가려움) 발진, AST 상승, ALT 상승, 고정발진 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "아세트아미노펜 325밀리그램",
+      "작용": "발열과 두통·근육통·생리통 등 다양한 통증을 완화하는 해열진통제입니다.",
+      "주요 증상": "감기로 인한 발열·동통, 두통, 신경통, 근육통, 월경통(생리통), 염좌통, 치통, 관절통, 류마티양 동통",
+      "주의 대상": "매일 3잔 이상 정기 음주자는 간손상 위험이 있어 복용 전 상담 필요, 아세트아미노펜 포함 다른 제품과 병용 주의",
+      "선택 포인트": "발열과 두통·생리통·근육통 등 다양한 통증에 쓰는 해열진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Acetaminophen 325 mg Soft Capsules (Fever Reducer and Pain Reliever)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain (period pain), sprain pain, toothache, joint pain, and rheumatic pain.",
+    "usage": "Children 12 years and older and adults take 2 capsules per 1 dose, 3 to 4 times a day (every 4 to 6 hours) as needed. Do not take more than a maximum of 12 capsules (4 g) per 1 day. Take this medicine at the lowest effective dose for the shortest possible duration.",
+    "caution": "If you regularly drink three or more alcoholic drinks every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics; it can cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalized exanthematous pustulosis, Stevens-Johnson syndrome, and toxic epidermal necrolysis, have been reported; if a skin rash or other signs of hypersensitivity appear after taking this medicine, stop taking it immediately. Do not take more than the maximum daily dose of acetaminophen (4,000 mg); it can cause liver damage. Do not take this medicine together with other products containing acetaminophen. Do not take this medicine if you are hypersensitive to it, have peptic ulcers, severe blood abnormalities, severe liver disorders, severe kidney disorders, or severely reduced heart function, or have or have had aspirin asthma (asthma attacks induced by nonsteroidal anti-inflammatory drugs). Before taking this medicine, consult a doctor or pharmacist if you have or have had liver disorders, have or have had kidney disorders, have had peptic ulcers, have or have had blood abnormalities, have a tendency to bleed, have heart function abnormalities, have experienced hypersensitivity, have bronchial asthma, are an older adult, or are pregnant or breastfeeding. Do not take this medicine together with barbiturates, tricyclic antidepressants, alcohol, or other anti-inflammatory pain relievers. Consult a doctor or pharmacist when taking this medicine together with warfarin (when taken long-term), lithium, or thiazide diuretics. If the following occur, stop taking this medicine immediately and consult a doctor or pharmacist: shock or anaphylactoid symptoms (hypersensitivity-like symptoms: difficulty breathing, reddening of the whole body, swelling of blood vessels, hives, etc.); asthma attacks; decreased platelets, decreased granulocytes, hemolytic anemia (destruction of red blood cells), methemoglobinemia, reduced platelet function (prolonged bleeding time), cyanosis; hypersensitivity symptoms (facial swelling, sweating, low blood pressure, etc.); nausea, vomiting, loss of appetite; gastrointestinal adverse reactions with long-term use such as gastrointestinal bleeding, peptic ulcers, and perforation; rash, allergic reactions, Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell syndrome); very rarely anaphylactic reactions, hypersensitivity, skin and subcutaneous tissue disorders; and very rarely hives, itchy rash, elevated AST, elevated ALT, or fixed drug eruption. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Acetaminophen 325 mg",
+      "How it works": "A fever reducer and pain reliever for fever and a wide range of pain including headache, muscle pain, and menstrual pain.",
+      "Main symptoms": "Fever and pain from colds, headache, nerve pain, muscle pain, menstrual pain, sprain pain, toothache, joint pain, and rheumatic pain",
+      "Caution for": "Regular drinkers of three or more alcoholic drinks a day risk liver damage — consult before use; use caution with other products containing acetaminophen",
+      "Why this one": "A fever reducer and pain reliever for fever, headache, menstrual pain, muscle pain, and more."
+    }
+  }
+}

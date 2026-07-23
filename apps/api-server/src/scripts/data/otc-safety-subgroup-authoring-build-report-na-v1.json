@@ -3,6 +3,2516 @@
   "agent": "나",
   "built": [
     {
+      "slug": "almagate500-01a",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "ee6c83dacd0bf162",
+      "T": 15,
+      "order": 401,
+      "sourceRef": "76a1e148-bacf-487d-8d52-d9bf67050fa1",
+      "koHtmlLen": 2349,
+      "enHtmlLen": 4375
+    },
+    {
+      "slug": "almagate500-01b",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "ee6c83dacd0bf162",
+      "T": 3,
+      "order": 401,
+      "sourceRef": "12e334de-019c-4679-81b2-0543c04ed3ad",
+      "koHtmlLen": 2349,
+      "enHtmlLen": 4375
+    },
+    {
+      "slug": "almagate500-02",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "a3452e5b0564a6bc",
+      "T": 8,
+      "order": 402,
+      "sourceRef": "616aa8b7-09e5-4a5b-86ee-6a46ca485d0c",
+      "koHtmlLen": 2350,
+      "enHtmlLen": 4380
+    },
+    {
+      "slug": "almagate500-03",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "4f8299df22f609ea",
+      "T": 7,
+      "order": 403,
+      "sourceRef": "feea3c83-0d6c-402a-8653-c1763c6c2fdc",
+      "koHtmlLen": 2262,
+      "enHtmlLen": 4210
+    },
+    {
+      "slug": "almagate500-04",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "e005b053d97b2d97",
+      "T": 7,
+      "order": 404,
+      "sourceRef": "2e0fc61d-14be-4f42-8200-185f411465a5",
+      "koHtmlLen": 2348,
+      "enHtmlLen": 4375
+    },
+    {
+      "slug": "almagate500-05",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "7d641ef454dacdfe",
+      "T": 6,
+      "order": 405,
+      "sourceRef": "f408e99e-f7de-4fb0-8560-e85bf16a866e",
+      "koHtmlLen": 2354,
+      "enHtmlLen": 4397
+    },
+    {
+      "slug": "almagate500-06a",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "ce3ecd41211df7b7",
+      "T": 3,
+      "order": 406,
+      "sourceRef": "79e605ec-6ba0-4660-80d3-136b17c4091e",
+      "koHtmlLen": 2322,
+      "enHtmlLen": 4329
+    },
+    {
+      "slug": "almagate500-06b",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "ce3ecd41211df7b7",
+      "T": 2,
+      "order": 406,
+      "sourceRef": "afbe6f0e-2d35-4bf5-8515-86ad7ff65908",
+      "koHtmlLen": 2322,
+      "enHtmlLen": 4329
+    },
+    {
+      "slug": "almagate500-07",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "50e6825f6f5a6b21",
+      "T": 4,
+      "order": 407,
+      "sourceRef": "d2bebd32-29d0-4b44-8e90-1ad62d74670a",
+      "koHtmlLen": 2264,
+      "enHtmlLen": 4215
+    },
+    {
+      "slug": "almagate500-08",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "863af09ffa8fa0fd",
+      "T": 4,
+      "order": 408,
+      "sourceRef": "65d90d65-56f9-433a-81e4-3f54ed1f011f",
+      "koHtmlLen": 2252,
+      "enHtmlLen": 4221
+    },
+    {
+      "slug": "almagate500-09",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "f213d6e50e19426d",
+      "T": 4,
+      "order": 409,
+      "sourceRef": "76d50a91-2e65-471d-85ca-9e738da8a6d6",
+      "koHtmlLen": 2241,
+      "enHtmlLen": 4205
+    },
+    {
+      "slug": "almagate500-10",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "8cf4b38d7f1f5e32",
+      "T": 3,
+      "order": 410,
+      "sourceRef": "e1347857-752a-461d-8803-93b6d72d3751",
+      "koHtmlLen": 2321,
+      "enHtmlLen": 4351
+    },
+    {
+      "slug": "almagate500-11",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "f064d829f9fad987",
+      "T": 3,
+      "order": 411,
+      "sourceRef": "46031b63-7675-4124-8d0e-d597ce6f63b3",
+      "koHtmlLen": 2375,
+      "enHtmlLen": 4418
+    },
+    {
+      "slug": "almagate500-12",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "f6387fabb33846e1",
+      "T": 3,
+      "order": 412,
+      "sourceRef": "fb19c879-cc2e-4bdc-8b72-9c1a9e2aefc4",
+      "koHtmlLen": 2368,
+      "enHtmlLen": 4428
+    },
+    {
+      "slug": "almagate500-13",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "fd95111921904cdf",
+      "T": 3,
+      "order": 413,
+      "sourceRef": "8d9d7840-4d06-4d0d-81c2-1a2f1e36da67",
+      "koHtmlLen": 2237,
+      "enHtmlLen": 4186
+    },
+    {
+      "slug": "almagate500-14",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "18a5349c2ca20f46",
+      "T": 2,
+      "order": 414,
+      "sourceRef": "6e451199-ba9a-432e-8a82-d41c6ba988a0",
+      "koHtmlLen": 2339,
+      "enHtmlLen": 4410
+    },
+    {
+      "slug": "almagate500-15",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "3658a127fbf9b1ee",
+      "T": 2,
+      "order": 415,
+      "sourceRef": "03a27adc-96dc-4b20-82e8-52496673a54a",
+      "koHtmlLen": 2244,
+      "enHtmlLen": 4203
+    },
+    {
+      "slug": "almagate500-16",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "50df57f51f4e4477",
+      "T": 2,
+      "order": 416,
+      "sourceRef": "4f382514-e855-4170-8135-3f9646e50e01",
+      "koHtmlLen": 2325,
+      "enHtmlLen": 4359
+    },
+    {
+      "slug": "almagate500-17",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "656d72f30b3f58fe",
+      "T": 2,
+      "order": 417,
+      "sourceRef": "af643ae1-5150-40b6-8898-58547b39da73",
+      "koHtmlLen": 2320,
+      "enHtmlLen": 4329
+    },
+    {
+      "slug": "almagate500-18",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "8ce8981c8274478a",
+      "T": 2,
+      "order": 418,
+      "sourceRef": "336c27c8-d99a-45dc-8f05-12f5a80e62a8",
+      "koHtmlLen": 2361,
+      "enHtmlLen": 4370
+    },
+    {
+      "slug": "almagate500-19",
+      "groupKey": "알마게이트|500밀리그램|정",
+      "safetyFp": "9fc73bd653e2d3ae",
+      "T": 2,
+      "order": 419,
+      "sourceRef": "56d09eb0-3fb6-414a-8b75-1908497b1db7",
+      "koHtmlLen": 2240,
+      "enHtmlLen": 4191
+    },
+    {
+      "slug": "naproxenna275-01a",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "b22a2d04f6b5d48a",
+      "T": 8,
+      "order": 301,
+      "sourceRef": "74382080-f3dd-44f8-813b-cabc25a48c32",
+      "koHtmlLen": 3955,
+      "enHtmlLen": 7805
+    },
+    {
+      "slug": "naproxenna275-01b",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "b22a2d04f6b5d48a",
+      "T": 4,
+      "order": 301,
+      "sourceRef": "30083381-861a-42a0-8f0b-25c31ecbd2f1",
+      "koHtmlLen": 3955,
+      "enHtmlLen": 7805
+    },
+    {
+      "slug": "naproxenna275-02",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "7842feb242424e9a",
+      "T": 9,
+      "order": 302,
+      "sourceRef": "7c1a01e5-9642-48e0-89c4-60b75d1d75c6",
+      "koHtmlLen": 3971,
+      "enHtmlLen": 7857
+    },
+    {
+      "slug": "naproxenna275-03",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "16dd7068bdc5d1f3",
+      "T": 7,
+      "order": 303,
+      "sourceRef": "b2011d2d-bbce-482f-83ed-0f1c4841c66d",
+      "koHtmlLen": 3976,
+      "enHtmlLen": 7871
+    },
+    {
+      "slug": "naproxenna275-04",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "18e45445e9716032",
+      "T": 7,
+      "order": 304,
+      "sourceRef": "4a47cbd7-dbfe-4c05-865b-fd92abe6175f",
+      "koHtmlLen": 3921,
+      "enHtmlLen": 7696
+    },
+    {
+      "slug": "naproxenna275-05",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "9a2a32751fa5c368",
+      "T": 7,
+      "order": 305,
+      "sourceRef": "528212f7-3f79-4ee4-8902-bcc3c9629787",
+      "koHtmlLen": 3965,
+      "enHtmlLen": 7822
+    },
+    {
+      "slug": "naproxenna275-06",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "7f0fee2f87dc91ab",
+      "T": 5,
+      "order": 306,
+      "sourceRef": "fe3757c8-a7bc-4c7d-8171-19cd11a3ee2f",
+      "koHtmlLen": 3931,
+      "enHtmlLen": 7947
+    },
+    {
+      "slug": "naproxenna275-07",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "b8e4aa10fb98743d",
+      "T": 5,
+      "order": 307,
+      "sourceRef": "d1719817-2102-4d20-8a41-483880d26426",
+      "koHtmlLen": 3971,
+      "enHtmlLen": 7776
+    },
+    {
+      "slug": "naproxenna275-08",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "d6e009ce461dd6b0",
+      "T": 5,
+      "order": 308,
+      "sourceRef": "8c0c73af-4b9d-491f-87f7-bdc9b662a2d7",
+      "koHtmlLen": 3952,
+      "enHtmlLen": 7812
+    },
+    {
+      "slug": "naproxenna275-09",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "61b33233474484bf",
+      "T": 4,
+      "order": 309,
+      "sourceRef": "f0765632-d8a0-4deb-871c-48ab73400fde",
+      "koHtmlLen": 3546,
+      "enHtmlLen": 6673
+    },
+    {
+      "slug": "naproxenna275-10",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "7a085fe4867179f6",
+      "T": 4,
+      "order": 310,
+      "sourceRef": "f0e8872b-2f8b-4082-8788-ce510b65bc2d",
+      "koHtmlLen": 3853,
+      "enHtmlLen": 7854
+    },
+    {
+      "slug": "naproxenna275-11",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "237aa95f2fcae156",
+      "T": 3,
+      "order": 311,
+      "sourceRef": "3df5e8bc-32f9-4712-8de9-c0831db605e2",
+      "koHtmlLen": 3908,
+      "enHtmlLen": 7627
+    },
+    {
+      "slug": "naproxenna275-12",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "281c372c3887dd3f",
+      "T": 3,
+      "order": 312,
+      "sourceRef": "774419cc-63e4-4b36-88ef-45b2c056a3eb",
+      "koHtmlLen": 3893,
+      "enHtmlLen": 7569
+    },
+    {
+      "slug": "naproxenna275-13",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "5b63f7934e7857fd",
+      "T": 3,
+      "order": 313,
+      "sourceRef": "c37d7558-2922-41fa-849a-8ce42d3c4e93",
+      "koHtmlLen": 3813,
+      "enHtmlLen": 7760
+    },
+    {
+      "slug": "naproxenna275-14",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "639fe2f1616e5ee0",
+      "T": 3,
+      "order": 314,
+      "sourceRef": "41aabbf9-ae6a-4173-8d3a-55c160364d43",
+      "koHtmlLen": 3968,
+      "enHtmlLen": 7854
+    },
+    {
+      "slug": "naproxenna275-15",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "da334edcaada77b7",
+      "T": 3,
+      "order": 315,
+      "sourceRef": "a561550a-0a9a-4b79-828b-a4c48fc34c73",
+      "koHtmlLen": 3946,
+      "enHtmlLen": 8087
+    },
+    {
+      "slug": "naproxenna275-16",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "33242f9a2eba4e61",
+      "T": 2,
+      "order": 316,
+      "sourceRef": "a506df59-8dc2-45a4-8bf3-0dcbbae0fca4",
+      "koHtmlLen": 3901,
+      "enHtmlLen": 7916
+    },
+    {
+      "slug": "naproxenna275-17",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "7ee566401c85364e",
+      "T": 2,
+      "order": 317,
+      "sourceRef": "2d382cc0-9103-4543-88de-8a869efc1e37",
+      "koHtmlLen": 3936,
+      "enHtmlLen": 7981
+    },
+    {
+      "slug": "naproxenna275-18",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "b0b518152c984ddc",
+      "T": 2,
+      "order": 318,
+      "sourceRef": "dbb77f00-cc63-4867-8a2d-dabc2b019d7b",
+      "koHtmlLen": 3613,
+      "enHtmlLen": 7167
+    },
+    {
+      "slug": "naproxenna275-19",
+      "groupKey": "나프록센나트륨|275밀리그램|정",
+      "safetyFp": "fc4dcb55c5f84d17",
+      "T": 2,
+      "order": 319,
+      "sourceRef": "f9e59e18-66e2-4f97-898d-308007a13080",
+      "koHtmlLen": 4107,
+      "enHtmlLen": 8038
+    },
+    {
+      "slug": "dexibuprofen300-01",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "645ddf9a60bdddd6",
+      "T": 11,
+      "order": 201,
+      "sourceRef": "e54153aa-f749-45c1-8f45-c4bc400cb07a",
+      "koHtmlLen": 4243,
+      "enHtmlLen": 8917
+    },
+    {
+      "slug": "dexibuprofen300-02",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "0751d7d5d68ff2e3",
+      "T": 8,
+      "order": 202,
+      "sourceRef": "574d1b5f-987a-4878-8c20-6996335755d9",
+      "koHtmlLen": 4095,
+      "enHtmlLen": 8643
+    },
+    {
+      "slug": "dexibuprofen300-03",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "17e24e44e6a9f2b4",
+      "T": 7,
+      "order": 203,
+      "sourceRef": "a6024576-b118-40fa-8985-51e1c41de9dd",
+      "koHtmlLen": 4232,
+      "enHtmlLen": 8862
+    },
+    {
+      "slug": "dexibuprofen300-04",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "09039cf9b1181f98",
+      "T": 6,
+      "order": 204,
+      "sourceRef": "414f9ef3-c6ed-47c3-8047-bf30d4c7bc3e",
+      "koHtmlLen": 3871,
+      "enHtmlLen": 8100
+    },
+    {
+      "slug": "dexibuprofen300-05",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "655d33a45e7aa3c5",
+      "T": 6,
+      "order": 205,
+      "sourceRef": "6693102a-4222-451f-81d8-8d16ff3b41d7",
+      "koHtmlLen": 3898,
+      "enHtmlLen": 8291
+    },
+    {
+      "slug": "dexibuprofen300-06",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "829ef4f3ae2a7d39",
+      "T": 6,
+      "order": 206,
+      "sourceRef": "677c7585-94e1-4901-8343-fab2f56d3817",
+      "koHtmlLen": 4149,
+      "enHtmlLen": 8605
+    },
+    {
+      "slug": "dexibuprofen300-07",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "11a2d5af39bdf963",
+      "T": 5,
+      "order": 207,
+      "sourceRef": "11097683-96f3-48a3-8f5a-f0890cdcdd77",
+      "koHtmlLen": 4166,
+      "enHtmlLen": 8778
+    },
+    {
+      "slug": "dexibuprofen300-08",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "0f962517614375ee",
+      "T": 4,
+      "order": 208,
+      "sourceRef": "c0bf2f0e-d548-4e01-86e1-d8676176adb9",
+      "koHtmlLen": 4165,
+      "enHtmlLen": 8731
+    },
+    {
+      "slug": "dexibuprofen300-09",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "219a82c2e9c8fd78",
+      "T": 4,
+      "order": 209,
+      "sourceRef": "784da8d1-233e-4a90-85cc-dd820cca0cdb",
+      "koHtmlLen": 4234,
+      "enHtmlLen": 8897
+    },
+    {
+      "slug": "dexibuprofen300-10",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "5fbf4826ae5c1498",
+      "T": 4,
+      "order": 210,
+      "sourceRef": "ed66ef5c-7d10-452d-8904-a8a312485461",
+      "koHtmlLen": 4307,
+      "enHtmlLen": 9034
+    },
+    {
+      "slug": "dexibuprofen300-11",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "67b22eabf1e2c1e8",
+      "T": 4,
+      "order": 211,
+      "sourceRef": "8f3b8fd9-a849-4c0d-8a90-89311aeb774c",
+      "koHtmlLen": 4093,
+      "enHtmlLen": 8643
+    },
+    {
+      "slug": "dexibuprofen300-12",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "a7395d0b243cbb4a",
+      "T": 4,
+      "order": 212,
+      "sourceRef": "01da6d66-9050-4de0-8ebc-cc1a10523dbe",
+      "koHtmlLen": 4256,
+      "enHtmlLen": 8829
+    },
+    {
+      "slug": "dexibuprofen300-13",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "e6c2cb6b22863708",
+      "T": 4,
+      "order": 213,
+      "sourceRef": "0d709308-5037-4e4c-84ea-29dd3c0ee5ff",
+      "koHtmlLen": 4282,
+      "enHtmlLen": 8961
+    },
+    {
+      "slug": "dexibuprofen300-14",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "0724b0692e32dfae",
+      "T": 3,
+      "order": 214,
+      "sourceRef": "cf56c716-3386-44b6-814c-33fbd586199d",
+      "koHtmlLen": 3277,
+      "enHtmlLen": 6721
+    },
+    {
+      "slug": "dexibuprofen300-15",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "1cc8ca321f17a768",
+      "T": 3,
+      "order": 215,
+      "sourceRef": "1663281e-3878-4894-8862-862839ed271f",
+      "koHtmlLen": 4121,
+      "enHtmlLen": 8714
+    },
+    {
+      "slug": "dexibuprofen300-16",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "68dd3997e8514c71",
+      "T": 3,
+      "order": 216,
+      "sourceRef": "bc1b7aaa-4f17-4f54-8df0-062d1452880f",
+      "koHtmlLen": 4209,
+      "enHtmlLen": 8824
+    },
+    {
+      "slug": "dexibuprofen300-17",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "8aa55c44d79230a0",
+      "T": 3,
+      "order": 217,
+      "sourceRef": "6b0fc5bd-8888-4eec-819e-db299c013f9e",
+      "koHtmlLen": 3366,
+      "enHtmlLen": 6920
+    },
+    {
+      "slug": "dexibuprofen300-18",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "d07b8f1356373d70",
+      "T": 3,
+      "order": 218,
+      "sourceRef": "b1262849-8992-42b6-806f-88c369d7bd24",
+      "koHtmlLen": 3757,
+      "enHtmlLen": 7823
+    },
+    {
+      "slug": "dexibuprofen300-19",
+      "groupKey": "덱시부프로펜|300밀리그램|정",
+      "safetyFp": "a0e2d0229e9c3a8c",
+      "T": 1,
+      "order": 219,
+      "sourceRef": "575bb1d9-9a0b-4f8a-8fa0-292f363d954d",
+      "koHtmlLen": 4156,
+      "enHtmlLen": 8760
+    },
+    {
+      "slug": "acetaminophen650-01",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7ddb34dd7159584e",
+      "T": 8,
+      "order": 601,
+      "sourceRef": "21744a31-5178-43c9-8cfd-e7115f91c927",
+      "koHtmlLen": 2782,
+      "enHtmlLen": 5560
+    },
+    {
+      "slug": "acetaminophen650-02",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7c4e68555a9ffe18",
+      "T": 7,
+      "order": 602,
+      "sourceRef": "895888b2-c996-4ac6-8015-eb6d5955add4",
+      "koHtmlLen": 2945,
+      "enHtmlLen": 5696
+    },
+    {
+      "slug": "acetaminophen650-03",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "72a7ed6b45bdcb5f",
+      "T": 6,
+      "order": 603,
+      "sourceRef": "66b03384-d669-4f57-836c-9f27ff313810",
+      "koHtmlLen": 2652,
+      "enHtmlLen": 5039
+    },
+    {
+      "slug": "acetaminophen650-04",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "e997b71c716ae591",
+      "T": 6,
+      "order": 604,
+      "sourceRef": "93693f70-ef4c-42a3-8cff-be97028c7d57",
+      "koHtmlLen": 2841,
+      "enHtmlLen": 5485
+    },
+    {
+      "slug": "acetaminophen650-05",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "4a20df65b36323dd",
+      "T": 5,
+      "order": 605,
+      "sourceRef": "6113c317-db53-4b40-8b9a-ff5845c5db93",
+      "koHtmlLen": 2702,
+      "enHtmlLen": 5395
+    },
+    {
+      "slug": "acetaminophen650-06",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "a6c4246a12c29e90",
+      "T": 5,
+      "order": 606,
+      "sourceRef": "c0f7d093-b8af-4c29-87fb-6ecdee5ee4ad",
+      "koHtmlLen": 2902,
+      "enHtmlLen": 5599
+    },
+    {
+      "slug": "acetaminophen650-07",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "35554d979d6c7474",
+      "T": 4,
+      "order": 607,
+      "sourceRef": "05b32ad9-0e42-44a5-8c06-c7d779362bd8",
+      "koHtmlLen": 2773,
+      "enHtmlLen": 5339
+    },
+    {
+      "slug": "acetaminophen650-08",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "7140ad4c299c090b",
+      "T": 4,
+      "order": 608,
+      "sourceRef": "67eb5bcd-cf76-494d-86e1-4ec76cddaa69",
+      "koHtmlLen": 2871,
+      "enHtmlLen": 5563
+    },
+    {
+      "slug": "acetaminophen650-09",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "9601dd11c3f269b5",
+      "T": 4,
+      "order": 609,
+      "sourceRef": "67301ac6-3dcb-4093-8c7a-2fa02919eab7",
+      "koHtmlLen": 2944,
+      "enHtmlLen": 5645
+    },
+    {
+      "slug": "acetaminophen650-10",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "ac400b733ed79295",
+      "T": 4,
+      "order": 610,
+      "sourceRef": "6c3c3f08-c986-4310-84c1-a3bef14a3af6",
+      "koHtmlLen": 2648,
+      "enHtmlLen": 5103
+    },
+    {
+      "slug": "acetaminophen650-11",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "c91ecec875de9064",
+      "T": 4,
+      "order": 611,
+      "sourceRef": "833e9c1c-eac4-4abd-8ab6-ef2b41c22fc0",
+      "koHtmlLen": 2805,
+      "enHtmlLen": 5405
+    },
+    {
+      "slug": "acetaminophen650-12",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "cd133b3d6d67ddb0",
+      "T": 4,
+      "order": 612,
+      "sourceRef": "d631a004-1b58-4e22-8040-66e524534b48",
+      "koHtmlLen": 2760,
+      "enHtmlLen": 5342
+    },
+    {
+      "slug": "acetaminophen650-13",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "e9dda62d0dec3cb0",
+      "T": 4,
+      "order": 613,
+      "sourceRef": "c698474b-acad-48d1-8213-155f9a770737",
+      "koHtmlLen": 2656,
+      "enHtmlLen": 5102
+    },
+    {
+      "slug": "acetaminophen650-14",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "18f4141c1739f06c",
+      "T": 3,
+      "order": 614,
+      "sourceRef": "73db35b3-93bc-4c87-8416-f9dcf068e46f",
+      "koHtmlLen": 2772,
+      "enHtmlLen": 5339
+    },
+    {
+      "slug": "acetaminophen650-15",
+      "groupKey": "아세트아미노펜|650밀리그램|정",
+      "safetyFp": "8d934d3331a50984",
+      "T": 3,
+      "order": 615,
+      "sourceRef": "d66b6994-3cb3-4996-8975-ef8d13a14e7c",
+      "koHtmlLen": 2621,
+      "enHtmlLen": 5081
+    },
+    {
+      "slug": "bromelain100-01",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "50f629465a309000",
+      "T": 16,
+      "order": 701,
+      "sourceRef": "28aa7028-2172-4ea3-82db-48f9a5a12ce6",
+      "koHtmlLen": 1945,
+      "enHtmlLen": 3666
+    },
+    {
+      "slug": "bromelain100-02",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "fb577ffada6a1ced",
+      "T": 9,
+      "order": 702,
+      "sourceRef": "78c2a24e-a950-4a56-8c57-d4124026348d",
+      "koHtmlLen": 1957,
+      "enHtmlLen": 3536
+    },
+    {
+      "slug": "bromelain100-03",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "0cedb40dc60df4ef",
+      "T": 6,
+      "order": 703,
+      "sourceRef": "0da33530-22aa-4727-8093-7ce4022b70d4",
+      "koHtmlLen": 1803,
+      "enHtmlLen": 3271
+    },
+    {
+      "slug": "bromelain100-04",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "8790edd4c0bf60f8",
+      "T": 6,
+      "order": 704,
+      "sourceRef": "b7a8ec4c-53c0-45bd-8372-b2bb622be51f",
+      "koHtmlLen": 1991,
+      "enHtmlLen": 3621
+    },
+    {
+      "slug": "bromelain100-05",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "b7b1e0a3de91c870",
+      "T": 6,
+      "order": 705,
+      "sourceRef": "87cc752c-b33a-4d1f-82f0-02c32b57ad8a",
+      "koHtmlLen": 2085,
+      "enHtmlLen": 3843
+    },
+    {
+      "slug": "bromelain100-06",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "2707f06cd3d38cca",
+      "T": 5,
+      "order": 706,
+      "sourceRef": "85e51179-a1e9-4913-801b-22f9c2438634",
+      "koHtmlLen": 2067,
+      "enHtmlLen": 3794
+    },
+    {
+      "slug": "bromelain100-07",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "92387ab59d6162fe",
+      "T": 4,
+      "order": 707,
+      "sourceRef": "e7c76bf7-f270-4811-8089-f07ba29d0370",
+      "koHtmlLen": 2072,
+      "enHtmlLen": 3828
+    },
+    {
+      "slug": "bromelain100-08",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "b8e029ca6666d18b",
+      "T": 4,
+      "order": 708,
+      "sourceRef": "4009a317-edda-4d7f-8ed5-5b08c2e14316",
+      "koHtmlLen": 1857,
+      "enHtmlLen": 3318
+    },
+    {
+      "slug": "bromelain100-09",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "3a27571e44825e15",
+      "T": 3,
+      "order": 709,
+      "sourceRef": "debdce52-5730-40b9-8859-0b1f855dc76d",
+      "koHtmlLen": 1889,
+      "enHtmlLen": 3517
+    },
+    {
+      "slug": "bromelain100-10",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "de8724bd545b0bea",
+      "T": 3,
+      "order": 710,
+      "sourceRef": "9dbd62ed-4cb8-4532-8798-35f1e4b8f781",
+      "koHtmlLen": 2055,
+      "enHtmlLen": 3765
+    },
+    {
+      "slug": "bromelain100-11",
+      "groupKey": "브로멜라인|100밀리그램|정",
+      "safetyFp": "218ba7ff54ee4a8e",
+      "T": 2,
+      "order": 711,
+      "sourceRef": "4ae3abef-6b80-4b26-8ee5-aced89d67b14",
+      "koHtmlLen": 1919,
+      "enHtmlLen": 3479
+    },
+    {
+      "slug": "naproxen250cap-01",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "545163103c30adef",
+      "T": 7,
+      "order": 501,
+      "sourceRef": "5f999203-566b-42f9-8c8f-9ed7f9a295b0",
+      "koHtmlLen": 3620,
+      "enHtmlLen": 7043
+    },
+    {
+      "slug": "naproxen250cap-02",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "3b957785c21b4799",
+      "T": 6,
+      "order": 502,
+      "sourceRef": "d6ce0295-cef7-427e-8df5-d21baf7849af",
+      "koHtmlLen": 3978,
+      "enHtmlLen": 7804
+    },
+    {
+      "slug": "naproxen250cap-03",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "f8d59317189a91fa",
+      "T": 6,
+      "order": 503,
+      "sourceRef": "2165549e-8fc1-4fee-871c-d1a05bbf9792",
+      "koHtmlLen": 3901,
+      "enHtmlLen": 7649
+    },
+    {
+      "slug": "naproxen250cap-04",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "9548a69a51079527",
+      "T": 5,
+      "order": 504,
+      "sourceRef": "d041e192-08b2-4157-8fe2-94e03c7cf8dc",
+      "koHtmlLen": 3910,
+      "enHtmlLen": 7892
+    },
+    {
+      "slug": "naproxen250cap-05",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "03cadfae0442af56",
+      "T": 4,
+      "order": 505,
+      "sourceRef": "78f1442b-e425-493e-8ce0-65e954134fd7",
+      "koHtmlLen": 3881,
+      "enHtmlLen": 7589
+    },
+    {
+      "slug": "naproxen250cap-06",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "14df201139bad2be",
+      "T": 3,
+      "order": 506,
+      "sourceRef": "3f8cd156-1f93-4123-87cf-235a1306e533",
+      "koHtmlLen": 3321,
+      "enHtmlLen": 6701
+    },
+    {
+      "slug": "naproxen250cap-07",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "a66baf9a1882a2d7",
+      "T": 3,
+      "order": 507,
+      "sourceRef": "26a58150-015a-4ca5-81bf-a87c004e6055",
+      "koHtmlLen": 3893,
+      "enHtmlLen": 7774
+    },
+    {
+      "slug": "naproxen250cap-08",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "09738795aec0ddc1",
+      "T": 2,
+      "order": 508,
+      "sourceRef": "7c4895a4-1143-47dd-8941-bc83b2785376",
+      "koHtmlLen": 3890,
+      "enHtmlLen": 7613
+    },
+    {
+      "slug": "naproxen250cap-09",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "102ff4fb95600899",
+      "T": 2,
+      "order": 509,
+      "sourceRef": "1619078d-d878-4c8f-831b-eb150a0f30a8",
+      "koHtmlLen": 4383,
+      "enHtmlLen": 8392
+    },
+    {
+      "slug": "naproxen250cap-10",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "1e878c94dcead915",
+      "T": 2,
+      "order": 510,
+      "sourceRef": "6befd6a3-8f26-47dd-8f30-44f98c772dbd",
+      "koHtmlLen": 3890,
+      "enHtmlLen": 7613
+    },
+    {
+      "slug": "naproxen250cap-11",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "2716ede1a0f10b64",
+      "T": 2,
+      "order": 511,
+      "sourceRef": "131bbae4-deb2-4fdc-8dc6-27525d439fbc",
+      "koHtmlLen": 3914,
+      "enHtmlLen": 8093
+    },
+    {
+      "slug": "naproxen250cap-12",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "2c6f48170f7e7387",
+      "T": 2,
+      "order": 512,
+      "sourceRef": "9132b156-bde6-443f-8b62-c428353822b3",
+      "koHtmlLen": 3904,
+      "enHtmlLen": 7649
+    },
+    {
+      "slug": "naproxen250cap-13",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "4c29322aa1c0eea8",
+      "T": 2,
+      "order": 513,
+      "sourceRef": "add132b1-092d-421b-8504-49f41ac2f87a",
+      "koHtmlLen": 3988,
+      "enHtmlLen": 7779
+    },
+    {
+      "slug": "naproxen250cap-14",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "4c94fbc92efaafa3",
+      "T": 2,
+      "order": 514,
+      "sourceRef": "b945327c-a367-480a-85ad-15fa3ad8c045",
+      "koHtmlLen": 3893,
+      "enHtmlLen": 7613
+    },
+    {
+      "slug": "naproxen250cap-15",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "4e482d4a3f589405",
+      "T": 2,
+      "order": 515,
+      "sourceRef": "5d99e887-3c90-47ff-8013-9449c11fb010",
+      "koHtmlLen": 4152,
+      "enHtmlLen": 8433
+    },
+    {
+      "slug": "naproxen250cap-16",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "52af741225b42dd3",
+      "T": 2,
+      "order": 516,
+      "sourceRef": "6cc4a7b5-793c-4409-8859-8cf38e465357",
+      "koHtmlLen": 3892,
+      "enHtmlLen": 7589
+    },
+    {
+      "slug": "naproxen250cap-17",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "5ceb2bbf240077ec",
+      "T": 2,
+      "order": 517,
+      "sourceRef": "d166936b-b2f2-47fc-87ea-017dac7d730a",
+      "koHtmlLen": 4132,
+      "enHtmlLen": 8168
+    },
+    {
+      "slug": "naproxen250cap-18",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "60c38a87a203762f",
+      "T": 2,
+      "order": 518,
+      "sourceRef": "38bdedb1-82d6-4290-8cf1-e82603e9da98",
+      "koHtmlLen": 3901,
+      "enHtmlLen": 7649
+    },
+    {
+      "slug": "naproxen250cap-19",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "6913564359dd9622",
+      "T": 2,
+      "order": 519,
+      "sourceRef": "c5f559a6-8cad-42d4-80e2-81c8d4850848",
+      "koHtmlLen": 3929,
+      "enHtmlLen": 7717
+    },
+    {
+      "slug": "naproxen250cap-20",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "72a14d6982859f6b",
+      "T": 2,
+      "order": 520,
+      "sourceRef": "d5491e07-1ae2-4b31-8b11-0ee06548be15",
+      "koHtmlLen": 3908,
+      "enHtmlLen": 7651
+    },
+    {
+      "slug": "naproxen250cap-21",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "7f7c8cf6607907c7",
+      "T": 2,
+      "order": 521,
+      "sourceRef": "1a1ae6da-0fec-44bb-8863-3f4f899cd9c7",
+      "koHtmlLen": 3892,
+      "enHtmlLen": 7613
+    },
+    {
+      "slug": "naproxen250cap-22",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "8aa2226ed0aec378",
+      "T": 2,
+      "order": 522,
+      "sourceRef": "0f75b67c-4fa1-4310-85c9-4ee01adffddc",
+      "koHtmlLen": 3885,
+      "enHtmlLen": 7587
+    },
+    {
+      "slug": "naproxen250cap-23",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "8f2aaf630a3780d0",
+      "T": 2,
+      "order": 523,
+      "sourceRef": "48cee869-e180-4f39-89a1-02988e0886da",
+      "koHtmlLen": 3901,
+      "enHtmlLen": 7649
+    },
+    {
+      "slug": "naproxen250cap-24",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "c442636cfb7b54e7",
+      "T": 2,
+      "order": 524,
+      "sourceRef": "19fd0a6f-df1a-4ec8-8234-d7aba0f0e620",
+      "koHtmlLen": 3887,
+      "enHtmlLen": 7613
+    },
+    {
+      "slug": "naproxen250cap-25",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "ca251b28a836032b",
+      "T": 2,
+      "order": 525,
+      "sourceRef": "7b636a7d-4ba2-44ee-8a23-3db326d56d24",
+      "koHtmlLen": 3833,
+      "enHtmlLen": 7921
+    },
+    {
+      "slug": "naproxen250cap-26",
+      "groupKey": "나프록센|250밀리그램|연질캡슐",
+      "safetyFp": "e51de413362bc63e",
+      "T": 2,
+      "order": 526,
+      "sourceRef": "b8cc09ca-b040-414d-81c9-ce34c269cb47",
+      "koHtmlLen": 3892,
+      "enHtmlLen": 7628
+    },
+    {
+      "slug": "diosmin600-01",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "16163a9e441311fc",
+      "T": 6,
+      "order": 901,
+      "sourceRef": "73c55697-f156-4c20-817b-a5f70a28ff8d",
+      "koHtmlLen": 1876,
+      "enHtmlLen": 3392
+    },
+    {
+      "slug": "diosmin600-02",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "4626ec4963997004",
+      "T": 5,
+      "order": 902,
+      "sourceRef": "92838b2e-27a5-42e4-8d09-8c46cac39398",
+      "koHtmlLen": 1839,
+      "enHtmlLen": 3197
+    },
+    {
+      "slug": "diosmin600-03",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "e1e66c9bed3b5ab6",
+      "T": 5,
+      "order": 903,
+      "sourceRef": "85c906f1-6229-41c0-8ae3-1d649445ef66",
+      "koHtmlLen": 1944,
+      "enHtmlLen": 3525
+    },
+    {
+      "slug": "diosmin600-04",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "4e0cc3122c0618d0",
+      "T": 4,
+      "order": 904,
+      "sourceRef": "920c6cb5-9783-4898-8ee6-9a6a4e5a873b",
+      "koHtmlLen": 1994,
+      "enHtmlLen": 3670
+    },
+    {
+      "slug": "diosmin600-05",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "637fe405e55560c3",
+      "T": 4,
+      "order": 905,
+      "sourceRef": "8585b779-f45e-4e6c-8eb8-47e258a488dc",
+      "koHtmlLen": 1782,
+      "enHtmlLen": 3132
+    },
+    {
+      "slug": "diosmin600-06",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "6a72bdb2f01ab01e",
+      "T": 3,
+      "order": 906,
+      "sourceRef": "acad62a7-3c44-4a31-8f49-c03e5e6d99a3",
+      "koHtmlLen": 1786,
+      "enHtmlLen": 3109
+    },
+    {
+      "slug": "diosmin600-07",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "860a98c429235edc",
+      "T": 3,
+      "order": 907,
+      "sourceRef": "f119f0c0-f4f6-4dd3-8c34-061df84a9f27",
+      "koHtmlLen": 1789,
+      "enHtmlLen": 3116
+    },
+    {
+      "slug": "diosmin600-08",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "923c7a7ffab2bd83",
+      "T": 3,
+      "order": 908,
+      "sourceRef": "f3afd9d3-e216-4357-86d1-aca59b7f8e28",
+      "koHtmlLen": 1833,
+      "enHtmlLen": 3214
+    },
+    {
+      "slug": "diosmin600-09",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "b062737b9efd072f",
+      "T": 3,
+      "order": 909,
+      "sourceRef": "55fbd285-b9c7-4c62-8496-4a406986fae3",
+      "koHtmlLen": 1925,
+      "enHtmlLen": 3561
+    },
+    {
+      "slug": "diosmin600-10",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "b1b8d0d3a6b4714b",
+      "T": 3,
+      "order": 910,
+      "sourceRef": "dd374ef2-fe0d-470c-8aae-3849ea742bc7",
+      "koHtmlLen": 1801,
+      "enHtmlLen": 3175
+    },
+    {
+      "slug": "diosmin600-11",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "dba8fd2dd1679830",
+      "T": 3,
+      "order": 911,
+      "sourceRef": "089edd7c-a737-4bc3-878e-c4741c012fd3",
+      "koHtmlLen": 1856,
+      "enHtmlLen": 3253
+    },
+    {
+      "slug": "diosmin600-12",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "e047b476c7cd7808",
+      "T": 3,
+      "order": 912,
+      "sourceRef": "1764a641-0c4f-4fe6-807b-37ef5319ee76",
+      "koHtmlLen": 1831,
+      "enHtmlLen": 3178
+    },
+    {
+      "slug": "diosmin600-13",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "f111ec8fd295f45c",
+      "T": 3,
+      "order": 913,
+      "sourceRef": "09eed9d2-c386-472f-830d-8fd6d84bff03",
+      "koHtmlLen": 1803,
+      "enHtmlLen": 3189
+    },
+    {
+      "slug": "diosmin600-14",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "20380f76af10acb0",
+      "T": 2,
+      "order": 914,
+      "sourceRef": "1a92d062-de5a-422b-873b-54276c6f3685",
+      "koHtmlLen": 1824,
+      "enHtmlLen": 3206
+    },
+    {
+      "slug": "diosmin600-15",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "a4302c49e04ffe29",
+      "T": 2,
+      "order": 915,
+      "sourceRef": "ee3ab4df-643d-45a4-8e8a-fccac3c83983",
+      "koHtmlLen": 1916,
+      "enHtmlLen": 3481
+    },
+    {
+      "slug": "diosmin600-16",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "eb472c50ae10c57c",
+      "T": 2,
+      "order": 916,
+      "sourceRef": "cce86668-8b75-45a9-8d39-98b134c8932f",
+      "koHtmlLen": 1754,
+      "enHtmlLen": 3070
+    },
+    {
+      "slug": "diosmin600-17",
+      "groupKey": "디오스민|600밀리그램|정",
+      "safetyFp": "eccbf92b92e9c388",
+      "T": 2,
+      "order": 917,
+      "sourceRef": "138f6c79-f90b-462d-8026-7d703c16a8b6",
+      "koHtmlLen": 1804,
+      "enHtmlLen": 3177
+    },
+    {
+      "slug": "albendazole400-01",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "47e4e9a1b1083d15",
+      "T": 19,
+      "order": 1001,
+      "sourceRef": "253ef86d-f525-43c5-8e39-18cbeb168149",
+      "koHtmlLen": 2353,
+      "enHtmlLen": 4470
+    },
+    {
+      "slug": "albendazole400-02",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "7125caaa24b3ba47",
+      "T": 17,
+      "order": 1002,
+      "sourceRef": "61001e17-9cf0-4b53-8c9b-6569a4b9c1b8",
+      "koHtmlLen": 2237,
+      "enHtmlLen": 4210
+    },
+    {
+      "slug": "albendazole400-03",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "59fed3da13781bec",
+      "T": 4,
+      "order": 1003,
+      "sourceRef": "b9417816-fae6-4ca5-812f-b9a31565cd0b",
+      "koHtmlLen": 2353,
+      "enHtmlLen": 4470
+    },
+    {
+      "slug": "albendazole400-04",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "a4fb4068e6dc72db",
+      "T": 4,
+      "order": 1004,
+      "sourceRef": "28359983-b5c7-469c-82c5-55329305ff54",
+      "koHtmlLen": 2439,
+      "enHtmlLen": 4544
+    },
+    {
+      "slug": "albendazole400-05",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "d7bb88dddc8a79bb",
+      "T": 4,
+      "order": 1005,
+      "sourceRef": "54472e26-d6c0-4c00-8173-c03d3a287765",
+      "koHtmlLen": 2603,
+      "enHtmlLen": 4942
+    },
+    {
+      "slug": "albendazole400-06",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "091def188845f436",
+      "T": 3,
+      "order": 1006,
+      "sourceRef": "2e97c643-fb28-4707-8b3e-c5e830744b3b",
+      "koHtmlLen": 2563,
+      "enHtmlLen": 4839
+    },
+    {
+      "slug": "albendazole400-07",
+      "groupKey": "알벤다졸|400밀리그램|정",
+      "safetyFp": "45a8851ef2fb4518",
+      "T": 3,
+      "order": 1007,
+      "sourceRef": "6882db9f-cc9c-487e-8b27-a4bd6df1ef83",
+      "koHtmlLen": 2539,
+      "enHtmlLen": 4798
+    },
+    {
+      "slug": "trimebutine100-01",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "af2066c0db98aeca",
+      "T": 12,
+      "order": 801,
+      "sourceRef": "748bcf7b-b84e-4ae1-86b2-0fa73f5b393c",
+      "koHtmlLen": 2030,
+      "enHtmlLen": 3801
+    },
+    {
+      "slug": "trimebutine100-02",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "1a2ad900abab40b9",
+      "T": 11,
+      "order": 802,
+      "sourceRef": "bfacf487-4600-472e-8f7f-9c953315e087",
+      "koHtmlLen": 2038,
+      "enHtmlLen": 3913
+    },
+    {
+      "slug": "trimebutine100-03",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "99b588004fcd6ade",
+      "T": 9,
+      "order": 803,
+      "sourceRef": "7e5c7e7f-d4f6-47ee-8b1e-4401472c2820",
+      "koHtmlLen": 2001,
+      "enHtmlLen": 3800
+    },
+    {
+      "slug": "trimebutine100-04",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "281b10e3363694de",
+      "T": 7,
+      "order": 804,
+      "sourceRef": "952da7fe-c0d8-4e4d-8739-f3ff46b9e045",
+      "koHtmlLen": 2022,
+      "enHtmlLen": 3762
+    },
+    {
+      "slug": "trimebutine100-05",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "3f71194710f3e0c8",
+      "T": 4,
+      "order": 805,
+      "sourceRef": "1fffec0a-815d-4483-8ec8-8f3d24f6cfd6",
+      "koHtmlLen": 1932,
+      "enHtmlLen": 3578
+    },
+    {
+      "slug": "trimebutine100-06",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "67fc51d766697249",
+      "T": 4,
+      "order": 806,
+      "sourceRef": "e7126e14-84fd-4173-85e0-8015c9bb3ca3",
+      "koHtmlLen": 1914,
+      "enHtmlLen": 3603
+    },
+    {
+      "slug": "trimebutine100-07",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "bed768635945c599",
+      "T": 4,
+      "order": 807,
+      "sourceRef": "d0bab0f3-d5de-4349-89fc-d9b145a0ccb9",
+      "koHtmlLen": 1942,
+      "enHtmlLen": 3605
+    },
+    {
+      "slug": "trimebutine100-08",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "5ca435ce3ec4ec46",
+      "T": 3,
+      "order": 808,
+      "sourceRef": "daae38b0-e75e-4e4d-8596-a8bd9970ec21",
+      "koHtmlLen": 1960,
+      "enHtmlLen": 3703
+    },
+    {
+      "slug": "trimebutine100-09",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "ac1f2e474869c8cd",
+      "T": 3,
+      "order": 809,
+      "sourceRef": "16198a2b-1cd7-45e3-8eca-86e06aa085f4",
+      "koHtmlLen": 1949,
+      "enHtmlLen": 3658
+    },
+    {
+      "slug": "trimebutine100-10",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "5125c2bc55cc6dbc",
+      "T": 2,
+      "order": 810,
+      "sourceRef": "6ea0193b-6875-422d-8d5b-e30f7507e6e9",
+      "koHtmlLen": 1945,
+      "enHtmlLen": 3611
+    },
+    {
+      "slug": "trimebutine100-11",
+      "groupKey": "트리메부틴말레산염|100밀리그램|정",
+      "safetyFp": "8bc527f5f4cedbbd",
+      "T": 2,
+      "order": 811,
+      "sourceRef": "9ff7c261-e4a0-4e65-829f-4aa2bf898dc8",
+      "koHtmlLen": 1936,
+      "enHtmlLen": 3586
+    },
+    {
+      "slug": "ibuprofen200cap-01",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "64c19fe75542344d",
+      "T": 7,
+      "order": 1101,
+      "sourceRef": "c9323560-aace-48f2-8ba2-aa013e305790",
+      "koHtmlLen": 4057,
+      "enHtmlLen": 8622
+    },
+    {
+      "slug": "ibuprofen200cap-02",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "196954eec48a1d02",
+      "T": 4,
+      "order": 1102,
+      "sourceRef": "4b372b42-ab4c-483d-8386-ee9dd050f797",
+      "koHtmlLen": 3709,
+      "enHtmlLen": 7849
+    },
+    {
+      "slug": "ibuprofen200cap-03",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "76440b3214463e1a",
+      "T": 4,
+      "order": 1103,
+      "sourceRef": "21f6047b-a7cb-434a-872e-651798c973fb",
+      "koHtmlLen": 4345,
+      "enHtmlLen": 9277
+    },
+    {
+      "slug": "ibuprofen200cap-04",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "97c40df123d7f1ac",
+      "T": 4,
+      "order": 1104,
+      "sourceRef": "5ffcc9c0-163b-46d1-8095-194a7daf5d00",
+      "koHtmlLen": 4003,
+      "enHtmlLen": 8548
+    },
+    {
+      "slug": "ibuprofen200cap-05",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "cc561b40146f01e7",
+      "T": 4,
+      "order": 1105,
+      "sourceRef": "8c060b55-af1c-4db9-807a-945ac8e4088e",
+      "koHtmlLen": 3978,
+      "enHtmlLen": 8479
+    },
+    {
+      "slug": "ibuprofen200cap-06",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "ecb36a46ae9ace1e",
+      "T": 3,
+      "order": 1106,
+      "sourceRef": "e76f9581-8ca8-4550-8f65-07ed143f3156",
+      "koHtmlLen": 3832,
+      "enHtmlLen": 8163
+    },
+    {
+      "slug": "ibuprofen200cap-07",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "f750ee47cedde162",
+      "T": 3,
+      "order": 1107,
+      "sourceRef": "18d17070-efbc-4969-8bba-40a69bca7942",
+      "koHtmlLen": 4005,
+      "enHtmlLen": 8497
+    },
+    {
+      "slug": "ibuprofen200cap-08",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "28198b508f750d23",
+      "T": 2,
+      "order": 1108,
+      "sourceRef": "3acd9359-0031-404a-85e3-1cceb3949c61",
+      "koHtmlLen": 3996,
+      "enHtmlLen": 8476
+    },
+    {
+      "slug": "ibuprofen200cap-09",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "35359482a3d6c899",
+      "T": 2,
+      "order": 1109,
+      "sourceRef": "6d0d7e97-3ff1-4288-8d8d-c7c11a8e9075",
+      "koHtmlLen": 3685,
+      "enHtmlLen": 7796
+    },
+    {
+      "slug": "ibuprofen200cap-10",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "76496d408df9c431",
+      "T": 2,
+      "order": 1110,
+      "sourceRef": "dd3a39a5-f76e-430d-8647-630ce0db4dbf",
+      "koHtmlLen": 4276,
+      "enHtmlLen": 9012
+    },
+    {
+      "slug": "ibuprofen200cap-11",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "bf2861a48acefe21",
+      "T": 2,
+      "order": 1111,
+      "sourceRef": "16c7b54c-e663-4493-81fa-effe40727d91",
+      "koHtmlLen": 4076,
+      "enHtmlLen": 8686
+    },
+    {
+      "slug": "ibuprofen200cap-12",
+      "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+      "safetyFp": "f39434cf5fa44e53",
+      "T": 2,
+      "order": 1112,
+      "sourceRef": "0da807b4-9f24-45dd-8be5-b68859c02a3f",
+      "koHtmlLen": 4259,
+      "enHtmlLen": 8864
+    },
+    {
+      "slug": "bacillus250-01",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "93a8092acb495088",
+      "T": 6,
+      "order": 1201,
+      "sourceRef": "a548478d-7c52-4f5d-8148-75fa5b90940d",
+      "koHtmlLen": 1832,
+      "enHtmlLen": 3251
+    },
+    {
+      "slug": "bacillus250-02",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "e0d5debacf8eb9da",
+      "T": 6,
+      "order": 1202,
+      "sourceRef": "d32cafd4-0cdd-405b-8ab7-8eadd15d6df6",
+      "koHtmlLen": 1736,
+      "enHtmlLen": 3111
+    },
+    {
+      "slug": "bacillus250-03",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "3471b9745f0547a6",
+      "T": 5,
+      "order": 1203,
+      "sourceRef": "6ae9c9e0-f6e0-4115-8708-3cb781465bee",
+      "koHtmlLen": 1726,
+      "enHtmlLen": 3142
+    },
+    {
+      "slug": "bacillus250-04",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "82e6a6631ad58093",
+      "T": 5,
+      "order": 1204,
+      "sourceRef": "b47b5148-53ea-4aa8-86e3-908b5cefffd7",
+      "koHtmlLen": 1931,
+      "enHtmlLen": 3512
+    },
+    {
+      "slug": "bacillus250-05",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "c05e829ba770f222",
+      "T": 4,
+      "order": 1205,
+      "sourceRef": "6c00f873-5047-4eff-8eab-36039681432d",
+      "koHtmlLen": 1865,
+      "enHtmlLen": 3349
+    },
+    {
+      "slug": "bacillus250-06",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "7417584d39ed88fe",
+      "T": 3,
+      "order": 1206,
+      "sourceRef": "c728179d-c702-4d12-8da2-d0d48f4544b0",
+      "koHtmlLen": 1892,
+      "enHtmlLen": 3373
+    },
+    {
+      "slug": "bacillus250-07",
+      "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+      "safetyFp": "c85bbf2ad4e971d8",
+      "T": 3,
+      "order": 1207,
+      "sourceRef": "6392eb38-8765-4805-8a5e-8e97ee550218",
+      "koHtmlLen": 1904,
+      "enHtmlLen": 3406
+    },
+    {
+      "slug": "clonixin125-01",
+      "groupKey": "클로닉신리시네이트|125밀리그램|정",
+      "safetyFp": "620fa22b08df9b0d",
+      "T": 20,
+      "order": 1501,
+      "sourceRef": "3563da9c-b4c0-4e92-8a03-c14faf59b60e",
+      "koHtmlLen": 2384,
+      "enHtmlLen": 4528
+    },
+    {
+      "slug": "clonixin125-02",
+      "groupKey": "클로닉신리시네이트|125밀리그램|정",
+      "safetyFp": "7130bb560ab4f942",
+      "T": 5,
+      "order": 1502,
+      "sourceRef": "dc5741d6-bda5-448e-8b83-0ee8a52c6a23",
+      "koHtmlLen": 2714,
+      "enHtmlLen": 5165
+    },
+    {
+      "slug": "fexofenadine120-01",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "2f318ff7d7ad1095",
+      "T": 5,
+      "order": 1301,
+      "sourceRef": "fe84f261-847a-40a4-8648-91fd6c704fc8",
+      "koHtmlLen": 2083,
+      "enHtmlLen": 3675
+    },
+    {
+      "slug": "fexofenadine120-02",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "342888e0806a95c7",
+      "T": 5,
+      "order": 1302,
+      "sourceRef": "3c425976-8aa7-42b2-81ab-84ab0e0fb24d",
+      "koHtmlLen": 2077,
+      "enHtmlLen": 3706
+    },
+    {
+      "slug": "fexofenadine120-03",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "548624cb0959a55e",
+      "T": 5,
+      "order": 1303,
+      "sourceRef": "66519e2c-a8c7-43e5-8a31-006c70a916fb",
+      "koHtmlLen": 2096,
+      "enHtmlLen": 3695
+    },
+    {
+      "slug": "fexofenadine120-04",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "e5addac2c49668ad",
+      "T": 4,
+      "order": 1304,
+      "sourceRef": "75788d3e-e948-45c5-86ed-67f3d4a6c580",
+      "koHtmlLen": 2084,
+      "enHtmlLen": 3675
+    },
+    {
+      "slug": "fexofenadine120-05",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "d5df80b3da7acf6b",
+      "T": 3,
+      "order": 1305,
+      "sourceRef": "5577bbb2-e5ea-4a80-81a6-1eaf671ddd26",
+      "koHtmlLen": 2086,
+      "enHtmlLen": 3859
+    },
+    {
+      "slug": "fexofenadine120-06",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "e3b53055edb6cc22",
+      "T": 3,
+      "order": 1306,
+      "sourceRef": "e14b3144-2a02-49a2-8e8b-001acd480d5f",
+      "koHtmlLen": 2177,
+      "enHtmlLen": 3842
+    },
+    {
+      "slug": "fexofenadine120-07",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "1a04b4adf4bf56e0",
+      "T": 2,
+      "order": 1307,
+      "sourceRef": "4bbf5888-f53a-4d3a-8b7f-d501a372ae4c",
+      "koHtmlLen": 2177,
+      "enHtmlLen": 3822
+    },
+    {
+      "slug": "fexofenadine120-08",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "9e2531477eb37832",
+      "T": 2,
+      "order": 1308,
+      "sourceRef": "9f5dd223-44d3-4f93-8fdf-5c3ca396b3f2",
+      "koHtmlLen": 2018,
+      "enHtmlLen": 3650
+    },
+    {
+      "slug": "elcarnitine330-01",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "3df38abbfd9a3648",
+      "T": 4,
+      "order": 1701,
+      "sourceRef": "04be481e-97d7-4338-8a12-58b7580aeb20",
+      "koHtmlLen": 1825,
+      "enHtmlLen": 3268
+    },
+    {
+      "slug": "elcarnitine330-02a",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "d3f8f7f5b47946c7",
+      "T": 2,
+      "order": 1702,
+      "sourceRef": "48a98086-c1fd-493a-85da-22aad3a11b73",
+      "koHtmlLen": 1741,
+      "enHtmlLen": 3097
+    },
+    {
+      "slug": "elcarnitine330-02b",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "d3f8f7f5b47946c7",
+      "T": 2,
+      "order": 1702,
+      "sourceRef": "1d74023d-44fd-4d2a-84c9-3069d7c1b92a",
+      "koHtmlLen": 1741,
+      "enHtmlLen": 3097
+    },
+    {
+      "slug": "elcarnitine330-03",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "08f64eed21d54af3",
+      "T": 3,
+      "order": 1703,
+      "sourceRef": "9b872cd8-1b0c-460e-89ab-832979bcd7b3",
+      "koHtmlLen": 1761,
+      "enHtmlLen": 3146
+    },
+    {
+      "slug": "elcarnitine330-04",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "82d510a5e815d4c9",
+      "T": 3,
+      "order": 1704,
+      "sourceRef": "6254f1ca-3038-4678-8b5c-e8f02456c3ee",
+      "koHtmlLen": 1760,
+      "enHtmlLen": 3113
+    },
+    {
+      "slug": "elcarnitine330-05",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "2821131c54a0c2f8",
+      "T": 2,
+      "order": 1705,
+      "sourceRef": "e64f2dcc-f8db-47bf-8b66-64d405b82d66",
+      "koHtmlLen": 1751,
+      "enHtmlLen": 3151
+    },
+    {
+      "slug": "elcarnitine330-06",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "4024861707a8cf8a",
+      "T": 2,
+      "order": 1706,
+      "sourceRef": "b1e4db83-49d2-431a-898f-8a80c0f5f087",
+      "koHtmlLen": 1916,
+      "enHtmlLen": 3521
+    },
+    {
+      "slug": "elcarnitine330-07",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "4d5023f37607599e",
+      "T": 2,
+      "order": 1707,
+      "sourceRef": "b2b3fb8c-c868-4d81-816a-225010cd94c9",
+      "koHtmlLen": 1720,
+      "enHtmlLen": 3061
+    },
+    {
+      "slug": "elcarnitine330-08",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "a786b093c1216b1e",
+      "T": 2,
+      "order": 1708,
+      "sourceRef": "2964a1fa-6685-4b61-823d-c35b63de0d4b",
+      "koHtmlLen": 1929,
+      "enHtmlLen": 3517
+    },
+    {
+      "slug": "elcarnitine330-09",
+      "groupKey": "엘카르니틴|330밀리그램|정",
+      "safetyFp": "eff694cf1af78f44",
+      "T": 2,
+      "order": 1709,
+      "sourceRef": "fb09f627-8f02-4352-84bf-ab9d2e4693da",
+      "koHtmlLen": 1813,
+      "enHtmlLen": 3236
+    },
+    {
+      "slug": "ibuprofen400cap-01",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "5e2f26e21e181fdf",
+      "T": 4,
+      "order": 1601,
+      "sourceRef": "25d32744-17e5-4471-8fea-2811fe8a6b8f",
+      "koHtmlLen": 3902,
+      "enHtmlLen": 8282
+    },
+    {
+      "slug": "ibuprofen400cap-02",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "05ec893c634dfdfd",
+      "T": 2,
+      "order": 1602,
+      "sourceRef": "44b5d375-b73c-472f-88a5-c7a07ba98fde",
+      "koHtmlLen": 4061,
+      "enHtmlLen": 8645
+    },
+    {
+      "slug": "ibuprofen400cap-03",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "05f4850ed56be04d",
+      "T": 2,
+      "order": 1603,
+      "sourceRef": "8d494d51-38aa-4e2a-81df-0ab26c29c036",
+      "koHtmlLen": 3981,
+      "enHtmlLen": 8443
+    },
+    {
+      "slug": "ibuprofen400cap-04",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "15e0e5b630405162",
+      "T": 2,
+      "order": 1604,
+      "sourceRef": "4f1d3234-41d5-4918-8341-5d0d211314a8",
+      "koHtmlLen": 4281,
+      "enHtmlLen": 8817
+    },
+    {
+      "slug": "ibuprofen400cap-05",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "68d4ca1b48a76541",
+      "T": 2,
+      "order": 1605,
+      "sourceRef": "248b3583-3813-43aa-8812-fff8c19d27df",
+      "koHtmlLen": 4364,
+      "enHtmlLen": 9159
+    },
+    {
+      "slug": "ibuprofen400cap-06",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "879c0bd18cfaa3ff",
+      "T": 2,
+      "order": 1606,
+      "sourceRef": "3f9ff102-58ab-4052-8ad4-2199ed0fe031",
+      "koHtmlLen": 4024,
+      "enHtmlLen": 8571
+    },
+    {
+      "slug": "ibuprofen400cap-07",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "909bc35a7eef3638",
+      "T": 2,
+      "order": 1607,
+      "sourceRef": "466ead97-3475-48a2-8be6-e0ec6bb94c8b",
+      "koHtmlLen": 4074,
+      "enHtmlLen": 8728
+    },
+    {
+      "slug": "ibuprofen400cap-08",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "d9be0d0f5c773340",
+      "T": 2,
+      "order": 1608,
+      "sourceRef": "13bc78c4-21f2-4d4b-894e-ab4bb7142b3b",
+      "koHtmlLen": 3972,
+      "enHtmlLen": 8440
+    },
+    {
+      "slug": "ibuprofen400cap-09",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "da9b98ecc856c54f",
+      "T": 2,
+      "order": 1609,
+      "sourceRef": "2e65f59c-5a19-4f7f-8b86-0f9a69e404e2",
+      "koHtmlLen": 4135,
+      "enHtmlLen": 8671
+    },
+    {
+      "slug": "ibuprofen400cap-10",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "dd93b9215db9a863",
+      "T": 2,
+      "order": 1610,
+      "sourceRef": "65d26a61-6831-4b1b-853b-a0c9c11eee3e",
+      "koHtmlLen": 4340,
+      "enHtmlLen": 9149
+    },
+    {
+      "slug": "ibuprofen400cap-11",
+      "groupKey": "이부프로펜|400밀리그램|연질캡슐",
+      "safetyFp": "f97ef9ccfbc66b8b",
+      "T": 2,
+      "order": 1611,
+      "sourceRef": "ad1ed573-71d0-437c-87e9-da74f836073c",
+      "koHtmlLen": 4032,
+      "enHtmlLen": 8585
+    },
+    {
+      "slug": "cetirizine10cap-01",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "6331acb23a01df21",
+      "T": 3,
+      "order": 1901,
+      "sourceRef": "21e8b9f3-4008-4cae-845a-036f8f96542d",
+      "koHtmlLen": 2722,
+      "enHtmlLen": 5400
+    },
+    {
+      "slug": "cetirizine10cap-02",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "17c5d428eb158d4f",
+      "T": 2,
+      "order": 1902,
+      "sourceRef": "dcca6a51-199f-4cb6-8d48-2e4ee9cc9956",
+      "koHtmlLen": 2653,
+      "enHtmlLen": 5302
+    },
+    {
+      "slug": "cetirizine10cap-03",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "374205afe6cb9878",
+      "T": 2,
+      "order": 1903,
+      "sourceRef": "7e1ec4aa-499e-4a31-82af-a3d018ca3ef8",
+      "koHtmlLen": 2810,
+      "enHtmlLen": 5671
+    },
+    {
+      "slug": "cetirizine10cap-04",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "4680e03bc7c59233",
+      "T": 2,
+      "order": 1904,
+      "sourceRef": "a8522909-9ada-4219-88da-e57216d6de48",
+      "koHtmlLen": 2818,
+      "enHtmlLen": 5674
+    },
+    {
+      "slug": "cetirizine10cap-05",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "4bce0f1df379d467",
+      "T": 2,
+      "order": 1905,
+      "sourceRef": "84ecdedf-44d8-4f82-8469-c86ba5abf8b9",
+      "koHtmlLen": 2794,
+      "enHtmlLen": 5662
+    },
+    {
+      "slug": "cetirizine10cap-06",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "c9c500f119982e53",
+      "T": 2,
+      "order": 1906,
+      "sourceRef": "02f841dc-d115-4499-8a97-b5f1fc5b2039",
+      "koHtmlLen": 2773,
+      "enHtmlLen": 5539
+    },
+    {
+      "slug": "cetirizine10cap-07",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "ce05f0fb2b4616dd",
+      "T": 2,
+      "order": 1907,
+      "sourceRef": "2961aaac-8122-4e70-812c-b07f6944b775",
+      "koHtmlLen": 2804,
+      "enHtmlLen": 5657
+    },
+    {
+      "slug": "cetirizine10cap-08",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "d1d8f2ce00e772c8",
+      "T": 2,
+      "order": 1908,
+      "sourceRef": "c5860f5e-af59-4842-8866-8ead46bd8bb6",
+      "koHtmlLen": 2818,
+      "enHtmlLen": 5669
+    },
+    {
+      "slug": "cetirizine10cap-09",
+      "groupKey": "세티리진염산염|10밀리그램|연질캡슐",
+      "safetyFp": "d605689d5fd9ea3f",
+      "T": 2,
+      "order": 1909,
+      "sourceRef": "1e995eb3-079c-44e2-8d82-c0d0713d52e9",
+      "koHtmlLen": 2806,
+      "enHtmlLen": 5815
+    },
+    {
+      "slug": "alfacalcidol05cap-01",
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "safetyFp": "8903739732775906",
+      "T": 9,
+      "order": 2001,
+      "sourceRef": "b291a291-305c-44e3-8126-65e6cb29748f",
+      "koHtmlLen": 2971,
+      "enHtmlLen": 5834
+    },
+    {
+      "slug": "alfacalcidol05cap-02",
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "safetyFp": "5cb7d1aabe41cbde",
+      "T": 4,
+      "order": 2002,
+      "sourceRef": "d5b46e0c-15f1-4c1d-8da6-c2e56d5812da",
+      "koHtmlLen": 3261,
+      "enHtmlLen": 6407
+    },
+    {
+      "slug": "alfacalcidol05cap-03",
+      "groupKey": "알파칼시돌|0.5마이크로그램|연질캡슐",
+      "safetyFp": "93088a29cab5dd76",
+      "T": 4,
+      "order": 2003,
+      "sourceRef": "d40ab42a-8bb1-40d7-834d-eb6a61bb35ca",
+      "koHtmlLen": 3302,
+      "enHtmlLen": 6815
+    },
+    {
+      "slug": "trimebutine200-01",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "b443ac71a546e540",
+      "T": 9,
+      "order": 1401,
+      "sourceRef": "3f34aeb5-122b-4713-8f74-4dbfd6862d4d",
+      "koHtmlLen": 1932,
+      "enHtmlLen": 3701
+    },
+    {
+      "slug": "trimebutine200-02",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "e640d79278ee8fd7",
+      "T": 7,
+      "order": 1402,
+      "sourceRef": "194179a2-6336-4dfd-88c4-a75ba9d36e26",
+      "koHtmlLen": 2064,
+      "enHtmlLen": 3937
+    },
+    {
+      "slug": "trimebutine200-03",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "0ebc586c64f27985",
+      "T": 2,
+      "order": 1403,
+      "sourceRef": "94441a3b-a793-4e40-8ac5-cd6f6c686adb",
+      "koHtmlLen": 2089,
+      "enHtmlLen": 3900
+    },
+    {
+      "slug": "trimebutine200-04",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "18464f4d5a4bbcb3",
+      "T": 2,
+      "order": 1404,
+      "sourceRef": "c62d4b02-7f89-49e3-8ee4-dbc35bc7fc70",
+      "koHtmlLen": 2013,
+      "enHtmlLen": 3728
+    },
+    {
+      "slug": "trimebutine200-05",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "cf7f3536eceddcda",
+      "T": 2,
+      "order": 1405,
+      "sourceRef": "e9963718-e422-4d76-8936-86d12dc42d06",
+      "koHtmlLen": 2060,
+      "enHtmlLen": 3824
+    },
+    {
+      "slug": "trimebutine200-06",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "da200d65248ea621",
+      "T": 2,
+      "order": 1406,
+      "sourceRef": "c607066b-588b-4646-8ced-dc885a993c8d",
+      "koHtmlLen": 2031,
+      "enHtmlLen": 3810
+    },
+    {
+      "slug": "trimebutine200-07",
+      "groupKey": "트리메부틴말레산염|200밀리그램|정",
+      "safetyFp": "dfa414b1530f12ce",
+      "T": 2,
+      "order": 1407,
+      "sourceRef": "91bc53c5-f109-46a4-87ab-f57ada7291c6",
+      "koHtmlLen": 2098,
+      "enHtmlLen": 3861
+    },
+    {
+      "slug": "trimebutine150-01",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "784980c038ffc622",
+      "T": 6,
+      "order": 1801,
+      "sourceRef": "a16ec5b9-4839-49b1-8443-6358f22bb906",
+      "koHtmlLen": 2051,
+      "enHtmlLen": 3865
+    },
+    {
+      "slug": "trimebutine150-02",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "8c8385e0c3079451",
+      "T": 4,
+      "order": 1802,
+      "sourceRef": "1d26a630-6b6e-4753-8a03-5ae3e44946c2",
+      "koHtmlLen": 2036,
+      "enHtmlLen": 3836
+    },
+    {
+      "slug": "trimebutine150-03",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "8d85dd31bcbeebdf",
+      "T": 3,
+      "order": 1803,
+      "sourceRef": "c6a2cce9-fdd3-4c95-80b4-bbe2a3b50b84",
+      "koHtmlLen": 2058,
+      "enHtmlLen": 3804
+    },
+    {
+      "slug": "trimebutine150-04",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "a4e50e4a207f33a3",
+      "T": 3,
+      "order": 1804,
+      "sourceRef": "ac06529b-5d71-4089-82c2-efb8832200fb",
+      "koHtmlLen": 1985,
+      "enHtmlLen": 3675
+    },
+    {
+      "slug": "trimebutine150-05",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "c8cf0baeeb8a32fc",
+      "T": 3,
+      "order": 1805,
+      "sourceRef": "84122189-3d3c-424d-8c64-9a285871e56c",
+      "koHtmlLen": 2056,
+      "enHtmlLen": 3803
+    },
+    {
+      "slug": "trimebutine150-06",
+      "groupKey": "트리메부틴말레산염|150밀리그램|정",
+      "safetyFp": "12342b0fa4c03b0e",
+      "T": 2,
+      "order": 1806,
+      "sourceRef": "2aab6fcf-ebec-4302-8f0e-d0f93dbeda5c",
+      "koHtmlLen": 1978,
+      "enHtmlLen": 3663
+    },
+    {
+      "slug": "loperamide2-01",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "safetyFp": "902fc5b5319ed454",
+      "T": 5,
+      "order": 2201,
+      "sourceRef": "a1c3448c-ae24-43ec-86f7-0c2baeee5574",
+      "koHtmlLen": 2921,
+      "enHtmlLen": 5437
+    },
+    {
+      "slug": "loperamide2-02",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "safetyFp": "5d7a59e846cfaee1",
+      "T": 3,
+      "order": 2202,
+      "sourceRef": "dba0a52e-ec83-40ab-88c8-b8fea6b587ca",
+      "koHtmlLen": 2661,
+      "enHtmlLen": 4874
+    },
+    {
+      "slug": "loperamide2-03",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "safetyFp": "4df80852910a6b4e",
+      "T": 2,
+      "order": 2203,
+      "sourceRef": "7c59fc04-2933-409b-831b-3fa28d2be430",
+      "koHtmlLen": 2736,
+      "enHtmlLen": 5182
+    },
+    {
+      "slug": "loperamide2-04",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "safetyFp": "7e6593d7633cb83f",
+      "T": 2,
+      "order": 2204,
+      "sourceRef": "49957ddc-4d0b-4788-8530-25b1a48f5740",
+      "koHtmlLen": 2689,
+      "enHtmlLen": 5056
+    },
+    {
+      "slug": "loperamide2-05",
+      "groupKey": "로페라미드염산염|2밀리그램|캡슐",
+      "safetyFp": "9c4d176d83c65b39",
+      "T": 2,
+      "order": 2205,
+      "sourceRef": "da7f0f72-3af7-43d4-83f5-51ae18d4e219",
+      "koHtmlLen": 2644,
+      "enHtmlLen": 4861
+    },
+    {
+      "slug": "nifuroxazide200-01",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "11ec34143e1eddb8",
+      "T": 6,
+      "order": 2501,
+      "sourceRef": "0a089635-a377-4cc1-88a9-0dc228473b88",
+      "koHtmlLen": 1903,
+      "enHtmlLen": 3380
+    },
+    {
+      "slug": "nifuroxazide200-02",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "a1b42d0bd4cc9c57",
+      "T": 4,
+      "order": 2502,
+      "sourceRef": "38d8dcc6-7407-4098-8fdc-5aa452075e13",
+      "koHtmlLen": 1972,
+      "enHtmlLen": 3553
+    },
+    {
+      "slug": "nifuroxazide200-03",
+      "groupKey": "니푸록사지드|200밀리그램|캡슐",
+      "safetyFp": "4130f92476145435",
+      "T": 2,
+      "order": 2503,
+      "sourceRef": "9c469c71-3502-41de-886a-df51121c0a9e",
+      "koHtmlLen": 1960,
+      "enHtmlLen": 3453
+    },
+    {
+      "slug": "doxylamine25-01",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "7ec149cc8167314a",
+      "T": 3,
+      "order": 2101,
+      "sourceRef": "65c899b7-cfef-4ccf-8f80-2f64b525771c",
+      "koHtmlLen": 1889,
+      "enHtmlLen": 3439
+    },
+    {
+      "slug": "doxylamine25-02",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "8a718888234358c9",
+      "T": 3,
+      "order": 2102,
+      "sourceRef": "4667b677-6cf9-4beb-83b0-99b17a527b15",
+      "koHtmlLen": 1816,
+      "enHtmlLen": 3287
+    },
+    {
+      "slug": "doxylamine25-03",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "bfd9db19c6c0783d",
+      "T": 2,
+      "order": 2103,
+      "sourceRef": "5e5bc515-f6e6-4137-8877-f84248d63b02",
+      "koHtmlLen": 2190,
+      "enHtmlLen": 3984
+    },
+    {
+      "slug": "doxylamine25-04",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "c0737c7fea122f08",
+      "T": 2,
+      "order": 2104,
+      "sourceRef": "f87f4f67-68bd-4369-8a33-adf3a7c8566e",
+      "koHtmlLen": 1894,
+      "enHtmlLen": 3441
+    },
+    {
+      "slug": "doxylamine25-05",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "ea59632321c2907a",
+      "T": 2,
+      "order": 2105,
+      "sourceRef": "b839207f-ae57-4046-86f0-430f9d94eabb",
+      "koHtmlLen": 1969,
+      "enHtmlLen": 3446
+    },
+    {
+      "slug": "doxylamine25-06",
+      "groupKey": "독시라민숙신산염|25밀리그램|정",
+      "safetyFp": "f3188bf094f2c158",
+      "T": 2,
+      "order": 2106,
+      "sourceRef": "8a091583-006b-4316-8bad-5d76ef9054be",
+      "koHtmlLen": 2008,
+      "enHtmlLen": 3505
+    },
+    {
+      "slug": "sodbicarbonate500-01",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "safetyFp": "a9081cef1848822a",
+      "T": 3,
+      "order": 2701,
+      "sourceRef": "37584388-4604-4131-8cd0-750d53e68652",
+      "koHtmlLen": 2075,
+      "enHtmlLen": 3952
+    },
+    {
+      "slug": "sodbicarbonate500-02",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "safetyFp": "a9499ae312376500",
+      "T": 3,
+      "order": 2702,
+      "sourceRef": "602598c3-c833-4915-85c1-975402d80323",
+      "koHtmlLen": 2092,
+      "enHtmlLen": 4075
+    },
+    {
+      "slug": "sodbicarbonate500-03",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "safetyFp": "dd3c6bc39630fb21",
+      "T": 3,
+      "order": 2703,
+      "sourceRef": "a855a114-f7d2-42a9-8592-d3447f335e61",
+      "koHtmlLen": 2043,
+      "enHtmlLen": 4019
+    },
+    {
+      "slug": "sodbicarbonate500-04",
+      "groupKey": "탄산수소나트륨|500밀리그램|정",
+      "safetyFp": "0951fd7c4948a015",
+      "T": 2,
+      "order": 2704,
+      "sourceRef": "230e4850-e00e-4328-8974-bc00fd11268a",
+      "koHtmlLen": 2125,
+      "enHtmlLen": 4005
+    },
+    {
+      "slug": "diphenhydramine50cap-01",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "safetyFp": "4278b391441ef68a",
+      "T": 3,
+      "order": 2601,
+      "sourceRef": "d4d39db0-33a5-46d5-8007-b8d10522f808",
+      "koHtmlLen": 2424,
+      "enHtmlLen": 4605
+    },
+    {
+      "slug": "diphenhydramine50cap-02",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "safetyFp": "65130d5d7ee91d9f",
+      "T": 2,
+      "order": 2602,
+      "sourceRef": "7aa96de8-da2f-48e0-8099-8cce3f10e230",
+      "koHtmlLen": 2490,
+      "enHtmlLen": 4548
+    },
+    {
+      "slug": "diphenhydramine50cap-03",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "safetyFp": "6e04e11a1101cd59",
+      "T": 2,
+      "order": 2603,
+      "sourceRef": "d000b3db-c904-4b89-8c50-8c3a43e4742b",
+      "koHtmlLen": 2390,
+      "enHtmlLen": 4512
+    },
+    {
+      "slug": "diphenhydramine50cap-04",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "safetyFp": "c32bbfd9d9a4671b",
+      "T": 2,
+      "order": 2604,
+      "sourceRef": "2ca32396-7a47-4927-8e54-6e9ba70a8bdb",
+      "koHtmlLen": 2323,
+      "enHtmlLen": 4358
+    },
+    {
+      "slug": "diphenhydramine50cap-05",
+      "groupKey": "디펜히드라민염산염|50밀리그램|연질캡슐",
+      "safetyFp": "edef21809453a469",
+      "T": 2,
+      "order": 2605,
+      "sourceRef": "ce5f1beb-ef17-416e-8174-13405d4c834c",
+      "koHtmlLen": 2363,
+      "enHtmlLen": 4462
+    },
+    {
+      "slug": "dexpanthenol100-01",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "safetyFp": "3ec5588b0b973a66",
+      "T": 4,
+      "order": 2401,
+      "sourceRef": "308f0308-c18c-49f3-80b3-11aba49ab3a9",
+      "koHtmlLen": 1929,
+      "enHtmlLen": 3316
+    },
+    {
+      "slug": "dexpanthenol100-02",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "safetyFp": "e92e8182e7776ef8",
+      "T": 4,
+      "order": 2402,
+      "sourceRef": "25e09473-8354-4071-861b-4390685af07a",
+      "koHtmlLen": 1809,
+      "enHtmlLen": 3097
+    },
+    {
+      "slug": "dexpanthenol100-03",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "safetyFp": "fb0ac3a481ef17ac",
+      "T": 2,
+      "order": 2403,
+      "sourceRef": "ed20f79b-4c31-4bd9-8020-ce15d60cac52",
+      "koHtmlLen": 1868,
+      "enHtmlLen": 3206
+    },
+    {
+      "slug": "dexpanthenol100-04",
+      "groupKey": "덱스판테놀|100밀리그램|정",
+      "safetyFp": "ffb834acdb5524bc",
+      "T": 2,
+      "order": 2404,
+      "sourceRef": "93aac7b4-584d-488a-8e03-de563f59dbb9",
+      "koHtmlLen": 1933,
+      "enHtmlLen": 3316
+    },
+    {
+      "slug": "folicacid1-01",
+      "groupKey": "폴산|1밀리그램|정",
+      "safetyFp": "7e5234e792e81243",
+      "T": 7,
+      "order": 2801,
+      "sourceRef": "fbdaf243-8505-4bd5-8631-e7429d16a887",
+      "koHtmlLen": 2488,
+      "enHtmlLen": 4882
+    },
+    {
+      "slug": "folicacid1-02",
+      "groupKey": "폴산|1밀리그램|정",
+      "safetyFp": "43e8a2a2600c6ff5",
+      "T": 2,
+      "order": 2802,
+      "sourceRef": "5022fa8d-77e7-4d26-8ad4-a5b85bf2fe6c",
+      "koHtmlLen": 2508,
+      "enHtmlLen": 4889
+    },
+    {
       "slug": "ibuprofen200tab-01",
       "groupKey": "이부프로펜|200밀리그램|정",
       "safetyFp": "c0ac6b9b3ba47923",
@@ -21,13 +2531,293 @@
       "sourceRef": "136490e7-fee0-4a85-855f-1c92d11a044e",
       "koHtmlLen": 3749,
       "enHtmlLen": 8007
+    },
+    {
+      "slug": "bromelain45-01",
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "safetyFp": "65b33fe7a3c53846",
+      "T": 5,
+      "order": 3201,
+      "sourceRef": "d8551bbb-e48b-4b8f-832b-68c05cc08944",
+      "koHtmlLen": 1975,
+      "enHtmlLen": 3744
+    },
+    {
+      "slug": "bromelain45-02",
+      "groupKey": "브로멜라인|45밀리그램|정",
+      "safetyFp": "256d28d631b618df",
+      "T": 3,
+      "order": 3202,
+      "sourceRef": "c5813654-7e62-46f4-8f71-e0a7d097645c",
+      "koHtmlLen": 2010,
+      "enHtmlLen": 3841
+    },
+    {
+      "slug": "citrulline500-01",
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "safetyFp": "441cd9beb089844e",
+      "T": 4,
+      "order": 3101,
+      "sourceRef": "cf35e486-6273-4c28-8200-2ee7627866c8",
+      "koHtmlLen": 1677,
+      "enHtmlLen": 2903
+    },
+    {
+      "slug": "citrulline500-02",
+      "groupKey": "시트룰린말산염|500밀리그램|정",
+      "safetyFp": "e918af0820f86722",
+      "T": 4,
+      "order": 3102,
+      "sourceRef": "fd549fd2-ebd5-466c-88df-7f1f23b586cf",
+      "koHtmlLen": 1728,
+      "enHtmlLen": 3082
+    },
+    {
+      "slug": "biotin5-01",
+      "groupKey": "비오틴|5밀리그램|정",
+      "safetyFp": "b3a62e7e17e88136",
+      "T": 6,
+      "order": 2301,
+      "sourceRef": "b49f79af-72c1-415a-80cb-4aed8522e302",
+      "koHtmlLen": 1850,
+      "enHtmlLen": 3122
+    },
+    {
+      "slug": "biotin5-02",
+      "groupKey": "비오틴|5밀리그램|정",
+      "safetyFp": "4990184c8433cb34",
+      "T": 3,
+      "order": 2302,
+      "sourceRef": "9ed65848-6b23-4078-892b-2ddbd8dc6138",
+      "koHtmlLen": 1821,
+      "enHtmlLen": 3071
+    },
+    {
+      "slug": "biotin5-03",
+      "groupKey": "비오틴|5밀리그램|정",
+      "safetyFp": "054c3b34b5613318",
+      "T": 2,
+      "order": 2303,
+      "sourceRef": "1fb9bcb1-dd5b-47a8-8dc9-fda3bd66edfc",
+      "koHtmlLen": 1785,
+      "enHtmlLen": 3117
+    },
+    {
+      "slug": "biotin5-04",
+      "groupKey": "비오틴|5밀리그램|정",
+      "safetyFp": "36578a22ae4ae32c",
+      "T": 2,
+      "order": 2304,
+      "sourceRef": "23888980-33a5-4a30-8d3d-d1e98e4a9260",
+      "koHtmlLen": 1853,
+      "enHtmlLen": 3122
+    },
+    {
+      "slug": "acetaminophen325cap-01",
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "safetyFp": "4c4041035190746b",
+      "T": 2,
+      "order": 3401,
+      "sourceRef": "bc34b3f2-2d28-4fb0-89c6-61a8d83a7491",
+      "koHtmlLen": 2427,
+      "enHtmlLen": 4672
+    },
+    {
+      "slug": "acetaminophen325cap-02",
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "safetyFp": "73bae0990d1e7e37",
+      "T": 2,
+      "order": 3402,
+      "sourceRef": "a8dbb1e4-2617-4fe5-8ee7-5fc337adcc34",
+      "koHtmlLen": 2860,
+      "enHtmlLen": 5551
+    },
+    {
+      "slug": "acetaminophen325cap-03",
+      "groupKey": "아세트아미노펜|325밀리그램|연질캡슐",
+      "safetyFp": "759b9308b924f1ff",
+      "T": 2,
+      "order": 3403,
+      "sourceRef": "d462b426-b43c-4f81-8528-4cca70dde5de",
+      "koHtmlLen": 2845,
+      "enHtmlLen": 5556
+    },
+    {
+      "slug": "ironpolysaccharide326-01",
+      "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+      "safetyFp": "5a38772b0e1c4588",
+      "T": 3,
+      "order": 3501,
+      "sourceRef": "92b2cb43-c300-484b-88cc-8f13952ba328",
+      "koHtmlLen": 2388,
+      "enHtmlLen": 4705
+    },
+    {
+      "slug": "ironpolysaccharide326-02",
+      "groupKey": "폴리사카리드철착염|326.1밀리그램|캡슐",
+      "safetyFp": "eab21e27eeee88a0",
+      "T": 2,
+      "order": 3502,
+      "sourceRef": "d2c7c570-a6b7-4c6b-80be-2351ad89a6ad",
+      "koHtmlLen": 2328,
+      "enHtmlLen": 4483
+    },
+    {
+      "slug": "erdosteine300-01",
+      "groupKey": "에르도스테인|300밀리그램|정",
+      "safetyFp": "ed0b9e1c34407e10",
+      "T": 4,
+      "order": 3801,
+      "sourceRef": "7638593b-9304-482a-84a0-fb3000ba25a5",
+      "koHtmlLen": 1807,
+      "enHtmlLen": 3180
+    },
+    {
+      "slug": "alfacalcidol1cap-01",
+      "groupKey": "알파칼시돌|1마이크로그램|연질캡슐",
+      "safetyFp": "db1eb6591019b19d",
+      "T": 4,
+      "order": 3901,
+      "sourceRef": "53090b3f-4175-46d9-8121-23c93ff0828c",
+      "koHtmlLen": 3287,
+      "enHtmlLen": 6780
+    },
+    {
+      "slug": "ginkgo80-01",
+      "groupKey": "은행엽건조엑스|80밀리그램|정",
+      "safetyFp": "5125c0035aff0e88",
+      "T": 4,
+      "order": 3701,
+      "sourceRef": "9f14255d-19b5-429b-883f-bbfd3fdba548",
+      "koHtmlLen": 2330,
+      "enHtmlLen": 4528
+    },
+    {
+      "slug": "saccharomyces282cap-01",
+      "groupKey": "사카로마이세스보울라르디균|282.5밀리그램|캡슐",
+      "safetyFp": "e57b3f957bcd72de",
+      "T": 4,
+      "order": 4001,
+      "sourceRef": "709d5a5b-6c9f-4c65-8a11-6ed682ca2c0f",
+      "koHtmlLen": 2114,
+      "enHtmlLen": 3894
+    },
+    {
+      "slug": "lcystine500cap-01",
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "safetyFp": "0d6f587265a0924b",
+      "T": 2,
+      "order": 3601,
+      "sourceRef": "1c3240f5-7720-410a-8f08-c902c122a58e",
+      "koHtmlLen": 2140,
+      "enHtmlLen": 3944
+    },
+    {
+      "slug": "lcystine500cap-02",
+      "groupKey": "L-시스틴|500밀리그램|연질캡슐",
+      "safetyFp": "e9a23526e985be52",
+      "T": 2,
+      "order": 3602,
+      "sourceRef": "7397c1ab-ffad-4388-85ea-0770675f2d83",
+      "koHtmlLen": 2030,
+      "enHtmlLen": 3682
+    },
+    {
+      "slug": "nizatidine75-01",
+      "groupKey": "니자티딘|75밀리그램|정",
+      "safetyFp": "4c4aebadf5222d98",
+      "T": 3,
+      "order": 4401,
+      "sourceRef": "a818c80e-145e-4f33-8f23-e47dad69b4ff",
+      "koHtmlLen": 2654,
+      "enHtmlLen": 5103
+    },
+    {
+      "slug": "grapeleaf180cap-01",
+      "groupKey": "포도엽건조엑스|180밀리그램|캡슐",
+      "safetyFp": "c518c91e1f0d2fcc",
+      "T": 3,
+      "order": 4201,
+      "sourceRef": "bae074f4-6fe6-4f54-803e-1cfe20e40b7b",
+      "koHtmlLen": 1969,
+      "enHtmlLen": 3572
+    },
+    {
+      "slug": "loratadine10-01",
+      "groupKey": "로라타딘|10밀리그램|정",
+      "safetyFp": "cb637d38e753aecb",
+      "T": 3,
+      "order": 4301,
+      "sourceRef": "6dfaf339-0f21-439e-8a77-30e2ed1691ca",
+      "koHtmlLen": 2084,
+      "enHtmlLen": 3622
+    },
+    {
+      "slug": "flubendazole500-01",
+      "groupKey": "플루벤다졸|500밀리그램|정",
+      "safetyFp": "eea353c3969009e9",
+      "T": 3,
+      "order": 4101,
+      "sourceRef": "952be2aa-2634-478c-836b-fe516e6fc587",
+      "koHtmlLen": 1724,
+      "enHtmlLen": 3032
+    },
+    {
+      "slug": "diosmin300cap-01",
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "safetyFp": "f0a444e291562f70",
+      "T": 4,
+      "order": 3301,
+      "sourceRef": "646a5744-a36d-42b1-85c0-9837845df218",
+      "koHtmlLen": 1886,
+      "enHtmlLen": 3322
+    },
+    {
+      "slug": "diosmin300cap-02",
+      "groupKey": "디오스민|300밀리그램|캡슐",
+      "safetyFp": "54cfe21fa45efdd0",
+      "T": 3,
+      "order": 3302,
+      "sourceRef": "62de67cc-9d73-4d07-8f1d-0d3d2abecf41",
+      "koHtmlLen": 1849,
+      "enHtmlLen": 3297
+    },
+    {
+      "slug": "acetylcysteine100-01",
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "safetyFp": "33b55f591ed7eedf",
+      "T": 6,
+      "order": 3001,
+      "sourceRef": "1e0276fd-2a44-4ed7-8b93-f6a4c11c3e08",
+      "koHtmlLen": 2181,
+      "enHtmlLen": 3989
+    },
+    {
+      "slug": "acetylcysteine100-02",
+      "groupKey": "아세틸시스테인|100밀리그램|캡슐",
+      "safetyFp": "3d6ebf97a706f7eb",
+      "T": 3,
+      "order": 3002,
+      "sourceRef": "60a30c35-1494-482a-8bc3-8f2c5e1dc330",
+      "koHtmlLen": 2076,
+      "enHtmlLen": 3750
+    },
+    {
+      "slug": "clonixin125cap-01",
+      "groupKey": "클로닉신리시네이트|125밀리그램|연질캡슐",
+      "safetyFp": "3d9107371f67f30b",
+      "T": 2,
+      "order": 4501,
+      "sourceRef": "cb765371-1e43-417e-8a66-4adc8ca37699",
+      "koHtmlLen": 2573,
+      "enHtmlLen": 4913
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 2,
-    "builtMasters": 9,
+    "builtFiles": 281,
+    "builtMasters": 1080,
     "holds": 0,
     "missingTm": 0
   }

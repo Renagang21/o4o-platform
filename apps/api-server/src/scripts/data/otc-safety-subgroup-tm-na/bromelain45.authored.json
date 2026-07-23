@@ -1,0 +1,27 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 브로멜라인 45mg 정 그룹 TM 저작(8줄, 2 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "브로멜라인|45밀리그램|정",
+  "meta": {
+    "titleKo": "브로멜라인 45mg 정 (소염 효소제)",
+    "titleEn": "Bromelain 45 mg Tablets (Anti-inflammatory Enzyme Medicine)",
+    "ingKo": "브로멜라인 45밀리그램",
+    "ingEn": "Bromelain 45 mg",
+    "actionKo": "파인애플 유래 단백분해효소로 염증과 부기(부종) 완화에 쓰는 소염 효소제입니다.",
+    "actionEn": "An anti-inflammatory enzyme medicine derived from pineapple, a proteolytic enzyme used to relieve inflammation and swelling (edema)."
+  },
+  "effSummaries": {},
+  "cauSummaries": {
+    "240cd0e6": { "watchKo": "심한 혈액응고이상(혈우병 등), 심한 간·신질환(혈액투석 등), 임부·수유부, 12세 미만 소아, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with severe blood clotting disorders (such as hemophilia), severe liver or kidney disease (such as hemodialysis patients), in pregnancy or breastfeeding, in children under 12, or with hereditary problems such as galactose intolerance" },
+    "273abddc": { "watchKo": "심한 혈액응고이상(혈우병 등), 심한 간·신질환(혈액투석 등), 항응고제·혈소판응집억제제 투여 중, 임부·수유부, 12세 미만 소아, 갈락토오스 불내성 등 유전적 문제 환자 복용 금지", "watchEn": "Do not use with severe blood clotting disorders (such as hemophilia), severe liver or kidney disease (such as hemodialysis patients), while on anticoagulants or platelet aggregation inhibitors, in pregnancy or breastfeeding, in children under 12, or with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "9860663f": "Do not take this medicine together with anticoagulants or platelet aggregation inhibitors.",
+    "240cd0e6": "Do not take this medicine if you have severe blood clotting disorders (for example, hemophilia), severe liver disease or severe kidney disease (such as hemodialysis patients), are pregnant or breastfeeding, are a child under 12 years of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "273abddc": "Do not take this medicine if you have severe blood clotting disorders (such as hemophilia), severe liver disease or severe kidney disease (such as hemodialysis patients), are taking anticoagulants or platelet aggregation inhibitors, are pregnant or breastfeeding, are a child under 12 years of age, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "36fd360d": "Consult a doctor or pharmacist when taking this medicine together with antibiotics (such as tetracycline).",
+    "58ec0d6d": "Children 12 years and older and adults take 1 to 2 tablets (45 to 90 mg) per dose, 3 times a day, 30 minutes before meals, with water.",
+    "9fbff81b": "Much about how this medicine works in the body has not yet been clarified, and its dose-effect relationship has not been established, so do not take it without a clear purpose.",
+    "c4246cdd": "Adults and children 12 years and older take 1 to 2 tablets (45 to 90 mg) per dose, 3 times a day, 30 minutes before meals, with water.",
+    "e6a75e40": "Consult a doctor or pharmacist when taking this medicine together with antibiotics (such as tetracycline)."
+  }
+}

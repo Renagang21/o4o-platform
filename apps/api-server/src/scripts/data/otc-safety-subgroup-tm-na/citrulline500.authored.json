@@ -1,0 +1,31 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 시트룰린말산염 500mg 정 그룹 TM 저작(10줄, 2 subgroup). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "시트룰린말산염|500밀리그램|정",
+  "meta": {
+    "titleKo": "시트룰린말산염 500mg 정 (기능 무력증 보조치료제)",
+    "titleEn": "Citrulline Malate 500 mg Tablets (Adjuvant Medicine for Functional Asthenia)",
+    "ingKo": "시트룰린말산염 500밀리그램",
+    "ingEn": "Citrulline malate 500 mg",
+    "actionKo": "기능 무력증(무력감·피로 상태)의 보조치료에 사용하는 약입니다.",
+    "actionEn": "A medicine used as adjuvant treatment for functional asthenia (weakness and fatigue states)."
+  },
+  "effSummaries": {
+    "640406a5": { "symKo": "기능 무력증의 보조치료", "symEn": "Adjuvant treatment of functional asthenia", "pointKo": "기능 무력증의 보조치료에 쓰는 약입니다.", "pointEn": "A medicine for adjuvant treatment of functional asthenia." }
+  },
+  "cauSummaries": {
+    "92d656b1": { "watchKo": "6세 미만 유아 복용 금지", "watchEn": "Infants under 6 years of age must not take this medicine" },
+    "c95181b4": { "watchKo": "6세 미만 유아, 임부·수유부, 황색5호 과민증·알레르기 반응 경험자 복용 금지", "watchEn": "Do not use in infants under 6 years of age, pregnant or breastfeeding women, or anyone with hypersensitivity or allergic reactions to Yellow No. 5" }
+  },
+  "en": {
+    "640406a5": "This medicine is used as adjuvant treatment for functional asthenia.",
+    "b46ddb72": "Rarely, mild gastrointestinal disturbances may occur at the beginning of treatment.",
+    "dc3c3b8a": "Do not take this medicine for more than 4 weeks.",
+    "10b00c0b": "Children (6 years and older) take 2 tablets per 1 dose, 2 times a day.",
+    "3dd114f5": "If you are pregnant or breastfeeding, or if symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist.",
+    "870e8c97": "Adults take 2 tablets per 1 dose, 3 times a day.",
+    "92d656b1": "Infants under 6 years of age must not take this medicine.",
+    "b2f15ea9": "Take 2 tablets per 1 dose: adults 3 times a day, and children 6 years and older 2 times a day.",
+    "c85fa1b9": "If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist.",
+    "c95181b4": "Infants under 6 years of age, pregnant or breastfeeding women, and anyone who has experienced hypersensitivity or allergic reactions to Yellow No. 5 (Sunset Yellow FCF) must not take this medicine."
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "citrulline500-02",
+  "order": 3102,
+  "groupKey": "시트룰린말산염|500밀리그램|정",
+  "safetyFp": "e918af0820f86722",
+  "sourceRef": "fd549fd2-ebd5-466c-88df-7f1f23b586cf",
+  "sensitive": false,
+  "title": "시트룰린말산염 500mg 정 (기능 무력증 보조치료제)",
+  "expectEasyMd5": "4513a129",
+  "masterIds": [
+    "01398127-5ffb-4d85-8e1b-b0111e33be6e",
+    "1f59e52c-0bd7-4911-ae12-854d5eef1e2c",
+    "63fdd0c8-6f3e-433d-a12c-00c671a4412b",
+    "a69f0590-7287-4329-bcba-0b3979502c61"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "4513a129",
+    "names": [
+      "리차지아정(시트룰린말산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 16,
+    "en": 8,
+    "total": 24
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 기능 무력증의 보조치료에 사용합니다.",
+    "usage": "1회 2정씩, 성인은 1일 3회, 6세 이상 소아는 1일 2회 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "6세 미만의 유아, 임부, 수유부, 황색5호에 과민증 또는 알레르기 반응 경험자는 이 약을 복용하지 마십시오.\n\n1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오\n\n정해진 용법과 용량을 잘 지키십시오.\n\n4주 이상 투여하지 마십시오.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.\n\n드물게 투여 초기에 약한 위장관 장애가 나타날 수 있습니다.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "시트룰린말산염 500밀리그램",
+      "작용": "기능 무력증(무력감·피로 상태)의 보조치료에 사용하는 약입니다.",
+      "주요 증상": "기능 무력증의 보조치료",
+      "주의 대상": "6세 미만 유아, 임부·수유부, 황색5호 과민증·알레르기 반응 경험자 복용 금지",
+      "선택 포인트": "기능 무력증의 보조치료에 쓰는 약입니다."
+    }
+  },
+  "en": {
+    "title": "Citrulline Malate 500 mg Tablets (Adjuvant Medicine for Functional Asthenia)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used as adjuvant treatment for functional asthenia.",
+    "usage": "Take 2 tablets per 1 dose: adults 3 times a day, and children 6 years and older 2 times a day.",
+    "caution": "Infants under 6 years of age, pregnant or breastfeeding women, and anyone who has experienced hypersensitivity or allergic reactions to Yellow No. 5 (Sunset Yellow FCF) must not take this medicine. If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. Do not take this medicine for more than 4 weeks. When giving this medicine to children, do so under the guidance and supervision of a guardian. Rarely, mild gastrointestinal disturbances may occur at the beginning of treatment. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Citrulline malate 500 mg",
+      "How it works": "A medicine used as adjuvant treatment for functional asthenia (weakness and fatigue states).",
+      "Main symptoms": "Adjuvant treatment of functional asthenia",
+      "Caution for": "Do not use in infants under 6 years of age, pregnant or breastfeeding women, or anyone with hypersensitivity or allergic reactions to Yellow No. 5",
+      "Why this one": "A medicine for adjuvant treatment of functional asthenia."
+    }
+  }
+}
