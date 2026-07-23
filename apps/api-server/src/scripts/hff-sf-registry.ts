@@ -15,6 +15,7 @@ export interface SfIngredient {
   indicatorRe?: RegExp;         // 지표성분(코로솔산·아스타잔틴 등) — 원료명 병용 인식
   fnNormalize?: (ko: string) => string; // EN 매핑 전 KO 최소 정규화(의미 보존)
   statusHint: 'READY' | 'PENDING';
+  allowClassified?: boolean;    // classify() 등재 라벨(예 은행잎·감마리놀렌산·마리골드)이지만 pure-single 은 본 원료 소유 → sf-select 의 classify 제외를 우회. combo 는 2+ signature 라 pure-single 미생산이므로 중복 없음.
 }
 
 export const SF_INGREDIENTS: Record<string, SfIngredient> = {
@@ -37,6 +38,14 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   // ── B TODO 추가 대사(체지방) 계열: EN=mapFunctionEn '체지방 감소' HIT, displayEn=표준 식물명 lookup(§3)
   '콜레우스포스콜리': { key: '콜레우스포스콜리', slug: 'coleus-forskohlii', displayKo: '콜레우스포스콜리 추출물', displayEn: 'Coleus forskohlii extract', labelRe: /콜레우스\s*포스콜리|포스콜린/, statusHint: 'READY' },
   '돌외잎': { key: '돌외잎', slug: 'gynostemma', displayKo: '돌외잎 추출물', displayEn: 'Gynostemma pentaphyllum extract', labelRe: /돌외/, statusHint: 'READY' },
+  // ── WO-O4O-HFF-INDEPENDENT-MAX-PRODUCTION-C-V1: 눈·혈행·인지·항산화 도메인(Agent C 독립소유).
+  //    은행잎·감마리놀렌산·마리골드 는 combo classify() 등재 라벨 → allowClassified 로 pure-single 소유. 기능성 EN 은 mapFunctionEn 기존 커버(임의생성 0).
+  '은행잎추출물': { key: '은행잎추출물', slug: 'ginkgo-leaf', displayKo: '은행잎추출물', displayEn: 'Ginkgo leaf extract', labelRe: /은행잎/, allowClassified: true, statusHint: 'READY' },
+  '마리골드꽃추출물': { key: '마리골드꽃추출물', slug: 'marigold-flower', displayKo: '마리골드꽃추출물', displayEn: 'Marigold flower extract', labelRe: /마리골드/, indicatorRe: /지아잔틴/, allowClassified: true, statusHint: 'READY' },
+  '감마리놀렌산': { key: '감마리놀렌산', slug: 'gamma-linolenic-acid', displayKo: '감마리놀렌산', displayEn: 'Gamma-linolenic acid', labelRe: /감마리놀렌/, allowClassified: true, statusHint: 'READY' },
+  '빌베리추출물': { key: '빌베리추출물', slug: 'bilberry', displayKo: '빌베리추출물', displayEn: 'Bilberry extract', labelRe: /빌베리/, statusHint: 'PENDING' },
+  '스피루리나': { key: '스피루리나', slug: 'spirulina', displayKo: '스피루리나', displayEn: 'Spirulina', labelRe: /스피루리나/, statusHint: 'READY' },
+  '클로렐라': { key: '클로렐라', slug: 'chlorella', displayKo: '클로렐라', displayEn: 'Chlorella', labelRe: /클로렐라/, statusHint: 'READY' },
 };
 
 /** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/·(중점) 구분. */

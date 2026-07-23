@@ -55,7 +55,7 @@ async function main(): Promise<void> {
         const t = normalizeSpecText(r.fn); const brackets = [...t.matchAll(/\[([^\]]{1,24})\]/g)].map((m) => m[1].trim());
         if (brackets.length !== 1) continue; const label = brackets[0];
         if (!ing.labelRe.test(label)) continue;               // 본 원료 pure-single 만
-        if (classify(label)) continue;                        // 기존 registry 등재 원료면 제외(교차 귀속 방지)
+        if (classify(label) && !ing.allowClassified) continue; // 기존 registry 등재 원료면 제외(교차 귀속 방지). allowClassified 원료(은행잎·감마리놀렌산·마리골드)는 pure-single 소유이므로 우회.
         funnel.pureSingle++;
         if (LIQUID.test(`${r.name} ${r.sungsang} ${r.srv}`)) continue; funnel.solid++;
         const stmt = String(r.stmt).trim(); if (!stmt || seen.has(stmt)) continue;
