@@ -62,12 +62,12 @@ export function createSupplierCampaignRequestController(
            "embedId",
            "thumbnailUrl",
            "serviceKey",
-           created_at AS "createdAt"
+           "createdAt"
          FROM signage_media
          WHERE "createdByUserId" = $1
            AND status = 'active'
            AND "sourceType" IN ('youtube', 'vimeo')
-         ORDER BY created_at DESC`,
+         ORDER BY "createdAt" DESC`,
         [user.id],
       );
 
