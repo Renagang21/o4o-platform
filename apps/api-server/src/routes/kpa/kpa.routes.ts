@@ -115,6 +115,7 @@ import { createContentApprovalController } from './controllers/content-approval.
 import { createSupplierContentController } from './controllers/supplier-content.controller.js';
 import { createSupplierSignageReportController } from './controllers/supplier-signage-report.controller.js';
 import { createSupplierCampaignRequestController } from './controllers/supplier-campaign-request.controller.js';
+import { createSupplierSignageMediaController } from './controllers/supplier-signage-media.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
@@ -273,6 +274,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Supplier Signage Campaign Requests (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REQUEST-V1)
   // NOTE: 더 구체적인 경로를 먼저 등록 (Express prefix matching)
   router.use('/supplier/signage/campaign-requests', createSupplierCampaignRequestController(dataSource, coreRequireAuth as any));
+
+  // Supplier Signage Media Authoring (WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1)
+  // 공급자 직접 제작·게시(source='supplier', serviceKey='kpa-society') — 기존 HUB/asset-snapshot 조회·복사 경로 재사용
+  router.use('/supplier/signage/media', createSupplierSignageMediaController(dataSource, coreRequireAuth as any));
 
   // Supplier Signage Campaign Report (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REPORT-API-V1)
   router.use('/supplier/signage', createSupplierSignageReportController(dataSource, coreRequireAuth as any));

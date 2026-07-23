@@ -89,6 +89,13 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [{ label: '매장용 태블렛 콘텐츠', path: '/supplier/tablet-screen-sets' }],
   },
   {
+    // WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1:
+    //   공급자 소유 사이니지(YouTube 연결) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감.
+    label: '디지털 사이니지',
+    icon: MonitorSmartphone,
+    items: [{ label: '사이니지 콘텐츠', path: '/supplier/signage' }],
+  },
+  {
     // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
     label: '판매자 모집',
     icon: Megaphone,

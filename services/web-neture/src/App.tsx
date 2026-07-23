@@ -192,6 +192,10 @@ const SupplierStoreDescriptionsPage = lazy(() =>
 const SupplierTabletScreenSetsPage = lazy(() =>
   import('./pages/supplier/SupplierTabletScreenSetsPage').then((m) => ({ default: m.default }))
 );
+// WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1: 공급자 디지털 사이니지 제작·게시
+const SupplierSignagePage = lazy(() =>
+  import('./pages/supplier/SupplierSignagePage').then((m) => ({ default: m.default }))
+);
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.MyForumDashboardPage }))
@@ -828,6 +832,9 @@ function App() {
               <Route path="/supplier/market-trial/:id" element={<SupplierTrialDetailPage />} />
               <Route path="/supplier/market-trial/:id/edit" element={<SupplierTrialEditPage />} />
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /supplier/signage/manage 제거 (Neture signage 미대상) */}
+              {/* WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1:
+                  공급자 소유 사이니지(canonical 아님) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감. */}
+              <Route path="/supplier/signage" element={<SupplierSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
               <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
