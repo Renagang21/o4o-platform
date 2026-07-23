@@ -20,7 +20,8 @@
 | audit(canonical_replaced) 세션 증가 | 443 (총 854 = V2 106 + V4라벨 748) |
 | no-op 재실행 | 전 그룹 producedFps 0 확인 |
 
-> ⚠️ audit metadata `wo` 값은 러너 하드코딩으로 `...DA-V4` 라벨 유지 — 본 세션(V5) 기록도 V4 라벨로 적재됨. 카운트 정합은 세션 전후 delta로 확인.
+> ⚠️ audit metadata `wo` 값은 당시 러너 하드코딩으로 `...DA-V4` 라벨 유지 — 본 세션(V5) 기록도 V4 라벨로 적재됨. 카운트·target·source 연결은 정상이므로 재적재하지 않고 본 예외 기록만 유지. 카운트 정합은 세션 전후 delta로 확인.
+> 하드코딩은 61e31b54d에서 제거됨 — 이후 신규 audit부터 실제 WO ID 기록 (해석 우선순위: `--wo-id` > EN config `woId`/`wo` > env `TOPICAL_WO_ID` > 미지정 시 실행 중지).
 
 ## 2. 그룹별 실적 (ingredient×form → fp/masters)
 
