@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-angelica-gigas-c",
+  "createdMasters": [
+    "f7d646a9-cbc0-4524-8288-91d75e981dbd"
+  ],
+  "createdSpd": [
+    "44d61d88-c7a7-4134-838b-5df7a9d20f91",
+    "edf9a451-8341-4ba5-b954-9699296aea4a"
+  ],
+  "candIds": [
+    "a13e7a50-e2b3-4df9-89b0-68f297f76aa2"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "a13e7a50-e2b3-4df9-89b0-68f297f76aa2",
+      "stmt": "201400170613",
+      "prev_status": "pending"
+    }
+  ]
+}

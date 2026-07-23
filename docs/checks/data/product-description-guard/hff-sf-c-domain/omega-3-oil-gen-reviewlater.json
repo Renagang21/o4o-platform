@@ -1,0 +1,22 @@
+[
+ {
+  "statementNo": "20040020016432",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20040020028230",
+  "reason": "REVIEW:Q-TRUNCATED-PARTIAL-005"
+ },
+ {
+  "statementNo": "20040020028165",
+  "reason": "BLOCKED:Q-TRUNCATED-002"
+ },
+ {
+  "statementNo": "20040020028162",
+  "reason": "REVIEW:Q-TRUNCATED-PARTIAL-005"
+ },
+ {
+  "statementNo": "20040020028180",
+  "reason": "REVIEW:Q-TRUNCATED-PARTIAL-005"
+ }
+]

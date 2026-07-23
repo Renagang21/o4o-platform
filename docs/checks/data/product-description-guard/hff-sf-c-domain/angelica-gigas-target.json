@@ -1,0 +1,30 @@
+[
+ {
+  "candidateId": "a13e7a50-e2b3-4df9-89b0-68f297f76aa2",
+  "productName": "인지Q",
+  "productNameEn": "인지Q",
+  "manufacturer": "(주)뉴트라젠",
+  "manufacturerEn": null,
+  "statementNo": "201400170613",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[참당귀 추출분말(Nutragen)]노화로 저하된 인지기능 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "baseStandard": "1. 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐\r\n2. 데커신(㎎/1,000㎎): 표시량(100.8)의 80~120%.\r\n3. 납(㎎/㎏) : 1.0 이하.\r\n4. 총 비소(㎎/㎏) : 1.0 이하.\r\n5. 카드뮴(㎎/㎏) : 0.5 이하.\r\n6. 총 수은(㎎/㎏) : 0.5 이하.\r\n7. 대장균군: 음성.\r\n8. 붕해 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "-소화불량, 속쓰림 등이 나타날 수 있습니다.\r\n-혈액응고방지제 또는 혈당강하제를 복용하시는 분은 의사의 상당하에 사용하여 주십시오특정질환 있거나 특이체질, 알레르기 체질이신 분은 섭취 전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "dosageForm": "이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐",
+   "storage": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 흡습될 수 있으므로 밀봉하여 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">참당귀추출분말</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인지Q<small>참당귀추출분말</small></h1><p class=\"sd-meta\">(주)뉴트라젠 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>참당귀추출분말</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>참당귀추출분말</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐 · (주)뉴트라젠 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>노화로 저하된 인지기능 개선에 도움을 줄 수 있음(생리활성기능 2등급)</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 흡습될 수 있으므로 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>참당귀추출분말 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Angelica gigas extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>인지Q<small>Angelica gigas extract</small></h1><p class=\"sd-meta\">Made by (주)뉴트라젠 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Angelica gigas extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Angelica gigas extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)뉴트라젠</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve cognitive function that declines with aging.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 연한 황갈색의 분말을 함유한 미황색의 경질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 흡습될 수 있으므로 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Angelica gigas extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

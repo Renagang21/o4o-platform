@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-plant-stanol-ester-c",
+  "createdMasters": [
+    "fc6d5799-ef5f-4fcd-954d-f85c7c593c88"
+  ],
+  "createdSpd": [
+    "9b3c16bd-8d65-4f23-8e7d-7d23da0a6dcc",
+    "52d18918-24b2-4183-a941-45c2b08945a7"
+  ],
+  "candIds": [
+    "76885ad8-acea-4480-9f52-ebe4fe28bbe2"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "76885ad8-acea-4480-9f52-ebe4fe28bbe2",
+      "stmt": "200400200061082",
+      "prev_status": "pending"
+    }
+  ]
+}

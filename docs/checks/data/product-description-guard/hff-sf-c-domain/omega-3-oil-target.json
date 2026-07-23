@@ -1,0 +1,1038 @@
+[
+ {
+  "candidateId": "03aa8529-413c-48e4-8baf-fc5da30c7107",
+  "productName": "오메가-3 프리미엄",
+  "productNameEn": "오메가-3 프리미엄",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "20040015083544",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]혈중 중성지질 개선·혈행개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 :  연노랑색의 내용물을 함유한 투명의 연질캡슐제품으로 이미, 이취가 없다.\r\n(2) EPA와 DHA의 합: 표시량(600mg/2000mg)의 80~120%\r\n(3) 중금속\r\n  (가) 납(mg/kg) :  3.0이하\r\n  (나) 카드뮴(mg/kg) :  1.0이하\r\n  (다) 총수은(mg/kg) :  0.5이하\r\n(4) 대장균군 :  음성\r\n(5) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.",
+   "dosageForm": "연노랑색의 내용물을 함유한 투명의 연질캡슐제품으로 이미, 이취가 없다.",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가-3 프리미엄<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>연노랑색의 내용물을 함유한 투명의 연질캡슐제품으로 이미, 이취가 없다. · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 연노랑색의 내용물을 함유한 투명의 연질캡슐제품으로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가-3 프리미엄<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides, improve blood circulation, improve dry eyes and support eye health.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 연노랑색의 내용물을 함유한 투명의 연질캡슐제품으로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "1d9815ef-1787-4bbc-9857-56ed06ab4b76",
+  "productName": "장용성 오메가3",
+  "productNameEn": "장용성 오메가3",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001205",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 고유의 색택과 향미를 가지며 이미 이취가 없어야 함\r\n(2) EPA와 DHA의 합 : 표시량(600mg/1000mg)의 80 ~ 120%\r\n(3) 중금속 :\r\n (가) 납(mg/kg) : 3.0 이하 \r\n (나) 카드뮴(mg/kg) : 1.0 이하 \r\n (다) 총수은(mg/kg) : 0.5 이하 \r\n(4) 대장균군 : 음성\r\n(5) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 2캅셀을 식후에 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미 이취가 없어야 함",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>장용성 오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미 이취가 없어야 함 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미 이취가 없어야 함</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>장용성 오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미 이취가 없어야 함</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "2129a0a4-7dde-4dfc-b7ac-1b3de2d68c50",
+  "productName": "오메가3 포르테",
+  "productNameEn": "오메가3 포르테",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006902",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 미황색 유상액을 함유한 투명 연질캡슐\n(2) EPA와 DHA의 합 : 표시량(500 mg/1.0g)의 80~120%\n(3) 잔류용매(헥산) : 5.0 mg/kg 이하\n(4) 납 : 3.0 mg/kg 이하\n(5) 카드뮴 : 1.0 mg/kg 이하\n(6) 수은 : 0.5 mg/kg 이하\n(7) 대장균군 : 음성\n(8) 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(1.0g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담 하십시오.\n② 개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n③ 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "미황색 유상액을 함유한 투명 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가3 포르테<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색 유상액을 함유한 투명 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색 유상액을 함유한 투명 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가3 포르테<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색 유상액을 함유한 투명 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "267f7b55-2aa9-479b-94c4-ddb0d1040fde",
+  "productName": "하루한알!혈행건강!오메가-3",
+  "productNameEn": "하루한알!혈행건강!오메가-3",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200021377",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음 ③건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음.",
+   "baseStandard": "1) 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\n2) EPA와 DHA의 합 : 표시량(604mg/1100mg)의 80%~120%\n3) 납(mg/kg) : 3.0 이하\n4) 카드뮴(mg/kg) : 1.0 이하\n5) 수은(mg/kg) : 0.5 이하\n6) 대장균군 : 음성 \n7) 붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부 및 수유부는 섭취를 삼가하십시오.\n섭취 시 캡슐이 목에 걸리지 않도록 주의하십시오.\n원료에 대한 알레르기 체질이시거나, 질병으로 인해 치료 중이신 분은 의사와 상담 후 섭취하십시오.      \n의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.\n개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "미황색의 유상 내용물을 함유한 미황색의 연질캡슐.",
+   "storage": "연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루한알!혈행건강!오메가-3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>하루한알!혈행건강!오메가-3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li><li>May help improve dry eyes and support eye health.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "26d21c16-53a6-455a-a73f-5a0651df2a0d",
+  "productName": "세모스무스IN",
+  "productNameEn": "세모스무스IN",
+  "manufacturer": "(주)세모",
+  "manufacturerEn": null,
+  "statementNo": "2004001704940",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상: 고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다.\r\n② EPA와 DHA의 합: 표시량(305mg/1,350mg)의 80 ~ 120%\r\n③ 중금속\r\n    ㉮ 납(mg/kg): 3.0 이하\r\n    ㉯ 카드뮴(mg/kg): 1.0 이하\r\n    ㉰ 총수은(mg/kg): 0.5 이하\r\n④ 대장균군: 음성\r\n⑤ 붕해도: 20분 이내",
+   "intake": "①1일 2회, 1회 3캡슐씩 식후에 씹어서 섭취하십시오.\r\n②기호에 따라 물 또는 우유 등과 함께 섭취하셔도 됩니다.",
+   "caution": "① 특이체질이나 알레르기 체질이신 경우 성분을 확인한 후 섭취하십시오.\r\n② 간혹 분말이 침전될 수 있으나 안심하고 드셔도 됩니다.\r\n③ 3세 이하의 유아 또는 어린이가 섭취할 때는 부모님의 주의가 필요합니다.",
+   "dosageForm": "이미,이취가 없는 연한 노랑색의 내용물이 들어있는 노랑색의 연질캅셀임",
+   "storage": "자동차 안 등 직사광선 및 고온다습한 곳은 피해주시고 25℃ 이하에서 보관하여 주십시오.",
+   "shelfLife": "제조일로부터2년"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>세모스무스IN<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)세모 제조 · 1일 2회 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 3캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다. · (주)세모 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터2년</div><div class=\"sd-item\"><b>보관</b> 자동차 안 등 직사광선 및 고온다습한 곳은 피해주시고 25℃ 이하에서 보관하여 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>세모스무스IN<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)세모 · 2 times a day · 3 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 3 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)세모</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터2년</div><div class=\"sd-item\"><b>Storage</b> 자동차 안 등 직사광선 및 고온다습한 곳은 피해주시고 25℃ 이하에서 보관하여 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "29f60a98-a2ca-4a8a-99dc-2c0027611173",
+  "productName": "오메가-3",
+  "productNameEn": "오메가-3",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020002923",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n② EPA와 DHA의 합 : 표시량(500.5mg/910mg)의 80%~120% \r\n③ 납(mg/kg) : 3.0 이하\r\n④ 카드뮴(mg/kg) : 1.0 이하\r\n⑤ 총수은(mg/kg) : 0.5 이하\r\n⑥ 대장균군 : 음성\r\n⑦ 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.\r\n1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부 및 수유부는 섭취를 삼가하십시오.\r\n섭취 시 캡슐이 목에 걸리지 않도록 주의하십시오.\r\n원료에 대한 알레르기 체질이시거나, 질병으로 인해 치료 중이신 분은 의사와 상담 후 섭취하십시오.",
+   "dosageForm": "미황색의 유상 내용물을 함유한 투명색의 연질캡슐.",
+   "storage": "연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가-3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가-3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "2a54daf6-df3c-40ee-9639-79af9014e123",
+  "productName": "데일리 오메가-3(Daily Omega-3)",
+  "productNameEn": "데일리 오메가-3(Daily Omega-3)",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006993",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 미황색의 유상액을 함유한 투명의 연질캡슐\r\n(2) EPA와 DHA의 합 : 표시량(500 mg/1.05 g)의 80~120%\r\n(3) 납(mg/kg) : 3.0 이하\r\n(4) 카드뮴(mg/kg) : 1.0 이하\r\n(5) 총수은(mg/kg) : 0.5 이하\r\n(6) 헥산(mg/kg) : 5.0 이하\r\n(7) 대장균군 : 음성\r\n(8) 붕해 :  20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1.05 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취에 주의하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n③ 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색의 유상액을 함유한 투명의 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>데일리 오메가-3(Daily Omega-3)<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 유상액을 함유한 투명의 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 유상액을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>데일리 오메가-3(Daily Omega-3)<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 유상액을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "302653e8-6d9f-464e-becd-6c18a70cb2fe",
+  "productName": "하프물범4200",
+  "productNameEn": "하프물범4200",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006678",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 미황색의 투명한 액을 내용물로 한 투명의 장방형 연질캡슐제\r\n(2) EPA+DHA : 표시량(546mg/4.2g)의 80.0~120.0%\r\n(3) 납(mg/kg) : 3.0 이하\r\n(4) 카드뮴(mg/kg) : 1.0 이하\r\n(5) 총수은(mg/kg) : 0.5 이하\r\n(6) 대장균군 : 음성\r\n(7) 붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐(2.1g)을 충분한 물과 함께 섭취.",
+   "caution": "① 임산부와 수유부는 섭취에 주의하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색의 투명한 액을 내용물로 한 투명의 장방형 연질캡슐제",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>하프물범4200<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 미황색의 투명한 액을 내용물로 한 투명의 장방형 연질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 미황색의 투명한 액을 내용물로 한 투명의 장방형 연질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>하프물범4200<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 미황색의 투명한 액을 내용물로 한 투명의 장방형 연질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "31360d5d-aabc-4bfb-9ed9-56eeda84b591",
+  "productName": "대상식물성DHA",
+  "productNameEn": "대상식물성DHA",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200021426",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n2) EPA와 DHA의 합 : 표시량(500mg/1300mg)의 80%~120%\r\n3) 납(mg/kg) : 3.0 이하\r\n4) 카드뮴(mg/kg) : 1.0 이하\r\n5) 총수은(mg/kg) : 0.5 이하\r\n6) 대장균군 : 음성 \r\n7) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.\r\n1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "임산부 및 수유부는 섭취를 삼가하십시오.\r\n섭취 시 캡슐이 목에 걸리지 않도록 주의하십시오.\r\n원료에 대한 알레르기 체질이시거나, 질병으로 인해 치료 중이신 분은 의사와 상담 후 섭취하십시오.",
+   "dosageForm": "미황색의 유상 내용물을 함유한 미황색의 연질캡슐.",
+   "storage": "연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>대상식물성DHA<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>대상식물성DHA<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "3a641377-8e63-4385-b589-dfb974b7a4e6",
+  "productName": "FISH OIL 1000MG",
+  "productNameEn": "FISH OIL 1000MG",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061001",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 미황색 유상액을 함유한 장방형의 투명 연질캡슐\r\n② EPA와 DHA의 합 : 표시량(600 mg/2,016mg)의 80~120%\r\n③ 잔류용매(헥산) : 5.0 mg/kg이하\r\n④ 납 : 3.0 mg/kg 이하\r\n⑤ 카드뮴 : 1.0 mg/kg 이하\r\n⑥ 총수은 : 0.5 mg/kg 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(2,016mg)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부와 수유부는 섭취시 의사와 상의하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색 유상액을 함유한 장방형의 투명 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>FISH OIL 1000MG<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색 유상액을 함유한 장방형의 투명 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색 유상액을 함유한 장방형의 투명 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>FISH OIL 1000MG<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색 유상액을 함유한 장방형의 투명 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "3b7420df-9b6c-4151-9549-f13279aac858",
+  "productName": "한일메가블루원골드",
+  "productNameEn": "한일메가블루원골드",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028176",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "성상: 미황색을 띤 오일제품\r\nEPA와 DHA의합:표시량(175mg/500mg)의80-120%\r\n납:3.0이하(mg/kg)\r\n카드뮴:1.0이하(mg/kg)\r\n총수은:0.5이하(mg/kg)\r\n대장균군:음성이어야한다\r\n붕해시험:20분이내",
+   "intake": "1일 2회,1회 2캅셀씩을 물과 함께 섭취하십시오.",
+   "caution": "특정 또는 특이체질등 알러지체질의 경우 성분을 확인하신후 섭취하십시오.\r\n섭취시 캅셀이 기도에 걸릴수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "미황색을 띤 오일제품",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>한일메가블루원골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색을 띤 오일제품 EPA와 DHA · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색을 띤 오일제품 EPA와 DHA</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>한일메가블루원골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색을 띤 오일제품 EPA와 DHA</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "46023735-cb58-44a3-9723-03f40d79cef3",
+  "productName": "오메가-3골드",
+  "productNameEn": "오메가-3골드",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028140",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "성상:투명한 연질캅셀\r\nEPA와DHA의합:표시량(299mg/1000mg)의80-120%\r\n납:3.0이하(mg/kg)\r\n카드뮴:1.0이하(mg/kg)    \r\n총수은:0.5이하(mg/kg)    \r\n대장균군:음성이어야한다\r\n붕해시험:20분이내",
+   "intake": "1일 3회 , 1회 2캅셀씩을 물과 함께 섭취하십시오.",
+   "caution": "특정 또는 특이체질 등 알러지 체질의 경우 성분을 확인하신 후 섭취하십시오. \r\n섭취시 캅셀이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "투명의 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>오메가-3골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>투명한 연질캅셀 EPA와DHA · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 투명한 연질캅셀 EPA와DHA</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>오메가-3골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 투명한 연질캅셀 EPA와DHA</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "48313bb4-5f18-48b3-8b77-3a7fba6c4292",
+  "productName": "프리미엄오메가3골드",
+  "productNameEn": "프리미엄오메가3골드",
+  "manufacturer": "종근당건강(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020016437",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]혈행∙ 혈중 중성지질 개선 ∙ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "baseStandard": "EPA 및 DHA의 합 : 600mg/1150mg\n납 (mg/kg) : 3.0 이하\n카드뮴  (mg/kg) : 1.0 이하\n총 수은  (mg/kg) : 0.5 이하 \n대장균군 : 음성\n붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐 씩 충분한 물과 함께 섭취한다.",
+   "caution": "1) 제품의 섭취시 섭취량 및 섭취방법을 확인하고 섭취하여 주십시오.\r\n2) 유통기한이 경과된 제품은 섭취하지 않도록 주의바랍니다.\r\n3) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\r\n4) 알레르기 체질이신 분은 성분을 확인하고 섭취하시기 바랍니다.",
+   "dosageForm": "미황색의 투명한 내용물을 함유한 투명의 장방형 연질캡슐",
+   "storage": "직사광선을 받지 않는 서늘한 곳에 보관하여야 한다.",
+   "shelfLife": "제조일로부터 2년"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프리미엄오메가3골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">종근당건강(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>종근당건강(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈행∙ 혈중 중성지질 개선 ∙ 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 않는 서늘한 곳에 보관하여야 한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>프리미엄오메가3골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 종근당건강(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 종근당건강(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with improving dry eyes for eye health</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 않는 서늘한 곳에 보관하여야 한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "5b6989d3-0f83-4a53-823c-81f204e494af",
+  "productName": "오메가3",
+  "productNameEn": "오메가3",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061040",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 미황색 유상액을 함유한 투명의 장방형 연질캡슐\r\n② EPA와 DHA의 합 : 표시량(500 mg/1.02 g)의 80~120%\r\n③ 납 : 3.0 mg/kg 이하\r\n④ 카드뮴 : 1.0 mg/kg 이하\r\n⑤ 총수은 : 0.5 mg/kg 이하\r\n⑥ 대장균군 : 음성\r\n⑦ 붕해 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐(1.02 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 임산부, 수유부, 만성질환이 있거나 현재 질병치료 중이신 분은 전문의와 상의 후 섭취하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n③ 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\r\n④ 유통기한이 경과된 제품은 섭취하지 않도록 주의바랍니다.\r\n⑤ 제품의 섭취시 섭취량 및 섭취방법을 확인하고 섭취하여 주십시오.",
+   "dosageForm": "미황색 유상액을 함유한 투명의 장방형 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색 유상액을 함유한 투명의 장방형 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색 유상액을 함유한 투명의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색 유상액을 함유한 투명의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "7169706e-f7a3-4b48-9236-d1ad5da89169",
+  "productName": "HANIL OMEGA 3 GOLD soft capsule",
+  "productNameEn": "HANIL OMEGA 3 GOLD soft capsule",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028321",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 미황색의 내용물이 든 투명한 연질캡슐\r\n2. EPA와 DHA의 합: 표시량(299mg/1,000mg)의 80~120%\r\n3. 납(mg/kg) : 3.0 이하\r\n4. 카드뮴(mg/kg) : 1.0 이하\r\n5. 총수은(mg/kg) : 0.5 이하\r\n6. 대장균군 : 음성\r\n7. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "알러지 및 특이체질이신분은 제품성분을 확인하신 후 섭취하십시오.",
+   "dosageForm": "미황색의 내용물이 든 투명한 연질캡슐",
+   "storage": "실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)",
+   "shelfLife": "36개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>HANIL OMEGA 3 GOLD soft capsule<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물이 든 투명한 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물이 든 투명한 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 36개월</div><div class=\"sd-item\"><b>보관</b> 실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>HANIL OMEGA 3 GOLD soft capsule<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물이 든 투명한 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 36개월</div><div class=\"sd-item\"><b>Storage</b> 실온(고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.)</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "7ea503dd-b601-42e5-ba9c-bc61fda0a7d4",
+  "productName": "프리미엄 식물성 오메가3",
+  "productNameEn": "프리미엄 식물성 오메가3",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006991",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 미황색 유상액을 함유한 녹색의 연질캡슐\r\n② EPA와 DHA의 합 : 표시량(500 mg/g)의 80~120%\r\n③ 헥산(mg/kg) : 5.0 이하\r\n④ 납 : 3.0 mg/kg 이하\r\n⑤ 카드뮴 : 1.0 mg/kg 이하\r\n⑥ 총수은 : 0.5 mg/kg 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 1캡슐(0.5 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "① 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n② 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색 유상액을 함유한 녹색의 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>프리미엄 식물성 오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색 유상액을 함유한 녹색의 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색 유상액을 함유한 녹색의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>프리미엄 식물성 오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색 유상액을 함유한 녹색의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "81563249-32a5-4ea1-b2d7-0901edb9f193",
+  "productName": "식물성 키즈 오메가3 츄어블",
+  "productNameEn": "식물성 키즈 오메가3 츄어블",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006462",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상: 미황색의 내용물을 함유한 타원형 모양의 연질캡슐\n2. EPA와 DHA의 합: 표시량(500mg/3,600mg)의 80~120%\n3. 중금속: 납 3.0mg/kg이하, 카드뮴 1.0mg/kg이하, 총수은 0.5mg/kg이하\n4. 대장균군: 음성",
+   "intake": "1일 2회, 1회 3캡슐(또는 1일 3회, 1회 2캡슐)을 씹어서 섭취하십시오.",
+   "caution": "섭취 시 위장장애, 소화불량 등의 증상이 있을 경우 섭취를 중단 하십시오.\r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 성분에 알레르기 체질이신 경우 성분을 확인 후 섭취하십시오.\r\n영 · 유아 섭취시 보호자의 지도 아래 섭취할 수 있도록 해주시기 바랍니다.",
+   "dosageForm": "미황색의 내용물을 함유한 타원형 모양의 연질캡슐",
+   "storage": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.\r\n어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>식물성 키즈 오메가3 츄어블<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 2회 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 3캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 타원형 모양의 연질캡슐 · (주)알피바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 3캡슐</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 타원형 모양의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>식물성 키즈 오메가3 츄어블<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · 2 times a day · 3 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 3 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">3 capsules per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 타원형 모양의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "830c5219-0c3e-4ad3-8398-4b205ff4db3b",
+  "productName": "혈행팔팔 DHA팔팔",
+  "productNameEn": "혈행팔팔 DHA팔팔",
+  "manufacturer": "(주)씨스팡",
+  "manufacturerEn": null,
+  "statementNo": "2004001536225",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 짙은 갈색의 반투명 연질캡슐 \r\n2) EPA와 DHA의 합 : 표시량의 80 ~ 120 % (표시량 : 504 mg / 1,260 mg)\r\n3) 납 (mg/kg) : 3.0 이하\r\n4) 카드뮴 (mg/kg) : 1.0 이하\r\n5) 총수은 (mg/kg) : 0.5 이하\r\n6) 대장균군 : 음성\r\n7) 붕해 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 3캡슐을 물과 함께 섭취",
+   "caution": "① 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하십시오.\r\n② 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "dosageForm": "짙은 갈색의 반투명 연질캡슐",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통, 어린이의 손에 닿지 않도록 주의",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행팔팔 DHA팔팔<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)씨스팡 제조 · 1일 1회 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>짙은 갈색의 반투명 연질캡슐 · (주)씨스팡 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 짙은 갈색의 반투명 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통, 어린이의 손에 닿지 않도록 주의</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행팔팔 DHA팔팔<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)씨스팡 · Once a day · 3 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 3 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)씨스팡</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">3 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 짙은 갈색의 반투명 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통, 어린이의 손에 닿지 않도록 주의</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "94182241-ad2b-4ae8-aba6-294eb192dbcd",
+  "productName": "골든 엔쵸비 트리플 오메가",
+  "productNameEn": "골든 엔쵸비 트리플 오메가",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020001240",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 고유의 색택을 가지며 이미, 이취가 없는 미황색의 액상을 함유한 투명연질캡슐\r\n(2) EPA와 DHA의 합 : 표시량(500mg/940mg)의 80 ~ 120%\r\n(3) 중금속 :\r\n (가) 납(mg/kg) : 3.0 이하 \r\n (나) 카드뮴(mg/kg) : 1.0 이하 \r\n (다) 총수은(mg/kg) : 0.5 이하 \r\n(4) 대장균군 : 음성\r\n(5) 붕해시험 : 20분이내",
+   "intake": "1일 1회, 1회 1캅셀을 식후에 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미,이취가 없어야 함.",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>골든 엔쵸비 트리플 오메가<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택을 가지며 이미, 이취가 없는 미황색의 액상을 함유한 투명연질캡슐 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택을 가지며 이미, 이취가 없는 미황색의 액상을 함유한 투명연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>골든 엔쵸비 트리플 오메가<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택을 가지며 이미, 이취가 없는 미황색의 액상을 함유한 투명연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "99d6e9b2-d557-451b-96da-ade85595e6ef",
+  "productName": "파워오메가-3골드",
+  "productNameEn": "파워오메가-3골드",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "200400200021307",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n2) EPA와 DHA의 합 : 표시량(550mg/1000mg)의 80%~120%\r\n3) 납(mg/kg) : 3.0 이하\r\n4) 카드뮴(mg/kg) : 1.0 이하\r\n5) 총수은(mg/kg) : 0.5 이하\r\n6) 대장균군 : 음성 \r\n7) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오.\r\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오. \r\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오. \r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색의 유상 내용물을 함유한 투명색의 연질캡슐.",
+   "storage": "수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>파워오메가-3골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>파워오메가-3골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "a1083f78-3167-4fe0-96a5-5d10b93ab6d2",
+  "productName": "명심오메가케어",
+  "productNameEn": "명심오메가케어",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006670",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없고 주황색의 유상액을 함유한 암갈색의 타원형 연질캡슐제\r\n(2) EPA+DHA : 표시량(251mg/1.0g, 1회 섭취기준)의 80.0~120.0%\r\n(3) 납(mg/kg) : 3.0 이하\r\n(4) 카드뮴(mg/kg) : 1.0 이하\r\n(5) 총수은(mg/kg) : 0.5 이하\r\n(6) 헥산(mg/kg) : 5.0 이하\r\n(7) 대장균군 : 음성\r\n(8) 붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐(1.0g)을 충분한 물과 함께 섭취.",
+   "caution": "① 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\r\n② 섭취량 및 섭취방법을 확인한 후 섭취하시고, 기타 제품관련 사항은 소비자 상담실로 문의 하십시오.",
+   "dosageForm": "주황색의 유상액을 함유한 암갈색의 타원형 연질캡슐제",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>명심오메가케어<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 주황색의 유상액을 함유한 암갈색의 타원형 연질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 주황색의 유상액을 함유한 암갈색의 타원형 연질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>명심오메가케어<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없고 주황색의 유상액을 함유한 암갈색의 타원형 연질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "ad871548-8ad3-499e-966b-45ae4665fedb",
+  "productName": "오메가-3 디에이치에이 앤 이피에이(DHA&EPA)",
+  "productNameEn": "오메가-3 디에이치에이 앤 이피에이(DHA&EPA)",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003125",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상:미황색의 내용물을 함유한 투명의 연질캡슐\r\n② EPA와 DHA의 합:표시량(598mg/2000mg)의 80~120% \r\n③ 납:3.0mg/kg이하 \r\n④ 카드뮴:1.0mg/kg이하 \r\n⑤ 총수은:0.5mg/kg이하 \r\n⑥ 대장균군:음성이어야 한다.\r\n⑦ 붕해 : 20분이내",
+   "intake": "1일 2회, 1회 2캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색의 내용물을 함유한 투명한 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>오메가-3 디에이치에이 앤 이피에이(DHA&amp;EPA)<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 투명의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>오메가-3 디에이치에이 앤 이피에이(DHA&amp;EPA)<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "b15f9edc-7a19-4f53-b979-7e8956a7d9aa",
+  "productName": "류(流)&케어 1 오메가3",
+  "productNameEn": "류(流)&케어 1 오메가3",
+  "manufacturer": "풀무원건강생활(주)",
+  "manufacturerEn": null,
+  "statementNo": "2004002000184",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 고유의 색택과 향미를 가지며 이미 이취가 없어야 함\r\n(2) EPA와 DHA의 합 : 표시량(600mg/1000mg)의 80 ~ 120%\r\n(3) 잔류용매(mg/kg) : 5.0 이하(헥산을 사용한 경우)\r\n(4) 중금속 :\r\n (가) 납(mg/kg) : 3.0 이하 \r\n (나) 카드뮴(mg/kg) : 1.0 이하 \r\n (다) 총수은(mg/kg) : 0.5 이하 \r\n(5) 대장균군 : 음성\r\n(6) 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 2캅셀을 식후에 물과 함께 섭취",
+   "caution": "알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "dosageForm": "고유의 색택과 향미를 가지며 이미 이취가 없어야 함",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관",
+   "shelfLife": "18개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>류(流)&amp;케어 1 오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">풀무원건강생활(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미 이취가 없어야 함 · 풀무원건강생활(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미 이취가 없어야 함</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>류(流)&amp;케어 1 오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 풀무원건강생활(주) · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 풀무원건강생활(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지며 이미 이취가 없어야 함</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 18개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "b4f19cf6-75bd-495d-a834-d8b7933ca990",
+  "productName": "혈행개선",
+  "productNameEn": "혈행개선",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003148",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "ⓛ성상 : 미황색의 내용물을 함유한 투명의 연질캡슐\r\n②EPA와 DHA의 합 :표시량(550mg/1080mg)의 80~120%\r\n③납 : 3.0mg/kg이하\r\n④카드뮴 : 1.0mg/kg이하\r\n⑤총수은 :0.5mg/kg\r\n⑥대장균군 : 음성\r\n⑦붕해 : 20분 이내이어야 한다.",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오",
+   "caution": "1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "갈색의 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>혈행개선<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 투명의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>혈행개선<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "b91a4085-4a1b-4c72-aaac-ebd26b0c6848",
+  "productName": "키드큐오메가3",
+  "productNameEn": "키드큐오메가3",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006839",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상 : 주황색의 점조성 내용물을 함유한 연주황색 장방형 연질캡슐제\r\n② EPA+DHA : 표시량(500mg/4.2g)의 80.0~120.0%\r\n③ 납(mg/kg) : 3.0 이하\r\n④ 카드뮴(mg/kg) : 1.0 이하\r\n⑤ 총수은(mg/kg) : 0.5 이하\r\n⑥ 헥산(mg/kg) : 5.0 이하\r\n⑦ 대장균군 : 음성",
+   "intake": "1일 3회, 1회 2캡슐(1.4g)을 충분히 씹어서 섭취하시기 바랍니다.",
+   "caution": "① 임산부와 수유부는 섭취에 주의하십시오.\r\n② 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
+   "dosageForm": "주황색의 점조성 내용물을 함유한 연주황색 장방형 연질캡슐제",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>키드큐오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 3회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>주황색의 점조성 내용물을 함유한 연주황색 장방형 연질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 2캡슐</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 주황색의 점조성 내용물을 함유한 연주황색 장방형 연질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>키드큐오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 3 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>3 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">2 capsules per serving</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 주황색의 점조성 내용물을 함유한 연주황색 장방형 연질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "ce5aabc3-d037-4307-8c4d-1b894d82be17",
+  "productName": "메가파워플러스",
+  "productNameEn": "메가파워플러스",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028210",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "성상 : 미황색의 연질캅셀\r\nEPA 와 DHA의 합 : 표시량(279mg/800mg)의 80-120%\r\n납 : 3.0이하(mg/kg)\r\n카드뮴 : 1.0이하(mg/kg)\r\n총수은 : 0.5이하(mg/kg)\r\n대장균군: 음성이어야한다\r\n붕해시험: 20분이내",
+   "intake": "1일 2회, 1회 2캅셀씩을 물과 함께 섭취하십시오.",
+   "caution": "특정 또는 특이체질등 알러지체질의 경우 성분을 확인하신후 섭취하십시오.\r\n섭취시 캅셀이 기도에 걸릴수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "미황색의 연질캅셀로 이미,이취가 없어야 한다.",
+   "storage": "직사광선을 피하고 서늘한 곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>메가파워플러스<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 연질캅셀 EPA 와 DHA의 합 : 표시량(279mg/800mg)의 80-120% 납 : · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 연질캅셀 EPA 와 DHA의 합 : 표시량(279mg/800mg)의 80-120% 납 :</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>메가파워플러스<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 연질캅셀 EPA 와 DHA의 합 : 표시량(279mg/800mg)의 80-120% 납 :</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "d021ad71-6674-4b46-a820-c9e7e23ad223",
+  "productName": "오메가-3 골드",
+  "productNameEn": "오메가-3 골드",
+  "manufacturer": "(주)한풍네이처팜",
+  "manufacturerEn": null,
+  "statementNo": "2012001900712",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]혈중 중성지질 개선,혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있는 황색의 내용물을 함유한 장방형의 투명한 연질캡슐로 이미, 이취가 없다.\r\n② EPA와 DHA의 합(mg/1,000mg) : 표시량(550)의 80~120%   \r\n③ 납(mg/kg) : 3.0이하\r\n④ 카드뮴(mg/kg) : 1.0이하\r\n⑤ 총수은(mg/kg) : 0.5이하 \r\n⑥ 대장균군 : 음성 \r\n⑦ 붕해시험 : 적합",
+   "intake": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질이신 경우 성분을 확인하신 후 섭취하여 주시기 바랍니다.\r\n- 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.\r\n- 어린이의 경우 섭취 시 목에 걸릴 우려가 있으므로 보호자의 지도하에 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있는 황색의 내용물을 함유한 장방형의 투명한 연질캡슐로 이미, 이취가 없다.",
+   "storage": "직사광선 및 고온다습한 곳을 피해 보관, 유통하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가-3 골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)한풍네이처팜 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있는 황색의 내용물을 함유한 장방형의 투명한 연질캡슐로 이미, 이취가 없다. · (주)한풍네이처팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선,혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있는 황색의 내용물을 함유한 장방형의 투명한 연질캡슐로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피해 보관, 유통하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가-3 골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)한풍네이처팜 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한풍네이처팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있는 황색의 내용물을 함유한 장방형의 투명한 연질캡슐로 이미, 이취가 없다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선 및 고온다습한 곳을 피해 보관, 유통하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "d028cb35-e068-4f57-a6b4-2f9f532cb335",
+  "productName": "오메가-3DHA&EPA",
+  "productNameEn": "오메가-3DHA&EPA",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003111",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상:미황색의 내용물을 함유한 투명의 연질캡슐\r\n② EPA와 DHA의 합:표시량(548mg/2000mg)의 80~120% \r\n③ 납:3.0mg/kg이하 \r\n④ 카드뮴:1.0mg/kg이하 \r\n⑤ 총수은:0.5mg/kg이하 \r\n⑥ 대장균군:음성이어야 한다.\r\n⑦ 붕해 : 20분이내",
+   "intake": "1일 2회, 1회 2캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색의 내용물을 함유한 투명한 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>오메가-3DHA&amp;EPA<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 투명의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>오메가-3DHA&amp;EPA<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "d492bccd-1806-4ffd-98ae-159bff3e905a",
+  "productName": "오메가3",
+  "productNameEn": "오메가3",
+  "manufacturer": "한국바이오팜(주)에이치피",
+  "manufacturerEn": null,
+  "statementNo": "20040020046355",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "성   상 : 미색의 내용물을 함유한 연질캡슐로 이미, 이취가 없어야 한다.\r\nEPA/DHA 의 합 : 1회 1캡슐 섭취시 표시량(500mg/1,000mg)의 80%~120% 이어야 한다. \r\n잔류용매 (mg/kg) : 5.0 이하 (헥산을 사용한 경우)\r\n납 : 3.0 이하\r\n카드뮴 : 1.0 이하\r\n총 수은 : 0.5 이하\r\n대장균군 : 음성 이어야 한다.\r\n붕해시험 : 적합 이어야 한다.",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취합니다.",
+   "caution": "① 알레르기, 특이체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.\r\n② 어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 아래 섭취하여 주시기 바랍니다.\r\n③ 제품 개봉후에는 가급적 빨리 섭취하시기 바랍니다.",
+   "dosageForm": "미색의 내용물을 함유한 연질 캡슐",
+   "storage": "습기가 적고 직사광선을 받지 않는 상온에 보관하시고, 냉장보관은 피해 주십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>오메가3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">한국바이오팜(주)에이치피 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>한국바이오팜(주)에이치피 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 상온에 보관하시고, 냉장보관은 피해 주십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>오메가3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 한국바이오팜(주)에이치피 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 한국바이오팜(주)에이치피</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 습기가 적고 직사광선을 받지 않는 상온에 보관하시고, 냉장보관은 피해 주십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "e912d14b-e4f2-41a1-8924-4c454602ecba",
+  "productName": "서흥 슈퍼 오메가3 DHA 95",
+  "productNameEn": "서흥 슈퍼 오메가3 DHA 95",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006961",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 적색의 유상액을 함유한 미황색 장방형 장용성 연질캡슐\r\n② EPA와 DHA의 합 : 표시량(535 mg/ 0.75 g)의 80~120%\r\n③ 헥산(mg/kg) : 5.0 이하\r\n④ 납 : 3.0 mg/kg 이하\r\n⑤ 카드뮴 : 1.0 mg/kg 이하\r\n⑥ 총수은 : 0.5 mg/kg 이하\r\n⑦ 대장균군 : 음성\r\n⑧ 붕해 : 1액-2시간 이상/2액-1시간 이내",
+   "intake": "1일 1회, 1회 1캡슐(0.75 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "적색의 유상액을 함유한 미황색 장방형 장용성 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>서흥 슈퍼 오메가3 DHA 95<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>적색의 유상액을 함유한 미황색 장방형 장용성 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 적색의 유상액을 함유한 미황색 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>서흥 슈퍼 오메가3 DHA 95<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 적색의 유상액을 함유한 미황색 장방형 장용성 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "f07d450f-a32e-4883-a817-9086619c5968",
+  "productName": "리드콜플러스EPA/DHA",
+  "productNameEn": "리드콜플러스EPA/DHA",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028160",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "성상: 노랑색의 연질캅셀\r\nEPA 와 DHA의합: 표시량(264mg/1600mg)의80-120%\r\n납: 3.0이하(mg/kg)\r\n카드뮴: 1.0이하(mg/kg)\r\n총수은: 0.5이하(mg/kg)\r\n대장균군: 음성이어야한다\r\n붕해시험: 20분이내",
+   "intake": "1일 2회, 1회 2캅셀씩 물과 함께 섭취하십시오.",
+   "caution": "특정 또는 특이체질등 알러지체질의 경우 성분을 확인하신 후 섭취하십시오.\r\n섭취시 캅셀이 기도에 걸릴수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "노랑색의 연질캅셀",
+   "storage": "직사광선을 피하고 서늘한곳에 보관.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>리드콜플러스EPA/DHA<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>노랑색의 연질캅셀 EPA 와 DHA · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 노랑색의 연질캅셀 EPA 와 DHA</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>리드콜플러스EPA/DHA<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 노랑색의 연질캅셀 EPA 와 DHA</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 피하고 서늘한곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "f16cc86e-5b91-459a-8816-d1bfe851049f",
+  "productName": "EPA/DHA프리미엄",
+  "productNameEn": "EPA/DHA프리미엄",
+  "manufacturer": "태웅식품(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020003115",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상:미황색의 내용물을 함유한 투명의 연질캡슐\r\n② EPA와 DHA의 합:표시량(585mg/3000mg)의 80~120% \r\n③ 납:3.0mg/kg이하 \r\n④ 카드뮴:1.0mg/kg이하 \r\n⑤ 총수은:0.5mg/kg이하 \r\n⑥ 대장균군:음성이어야 한다.\r\n⑦ 붕해 : 20분이내",
+   "intake": "1일 3회, 1회 1캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "1) 특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.\r\n2) 제품 개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "미황색의 내용물을 함유한 투명한 연질캡슐",
+   "storage": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>EPA/DHA프리미엄<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">태웅식품(주) 제조 · 1일 3회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물을 함유한 투명의 연질캡슐 · 태웅식품(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>EPA/DHA프리미엄<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 태웅식품(주) · 3 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>3 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 태웅식품(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물을 함유한 투명의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "f1f8c2db-a3d9-44fa-8a97-9e02adbadb4d",
+  "productName": "닥터오메가-3",
+  "productNameEn": "닥터오메가-3",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028250",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "1. 성상 : 미황색의 내용물이 든 투명한 연질캡슐\r\n2. EPA와 DHA의 합 : 표시량(540mg/1,800mg)의 80~120%\r\n3. 납(mg/kg) : 3.0 이하\r\n4. 카드뮴(mg/kg) : 1.0 이하\r\n5. 총수은(mg/kg) : 0.5 이하\r\n6. 대장균군 : 음성\r\n7. 붕해도 : 20분 이내",
+   "intake": "1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "caution": "특이체질 등 알러지체질의 경우 성분을 확인하신 후 섭취하십시오.\r\n섭취 시 캡슐이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
+   "dosageForm": "미황색의 내용물이 든 투명한 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터오메가-3<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 내용물이 든 투명한 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 미황색의 내용물이 든 투명한 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>닥터오메가-3<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 미황색의 내용물이 든 투명한 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "f3136556-7afd-49c5-912a-b95c8f7f1869",
+  "productName": "OMEGA3+",
+  "productNameEn": "OMEGA3+",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "manufacturerEn": null,
+  "statementNo": "200400200071449",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성   상 : 주황색의 내용물을 함유한 명적색의 연질캡슐\r\n2) EPA와 DHA의 합 : 표시량의 80~120% 이상 ( 표시량  : 500 mg / 1,100 mg )\r\n3) 대장균군 : 음성\r\n4) 붕해 : 적합(20분 이내)",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "① 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하십시오.\r\n② 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "dosageForm": "주황색의 내용물을 함유한 명적색의 연질캡슐",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>OMEGA3+<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>(주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>OMEGA3+<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)한국씨엔에스팜 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)한국씨엔에스팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "f55cdfc4-f312-4238-856f-a2411d0747fe",
+  "productName": "종근당건강 오메가3탑 EPA DHA",
+  "productNameEn": "종근당건강 오메가3탑 EPA DHA",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "20040020006646",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없는 미황색의 투명한 내용물을 함유한 투명의 연질캡슐제\r\n(2) EPA와 DHA의 합(%) : 표시량(270mg/1.0g, 1회섭취기준)의 80.0~ 120.0%\r\n(3) 납(mg/kg) : 3.0 이하이어야 한다.\r\n(4) 카드뮴(mg/kg) : 1.0 이하이어야 한다. \r\n(5) 총수은(mg/kg) : 0.5 이하이어야 한다. \r\n(6) 대장균군 : 음성이어야 한다. \r\n(7) 붕해 : 20분 이내이어야 한다.",
+   "intake": "1일 2회 , 1회 1캡슐(1.0g)을 먹는물로 섭취.",
+   "caution": "① 알레르기 체질이신 경우 성분을 확인하신 후 섭취하십시오.\r\n② 섭취량 및 섭취방법을 확인한 후 섭취하시고, 기타 제품관련 사항은 소비자 상담실로 문의 하십시오.",
+   "dosageForm": "미황색 투명 내용물을 함유한 투명의 연질캡슐제",
+   "storage": "① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습에 주의하여 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>종근당건강 오메가3탑 EPA DHA<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없는 미황색의 투명한 내용물을 함유한 투명의 연질캡슐제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없는 미황색의 투명한 내용물을 함유한 투명의 연질캡슐제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 인습에 주의하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>종근당건강 오메가3탑 EPA DHA<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)서흥 · 2 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 이미, 이취가 없는 미황색의 투명한 내용물을 함유한 투명의 연질캡슐제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 인습에 주의하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "f69a9c33-3789-4750-8113-8db77286d348",
+  "productName": "김정문오메가-3골드",
+  "productNameEn": "김정문오메가-3골드",
+  "manufacturer": "코스맥스바이오(주)",
+  "manufacturerEn": null,
+  "statementNo": "20040020002902",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선②혈행개선",
+   "baseStandard": "① 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.\r\n② EPA와 DHA의 합 : 표시량(168mg/560mg)의 80%~120%\r\n③ 납(mg/kg) : 3.0 이하\r\n④ 카드뮴(mg/kg) : 1.0 이하\r\n⑤ 총수은(mg/kg) : 0.5 이하\r\n⑥ 대장균군 : 음성\r\n⑦ 붕해시험 : 적합",
+   "intake": "1일 3회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "섭취 시 목에 걸리거나 불편할 수 있으므로 반드시 물과 함께 섭취하십시오. \r\n섭취 시 위장장애, 소화불량의 증상이 있을 경우 섭취를 중단하십시오.\r\n개인의 신체 상태에 따라 이상 증상이 생길 경우 섭취를 중단하십시오.\r\n섭취 전 제품에 이상이 있는 경우 섭취를 금하십시오.\r\n특정 원료 성분에 알레르기 체질은 원료 성분을 확인 후 섭취하십시오.",
+   "dosageForm": "미황색의 유상 내용물을 함유한 투명색의 연질캡슐.",
+   "storage": "수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.\r\n어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 2년."
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>김정문오메가-3골드<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 3회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>김정문오메가-3골드<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by 코스맥스바이오(주) · 3 times a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>3 times a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 코스맥스바이오(주)</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>Storage</b> 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "fa8e2043-0157-43e6-b16e-acce35e143f2",
+  "productName": "오감청",
+  "productNameEn": "오감청",
+  "manufacturer": "(주)유니쎌팜",
+  "manufacturerEn": null,
+  "statementNo": "20040020028279",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[오메가-3지방산함유유지 제품]①혈중 중성지질 개선에 도움을 줄 수 있음 ②혈행개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 투명한 연질캡슐\r\n2. EPA와 DHA의 합 : 표시량(600mg/2g)의 80~120%\r\n3. 납(mg/kg) : 3.0 이하\r\n4. 총 수은(mg/kg) : 0.5 이하\r\n5. 카드뮴(mg/kg) : 1.0 이하\r\n6. 대장균군 : 음성\r\n7. 붕해도 : 20분 이내",
+   "intake": "1일 2회, 1회 2캡슐씩 물과 함께 섭취하십시오.",
+   "caution": "- 섭취 시 캡슐이 기도에 걸릴 수 있으므로 반드시 물과 함께 섭취하십시오.\r\n- 특이체질 등 알러지 체질의 경우 제품성분을 확인하신 후 섭취하십시오.",
+   "dosageForm": "투명한 연질캡슐",
+   "storage": "고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">오메가-3지방산 함유 유지</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>오감청<small>오메가-3지방산 함유 유지</small></h1><p class=\"sd-meta\">(주)유니쎌팜 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>오메가-3지방산 함유 유지</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>오메가-3지방산 함유 유지</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>투명한 연질캡슐 · (주)유니쎌팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 투명한 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>오메가-3지방산 함유 유지 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Omega-3 fatty acid oil</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>오감청<small>Omega-3 fatty acid oil</small></h1><p class=\"sd-meta\">Made by (주)유니쎌팜 · 2 times a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Omega-3 fatty acid oil</b> as its functional ingredient. The official directions are <b>2 times a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Omega-3 fatty acid oil</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)유니쎌팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help improve blood triglycerides.</li><li>May help improve blood circulation.</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 투명한 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Omega-3 fatty acid oil</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

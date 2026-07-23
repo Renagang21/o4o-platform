@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-policosanol-c",
+  "createdMasters": [
+    "a7afaa2b-3449-40ea-b45d-291e98cdba15"
+  ],
+  "createdSpd": [
+    "eb4cdf1d-a331-420a-9d80-3d31e0f1e75a",
+    "56dbb0a3-4f46-4f28-9bb6-95eba0094967"
+  ],
+  "candIds": [
+    "43cdd8ab-ff23-47ef-ba25-746e8395271a"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "43cdd8ab-ff23-47ef-ba25-746e8395271a",
+      "stmt": "200400200021296",
+      "prev_status": "pending"
+    }
+  ]
+}

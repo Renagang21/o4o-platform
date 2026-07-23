@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-globin-hydrolysate-c",
+  "createdMasters": [
+    "b0c1bd28-7bd7-4715-a87b-da5530314f7a"
+  ],
+  "createdSpd": [
+    "913c79ea-d0b7-4616-bba0-4fa1b7ec9d58",
+    "36c0f367-772d-4a2b-a229-eb59537552b5"
+  ],
+  "candIds": [
+    "03713f09-eba1-41a3-9f9a-01c04278fbe4"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "03713f09-eba1-41a3-9f9a-01c04278fbe4",
+      "stmt": "20040020006798",
+      "prev_status": "pending"
+    }
+  ]
+}

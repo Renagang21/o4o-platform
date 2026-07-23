@@ -32,6 +32,8 @@ function normAtom(s: string): string {
 const ATOM_EN: Array<{ re: RegExp; en: string }> = [
   // 포스파티딜세린 인지·피부
   { re: /^노화로인해저하된인지력개선/, en: 'improve cognitive function that declines with aging' },
+  // 인지기능(PQQ·천마·참당귀 등) — 공식 '노화로 (인해) 저하된 인지기능 개선'
+  { re: /^노화로(인해)?저하된인지기능개선/, en: 'improve cognitive function that declines with aging' },
   { re: /^자외선에의한피부손상로부터피부건강유지/, en: 'maintain skin health from UV-induced skin damage' },
   { re: /^피부보습/, en: 'support skin moisturizing' },
   // 빌베리·헤마토코쿠스 눈 피로
@@ -42,12 +44,14 @@ const ATOM_EN: Array<{ re: RegExp; en: string }> = [
   // 혈행·혈중 지표(폴백 보강)
   { re: /^기억력개선/, en: 'improve memory' },
   { re: /^혈행개선/, en: 'improve blood circulation' },
+  { re: /^식후혈중중성지질개선/, en: 'improve post-meal blood triglycerides' },
   { re: /^혈중중성지질개선/, en: 'improve blood triglycerides' },
-  { re: /^혈중콜레스테롤개선/, en: 'improve blood cholesterol' },
+  { re: /^(높은)?혈중콜레스테롤수치?개선/, en: 'improve blood cholesterol' },
   { re: /^혈압조절/, en: 'support blood pressure regulation' },
   // 항산화
   { re: /^항산화작용을하여유해산소로부터세포를보호/, en: 'protect cells from reactive oxygen species through antioxidant activity' },
   { re: /^유해산소로부터세포를보호/, en: 'protect cells from reactive oxygen species' },
+  { re: /^산화스트레스로부터인체를?보호/, en: 'protect the body from oxidative stress' },
   { re: /^항산화/, en: 'antioxidant activity' },
 ];
 
@@ -64,8 +68,12 @@ function mapAtom(atom: string): string | null {
  */
 export function mapFunctionEnC(ko: string): string | null {
   if (!ko) return null;
-  // '원료명 :' 접두 제거(예 '포스파티딜세린 : ...')
-  const cleaned = ko.replace(/^[^:：]{1,20}[:：]\s*/, '');
+  // 공식 원문 이중언어/따옴표 형식 정리: '(영문) ...' 영어 tail 제거, '(국문)' 마커·따옴표 제거.
+  const cleaned = ko
+    .replace(/\(?\s*영문\s*\)?[\s\S]*$/, '')       // (영문)/영문 이후(영어 병기) 제거
+    .replace(/\(?\s*국문\s*\)?\s*/g, '')            // (국문) 마커 제거
+    .replace(/[“”"『』「」''`]/g, '')                // 따옴표류 제거
+    .replace(/^[^:：]{1,20}[:：]\s*/, '');           // '원료명 :' 접두 제거(예 '포스파티딜세린 : ...')
   const unified = cleaned.replace(/[･・‧∙•⋅․]/g, '·');
   const parts = unified.split(/·/).map((p) => p.trim()).filter((p) => p.length >= 2);
   if (parts.length < 1) return null;

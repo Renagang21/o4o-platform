@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-gastrodia-extract-c",
+  "createdMasters": [
+    "57781f1c-1c01-401f-8d52-3e51889e56fc",
+    "ac891eb9-881b-4469-86ff-5d4bc75bb273"
+  ],
+  "createdSpd": [
+    "25e26afe-bd25-4a87-89e4-ed7f05b82dca",
+    "17a14716-4a8a-4390-aa22-2e1a9f041036",
+    "0dca575e-9d64-4ced-92b1-85ca4bae0980",
+    "de4d3be3-ba60-4ece-b8da-75a766f30fe8"
+  ],
+  "candIds": [
+    "36fc6c7e-231f-4090-aa73-85276f73ea5b",
+    "94a17b3b-5166-418d-a7e9-4e1afe6c1552"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "36fc6c7e-231f-4090-aa73-85276f73ea5b",
+      "stmt": "202400281494",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "94a17b3b-5166-418d-a7e9-4e1afe6c1552",
+      "stmt": "202400281493",
+      "prev_status": "pending"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-reishi-fruitbody-c",
+  "createdMasters": [
+    "02908388-74dc-4539-88eb-34a64042956d",
+    "ec0948c2-ecfd-4401-941b-ca0357a9df02"
+  ],
+  "createdSpd": [
+    "9ec5088a-9e95-4c04-b138-eba44bdb7db8",
+    "c8751aa5-180e-4a9e-82ec-4b94b9d7f285",
+    "b1ae0d32-4281-4b67-93f6-45db60e9a2ab",
+    "8be46758-e358-494c-8e5d-36d63eb717e9"
+  ],
+  "candIds": [
+    "f2699074-8740-4506-91f4-702b934dad51",
+    "f35f42db-bac2-408e-813a-1e04623ec7fb"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "f2699074-8740-4506-91f4-702b934dad51",
+      "stmt": "2004002003642",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "f35f42db-bac2-408e-813a-1e04623ec7fb",
+      "stmt": "2004002001818",
+      "prev_status": "pending"
+    }
+  ]
+}

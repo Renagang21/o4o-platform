@@ -52,12 +52,29 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '스쿠알렌': { key: '스쿠알렌', slug: 'squalene', displayKo: '스쿠알렌', displayEn: 'Squalene', labelRe: /스쿠알렌/, statusHint: 'READY' },
   '마늘': { key: '마늘', slug: 'garlic', displayKo: '마늘', displayEn: 'Garlic', labelRe: /마늘/, statusHint: 'READY' },
   '천마등복합추출물HX106': { key: '천마등복합추출물HX106', slug: 'gastrodia-hx106', displayKo: '천마등복합추출물(HX106)', displayEn: 'Gastrodia complex extract (HX106)', labelRe: /HX106/i, statusHint: 'READY' },
+  // ── C-09 discovery(도메인=눈·인지·혈행·항산화, B 레지스트리·shared classify 미충돌). 기능성 EN=C overlay(인지기능·콜레스테롤수치·식후중성지질·산화스트레스·눈·혈행) grounded.
+  '오메가3지방산함유유지': { key: '오메가3지방산함유유지', slug: 'omega-3-oil', displayKo: '오메가-3지방산 함유 유지', displayEn: 'Omega-3 fatty acid oil', labelRe: /오메가[-\s]?3/, statusHint: 'READY' },
+  '피롤로퀴놀린퀴논이나트륨염': { key: '피롤로퀴놀린퀴논이나트륨염', slug: 'pqq', displayKo: '피롤로퀴놀린퀴논이나트륨염', displayEn: 'Pyrroloquinoline quinone disodium', labelRe: /피롤로퀴놀린퀴논|PQQ|NOVAQ/i, statusHint: 'READY' },
+  '천마추출물': { key: '천마추출물', slug: 'gastrodia-extract', displayKo: '천마추출물', displayEn: 'Gastrodia elata extract', labelRe: /천마추출물/, statusHint: 'READY' },
+  '참당귀추출분말': { key: '참당귀추출분말', slug: 'angelica-gigas', displayKo: '참당귀추출분말', displayEn: 'Angelica gigas extract', labelRe: /참당귀/, statusHint: 'READY' },
+  '피브로인추출물BF7': { key: '피브로인추출물BF7', slug: 'fibroin-bf7', displayKo: '피브로인추출물BF-7', displayEn: 'Fibroin extract BF-7', labelRe: /피브로인|BF-?7/i, statusHint: 'READY' },
+  '폴리코사놀': { key: '폴리코사놀', slug: 'policosanol', displayKo: '폴리코사놀-사탕수수 왁스알코올', displayEn: 'Policosanol (sugarcane wax alcohol)', labelRe: /폴리코사놀/, statusHint: 'READY' },
+  '식물스타놀에스테르': { key: '식물스타놀에스테르', slug: 'plant-stanol-ester', displayKo: '식물스타놀 에스테르', displayEn: 'Plant stanol ester', labelRe: /식물스타놀|스타놀에스테르/, statusHint: 'READY' },
+  '칸탈로프멜론추출물': { key: '칸탈로프멜론추출물', slug: 'cantaloupe-melon', displayKo: '칸탈로프멜론추출물', displayEn: 'Cantaloupe melon extract', labelRe: /칸[탈타]로프멜론/, statusHint: 'READY' },
+  '글로빈가수분해물': { key: '글로빈가수분해물', slug: 'globin-hydrolysate', displayKo: '글로빈 가수분해물', displayEn: 'Globin hydrolysate', labelRe: /글로빈/, statusHint: 'READY' },
+  '영지버섯자실체추출물': { key: '영지버섯자실체추출물', slug: 'reishi-fruitbody', displayKo: '영지버섯자실체추출물', displayEn: 'Reishi mushroom fruiting body extract', labelRe: /영지버섯/, statusHint: 'READY' },
 };
 
-/** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/·(중점) 구분. */
+/** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/문장종결 경계 구분.
+ *  이중언어 원문((국문)/(영문) May help…) 은 영어 블록·마커 제거로 KO 초안 영어 누출을 차단하고,
+ *  한 브래킷에 다항 기능성이 병기된 제품(복합)은 문장종결('…있음/있습니다/필요함' 등) 경계로 분리하여
+ *  각 원자를 개별 매핑한다(미매핑 원자 발생 시 resolveFunctions 가 pending 처리 → 안전 보류). */
 export function extractFunctionsKo(mainFn: string): string[] {
-  let t = normalizeSource(mainFn); t = t.replace(/\[[^\]]*\]/g, ' ');
-  return [...new Set(t.split(/[①②③④⑤⑥⑦⑧⑨⑩]|(?:^|\s)\(?\d+[).]|\s*\/\s*/)
+  let raw = (mainFn ?? '').replace(/[（]/g, '(').replace(/[）]/g, ')');
+  // (영문)/영어 병기(May help…) 블록 및 (국문) 마커 제거 — 원문 KO 기능성만 보존
+  raw = raw.replace(/\(?\s*영문\s*\)?[\s\S]*$/, '').replace(/May\s+help[\s\S]*$/i, '').replace(/\(?\s*국문\s*\)?/g, '');
+  let t = normalizeSource(raw); t = t.replace(/\[[^\]]*\]/g, ' ');
+  return [...new Set(t.split(/[①②③④⑤⑥⑦⑧⑨⑩]|(?:^|\s)\(?\d+[).]|\s*\/\s*|(?<=있음|있습니다|없음|필요함|가능함)[.。]?\s+(?=[가-힣])/)
     .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。\s]+$/, '').trim())
     .filter((x) => x.length >= 5 && /도움|개선|유지|억제|완화|증진|보호|보습/.test(x)))];
 }

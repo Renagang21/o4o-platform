@@ -1,0 +1,25 @@
+[
+ {
+  "statementNo": "20040020006798",
+  "candidateId": "03713f09-eba1-41a3-9f9a-01c04278fbe4",
+  "shard": 0,
+  "ingredientKey": "글로빈가수분해물",
+  "productName": "보움글로빈가수분해물",
+  "manufacturer": "(주)서흥",
+  "functionsKo": [
+   "식후 혈중 중성지질 개선에 도움을 줄 수 있음(기타기능Ⅱ)"
+  ],
+  "functionsEn": [
+   "May help improve post-meal blood triglycerides."
+  ],
+  "source": {
+   "mainFunction": "[글로빈 가수분해물]식후 혈중 중성지질 개선에 도움을 줄 수 있음(기타기능Ⅱ)",
+   "baseStandard": "(1) 성상 : 이미, 이취가 없는 흰 노란색 제피정제\r\n(2) Val-Val-Tyr-Pro : 표시량(8.5mg/1.65g)의 80.0~120.0%\r\n(3) 납(mg/kg) : 1.0 이하\r\n(4) 카드뮴(mg/kg) : 0.5 이하\r\n(5) 총수은(mg/kg) : 0.5 이하\r\n(6) 총비소(mg/kg) : 1.0 이하\r\n(7) 대장균군 : 음성 \r\n(8) 붕해 : 60분 이내",
+   "intake": "1일 1회, 1회 3정(1.65g)을 충분한 물과 함께 섭취.(식사와함께섭취)",
+   "dosageForm": "흰 노란색 제피정제",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.\r\n② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오.",
+   "caution": "[글로빈 가수분해물]영유아, 어린이, 임산부와 수유부는 섭취 시 주의. 높은 혈당 및 당뇨환자는 섭취 시 주의\r\n특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오."
+  }
+ }
+]

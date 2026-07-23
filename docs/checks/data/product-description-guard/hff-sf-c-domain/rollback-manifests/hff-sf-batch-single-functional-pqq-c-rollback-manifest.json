@@ -1,0 +1,65 @@
+{
+  "tag": "batch:single-functional-pqq-c",
+  "createdMasters": [
+    "d6623b11-e0a9-47bb-9ac6-7b599760ab24",
+    "17f754c5-6623-47d5-b9f9-22adad38acb8",
+    "1bae3cae-867e-4cd1-862f-4bb1e6e4b364",
+    "4919a893-b581-401f-9a82-637863d65498",
+    "89f88cc3-ae08-48d8-ab7d-6ee51cb657e9",
+    "f7c9813a-66d6-406f-8007-406d24ccc35e"
+  ],
+  "createdSpd": [
+    "9eaabfa6-9cc6-4a3e-97f7-71ba269ddcd0",
+    "40e004a7-3f35-4665-94da-0c1bef2690a7",
+    "58349010-6d6e-4f6c-b751-4addd2b368a4",
+    "19852ee8-4e04-45b3-bcdc-306762825fdd",
+    "e586d5ba-a995-4ef6-8b65-1708de3a7c02",
+    "ba3098bc-a1f7-4a76-9d1f-1c3ffea99486",
+    "c3668863-dbec-4c30-a582-78203f028ae1",
+    "89105e79-df37-47f7-8933-9d4c2ad8279e",
+    "26ee1770-293d-4f06-af16-ab34a18a6423",
+    "f407d9b6-d70a-4f8b-8c81-6175fb14cc1b",
+    "2d2ae1d6-99ef-4650-97cf-fadda2f01712",
+    "f3c722ab-61d1-4534-9da1-04967d10dd55"
+  ],
+  "candIds": [
+    "681504d6-bf9a-4eef-a6d1-14248b9c61f5",
+    "7f964cca-f785-41e6-be80-34bd6889bc0a",
+    "acb4dc2f-13c5-47dc-845b-13f814f37e05",
+    "b9466e6c-1fe2-441a-9bc4-5d4d6b923f0b",
+    "dedf3f15-4471-472f-b642-f7e9d9e32a62",
+    "edf43f82-8ab2-41f1-b01e-1680357c0c04"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "681504d6-bf9a-4eef-a6d1-14248b9c61f5",
+      "stmt": "200400200083374",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "7f964cca-f785-41e6-be80-34bd6889bc0a",
+      "stmt": "200400200083366",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "acb4dc2f-13c5-47dc-845b-13f814f37e05",
+      "stmt": "200400200083388",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "b9466e6c-1fe2-441a-9bc4-5d4d6b923f0b",
+      "stmt": "200400200083380",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "dedf3f15-4471-472f-b642-f7e9d9e32a62",
+      "stmt": "200400200083394",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "edf43f82-8ab2-41f1-b01e-1680357c0c04",
+      "stmt": "200400200083379",
+      "prev_status": "pending"
+    }
+  ]
+}
