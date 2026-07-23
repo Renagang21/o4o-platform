@@ -46,6 +46,11 @@ export const SF_INGREDIENTS: Record<string, SfIngredient> = {
   '빌베리추출물': { key: '빌베리추출물', slug: 'bilberry', displayKo: '빌베리추출물', displayEn: 'Bilberry extract', labelRe: /빌베리/, statusHint: 'PENDING' },
   '스피루리나': { key: '스피루리나', slug: 'spirulina', displayKo: '스피루리나', displayEn: 'Spirulina', labelRe: /스피루리나/, statusHint: 'READY' },
   '클로렐라': { key: '클로렐라', slug: 'chlorella', displayKo: '클로렐라', displayEn: 'Chlorella', labelRe: /클로렐라/, statusHint: 'READY' },
+  // ── C-08 discovery HIT(도메인=항산화·혈행·인지, classify 미등재, mapFunctionEn 기존 커버). labelRe 는 브래킷 유일식별.
+  '토마토추출물': { key: '토마토추출물', slug: 'tomato', displayKo: '토마토추출물', displayEn: 'Tomato extract', labelRe: /토마토/, statusHint: 'READY' },
+  '스쿠알렌': { key: '스쿠알렌', slug: 'squalene', displayKo: '스쿠알렌', displayEn: 'Squalene', labelRe: /스쿠알렌/, statusHint: 'READY' },
+  '마늘': { key: '마늘', slug: 'garlic', displayKo: '마늘', displayEn: 'Garlic', labelRe: /마늘/, statusHint: 'READY' },
+  '천마등복합추출물HX106': { key: '천마등복합추출물HX106', slug: 'gastrodia-hx106', displayKo: '천마등복합추출물(HX106)', displayEn: 'Gastrodia complex extract (HX106)', labelRe: /HX106/i, statusHint: 'READY' },
 };
 
 /** 제품 MAIN_FNCTN → 공식 기능성 문장 분리(원문 grounded). 번호/원문자/슬래시/·(중점) 구분. */

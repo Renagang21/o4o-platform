@@ -1,0 +1,48 @@
+[
+ {
+  "statementNo": "200400200072747",
+  "candidateId": "1c26bdc0-d521-4008-a5e6-553819badf5b",
+  "shard": 2,
+  "ingredientKey": "천마등복합추출물HX106",
+  "productName": "락티브 브레인 HX106",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "functionsKo": [
+   "기억력 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with memory improvement"
+  ],
+  "source": {
+   "mainFunction": "[천마 등 복합추출물(HX106)] 기억력 개선에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 고유의 향미가 있고 이미·이취가 없는 갈색의 분말\n2) Gastrodin(mg/g) : 표시량의 80 ~ 120% (표시량 : 0.84 mg / 4,000 mg)\n3) Salvianolic acid B(mg/g) : 표시량의 80 ~ 120% (표시량 : 8.16 mg / 4,000 mg)\n4) Spicatoside A : 확인되어야 함\n5) Ellagic acid : 확인되어야 함\n6) 납(mg/kg) : 1.0 이하\n7) 총비소(mg/kg) : 1.0 이하\n8) 카드뮴(mg/kg) : 0.5 이하\n9) 총수은(mg/kg) : 0.1 이하\n10) 대장균군 : 음성\n11) 총 아플라톡신(ug/kg) : 15 이하(단, B1은 10 이하)\n12) 오크라톡신 A(ug/kg) : 10 이하",
+   "intake": "1일 2회, 1회 1포(1포 당 2 g)를 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 갈색의 분말",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "caution": "1) 소비기한을 확인하시기 바라며, 섭취량 및 섭취방법을 준수하시기 바랍니다.\n2) 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다. \n3) 임산부와 수유부는 섭취에 주의하십시오.\n4) 흡습의 우려가 있으니 개봉한 제품은 바로 섭취하시기 바랍니다."
+  }
+ },
+ {
+  "statementNo": "200400200072483",
+  "candidateId": "5b1e37e7-e5e8-4c7c-8cf5-63aa76701d22",
+  "shard": 0,
+  "ingredientKey": "천마등복합추출물HX106",
+  "productName": "포커스온",
+  "manufacturer": "(주)한국씨엔에스팜",
+  "functionsKo": [
+   "기억력 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with memory improvement"
+  ],
+  "source": {
+   "mainFunction": "[천마 등 복합추출물(HX106)] \n기억력 개선에 도움을 줄 수 있음",
+   "baseStandard": "[기준규격]\n   1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 갈색의 분말\n   2) Gastrodin : 표시량의 80 % ~ 120 % (표시량 : 0.77 mg / 4,000 mg)\n   3) Salvianolic acid B : 표시량의 80 % ~ 120 % (표시량 : 8.14 mg / 4,000 mg)  \n   4) Spicatoside A : 확인되어야 함\n   5) Ellagic acid : 확인되어야 함\n   6) 대장균군 : 음성 \n   7) 납(mg/kg) : 1.0 이하\n   8) 총비소(mg/kg) : 1.0 이하\n   9) 카드뮴(mg/kg) : 0.5 이하\n   10) 총수은(mg/kg) : 0.1 이하",
+   "intake": "1일 2회, 1회 1포(1포 당 2,000 mg)을 물과 함께 섭취하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 연한 갈색의 분말",
+   "shelfLife": "제조일로부터 24개월까지",
+   "storage": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.",
+   "caution": "① 특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.\n② 어린이의 경우 섭취 시 목에 걸릴 우려가 있으니 보호자의 지도하에 섭취하십시오.\n③ 임산부 및 수유부는 섭취에 주의하시기 바랍니다."
+  }
+ }
+]

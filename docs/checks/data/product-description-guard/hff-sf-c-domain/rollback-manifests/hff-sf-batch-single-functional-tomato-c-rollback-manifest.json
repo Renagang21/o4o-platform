@@ -1,0 +1,38 @@
+{
+  "tag": "batch:single-functional-tomato-c",
+  "createdMasters": [
+    "895087b5-c220-4159-93bd-9c5da3efab03",
+    "95389f15-00d6-4d6e-b3ca-9e3ff6006446",
+    "e6889f73-9226-4243-bdec-a4c567f62230"
+  ],
+  "createdSpd": [
+    "98ad2274-e8d8-4971-95f6-40c03800f4d5",
+    "eec10504-f305-45d9-8e0d-34ce98fff2cc",
+    "3e070d9b-6087-46bc-8757-b28ee8ea9263",
+    "fc9e907d-d7b5-4ed9-b6cb-43bc51422554",
+    "4c80a569-0445-4ebf-a1f7-c1edceff0169",
+    "1dacc73f-050a-4031-88ab-98218d7619d4"
+  ],
+  "candIds": [
+    "c709c471-7ac7-4c36-ad70-c08b82f4def3",
+    "c87c28ee-9b53-4e2b-a4fe-9f16a46c57fb",
+    "db7a1565-bf00-466d-a173-1d33163f6905"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "c709c471-7ac7-4c36-ad70-c08b82f4def3",
+      "stmt": "200400170211361",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c87c28ee-9b53-4e2b-a4fe-9f16a46c57fb",
+      "stmt": "200400150832176",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "db7a1565-bf00-466d-a173-1d33163f6905",
+      "stmt": "200400200061102",
+      "prev_status": "pending"
+    }
+  ]
+}

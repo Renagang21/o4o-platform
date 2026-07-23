@@ -1,0 +1,20 @@
+{
+  "tag": "batch:single-functional-gastrodia-hx106-c",
+  "createdMasters": [
+    "759477cf-be03-4fdb-abd5-e0a1312e734b"
+  ],
+  "createdSpd": [
+    "b033df71-5a67-4ea2-a4d3-b29e4e8aaf33",
+    "f9b2c072-9f28-4aeb-8c22-f878bbdb86f1"
+  ],
+  "candIds": [
+    "5b1e37e7-e5e8-4c7c-8cf5-63aa76701d22"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "5b1e37e7-e5e8-4c7c-8cf5-63aa76701d22",
+      "stmt": "200400200072483",
+      "prev_status": "pending"
+    }
+  ]
+}

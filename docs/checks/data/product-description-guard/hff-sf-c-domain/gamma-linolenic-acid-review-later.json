@@ -1,0 +1,57 @@
+[
+ {
+  "statementNo": "20040020003142",
+  "productName": "물레방아",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040015107423",
+  "productName": "건강한 감마리놀렌산100",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020001130",
+  "productName": "이브감마리놀렌산 300",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020003139",
+  "productName": "엠피(MP)4590",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020001114",
+  "productName": "이브감마리놀렌산에스(S)",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020046343",
+  "productName": "뉴감마리놀렌산",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "2004001508125",
+  "productName": "화진감마리놀렌산366",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040015107458",
+  "productName": "감마리놀렌산플러스",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "2004002003897",
+  "productName": "감마리놀렌산 이피오",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020003156",
+  "productName": "보라지종자유 감마리놀렌산",
+  "reason": "GROUNDING_PENDING_EN"
+ },
+ {
+  "statementNo": "20040020046339",
+  "productName": "감마리놀렌산레벨업",
+  "reason": "SERVING_PARSE_FAILED,BULK,GROUNDING_PENDING_EN"
+ }
+]

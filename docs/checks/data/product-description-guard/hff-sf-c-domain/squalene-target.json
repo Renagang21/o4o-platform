@@ -1,0 +1,58 @@
+[
+ {
+  "candidateId": "5d807684-f89c-4acd-ba2a-113918f59159",
+  "productName": "헬스하우스 스쿠알렌 1,250mg",
+  "productNameEn": "헬스하우스 스쿠알렌 1,250mg",
+  "manufacturer": "동서바이오팜(주) 안성공장",
+  "manufacturerEn": null,
+  "statementNo": "20220011370103",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[스쿠알렌] 항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미, 이취가 없는 투명한 노란색 내용물을 함유한 투명색의 장방형 연질캡슐\n2. 스쿠알렌 : 표시량(10 g / 10 g)의 80~120 %\n3. 대장균군 : 음성\n4. 붕해 : 20분 이내",
+   "intake": "1일 2회, 1회 4캡슐을 충분한 물과 함께 섭취하십시오.",
+   "caution": "",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 투명한 노란색 내용물을 함유한 투명색의 장방형 연질캡슐",
+   "storage": "고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">스쿠알렌</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>헬스하우스 스쿠알렌 1,250mg<small>스쿠알렌</small></h1><p class=\"sd-meta\">동서바이오팜(주) 안성공장 제조 · 1일 2회 1회 4캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>스쿠알렌</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 4캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>스쿠알렌</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 투명한 노란색 내용물을 함유한 투명색의 장방형 연질캡슐 · 동서바이오팜(주) 안성공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 4캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 투명한 노란색 내용물을 함유한 투명색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>스쿠알렌 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Squalene</span><span class=\"sd-badge\">2 times a day</span></div>\n  <h1>헬스하우스 스쿠알렌 1,250mg<small>Squalene</small></h1><p class=\"sd-meta\">Made by 동서바이오팜(주) 안성공장 · 2 times a day · 4 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Squalene</b> as its functional ingredient. The official directions are <b>2 times a day, 4 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Squalene</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 동서바이오팜(주) 안성공장</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">2 times a day</span><span class=\"sd-tag\">4 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 투명한 노란색 내용물을 함유한 투명색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습, 직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Squalene</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ },
+ {
+  "candidateId": "9fb311a2-4266-4c35-aaa1-10b5b0510b40",
+  "productName": "스몰윈도우 스쿠알렌",
+  "productNameEn": "스몰윈도우 스쿠알렌",
+  "manufacturer": "(주)알피바이오",
+  "manufacturerEn": null,
+  "statementNo": "20040017006732",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[스쿠알렌]①항산화에 도움을 줄 수 있음",
+   "baseStandard": "1) 성상 : 투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 투명한 유상의 액체\n2) 스쿠알렌 : 표시량(10 g/10,104 mg)의 80~120%\n *  비타민A 및 비타민D의 함량이 일일섭취량의 최대함량을 넘지 않도록 하여야 함.\n3) 대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐 섭취. 섭취 시 캡슐의 뾰족한 끝부분을 잘라 내용물만 짜서 드십시오.",
+   "caution": "냉장고 등 차가운 곳에 보관하시면 캡슐이 딱딱하게 되어 터트려 드시면 입안에 상처가 날 수 있으므로 상온에서 일정시간 녹인 후 드십시오. \n캡슐이 목에 걸릴 수 있으니 절대로 그냥 삼키지 마십시오.\n영유아에게 먹일 경우에는 우유나 이유식에 섞어 앉힌 자세로 먹이시기 바랍니다.\n스쿠알렌이 몸 속을 통과한 뒤 배설될 때에는 노폐물과 함께 나올 수 있으므로 그때는 화장실로 가셔서 처리하셔야 합니다.",
+   "dosageForm": "투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 투명한 유상의 액체",
+   "storage": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 36개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">스쿠알렌</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>스몰윈도우 스쿠알렌<small>스쿠알렌</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>스쿠알렌</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>스쿠알렌</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 투명한 유상의 액체 · (주)알피바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 투명한 유상의 액체</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>스쿠알렌 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Squalene</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>스몰윈도우 스쿠알렌<small>Squalene</small></h1><p class=\"sd-meta\">Made by (주)알피바이오 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Squalene</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Squalene</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)알피바이오</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 투명한 유상의 액체</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Squalene</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Refer to the official labelling before use</div></div>"
+  }
+ }
+]

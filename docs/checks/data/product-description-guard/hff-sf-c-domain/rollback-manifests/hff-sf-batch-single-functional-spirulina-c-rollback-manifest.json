@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-spirulina-c",
+  "createdMasters": [
+    "c7e6c3aa-6ac4-4738-a20a-c1de54190654",
+    "0d1d8d65-24d0-47f6-b6dd-9ca3976ea0ab"
+  ],
+  "createdSpd": [
+    "0232fe48-fb1d-479f-9b4b-19fbdb2c7545",
+    "09ecf3e4-0759-46e4-a36a-2182bf5121e0",
+    "a47ae7fd-99da-4e12-9259-db7c03995c7c",
+    "d5d9baa5-52de-4092-bcfd-f552e180a072"
+  ],
+  "candIds": [
+    "a0120521-f320-4acc-b455-e32eb892170c",
+    "d30be143-b674-468a-9c6c-d402effd9a5b"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "a0120521-f320-4acc-b455-e32eb892170c",
+      "stmt": "200400170211584",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "d30be143-b674-468a-9c6c-d402effd9a5b",
+      "stmt": "200400200072996",
+      "prev_status": "pending"
+    }
+  ]
+}

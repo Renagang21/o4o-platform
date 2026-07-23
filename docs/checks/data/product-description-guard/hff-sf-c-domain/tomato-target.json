@@ -1,0 +1,86 @@
+[
+ {
+  "candidateId": "c709c471-7ac7-4c36-ad70-c08b82f4def3",
+  "productName": "라이코마토",
+  "productNameEn": "라이코마토",
+  "manufacturer": "(주)비오팜",
+  "manufacturerEn": null,
+  "statementNo": "200400170211361",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[토마토추출물] ①항산화에 도움을 줄 수 있음",
+   "baseStandard": "①성상 : 고유의 향미가 있고 이미, 이취가 없으며 어두운 빨강색의 점도가 있는 내용물을 함유한 투명한 \n 타원형의 연질캡슐\n②all-trans-라이코펜 : 표시량(15 mg /500 mg)의 80~120%\n③납(mg/kg) : 1.0 이하\n④카드뮴(mg/kg) : 1.0 이하\n⑤수은(mg/kg) : 1.0 이하\n⑥비소(mg/kg) : 1.0 이하\n⑦초산에틸(mg/kg) : 50.0 이하\n⑧붕해시험 : 적합(20분 이내)\n⑨대장균군 : 음성",
+   "intake": "1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "caution": "(가) 알레르기 체질이신 분은 개인에 따라 과민반응을 나타낼 수 있음\n(나) 과량 섭취 시 피부색이 오렌지색으로 변할 수 있음\n(다) 임산부, 수유 여성 및 어린이는 섭취에 주의",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없으며 어두운 빨강색의 점도가 있는 내용물을 함유한 투명한  타원형의 연질캡슐",
+   "storage": "실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">토마토추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>라이코마토<small>토마토추출물</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>토마토추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>토마토추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 어두운 빨강색의 점도가 있는 내용물을 함유한 투명한 타원형의 연질캡슐 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 어두운 빨강색의 점도가 있는 내용물을 함유한 투명한 타원형의 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>토마토추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Tomato extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>라이코마토<small>Tomato extract</small></h1><p class=\"sd-meta\">Made by (주)비오팜 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Tomato extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Tomato extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)비오팜</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없으며 어두운 빨강색의 점도가 있는 내용물을 함유한 투명한 타원형의 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온/①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 유통하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Tomato extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "c87c28ee-9b53-4e2b-a4fe-9f16a46c57fb",
+  "productName": "파이토 액션 퓨어 부스터",
+  "productNameEn": "파이토 액션 퓨어 부스터",
+  "manufacturer": "주식회사한미양행",
+  "manufacturerEn": null,
+  "statementNo": "200400150832176",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[토마토추출물]\n항산화에 도움을 줄 수 있음",
+   "baseStandard": "(1) 성상 : 고유의 향미를 지니고 이미, 이취가 없는 어두운 빨간색의 내용물을 함유한 빨간 자주색 또는 탁한 적자색의 타원형 연질캡슐.\n(2) all-trans-라이코펜 : 표시량(5.7mg/500mg)의 80% 이상 120% 이하\n(3) 초산에틸(mg/kg) : 50.0 이하\n(4) 납(mg/kg) : 1.0 이하\n(5) 카드뮴(mg/kg) : 1.0 이하\n(6) 비소(mg/kg) : 1.0 이하\n(7) 수은(mg/kg) : 1.0 이하　　\n(8) 대장균군 : 음성\n(9) 붕해시험 : 20분 이내",
+   "intake": "1일 1회, 1회 1캡슐을 충분한 물과 함께 섭취.",
+   "caution": "알레르기 체질이신 경우 성분을 확인 한 후 섭취하시기 바랍니다.\n[토마토추출물]\n(가) 알레르기 체질이신 분은 개인에 따라 과민반응을 나타낼 수 있음\n(나) 과량 섭취 시 피부색이 오렌지색으로 변할 수 있음\n(다) 임산부, 수유 여성 및 어린이는 섭취에 주의",
+   "dosageForm": "고유의 향미를 지니고 이미, 이취가 없는 어두운 빨간색의 내용물을 함유한 빨간 자주색 또는 탁한 적자색의 타원형 연질캡슐.",
+   "storage": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.",
+   "shelfLife": "제조일로부터 36개월까지"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">토마토추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>파이토 액션 퓨어 부스터<small>토마토추출물</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>토마토추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>토마토추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 어두운 빨간색의 내용물을 함유한 빨간 자주색 또는 탁한 적자색의 타원형 연질캡슐. · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 어두운 빨간색의 내용물을 함유한 빨간 자주색 또는 탁한 적자색의 타원형 연질캡슐.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>토마토추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Tomato extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>파이토 액션 퓨어 부스터<small>Tomato extract</small></h1><p class=\"sd-meta\">Made by 주식회사한미양행 · Once a day · 1 capsule per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Tomato extract</b> as its functional ingredient. The official directions are <b>Once a day, 1 capsule per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Tomato extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사한미양행</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">1 capsule per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 어두운 빨간색의 내용물을 함유한 빨간 자주색 또는 탁한 적자색의 타원형 연질캡슐.</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>Storage</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Tomato extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ },
+ {
+  "candidateId": "db7a1565-bf00-466d-a173-1d33163f6905",
+  "productName": "안심보",
+  "productNameEn": "안심보",
+  "manufacturer": "(주)서흥",
+  "manufacturerEn": null,
+  "statementNo": "200400200061102",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[토마토추출물]항산화에 도움을 줄 수 있음\n\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌",
+   "baseStandard": "① 성상 : 암적색의 점조성 내용물을 함유한 암갈색 연질캡슐\n② (all-trans)-lycopene : 표시량(5.7 mg/g)의 80~120%\n③ 루테인 : 표시량(10 mg/g)의 80~120%\n④ 헥산(mg/kg) : 5.0 이하\n⑤ 초산에틸(mg/kg) : 50.0 이하\n⑥ 납(mg/kg) : 1.0 이하\n⑦ 총비소(mg/kg) : 1.0 이하\n⑧ 카드뮴(mg/kg) : 1.0 이하\n⑨ 총수은(mg/kg) : 1.0 이하\n⑩ 대장균군 : 음성 \n⑪ 붕해 :  20분 이내",
+   "intake": "1일 1회, 1회 2캡슐(1 g)을 충분한 물과 함께 섭취하십시오.",
+   "caution": "[토마토추출물]①임산부, 수유여성 및 어린이는 섭취에 주의②과량 섭취 시 피부색이 오렌지색으로 변할 수 있음③알레르기 체질이신 분은 개인에 따라 과민반응을 나타낼 수 있음\n\n[루테인]과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음.\n\n특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.\n\n개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의하시기 바랍니다.",
+   "dosageForm": "암적색의 점조성 내용물을 함유한 암갈색 연질캡슐",
+   "storage": "① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오.   ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.",
+   "shelfLife": "제조일부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">토마토추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>안심보<small>토마토추출물</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>토마토추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>토마토추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>암적색의 점조성 내용물을 함유한 암갈색 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 암적색의 점조성 내용물을 함유한 암갈색 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>토마토추출물 섭취를 챙기고 싶은 분</li><li>캡슐 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Tomato extract</span><span class=\"sd-badge\">Once a day</span></div>\n  <h1>안심보<small>Tomato extract</small></h1><p class=\"sd-meta\">Made by (주)서흥 · Once a day · 2 capsules per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Tomato extract</b> as its functional ingredient. The official directions are <b>Once a day, 2 capsules per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Tomato extract</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)서흥</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">Once a day</span><span class=\"sd-tag\">2 capsules per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 암적색의 점조성 내용물을 함유한 암갈색 연질캡슐</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>Storage</b> ① 제품은 직사광선을 피해 서늘한 곳에 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Tomato extract</li><li>Those who prefer capsules</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Allergic reactions may occur in sensitive individuals</div></div>"
+  }
+ }
+]

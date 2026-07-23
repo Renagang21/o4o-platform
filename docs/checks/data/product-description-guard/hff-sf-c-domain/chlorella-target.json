@@ -1,0 +1,58 @@
+[
+ {
+  "candidateId": "64ce5de7-1084-4f3d-ac7e-03f3ea39854a",
+  "productName": "클로렐라 뉴",
+  "productNameEn": "클로렐라 뉴",
+  "manufacturer": "(주)에스엘에스",
+  "manufacturerEn": null,
+  "statementNo": "2004001706286",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[클로렐라] 항산화에 도움을 줄 수 있음",
+   "baseStandard": "① 성상 : 고유의 향미가 있고 이미, 이취가 없는 녹색의 원형 정제\n ② 총 엽록소 : 표시량(74.25mg/3g)의 80~120%\n ③ 중금속 \n    (가) 납(mg/kg) : 1.0 이하\n    (나) 카드뮴(mg/kg) : 1.0 이하\n    (다) 수은(mg/kg) : 0.5 이하\n ④ 총 페오포르바이드(mg/kg) : 1,000 이하\n ⑤ 대장균군 : 음성\n ⑥ 붕해시험 : 적합(30분)",
+   "intake": "1일 3회, 1회 5정 씹거나 물과 함께 섭취하십시오.",
+   "caution": "- 특이체질, 알레르기 체질이신 경우에는 성분을 확인 후 섭취하십시오.\n- 어린이가 정제를 섭취할 경우 목에 걸릴 우려가 있으니 보호자의 관찰 아래 섭취하십시오.\n- 질병으로 인해 치료중이신 분은 의사와 상담 후 섭취하십시오.\n- 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "dosageForm": "고유의 향미가 있고 이미, 이취가 없는 녹색의 원형 정제",
+   "storage": "실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.",
+   "shelfLife": "24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">클로렐라</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>클로렐라 뉴<small>클로렐라</small></h1><p class=\"sd-meta\">(주)에스엘에스 제조 · 1일 3회 1회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>클로렐라</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 5정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>클로렐라</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 녹색의 원형 정제 · (주)에스엘에스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 녹색의 원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>클로렐라 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Chlorella</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>클로렐라 뉴<small>Chlorella</small></h1><p class=\"sd-meta\">Made by (주)에스엘에스 · 3 times a day · 5 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Chlorella</b> as its functional ingredient. The official directions are <b>3 times a day, 5 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Chlorella</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by (주)에스엘에스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 녹색의 원형 정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 24개월</div><div class=\"sd-item\"><b>Storage</b> 실온 / 직사광선 및 고온다습한 곳을 피하여 서늘한 실온에 보관하십시오.</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Chlorella</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ },
+ {
+  "candidateId": "c971175f-f19a-4a23-acce-41072ced7bf2",
+  "productName": "튼튼닷컴 클로렐라",
+  "productNameEn": "튼튼닷컴 클로렐라",
+  "manufacturer": "주식회사 노바렉스",
+  "manufacturerEn": null,
+  "statementNo": "200400200081290",
+  "category": "hff",
+  "source": {
+   "mainFunction": "[클로렐라] 항산화에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 검은초록색의 원형정제\n2. 총 엽록소 : 표시량(90mg/3750mg)의 80~120%\n3. 납(mg/kg) : 1.0 이하\n4. 카드뮴(mg/kg) : 1.0 이하\n5. 수은(mg/kg) : 0.5 이하\n6. 총 페오포르바이드(mg/kg) : 1,000이하\n7. 대장균군 : 음성\n8. 붕해 : 30분 이내",
+   "intake": "1일 3회 1회 5정(1정 250mg)을 충분한 물과 함께 섭취하십시오",
+   "caution": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.\n제품 개봉 또는 섭취 시 포장재에 의해 다칠 우려가 있으니 주의하시기 바랍니다.\n이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것\n동봉된 방습제는 절대 섭취하지 마십시오.",
+   "dosageForm": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 검은초록색의 원형정제",
+   "storage": "1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오\r\n2) 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오\r\n3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오",
+   "shelfLife": "제조일로부터 24개월"
+  },
+  "grounding": {
+   "declaredAmount": null,
+   "serving": null,
+   "calculationAllowed": false,
+   "ageBandsRaw": null
+  },
+  "drafts": {
+   "ko": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">클로렐라</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>튼튼닷컴 클로렐라<small>클로렐라</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 3회 1회 5정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>클로렐라</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 5정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>클로렐라</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 검은초록색의 원형정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 5정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 검은초록색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오 2) 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>클로렐라 섭취를 챙기고 싶은 분</li><li>정 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "en": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">Health Functional Food</span><span class=\"sd-badge is-solid\">Chlorella</span><span class=\"sd-badge\">3 times a day</span></div>\n  <h1>튼튼닷컴 클로렐라<small>Chlorella</small></h1><p class=\"sd-meta\">Made by 주식회사 노바렉스 · 3 times a day · 5 tablets per serving</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">This product features <b>Chlorella</b> as its functional ingredient. The official directions are <b>3 times a day, 5 tablets per serving</b>. Its officially recognised functions are listed below.</p>\n  <h2>Why this product</h2><ul class=\"sd-why\"><li>Functional ingredient: <b>Chlorella</b></li><li>Coliform negative — meets its MFDS notified standard</li><li>Made by 주식회사 노바렉스</li></ul>\n  <h2>Officially recognised functions</h2><ul class=\"sd-why\"><li>May help with antioxidant activity</li></ul>\n  <h2>Directions (exactly as officially stated)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">3 times a day</span><span class=\"sd-tag\">5 tablets per serving</span><span class=\"sd-tag\">With water</span></span></div>\n  <h2>Labelled standard</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>Appearance</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 검은초록색의 원형정제</div><div class=\"sd-item\"><b>Coliform</b> Negative</div><div class=\"sd-item\"><b>Shelf life</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>Storage</b> 1) 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오 2) 개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오 3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오</div></div>\n  <h2>Who it suits</h2><ul class=\"sd-who\"><li>Those who want to take Chlorella</li><li>Those who prefer tablets</li></ul></div><div class=\"sd-foot\"><b>Precautions</b> · Pregnant or breastfeeding women should consult a professional before use · Consult a professional if you have a medical condition or take medication · Allergic reactions may occur in sensitive individuals · Stop use and consult a professional if adverse effects occur</div></div>"
+  }
+ }
+]

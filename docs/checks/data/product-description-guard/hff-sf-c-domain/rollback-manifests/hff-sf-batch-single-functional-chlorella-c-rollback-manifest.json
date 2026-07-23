@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-chlorella-c",
+  "createdMasters": [
+    "9ea3bc88-4d74-4d81-96a4-eba87bb481e9",
+    "dc9ec40d-d2a4-4ddb-9693-78d133a2df12"
+  ],
+  "createdSpd": [
+    "4541eb83-cf9d-4316-bf7d-17ee26d7f229",
+    "aae3d23a-ee54-4bb9-82f9-31b3ec757287",
+    "dc69214b-73ed-4fb8-89e7-791768330e7c",
+    "8af829c4-fb6c-416e-a112-96045de069d3"
+  ],
+  "candIds": [
+    "64ce5de7-1084-4f3d-ac7e-03f3ea39854a",
+    "c971175f-f19a-4a23-acce-41072ced7bf2"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "64ce5de7-1084-4f3d-ac7e-03f3ea39854a",
+      "stmt": "2004001706286",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "c971175f-f19a-4a23-acce-41072ced7bf2",
+      "stmt": "200400200081290",
+      "prev_status": "pending"
+    }
+  ]
+}

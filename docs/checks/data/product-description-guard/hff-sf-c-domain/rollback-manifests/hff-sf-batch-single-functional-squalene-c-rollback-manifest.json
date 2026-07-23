@@ -1,0 +1,29 @@
+{
+  "tag": "batch:single-functional-squalene-c",
+  "createdMasters": [
+    "0667fabe-7dab-4e30-9af0-97053363e834",
+    "9972b9bb-256b-47a5-b6c9-9e1081f5a47b"
+  ],
+  "createdSpd": [
+    "319900ab-c802-484f-bbe0-73ae7d1138a7",
+    "dcb0a65e-f08c-4d16-a3c2-023a80535aed",
+    "007e7015-e815-4f9c-92d1-75b073928c6e",
+    "7ad375d8-05d3-4c08-9257-98fb6634bad9"
+  ],
+  "candIds": [
+    "5d807684-f89c-4acd-ba2a-113918f59159",
+    "9fb311a2-4266-4c35-aaa1-10b5b0510b40"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "5d807684-f89c-4acd-ba2a-113918f59159",
+      "stmt": "20220011370103",
+      "prev_status": "pending"
+    },
+    {
+      "candidateId": "9fb311a2-4266-4c35-aaa1-10b5b0510b40",
+      "stmt": "20040017006732",
+      "prev_status": "pending"
+    }
+  ]
+}
