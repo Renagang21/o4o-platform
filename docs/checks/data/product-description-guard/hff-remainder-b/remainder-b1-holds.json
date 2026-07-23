@@ -1,0 +1,92 @@
+[
+ {
+  "statementNo": "20040020028270",
+  "sig": "MSM_비타민B1_비타민B2_비타민B6_비타민C_판토텐산.json",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20040020020535",
+  "sig": "MSM_비타민D_칼슘.json",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20040020010320",
+  "sig": "MSM_아연.json",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20040020010369",
+  "sig": "MSM_아연.json",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "200400200061366",
+  "sig": "가르시니아_녹차.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200700170352758",
+  "sig": "나이아신_밀크씨슬_비타민B1_비타민B2_비타민B6_아연.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "201000190041445",
+  "sig": "마그네슘_비타민C_비타민D_비타민K_아연_칼슘.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20100019004542",
+  "sig": "망간_몰리브덴_비타민B12_비타민B6_비타민C_엽산.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200400200022781",
+  "sig": "몰리브덴_비타민C_비타민E.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200700170352956",
+  "sig": "몰리브덴_비타민C_아연.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040017059266",
+  "sig": "몰리브덴_비타민C_테아닌.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "2022001309314",
+  "sig": "몰리브덴_셀레늄_아연.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040020020333",
+  "sig": "비타민A_비타민D.json",
+  "reason": "REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003"
+ },
+ {
+  "statementNo": "20160012278185",
+  "sig": "비타민A_비타민D_비타민E_오메가3.json",
+  "reason": "BLOCKED:PRE-SRC-BASIS-MISMATCH-002"
+ },
+ {
+  "statementNo": "200400151101005",
+  "sig": "비타민B12_비타민B6_엽산.json",
+  "reason": "BLOCKED:D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "statementNo": "2004001601145",
+  "sig": "비타민B1_비타민B2_비타민B6.json",
+  "reason": "BLOCKED:H-COUNT-MISMATCH-001"
+ },
+ {
+  "statementNo": "2004001601146",
+  "sig": "비타민B1_비타민B2_비타민B6.json",
+  "reason": "BLOCKED:H-COUNT-MISMATCH-001"
+ },
+ {
+  "statementNo": "200400200142124",
+  "sig": "비타민C_비타민E_셀레늄_코엔자임Q10.json",
+  "reason": "G-MULTI:G-MULTI-AMOUNT-SOURCE"
+ }
+]
