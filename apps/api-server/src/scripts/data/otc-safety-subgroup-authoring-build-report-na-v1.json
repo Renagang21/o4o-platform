@@ -3,181 +3,91 @@
   "agent": "나",
   "built": [
     {
-      "slug": "diosmin600-01",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "16163a9e441311fc",
-      "T": 6,
-      "order": 901,
-      "sourceRef": "73c55697-f156-4c20-817b-a5f70a28ff8d",
-      "koHtmlLen": 1876,
-      "enHtmlLen": 3392
-    },
-    {
-      "slug": "diosmin600-02",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "4626ec4963997004",
+      "slug": "fexofenadine120-01",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "2f318ff7d7ad1095",
       "T": 5,
-      "order": 902,
-      "sourceRef": "92838b2e-27a5-42e4-8d09-8c46cac39398",
-      "koHtmlLen": 1839,
-      "enHtmlLen": 3197
+      "order": 1301,
+      "sourceRef": "fe84f261-847a-40a4-8648-91fd6c704fc8",
+      "koHtmlLen": 2083,
+      "enHtmlLen": 3675
     },
     {
-      "slug": "diosmin600-03",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "e1e66c9bed3b5ab6",
+      "slug": "fexofenadine120-02",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "342888e0806a95c7",
       "T": 5,
-      "order": 903,
-      "sourceRef": "85c906f1-6229-41c0-8ae3-1d649445ef66",
-      "koHtmlLen": 1944,
-      "enHtmlLen": 3525
+      "order": 1302,
+      "sourceRef": "3c425976-8aa7-42b2-81ab-84ab0e0fb24d",
+      "koHtmlLen": 2077,
+      "enHtmlLen": 3706
     },
     {
-      "slug": "diosmin600-04",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "4e0cc3122c0618d0",
+      "slug": "fexofenadine120-03",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "548624cb0959a55e",
+      "T": 5,
+      "order": 1303,
+      "sourceRef": "66519e2c-a8c7-43e5-8a31-006c70a916fb",
+      "koHtmlLen": 2096,
+      "enHtmlLen": 3695
+    },
+    {
+      "slug": "fexofenadine120-04",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "e5addac2c49668ad",
       "T": 4,
-      "order": 904,
-      "sourceRef": "920c6cb5-9783-4898-8ee6-9a6a4e5a873b",
-      "koHtmlLen": 1994,
-      "enHtmlLen": 3670
+      "order": 1304,
+      "sourceRef": "75788d3e-e948-45c5-86ed-67f3d4a6c580",
+      "koHtmlLen": 2084,
+      "enHtmlLen": 3675
     },
     {
-      "slug": "diosmin600-05",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "637fe405e55560c3",
-      "T": 4,
-      "order": 905,
-      "sourceRef": "8585b779-f45e-4e6c-8eb8-47e258a488dc",
-      "koHtmlLen": 1782,
-      "enHtmlLen": 3132
-    },
-    {
-      "slug": "diosmin600-06",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "6a72bdb2f01ab01e",
+      "slug": "fexofenadine120-05",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "d5df80b3da7acf6b",
       "T": 3,
-      "order": 906,
-      "sourceRef": "acad62a7-3c44-4a31-8f49-c03e5e6d99a3",
-      "koHtmlLen": 1786,
-      "enHtmlLen": 3109
+      "order": 1305,
+      "sourceRef": "5577bbb2-e5ea-4a80-81a6-1eaf671ddd26",
+      "koHtmlLen": 2086,
+      "enHtmlLen": 3859
     },
     {
-      "slug": "diosmin600-07",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "860a98c429235edc",
+      "slug": "fexofenadine120-06",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "e3b53055edb6cc22",
       "T": 3,
-      "order": 907,
-      "sourceRef": "f119f0c0-f4f6-4dd3-8c34-061df84a9f27",
-      "koHtmlLen": 1789,
-      "enHtmlLen": 3116
+      "order": 1306,
+      "sourceRef": "e14b3144-2a02-49a2-8e8b-001acd480d5f",
+      "koHtmlLen": 2177,
+      "enHtmlLen": 3842
     },
     {
-      "slug": "diosmin600-08",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "923c7a7ffab2bd83",
-      "T": 3,
-      "order": 908,
-      "sourceRef": "f3afd9d3-e216-4357-86d1-aca59b7f8e28",
-      "koHtmlLen": 1833,
-      "enHtmlLen": 3214
-    },
-    {
-      "slug": "diosmin600-09",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "b062737b9efd072f",
-      "T": 3,
-      "order": 909,
-      "sourceRef": "55fbd285-b9c7-4c62-8496-4a406986fae3",
-      "koHtmlLen": 1925,
-      "enHtmlLen": 3561
-    },
-    {
-      "slug": "diosmin600-10",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "b1b8d0d3a6b4714b",
-      "T": 3,
-      "order": 910,
-      "sourceRef": "dd374ef2-fe0d-470c-8aae-3849ea742bc7",
-      "koHtmlLen": 1801,
-      "enHtmlLen": 3175
-    },
-    {
-      "slug": "diosmin600-11",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "dba8fd2dd1679830",
-      "T": 3,
-      "order": 911,
-      "sourceRef": "089edd7c-a737-4bc3-878e-c4741c012fd3",
-      "koHtmlLen": 1856,
-      "enHtmlLen": 3253
-    },
-    {
-      "slug": "diosmin600-12",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "e047b476c7cd7808",
-      "T": 3,
-      "order": 912,
-      "sourceRef": "1764a641-0c4f-4fe6-807b-37ef5319ee76",
-      "koHtmlLen": 1831,
-      "enHtmlLen": 3178
-    },
-    {
-      "slug": "diosmin600-13",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "f111ec8fd295f45c",
-      "T": 3,
-      "order": 913,
-      "sourceRef": "09eed9d2-c386-472f-830d-8fd6d84bff03",
-      "koHtmlLen": 1803,
-      "enHtmlLen": 3189
-    },
-    {
-      "slug": "diosmin600-14",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "20380f76af10acb0",
+      "slug": "fexofenadine120-07",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "1a04b4adf4bf56e0",
       "T": 2,
-      "order": 914,
-      "sourceRef": "1a92d062-de5a-422b-873b-54276c6f3685",
-      "koHtmlLen": 1824,
-      "enHtmlLen": 3206
+      "order": 1307,
+      "sourceRef": "4bbf5888-f53a-4d3a-8b7f-d501a372ae4c",
+      "koHtmlLen": 2177,
+      "enHtmlLen": 3822
     },
     {
-      "slug": "diosmin600-15",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "a4302c49e04ffe29",
+      "slug": "fexofenadine120-08",
+      "groupKey": "펙소페나딘염산염|120밀리그램|정",
+      "safetyFp": "9e2531477eb37832",
       "T": 2,
-      "order": 915,
-      "sourceRef": "ee3ab4df-643d-45a4-8e8a-fccac3c83983",
-      "koHtmlLen": 1916,
-      "enHtmlLen": 3481
-    },
-    {
-      "slug": "diosmin600-16",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "eb472c50ae10c57c",
-      "T": 2,
-      "order": 916,
-      "sourceRef": "cce86668-8b75-45a9-8d39-98b134c8932f",
-      "koHtmlLen": 1754,
-      "enHtmlLen": 3070
-    },
-    {
-      "slug": "diosmin600-17",
-      "groupKey": "디오스민|600밀리그램|정",
-      "safetyFp": "eccbf92b92e9c388",
-      "T": 2,
-      "order": 917,
-      "sourceRef": "138f6c79-f90b-462d-8026-7d703c16a8b6",
-      "koHtmlLen": 1804,
-      "enHtmlLen": 3177
+      "order": 1308,
+      "sourceRef": "9f5dd223-44d3-4f93-8fdf-5c3ca396b3f2",
+      "koHtmlLen": 2018,
+      "enHtmlLen": 3650
     }
   ],
   "holds": [],
   "missingTm": [],
   "summary": {
-    "builtFiles": 17,
-    "builtMasters": 56,
+    "builtFiles": 8,
+    "builtMasters": 29,
     "holds": 0,
     "missingTm": 0
   }

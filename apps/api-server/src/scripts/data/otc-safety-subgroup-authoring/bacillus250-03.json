@@ -1,0 +1,67 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "bacillus250-03",
+  "order": 1203,
+  "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+  "safetyFp": "3471b9745f0547a6",
+  "sourceRef": "6ae9c9e0-f6e0-4115-8708-3cb781465bee",
+  "sensitive": false,
+  "title": "바실루스리케니포르미스균 250mg 캡슐 (정장제)",
+  "expectEasyMd5": "e4e86b21",
+  "masterIds": [
+    "1430d894-ff80-45f2-a331-4ef2649d53b0",
+    "16c7a383-96e2-47ab-aaae-ab7161131f97",
+    "34b677e4-882d-4444-8d76-5e2476c2cb06",
+    "417fa0af-39b4-4b52-ad1b-f97f9c66c14f",
+    "c1d89517-4b6a-442e-9bdf-feadaead11b2"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "e4e86b21",
+    "names": [
+      "정장생캡슐(바실루스리케니포르미스균)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 20,
+    "en": 10,
+    "total": 30
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 급ㆍ만성장염(창자염), 급ㆍ만성설사, 급성이질, 각종 원인에 기인한 장내 이상발효에 사용합니다.",
+    "usage": "성인은 1회 2캡슐씩, 1일 3회 복용합니다. 첫 회에는 4캅셀을 복용하십시오.어린이는 1회 1캡슐씩, 1일 3회 복용합니다.유아의 경우 캅셀 내용물을 소량의 물이나 우유에 타서 복용할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약을 복용하기 전에 3개월 미만의 영아는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.\n\n시프로플록사신, 이미페넴, 실라스타틴나트륨을 함께 투여 시 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "바실루스리케니포르미스균 250밀리그램",
+      "작용": "장내 유익균 환경을 도와 장염·설사 등 장의 이상 상태를 개선하는 생균 정장제입니다.",
+      "주요 증상": "급·만성 장염, 급·만성 설사, 급성 이질, 장내 이상발효",
+      "주의 대상": "3개월 미만 영아는 복용 전 의사·약사 상담, 정해진 용법·용량 준수",
+      "선택 포인트": "장염·설사·이질과 장내 이상발효에 쓰는 생균 정장제입니다."
+    }
+  },
+  "en": {
+    "title": "Bacillus licheniformis 250 mg Capsules (Intestinal Regulator)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for acute and chronic enteritis (bowel inflammation), acute and chronic diarrhea, acute dysentery, and abnormal intestinal fermentation due to various causes.",
+    "usage": "Adults take 2 capsules per 1 dose, 3 times a day, taking 4 capsules for the first dose. Children take 1 capsule per dose, 3 times a day. For infants, the capsule contents can be mixed into a small amount of water or milk.",
+    "caution": "Before taking this medicine, consult a doctor or pharmacist for infants under 3 months old. Follow the prescribed dosage and administration carefully. Consult a doctor or pharmacist when using ciprofloxacin, imipenem, or cilastatin sodium together with this medicine. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Bacillus licheniformis 250 mg",
+      "How it works": "A live-bacteria intestinal regulator that supports a healthy gut flora environment to improve bowel conditions such as enteritis and diarrhea.",
+      "Main symptoms": "Acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, abnormal intestinal fermentation",
+      "Caution for": "For infants under 3 months, consult a doctor or pharmacist before use; follow the prescribed dosage",
+      "Why this one": "A live-bacteria intestinal regulator for enteritis, diarrhea, dysentery, and abnormal intestinal fermentation."
+    }
+  }
+}

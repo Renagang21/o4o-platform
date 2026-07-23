@@ -1,0 +1,82 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "albendazole400-02",
+  "order": 1002,
+  "groupKey": "알벤다졸|400밀리그램|정",
+  "safetyFp": "7125caaa24b3ba47",
+  "sourceRef": "61001e17-9cf0-4b53-8c9b-6569a4b9c1b8",
+  "sensitive": false,
+  "title": "알벤다졸 400mg 정 (구충제)",
+  "expectEasyMd5": "126de4f2",
+  "masterIds": [
+    "01bd3247-64dd-4918-9d2a-8d52c2dd24e5",
+    "0eb241d9-9bd0-4441-9e45-b0f70fe521c9",
+    "2a1c8aad-dedb-4a25-87a3-f4e75008a704",
+    "3e89f854-6db9-4a37-8e77-b7817cd677da",
+    "5eaa193e-585d-42f7-94b9-1f1938905186",
+    "64b407fb-f2fb-4b10-8cba-21aa0c6deca8",
+    "6c371139-1397-4713-9f94-0de9bba1eb92",
+    "76e45140-2e9a-4e16-8b0e-4365dec31c43",
+    "835546bf-4536-4518-98be-1258845a5fb8",
+    "9adc322f-bba6-4465-a3eb-2a545e6d5142",
+    "a4469022-2375-4e06-857b-088e28491b94",
+    "b35fceff-fe62-472c-a314-664ef0a7d011",
+    "bd2b9d8c-f077-4729-bcce-5816e16946a6",
+    "d71f6e10-19d0-46c9-b7f8-77b30be44464",
+    "dc8320c0-8bb3-4e37-b8fe-0c9ae964a727",
+    "e8cdb184-ada5-4e6c-aa1b-e11539eb140c",
+    "f877843c-6d09-44b2-a102-bca33da455a6"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "126de4f2",
+    "names": [
+      "벤다졸정(알벤다졸)",
+      "알킬정(알벤다졸)",
+      "제나콤정(알벤다졸)",
+      "젠텔정400밀리그람(알벤다졸)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 68,
+    "en": 34,
+    "total": 102
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 회충, 요충, 십이지장충, 편충, 아메리카 구충, 분선충의 감염 및 이들 혼합감염의 치료에 사용합니다.",
+    "usage": "성인 및 24개월 이상의 소아는 요충에 감염된 경우 1일 1회 1정(400 mg) 복용합니다. 박멸을 위하여 7일 뒤, 한번만 더 1정(400 mg)을 복용합니다.회충, 십이지장충, 편충, 아메리카구충에 감염된 경우 1정(400 mg)을 단회(1회) 복용합니다.분선충의 다른 기생충(조충)과 중증(심한증상) 혼합 감염시 1일 1회 1정(400 mg)씩 3일간 복용합니다.삼키기 어려울 경우 씹거나 소량의 물로 복용할 수 있으며 식사를 중단하거나 하제를 쓰는 등의 특별한 과정은 필요하지 않습니다.치료 3주 후 검사를 하여 치료되지 않았으면 경우에 따라 2차 투여를 실시할 수 있습니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자, 임부 및 임신하고 있을 가능성이 있는 여성 및 수유부, 2세 미만의 소아는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 간장애, 신장애 환자는 의사 또는 약사와 상의하십시오.\n\n이 약을 복용하는 동안 테오필린, 시메티딘, 프라지콴텔, 덱사메타손, 리토나비르, 페니토인, 카르바마제핀, 페노바르비탈을 함께 복용하지 마십시오.\n\n피부점막안증후군(스티븐스-존슨증후군), 다형홍반(여러 모양의 붉은 반점), 구역, 구토, 속쓰림, 설사, 상복부(배부분) 또는 복부(배부분) 통증, 두통 및 어지럼, 발열, 전신 발적(충혈되어 붉어짐), 발진, 가려움, 두드러기 등의 과민반응, 가역적인(회복 가능한) 탈모증 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "알벤다졸 400밀리그램",
+      "작용": "기생충의 에너지 대사를 차단하여 회충·요충 등 장내 기생충 감염을 치료하는 구충제입니다.",
+      "주요 증상": "회충·요충·십이지장충·편충·아메리카구충·분선충 감염 및 혼합감염",
+      "주의 대상": "과민증·임부(가능성 포함)·수유부·2세 미만 복용 금지, 간·신장애 환자는 복용 전 상담",
+      "선택 포인트": "장내 기생충 감염과 혼합감염 치료에 쓰는 알벤다졸 구충제입니다."
+    }
+  },
+  "en": {
+    "title": "Albendazole 400 mg Tablets (Anthelmintic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to treat infections with roundworms, pinworms, hookworms, whipworms, American hookworms, and threadworms (Strongyloides), and mixed infections of these.",
+    "usage": "Adults and children 24 months and older, if infected with pinworms, take 1 tablet (400 mg), 1 time a day. For eradication, take 1 more tablet (400 mg) once, 7 days later. If infected with roundworms, hookworms, whipworms, or American hookworms, take 1 tablet (400 mg) as a single (1-time) dose. For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days. If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed. Get tested 3 weeks after treatment, and if the infection has not been cured, a 2nd course may be given depending on the case.",
+    "caution": "Do not take this medicine if you are hypersensitive to it; are pregnant, may be pregnant, or are breastfeeding; or are a child under 2 years old. Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment. While taking this medicine, do not take theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine, or phenobarbital together with it. If oculomucocutaneous syndrome (Stevens-Johnson syndrome), erythema multiforme (red spots of various shapes), nausea, vomiting, heartburn, diarrhea, upper abdominal or abdominal pain, headache and dizziness, fever, whole-body flushing (redness), hypersensitivity reactions such as rash, itching, and hives, or reversible (recoverable) hair loss occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Albendazole 400 mg",
+      "How it works": "An anthelmintic that treats intestinal parasitic infections such as roundworms and pinworms by blocking the parasites' energy metabolism.",
+      "Main symptoms": "Infections with roundworms, pinworms, hookworms, whipworms, American hookworms, and threadworms (Strongyloides), and mixed infections",
+      "Caution for": "Do not use if hypersensitive, pregnant (or possibly), breastfeeding, or under 2 years; consult before use with liver or kidney impairment",
+      "Why this one": "An albendazole anthelmintic for treating intestinal worm infections and mixed infections."
+    }
+  }
+}

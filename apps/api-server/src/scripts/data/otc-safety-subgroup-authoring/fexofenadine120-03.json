@@ -1,0 +1,67 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "fexofenadine120-03",
+  "order": 1303,
+  "groupKey": "펙소페나딘염산염|120밀리그램|정",
+  "safetyFp": "548624cb0959a55e",
+  "sourceRef": "66519e2c-a8c7-43e5-8a31-006c70a916fb",
+  "sensitive": false,
+  "title": "펙소페나딘염산염 120mg 정 (알레르기비염약)",
+  "expectEasyMd5": "086182af",
+  "masterIds": [
+    "004846f0-2d72-402a-b53b-070da950a9fa",
+    "47eddfa5-8c86-4c02-8a49-4a94f734f94e",
+    "5ef35aeb-3331-4879-8237-bef0a405fbeb",
+    "a40b4774-1f4b-4257-add2-08d883e42472",
+    "fb8ab742-e650-4eda-8af0-f9d919aeff53"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "086182af",
+    "names": [
+      "알레그라정120밀리그람(펙소페나딘염산염)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 20,
+    "en": 10,
+    "total": 30
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 알레르기비염 증상 완화에 사용합니다.",
+    "usage": "성인 및 12세 이상 청소년은 1일 1회 120 mg을 식사전 물과 함께 복용합니다.\n\n신부전 환자는 시작용량으로서 1일 1회 60 mg을 식사전 물과 함께 복용합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 신부전 환자, 고령자, 심혈관질환 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 저체중신생아, 신생아, 12세 미만의 소아는 의사 또는 약사와 상의하십시오.\n\n케토코나졸이나 에리트로마이신, 알루미늄, 수산화마그네슘을 함유한 제산제, 아팔루타마이드와 같은 P-gp 유도제와 함께 사용 시 의사 또는 약사와 상의하십시오.\n\n자몽주스, 오렌지 및 사과주스와 같은 과일주스와 함께 복용 시 이 약의 효과를 감소시킬 수 있으므로 물과 함께 복용하는 것을 권장합니다.\n\n쇽 증상(호흡곤란, 혈압저하, 혈관부종, 가슴통증, 홍조 등), AST, ALT, -GTP, ALP, LDH 상승 등의 간기능장애, 황달이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n두통, 졸음, 어지러움, 구역, 피로, 불면증, 신경과민증, 수면장애, 악몽, 발진, 발적, 두드러기, 가려움, 빈맥, 심계항진, 설사가 나타날 수 있습니다.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "펙소페나딘염산염 120밀리그램",
+      "작용": "히스타민 작용을 차단하여 알레르기비염 증상을 완화하는 항히스타민제입니다.",
+      "주요 증상": "알레르기비염 증상(재채기·콧물·코막힘·코 가려움 등)",
+      "주의 대상": "이 약 과민증 환자 복용 금지",
+      "선택 포인트": "알레르기비염 증상 완화에 쓰는 펙소페나딘 항히스타민제입니다."
+    }
+  },
+  "en": {
+    "title": "Fexofenadine Hydrochloride 120 mg Tablets (Allergic Rhinitis Medicine)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used to relieve symptoms of allergic rhinitis.",
+    "usage": "Adults and adolescents 12 years and older take 120 mg, 1 time a day, with water before a meal. Patients with kidney failure take 60 mg, 1 time a day, with water before a meal as a starting dose.",
+    "caution": "Do not take this medicine if you are hypersensitive to it. Before taking this medicine, consult a doctor or pharmacist if you have kidney failure; are elderly; have or have experienced cardiovascular disease; are pregnant, may be pregnant, or are breastfeeding; or for low-birth-weight newborns, newborns, and children under 12 years old. Consult a doctor or pharmacist when using ketoconazole, erythromycin, antacids containing aluminum or magnesium hydroxide, or P-gp inducers such as apalutamide together with this medicine. Taking this medicine with fruit juices such as grapefruit, orange, and apple juice may reduce its effect, so it is recommended to take it with water. If shock symptoms (difficulty breathing, drop in blood pressure, angioedema, chest pain, flushing, etc.), liver function disorders such as elevated AST, ALT, GTP, ALP, and LDH, or jaundice occurs, stop taking this medicine immediately and consult a doctor or pharmacist. Headache, drowsiness, dizziness, nausea, fatigue, sleeplessness, nervousness, sleep disturbances, nightmares, rash, redness, hives, itching, rapid heartbeat, palpitations, and diarrhea may occur. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Fexofenadine hydrochloride 120 mg",
+      "How it works": "An antihistamine that relieves symptoms of allergic rhinitis by blocking the action of histamine.",
+      "Main symptoms": "Symptoms of allergic rhinitis (sneezing, runny nose, nasal congestion, itchy nose, etc.)",
+      "Caution for": "Do not use if hypersensitive to this medicine",
+      "Why this one": "A fexofenadine antihistamine for relieving allergic rhinitis symptoms."
+    }
+  }
+}

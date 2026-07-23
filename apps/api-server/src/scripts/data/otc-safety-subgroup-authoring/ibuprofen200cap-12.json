@@ -1,0 +1,64 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 안전 subgroup 저작(에이전트 나). 공식 원문(mfds_easy_drug) grounded, 원문 외 의료사실 0. KO=원문 결정론 전개+약사footer, EN=라인 TM 충실 번역. runner=otc-safety-subgroup-apply.ts",
+  "slug": "ibuprofen200cap-12",
+  "order": 1112,
+  "groupKey": "이부프로펜|200밀리그램|연질캡슐",
+  "safetyFp": "f39434cf5fa44e53",
+  "sourceRef": "0da807b4-9f24-45dd-8be5-b68859c02a3f",
+  "sensitive": false,
+  "title": "이부프로펜 200mg 연질캡슐 (해열소염진통제)",
+  "expectEasyMd5": "7395dd11",
+  "masterIds": [
+    "645af195-58bb-4615-b151-01160375f980",
+    "c17ecf45-4a6e-4103-a4d6-086427952bde"
+  ],
+  "sourceBasis": {
+    "sourceType": "mfds_easy_drug",
+    "easyMd5": "7395dd11",
+    "names": [
+      "펜프리연질캡슐(이부프로펜)"
+    ],
+    "note": "효능/용법/주의 버킷 전량 보존(안전지문 SSOT)"
+  },
+  "writePlan": {
+    "ko": 8,
+    "en": 4,
+    "total": 12
+  },
+  "gates": {
+    "builderKo": "PASS",
+    "builderEn": "PASS",
+    "hangulFreeEn": true,
+    "numbersPreserved": true,
+    "hold": false
+  },
+  "ko": {
+    "efficacy": "이 약은 감기로 인한 발열 및 동통, 요통, 생리통, 류마티양 관절염, 연소성 류마티양 관절염, 골관절염, 수술 후 동통(통증) 및 두통, 편두통, 치통, 근육통, 신경통, 강직성 척추염, 급성통풍, 건선성 관절염, 연조직손상, 비관절 류마티스질환에 사용합니다.",
+    "usage": "류마티양 관절염, 골관절염, 강직성 척추염, 연조직손상, 비관절 류마티스질환, 급성 통풍, 건선성 관절염에는 1회 200~600 mg씩, 1일 3~4회 복용하십시오. 1일 최고 3,200 mg까지 복용할 수 있습니다.\n\n연소성 류마티양 관절염에는 1일 체중 kg당 30~40 mg을 3~4회 분할 복용하십시오.\n\n경증(경증상, 가벼운 증상) 및 중등도의 동통(통증), 감기에는 성인은 1회 200~400 mg씩, 1일 3~4회 복용하십시오. 연령, 증상에 따라 적절히 증감하십시오.\n\n편두통에는 성인은 1회 200~400 mg을 복용합니다. 24시간 동안 400 mg을 초과하지 않도록 하십시오.\n\n만 12세 이상 청소년은 1회 200~400 mg씩, 1일 3~4회 복용하십시오. 체중이 30 kg 미만인 경우 1일량이 500 mg을 초과해서는 안되며 공복시 투여는 피하는 것이 바람직합니다.",
+    "usageLabel": "복용 안내",
+    "caution": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다.\n\n이 약 복용 시 치명적일 수 있는 중대한 심혈관계 혈전 반응, 심근경색증, 뇌졸중의 위험이 증가하며, 위장관 출혈, 궤양 및 천공 등 심각한 위장관계 이상반응이 나타날 수 있습니다.\n\n조절되지 않는 고혈압, 울혈심부전증, 확립된 허혈성 심장질환, 말초동맥질환, 뇌혈관질환을 가진 환자는 고용량 이부프로펜(1일 2,400 mg) 복용을 피해야 하며, 심혈관계 위험 요소(고혈압, 고지혈증, 당뇨병, 흡연 등)를 가지고 있는 환자는 고용량 이부프로펜(1일 2,400 mg) 복용이 필요한 경우 이 약을 복용하기 전에 의사 또는 약사와 상의하십시오.\n\n이 약에 위장관 궤양, 위장관 출혈 환자 또는 경험자, 심한 혈액이상, 심한 간장애, 심한 신장(콩팥)장애, 심한 심장기능부전, 심한 고혈압, 과민증 환자, 기관지천식 환자 또는 경험자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 저해제 포함)에 대하여 천식, 두드러기, 알레르기 반응 환자 또는 경험자, 관상동맥(심장동맥) 우회로술(CABG) 전후 통증 발생 환자, 임신 말기 3개월 기간에 해당하는 임부, 항암요법으로 고용량 메토트렉세이트를 투여중인 환자는 이 약을 복용하지 마십시오.\n\n이 약을 복용하기 전에 혈액이상 또는 경험자, 출혈경향, 간경화, 간장애 또는 경험자, 신장(콩팥)장애 또는 경험자, 심장기능부전 또는 심질환, 고혈압, 과민증, 전신성 홍반성 루푸스(SLE) 환자 및 혼합 결합조직질환(MCTD), 궤양성 대장염, 크론병 환자, 고령자(노인) 및 소아, 임부, 수유부, 심근경색이나 뇌졸중 예방목적으로 저용량 아스피린을 복용하는 사람은 의사 또는 약사와 상의하십시오.\n\n정해진 용법과 용량을 잘 지키십시오.\n\n다른 비스테로이드성 소염진통제(NSAIDs)와 함께 복용하지 마십시오.\n\n이 약을 복용하기 전에 심근경색이나 뇌졸중 예방목적으로 저용량 아스피린을 복용하는 환자는 의사 또는 약사와 상의하십시오.\n\n이 약을 복용하기 전에 ACE 저해제(억제제), 리튬, 푸로세미드 및 티아자이드계 이뇨제, 메토트렉세이트, 쿠마린계 항응혈제(와파린 등), 선택적 세로토닌 재흡수억제제와 함께 복용하는 환자는 의사 또는 약사와 상의하십시오.\n\n쇽 증상(가슴쓰림, 오한, 호흡곤란, 혈압저하 등), 헤마토크릿 감소, 헤모글로빈 감소, 빈혈, 재생불량성빈혈, 용혈성빈혈, 무과립구증, 과립구감소, 백혈구감소, 혈소판감소, 혈소판 기능 저하, 호산구증가 등의 혈액장애, 소화성궤양, 위장관궤양, 위장출혈, 천공(뚫림), 궤양성 대장염, 혈변, 위염, 췌장염, 토혈, 크론병, 식욕부진, 구역, 구토, 복통, 소화불량, 설사, 위부 불쾌감, 상복부 통증, 구갈, 구내염, 복부팽만감, 구강 궤양, 변비, 흑변(검게 변함), 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군), 광민감 반응, 빈도불명의 호산구 증가 및 전신 증후군을 동반한 약물 반응(DRESS 증후군), 혈관신경성 부종(부기), 수포성피부염, 다형성 홍반(여러 모양의 붉은 반점), 반구진 발진, 피부 붉어짐, 수포(물집), 발진, 탈락 피부염, 급성전신발진고름물집증, 간염, 황달, GOT, GPT, 알칼라인 포스파타제(ALP)의 상승 등과 같은 간기능이상, 간장애, 과민증 또는 아나필락시스 반응, 천식발작, 두드러기, 습진, 자반(자주색반점), 발진, 가려움증, 천식, 기관지수축, 호흡곤란 또는 쌕쌕거림, 암점(시야불능부위) 등 시각장애, 난청, 이명, 미각이상, 현기증, 졸음, 어지러움, 우울, 두통, 뇌혈관 사고 또는 신경질, 무균성 수막염 또는 수막염, 혈압저하, 혈압상승, 심계항진, 심부전, 심근경색증 또는 협심증, 급성신부전, 핍뇨, 혈뇨, 요단백, BUN, 혈중크레아티닌의 상승, 고칼륨혈증, 간질성 콩팥염, 콩팥염증후군, 콩팥유두괴사, 요량 감소, 전신부종 및 이에 수반하는 숨가쁨, 나른함, 안와주위부종, 안면부기, 권태감, 발열, 비출혈, 부종, 말초부종 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.\n\n이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오.",
+    "summaryTable": {
+      "분류": "일반의약품",
+      "성분": "이부프로펜 200밀리그램",
+      "작용": "프로스타글란딘 생성을 억제하여 열을 내리고 염증과 통증을 완화하는 비스테로이드성 소염진통제입니다.",
+      "주요 증상": "감기 발열·통증, 요통·생리통·두통·편두통·치통·근육통·신경통, 류마티양·골관절염 등 관절질환, 급성통풍, 연조직손상",
+      "주의 대상": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부",
+      "선택 포인트": "해열과 여러 통증·관절 염증 완화에 쓰는 이부프로펜 소염진통제입니다."
+    }
+  },
+  "en": {
+    "title": "Ibuprofen 200 mg Soft Capsules (Antipyretic Anti-inflammatory Analgesic)",
+    "usageLabel": "How to take it",
+    "efficacy": "This medicine is used for fever and pain caused by the common cold, low back pain, menstrual pain, rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis, post-surgical pain and headache, migraine, toothache, muscle pain, nerve pain, ankylosing spondylitis, acute gout, psoriatic arthritis, soft tissue injury, and non-articular rheumatic diseases.",
+    "usage": "For rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic disease, acute gout, or psoriatic arthritis, take 200 to 600 mg per 1 dose, 3 to 4 times a day. Up to 3,200 mg a day may be taken. For juvenile rheumatoid arthritis, take 30 to 40 mg per kg of body weight per 1 day, divided into 3 to 4 doses. For mild (light symptoms) to moderate pain or the common cold, adults take 200 to 400 mg per 1 dose, 3 to 4 times a day. Adjust appropriately according to age and symptoms. For migraine, adults take 200 to 400 mg per 1 dose. Do not exceed 400 mg in 24 hours. Adolescents 12 years and older take 200 to 400 mg per 1 dose, 3 to 4 times a day. If body weight is under 30 kg, the total amount for 1 day must not exceed 500 mg, and it is best to avoid taking this medicine on an empty stomach.",
+    "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or other antipyretic analgesics. It may cause stomach bleeding. Taking this medicine increases the risk of serious cardiovascular thrombotic events, myocardial infarction, and stroke, which can be fatal, and serious gastrointestinal adverse reactions such as gastrointestinal bleeding, ulceration, and perforation may occur. Patients with uncontrolled high blood pressure, congestive heart failure, established ischemic heart disease, peripheral arterial disease, or cerebrovascular disease should avoid taking high-dose ibuprofen (2,400 mg per 1 day), and patients with cardiovascular risk factors (high blood pressure, high blood lipids, diabetes, smoking, etc.) who need high-dose ibuprofen (2,400 mg per 1 day) should consult a doctor or pharmacist before taking this medicine. Do not take this medicine if you have or have experienced gastrointestinal ulcers or gastrointestinal bleeding; have severe blood abnormalities, severe liver impairment, severe kidney impairment, severe cardiac insufficiency, or severe high blood pressure; are hypersensitive to it; have or have experienced bronchial asthma; have or have experienced asthma, hives, or allergic reactions to aspirin or other nonsteroidal anti-inflammatory analgesics (including COX-2 inhibitors); have pain around coronary artery bypass graft (CABG) surgery; are in the last 3 months of pregnancy; or are receiving high-dose methotrexate as anticancer therapy. Before taking this medicine, consult a doctor or pharmacist if you have or have experienced blood abnormalities; have a bleeding tendency; have or have experienced liver cirrhosis or liver impairment; have or have experienced kidney impairment; have cardiac insufficiency or heart disease, high blood pressure, hypersensitivity, systemic lupus erythematosus (SLE) or mixed connective tissue disease (MCTD), ulcerative colitis, or Crohn's disease; are elderly or a child, pregnant, or breastfeeding; or take low-dose aspirin to prevent myocardial infarction or stroke. Follow the prescribed dosage and administration carefully. Do not take this medicine together with other nonsteroidal anti-inflammatory drugs (NSAIDs). Before taking this medicine, consult a doctor or pharmacist if you take low-dose aspirin to prevent myocardial infarction or stroke. Before taking this medicine, consult a doctor or pharmacist if you take ACE inhibitors, lithium, furosemide or thiazide diuretics, methotrexate, coumarin anticoagulants (such as warfarin), or selective serotonin reuptake inhibitors together with it. If shock symptoms (heartburn, chills, difficulty breathing, drop in blood pressure, etc.), blood disorders such as decreased hematocrit, decreased hemoglobin, anemia, aplastic anemia, hemolytic anemia, agranulocytosis, decreased granulocytes, decreased white blood cells, decreased platelets, reduced platelet function, and increased eosinophils, peptic ulcer, gastrointestinal ulcer, gastrointestinal bleeding, perforation, ulcerative colitis, bloody stool, gastritis, pancreatitis, vomiting of blood, Crohn's disease, loss of appetite, nausea, vomiting, abdominal pain, indigestion, diarrhea, stomach discomfort, upper abdominal pain, dry mouth, stomatitis, abdominal bloating, mouth ulcers, constipation, black stool (turning black), oculomucocutaneous syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell syndrome), photosensitivity reactions, drug reaction with eosinophilia and systemic symptoms of unknown frequency (DRESS syndrome), angioneurotic edema (swelling), bullous dermatitis, erythema multiforme (red spots of various shapes), maculopapular rash, skin redness, blisters, rash, exfoliative dermatitis, acute generalized exanthematous pustulosis, hepatitis, jaundice, abnormal liver function such as elevated GOT, GPT, and alkaline phosphatase (ALP), liver impairment, hypersensitivity or anaphylactic reactions, asthma attack, hives, eczema, purpura (purple spots), rash, itching, asthma, bronchoconstriction, difficulty breathing or wheezing, visual disturbances such as scotoma (blind spots), hearing loss, tinnitus, taste abnormalities, vertigo, drowsiness, dizziness, depression, headache, cerebrovascular accident or nervousness, aseptic meningitis or meningitis, drop in blood pressure, rise in blood pressure, palpitations, heart failure, myocardial infarction or angina, acute kidney failure, oliguria, blood in the urine, protein in the urine, elevated BUN and blood creatinine, hyperkalemia, interstitial nephritis, nephritic syndrome, renal papillary necrosis, decreased urine volume, generalized swelling with accompanying shortness of breath, listlessness, periorbital swelling, facial swelling, malaise, fever, nosebleeds, swelling, or peripheral edema occurs, stop taking this medicine immediately and consult a doctor or pharmacist. This leaflet is provided to help with product selection; for exact dosing and precautions, consult a pharmacist or other expert in the store.",
+    "summaryTable": {
+      "Category": "Over-the-counter",
+      "Ingredient": "Ibuprofen 200 mg",
+      "How it works": "A nonsteroidal anti-inflammatory analgesic that lowers fever and relieves inflammation and pain by inhibiting prostaglandin production.",
+      "Main symptoms": "Fever and pain from the common cold; low back, menstrual, head, migraine, tooth, muscle, and nerve pain; joint diseases such as rheumatoid arthritis and osteoarthritis; acute gout; soft tissue injury",
+      "Caution for": "People with a history of gastrointestinal ulcers or bleeding, those with cardiovascular risk factors, regular drinkers of three or more glasses daily, and women 6 or more months pregnant",
+      "Why this one": "An ibuprofen anti-inflammatory analgesic for fever and various kinds of pain and joint inflammation."
+    }
+  }
+}

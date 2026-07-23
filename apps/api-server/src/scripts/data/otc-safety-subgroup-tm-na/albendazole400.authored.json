@@ -1,0 +1,60 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 알벤다졸 400mg 정 그룹 TM 저작(38줄). EN=공식 원문 KO 라인별 충실 번역(원문 외 의료사실 0, 수치/강도/항목 보존).",
+  "groupKey": "알벤다졸|400밀리그램|정",
+  "meta": {
+    "titleKo": "알벤다졸 400mg 정 (구충제)",
+    "titleEn": "Albendazole 400 mg Tablets (Anthelmintic)",
+    "ingKo": "알벤다졸 400밀리그램",
+    "ingEn": "Albendazole 400 mg",
+    "actionKo": "기생충의 에너지 대사를 차단하여 회충·요충 등 장내 기생충 감염을 치료하는 구충제입니다.",
+    "actionEn": "An anthelmintic that treats intestinal parasitic infections such as roundworms and pinworms by blocking the parasites' energy metabolism."
+  },
+  "effSummaries": {
+    "a71c45d3": { "symKo": "회충·요충·십이지장충·편충·아메리카구충·분선충 감염 및 혼합감염", "symEn": "Infections with roundworms, pinworms, hookworms, whipworms, American hookworms, and threadworms (Strongyloides), and mixed infections", "pointKo": "장내 기생충 감염과 혼합감염 치료에 쓰는 알벤다졸 구충제입니다.", "pointEn": "An albendazole anthelmintic for treating intestinal worm infections and mixed infections." }
+  },
+  "cauSummaries": {
+    "0f3aae6c": { "watchKo": "과민증·임부(가능성 포함)·수유부·2세 미만·갈락토오스 관련 유전 문제 복용 금지, 간·신장애 및 황색5호 과민증(경험자)은 복용 전 상담", "watchEn": "Do not use if hypersensitive, pregnant (or possibly), breastfeeding, under 2 years, or with hereditary galactose-related problems; consult before use with liver/kidney impairment or Yellow No. 5 hypersensitivity" },
+    "783031bc": { "watchKo": "과민증·임부(가능성 포함)·수유부·2세 미만 복용 금지, 간·신장애 환자는 복용 전 상담", "watchEn": "Do not use if hypersensitive, pregnant (or possibly), breastfeeding, or under 2 years; consult before use with liver or kidney impairment" },
+    "8db302a9": { "watchKo": "아스파탐(페닐알라닌 대사) 함유 — 페닐케톤뇨증 환자 복용 금지", "watchEn": "Contains aspartame (metabolized to phenylalanine) — do not use with phenylketonuria" }
+  },
+  "en": {
+    "a71c45d3": "This medicine is used to treat infections with roundworms, pinworms, hookworms, whipworms, American hookworms, and threadworms (Strongyloides), and mixed infections of these.",
+    "0d9412a7": "For roundworms, hookworms, whipworms, and American hookworms, take 1 tablet (400 mg) as a single dose.",
+    "ef2642ce": "If infected with roundworms, hookworms, whipworms, or American hookworms, take 1 tablet (400 mg) as a single (1-time) dose.",
+    "c8832998": "For roundworms, hookworms, whipworms, and American hookworms, take 400 mg as a single dose.",
+    "36f33fb1": "Adults and children 24 months and older take 1 tablet (400 mg), 1 time a day, for pinworms. For eradication, take 1 more tablet (400 mg) once, 7 days later.",
+    "6c3196bf": "Adults and children 24 months and older, if infected with pinworms, take 1 tablet (400 mg), 1 time a day. For eradication, take 1 more tablet (400 mg) once, 7 days later.",
+    "90cd6ff3": "Adults and children 24 months and older, if infected with pinworms, take 1 tablet (400 mg), 1 time a day. For eradication, take 1 more tablet (400 mg) once, 7 days later. If infected with roundworms, hookworms, whipworms, or American hookworms, take 1 tablet (400 mg) as a single (1-time) dose. For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days. If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed. Get tested 3 weeks after treatment, and if the infection has not been cured, a 2nd course may be given depending on the case.",
+    "cdc710ac": "Adults and children 24 months and older, if infected with pinworms, take 1 tablet (400 mg), 1 time a day. For eradication, take 1 more tablet (400 mg) once, 7 days later. If infected with roundworms, hookworms, whipworms, or American hookworms, take 1 tablet (400 mg) as a single (1-time) dose. For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days. If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed. Get tested 3 weeks after treatment, and if the infection has not been cured, a 2nd course may be given depending on the case.",
+    "edc51cee": "Adults and children 24 months and older, if infected with pinworms, take 1 tablet (400 mg), 1 time a day. For eradication, take 1 more tablet (400 mg) once, 7 days later. If infected with roundworms, hookworms, whipworms, or American hookworms, take 1 tablet (400 mg) as a single (1-time) dose. For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days. If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed. Get tested 3 weeks after treatment, and if the infection has not been cured, a 2nd course may be given depending on the case.",
+    "1e8bbe7a": "Adults and children 24 months and older take 400 mg of albendazole, 1 time a day, for pinworms. For eradication, take 400 mg of this medicine once more, 7 days later.",
+    "128e8859": "For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days.",
+    "9aba21b9": "For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days.",
+    "c480ca2f": "For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 1 tablet (400 mg), 1 time a day, for 3 days.",
+    "4a3da636": "For severe mixed infection of threadworms (Strongyloides) with other parasites (tapeworms), take 400 mg of this medicine, 1 time a day, for 3 days.",
+    "46b9c856": "If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed.",
+    "325aacac": "If the tablet is hard to swallow, it can be chewed or taken with a small amount of water; no special measures such as stopping meals or using laxatives are needed (tablets and chewable tablets only).",
+    "c4c0b8e4": "Get tested 3 weeks after treatment, and if the infection has not been cured, a 2nd course may be given depending on the case.",
+    "59f43327": "While taking this medicine, do not take theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine, or phenobarbital together with it.",
+    "b3b70a1c": "Do not take this medicine together with theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine, or phenobarbital.",
+    "08beddb5": "Do not take this medicine together with theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine, or phenobarbital.",
+    "024f8c84": "If oculomucocutaneous syndrome (Stevens-Johnson syndrome), erythema multiforme (red spots of various shapes), nausea, vomiting, heartburn, diarrhea, upper abdominal or abdominal pain, headache and dizziness, fever, whole-body flushing (redness), hypersensitivity reactions such as rash, itching, and hives, or reversible (recoverable) hair loss occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "416004cb": "If oculomucocutaneous syndrome (Stevens-Johnson syndrome), erythema multiforme (red spots of various shapes), gastrointestinal disturbances such as nausea, vomiting, heartburn, diarrhea, and upper abdominal or abdominal pain, or headache and dizziness, or in rare cases fever, whole-body flushing (redness), hypersensitivity reactions such as rash, itching, and hives, or reversible (recoverable) hair loss occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "9deb9a10": "If oculomucocutaneous syndrome (Stevens-Johnson syndrome), erythema multiforme (red spots of various shapes), gastrointestinal disturbances such as nausea, vomiting, heartburn, diarrhea, and upper abdominal or abdominal pain, or headache and dizziness, or in rare cases fever, whole-body flushing (redness), hypersensitivity reactions such as rash, itching, and hives, or recoverable hair loss occurs, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "c6907cd0": "If oculomucocutaneous syndrome (Stevens-Johnson syndrome), erythema multiforme (red spots of various shapes), gastrointestinal disturbances such as nausea, vomiting, heartburn, diarrhea, and upper abdominal or abdominal pain, or headache and dizziness, or in rare cases fever, whole-body flushing (redness), hypersensitivity reactions such as rash, itching, and hives, or reversible (recoverable) hair loss appears, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "8db302a9": "This medicine contains aspartame, which is metabolized to phenylalanine in the body; do not take it if you have phenylketonuria and need to restrict phenylalanine intake.",
+    "0636cb1a": "Do not take this medicine if you are hypersensitive to it; are pregnant, may be pregnant, or are breastfeeding; are a child under 2 years old; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "a10867c2": "Do not take this medicine if you are hypersensitive to it; are pregnant, may be pregnant, or are breastfeeding; are a child under 2 years old; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "0f3aae6c": "Do not take this medicine if you are hypersensitive to it; are pregnant, may be pregnant, or are breastfeeding; are a child under 2 years old; or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment, or if you have or have experienced hypersensitivity to Yellow No. 5.",
+    "783031bc": "Do not take this medicine if you are hypersensitive to it; are pregnant, may be pregnant, or are breastfeeding; or are a child under 2 years old. Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment.",
+    "69599768": "Before taking this medicine, be sure to confirm that you are not pregnant.",
+    "b2debabd": "Before taking this medicine, be sure to confirm that you are not pregnant.",
+    "80c73962": "Be sure to confirm that you are not pregnant before using this medicine. To avoid taking this medicine during early pregnancy, women of childbearing age should start treatment during the first 10 days of their menstrual period or after a negative pregnancy test. It can cause harm to the fetus.",
+    "87f24550": "Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment, or if you have or have experienced hypersensitivity to Yellow No. 4 or Yellow No. 5.",
+    "f5299756": "Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment, or if you have or have experienced hypersensitivity to Yellow No. 4 or Yellow No. 5.",
+    "d70381d7": "Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment, or if you are hypersensitive to Yellow No. 5 or have experienced allergic reactions to it.",
+    "eb6ab02c": "Before taking this medicine, consult a doctor or pharmacist if you have liver impairment or kidney impairment, or if you are hypersensitive to Yellow No. 5 or have experienced allergic reactions.",
+    "23101524": "Effects on laboratory test values: occasionally, a recoverable decrease in white blood cell count and mild to moderate increases in liver enzyme levels may occur.",
+    "fd7d8c38": "This medicine may occasionally cause a recoverable decrease in white blood cell count, and mild to moderate increases in liver enzyme levels may occur."
+  }
+}

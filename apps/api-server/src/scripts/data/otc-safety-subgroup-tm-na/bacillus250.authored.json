@@ -1,0 +1,48 @@
+{
+  "_doc": "WO-O4O-OTC-SAFETY-MISMATCH-HYBRID-AUTHORING-AND-BATCH-APPLY-NA-V3 — 에이전트 나. 바실루스리케니포르미스균 250mg 캡슐 그룹 TM 저작(23줄). EN=공식 원문 KO 라인별 충실 번역.",
+  "groupKey": "바실루스리케니포르미스균|250밀리그램|캡슐",
+  "meta": {
+    "titleKo": "바실루스리케니포르미스균 250mg 캡슐 (정장제)",
+    "titleEn": "Bacillus licheniformis 250 mg Capsules (Intestinal Regulator)",
+    "ingKo": "바실루스리케니포르미스균 250밀리그램",
+    "ingEn": "Bacillus licheniformis 250 mg",
+    "actionKo": "장내 유익균 환경을 도와 장염·설사 등 장의 이상 상태를 개선하는 생균 정장제입니다.",
+    "actionEn": "A live-bacteria intestinal regulator that supports a healthy gut flora environment to improve bowel conditions such as enteritis and diarrhea."
+  },
+  "effSummaries": {
+    "21bb8e0e": { "symKo": "급·만성 장염, 급·만성 설사, 급성 이질, 장내 이상발효", "symEn": "Acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, abnormal intestinal fermentation", "pointKo": "장염·설사·이질과 장내 이상발효에 쓰는 생균 정장제입니다.", "pointEn": "A live-bacteria intestinal regulator for enteritis, diarrhea, dysentery, and abnormal intestinal fermentation." },
+    "c0f13a5b": { "symKo": "급·만성 장염, 급·만성 설사, 급성 이질, 장내 이상발효", "symEn": "Acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, abnormal intestinal fermentation", "pointKo": "장염·설사·이질과 장내 이상발효에 쓰는 생균 정장제입니다.", "pointEn": "A live-bacteria intestinal regulator for enteritis, diarrhea, dysentery, and abnormal intestinal fermentation." },
+    "d92e6421": { "symKo": "급·만성 장염, 급·만성 설사, 급성 이질, 장내 이상발효", "symEn": "Acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, abnormal intestinal fermentation", "pointKo": "장염·설사·이질과 장내 이상발효에 쓰는 생균 정장제입니다.", "pointEn": "A live-bacteria intestinal regulator for enteritis, diarrhea, dysentery, and abnormal intestinal fermentation." },
+    "f1be4338": { "symKo": "급·만성 장염, 급·만성 설사, 급성 이질, 장내 이상발효", "symEn": "Acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, abnormal intestinal fermentation", "pointKo": "장염·설사·이질과 장내 이상발효에 쓰는 생균 정장제입니다.", "pointEn": "A live-bacteria intestinal regulator for enteritis, diarrhea, dysentery, and abnormal intestinal fermentation." }
+  },
+  "cauSummaries": {
+    "57fd1de1": { "watchKo": "3개월 미만 영아는 복용 전 의사·약사 상담", "watchEn": "For infants under 3 months, consult a doctor or pharmacist before use" },
+    "01d9bc5c": { "watchKo": "3개월 미만 영아는 복용 전 의사·약사 상담, 정해진 용법·용량 준수", "watchEn": "For infants under 3 months, consult a doctor or pharmacist before use; follow the prescribed dosage" },
+    "88bef048": { "watchKo": "갈락토오스 불내성 등 유전적 문제가 있는 환자 복용 금지", "watchEn": "Do not use with hereditary problems such as galactose intolerance" }
+  },
+  "en": {
+    "21bb8e0e": "This medicine is used for acute and chronic enteritis (bowel inflammation), acute and chronic diarrhea, acute dysentery, and abnormal intestinal fermentation due to various causes.",
+    "c0f13a5b": "This medicine is used for acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, and abnormal intestinal fermentation due to various causes.",
+    "d92e6421": "This medicine is used for acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, and abnormal intestinal fermentation due to various causes.",
+    "f1be4338": "This medicine is used for acute and chronic enteritis, acute and chronic diarrhea, acute dysentery, and abnormal intestinal fermentation due to various causes.",
+    "a9ffddeb": "Adults take 2 capsules per 1 dose, 3 times a day. For the first dose, take 4 capsules.",
+    "1563c23e": "Adults take 2 capsules per 1 dose, 3 times a day, taking 4 capsules for the first dose.",
+    "0ea55d93": "Adults take 2 capsules per 1 dose (4 capsules for the first dose), and children take 1 capsule per dose, 3 times a day.",
+    "6f522340": "Children take 1 capsule per dose, 3 times a day.",
+    "719d1794": "For infants, the capsule contents can be mixed into a small amount of water or milk.",
+    "edafc100": "For infants, the capsule contents can be mixed into a small amount of water or milk.",
+    "b793c79a": "Adults take 2 capsules per 1 dose, 3 times a day, taking 4 capsules for the first dose. Children take 1 capsule per dose, 3 times a day. For infants, the capsule contents can be mixed into a small amount of water or milk.",
+    "57fd1de1": "Before taking this medicine, consult a doctor or pharmacist for infants under 3 months old.",
+    "01d9bc5c": "Before taking this medicine, consult a doctor or pharmacist for infants under 3 months old. Follow the prescribed dosage and administration carefully.",
+    "7b9d651d": "Before taking this medicine, consult a doctor or pharmacist for infants under 3 months old, or if you are hypersensitive to Yellow No. 5 or have experienced hypersensitivity to it.",
+    "88bef048": "Do not take this medicine if you have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.",
+    "76907cc5": "Consult a doctor or pharmacist when using ciprofloxacin, imipenem, or cilastatin sodium together with this medicine.",
+    "d339fa85": "Consult a doctor or pharmacist when using ciprofloxacin, imipenem, or cilastatin sodium together with this medicine.",
+    "f701ca47": "Consult a doctor or pharmacist when taking ciprofloxacin, imipenem, or cilastatin sodium together with this medicine.",
+    "c1d98c90": "Do not take this medicine together with ciprofloxacin, imipenem, or cilastatin sodium.",
+    "3f7b4084": "If symptoms do not improve after taking this medicine for about 1 month, consult a doctor or pharmacist.",
+    "4f764968": "If symptoms do not improve after about 1 month of use, stop taking this medicine immediately and consult a doctor or pharmacist.",
+    "512658a1": "If symptoms do not improve after taking this medicine for 1 month or longer, stop taking it immediately and consult a doctor or pharmacist.",
+    "67902d25": "If symptoms do not improve after taking this medicine for about 1 month, stop taking it immediately and consult a doctor or pharmacist."
+  }
+}
