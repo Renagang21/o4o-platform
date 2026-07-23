@@ -71,6 +71,13 @@ function fingerprintOf(name: string, spec: string, content: string): { fp: strin
 }
 
 const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 설명입니다. 사용 전·후 궁금한 점이나 이상이 있으면 매장 내 약사 등 전문가와 상담하세요.';
+/** V5: 원문 전체 맥락이 피부 외용으로 명확('외용으로만/외용으로 사용' 명시)한 경우에 한해, 원문 데이터의 경구 오기(복용하지 마십시오/복용을 중지)를 외용 표현으로 정규화. 그 외 경구 표현은 기존 가드(HOLD_KO) 유지. */
+function normalizeOralMisphrase(text: string, fullContent: string): string {
+  if (!/외용으로만|외용으로 사용/.test(stripTags(fullContent || ''))) return text;
+  return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
+    .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
+    .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록'); // 외용전용 지시(의미 보존 재표현)
+}
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }
 function usageLabelOf(u: string): string { if (/뿌리|분무|스프레이/.test(u)) return '뿌리는 방법'; if (/바르|도포|붙이|첩부/.test(u)) return '바르는 방법'; return '사용 방법'; }
@@ -79,10 +86,12 @@ function composeTopicalKo(name: string, content: string, title: string): { html:
   let sec = easySections(content || ''); if (Object.keys(sec).length === 0) sec = freeSections(content || '');
   const get = (re: RegExp): string => { for (const [t, b] of Object.entries(sec)) if (re.test(t)) return b.trim(); return ''; };
   const efficacy = cleanText(get(/효능|효과|적응/));
-  const usage = splitSentences(get(/용법|용량/)).join('\n\n');
-  const cautionRaw = get(/주의/); const adverse = get(/이상반응|부작용/);
+  const usage = splitSentences(normalizeOralMisphrase(get(/용법|용량/), content)).join('\n\n');
+  const warning = normalizeOralMisphrase(get(/^경고|(?<!주의)경고/), content); // V5: 경고 섹션 보존(누락=안전정보 약화 금지)
+  const cautionRaw = normalizeOralMisphrase(get(/주의/), content); const adverse = normalizeOralMisphrase(get(/이상반응|부작용/), content);
   const ingredientKo = ingredientOf(name), form = formOf(name);
-  const cautionParts = [...splitSentences(cautionRaw)];
+  const interact = normalizeOralMisphrase(get(/상호작용/), content); // V5: 상호작용 섹션 보존
+  const cautionParts = [...splitSentences(warning), ...splitSentences(cautionRaw), ...splitSentences(interact)];
   if (adverse) cautionParts.push('이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: ' + cleanText(adverse));
   const summaryTable: Record<string, string> = { 분류: '일반의약품' };
   if (ingredientKo) summaryTable['성분'] = ingredientKo;
