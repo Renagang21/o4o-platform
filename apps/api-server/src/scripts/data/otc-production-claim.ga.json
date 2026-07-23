@@ -167,6 +167,106 @@
    "op": "KO_EN",
    "status": "DONE",
    "note": "GA-V5 batch5 KO+EN LIVE (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "속엔쿨정|A09AA|175밀리그램|정",
+   "targetFp": "401090229c631e53",
+   "sourceType": "mfds_drug_otc",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "칼슈머정|A12AX|750밀리그램|정",
+   "targetFp": "4da3b7a0f97b4206",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "디카맥스디정|A12AX|250밀리그램|정",
+   "targetFp": "5383df7d49fdf7f7",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "소하자임플러스정|A02AX|50밀리그램|정",
+   "targetFp": "5b02d746e0b674e0",
+   "sourceType": "mfds_drug_otc",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "예스비타연질캡슐|A11AA03|92.6밀리그램|연질캡슐",
+   "targetFp": "69d379dfe5e8d7f4",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "메가토스씨정|A11JB|250밀리그램|정",
+   "targetFp": "a228c0c1f7510fea",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "리보테인정|A11JC|33.33밀리그램|정",
+   "targetFp": "ab81f93bb943b39a",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "칼본맥스연질캡슐|A12AX|590밀리그램|연질캡슐",
+   "targetFp": "aec70069fea678da",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "파워콘드로600에프정|A11EX|600밀리그램|정",
+   "targetFp": "d8f3c650f529eee4",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
+  },
+  {
+   "agent": "ga",
+   "status": "CLAIMED",
+   "groupKey": "비나폴로프리미엄정|A11JB|50밀리그램|정",
+   "targetFp": "f3dbf8ad57fb4432",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V5 batch6 claim (2026-07-23)"
   }
  ]
 }
