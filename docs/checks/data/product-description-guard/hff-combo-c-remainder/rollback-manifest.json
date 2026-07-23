@@ -1,0 +1,21 @@
+{
+  "slug": "combo-c-remainder-v1",
+  "createdMasters": [
+    "3f9c0836-0b6d-45ce-aed9-d6368a0f414b"
+  ],
+  "createdSpd": [
+    "6d8eff7f-5053-405e-9576-005b68e1a0f6",
+    "8bf4abea-9ad3-4390-93c8-8fe5a8e24b60"
+  ],
+  "candIds": [
+    "932664e4-aff0-4df5-8b0d-f69c0679039e"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "932664e4-aff0-4df5-8b0d-f69c0679039e",
+      "stmt": "2024002023365",
+      "prev_status": "pending"
+    }
+  ],
+  "skippedStmts": []
+}

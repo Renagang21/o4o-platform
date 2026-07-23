@@ -1,0 +1,29 @@
+{
+  "_doc": "WO-O4O-HFF-PARSER-BASED-C-REMAINDER-PRODUCTION-C-V1 read-only census (2026-07-23). parser 기준 74c9e8f2d. taken=canonical STORE o4o_hff_generated stmts.",
+  "baseline": { "hffCandidates": 41261, "takenStmts": 11361 },
+  "cLed87": {
+    "total": 87, "alreadyTaken": 39, "notTaken": 48,
+    "notTakenDiagnostic": { "UNKNOWN_LABELS": 33, "PRODUCIBLE_looseCheck": 3, "N_LT_2": 11, "ATTR_FAIL": 1 },
+    "registeredHarvestEligible": 1,
+    "note": "UNKNOWN_LABELS 대다수 = 히알루론산·세라마이드·콜라겐(A도메인 피부, 미등록) + 번호라벨/(N) 원료·EPA와DHA의 합(공용 parseSpecs 포맷갭=PENDING_SHARED). 공용 parser 무수정 원칙으로 HOLD. registeredHarvest 는 amount/serving 게이트로 3→1."
+  },
+  "cUnregFresh": {
+    "scanned": 41261, "signaturesEligible": 97, "totalEligible": 501, "totalFresh": 5,
+    "note": "기존 injectC 레지스트리(포스파티딜세린·아스타잔틴·홍국·라이코펜·나토균) C-unreg 코퍼스 수렴 — eligible 501 중 496 이미 taken, fresh 5."
+  },
+  "generateGate": {
+    "poolFresh": 6, "target": 1, "autoHold": 5,
+    "holds": [
+      { "stmt": "20060020008999", "name": "액티브솔루션 눈건강", "hold": "G-MULTI-AMOUNT-SOURCE" },
+      { "stmt": "200700170352356", "name": "VIKlab 20mg 특허형 루테인 30's", "hold": "D-CLAIM-UNGROUNDED-001" },
+      { "stmt": "201200190071246", "name": "올인원 브레인아이 샷", "hold": "G-MULTI-AMOUNT-SOURCE" },
+      { "stmt": "200400200083055", "name": "메모리메이트", "hold": "G-MULTI-AMOUNT-SOURCE" },
+      { "stmt": "20040015107981", "name": "써큐파워", "hold": "G-MULTI-AMOUNT-SOURCE" }
+    ]
+  },
+  "newIngredientCeiling_notTaken_solid": {
+    "레시틴": 1, "스피루리나": 5, "클로렐라": 5, "당귀": "0 (전량 액상)", "나토균": 3, "홍경천": 45,
+    "decision": "레시틴·스피루리나·클로렐라·당귀 = 신규 registry 필요(공식 EN canonical 확정 전 미등록·저수율). 나토균 이미 injectC(≥2등록원료 조합 부재로 fresh 0). 홍경천 = 공식 EN 미확정 → PENDING(WO 명시). 신규원료 등록은 공식 KO+EN+표시량+지표+1일섭취+statementNo 전부 확정 전 미수행(CLAUDE.md 원문밖 의료사실 생성금지)."
+  },
+  "produced": { "liveNew": 1, "stmt": "2024002023365", "sig": "글루코사민|루테인|망간|비타민A|비타민E|오메가3", "slug": "combo-c-remainder-v1", "dbWrite": 4 }
+}

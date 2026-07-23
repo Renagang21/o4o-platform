@@ -1,0 +1,32 @@
+[
+ {
+  "statementNo": "20060020008999",
+  "productName": "액티브솔루션 눈건강",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200700170352356",
+  "productName": "VIKlab 20mg 특허형 루테인 30's (VIKlab 20mg Patented Lutein 30's)",
+  "holdCode": "HOLD_GUARD_BLOCKED",
+  "reason": "D-CLAIM-UNGROUNDED-001,D-CLAIM-UNGROUNDED-001"
+ },
+ {
+  "statementNo": "201200190071246",
+  "productName": "올인원 브레인아이 샷",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "200400200083055",
+  "productName": "메모리메이트",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ },
+ {
+  "statementNo": "20040015107981",
+  "productName": "써큐파워",
+  "holdCode": "HOLD_MULTI_GUARD",
+  "reason": "G-MULTI-AMOUNT-SOURCE,G-MULTI-AMOUNT-SOURCE"
+ }
+]
