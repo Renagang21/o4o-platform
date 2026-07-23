@@ -34,6 +34,10 @@ const B_COMPONENT: Array<[RegExp, string]> = [
   [/^유해균의?\s*억제$/, 'inhibiting harmful bacteria'],
   [/^배변활동$/, 'smooth bowel movements'],
   [/^면역기능\s*증진$/, 'supporting immune function'],
+  // B-GUT-REMAINDER: 간건강·체지방·면역력 공식 기능성 EN 정적 보강(MFDS 표준 영문 표현, 임의생성 0)
+  [/^간\s*건강$/, 'liver health'],
+  [/^체지방\s*감소$/, 'reducing body fat'],
+  [/^면역력\s*증진$/, 'boosting immunity'],
 ];
 function bJoin(a: string[]): string { return a.length <= 1 ? (a[0] ?? '') : a.length === 2 ? `${a[0]} and ${a[1]}` : `${a.slice(0, -1).join(', ')}, and ${a[a.length - 1]}`; }
 function mapComponentB(ko: string): string | null { const c = ko.replace(/\s+/g, ' ').trim(); for (const [re, en] of B_COMPONENT) if (re.test(c)) return en; return null; }
@@ -91,4 +95,11 @@ export const B_INGREDIENTS: Record<string, SfIngredient> = {
   '폴리덱스트로스': { key: '폴리덱스트로스', slug: 'polydextrose', displayKo: '폴리덱스트로스', displayEn: 'Polydextrose', labelRe: /폴리덱스트로스/, allowClassified: true, statusHint: 'READY' },
   '키토올리고당': { key: '키토올리고당', slug: 'chitooligosaccharide', displayKo: '키토올리고당', displayEn: 'Chitooligosaccharide', labelRe: /키토올리고당/, allowClassified: true, statusHint: 'READY' },
   '베타글루칸': { key: '베타글루칸', slug: 'beta-glucan', displayKo: '베타글루칸', displayEn: 'Beta-glucan', labelRe: /베타글루칸/, allowClassified: true, statusHint: 'READY' },
+  // B-GUT-REMAINDER 신규: 표고버섯균사체 — 공식 기능성 간건강 / 면역기능 증진(둘 다 B_COMPONENT 정적 EN 커버). 홍경천 등 combo(괄호 표기)는 pure-single 브래킷 필터로 자동 제외.
+  '표고버섯균사체': { key: '표고버섯균사체', slug: 'shiitake-mycelium', displayKo: '표고버섯균사체', displayEn: 'Shiitake mushroom mycelium', labelRe: /표고/, allowClassified: true, statusHint: 'READY' },
+  // B-GUT-REMAINDER discovery 라운드2 (장·대사·면역, A/C 미청구). 간(밀크씨슬)·항산화(녹차)·own-track(인삼/홍삼)은 도메인 경계로 HOLD.
+  '청국장균배양정제물': { key: '청국장균배양정제물', slug: 'chungkookjang-culture', displayKo: '청국장균배양정제물', displayEn: 'Chungkookjang bacterial culture', labelRe: /청국장균/, allowClassified: true, statusHint: 'READY' },
+  '풋사과추출물애플페논': { key: '풋사과추출물애플페논', slug: 'green-apple-applephenon', displayKo: '풋사과 추출물 애플페논', displayEn: 'Green apple extract (Applephenon)', labelRe: /풋사과/, allowClassified: true, statusHint: 'READY' },
+  '홍국': { key: '홍국', slug: 'red-yeast-rice', displayKo: '홍국', displayEn: 'Red yeast rice', labelRe: /홍국/, allowClassified: true, statusHint: 'READY' },
+  '미역등복합추출물': { key: '미역등복합추출물', slug: 'xanthigen', displayKo: '미역등복합추출물(잔티젠)', displayEn: 'Undaria/pomegranate complex extract (Xanthigen)', labelRe: /잔티젠|미역등복합/, allowClassified: true, statusHint: 'READY' },
 };
