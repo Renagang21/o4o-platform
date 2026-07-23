@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "큐엔디1000연질캡슐|A11JA|10밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "00bd3c31-224b-fe39-d9c5-2cde9ef2e2d7",
+  "expected": 6,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/6"
+  ],
+  "fetched": 6,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 6,
+  "anyCanonical": 6,
+  "existingAuthoredCanonical": 6,
+  "htmlLen": 1528,
+  "htmlMd5": "7efcb97dc364c8a32fea954d02c0cf10",
+  "summary": "비타민 D, E의 보급과 뼈·이의 발육불량, 구루병의 예방",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 6,
+    "STEP_B_authored_flip": 6,
+    "audit": 6
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

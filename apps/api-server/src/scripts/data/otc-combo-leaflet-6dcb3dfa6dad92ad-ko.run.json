@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "벤포렉스캡슐|A11DB|50밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "cb94cc2e-c680-529e-7bf5-24a58cb1dd8b",
+  "expected": 6,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/6"
+  ],
+  "fetched": 6,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 6,
+  "anyCanonical": 6,
+  "existingAuthoredCanonical": 6,
+  "htmlLen": 1656,
+  "htmlMd5": "7d4c07819cf0149888d65d53a89a6e34",
+  "summary": "비타민 수요 증대 시의 비타민 보급과 신경통·근육통·관절통·말초신경염·말초신경마비 등 비타민 결핍·대사장해가 추정되는 경우의 개선",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 6,
+    "STEP_B_authored_flip": 6,
+    "audit": 6
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

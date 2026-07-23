@@ -370,103 +370,103 @@
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "맥스원플러스연질캡슐|A11JC|500밀리그램|연질캡슐",
    "targetFp": "5525cff600f31aa4",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "토코탑연질캡슐|A11JC|250밀리그램|연질캡슐",
    "targetFp": "5ce4a14458a28973",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "투엑스비골드100정|A11EX|100밀리그램|정",
    "targetFp": "5e57d1b6c389c411",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "벤포렉스캡슐|A11DB|50밀리그램|캡슐",
    "targetFp": "6dcb3dfa6dad92ad",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "마그셀연질캡슐|A11JB|250밀리그램|연질캡슐",
    "targetFp": "6e32f70de3f2372c",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "로비탈연질캡슐|A11JC|20밀리그램|연질캡슐",
    "targetFp": "82324f96e58e3466",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "트리겔정|A02AX|208.7밀리그램|정",
    "targetFp": "838accb04dda5160",
    "sourceType": "mfds_drug_otc",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "마이비칼정|A12AX|475밀리그램|정",
    "targetFp": "86ea446f1ffff152",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "벤포스정|A11DB|300밀리그램|정",
    "targetFp": "89b7e1fcd52566a1",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   },
   {
    "agent": "ga",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "큐엔디1000연질캡슐|A11JA|10밀리그램|연질캡슐",
    "targetFp": "97960be079db9b97",
    "sourceType": "mfds_drug_otc_nutrition_combo",
    "masters": 6,
    "op": "KO_EN",
-   "note": "GA-V5 batch8 claim (2026-07-23)"
+   "note": "GA-V5 batch8 KO+EN LIVE (2026-07-23)"
   }
  ]
 }

@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "벤포렉스캡슐|A11DB|50밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "cb94cc2e-c680-529e-7bf5-24a58cb1dd8b",
+  "anomalies": [],
+  "targetMasters": 6,
+  "koFingerprintKinds": 1,
+  "builtLen": 2954,
+  "builtMd5": "52e2a2a1977acd18232452b594cf02ca",
+  "existingEnCanonical": 6,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 6,
+    "STEP2_flip": 6,
+    "total": 12
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
