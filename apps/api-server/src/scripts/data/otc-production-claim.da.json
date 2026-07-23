@@ -191,6 +191,14 @@
       "note": "V6 완결 8fp/12 = 덤겔 6(3fp)+크림 1+외용액 3(3fp)+원스 2(2fp) — EN 4형(1일1회 겔/질환별 기간 크림/1~2회 액/1회 필름 15세 금기). 함정 수정: coarse '%(성분%)'→'%(성분)%'(용량 접미 30mL·10g·1튜브 변형 누락 해소+성분 토큰 정확화), ingredientOf 마지막 (성분) 그룹 허용 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
+      "groupKey": "가수과산화벤조일|겔(여드름)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 7,
+      "op": "KO_EN",
+      "status": "CLAIMED",
+      "note": "우선순위⑤: 조아아크네겔2+아크덤겔2+파티마겔2.5% 3=3 원문형 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+    },
+    {
       "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 16,
