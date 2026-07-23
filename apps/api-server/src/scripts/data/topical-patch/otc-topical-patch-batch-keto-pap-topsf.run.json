@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "탑스에프카타플라스마",
+ "slugbase": "keto-pap-topsf",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f09f4c137664dcdc",
+   "n": 2
+  },
+  {
+   "fp": "302570df54272e44",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

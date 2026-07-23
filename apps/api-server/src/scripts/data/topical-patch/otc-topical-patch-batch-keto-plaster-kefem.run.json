@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-STORE-LEAFLET-PRODUCTION-DA-V7",
+ "ingredient": "케토프로펜",
+ "form": "케펨플라스타",
+ "slugbase": "keto-plaster-kefem",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c90434761538a9d6",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}
