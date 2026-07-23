@@ -159,12 +159,12 @@
       "note": "V6 완결 9fp/50 — 전 제품 동일 요법(주1~2회·줄+패드+스파툴라·손톱6개월/발톱9~12개월)로 단일 EN 그룹. 금기=영유아·소아/조갑주위염증/혈액순환장애/영양실조/알코올중독/임부·수유부. HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     },
     {
-      "groupKey": "살리실산|액(외용)",
+      "groupKey": "살리실산|외용액·겔·팁스왑액(여드름)",
       "sourceType": "o4o_drug_otc_topical",
-      "masters": 9,
+      "masters": 16,
       "op": "KO_EN",
-      "status": "CLAIMED",
-      "note": "V6 재선점 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
+      "status": "DONE",
+      "note": "V6 완결 9fp/16 = 외용액 9(애크린형 3fp/3 + 2%형 유클리어톡·클리어틴·클리톡 3fp/6) + 겔 4(애크린겔 1fp/2 + 센스힐겔 1fp/2, 감량요법 문구별 EN 분리) + 팁스왑액 1fp/3. 전 제품 여드름 효능 — 각질·사마귀·티눈 후보는 현 풀에 없음. 재우스오라쿠고에이취플라스타 4=첩부제 → WO 지침대로 생산 제외(조사만). HOLD 0·dup 0·no-op 0 (WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6)"
     }
   ],
   "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."

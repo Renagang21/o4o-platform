@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "살리실산",
+ "form": "애크린외용액",
+ "slugbase": "salicylic-sol-a",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a107d67fde2c9fe6",
+   "n": 1
+  },
+  {
+   "fp": "b73946526003bed4",
+   "n": 1
+  },
+  {
+   "fp": "7e4cda3cc9fba3f7",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6",
+ "ingredient": "살리실산",
+ "form": "외용액",
+ "slugbase": "salicylic-sol-b",
+ "assumeRoute": "topical",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "737f3cac78ecb7a0",
+   "n": 4
+  },
+  {
+   "fp": "8f9063cc7bbb48e3",
+   "n": 1
+  },
+  {
+   "fp": "843cf799dcc08620",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}
