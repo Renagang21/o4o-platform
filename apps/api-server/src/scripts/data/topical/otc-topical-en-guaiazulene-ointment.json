@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-STORE-LEAFLET-CONTINUOUS-PRODUCTION-DA-V5",
+ "slug": "guaiazulene-ointment",
+ "translation": {
+  "groupKey": "구아야줄렌|연고",
+  "title": "Guaiazulene Ointment",
+  "usageLabel": "How to use it",
+  "efficacy": "This medicine is used for eczema, burns, and erosions and ulcers caused by other conditions.",
+  "usage": "Apply to the affected area several times a day.",
+  "caution": "Do not use this medicine if you are hypersensitive to it. Before using it, consult a doctor or pharmacist if you are or have been hypersensitive to propylene glycol. Do not use it in the eyes. Skin irritation symptoms such as a feeling of heat, itching or a stinging sensation may occur; if they do, stop use and consult a doctor or pharmacist.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Guaiazulene",
+   "Form": "Ointment"
+  }
+ }
+}

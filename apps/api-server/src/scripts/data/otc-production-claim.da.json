@@ -67,28 +67,29 @@
       "sourceType": "o4o_drug_otc_topical",
       "masters": 17,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "구아야줄렌|연고",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 14,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "프라목신염산염|크림",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 17,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "HOLD",
+      "holdReason": "mucosa-adjacent(치질·항문부위 전용)=점막 인접 후순위(WO 리도카인 준용)"
     },
     {
       "groupKey": "테르비나핀염산염|액(외용)",
       "sourceType": "o4o_drug_otc_topical",
       "masters": 41,
       "op": "KO_EN",
-      "status": "CLAIMED"
+      "status": "DONE"
     },
     {
       "groupKey": "이소코나졸질산염|크림",

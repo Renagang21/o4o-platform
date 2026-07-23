@@ -75,7 +75,7 @@ const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 �
 function normalizeOralMisphrase(text: string, fullContent: string): string {
   if (!/외용으로만|외용으로 사용/.test(stripTags(fullContent || ''))) return text;
   return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
-    .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
+    .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우') // 우발적 경구섭취 안내(의미 보존 재표현)
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록'); // 외용전용 지시(의미 보존 재표현)
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
