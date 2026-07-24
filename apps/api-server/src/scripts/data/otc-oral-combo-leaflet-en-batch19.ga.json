@@ -1,0 +1,330 @@
+{
+ "_doc": "batch19 (GA-V7) authored EN renderings of 25 KO store leaflets. Faithful translation of the official easy_drug source restructured in KO — no new medical facts, no weakening of efficacy/contraindications/cautions, pharmacist-consultation routing preserved. Merged into config groups[fp].en. 25 groups / 100 masters. English romanized titles.",
+ "groups": {
+  "896c9f96ab4136c9": {
+   "groupKey": "쎈비백뉴로업정|A11JC|100밀리그램|정",
+   "title": "Senbibaek Neuro Up Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins D, B1, B2, B6 during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; prevention of poor bone and tooth development and rickets; relief of beriberi, eye fatigue, neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and supplementation of zinc.",
+   "usage": "Adolescents aged 12 and older and adults: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine; hypercalcemia; sarcoidosis; kidney disease; kidney stones; severe renal failure; or infants under 12 months.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; or a history of kidney stones.\n\nFollow the prescribed dosage and usage.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Taking with antialdosterone agents or triamterene may cause hyperkalemia, so use with caution. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, loose stools, red spots, cardiac arrest, central nervous system depression, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, or pulmonary edema occur, or there is no improvement after about a month of use, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins D, B-group and zinc for fatigue, recovery, growth and old age",
+    "Main symptoms": "Physical fatigue, rickets prevention, beriberi, neuralgia/joint pain, stomatitis"
+   }
+  },
+  "8cd3f4345b3aa75a": {
+   "groupKey": "맥세렌비제트정|A11JB|62.244밀리그램|정",
+   "title": "Maxselen BZ Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin B1 during physical fatigue, pregnancy/lactation, and reduced stamina during or after illness, and for supplementation of zinc and selenium.",
+   "usage": "Ages 12 and older and adults: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are hypersensitive to this medicine or an infant under 12 months.\n\nConsult a pharmacist before use if you have gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; or hypoproteinemia. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Consult a pharmacist when taking with antialdosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, loose stools, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, or pulmonary edema occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin B1, zinc and selenium for fatigue and recovery",
+    "Main symptoms": "Physical fatigue, reduced stamina, zinc/selenium supplementation"
+   }
+  },
+  "93f8f9da82d5e19d": {
+   "groupKey": "미투-에스연질캡슐|A11JB|200밀리그램|연질캡슐",
+   "title": "Mitu-S Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins E, B1, B2, B6 during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, and old age; relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), beriberi, eye fatigue, angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; relief of peripheral circulation disorders and menopausal shoulder/neck stiffness, numbness of hands and feet, and cold hands and feet; and for muscle cramps caused by magnesium deficiency.",
+   "usage": "Ages 12 and older and adults: take 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months; or severe renal failure.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; a lipid-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or otherwise require caution with lipid emulsions; at special risk from lipid overload; a thrombotic (blood-vessel-blocking) predisposition; or hypersensitive to Yellow No. 4 or Yellow No. 5 or have such experience. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when using with estrogen-containing oral contraceptives, antialdosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, loose stools, gastric discomfort, diarrhea, constipation, redness (congested reddening), rash, red spots, cardiac arrest, central nervous system depression, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins E, B-group and relieves circulation problems and muscle cramps",
+    "Main symptoms": "Physical fatigue, neuralgia/joint pain, cold hands/feet, muscle cramps"
+   }
+  },
+  "94159bef193bffba": {
+   "groupKey": "리버골드에프연질캡슐|A05BA|100밀리그램|연질캡슐",
+   "title": "Liver Gold F Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for adjunctive treatment of chronic liver disease and toxic liver disease.",
+   "usage": "Adults: take 1 capsule 3 times daily. After improvement, reduce the dose to 1–2 capsules per day.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are hypersensitive to or have experienced allergy to soybean oil, or are hypersensitive to soybeans or peanuts.\n\nConsult a pharmacist before use if you are pregnant; have hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis or other lipid-metabolism disorder, or otherwise require caution with lipid emulsions.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nIf diarrhea or any abnormal symptom occurs, or there is no improvement after about a month of use, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Adjunctive treatment for chronic and toxic liver disease",
+    "Main symptoms": "Chronic liver disease, toxic liver disease"
+   }
+  },
+  "94c92b1f1f508cec": {
+   "groupKey": "테라젠비타골드정|A11JC|100밀리그램|정",
+   "title": "Theragen Vita Gold Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins B1, B2, B6, C, D, E during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; relief of beriberi and eye fatigue; prevention of poor bone and tooth development and rickets; and supplementation of zinc.",
+   "usage": "Ages 12 and older and adults: take 1 tablet once daily after a meal.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine; infants under 12 months; hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; kidney stones; severe renal failure; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; have hyperoxaluria (excess oxalate excreted in urine); cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; gout; kidney stones or a history of them; a thrombotic (blood-vessel-blocking) predisposition; deficient in folic acid; or hypersensitive to Yellow No. 4 or have such experience. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nThis medicine may interfere with the detection of blood glucose in various urine tests and may turn urine yellow, affecting clinical test values.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with estrogen-containing oral contraceptives, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, gastric discomfort, constipation, rash, redness (congested reddening), loose stools, red spots, cardiac arrest, central nervous system depression, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, pulmonary edema, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins B-group, C, D, E and zinc for fatigue, recovery and growth",
+    "Main symptoms": "Physical fatigue, neuralgia/joint pain, stomatitis, beriberi, rickets prevention"
+   }
+  },
+  "95f26bb515556289": {
+   "groupKey": "위싱유정|A02AX|312.5밀리그램|정",
+   "title": "Wishingyou Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for hyperacidity, heartburn, indigestion, gastric discomfort, gastric bloating, food stagnation, nausea, vomiting, stomach pain, acid belching, overeating, promotion of digestion, and loss of appetite.",
+   "usage": "Ages 15 and older and adults: take 2 tablets 3 times daily, 30 minutes after meals.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are a patient receiving dialysis therapy or a child aged 7 or under.\n\nConsult a pharmacist before use if you have renal impairment, an allergic constitution, or are on a sodium-restricted diet. If there is no improvement after about 2 weeks of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nDo not take tetracycline antibiotics while taking this medicine.\n\nIf constipation or diarrhea occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves hyperacidity and aids digestion for indigestion-related symptoms",
+    "Main symptoms": "Hyperacidity, heartburn, indigestion, gastric discomfort/bloating, nausea"
+   }
+  },
+  "97f798410bdae1d6": {
+   "groupKey": "활비에이캡슐|A11JA|25밀리그램|캡슐",
+   "title": "Hwalbi A Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins B1, B6 during physical fatigue, pregnancy/lactation, and reduced stamina during or after illness, and for relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, dermatitis, beriberi, and eye fatigue.",
+   "usage": "Ages 8 and older and adults: take 2 capsules once daily, or 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are hypersensitive to this medicine, an infant under 3 months, or taking levodopa.\n\nConsult a pharmacist before use if you are an infant under 1 year or deficient in folic acid.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with levodopa.\n\nIf nausea, vomiting, loose stools, loss of appetite, or abdominal bloating occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins B1, B6 for fatigue, recovery and nerve/muscle relief",
+    "Main symptoms": "Physical fatigue, neuralgia/muscle/joint pain, beriberi, eye fatigue"
+   }
+  },
+  "98079e34748adae9": {
+   "groupKey": "엘비페롤정|A12AX|250밀리그램|정",
+   "title": "Elbiferol Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin D during pregnancy/lactation, growth periods, and old age, and for prevention of poor bone and tooth development and rickets.",
+   "usage": "Adults and children aged 8 and older: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine; hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; infants under 12 months; kidney stones; severe renal failure; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you are an infant under 1 year; a child who gets much sunlight and eats normally; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; or a history of kidney stones. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nFollow the prescribed dosage and usage.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Consult a pharmacist when taking with antialdosterone agents, triamterene, or cardiac glycosides. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin D for pregnancy/lactation, growth and old age",
+    "Main symptoms": "Vitamin D deficiency, poor bone/tooth development, rickets"
+   }
+  },
+  "9a533ad885ec10ec": {
+   "groupKey": "헤모큐수정|B03AE|76.09밀리그램|정",
+   "title": "Hemoqueen S Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins B6, C during physical fatigue, pregnancy/lactation, and reduced stamina during or after illness, and for prevention and treatment of iron-deficiency anemia.",
+   "usage": "Children aged 8 and older and adults: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Warning: Overdose in children aged 6 or under may cause fatal iron poisoning, so store out of the reach of children.\n\nDo not take this medicine if any of the following applies: those hypersensitive to this medicine; infants under 12 months; hemochromatosis; hemosiderosis; non-iron-deficiency anemia; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you have hyperoxaluria; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; gout; kidney stones; or are deficient in folic acid.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nThis medicine may interfere with the detection of blood glucose in urine tests.\n\nWhile taking this medicine, do not take phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with antialdosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, hives, itching, photosensitivity, abdominal/stomach pain, cramps, fever, or coma occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies iron with vitamins B6 and C for iron-deficiency anemia and fatigue",
+    "Main symptoms": "Iron-deficiency anemia, physical fatigue, reduced stamina"
+   }
+  },
+  "9c0c04463feaad48": {
+   "groupKey": "삐콤정|A11EB|6밀리그램|정",
+   "title": "Bcomplex Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins B1, B2, B6, C during physical fatigue, pregnancy/lactation, and reduced stamina during or after illness.",
+   "usage": "Ages 8 and older and adults: take 1–3 tablets once daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine; infants aged 3 months or under; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you have hyperoxaluria (excess oxalate excreted in urine); are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gout; kidney stones; or are deficient in folic acid.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with levodopa.\n\nIf nausea, vomiting, diarrhea, or loose stools occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins B1, B2, B6, C for fatigue and recovery",
+    "Main symptoms": "Physical fatigue, reduced stamina, vitamin B/C supplementation"
+   }
+  },
+  "a1623f1a1f1ab3d8": {
+   "groupKey": "에디맥스디정|A12AX|250밀리그램|정",
+   "title": "Edimax D Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin D during pregnancy/lactation, growth periods, and old age, and for prevention of poor bone and tooth development and rickets.",
+   "usage": "Ages 8 and older and adults: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); those hypersensitive to this medicine; infants under 12 months; kidney stones; severe renal failure; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you are an infant under 1 year; under a doctor's care; a child who gets much sunlight and eats normally; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; a history of kidney stones; or being treated with cardiac glycosides. If there is no improvement after about a month of use, stop immediately and consult a doctor or pharmacist.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Taking with antialdosterone agents or triamterene may cause hyperkalemia, so consult a pharmacist. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin D for pregnancy/lactation, growth and old age",
+    "Main symptoms": "Vitamin D deficiency, poor bone/tooth development, rickets"
+   }
+  },
+  "a39edf7cb87e4a26": {
+   "groupKey": "제니폴연질캡슐|C10B|333.3밀리그램|연질캡슐",
+   "title": "Zenipol Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for improvement of lipid metabolism in obesity and in diabetic or essential hypercholesterolemia.",
+   "usage": "Take 3 capsules 3 times daily, 30 minutes before meals.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are hypersensitive to this medicine or to soybean oil, soybeans, or peanuts.\n\nConsult a pharmacist before use if you are pregnant or may be pregnant; have hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis or other lipid-metabolism disorder, or otherwise require caution with lipid emulsions; are at special risk from lipid overload; have a thrombotic (blood-vessel-blocking) predisposition; or are hypersensitive to Yellow No. 5 or have such experience.\n\nFollow the prescribed dosage and usage.\n\nConsult a pharmacist when using with levodopa, estrogen-containing oral contraceptives, or intravenous lipid preparations.\n\nGastric discomfort, diarrhea, constipation, rash, redness (congested reddening), earlier-than-expected menstruation, or increased menstrual amount may occur. If menstrual bleeding continues for a prolonged period, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improves lipid metabolism in obesity and hypercholesterolemia",
+    "Main symptoms": "Obesity, diabetic/essential hypercholesterolemia, lipid metabolism"
+   }
+  },
+  "a3dec6a19ffd68b2": {
+   "groupKey": "토마쎈플러스연질캡슐|A11JB|500밀리그램|연질캡슐",
+   "title": "Tomassen Plus Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin E during old age, for relief of peripheral circulation disorders and menopausal shoulder/neck stiffness, numbness of hands and feet, and cold hands and feet, and for muscle cramps caused by magnesium deficiency.",
+   "usage": "Adolescents aged 12 and older and adults: take 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months; or severe renal failure.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; a lipid-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or otherwise require caution with lipid emulsions; at special risk from lipid overload; or a thrombotic predisposition.\n\nFollow the prescribed dosage and usage.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Consult a pharmacist when using with estrogen-containing oral contraceptives, antialdosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf gastric discomfort, diarrhea, constipation, rash, redness, red spots, cardiac arrest, central nervous system depression, dermatitis, body odor in sweat/breath, hair loss, restlessness, vomiting, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin E and relieves circulation problems and muscle cramps",
+    "Main symptoms": "Peripheral circulation disorders, cold hands/feet, muscle cramps"
+   }
+  },
+  "a5244581d1b9a531": {
+   "groupKey": "센티렉스어드밴스정|A11JC|650.132밀리그램|정",
+   "title": "Centrex Advance Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; relief of eye dryness and night blindness (difficulty seeing in the dark); and prevention of poor bone and tooth development and rickets.",
+   "usage": "Adults: take 1 tablet once daily with a meal.\nFollow the prescribed dosage.",
+   "caution": "Warning: Taking 5,000 IU or more of vitamin A per day may cause congenital malformations. Women within the first 3 months of pregnancy or who may be pregnant should not take this medicine. Overdose in children aged 6 or under may cause fatal iron poisoning, so store out of the reach of children.\n\nDo not take this medicine if any of the following applies: hypercalcemia; sarcoidosis; kidney disease; those hypersensitive to this medicine; infants under 12 months; hyperkalemia; Wilson's disease; hemochromatosis; hemosiderosis; non-iron-deficiency anemia; kidney stones; or severe renal failure.\n\nConsult a pharmacist before use if you have hyperoxaluria; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; are being treated with cardiac glycosides; gallbladder-related disease; liver disease; biliary obstruction; copper deficiency; acute or chronic bronchitis; pulmonary edema; alkalosis; peptic ulcer; diabetes; gout; kidney stones or a history of them; deficient in folic acid; or a thrombotic predisposition.\n\nFollow the prescribed dosage and usage.\n\nThis medicine may turn urine yellow, affecting clinical test values, or interfere with the detection of blood glucose in urine tests.\n\nWhile taking this medicine, do not take phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with cardiac glycosides, estrogen-containing oral contraceptives, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, itching, dry and rough skin, painful joint swelling, diarrhea, gastric discomfort, constipation, rash, redness, loose stools, low blood pressure, facial flushing, irregular heartbeat, skin rash, hives, photosensitivity, abdominal/stomach pain, cramps, fever, coma, upper abdominal pain, allergic reaction, angioedema, joint pain, eosinophilia, iodism, red spots, cardiac arrest, central nervous system depression, hyperuricemia, hyperkalemia, gas/bloating, gastrointestinal pain, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, pulmonary edema, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Full multivitamin with iron for fatigue, recovery, eyes and growth",
+    "Main symptoms": "Physical fatigue, eye dryness, night blindness, rickets prevention"
+   }
+  },
+  "a5a7e0c58f2624fa": {
+   "groupKey": "위속엔정|A02AX|40밀리그램|정",
+   "title": "Wisogen Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for hyperacidity, heartburn, gastric discomfort, gastric bloating, food stagnation, nausea, vomiting, stomach pain, acid belching, indigestion, loss of appetite (anorexia), overeating, and gastric bloating from promotion of digestion.",
+   "usage": "Adults: take 2 tablets 3 times daily after meals.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption; children under 15 years; women who are pregnant or may be pregnant; or breastfeeding women.\n\nConsult a pharmacist before use if you are an allergy patient; hypersensitive to Yellow No. 4 or have such experience; have renal impairment or liver impairment; high blood pressure or are elderly; cardiac or renal impairment; or edema. If there is no improvement after about 2 weeks of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nDo not take with gastrointestinal analgesics or antispasmodics. Consult a pharmacist when taking with potassium-containing preparations, licorice-containing preparations, glycyrrhizic acid or its salt preparations, loop diuretics (furosemide, etacrynic acid), or thiazide diuretics (trichlormethiazide).\n\nIf allergic symptoms (rash, itching, etc.); rarely palpitations, drowsiness, dizziness, malaise, headache, constipation, dry mouth, or heart palpitations; elevated GOT/GPT; pseudoaldosteronism (decreased urine output, swelling of the face and limbs, heavy eyelids, stiffening of the hands, elevated blood pressure, or headache); or myopathy (weakness, limb cramps, paralysis, etc.) occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves hyperacidity and aids digestion for indigestion-related symptoms",
+    "Main symptoms": "Hyperacidity, heartburn, gastric discomfort/bloating, food stagnation, nausea"
+   }
+  },
+  "a9fb9874e9cc78c3": {
+   "groupKey": "코큐텐비타알부정|A11AB|280.9밀리그램|정",
+   "title": "CoQ10 Vita Albu Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins A, B1, B2, B6, C, D, E during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; relief of eye dryness and night blindness (difficulty seeing in the dark); prevention of poor bone and tooth development and rickets; and prevention and treatment of iron-deficiency anemia.",
+   "usage": "Adults: take 1 tablet once daily after a meal.\nFollow the prescribed dosage.",
+   "caution": "Warning: Taking 5,000 IU or more of vitamin A per day may cause congenital malformations. Women within the first 3 months of pregnancy or who may be pregnant should not take this medicine. Overdose in children aged 6 or under may cause fatal iron poisoning, so store out of the reach of children.\n\nDo not take this medicine if any of the following applies: those hypersensitive to this medicine; infants under 12 months; hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney disease; Wilson's disease; hemochromatosis; hemosiderosis; non-iron-deficiency anemia; kidney stones; severe renal failure; or those hypersensitive to Yellow No. 5 or with such experience.\n\nConsult a pharmacist before use if you have hyperoxaluria (excess oxalate excreted in urine); are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; hypoproteinemia; gallbladder-related disease; liver disease; gout; kidney stones or a history of them; deficient in folic acid; or a thrombotic (blood-vessel-blocking) predisposition.\n\nFollow the prescribed dosage and usage.\n\nThis medicine may interfere with the detection of blood glucose in various urine tests and may turn urine yellow, affecting clinical test values.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with estrogen-containing oral contraceptives, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, itching, dry and rough skin, painful joint swelling, diarrhea, gastric discomfort, constipation, rash, redness, loose stools, hives, photosensitivity, abdominal/stomach pain, cramps, fever, coma, upper abdominal pain, red spots, cardiac arrest, central nervous system depression, gastrointestinal disorders, indigestion, low blood pressure, pulmonary edema, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Full multivitamin with iron for fatigue, recovery, eyes and growth",
+    "Main symptoms": "Physical fatigue, eye dryness, night blindness, rickets prevention, iron-deficiency anemia"
+   }
+  },
+  "ac3c1c16bb8ccf74": {
+   "groupKey": "속편아제정|A09AA|175밀리그램|정",
+   "title": "Sokpyeonaje Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for indigestion, loss of appetite (anorexia), overeating, food stagnation, promotion of digestion, and gastric (upper abdominal) bloating caused by indigestion.",
+   "usage": "Ages 15 and older: take 1–2 tablets 3 times daily after meals.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are a child aged 7 or under, or have hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you have an allergic constitution or are hypersensitive to Yellow No. 4 or have such experience. If there is no improvement after about 2 weeks of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Aids digestion and relieves indigestion-related upper-abdominal bloating",
+    "Main symptoms": "Indigestion, loss of appetite, overeating, food stagnation, gastric bloating"
+   }
+  },
+  "b0ba0bbcff5da724": {
+   "groupKey": "센티렉스실버어드밴스정|A11JC|518.55밀리그램|정",
+   "title": "Centrex Silver Advance Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; relief of eye dryness and night blindness (difficulty seeing in the dark); and prevention of poor bone and tooth development and rickets.",
+   "usage": "Adults: take 1 tablet once daily with a meal.\nFollow the prescribed dosage.",
+   "caution": "Warning: Taking 5,000 IU or more of vitamin A per day may cause congenital malformations. Women within the first 3 months of pregnancy or who may be pregnant should not take this medicine. Overdose in children aged 6 or under may cause fatal iron poisoning, so store out of the reach of children.\n\nDo not take this medicine if any of the following applies: hypercalcemia; sarcoidosis; kidney disease; those hypersensitive to this medicine; infants under 12 months; hyperkalemia; Wilson's disease; hemochromatosis; hemosiderosis; non-iron-deficiency anemia; kidney stones; or severe renal failure.\n\nConsult a pharmacist before use if you have hyperoxaluria; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; are being treated with cardiac glycosides; gallbladder-related disease; liver disease; biliary obstruction; copper deficiency; acute or chronic bronchitis; pulmonary edema; alkalosis; peptic ulcer; diabetes; gout; kidney stones or a history of them; deficient in folic acid; or a thrombotic predisposition.\n\nFollow the prescribed dosage and usage.\n\nThis medicine may turn urine yellow, affecting clinical test values, or interfere with the detection of blood glucose in urine tests.\n\nWhile taking this medicine, do not take phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with cardiac glycosides, estrogen-containing oral contraceptives, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, itching, dry and rough skin, painful joint swelling, diarrhea, gastric discomfort, constipation, rash, redness, loose stools, low blood pressure, facial flushing, irregular heartbeat, skin rash, hives, photosensitivity, abdominal/stomach pain, cramps, fever, coma, upper abdominal pain, allergic reaction, angioedema, joint pain, eosinophilia, iodism, red spots, cardiac arrest, central nervous system depression, hyperuricemia, hyperkalemia, gas/bloating, gastrointestinal pain, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, pulmonary edema, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Full multivitamin with iron for fatigue, recovery, eyes and growth",
+    "Main symptoms": "Physical fatigue, eye dryness, night blindness, rickets prevention"
+   }
+  },
+  "b151c57cfc31f604": {
+   "groupKey": "네오칼디정|A12AX|750밀리그램|정",
+   "title": "Neocaldi Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin D during pregnancy/lactation, growth periods, and old age; prevention of poor bone and tooth development and rickets; and calcium deficiency and other calcium supplementation.",
+   "usage": "Children aged 8 and older and adults: take 2 tablets once daily after a meal.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine; infants under 12 months; hypercalcemia; sarcoidosis; kidney disease; kidney stones; severe renal failure; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you are a child who gets much sunlight and eats normally; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; cardiac/circulatory dysfunction; renal impairment; or hypoproteinemia.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Consult a pharmacist when using with cardiac glycosides, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, diarrhea, constipation, low blood pressure, facial flushing, irregular heartbeat, or skin rash occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin D and calcium for deficiency, growth and old age",
+    "Main symptoms": "Vitamin D/calcium deficiency, poor bone/tooth development, rickets"
+   }
+  },
+  "bb280c74c76cf677": {
+   "groupKey": "위앤프레쉬정|A02AX|100밀리그램|정",
+   "title": "Wienfresh Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for hyperacidity, heartburn, gastric discomfort, gastric bloating, food stagnation, nausea, vomiting, stomach pain, acid belching, indigestion, loss of appetite, overeating, and promotion of digestion.",
+   "usage": "Adults: take 2 tablets 3 times daily between meals, i.e. at and between mealtimes.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years; women who are pregnant or may be pregnant; breastfeeding women; patients receiving dialysis therapy; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you have experienced allergic symptoms such as rash, redness, or itching; have renal impairment, liver impairment, or cardiac impairment; phosphate depletion; edema; high blood pressure; are elderly; or have a history of kidney disease. If there is no improvement after about 2 weeks of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nDo not take with gastrointestinal analgesics or antispasmodics. Consult a pharmacist when taking with potassium-containing preparations, licorice-containing preparations, glycyrrhizic acid or its salt preparations, loop diuretics such as furosemide or etacrynic acid, or thiazide diuretics such as trichlormethiazide.\n\nIf allergic symptoms such as rash or itching; pseudoaldosteronism (decreased urine output, swelling of the face and limbs, heavy eyelids, stiffening of the hands, elevated blood pressure, or headache); or myopathy (weakness, limb cramps, paralysis, etc.) occur, stop immediately and consult a pharmacist. Rarely, palpitations, drowsiness, dizziness, malaise, headache, constipation, dry mouth, heart palpitations, or elevated GOT/GPT may occur; if so, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves hyperacidity and aids digestion for indigestion-related symptoms",
+    "Main symptoms": "Hyperacidity, heartburn, gastric discomfort/bloating, food stagnation, nausea"
+   }
+  },
+  "bca957a346248e42": {
+   "groupKey": "메가트루골드정|A11AA|25밀리그램|정",
+   "title": "Megatru Gold Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins A, D, E, B1, B2, B6, C during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; relief of eye dryness and night blindness (difficulty seeing in the dark); prevention of poor bone and tooth development and rickets; relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), beriberi, eye fatigue, angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and supplementation of zinc.",
+   "usage": "Ages 12 and older and adults: take 1 tablet once or twice daily.\nFollow the prescribed dosage.",
+   "caution": "Warning: Taking 5,000 IU or more of vitamin A per day may cause congenital malformations. Women within the first 3 months of pregnancy or who may be pregnant should not take this medicine.\n\nDo not take this medicine if any of the following applies: hypercalcemia; sarcoidosis; kidney disease; those hypersensitive to this medicine; infants under 12 months; kidney stones; or severe renal failure.\n\nConsult a pharmacist before use if you have hyperoxaluria; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; gallbladder-related disease; liver disease; biliary obstruction; copper deficiency; gout; kidney stones or a history of them; or deficient in folic acid.\n\nFollow the prescribed dosage and usage.\n\nThis medicine may turn urine yellow, affecting clinical test values, or interfere with the detection of blood glucose in urine tests.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when taking with cardiac glycosides, estrogen-containing oral contraceptives, antialdosterone agents, or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, itching, dry and rough skin, painful joint swelling, diarrhea, gastric discomfort, constipation, rash, redness (congested reddening), loose stools, low blood pressure, facial flushing, irregular heartbeat, skin rash, red spots, cardiac arrest, central nervous system depression, hyperuricemia, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, pulmonary edema, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Full multivitamin supplying vitamins A, D, E, B-group, C and zinc",
+    "Main symptoms": "Physical fatigue, eye dryness, night blindness, neuralgia/joint pain, rickets prevention"
+   }
+  },
+  "bd6e77255e5f9e61": {
+   "groupKey": "조인파워연질캡슐|A11EX|300밀리그램|연질캡슐",
+   "title": "Joinpower Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins E, B1, B2, B6 during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, and old age; relief of peripheral circulation disorders and menopausal shoulder/neck stiffness, numbness of hands and feet, and cold hands and feet; relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and relief of beriberi and eye fatigue.",
+   "usage": "Adults and children/adolescents aged 8 and older: take 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if you are hypersensitive to this medicine, an infant under 3 months, or hypersensitive to soybean oil, soybeans, or peanuts.\n\nConsult a pharmacist before use if you have hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis or other lipid-metabolism disorder, or otherwise require caution with lipid emulsions; are at special risk from lipid overload; hypersensitive to Yellow No. 5; an infant under 1 year; are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; deficient in folic acid; or have a thrombotic predisposition. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with levodopa. Consult a pharmacist when using with estrogen-containing oral contraceptives.\n\nIf gastric discomfort, diarrhea, constipation, rash, redness, nausea, vomiting, loose stools, stomatitis, loss of appetite, abdominal bloating, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins E, B-group and relieves circulation problems and nerve/muscle pain",
+    "Main symptoms": "Physical fatigue, peripheral circulation disorders, cold hands/feet, neuralgia/joint pain"
+   }
+  },
+  "bde6c720ceabe49d": {
+   "groupKey": "토마벤연질캡슐|A11JC|500밀리그램|연질캡슐",
+   "title": "Tomaben Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins E, B1, B6 during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, and old age; relief of peripheral circulation disorders and menopausal shoulder/neck stiffness, numbness of hands and feet, and cold hands and feet; relief of neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), beriberi, eye fatigue, angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and for muscle cramps caused by magnesium deficiency.",
+   "usage": "Children aged 12 and older and adults: take 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months; or severe renal failure.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; a lipid-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or otherwise require caution with lipid emulsions; at special risk from lipid overload; or a thrombotic (blood-vessel-blocking) predisposition.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, or levodopa. Consult a pharmacist when using with estrogen-containing oral contraceptives, antialdosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf gastric discomfort, diarrhea, constipation, rash, redness (congested reddening), nausea, vomiting, loose stools, red spots, cardiac arrest, central nervous system depression, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamins E, B1, B6 and relieves circulation problems and muscle cramps",
+    "Main symptoms": "Physical fatigue, peripheral circulation disorders, cold hands/feet, muscle cramps"
+   }
+  },
+  "bec236229e411cd0": {
+   "groupKey": "헤파코엔플러스정|A11AB|100밀리그램|정",
+   "title": "Hepacoen Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamins A, D, E, B1, B2, B6, C during physical fatigue, pregnancy/lactation, reduced stamina during or after illness, growth periods, and old age; prevention of poor bone and tooth development and rickets; relief of beriberi, eye fatigue, neuralgia, muscle pain, joint pain (lower-back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema, and dermatitis; and supplementation of zinc.",
+   "usage": "Ages 8 and older and adults: take 1 tablet once daily.\nFollow the prescribed dosage.",
+   "caution": "Warning: Taking 5,000 IU or more of vitamin A per day may cause congenital malformations. Women within the first 3 months of pregnancy or who may be pregnant should not take this medicine.\n\nDo not take this medicine if any of the following applies: those hypersensitive to this medicine; hypercalcemia (excess calcium in the blood); sarcoidosis (a systemic inflammatory disease of unknown cause); kidney stones; severe renal failure; infants under 12 months; or hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before use if you are an infant under 1 year; a child who gets much sunlight and eats normally; have hyperoxaluria (excess oxalate excreted in urine); are pregnant, may be pregnant, or are breastfeeding; premature infants, infants; gastrointestinal disorders such as peptic ulcer, chronic ulcerative colitis, or regional enteritis; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; gout; or kidney stones or a history of them. If there is no improvement after about a month of use, stop immediately and consult a pharmacist.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nThis medicine may interfere with the detection of blood glucose in various urine tests and may turn urine yellow, affecting clinical test values.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, antacids, levodopa, or estrogen-containing oral contraceptives. Consult a pharmacist when taking with antialdosterone agents or triamterene. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf nausea, vomiting, itching, dry and rough skin, painful joint swelling, diarrhea, gastric discomfort, constipation, rash, redness, loose stools, red spots, cardiac arrest, central nervous system depression, dermatitis, body odor in sweat/breath, hair loss, restlessness, gastrointestinal disorders, indigestion, upper abdominal pain, low blood pressure, pulmonary edema, menstruation coming earlier than expected or increasing in amount or bleeding for a prolonged period, or (in folic-acid-deficient patients) related symptoms occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Full multivitamin supplying vitamins A, D, E, B-group, C and zinc",
+    "Main symptoms": "Physical fatigue, rickets prevention, beriberi, neuralgia/joint pain, stomatitis"
+   }
+  },
+  "bf208d9058d5138c": {
+   "groupKey": "쎄투연질캡슐|A11JB|500밀리그램|연질캡슐",
+   "title": "Cetu Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for supplementation of vitamin E during old age, for relief of peripheral circulation disorders and menopausal shoulder/neck stiffness, numbness of hands and feet, and cold hands and feet, and for muscle cramps caused by magnesium deficiency.",
+   "usage": "Children aged 8 and older and adults: take 1 capsule twice daily.\nFollow the prescribed dosage.",
+   "caution": "Do not take this medicine if any of the following applies: those hypersensitive to this medicine or to soybean oil, soybeans, or peanuts; infants under 12 months; or severe renal failure.\n\nConsult a pharmacist before use if you are pregnant, may be pregnant, or are breastfeeding; cardiac/circulatory dysfunction; renal impairment; hypoproteinemia; a lipid-metabolism disorder such as hyperlipoproteinemia, diabetic hyperlipidemia, or pancreatitis, or otherwise require caution with lipid emulsions; hypersensitive to Yellow No. 5 or have such experience; at special risk from lipid overload; or a thrombotic (blood-vessel-blocking) predisposition.\n\nFollow the prescribed dosage and usage.\n\nWhen administering to children, do so under the guidance and supervision of a guardian.\n\nDo not take with phosphates, calcium salts, oral tetracyclines, or antacids. Consult a pharmacist when using with estrogen-containing oral contraceptives, antialdosterone agents, triamterene, or intravenous lipid preparations. Avoid tannin-containing teas such as green tea and black tea during, before, and after taking this medicine.\n\nIf gastric discomfort, diarrhea, constipation, rash, redness (congested reddening), red spots, cardiac arrest, central nervous system depression, or menstruation coming earlier than expected, increasing in amount, or bleeding for a prolonged period occur, stop immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supplies vitamin E and relieves circulation problems and muscle cramps",
+    "Main symptoms": "Peripheral circulation disorders, cold hands/feet, muscle cramps"
+   }
+  }
+ }
+}
