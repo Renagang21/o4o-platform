@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "투엑스비디큐정|A11JC|500마이크로그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "94806fcb-981a-f0a3-8c1f-3ed56dd97cea",
+  "expected": 5,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/5"
+  ],
+  "fetched": 5,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 5,
+  "anyCanonical": 5,
+  "existingAuthoredCanonical": 5,
+  "htmlLen": 2290,
+  "htmlMd5": "6c7313fc3d97133d2e2671eb4b24fb8f",
+  "summary": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 5,
+    "STEP_B_authored_flip": 5,
+    "audit": 5
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

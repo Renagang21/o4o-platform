@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "투엑스비디큐정|A11JC|500마이크로그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "94806fcb-981a-f0a3-8c1f-3ed56dd97cea",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 4328,
+  "builtMd5": "a0f5d1c6f0e606bd1b3c3eddf6317d52",
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

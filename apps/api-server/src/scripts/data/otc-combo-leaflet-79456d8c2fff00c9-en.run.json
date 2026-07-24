@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "바로코민골드정|A11JB|60밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "33e130bd-057f-952a-1108-77a8dd713a7f",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 3446,
+  "builtMd5": "97041f3e6f3242990ff835b7d783d546",
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

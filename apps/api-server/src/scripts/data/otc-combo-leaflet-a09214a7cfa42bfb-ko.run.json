@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "동성정로환에프정|A07XA|25밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "8ea7ec85-a39f-a865-cde8-2d0fae8fd83a",
+  "expected": 5,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/5"
+  ],
+  "fetched": 5,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 5,
+  "anyCanonical": 5,
+  "existingAuthoredCanonical": 5,
+  "htmlLen": 1395,
+  "htmlMd5": "f86afc05a9b7fdcf318047d63f8fe45a",
+  "summary": "설사, 체함, 묽은 변, 토사",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 5,
+    "STEP_B_authored_flip": 5,
+    "audit": 5
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

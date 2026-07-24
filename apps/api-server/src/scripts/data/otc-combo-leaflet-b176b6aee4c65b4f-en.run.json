@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "애니탈삼중정|A02AX|50밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "a8495d1f-881e-d7ae-2447-3db80ecb1a81",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 3242,
+  "builtMd5": "f6b59410fc5dcd9bbb3206021fcfeaab",
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비카페롤플러스정|A12AX|1250밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "cc251b2b-dd6f-fa2f-72ad-eae09120b093",
+  "expected": 5,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/5"
+  ],
+  "fetched": 5,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 5,
+  "anyCanonical": 5,
+  "existingAuthoredCanonical": 5,
+  "htmlLen": 1926,
+  "htmlMd5": "6a5e7c833427ea417447303805a1cc34",
+  "summary": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 5,
+    "STEP_B_authored_flip": 5,
+    "audit": 5
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

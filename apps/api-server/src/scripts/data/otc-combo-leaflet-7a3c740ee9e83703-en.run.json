@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "원더칼-디츄어블정|A12AX|850밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "d9861f9f-dbc0-4f8a-38e0-c283af8d78ac",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 3335,
+  "builtMd5": "732eaa51862ddd5f116c91c3c0e5f113",
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

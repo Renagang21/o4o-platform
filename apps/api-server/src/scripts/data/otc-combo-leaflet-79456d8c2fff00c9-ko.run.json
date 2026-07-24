@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "바로코민골드정|A11JB|60밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "33e130bd-057f-952a-1108-77a8dd713a7f",
+  "expected": 5,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/5"
+  ],
+  "fetched": 5,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 5,
+  "anyCanonical": 5,
+  "existingAuthoredCanonical": 5,
+  "htmlLen": 1944,
+  "htmlMd5": "2005b1dbf7075b61c82a66d68218aa52",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 5,
+    "STEP_B_authored_flip": 5,
+    "audit": 5
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

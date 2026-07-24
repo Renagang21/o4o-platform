@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "삐콤씨정|A11JB|15밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "389dadbe-3d79-9149-e013-d154b1d8509c",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 3914,
+  "builtMd5": "bd3f681c66ddd4aa3d18be6dc1573817",
+  "existingEnCanonical": 5,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

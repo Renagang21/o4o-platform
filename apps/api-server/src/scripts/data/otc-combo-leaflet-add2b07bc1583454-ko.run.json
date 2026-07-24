@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "비스콘틴엠800정|A11JC|800밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "c747fcb8-48e3-66c2-6847-519fb2af4298",
+  "expected": 5,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/5"
+  ],
+  "fetched": 5,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 5,
+  "anyCanonical": 5,
+  "existingAuthoredCanonical": 5,
+  "htmlLen": 2134,
+  "htmlMd5": "076f9e4824ac207f9db4b68f356e2947",
+  "summary": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후, 발육기, 노년기의 비타민 B1, B2, B6,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 5,
+    "STEP_B_authored_flip": 5,
+    "audit": 5
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}
