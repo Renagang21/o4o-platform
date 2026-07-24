@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "체비거프러스정|A08AX|200밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "f61b9935-7490-4d27-6ae0-b1697a30abc2",
+  "expected": 7,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/7"
+  ],
+  "fetched": 7,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 7,
+  "anyCanonical": 7,
+  "existingAuthoredCanonical": 7,
+  "htmlLen": 1502,
+  "htmlMd5": "07e5a117851ab2c764675176a16f2be9",
+  "summary": "음식물 섭취 감소를 통한 체중감량의 보조요법으로 사용하는 일반의약품입니다.",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 7,
+    "STEP_B_authored_flip": 7,
+    "audit": 7
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

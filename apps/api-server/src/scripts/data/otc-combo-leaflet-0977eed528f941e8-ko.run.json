@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "락토폴정|A07FA51|70밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "7bf42a77-618e-d9c2-7455-4c235b77308e",
+  "expected": 11,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/11"
+  ],
+  "fetched": 11,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 11,
+  "anyCanonical": 11,
+  "existingAuthoredCanonical": 11,
+  "htmlLen": 1646,
+  "htmlMd5": "3aff88479e8c5eff9794fa239a080791",
+  "summary": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 11,
+    "STEP_B_authored_flip": 11,
+    "audit": 11
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

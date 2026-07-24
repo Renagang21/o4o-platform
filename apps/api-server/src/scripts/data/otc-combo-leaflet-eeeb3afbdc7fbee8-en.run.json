@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "새로모아캡슐|D11AX|100밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "53188a72-fe99-4d67-540b-513fdc328962",
+  "anomalies": [],
+  "targetMasters": 60,
+  "koFingerprintKinds": 1,
+  "builtLen": 2451,
+  "builtMd5": "8202c7b2c31bad1655c98e27a95f296c",
+  "existingEnCanonical": 60,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 60,
+    "STEP2_flip": 60,
+    "total": 120
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

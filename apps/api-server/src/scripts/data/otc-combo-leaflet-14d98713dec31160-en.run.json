@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "티스탑에프캡슐|A01AD|150밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "93539758-90b2-d57c-4ff6-e29222599657",
+  "anomalies": [],
+  "targetMasters": 13,
+  "koFingerprintKinds": 1,
+  "builtLen": 2477,
+  "builtMd5": "aab00d1f66afd3adde6eb5932a8585d0",
+  "existingEnCanonical": 13,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 13,
+    "STEP2_flip": 13,
+    "total": 26
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

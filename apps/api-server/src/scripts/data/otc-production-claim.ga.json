@@ -691,182 +691,182 @@
   {
    "targetFp": "eeeb3afbdc7fbee8",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "새로모아캡슐|D11AX|캡슐",
    "masters": 60,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "a0df42651d724493",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "덴드리스캡슐|A01AD|캡슐",
    "masters": 41,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "14d98713dec31160",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "티스탑에프캡슐|A01AD|캡슐",
    "masters": 13,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "fba608b29a1b7ed0",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "파로네프캡슐|A01AD|캡슐",
    "masters": 12,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "0977eed528f941e8",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "락토폴정|A07FA51|정",
    "masters": 11,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "7ffa970ad3e1f793",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "케라탑캡슐|D11AX|캡슐",
    "masters": 11,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "2f70f3125c893365",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "락토폴플러스정|A07FA51|정",
    "masters": 10,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "417ff6f3ac64e5ce",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "마이시딜캡슐|D11AX|캡슐",
    "masters": 10,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "5c5833336f4105bc",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "리피클연질캡슐|C10B|연질캡슐",
    "masters": 10,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "a84ed9470bc34b72",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "이덴큐캡슐|A01AD|캡슐",
    "masters": 10,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "b86ec051457ce436",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "콜레스텐연질캡슐|C10B|연질캡슐",
    "masters": 10,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "65c686b22a3a960e",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "멜린씨정|D11AX|정",
    "masters": 9,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "73e0834e852d6957",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "웰러드연질캡슐|C10B|연질캡슐",
    "masters": 9,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "1ed969e3dfb3a843",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "덴카바캡슐|A01AD|캡슐",
    "masters": 8,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "268b5da57ba3c359",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "듀오레플러스정|A07FA51|정",
    "masters": 8,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "7cd43f797f5647b6",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "듀오레정|A07FA51|정",
    "masters": 8,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "a451c1b9a5656f1d",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "락토스탑정|A07FA51|정",
    "masters": 8,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "246b347480652e7f",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "체비거프러스정|A08AX|정",
    "masters": 7,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "827c2fdaa18b348c",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "트레스오릭스포르테캡슐|A15|캡슐",
    "masters": 7,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   },
   {
    "targetFp": "d3f60492492fb5dc",
    "agent": "GA",
-   "status": "CLAIMED",
+   "status": "DONE",
    "groupKey": "에스알파정|A09A|정",
    "masters": 7,
    "op": "KO_EN",
-   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+   "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
   }
  ]
 }

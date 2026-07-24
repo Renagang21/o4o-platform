@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "마이시딜캡슐|D11AX|100밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "884a56f2-94b7-60ba-374a-4153a7e4b98c",
+  "anomalies": [],
+  "targetMasters": 10,
+  "koFingerprintKinds": 1,
+  "builtLen": 2652,
+  "builtMd5": "aede2b0d73a86fdd55832e640f09e6f4",
+  "existingEnCanonical": 10,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 10,
+    "STEP2_flip": 10,
+    "total": 20
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

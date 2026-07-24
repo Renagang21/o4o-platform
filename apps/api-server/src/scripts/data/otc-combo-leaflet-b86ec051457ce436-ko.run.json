@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "콜레스텐연질캡슐|C10B|333.33밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "755354f7-1cc5-f11c-44eb-c3a3a9b4fcea",
+  "expected": 10,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/10"
+  ],
+  "fetched": 10,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 10,
+  "anyCanonical": 10,
+  "existingAuthoredCanonical": 10,
+  "htmlLen": 1545,
+  "htmlMd5": "ec99562cfdca480d728092711e719d11",
+  "summary": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 10,
+    "STEP_B_authored_flip": 10,
+    "audit": 10
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

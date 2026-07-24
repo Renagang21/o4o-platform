@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "듀오레정|A07FA51|70밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d8d92ec4-46cd-9b80-a95f-622001f9aa3c",
+  "expected": 8,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/8"
+  ],
+  "fetched": 8,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 8,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 8,
+  "htmlLen": 1617,
+  "htmlMd5": "1dd8d3ca7d83da58c7ed0b04886bbf41",
+  "summary": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

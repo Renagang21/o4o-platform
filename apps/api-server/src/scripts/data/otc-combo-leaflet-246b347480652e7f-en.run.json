@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "체비거프러스정|A08AX|200밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "f61b9935-7490-4d27-6ae0-b1697a30abc2",
+  "anomalies": [],
+  "targetMasters": 7,
+  "koFingerprintKinds": 1,
+  "builtLen": 2378,
+  "builtMd5": "121c66f3feae70446166291f4b5d8715",
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_flip": 7,
+    "total": 14
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

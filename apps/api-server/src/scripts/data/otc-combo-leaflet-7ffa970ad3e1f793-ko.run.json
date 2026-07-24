@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "케라탑캡슐|D11AX|100밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d0f33008-1fa5-8276-6c06-0a0e5917801a",
+  "expected": 11,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/11"
+  ],
+  "fetched": 11,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 11,
+  "anyCanonical": 11,
+  "existingAuthoredCanonical": 11,
+  "htmlLen": 1548,
+  "htmlMd5": "69d1afee8ff2bf317b124201367b487d",
+  "summary": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 11,
+    "STEP_B_authored_flip": 11,
+    "audit": 11
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

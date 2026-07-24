@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "멜린씨정|D11AX|120밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "8233fe3f-fe42-68bb-8aa1-43802c785b88",
+  "expected": 9,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/9"
+  ],
+  "fetched": 9,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 9,
+  "anyCanonical": 9,
+  "existingAuthoredCanonical": 9,
+  "htmlLen": 1710,
+  "htmlMd5": "fc9a731123c64715f84520cd93dbd8ab",
+  "summary": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 9,
+    "STEP_B_authored_flip": 9,
+    "audit": 9
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

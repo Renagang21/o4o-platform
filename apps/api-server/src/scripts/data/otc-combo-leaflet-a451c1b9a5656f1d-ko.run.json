@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "락토스탑정|A07FA51|100밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "a16dd836-7f2c-c994-12d0-2e6e52c5acf2",
+  "expected": 8,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/8"
+  ],
+  "fetched": 8,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 8,
+  "anyCanonical": 8,
+  "existingAuthoredCanonical": 8,
+  "htmlLen": 1663,
+  "htmlMd5": "a0c8746705646a1a018d3524d1c611b1",
+  "summary": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 8,
+    "STEP_B_authored_flip": 8,
+    "audit": 8
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

@@ -1,0 +1,914 @@
+{
+ "_doc": "batch13 (GA-V6-2) deterministic KO compose from official easy_drug source (faithful restructure, no synthesis). EN authored separately. 20 groups / 269 masters.",
+ "groups": {
+  "eeeb3afbdc7fbee8": {
+   "key": "새로모아캡슐|D11AX|100밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "eeeb3afbdc7fbee8",
+   "target_master_ids": [
+    "05c2ed97-9514-4504-8491-9f870836bef3",
+    "0e3ee043-83b7-4112-92f3-3c61db78493c",
+    "162d134c-6bd8-42ae-b3e9-10eb6a86dd6f",
+    "18056c6f-80e6-42b2-af8c-e18a19dc9106",
+    "19508061-f2f1-4e15-a40f-7de7db11b8db",
+    "1de2e012-8e83-4301-9359-f98f28401722",
+    "20bc85c0-eda8-4d13-9a02-4e8e202c3c6e",
+    "247c3b0e-d717-450b-ac99-8b54e90d823e",
+    "25666bab-c5cd-42e8-98a2-e28577230d12",
+    "27829b65-e263-40fb-88a8-cdf4d8487cab",
+    "27ceeeb5-8134-4b22-8f4c-123d9a9f219b",
+    "35405b50-506a-4cb8-8276-d2add7606a5e",
+    "433f2788-598e-4034-9331-5b34baa053ae",
+    "45902ea5-8834-4a4a-ade9-84e8fd97697a",
+    "4aa6c53f-aa76-42a9-be48-1c8c61d5c60c",
+    "4bca6d51-59d3-4fa9-a98b-2992bae4ec84",
+    "4c8a9eac-e7f1-4372-9006-aa4a16910460",
+    "4d43ad39-5d22-49d8-9929-de7e8b5438ac",
+    "4de3d852-a386-4fb2-b719-0df1ff701117",
+    "5033480d-c534-41f4-b409-ba162b9f9acb",
+    "52acf5ba-55d4-4f92-bbba-47efcd5ee1b3",
+    "590ebbed-3036-4eee-bac3-d03b9a1f1ba3",
+    "5c08d503-fb55-4316-9af2-c41977fed1ba",
+    "5c2e6d13-2910-48b7-96c1-b177143cf753",
+    "5dcc0c93-965b-4b16-ad48-b8debf7e0dde",
+    "5f069ff5-d6a2-4c4e-b824-1329bead86c0",
+    "615ae863-657d-4f63-9bdc-338b0782f2f3",
+    "63fc95b4-3869-496e-b806-800aa2afae42",
+    "64dd462f-89b6-40d9-9808-9628632c6a1a",
+    "69df203e-1f77-43b4-a99f-fbeb83ac7efa",
+    "6e50ff33-2380-4cfc-8f18-d3181677ca0a",
+    "7d9c7f2e-61be-4688-aa0e-65827c5d256b",
+    "7f1b5528-9d01-4210-952e-cf59c98f51fa",
+    "84b2b12f-539e-42b1-9f0d-f7cbe13053d4",
+    "8a8ab015-ab2f-49a6-bcd8-a12b93cd173a",
+    "8c95671d-0cde-4e4f-a276-dc024317f892",
+    "96b1fafc-768f-4bb1-b623-59476a8ddaca",
+    "997db5b4-a0f0-4e6b-8234-3c0b47b4bf3d",
+    "a6f4865d-59c1-4b32-8fa4-e8711b2b3ad6",
+    "a752b47d-3091-4e3f-bc17-adc24c141049",
+    "aa0fb097-9d1d-4551-9f84-2c088a3cec7c",
+    "b39e57a3-31f6-4cbb-a1cf-9b225a8aa02a",
+    "b6403fcd-2848-403e-aeb9-4a92774ce586",
+    "bbc5c815-8bd9-46d3-8f47-648fd5ba865a",
+    "bc2ef5aa-fa59-4f73-9fcb-2aa54936c43d",
+    "d0c0daca-3c1a-4fd7-992c-5f87265230e2",
+    "d11ee788-f5d2-47aa-ae4f-f5b4f0ed7abb",
+    "d143f541-be04-4dd3-a60c-f0f7b72f4e5d",
+    "d46886ac-b0bc-4b91-b8fd-687ff5fc6130",
+    "d4dd94c1-59f8-40d0-be3a-1560cf0d5297",
+    "d750f77a-07a9-43bf-93b1-125dbca64466",
+    "dc99a36a-f4c2-41bf-8db3-3d5318fbc822",
+    "dec35ff3-71c5-4077-9b6e-3268b401ea82",
+    "edd2896b-7eee-4e97-8a13-1a448ebb86f8",
+    "ee9d89b7-515d-4504-9e01-30cccf6cdef2",
+    "f1b51f7c-5662-46f0-a63b-e80a82516cf4",
+    "f2eb9800-5f6f-4056-9f2a-12a13e69adef",
+    "f44df5ae-bbfc-4255-bf0a-5276eeb4d381",
+    "fd93cf08-01d0-4dc0-af5f-146a816798cb",
+    "fdf7df22-e6eb-4c59-9390-df10ef76c31b"
+   ],
+   "title": "새로모아캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+     "주요 증상": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료"
+    },
+    "efficacy": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐을 1일 3회, 12세 이상 소아는 식후 1회 1캡슐을 1일 1~2회 식후에 복용합니다.평균치료기간은 3~6개월입니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 12세 미만 소아, 흉터로 인한 탈모, 안드로젠 유전성 탈모증, 남성형 대머리에는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 약사와 상의하세요.\n\n설폰아미드 제제와 함께 사용 시 약사와 상의하세요.\n\n위장관 불쾌감(위통, 구토), 발한, 빈맥, 가려움, 두드러기, 두통, 어지럼, 홍조, 두부이외의 신체부위에서 발모현상이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Saeromoa Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily. Children aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals. The average treatment period is 3 to 6 months.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not use it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women.\n\nConsult a pharmacist if you use this medicine together with sulfonamide preparations.\n\nIf gastrointestinal discomfort (stomach pain, vomiting), sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+     "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+    }
+   }
+  },
+  "a0df42651d724493": {
+   "key": "덴드리스캡슐|A01AD|150밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "a0df42651d724493",
+   "target_master_ids": [
+    "0730652b-b89e-456c-8bf5-28098f5c64fe",
+    "0e5c7d6e-8f45-4a08-9a06-8dd94fe346a2",
+    "11463c0d-b341-4315-ba1d-3e000db2e726",
+    "132e6f26-c1cf-42e4-9e09-a7c37ef74e72",
+    "19e1cce6-f378-4ced-9b11-4729461fedb0",
+    "1a744400-2e16-4e70-957e-7373ed68a484",
+    "1e1d39c5-37cc-48f5-afa8-fd8334dbb7e3",
+    "27395670-8e08-4aed-bc3a-b70fe5a71be1",
+    "2e1fe627-e727-48bd-a045-d30a79feaa76",
+    "2fb66f70-2c38-4ce4-b4c4-41a11cb6c33e",
+    "3553ad08-66f5-48f6-bbab-c88d124d4896",
+    "3567138d-a4e2-415b-be85-8cc33a12ae2b",
+    "37f81866-1463-4fc7-a62b-550137264dda",
+    "416e51a0-18bd-4c7f-802a-6bf72f2fa267",
+    "42f8ecdf-7ca6-455e-a8f0-a494cfa9993c",
+    "43a302d8-7fd7-48de-b7de-34719abe70c5",
+    "46dbb939-085c-49a4-8410-ff4fef15e244",
+    "54ac8293-aa0b-454a-a2ee-f236fc6c0d63",
+    "564dacd0-2b32-4ff5-9273-32c02e85c57b",
+    "64ca73bd-0353-45b4-a481-b5a8a6e80018",
+    "75ee0ed0-c252-4d8d-9257-5aee82a9a8fd",
+    "808f594f-ccb4-483e-872c-d0556c23c4b7",
+    "86ceb75e-10c3-4bfc-934f-bc6eb4077e7d",
+    "8720fa28-9ff3-43a6-a3da-a7b39163ba9d",
+    "894dbcd9-6269-4b51-be57-0409bee0ee08",
+    "90d774c8-bd3b-465c-9284-c45a0be46f7b",
+    "92f02990-13bf-4631-ba22-6e480882afed",
+    "953d310e-90d4-4168-a67d-3e1416e05041",
+    "9964b667-ee37-4593-9433-9a237dd4c774",
+    "b1e76ab2-17ef-4576-aebb-baa84bf8fb40",
+    "b35616cc-650c-4cca-829c-c98602bd3585",
+    "bcc74290-f517-463b-a3a2-8ec51ffba825",
+    "bf81f248-6835-4221-becc-06c2238aa6c4",
+    "d099733e-f6c9-4cbc-a5f0-0ab1d1c9d92b",
+    "d28eca86-5682-4238-bd86-522ea1e0a7f9",
+    "d501653e-1227-4cfd-a813-d5a22a9b4f0e",
+    "dd734043-c4c5-4628-8767-45a8043388fa",
+    "e1449135-9367-4f1f-bbf2-92d27ebab42b",
+    "e806d459-67e8-44a9-acdc-452559949382",
+    "ea88710e-231f-4540-b4a9-dc9be7056de1",
+    "f28e8d32-00a0-4194-b06e-fb82bfae6b05"
+   ],
+   "title": "덴드리스캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+     "주요 증상": "치주치료 후 치은염, 경, 중등도 치주염의 보조치료"
+    },
+    "efficacy": "치주치료 후 치은염, 경·중등도 치주염의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 15세 미만 소아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 약 및 화장품에 알레르기 증상(발진, 발적, 가려움 등) 경험자, 달걀에 알레르기 증상(발열, 발진, 관절통, 천식, 가려움 등) 경험자, 알레르기 체질인 사람, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 경우 약사와 상의하세요.\n\n발진, 발적, 설사, 식욕부진, 위부불쾌감, 구역, 구토, 구내염, 피부점막안증후군(스티븐스-존슨증후군) 또는 독성표피괴사용해(리엘증후군)의 증상(예: 발열, 홍반, 가려움, 안충혈, 구내염 등의 증상, 전신의 피부, 입과 목의 점막에 고열을 동반하는 발진·발적, 화상모양의 수종 등의 중증의 증상) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Dendris Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children under 15 years; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic symptoms to medicines or cosmetics (rash, redness, itching); a history of allergic symptoms to eggs (fever, rash, joint pain, asthma, itching); an allergic constitution; hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking any other medicine.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, or symptoms of Stevens-Johnson syndrome or toxic epidermal necrolysis (Lyell's syndrome) occur — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+     "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+    }
+   }
+  },
+  "14d98713dec31160": {
+   "key": "티스탑에프캡슐|A01AD|150밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "14d98713dec31160",
+   "target_master_ids": [
+    "02e90887-fcd2-4a70-82ad-b920a46ddd8b",
+    "2886dd54-920c-49ec-86bf-0d9ee1259e09",
+    "2e270c77-702e-4a2e-880f-a439d45ddc83",
+    "37db59a5-da7c-495c-afa2-e5485aac75a8",
+    "474f27f4-cbbf-4423-80f5-0157daa4e17d",
+    "7ec5df68-b878-43d7-bea3-baf03577effe",
+    "9ad5585d-55c4-4643-aa7a-6dc66b1b0a94",
+    "a7d89ba1-712e-422b-b585-77974e91d72b",
+    "bce1a7b1-6fac-4b5e-a0b1-56c76b150715",
+    "cb373a47-d4d8-4965-8e26-ec4e3d56216c",
+    "dbe0f087-cd81-4ca8-9d03-86663e5868d1",
+    "df8d2455-73d1-4913-867a-fbf6cdd8525f",
+    "e864d14b-ec08-4edc-8f55-4342e11300e7"
+   ],
+   "title": "티스탑에프캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+     "주요 증상": "치주치료 후 치은염, 경, 중등도 치주염의 보조치료"
+    },
+    "efficacy": "치주치료 후 치은염, 경·중등도 치주염의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 15세 미만 소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약에 과민증 환자, 화장품 또는 달걀에 과민증(발열, 발진, 관절통, 천식, 가려움 등) 경험자, 알레르기 체질인 사람은 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n발진, 발적, 설사, 식욕부진, 위부불쾌감, 구역, 구토, 구내염, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(발열, 홍반, 가려움, 안충혈, 구내염 등의 증상, 전신의 피부, 입과 목의 점막에 고열을 동반하는 발진·발적, 화상모양의 수종 등의 중증의 증상) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Teethstop F Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of hypersensitivity to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+     "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+    }
+   }
+  },
+  "fba608b29a1b7ed0": {
+   "key": "파로네프캡슐|A01AD|30밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "fba608b29a1b7ed0",
+   "target_master_ids": [
+    "20b2dbc2-00e1-478e-a4a3-dd5b733ea1cf",
+    "3256154d-a222-482c-bbba-bd1829890519",
+    "770830b7-0d93-42c5-9cdc-1e1886d5d193",
+    "7f98d563-8e3b-49bb-88c1-ee867d7250cb",
+    "81e59d3d-4f5d-4cdd-9b14-4d63130e8cca",
+    "84fd62f1-5875-4b32-ba2b-6020e7d429f5",
+    "9e0a55d4-9d3a-4fb5-b007-2f488fe021eb",
+    "b7a719d4-fbfb-4d9c-a0d9-dbb9b271a140",
+    "c5f7436b-e555-48f4-a896-e7de017bfe4a",
+    "c9c5e96c-ad06-4332-adb9-214b4e805827",
+    "d6330181-cf32-4789-9d78-8fc5836a642f",
+    "fc733a16-b80b-45f2-955f-f44198c86a63"
+   ],
+   "title": "파로네프캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+     "주요 증상": "치주치료 후 치은염, 경, 중등도 치주염의 보조치료"
+    },
+    "efficacy": "치주치료 후 치은염, 경·중등도 치주염의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 15세 미만의 소아, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 이 약에 과민증 환자, 화장품 또는 달걀에 과민증(발열, 발진, 관절통, 천식, 가려움 등) 경험자, 알레르기 체질인 사람은 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n발진, 발적, 설사, 식욕부진, 위부불쾌감, 구역, 구토, 구내염, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(발열, 홍반, 가려움, 안충혈, 구내염 등의 증상, 전신의 피부, 입과 목의 점막에 고열을 동반하는 발진·발적, 화상모양의 수종 등의 중증의 증상) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Paronef Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children under 15 years; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of hypersensitivity to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+     "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+    }
+   }
+  },
+  "0977eed528f941e8": {
+   "key": "락토폴정|A07FA51|70밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "0977eed528f941e8",
+   "target_master_ids": [
+    "0fa3d1a1-fe57-4c52-97bf-dbc81494025d",
+    "3cbdd7ed-08f7-4c19-a066-ee065fe69092",
+    "493097a9-17b0-49a0-850b-7914f0790edb",
+    "66e41bd7-bb9b-430c-9a0c-02cfcd008e62",
+    "68258d47-a33b-4087-8b57-50e51c542cb0",
+    "737f6469-f4b2-4456-a5d9-bc5272a946fd",
+    "a27d2f4a-5731-4f29-bf03-72d27ff5ce38",
+    "bd633c44-e7b6-4f31-9465-5e40eed070fc",
+    "dcf65d68-71e9-481a-bf92-42bc84375655",
+    "e8f7dc0a-5f8f-409d-8327-b9427937ed44",
+    "eefc0bf8-89ba-4088-99bc-00fd8f014d58"
+   ],
+   "title": "락토폴정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+     "주요 증상": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사"
+    },
+    "efficacy": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정씩, 1일 3회 식후에 복용합니다.\n복용간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 신생아, 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당(젖당)분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요. 3일 이상 계속하여 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 황색4호에 과민증 환자 또는 경험자, 약에 의한 알레르기(발열, 발진, 관절통, 천식, 가려움증 등) 경험자, 위·십이지장궤양 환자, 발열을 수반하는 설사 환자, 고령자, 혈변 환자 또는 점액변이 계속되는 환자는 약사와 상의하세요. 복용 중에 음주하지 마십시오. 여러 차례 투여하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n위장진통·진경제와 함께 복용하지 마세요.\n\n알레르기 증상(발진, 가려움 등), 드물게 입이 마르는 증상 등이 나타나는 경우 사용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Lactopol Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nLeave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 4 or a history of it; a history of drug allergy (fever, rash, joint pain, asthma, itching); gastric or duodenal ulcer; diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools. Do not drink alcohol while taking this medicine. If symptoms do not improve after repeated doses, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics.\n\nIf allergic symptoms (rash, itching) or, rarely, a dry mouth occurs, stop using immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+     "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+    }
+   }
+  },
+  "7ffa970ad3e1f793": {
+   "key": "케라탑캡슐|D11AX|100밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "7ffa970ad3e1f793",
+   "target_master_ids": [
+    "054bb7d4-5b17-411b-af00-42aa28d56d3e",
+    "085efb6b-4357-4831-9044-d168bd610656",
+    "0a3b630d-efad-40a5-a7a4-98f42b1cefba",
+    "69ca5936-334a-4134-ae58-a7733d5795bd",
+    "722fd34a-b47c-4910-ae36-d63f71768ea4",
+    "84c7b93b-41a7-4cfb-8e08-e8e028453feb",
+    "85a76f10-9d60-4cbf-96d9-9836b560bf65",
+    "970d0c0c-db36-4e55-9241-968e25e9e9ca",
+    "a31ffcf3-396e-48d3-b06c-370d7175a9d3",
+    "aa224c94-c611-4aa2-be99-8c3e8c31f846",
+    "c7a4e400-6110-499d-99dc-a743e9d8d3db"
+   ],
+   "title": "케라탑캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+     "주요 증상": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료"
+    },
+    "efficacy": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐을 1일 3회 식후에 복용합니다.\n12세 이상 소아는 1회 1캡슐을 1일 1~2회 식후에 복용합니다.\n12세 미만은 복용하지 마세요.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 12세 미만 소아는 이 약을 복용하지 마세요. 흉터로 인한 탈모나 안드로젠 유전성 탈모증, 남성형 대머리에는 사용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 황색5호 과민증 또는 알레르기 반응 경험자는 약사와 상의하세요.\n\n설폰아미드 제제와 함께 복용 시 주의하세요.\n\n위통, 구토 등 위장관 불쾌감과 발한, 빈맥, 가려움, 두드러기, 두통, 어지럼, 홍조, 두부이외의 신체부위에서 발모현상이 나타나거나, 정해진 용법과 용량대로 3~4개월 사용 후에도 증상의 개선이 보이지 않거나, 증상이 지속되거나 기대하는 효과가 나타나지 않는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Keratop Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nChildren aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals.\nChildren under 12 years must not take this medicine.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not use it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; a history of hypersensitivity to Yellow No. 5 or of allergic reactions.\n\nTake care when using this medicine together with sulfonamide preparations.\n\nIf stomach pain, vomiting or other gastrointestinal discomfort, sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, or if there is no improvement after 3 to 4 months of use at the stated dose and directions, or if symptoms persist or the expected effect does not appear, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+     "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+    }
+   }
+  },
+  "2f70f3125c893365": {
+   "key": "락토폴플러스정|A07FA51|100밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "2f70f3125c893365",
+   "target_master_ids": [
+    "1b94a1d3-8986-49cd-9773-0a937e43d9a9",
+    "301352c6-0d9f-4418-b3bc-1e88f026c90a",
+    "36770d5f-0c8c-4c1a-b202-24d84fac5615",
+    "3a18a847-9fa6-41c3-a1a3-db973338146f",
+    "691e1518-f88b-407d-abd7-ab7391ddd6a2",
+    "6dd67d72-735b-423a-a050-c424ecb0ae20",
+    "84059264-f0bc-4ecd-87b1-38c52cd6decb",
+    "ad3e7c30-f035-43ec-93e7-195145b01918",
+    "b5f426b3-5d4b-498b-a803-33d687a53777",
+    "eeb8b5d6-063f-485a-be65-24022b0ac80a"
+   ],
+   "title": "락토폴플러스정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+     "주요 증상": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사"
+    },
+    "efficacy": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정씩, 1일 3회 식후에 복용합니다.\n복용간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 신생아, 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수 장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요. 복용 중에 음주하지 마십시오. 3일 이상 계속하여 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 황색4호에 과민증 환자 또는 경험자, 약에 의한 알레르기(발열, 발진, 관절통, 천식, 가려움증 등) 경험자, 발열을 수반하는 설사 환자, 고령자, 혈변 환자 또는 점액변이 계속되는 환자, 위·십이지장궤양 등이 있는 환자는 약사와 상의하세요. 여러 차례 투여하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n위장진통, 진경제와 함께 복용하지 마세요.\n\n알레르기 증상(발진, 가려움 등), 드물게 입이 마르는 증상 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Lactopol Plus Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nLeave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not drink alcohol while taking this medicine. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 4 or a history of it; a history of drug allergy (fever, rash, joint pain, asthma, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer. If symptoms do not improve after repeated doses, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics.\n\nIf allergic symptoms (rash, itching) or, rarely, a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+     "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+    }
+   }
+  },
+  "417ff6f3ac64e5ce": {
+   "key": "마이시딜캡슐|D11AX|100밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "417ff6f3ac64e5ce",
+   "target_master_ids": [
+    "0c14d1b4-c586-46d1-b2e2-b5649aafb02b",
+    "3fbaed8b-a6d2-45a6-8bcb-dfca4c55b8df",
+    "4d30ae24-767d-43f5-85a0-99b68ce8abce",
+    "81189b85-ad97-4b50-be82-b30b03c1ef68",
+    "af96efc8-789c-4ce8-b1d9-b2d5939e2f30",
+    "b1176fc1-91f4-4e33-86e9-33a795d0a1ed",
+    "c156666c-000f-4fd8-af15-840e02dbe9bf",
+    "d231b713-b705-4ba6-82bb-71803b141609",
+    "e2329735-7485-4cfa-a828-9ccd5fe04754",
+    "f61d0a13-48a5-4691-a977-685a50b50cd3"
+   ],
+   "title": "마이시딜캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+     "주요 증상": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료"
+    },
+    "efficacy": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회, 12세 이상은 1회 1캡슐, 1일 1~2회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 12세 미만의 소아는 이 약을 복용하지 마세요. 흉터로 인한 탈모, 안드로겐 유전성 탈모증, 남성형 대머리에는 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요. 3~4개월 동안 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n설폰아미드 제제와 함께 복용 시 약사와 상의하세요.\n\n위통, 구토 등 위장관 불쾌감, 발한, 빈맥, 가려움, 두드러기, 두통, 어지럼, 홍조, 두부이외의 신체부위에서 발모현상이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Mysidil Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily. People aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not take it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before using this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; hypersensitivity to Yellow No. 5 or a history of it. If symptoms do not improve after taking this medicine for 3 to 4 months, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you take this medicine together with sulfonamide preparations.\n\nIf stomach pain, vomiting or other gastrointestinal discomfort, sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+     "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+    }
+   }
+  },
+  "5c5833336f4105bc": {
+   "key": "리피클연질캡슐|C10B|100밀리그램|연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "5c5833336f4105bc",
+   "target_master_ids": [
+    "00afea2a-4e51-4671-9bef-6fe93118fcc2",
+    "05eb0b2a-6e8d-4feb-880d-3e8ecf9c172a",
+    "70bebd56-7c34-4815-a6b0-613ba0183678",
+    "72e6d73a-8e94-429a-a91f-ba8181dc28ac",
+    "8e09891e-485c-4dd7-a8ca-6b4500a49398",
+    "9f44c944-b75e-492f-ba9c-8a2a04b3b122",
+    "a118b965-439e-4884-877c-29923f9bd57f",
+    "a3653df9-e9a9-43f9-bc61-a204f6942cd9",
+    "d163ad47-8438-48ef-8475-aeaa5c68d0a2",
+    "f5155307-64cf-4d2e-923e-b49bdc4025e5"
+   ],
+   "title": "리피클연질캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "고콜레스테롤 혈증의 개선, 고콜레스테롤 혈증에 수반되는 말초혈행장애(수족냉증, 저림)의 완화",
+     "주요 증상": "고콜레스테롤 혈증의 개선, 고콜레스테롤 혈증에 수반되는 말초혈행장애(수족냉증, 저림)의 완화"
+    },
+    "efficacy": "고콜레스테롤 혈증의 개선, 고콜레스테롤 혈증에 수반되는 말초혈행장애(수족냉증, 저림)의 완화에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 2캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "복용 전 약사와 상의하세요. 이 약을 복용하기 전에 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n가려움, 발진, 발적, 식욕부진, 설사, 연변, 복통, 위부불쾌감, 구역, 가슴앓이, 오심, 생리가 예정보다 빨라지거나 양이 많아지고, 출혈이 오래 지속되는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Lipicle Soft Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to improve high blood cholesterol and to relieve peripheral circulatory disorders accompanying it (cold hands and feet, numbness).",
+    "usage": "Adults: take 2 capsules at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Consult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 5 or a history of it. If symptoms do not improve after taking this medicine for about a month, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIf itching, rash, redness, loss of appetite, diarrhoea, soft stools, abdominal pain, stomach discomfort, nausea, heartburn, or queasiness occurs, or if menstruation comes earlier than expected, the flow increases, or bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Improves high blood cholesterol and relieves the peripheral circulatory problems that accompany it",
+     "Main symptoms": "High blood cholesterol, cold hands and feet, numbness"
+    }
+   }
+  },
+  "a84ed9470bc34b72": {
+   "key": "이덴큐캡슐|A01AD|156.3밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "a84ed9470bc34b72",
+   "target_master_ids": [
+    "0215398d-d53a-45f9-893f-de4bcf49c626",
+    "10894c82-74ee-45cd-a178-2a41d3ff3aad",
+    "201f0dbb-efa2-400b-9ae5-bf8882e1a731",
+    "365a277a-14b3-4570-b8dd-ebc60af68764",
+    "5accf8d4-fbf1-404a-9f94-3f8224ccb810",
+    "689e64bf-0970-461f-b96e-a38c494a759b",
+    "85a5d957-8864-4ce2-885c-6148556b11c7",
+    "88972748-eaf6-4fd6-bd7a-68919eb1dd8f",
+    "e892c844-cb12-4de6-83c1-60def2c45bbd",
+    "f455e07b-f74f-404e-b87c-bb57658566d1"
+   ],
+   "title": "이덴큐캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+     "주요 증상": "치주치료 후 치은염, 경, 중등도 치주염의 보조치료"
+    },
+    "efficacy": "치주치료 후 치은염, 경·중등도 치주염의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 15세 미만 소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 약 및 화장품에 알레르기 증상(발진, 발적, 가려움 등) 경험자, 달걀에 알레르기 증상(발열, 발진, 관절통, 천식, 가려움 등) 경험자, 알레르기 체질인 사람은 약사와 상의하세요. 1개월 이상 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n이 약을 복용하기 전에 다른 약물을 복용하고 있는 경우 약사와 상의하세요.\n\n발진, 발적, 설사, 식욕부진, 위부불쾌감, 구역, 구토, 구내염, 피부점막안증후군(스티븐스-존슨증후군) 또는 독성표피괴사용해(리엘증후군)의 증상(예: 발열, 홍반, 가려움, 안충혈, 구내염 등의 증상, 전신의 피부, 입과 목의 점막에 고열을 동반하는 발진·발적, 화상모양의 수종 등의 중증의 증상) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Edenq Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic symptoms to medicines or cosmetics (rash, redness, itching); a history of allergic symptoms to eggs (fever, rash, joint pain, asthma, itching); an allergic constitution. If symptoms do not improve after taking this medicine for a month or more, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking any other medicine.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, or symptoms of Stevens-Johnson syndrome or toxic epidermal necrolysis (Lyell's syndrome) occur — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+     "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+    }
+   }
+  },
+  "b86ec051457ce436": {
+   "key": "콜레스텐연질캡슐|C10B|333.33밀리그램|연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "b86ec051457ce436",
+   "target_master_ids": [
+    "84fd3585-ba85-4f35-9e50-cbd761cfd87d",
+    "938e800d-9089-4ee0-a434-3a10396eea93",
+    "a23c1f61-94c7-4798-9d03-9e0744ae32c9",
+    "b6572393-593e-462a-b7b5-27bea14b476a",
+    "bb6ca77c-5ef0-473c-ae1d-13ce071aceeb",
+    "caea666c-fcec-405d-9fc0-add1e21eb542",
+    "cc2a5981-653f-4cf4-b663-aed43c75aab7",
+    "f5479767-fe0d-465e-b0f3-67f6b454b847",
+    "fb815580-aeb6-4187-b070-cbefb3d46933",
+    "fd42cb72-9669-47cd-8d5b-f9f56b5f8584"
+   ],
+   "title": "콜레스텐연질캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선",
+     "주요 증상": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선"
+    },
+    "efficacy": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선에 사용하는 일반의약품입니다.",
+    "usage": "1회 3캡슐, 1일 3회 식전 30분 전에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약 또는 대두유, 콩, 땅콩에 과민증 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 환자, 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자, 혈전(혈관 막힘)성 소인이 있는 환자, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n레보도파, 에스트로겐을 포함한 경구용 피임약, 정주용 지질제와 함께 사용 시 약사와 상의하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적(충혈되어 붉어짐), 예정보다 빠른 생리, 생리 양 증가 등이 나타날 수 있습니다.생리 출혈이 오래 지속될 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Cholesten Soft Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to improve lipid metabolism in obesity and in diabetic or essential high blood cholesterol.",
+    "usage": "Take 3 capsules at a time, 3 times daily, 30 minutes before meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine, to soybean oil, to soy, or to peanuts.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with disorders of fat metabolism such as hyperlipoproteinaemia, diabetic hyperlipidaemia, or pancreatitis; patients who require careful administration of lipid emulsions; patients at particular risk from fat overload; patients predisposed to thrombosis (blocked blood vessels); hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you use this medicine together with levodopa, oral contraceptives containing oestrogen, or intravenous lipid preparations.\n\nStomach discomfort, diarrhoea, constipation, rash, redness (congested and reddened skin), earlier-than-expected menstruation, or increased menstrual flow may occur. If menstrual bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Improves lipid metabolism in obesity and in diabetic or essential high blood cholesterol",
+     "Main symptoms": "Obesity, high blood cholesterol, impaired lipid metabolism"
+    }
+   }
+  },
+  "65c686b22a3a960e": {
+   "key": "멜린씨정|D11AX|120밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "65c686b22a3a960e",
+   "target_master_ids": [
+    "0da03364-4998-4411-a97a-ff85e2ada8e8",
+    "3bf5c055-c5cc-49b4-a6fc-fb91da57d0fe",
+    "461b2d14-20a2-4ea4-b19b-430f0b4d919e",
+    "67ebe640-1ab5-4f58-a619-bdfb5169190a",
+    "89770324-0d8f-48a8-9e50-a61f6e89e6d8",
+    "9c4162b8-3f8e-42e4-9f9b-885a84187002",
+    "d0bc0d05-6c51-4506-b214-c85354a745dd",
+    "d0bef8ff-de45-4c2e-a062-508e7bae8341",
+    "f081e32a-ecb1-4e55-b5c6-215647e3f2a9"
+   ],
+   "title": "멜린씨정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신,…",
+     "주요 증상": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신, 수유기"
+    },
+    "efficacy": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신, 수유기, 병증 및 병후의 체력 저하 시에 사용하는 일반의약품입니다.",
+    "usage": "8세 이상 어린이 및 성인은 1회 1정, 1일 1회 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 3개월 미만의 영아, 고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태), 유육종증, 신질환, 신결석, 중증의 신부전 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 임부 및 수유부, 과수산뇨증(뇨증에 과량의 수산염이 배설되는 상태) 환자, 황색4호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n각종 요검사 시에 혈당의 검출을 방해할 수 있습니다.\n\n강심배당체와 함께 복용 시 약사와 상의하세요.\n\n구토, 구역, 설사, 변비, 저혈압, 얼굴 달아오름, 심장박동불규칙, 구역질, 구토, 피부발진 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Melin C Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to relieve pigmentation (melasma, freckles) caused by sunlight and skin conditions, to prevent bleeding gums and nosebleeds, and for physical fatigue, pregnancy, breastfeeding, and reduced physical strength during and after illness.",
+    "usage": "Children aged 8 years and over and adults: take 1 tablet at a time, once daily.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants under 3 months; hypercalcaemia (excess calcium in the blood); sarcoidosis; kidney disease; kidney stones; severe renal failure.\n\nConsult a pharmacist before taking this medicine if any of the following applies: children who get a lot of sunlight and eat a normal diet; pregnant and breastfeeding women; patients with hyperoxaluria (excessive excretion of oxalate in the urine); hypersensitivity to Yellow No. 4 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving this medicine to a child, do so under the guidance and supervision of a guardian.\n\nThis medicine may interfere with the detection of glucose in various urine tests.\n\nConsult a pharmacist if you take this medicine together with cardiac glycosides.\n\nIf vomiting, nausea, diarrhoea, constipation, low blood pressure, facial flushing, irregular heartbeat, queasiness, or skin rash occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves pigmentation such as melasma and freckles, helps prevent bleeding gums and nosebleeds, and supports reduced physical strength",
+     "Main symptoms": "Melasma and freckles, bleeding gums, nosebleeds, physical fatigue"
+    }
+   }
+  },
+  "73e0834e852d6957": {
+   "key": "웰러드연질캡슐|C10B|0.67밀리그램|연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "73e0834e852d6957",
+   "target_master_ids": [
+    "04fcf6d1-b0aa-4d57-a520-a3134a8207cd",
+    "07020d3b-57cb-4876-bc52-30b299e3252a",
+    "0dbb12c8-29c7-4271-bfc3-7a052e67b81b",
+    "3c87878f-e49e-4465-8aac-41bb74b601ba",
+    "43b1320d-8b47-4078-bdda-39aeb10dfa5b",
+    "ecf926a0-0a6e-44c9-b49e-ecc1e4982e05",
+    "f176ee41-84fe-472f-9fa9-7a6c248df32e",
+    "f2ae6acc-a36e-4f10-94da-d9b1e8c9cd9e",
+    "f7da8b54-5ac5-46ef-b4dd-88530c6e85ae"
+   ],
+   "title": "웰러드연질캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선",
+     "주요 증상": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선"
+    },
+    "efficacy": "비만증, 당뇨성ㆍ본태성 고콜레스테롤혈증에 의한 지질대사 개선에 사용하는 일반의약품입니다.",
+    "usage": "1회 3캡슐, 1일 3회 식전 30분 전에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약 또는 대두유, 콩, 땅콩에 과민증 환자는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 환자, 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자, 혈전(혈관 막힘)성 소인이 있는 환자, 황색5호에 과민증 환자 또는 경험자는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n레보도파, 에스트로겐을 포함한 경구용 피임약, 정주용 지질제와 함께 사용 시 약사와 상의하세요.\n\n위부불쾌감, 설사, 변비, 발진, 발적(충혈되어 붉어짐), 예정보다 빠른 생리, 생리 양 증가 등이 나타날 수 있습니다.생리 출혈이 오래 지속될 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Wellard Soft Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used to improve lipid metabolism in obesity and in diabetic or essential high blood cholesterol.",
+    "usage": "Take 3 capsules at a time, 3 times daily, 30 minutes before meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine, to soybean oil, to soy, or to peanuts.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with disorders of fat metabolism such as hyperlipoproteinaemia, diabetic hyperlipidaemia, or pancreatitis; patients who require careful administration of lipid emulsions; patients at particular risk from fat overload; patients predisposed to thrombosis (blocked blood vessels); hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you use this medicine together with levodopa, oral contraceptives containing oestrogen, or intravenous lipid preparations.\n\nStomach discomfort, diarrhoea, constipation, rash, redness (congested and reddened skin), earlier-than-expected menstruation, or increased menstrual flow may occur. If menstrual bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Improves lipid metabolism in obesity and in diabetic or essential high blood cholesterol",
+     "Main symptoms": "Obesity, high blood cholesterol, impaired lipid metabolism"
+    }
+   }
+  },
+  "1ed969e3dfb3a843": {
+   "key": "덴카바캡슐|A01AD|150밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "1ed969e3dfb3a843",
+   "target_master_ids": [
+    "214b24f2-a067-4dcc-92ad-7bec6778a582",
+    "3f247afe-3d2c-48ad-b8cb-840eab4624b8",
+    "4cde177f-88bc-46fe-88b4-15665d3e4cbd",
+    "4d099343-d56b-4f8a-9efb-38528a782dff",
+    "643e8cea-9817-4acd-aca2-29fa02271386",
+    "b0be6015-b4e2-490b-ad3b-578fee87ce6c",
+    "f27626b7-e6d7-4b25-bbfe-7636ea02bf2b",
+    "fc7e5d40-6c4e-4c0c-9ade-ccd5eaf5feee"
+   ],
+   "title": "덴카바캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "치주(치아주위조직) 치료 후 치은염(잇몸염), 경·중등도 치주(치아주위조직)염의 보조치료",
+     "주요 증상": "치주(치아주위조직) 치료 후 치은염(잇몸염), 경, 중등도 치주(치아주위조직)염의 보조치료"
+    },
+    "efficacy": "치주(치아주위조직) 치료 후 치은염(잇몸염), 경·중등도 치주(치아주위조직)염의 보조치료에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1회 1캡슐, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 15세 미만 소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 이 약에 과민증 환자, 화장품 또는 달걀에 알레르기 증상(발열, 발진, 관절통, 천식, 가려움 등) 경험자, 알레르기 체질인 사람은 약사와 상의하세요. 1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n발진, 발적, 설사, 식욕부진, 위부불쾌감, 구역, 구토, 구내염, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(발열, 홍반, 가려움, 안충혈, 구내염 등의 증상, 전신의 피부, 입과 목의 점막에 고열을 동반하는 발진·발적, 화상모양의 수종 등의 중증의 증상) 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Dencaba Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis (inflammation of the gums) after periodontal treatment and for mild to moderate periodontitis.",
+    "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of allergic symptoms to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution. If symptoms do not improve after taking this medicine for about a month, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+     "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+    }
+   }
+  },
+  "268b5da57ba3c359": {
+   "key": "듀오레플러스정|A07FA51|100밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "268b5da57ba3c359",
+   "target_master_ids": [
+    "07841f50-36b0-473f-a545-900f0b923b11",
+    "0de5bf19-5a4d-4f51-b9b2-861456aa0e36",
+    "19135cf5-5b29-43e9-a021-7f639460278d",
+    "1cb3802e-8eb7-4fe9-b7d4-f99e192bdaf9",
+    "1fc04b8f-dfe5-4a8d-9742-a9749611bd25",
+    "46d245df-56b0-4628-b9e6-022bb8ae76d5",
+    "75ad5863-a6af-405f-a753-f6683b309a4d",
+    "87683896-bb53-4863-a6c1-ca8a75fbb049"
+   ],
+   "title": "듀오레플러스정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+     "주요 증상": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사"
+    },
+    "efficacy": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정, 1일 3회 식후에 복용합니다. 복용간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 신생아, 만 7세 이하의 어린이, 갈락토오스불내성, Lapp유당분해효소결핍증 또는 포도당-갈락토오스흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요. 3일 이상 계속하여 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 반응(발진, 충혈되어 붉어짐, 가려움 등) 경험자, 발열을 수반하는 설사 환자, 고령자, 혈변 환자 또는 점액변이 계속되는 환자, 위·십이지장궤양 등이 있는 환자, 다른 약물을 복용하는 사람, 황색4호(타르트라진)에 과민증 환자 또는 알레르기 반응 경험자의 경우는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n위장진통·진경제와 함께 복용하지 마세요. 복용 중 음주하지 마십시오.\n\n알레르기 증상(발진, 가려움 등), 입이 마르는 증상 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Duore Plus Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals. Leave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; people taking other medicines; hypersensitivity to Yellow No. 4 (tartrazine) or a history of allergic reactions to it.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic symptoms (rash, itching) or a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+     "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+    }
+   }
+  },
+  "7cd43f797f5647b6": {
+   "key": "듀오레정|A07FA51|70밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "7cd43f797f5647b6",
+   "target_master_ids": [
+    "1652c5b5-79c9-4816-8ad8-7456bfcb416c",
+    "2bb08c51-1b98-4717-965e-3d1f6ed54f2a",
+    "601f3df8-b49d-4dd0-af46-d828a90c8cd2",
+    "8dc3f96b-5ff6-4403-9f79-dd8902eb34db",
+    "926e766e-c28a-4c90-9751-33eb364ca2cd",
+    "97954ccb-f821-46e4-b90b-96954d9c57a6",
+    "9f2327e7-99e7-47d2-ac04-8703639ff1c8",
+    "faf652a9-29ba-4284-b5ac-32b86064678a"
+   ],
+   "title": "듀오레정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+     "주요 증상": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사"
+    },
+    "efficacy": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정, 1일 3회 식후에 복용합니다. 복용간격은 4시간 이상으로 합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 신생아, 만 7세 이하의 어린이, 갈락토오스불내성, Lapp유당분해효소결핍증 또는 포도당-갈락토오스흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요. 3일 이상 계속하여 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 알레르기 반응(발진, 충혈되어 붉어짐, 가려움 등) 경험자, 발열을 수반하는 설사 환자, 고령자, 혈변 환자 또는 점액변이 계속되는 환자, 위·십이지장궤양 등이 있는 환자, 다른 약물을 복용하는 사람, 황색4호(타르트라진)에 과민증 환자 또는 알레르기 반응 경험자의 경우는 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n위장진통·진경제와 함께 복용하지 마세요. 복용 중 음주하지 마십시오.\n\n알레르기 증상(발진, 가려움 등), 입이 마르는 증상 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Duore Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals. Leave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; people taking other medicines; hypersensitivity to Yellow No. 4 (tartrazine) or a history of allergic reactions to it.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic symptoms (rash, itching) or a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+     "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+    }
+   }
+  },
+  "a451c1b9a5656f1d": {
+   "key": "락토스탑정|A07FA51|100밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "a451c1b9a5656f1d",
+   "target_master_ids": [
+    "580df5a4-ee62-472f-9e93-27e854dea55a",
+    "76cd9284-85c2-46d1-9a79-a2348f455978",
+    "819ffd80-84a6-4f43-a682-1dc2faaad5b2",
+    "89202abb-cc56-42e0-a268-6900fbd4d17a",
+    "9fc77fb2-5ef6-443a-ae81-02717f34ddc4",
+    "b0617c13-e123-4dab-964e-82be48435a80",
+    "e8bb75db-9883-4a62-b7a7-8aee4ab29865",
+    "eddb6683-9689-428a-bf81-c3580bf29346"
+   ],
+   "title": "락토스탑정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사",
+     "주요 증상": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사"
+    },
+    "efficacy": "설사, 복통(배아픔)을 수반하는 설사, 체함, 묽은 변, 토사에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1일 3회에 1회 2정을 식후에 복용하고, 복용간격은 4시간 이상으로 하세요.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 신생아 및 만 7세 이하의 어린이, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마세요. 3일 이상 계속하여 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 약으로 알레르기 반응(발진, 충혈되어 붉어짐, 가려움 등) 경험자, 발열을 수반하는 설사 환자, 고령자, 혈변 환자 또는 점액변이 계속되는 환자, 위·십이지장궤양등이 있는 환자, 황색4호 과민증 환자 또는 알레르기 반응 경험자는 약사와 상의하세요. 여러 차례 투여하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상담하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n위장진통, 진경제와 함께 복용하지 마세요. 복용중에는 음주하지 마십시오.\n\n알레르기 반응(발진, 가려움 등), 드물게 입이 마르는 증상이 나타나는 경우 이 약의 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Lactostop Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals, leaving an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns and children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions to medicines (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; hypersensitivity to Yellow No. 4 or a history of allergic reactions to it. If symptoms do not improve after repeated doses, stop taking immediately and consult a doctor or pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic reactions (rash, itching) or, rarely, a dry mouth occurs, stop taking this medicine immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+     "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+    }
+   }
+  },
+  "246b347480652e7f": {
+   "key": "체비거프러스정|A08AX|200밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "246b347480652e7f",
+   "target_master_ids": [
+    "231d9cc8-9d7c-4898-8a05-26fc979f0b7f",
+    "33046cf8-f02e-4e5e-b4ea-544a03b00c83",
+    "5edf425b-3237-4909-aef4-18ad15b30b53",
+    "7c451eb3-93ff-4477-b637-30e47fcc02ec",
+    "a4de37fe-96fe-41aa-9b4d-466b4eeedc6e",
+    "c6a3e3b3-74ed-4d55-8e60-2516518d6cc1",
+    "ec7955b8-a731-4e06-b7b1-432c571ea705"
+   ],
+   "title": "체비거프러스정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "음식물 섭취 감소를 통한 체중감량의 보조요법으로 사용하는 일반의약품입니다.",
+     "주요 증상": "음식물 섭취 감소를 통한 체중감량의 보조요법으로 사용하는 일반의약품입니다."
+    },
+    "efficacy": "음식물 섭취 감소를 통한 체중감량의 보조요법으로 사용하는 일반의약품입니다.",
+    "usage": "1회 2정씩, 1일 3회 식전에 복용하고 필요에 따라서는 취침전에 추가로 2정 복용 가능합니다.\n충분한 양의 물과 함께 복용하는 것이 좋습니다.\n권장량을 최소 3~4주간 복용할 것이 권장됩니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 이 약에 과민증 환자, 유소아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 및 수유부, 소화기장애 환자는 약사와 상의하세요. 1개월 이상 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n다른 약과 동시에 복용하지 않는 것이 좋으며, 복용할 경우 30분~1시간의 간격을 두고 복용하는 것이 권장됩니다.\n\n복부 팽만감, 구역, 변비 또는 설사 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Chebiger Plus Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used as supportive therapy for weight reduction through reduced food intake.",
+    "usage": "Take 2 tablets at a time, 3 times daily before meals; if needed, 2 additional tablets may be taken before bedtime.\nIt is best taken with plenty of water.\nTaking the recommended dose for at least 3 to 4 weeks is advised.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants and young children.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant and breastfeeding women; patients with digestive disorders. If symptoms do not improve after taking this medicine for a month or more, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIt is best not to take this medicine at the same time as other medicines; if you do, leaving an interval of 30 minutes to 1 hour is recommended.\n\nIf abdominal bloating, nausea, constipation, or diarrhoea occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Supports weight reduction by reducing food intake",
+     "Main symptoms": "Weight reduction support"
+    }
+   }
+  },
+  "827c2fdaa18b348c": {
+   "key": "트레스오릭스포르테캡슐|A15|1밀리그램|캡슐",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "827c2fdaa18b348c",
+   "target_master_ids": [
+    "1443bb09-f824-4f72-95d6-8fb0d52e28af",
+    "5e6fbe2b-478b-4f60-a645-d49a4a435cf3",
+    "6db71865-c68f-4edd-84a0-92c4ba7579bd",
+    "79edf6d2-74e7-4023-a1fc-97b5542f9a10",
+    "992e9599-9e85-4823-b355-00f3b62b2ab0",
+    "aaacf6e9-654a-422a-bd1d-14e08168631f",
+    "ba11f2fa-b201-45d7-baa9-4dbf8d9ce92d"
+   ],
+   "title": "트레스오릭스포르테캡슐",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "식욕부진",
+     "주요 증상": "식욕부진"
+    },
+    "efficacy": "식욕부진에 사용하는 일반의약품입니다.",
+    "usage": "성인은 1일 2회, 1회 1캡슐을 아침ㆍ저녁 식전에 8일간 복용하고, 이후부터는 1일 2회, 1회 2캡슐을 아침ㆍ저녁 식전에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 녹내장 환자, 이 약에 과민증 환자, 요저류(소변이 고임)의 소인이 있는 환자, 고령자 및 쇠약자, 신생아는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 녹내장질환자나 요폐(소변축적)를 일으킬 수 있는 환자, 과염소성 혈증성 산증, 신부전 환자는 약사와 상의하세요.\n\nMAO 저해제(억제제) 및 알코올 등 및 기타 중추신경억제제와 함께 복용하지 마세요.\n\n어지러움, 구역, 발진, 권태감, 정신적 혼란, 식욕부진, 드물게 두통, 구갈(목마름), 대사성 산증 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "Tresorix Forte Capsule",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for loss of appetite.",
+    "usage": "Adults: take 1 capsule at a time, twice daily, before breakfast and before the evening meal, for 8 days; from then on take 2 capsules at a time, twice daily, before breakfast and before the evening meal.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: patients with glaucoma; hypersensitivity to this medicine; patients predisposed to urinary retention (build-up of urine); elderly or debilitated people; newborns.\n\nConsult a pharmacist before taking this medicine if any of the following applies: patients with glaucoma or who may develop urinary retention; hyperchloraemic acidosis; renal failure.\n\nDo not take this medicine together with MAO inhibitors, alcohol, or other central nervous system depressants.\n\nIf dizziness, nausea, rash, malaise, mental confusion, loss of appetite, or, rarely, headache, thirst, or metabolic acidosis occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Used for loss of appetite",
+     "Main symptoms": "Loss of appetite"
+    }
+   }
+  },
+  "d3f60492492fb5dc": {
+   "key": "에스알파정|A09A|25밀리그램|정",
+   "sourceType": "mfds_drug_otc",
+   "targetFp": "d3f60492492fb5dc",
+   "target_master_ids": [
+    "2100692a-a4ce-4dcc-934c-45a05e6a4c39",
+    "249b41fe-5a5b-43a3-b309-7c1bc599fce3",
+    "5a62fe8c-ab61-4d9e-a3bc-6f2aa9526559",
+    "78dc6295-039f-4c42-9061-1401c2a6efc7",
+    "a2a4b6b0-854a-4bc7-8dc5-e9d4944a74dd",
+    "d2558ba8-dc3b-42ad-a089-5793f01993ba",
+    "f524591c-8862-41b1-8c5d-ed6d3fd5a03d"
+   ],
+   "title": "에스알파정",
+   "content_json": {
+    "summaryTable": {
+     "분류": "일반의약품",
+     "작용": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진…",
+     "주요 증상": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림"
+    },
+    "efficacy": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진, 구역, 구토에 사용하는 일반의약품입니다.",
+    "usage": "만 15세 이상 및 성인은 1회 2정씩, 1일 3회 식후에 복용합니다.\n만 8세 이상~15세 미만은 1회 1정씩, 1일 3회 식후에 복용합니다.\n정해진 용법·용량을 지키세요.",
+    "usageLabel": "복용 안내",
+    "caution": "다음 분은 복용하지 마세요. 만 7세 이하의 어린이는 이 약을 복용하지 마세요.\n\n복용 전 약사와 상의하세요. 이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 위장관질환 환자, 신장장애환자, 심장장애 환자, 녹내장(눈의 통증, 눈의 침침함 등) 또는 배뇨장애 환자, 갑상선기능장애 환자 또는 고령자, 고마그네슘혈증 환자, 알레르기 체질, 약에 의한 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등)경험자는 약사와 상의하세요. 2주일 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 약사와 상의하세요.\n\n정해진 용법과 용량을 잘 지키세요.\n\n어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요.\n\n위장진통·진경제와 함께 복용하지 마세요. 다량의 우유, 칼슘제제와 병용시 우유 알칼리 증후군(고칼슘혈증, 고질소혈증, 알카리증 등)이 나타날 수 있으므로 충분히 관찰하고 이러한 증상이 나타나는 경우에는 투여를 중지하세요.\n\n알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 입이 마름, 변비 또는 설사의 증상, 두통, 안면홍조, 눈부심, 배뇨장애 등이 나타나는 경우 복용을 즉각 중지하고 약사와 상의하세요.",
+    "ingredientSelection": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요.\n증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요."
+   },
+   "en": {
+    "title": "S-Alpha Tablet",
+    "usageLabel": "How to take",
+    "efficacy": "An over-the-counter medicine used for stomach discomfort, bloating, stomach pain, excess stomach acid, heartburn, acid reflux, overeating, food stagnation, indigestion, aiding digestion, loss of appetite, nausea, and vomiting.",
+    "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nChildren aged 8 years to under 15 years: take 1 tablet at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+    "caution": "Do not take this medicine if any of the following applies: children aged 7 years and under.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with gastrointestinal disease, kidney disorder, or heart disorder; patients with glaucoma (eye pain, blurred vision) or urinary difficulty; patients with thyroid dysfunction or elderly people; patients with hypermagnesaemia; an allergic constitution or a history of allergic symptoms to medicines (rash, redness, itching). If symptoms do not improve after taking this medicine for about 2 weeks, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving this medicine to a child, do so under the guidance and supervision of a guardian.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Taken together with large amounts of milk or calcium preparations, milk-alkali syndrome (hypercalcaemia, azotaemia, alkalosis) may occur, so observe carefully and stop taking if such symptoms appear.\n\nIf allergic symptoms (rash, redness, itching), dry mouth, constipation or diarrhoea, headache, facial flushing, sensitivity to light, or difficulty passing urine occurs, stop taking immediately and consult a pharmacist.",
+    "summaryTable": {
+     "Category": "OTC medicine",
+     "How it works": "Relieves stomach discomfort, excess stomach acid, indigestion, and nausea",
+     "Main symptoms": "Stomach discomfort, bloating, stomach pain, heartburn, indigestion, nausea"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "파로네프캡슐|A01AD|30밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "3d11b2bd-5cd1-af30-21f9-82c0cbd200d7",
+  "expected": 12,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/12"
+  ],
+  "fetched": 12,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 12,
+  "anyCanonical": 12,
+  "existingAuthoredCanonical": 12,
+  "htmlLen": 1492,
+  "htmlMd5": "62526de4d75fe2909e8d5c7d9b50fb7c",
+  "summary": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 12,
+    "STEP_B_authored_flip": 12,
+    "audit": 12
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

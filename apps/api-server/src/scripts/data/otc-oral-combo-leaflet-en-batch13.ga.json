@@ -1,0 +1,265 @@
+{
+ "_doc": "GA-V6-2 batch13 EN authored leaflets (20 groups / 269 masters). Faithful translation of the official MFDS easy_drug source used for the KO canonical — no new medical facts, no weakening of indications/contraindications/warnings, no marketing claims. Merged into otc-oral-combo-leaflet-config-batch13.ga.json under each group's `en` block.",
+ "groups": {
+  "eeeb3afbdc7fbee8": {
+   "groupKey": "새로모아캡슐|D11AX|100밀리그램|캡슐",
+   "title": "Saeromoa Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily. Children aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals. The average treatment period is 3 to 6 months.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not use it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women.\n\nConsult a pharmacist if you use this medicine together with sulfonamide preparations.\n\nIf gastrointestinal discomfort (stomach pain, vomiting), sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+    "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+   }
+  },
+  "a0df42651d724493": {
+   "groupKey": "덴드리스캡슐|A01AD|150밀리그램|캡슐",
+   "title": "Dendris Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic symptoms to medicines or cosmetics (rash, redness, itching); a history of allergic symptoms to eggs (fever, rash, joint pain, asthma, itching); an allergic constitution; hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking any other medicine.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, or symptoms of Stevens-Johnson syndrome or toxic epidermal necrolysis (Lyell's syndrome) occur — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+    "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+   }
+  },
+  "14d98713dec31160": {
+   "groupKey": "티스탑에프캡슐|A01AD|150밀리그램|캡슐",
+   "title": "Teethstop F Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of hypersensitivity to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+    "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+   }
+  },
+  "fba608b29a1b7ed0": {
+   "groupKey": "파로네프캡슐|A01AD|30밀리그램|캡슐",
+   "title": "Paronef Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of hypersensitivity to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+    "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+   }
+  },
+  "a84ed9470bc34b72": {
+   "groupKey": "이덴큐캡슐|A01AD|156.3밀리그램|캡슐",
+   "title": "Edenq Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic symptoms to medicines or cosmetics (rash, redness, itching); a history of allergic symptoms to eggs (fever, rash, joint pain, asthma, itching); an allergic constitution. If symptoms do not improve after taking this medicine for a month or more, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist before taking this medicine if you are taking any other medicine.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, or symptoms of Stevens-Johnson syndrome or toxic epidermal necrolysis (Lyell's syndrome) occur — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+    "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+   }
+  },
+  "1ed969e3dfb3a843": {
+   "groupKey": "덴카바캡슐|A01AD|150밀리그램|캡슐",
+   "title": "Dencaba Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for gingivitis (inflammation of the gums) after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children under 15 years.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to this medicine; a history of allergic symptoms to cosmetics or eggs (fever, rash, joint pain, asthma, itching); an allergic constitution. If symptoms do not improve after taking this medicine for about a month, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIf rash, redness, diarrhoea, loss of appetite, stomach discomfort, nausea, vomiting, stomatitis, Stevens-Johnson syndrome, or toxic epidermal necrolysis occurs — for example fever, erythema, itching, eye congestion, stomatitis, or severe symptoms such as rash and redness with high fever over the skin of the whole body and the mucous membranes of the mouth and throat, or burn-like blistering — stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for gingivitis after periodontal treatment and mild to moderate periodontitis",
+    "Main symptoms": "Gingivitis after periodontal treatment, mild to moderate periodontitis"
+   }
+  },
+  "7ffa970ad3e1f793": {
+   "groupKey": "케라탑캡슐|D11AX|100밀리그램|캡슐",
+   "title": "Keratop Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily, after meals.\nChildren aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals.\nChildren under 12 years must not take this medicine.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not use it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; a history of hypersensitivity to Yellow No. 5 or of allergic reactions.\n\nTake care when using this medicine together with sulfonamide preparations.\n\nIf stomach pain, vomiting or other gastrointestinal discomfort, sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, or if there is no improvement after 3 to 4 months of use at the stated dose and directions, or if symptoms persist or the expected effect does not appear, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+    "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+   }
+  },
+  "417ff6f3ac64e5ce": {
+   "groupKey": "마이시딜캡슐|D11AX|100밀리그램|캡슐",
+   "title": "Mysidil Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive treatment for damaged hair, poor nail growth that is not caused by infection, and hair loss.",
+   "usage": "Adults: take 1 capsule at a time, 3 times daily. People aged 12 years and over: take 1 capsule at a time, 1 to 2 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; children under 12 years. Do not take it for hair loss caused by scarring, androgenetic hereditary alopecia, or male-pattern baldness.\n\nConsult a pharmacist before using this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; hypersensitivity to Yellow No. 5 or a history of it. If symptoms do not improve after taking this medicine for 3 to 4 months, stop taking and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you take this medicine together with sulfonamide preparations.\n\nIf stomach pain, vomiting or other gastrointestinal discomfort, sweating, rapid heartbeat, itching, hives, headache, dizziness, flushing, or hair growth on parts of the body other than the head occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supportive treatment for damaged hair, poor non-infectious nail growth, and hair loss",
+    "Main symptoms": "Damaged hair, poor nail growth, hair loss"
+   }
+  },
+  "65c686b22a3a960e": {
+   "groupKey": "멜린씨정|D11AX|120밀리그램|정",
+   "title": "Melin C Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used to relieve pigmentation (melasma, freckles) caused by sunlight and skin conditions, to prevent bleeding gums and nosebleeds, and for physical fatigue, pregnancy, breastfeeding, and reduced physical strength during and after illness.",
+   "usage": "Children aged 8 years and over and adults: take 1 tablet at a time, once daily.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants under 3 months; hypercalcaemia (excess calcium in the blood); sarcoidosis; kidney disease; kidney stones; severe renal failure.\n\nConsult a pharmacist before taking this medicine if any of the following applies: children who get a lot of sunlight and eat a normal diet; pregnant and breastfeeding women; patients with hyperoxaluria (excessive excretion of oxalate in the urine); hypersensitivity to Yellow No. 4 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving this medicine to a child, do so under the guidance and supervision of a guardian.\n\nThis medicine may interfere with the detection of glucose in various urine tests.\n\nConsult a pharmacist if you take this medicine together with cardiac glycosides.\n\nIf vomiting, nausea, diarrhoea, constipation, low blood pressure, facial flushing, irregular heartbeat, queasiness, or skin rash occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves pigmentation such as melasma and freckles, helps prevent bleeding gums and nosebleeds, and supports reduced physical strength",
+    "Main symptoms": "Melasma and freckles, bleeding gums, nosebleeds, physical fatigue"
+   }
+  },
+  "0977eed528f941e8": {
+   "groupKey": "락토폴정|A07FA51|70밀리그램|정",
+   "title": "Lactopol Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nLeave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 4 or a history of it; a history of drug allergy (fever, rash, joint pain, asthma, itching); gastric or duodenal ulcer; diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools. Do not drink alcohol while taking this medicine. If symptoms do not improve after repeated doses, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics.\n\nIf allergic symptoms (rash, itching) or, rarely, a dry mouth occurs, stop using immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+    "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+   }
+  },
+  "2f70f3125c893365": {
+   "groupKey": "락토폴플러스정|A07FA51|100밀리그램|정",
+   "title": "Lactopol Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nLeave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not drink alcohol while taking this medicine. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 4 or a history of it; a history of drug allergy (fever, rash, joint pain, asthma, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer. If symptoms do not improve after repeated doses, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics.\n\nIf allergic symptoms (rash, itching) or, rarely, a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+    "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+   }
+  },
+  "268b5da57ba3c359": {
+   "groupKey": "듀오레플러스정|A07FA51|100밀리그램|정",
+   "title": "Duore Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals. Leave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; people taking other medicines; hypersensitivity to Yellow No. 4 (tartrazine) or a history of allergic reactions to it.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic symptoms (rash, itching) or a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+    "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+   }
+  },
+  "7cd43f797f5647b6": {
+   "groupKey": "듀오레정|A07FA51|70밀리그램|정",
+   "title": "Duore Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals. Leave an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns; children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; people taking other medicines; hypersensitivity to Yellow No. 4 (tartrazine) or a history of allergic reactions to it.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic symptoms (rash, itching) or a dry mouth occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+    "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+   }
+  },
+  "a451c1b9a5656f1d": {
+   "groupKey": "락토스탑정|A07FA51|100밀리그램|정",
+   "title": "Lactostop Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for diarrhoea, diarrhoea accompanied by abdominal pain, indigestion from overeating, loose stools, and vomiting with diarrhoea.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals, leaving an interval of at least 4 hours between doses.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: pregnant women, women who may be pregnant, and breastfeeding women; newborns and children aged 7 years and under; patients with hereditary problems such as galactose intolerance, Lapp lactase deficiency, or glucose-galactose malabsorption. Do not take this medicine for more than 3 days in a row.\n\nConsult a pharmacist before taking this medicine if any of the following applies: a history of allergic reactions to medicines (rash, redness, itching); diarrhoea accompanied by fever; elderly people; bloody stools or persistent mucous stools; gastric or duodenal ulcer; hypersensitivity to Yellow No. 4 or a history of allergic reactions to it. If symptoms do not improve after repeated doses, stop taking immediately and consult a doctor or pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Do not drink alcohol while taking this medicine.\n\nIf allergic reactions (rash, itching) or, rarely, a dry mouth occurs, stop taking this medicine immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves diarrhoea, loose stools, indigestion from overeating, and vomiting with diarrhoea",
+    "Main symptoms": "Diarrhoea, abdominal pain, indigestion from overeating, loose stools, vomiting with diarrhoea"
+   }
+  },
+  "5c5833336f4105bc": {
+   "groupKey": "리피클연질캡슐|C10B|100밀리그램|연질캡슐",
+   "title": "Lipicle Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used to improve high blood cholesterol and to relieve peripheral circulatory disorders accompanying it (cold hands and feet, numbness).",
+   "usage": "Adults: take 2 capsules at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Consult a pharmacist before taking this medicine if any of the following applies: hypersensitivity to Yellow No. 5 or a history of it. If symptoms do not improve after taking this medicine for about a month, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIf itching, rash, redness, loss of appetite, diarrhoea, soft stools, abdominal pain, stomach discomfort, nausea, heartburn, or queasiness occurs, or if menstruation comes earlier than expected, the flow increases, or bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improves high blood cholesterol and relieves the peripheral circulatory problems that accompany it",
+    "Main symptoms": "High blood cholesterol, cold hands and feet, numbness"
+   }
+  },
+  "b86ec051457ce436": {
+   "groupKey": "콜레스텐연질캡슐|C10B|333.33밀리그램|연질캡슐",
+   "title": "Cholesten Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used to improve lipid metabolism in obesity and in diabetic or essential high blood cholesterol.",
+   "usage": "Take 3 capsules at a time, 3 times daily, 30 minutes before meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine, to soybean oil, to soy, or to peanuts.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with disorders of fat metabolism such as hyperlipoproteinaemia, diabetic hyperlipidaemia, or pancreatitis; patients who require careful administration of lipid emulsions; patients at particular risk from fat overload; patients predisposed to thrombosis (blocked blood vessels); hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you use this medicine together with levodopa, oral contraceptives containing oestrogen, or intravenous lipid preparations.\n\nStomach discomfort, diarrhoea, constipation, rash, redness (congested and reddened skin), earlier-than-expected menstruation, or increased menstrual flow may occur. If menstrual bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improves lipid metabolism in obesity and in diabetic or essential high blood cholesterol",
+    "Main symptoms": "Obesity, high blood cholesterol, impaired lipid metabolism"
+   }
+  },
+  "73e0834e852d6957": {
+   "groupKey": "웰러드연질캡슐|C10B|0.67밀리그램|연질캡슐",
+   "title": "Wellard Soft Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used to improve lipid metabolism in obesity and in diabetic or essential high blood cholesterol.",
+   "usage": "Take 3 capsules at a time, 3 times daily, 30 minutes before meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine, to soybean oil, to soy, or to peanuts.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with disorders of fat metabolism such as hyperlipoproteinaemia, diabetic hyperlipidaemia, or pancreatitis; patients who require careful administration of lipid emulsions; patients at particular risk from fat overload; patients predisposed to thrombosis (blocked blood vessels); hypersensitivity to Yellow No. 5 or a history of it.\n\nKeep strictly to the stated dose and directions.\n\nConsult a pharmacist if you use this medicine together with levodopa, oral contraceptives containing oestrogen, or intravenous lipid preparations.\n\nStomach discomfort, diarrhoea, constipation, rash, redness (congested and reddened skin), earlier-than-expected menstruation, or increased menstrual flow may occur. If menstrual bleeding continues for a long time, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Improves lipid metabolism in obesity and in diabetic or essential high blood cholesterol",
+    "Main symptoms": "Obesity, high blood cholesterol, impaired lipid metabolism"
+   }
+  },
+  "246b347480652e7f": {
+   "groupKey": "체비거프러스정|A08AX|200밀리그램|정",
+   "title": "Chebiger Plus Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used as supportive therapy for weight reduction through reduced food intake.",
+   "usage": "Take 2 tablets at a time, 3 times daily before meals; if needed, 2 additional tablets may be taken before bedtime.\nIt is best taken with plenty of water.\nTaking the recommended dose for at least 3 to 4 weeks is advised.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: hypersensitivity to this medicine; infants and young children.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant and breastfeeding women; patients with digestive disorders. If symptoms do not improve after taking this medicine for a month or more, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nIt is best not to take this medicine at the same time as other medicines; if you do, leaving an interval of 30 minutes to 1 hour is recommended.\n\nIf abdominal bloating, nausea, constipation, or diarrhoea occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Supports weight reduction by reducing food intake",
+    "Main symptoms": "Weight reduction support"
+   }
+  },
+  "827c2fdaa18b348c": {
+   "groupKey": "트레스오릭스포르테캡슐|A15|1밀리그램|캡슐",
+   "title": "Tresorix Forte Capsule",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for loss of appetite.",
+   "usage": "Adults: take 1 capsule at a time, twice daily, before breakfast and before the evening meal, for 8 days; from then on take 2 capsules at a time, twice daily, before breakfast and before the evening meal.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: patients with glaucoma; hypersensitivity to this medicine; patients predisposed to urinary retention (build-up of urine); elderly or debilitated people; newborns.\n\nConsult a pharmacist before taking this medicine if any of the following applies: patients with glaucoma or who may develop urinary retention; hyperchloraemic acidosis; renal failure.\n\nDo not take this medicine together with MAO inhibitors, alcohol, or other central nervous system depressants.\n\nIf dizziness, nausea, rash, malaise, mental confusion, loss of appetite, or, rarely, headache, thirst, or metabolic acidosis occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Used for loss of appetite",
+    "Main symptoms": "Loss of appetite"
+   }
+  },
+  "d3f60492492fb5dc": {
+   "groupKey": "에스알파정|A09A|25밀리그램|정",
+   "title": "S-Alpha Tablet",
+   "usageLabel": "How to take",
+   "efficacy": "An over-the-counter medicine used for stomach discomfort, bloating, stomach pain, excess stomach acid, heartburn, acid reflux, overeating, food stagnation, indigestion, aiding digestion, loss of appetite, nausea, and vomiting.",
+   "usage": "People aged 15 years and over and adults: take 2 tablets at a time, 3 times daily, after meals.\nChildren aged 8 years to under 15 years: take 1 tablet at a time, 3 times daily, after meals.\nKeep to the stated dose and directions.",
+   "caution": "Do not take this medicine if any of the following applies: children aged 7 years and under.\n\nConsult a pharmacist before taking this medicine if any of the following applies: pregnant women and women who may be pregnant; patients with gastrointestinal disease, kidney disorder, or heart disorder; patients with glaucoma (eye pain, blurred vision) or urinary difficulty; patients with thyroid dysfunction or elderly people; patients with hypermagnesaemia; an allergic constitution or a history of allergic symptoms to medicines (rash, redness, itching). If symptoms do not improve after taking this medicine for about 2 weeks, stop taking immediately and consult a pharmacist.\n\nKeep strictly to the stated dose and directions.\n\nWhen giving this medicine to a child, do so under the guidance and supervision of a guardian.\n\nDo not take this medicine together with gastrointestinal analgesics or antispasmodics. Taken together with large amounts of milk or calcium preparations, milk-alkali syndrome (hypercalcaemia, azotaemia, alkalosis) may occur, so observe carefully and stop taking if such symptoms appear.\n\nIf allergic symptoms (rash, redness, itching), dry mouth, constipation or diarrhoea, headache, facial flushing, sensitivity to light, or difficulty passing urine occurs, stop taking immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine",
+    "How it works": "Relieves stomach discomfort, excess stomach acid, indigestion, and nausea",
+    "Main symptoms": "Stomach discomfort, bloating, stomach pain, heartburn, indigestion, nausea"
+   }
+  }
+ }
+}

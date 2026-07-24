@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "듀오레정|A07FA51|70밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "d8d92ec4-46cd-9b80-a95f-622001f9aa3c",
+  "anomalies": [],
+  "targetMasters": 8,
+  "koFingerprintKinds": 1,
+  "builtLen": 2838,
+  "builtMd5": "365334c2ca6adc2e3d7d9e07e3247319",
+  "existingEnCanonical": 8,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 8,
+    "STEP2_flip": 8,
+    "total": 16
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

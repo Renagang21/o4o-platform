@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "웰러드연질캡슐|C10B|0.67밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "f53df25d-25e3-5f40-b088-a84d62897491",
+  "anomalies": [],
+  "targetMasters": 9,
+  "koFingerprintKinds": 1,
+  "builtLen": 2710,
+  "builtMd5": "9c4a01e3ceb1ffec72bd43af469b9ba3",
+  "existingEnCanonical": 9,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 9,
+    "STEP2_flip": 9,
+    "total": 18
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

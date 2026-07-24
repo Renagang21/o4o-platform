@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "마이시딜캡슐|D11AX|100밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "884a56f2-94b7-60ba-374a-4153a7e4b98c",
+  "expected": 10,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/10"
+  ],
+  "fetched": 10,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 10,
+  "anyCanonical": 10,
+  "existingAuthoredCanonical": 10,
+  "htmlLen": 1535,
+  "htmlMd5": "aad7a4b5946380acd3a6c02a4219a902",
+  "summary": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 10,
+    "STEP_B_authored_flip": 10,
+    "audit": 10
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

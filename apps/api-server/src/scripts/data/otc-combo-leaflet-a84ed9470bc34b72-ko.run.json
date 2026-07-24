@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "이덴큐캡슐|A01AD|156.3밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "bdc8a43c-2d5a-d522-1f06-b5aa4786e757",
+  "expected": 10,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/10"
+  ],
+  "fetched": 10,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 10,
+  "anyCanonical": 10,
+  "existingAuthoredCanonical": 10,
+  "htmlLen": 1570,
+  "htmlMd5": "1d8ebdb4c95a9737e4e4d885cee2285c",
+  "summary": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 10,
+    "STEP_B_authored_flip": 10,
+    "audit": 10
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

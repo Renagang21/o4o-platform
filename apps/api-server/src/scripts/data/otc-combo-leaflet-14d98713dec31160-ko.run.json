@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "티스탑에프캡슐|A01AD|150밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "93539758-90b2-d57c-4ff6-e29222599657",
+  "expected": 13,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/13"
+  ],
+  "fetched": 13,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 13,
+  "anyCanonical": 13,
+  "existingAuthoredCanonical": 13,
+  "htmlLen": 1415,
+  "htmlMd5": "dd42533571e6549ce3f252e3d3ae65a5",
+  "summary": "치주치료 후 치은염, 경·중등도 치주염의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 13,
+    "STEP_B_authored_flip": 13,
+    "audit": 13
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

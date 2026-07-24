@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "새로모아캡슐|D11AX|100밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "53188a72-fe99-4d67-540b-513fdc328962",
+  "expected": 60,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/60"
+  ],
+  "fetched": 60,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 60,
+  "anyCanonical": 60,
+  "existingAuthoredCanonical": 60,
+  "htmlLen": 1438,
+  "htmlMd5": "2be0c0c60d6ae748bdddedcd8aeb6343",
+  "summary": "손상된 모발, 감염성이 아닌 손톱의 발육 부진, 탈모의 보조치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 60,
+    "STEP_B_authored_flip": 60,
+    "audit": 60
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

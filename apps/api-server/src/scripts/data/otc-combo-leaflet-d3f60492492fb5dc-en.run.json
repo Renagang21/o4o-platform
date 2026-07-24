@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "에스알파정|A09A|25밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "1acc8791-a077-c085-1833-f673986402bc",
+  "anomalies": [],
+  "targetMasters": 7,
+  "koFingerprintKinds": 1,
+  "builtLen": 3208,
+  "builtMd5": "a0b7c89516a9e2ceb9b666a2eb0f776d",
+  "existingEnCanonical": 7,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 7,
+    "STEP2_flip": 7,
+    "total": 14
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}
