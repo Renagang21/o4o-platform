@@ -1452,6 +1452,256 @@
    "masters": 4,
    "op": "KO_EN",
    "note": "GA-V7 batch16 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "맥시라민에이정|A11JC|1.2밀리그램|정",
+   "targetFp": "14454a4a8fa4c279",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "액티진맥스정|A11JC|100밀리그램|정",
+   "targetFp": "19620cb86ccc26e2",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "칼시롤정|A12AX|1250밀리그램|정",
+   "targetFp": "1cffca51f742bf0b",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "아로나민골드프리미엄정|A11EX|50밀리그램|정",
+   "targetFp": "1de6385a4dd03a1e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "디카본500정|A12AX|500밀리그램|정",
+   "targetFp": "23646cc49126c07c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "토비콤골드정|A11JC|206.2밀리그램|정",
+   "targetFp": "23766b9d9a97955a",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "칼디맥정|A12AX|250밀리그램|정",
+   "targetFp": "24ba4176098374b8",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "로페시콘츄정|A07DA53|181.2밀리그램|정",
+   "targetFp": "2d55aded7a3f6d36",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "마그네스정|A12CC|470밀리그램|정",
+   "targetFp": "2debc17fab1c56f9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "맥세렌디정|A11CC55|10밀리그램|정",
+   "targetFp": "2f22084af9dfa952",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "칼시마정|A11CC55|468밀리그램|정",
+   "targetFp": "30d703e80b47afb2",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "복합유디리버연질캡슐|A13A|25밀리그램|연질캡슐",
+   "targetFp": "30dd5847198cb416",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "비나폴로엑스트라연질캡슐|A11AB|50밀리그램|연질캡슐",
+   "targetFp": "30fa9588213f669c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "다이제스토정|A09AA|175밀리그램|정",
+   "targetFp": "32b4df64a0a52242",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "레스톨캡슐|A01AD|333밀리그램|캡슐",
+   "targetFp": "34cc6ad99d4408c0",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "텐텐츄정|A11AB|26.04밀리그램|정",
+   "targetFp": "36513c8609ca42b3",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "위엔자임듀얼정|A09AA|40밀리그램|정",
+   "targetFp": "3653a3158f691ba3",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "쎄토마연질캡슐|A11JB|500밀리그램|연질캡슐",
+   "targetFp": "36a3e1c3de28c2f6",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "제노타에이캡슐|A01AD|150밀리그램|캡슐",
+   "targetFp": "3ba257da3d05b9df",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "헬씨민큐연질캡슐|A11JA|20밀리그램|연질캡슐",
+   "targetFp": "3f2c9afe8f7389f3",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "헤모퀸골드엠프리미엄캡슐|B03AE|100밀리그램|캡슐",
+   "targetFp": "4254a1365b2c6470",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "이가탄에프캡슐|A01AD|150밀리그램|캡슐",
+   "targetFp": "4264e0e5afaabae9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "칼비리아플러스정|A12AX|1314밀리그램|정",
+   "targetFp": "440424dc540fc606",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "비스칸비캡슐|A07FA51|250밀리그램|캡슐",
+   "targetFp": "453753f682a6c0e8",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "카필러스캡슐|D11AX|112밀리그램|캡슐",
+   "targetFp": "455ddab9c56a63ca",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "KO_EN",
+   "status": "DONE",
+   "note": "GA-V7 batch17 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
   }
  ]
 }
