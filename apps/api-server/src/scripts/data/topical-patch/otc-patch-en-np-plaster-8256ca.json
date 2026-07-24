@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "slug": "np-plaster-8256ca",
+ "translation": {
+  "groupKey": "펠비낙|Plaster|8256ca",
+  "title": "Felbinac Plaster",
+  "usageLabel": "How to apply it",
+  "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of osteoarthritis (degenerative arthritis), periarthritis of the shoulder, tendinitis and tenosynovitis, peritendinitis, epicondylitis of the humerus (such as tennis elbow), muscle pain, and swelling and pain after an injury.",
+  "usage": "Peel off the release liner from the medicated surface and apply 1 patch to the affected area twice a day.",
+  "caution": "Do not use this medicine in the following cases: people who are hypersensitive to this medicine; people who have had, or are liable to have, asthma attacks caused by aspirin or non-steroidal anti-inflammatory drugs; people who have experienced urticaria or acute rhinitis caused by aspirin or non-steroidal anti-inflammatory drugs; women who are pregnant, may be pregnant, or are breastfeeding. Consult a doctor or pharmacist before using this medicine in the following cases: people with bronchial asthma; children. Do not use this medicine in the following cases: damaged skin or mucous membranes; areas of eczema or rash. Stop using it immediately and consult a doctor or pharmacist if any of the following occur: occasional itching; erythema; redness; dermatitis (rash, eczema); contact dermatitis; irritation or blisters (rarely). Store at room temperature.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Felbinac",
+   "Form": "Plaster"
+  }
+ }
+}

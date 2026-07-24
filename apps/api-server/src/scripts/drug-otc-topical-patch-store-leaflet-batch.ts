@@ -92,7 +92,7 @@ function fingerprintOf(name: string, spec: string, content: string): { fp: strin
 const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 설명입니다. 사용 전·후 궁금한 점이나 이상이 있으면 매장 내 약사 등 전문가와 상담하세요.';
 /** 원문 전체 맥락이 피부 외용(첩부 포함)으로 명확한 경우에 한해 원문 데이터의 경구 오기를 외용 표현으로 정규화. 첩부 신호(붙이/부착/첩부) 포함. */
 function normalizeOralMisphrase(text: string, fullContent: string): string {
-  if (!/외용으로만|외용으로 사용|도포|바르|바릅|발라|붙이|붙입|부착|첩부/.test(stripTags(fullContent || ''))) return text;
+  if (!/외용으로만|외용으로 사용|도포|바르|바릅|발라|붙[이입여인일]|부착|첩부/.test(stripTags(fullContent || ''))) return text;
   return text
     // '외용으로만 사용하고 복용하지 마십시오' → '사용하지 마십시오'로 바꾸면 문장이 자기모순이 되므로 '먹지'로 정규화한다.
     .replace(/(외용으로(만)? 사용(하고|하며)) 복용하지 마십시오/g, '$1 먹지 마십시오')
@@ -102,6 +102,7 @@ function normalizeOralMisphrase(text: string, fullContent: string): string {
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우')
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록')
     .replace(/내복용/g, '먹는 용도')
+    .replace(/복용\s*후 바로/g, '사용 후 바로').replace(/복용\s*후에/g, '사용 후에') // 첩부제 쇽 증상 주해의 '복용후' 오기 정규화(부착 시점 의미 동일)
     .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우')
     .replace(/함께 복용 시/g, '함께 사용 시')
     .replace(/병용\(함께 복용,? ?\(?사용\)?\)/g, '병용(함께 사용)'); // '병용(함께 복용, 사용)'/'병용(함께 복용(사용))' 괄호 주해 정규화 — 사용은 복용을 포괄(약화 아님)
