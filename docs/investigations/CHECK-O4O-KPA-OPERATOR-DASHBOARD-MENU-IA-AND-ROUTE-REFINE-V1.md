@@ -113,7 +113,26 @@ WO §6 목표 트리(대시보드 / 회원·커뮤니티 / 상품·거래 / 매�
 
 ## 7. 배포 · 운영 smoke
 
-> 아래 §7 는 배포/smoke 수행 후 채움.
+**커밋:** `342f7cef1` (code 3 + CHECK).
+**CI/CD:** Deploy API Server (Cloud Run) EXIT 0 · Deploy Web Services (kpa-society) EXIT 0.
+
+**브라우저 운영 smoke** (KPA admin 로그인 → `/operator`):
+
+| 대상 | 결과 |
+|------|------|
+| 사이드바 `승인` 그룹 | ✅ `공급 상품 신청 승인` + `이벤트 오퍼 승인` 2항목만 — `판매자 모집 노출 승인` 제거됨 |
+| `판매자 모집 노출 승인` 텍스트/route 존재 | ✅ 사이드바 어디에도 없음 (recruitmentTextPresent=false, route 없음) |
+| `/operator/recruitment-exposure` 직접 접근 | ✅ page 보존 — 준비중 목록 화면 정상 렌더("노출 승인 대상 모집이 없습니다") · 데드 아님 |
+| 대시보드 카드 `포럼 요청` 링크 | ✅ `/operator/forum-requests` (구 forum-management redirect 제거) |
+| Overview `포럼 요청 대기` | ✅ `/operator/forum-requests` |
+| Quick Action `공지사항` | ✅ `/operator/content` (구 /operator/news redirect 제거) |
+| Quick Action `포럼 관리` | ✅ `/operator/forum-requests` |
+| Overview `서비스 신청` | ⚠️ `/operator/organization-requests` (미변경 — §5 보고 항목, admin-only branch·operator route 부재) |
+| 사이드바 legacy `/operator/forum-management` 링크 | ✅ 잔존 0 |
+
+**권한(§5.G):** 로그인 계정이 admin 역할이라 `시스템`(감사 로그·역할 관리) 그룹 정상 노출. 비-admin 운영자에 대한 `filterMenuByRole` adminOnly strip 은 정적 확인(직전 V1 smoke 및 로직 검증) — 별도 non-admin 운영자 전용 자격증명 부재로 본 회차 브라우저 재확인은 정적 판정으로 대체.
+
+**판정:** 안전 정비 항목 전부 GREEN. 보류 항목(그룹 split·도메인 4축·organization-requests)은 §5 보고.
 
 ---
 
