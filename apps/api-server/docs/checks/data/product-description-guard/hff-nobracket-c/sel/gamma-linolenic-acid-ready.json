@@ -1,0 +1,25 @@
+[
+ {
+  "statementNo": "20190004553140",
+  "candidateId": "7162e9db-05cb-44ca-855c-c3db7aee8b57",
+  "shard": 2,
+  "ingredientKey": "감마리놀렌산",
+  "productName": "바디시그널 여성건강",
+  "manufacturer": "주식회사 네추럴웨이 포천 제2공장",
+  "functionsKo": [
+   "혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+  ],
+  "functionsEn": [
+   "May help with improving blood cholesterol, improving blood circulation, easing discomfort related to premenstrual changes, and improving skin condition related to immune hypersensitivity"
+  ],
+  "source": {
+   "mainFunction": "-혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+   "baseStandard": "1. 성상 : 이미,이취가 없고 고유의 향미가 있고 유상액 함유한 투명의 연질캡슐\n2. 붕해 : 20분 이내\n3. 대장균군 : 음성\n4. 감마리놀렌산 : 240mg/1,600mg(표시량의80~120%)",
+   "intake": "1일1회, 1회2캡슐을 물과 함께 섭취하십시오.",
+   "dosageForm": "이미,이취가 없고 고유의 향미가 있고 유상액 함유한 투명의 연질캡슐",
+   "shelfLife": "제조일로부터 24개월",
+   "storage": "실온",
+   "caution": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취할 것 (면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시‧판매하는 경우에 한함)"
+  }
+ }
+]
