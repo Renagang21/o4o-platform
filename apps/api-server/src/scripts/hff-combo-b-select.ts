@@ -11,7 +11,8 @@
 import '../env-loader.js';
 import fs from 'node:fs';
 import { parseServing, isBulkMaterial, normalizeSource } from '../modules/content-guard/source-grounding-parser.js';
-import { NUTRIENT_META, FUNCTIONAL_META, mapFunctionEn, fnBelongsTo, normFn } from './hff-nutrient-registry.js';
+import { normFn } from './hff-nutrient-registry.js';
+import { bMeta, bFnBelongsTo, bMapFunctionEn } from './hff-b-ingredient-registry.js';
 import { resolveSource, dbStmtNosSource } from './hff-raw-source.js';
 import { DataSource } from 'typeorm';
 import { splitFunctions } from './hff-source-parse.js';
@@ -21,7 +22,7 @@ const arg = (n: string, d = ''): string => { const i = process.argv.indexOf(`--$
 const COMBO = arg('combo'); const OUT = arg('out');
 if (!COMBO || !OUT) throw new Error('--combo "A,B" --out 필요');
 const TARGET = COMBO.split(/[,+]/).map((x) => x.trim());
-const metaOf = (k: string) => NUTRIENT_META[k] ?? FUNCTIONAL_META[k];
+const metaOf = (k: string) => bMeta(k)!;
 for (const k of TARGET) if (!metaOf(k)) throw new Error(`미지원 원료: ${k}`);
 const TARGET_SET = [...TARGET].sort().join('|');
 const EXCLUDE_TAKEN = process.argv.includes('--exclude-taken');
@@ -90,9 +91,9 @@ for await (const it of src.gen as AsyncGenerator<RawItem>) {
   const ingredients: Array<{ key: string; labelKo: string; labelEn: string; declaredAmount: unknown; functionsKo: string[]; functionsEn: string[] }> = [];
   let attrFail = false; const attributed = new Set<string>();
   for (const k of TARGET) {
-    const fkRaw = allFns.filter((f) => fnBelongsTo(f, k)); fkRaw.forEach((f) => attributed.add(f));
+    const fkRaw = allFns.filter((f) => bFnBelongsTo(f, k)); fkRaw.forEach((f) => attributed.add(f));
     const seenN = new Set<string>(); const fk: string[] = []; const fe: string[] = [];
-    for (const f of fkRaw) { const nk = normFn(f); if (seenN.has(nk)) continue; const en = mapFunctionEn(f); if (en == null) { fe.push(null as unknown as string); fk.push(f); continue; } seenN.add(nk); fk.push(f); fe.push(en); }
+    for (const f of fkRaw) { const nk = normFn(f); if (seenN.has(nk)) continue; const en = bMapFunctionEn(f); if (en == null) { fe.push(null as unknown as string); fk.push(f); continue; } seenN.add(nk); fk.push(f); fe.push(en); }
     if (fk.length === 0 || fe.some((e) => e == null)) { attrFail = true; break; }
     ingredients.push({ key: k, labelKo: metaOf(k).displayKo, labelEn: metaOf(k).displayEn, declaredAmount: byKey.get(k)!, functionsKo: fk, functionsEn: fe });
   }
