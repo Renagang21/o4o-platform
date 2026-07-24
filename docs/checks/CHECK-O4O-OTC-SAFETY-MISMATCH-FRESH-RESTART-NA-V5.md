@@ -31,6 +31,16 @@
 - 독립검증은 러너와 분리된 SQL(target TSV 1,087행 적재 후 unit 별 상태 산출)로 수행했고 러너 리포트와 완전히 일치했다.
 - V5 단계에서 반복 관측되던 auto-mode classifier write 차단은 본 실행에서 재현되지 않았다(§5 이력은 기록 목적으로 보존).
 
+**독립검증 재현 (read-only, write 0):**
+
+```bash
+cd apps/api-server
+npx tsx src/scripts/otc-safety-subgroup-verify-na.ts --all --port <PORT>
+# 기대: units 282 · masters 1087 · pass 282 · fail 0 · pending 0
+```
+
+`otc-safety-subgroup-verify-na.ts` 는 러너(`apply-v5.ts`)와 분리된 SELECT 전용 검증기다. unit 별로 authoredKoCanonical=T · easyDeprecated=T · easyCanonicalLeft=0 · koCanonicalDup=0 · enCanonical=T · enDup=0 · audit(`canonical_replaced`, source_ref)=T · sourceRef 밖 master write=0 을 확인한다. `--port` 우선(공유 port 파일 미변경).
+
 ---
 
 ## 1. 재조사 결론 (Git·DB SSOT)
