@@ -2,7 +2,7 @@
 
 **WO 제목:** 약국 서비스 별도 신청(pharmacy-requests) 폐지 — 회원 승인·매장 운영 승인 단일화(경로 B)
 
-**상태:** 구현 완료 · typecheck/build GREEN · 배포·운영 smoke 진행
+**상태:** 완료 — 구현 · typecheck/build GREEN · 배포(API+Web) GREEN · 운영 smoke PASS · commit/push 완료
 
 ---
 
@@ -120,6 +120,36 @@
 - `apps/api-server` `tsc -p tsconfig.build.json --noEmit` → **EXIT 0** (변경 파일 오류 0).
   - (참고: `scripts/` 내 사전 존재 TS 오류는 build tsconfig 범위 밖 · 본 WO 무관)
 - `pnpm --filter @o4o/web-kpa-society build` → **✓ built** (shared-space-ui `kpa.ts` 의존 포함).
+
+---
+
+---
+
+## 9. 배포 · 운영 smoke (Step 7)
+
+**커밋:** `136d38fb2` (본체 17파일) + `f2bcabc30` (누락분 KpaOperatorDashboard.tsx 카드 chip).
+- 1차 커밋에서 `KpaOperatorDashboard.tsx` 누락 → 배포본에 `약국 서비스 → /operator/pharmacy-requests` 데드링크 chip 잔존을 운영 smoke에서 발견 → 후속 커밋으로 `이벤트 오퍼 승인 → /operator/event-offers` 교체 후 재배포.
+
+**CI/CD 배포:** Deploy API Server (Cloud Run) EXIT 0 · Deploy Web Services (kpa-society) EXIT 0 (재배포 포함).
+- API rev `o4o-core-api-02851-2nx` · Web rev `kpa-society-web-01686-5hc` 서빙.
+
+**백엔드 route 제거 (curl):**
+- `POST /api/v1/kpa/pharmacy-requests` → **404** (기존 생성 경로 폐쇄)
+- `GET /api/v1/kpa/pharmacy-requests/my` → **404**
+- `/health` → 200
+
+**브라우저 운영 smoke:**
+| 대상 | 결과 |
+|------|------|
+| 약국 경영자(store_owner) 로그인 | ✅ 곧바로 `/store` 진입 (경로 B 자동 이용) |
+| `/pharmacy/approval` 접근 | ✅ `/pharmacy` → `/store` redirect (신청 폼 없음) |
+| 운영자 대시보드 — 카드 그리드 "매장 HUB 운영" | ✅ `이벤트 오퍼 승인 → /operator/event-offers` (약국 서비스 chip 제거) |
+| 운영자 대시보드 — Overview 5-Block | ✅ `이벤트 오퍼 승인 대기` KPI, 약국 서비스 신청 KPI 없음 |
+| AI Summary / Action Queue / Recent Activity | ✅ pharmacy 항목 없음 |
+| Quick Actions | ✅ `이벤트 오퍼`, 약국 서비스 신청 없음 |
+| `/operator/pharmacy-requests` 직접 접근 | ✅ `/operator`로 redirect (데드 페이지 없음) |
+
+**판정:** 최종 검증 10항 + 운영 smoke 전부 GREEN. WO 종료.
 
 ---
 
