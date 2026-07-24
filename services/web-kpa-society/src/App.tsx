@@ -223,6 +223,8 @@ const ForeignVisitorPartnerQrCodesPage = lazy(() => import('./pages/pharmacy/For
 const StoreOrdersPage = lazy(() => import('./pages/pharmacy/StoreOrdersPage').then(m => ({ default: m.StoreOrdersPage })));
 // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
 const StoreRecruitmentApplicationsPage = lazy(() => import('./pages/pharmacy/StoreRecruitmentApplicationsPage'));
+// WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여(매장 경영자)
+const SellerRecruitmentsBrowsePage = lazy(() => import('./pages/pharmacy/SellerRecruitmentsBrowsePage'));
 // WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: StoreBillingPage 제거 (KPA 사이드바 미노출, API 미연결 placeholder)
 const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').then(m => ({ default: m.StoreSignagePage })));
 // WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
@@ -1006,6 +1008,8 @@ function App() {
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
             <Route path="commerce/orders" element={<StoreOrdersPage />} />
+            {/* WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여 */}
+            <Route path="commerce/seller-recruitments" element={<SellerRecruitmentsBrowsePage />} />
             {/* WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1 */}
             <Route path="commerce/recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
 

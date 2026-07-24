@@ -118,6 +118,7 @@ import { createSupplierContentController } from './controllers/supplier-content.
 import { createSupplierSignageReportController } from './controllers/supplier-signage-report.controller.js';
 import { createSupplierCampaignRequestController } from './controllers/supplier-campaign-request.controller.js';
 import { createSupplierSignageMediaController } from './controllers/supplier-signage-media.controller.js';
+import { createStoreSellerRecruitmentBrowseController } from '../../modules/neture/controllers/store-seller-recruitment-browse.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createEventOfferController } from './controllers/event-offer.controller.js';
@@ -280,6 +281,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Supplier Signage Media Authoring (WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1)
   // 공급자 직접 제작·게시(source='supplier', serviceKey='kpa-society') — 기존 HUB/asset-snapshot 조회·복사 경로 재사용
   router.use('/supplier/signage/media', createSupplierSignageMediaController(dataSource, coreRequireAuth as any));
+
+  // Store Seller Recruitment Browse (WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1)
+  // 매장 경영자(kpa:store_owner)가 승인·모집중 판매자 모집을 조회. serviceKey/exposure/status backend 고정.
+  router.use(createStoreSellerRecruitmentBrowseController(dataSource, coreRequireAuth as any));
 
   // Supplier Signage Campaign Report (WO-O4O-SIGNAGE-SUPPLIER-CAMPAIGN-REPORT-API-V1)
   router.use('/supplier/signage', createSupplierSignageReportController(dataSource, coreRequireAuth as any));

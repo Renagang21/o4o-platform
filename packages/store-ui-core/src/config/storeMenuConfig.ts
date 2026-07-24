@@ -279,6 +279,9 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   /commerce/orders 는 매장이 공급자에게 주문한 '구매/발주' 내역(buyer) → '발주 내역'으로 라벨 정비.
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.
       { key: 'orders',   label: '발주 내역', subPath: '/commerce/orders' },
+      // WO-O4O-KPA-SELLER-RECRUITMENT-STORE-CONSUMER-BROWSE-UI-V1: 승인된 판매자 모집 조회·참여(유통 기능).
+      //   KPA 블록 한정 — backend proxy(/kpa/store/seller-recruitments)가 kpa-society 고정. GP/KCos 미추가.
+      { key: 'seller-recruitments', label: '판매자 모집', subPath: '/commerce/seller-recruitments' },
       // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
     ]},
