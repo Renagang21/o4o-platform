@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "칼디플러스정|A12AX|750밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "1dfd29f3-f85e-cb0c-5bce-c4f56b2c3a8f",
+  "anomalies": [],
+  "targetMasters": 4,
+  "koFingerprintKinds": 1,
+  "builtLen": 2742,
+  "builtMd5": "03daab4b749bbe897349da46a6744191",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_flip": 4,
+    "total": 8
+  },
+  "step1_inserted": 4,
+  "step2_flipped": 4,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 4,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

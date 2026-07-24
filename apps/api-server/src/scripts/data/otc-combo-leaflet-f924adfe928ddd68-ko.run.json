@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "비타포린정|A11JA|50밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "3fe8f02e-2336-4780-0515-7b0579c0ae22",
+  "expected": 4,
+  "anomalies": [],
+  "fetched": 4,
+  "easyCanonicalExactly1": 4,
+  "authoredConflict": 0,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1608,
+  "htmlMd5": "7915afcf874db18aeb740caf7304bdd8",
+  "summary": "임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B6 의 보급과 구각염(입…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 4,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "stepA_inserted": 4,
+  "writeActual": {
+    "stepA_inserted": 4,
+    "demoted": 4,
+    "flipped": 4,
+    "audited": 4
+  },
+  "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "deprecatedEasy": 4,
+    "dup": 0
+  }
+}

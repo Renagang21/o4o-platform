@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "잔타뉴정|A02AD01|185밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "f6090ac3-14ad-cd65-2107-dab063e8a97b",
+  "expected": 4,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/4"
+  ],
+  "fetched": 4,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 4,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 4,
+  "htmlLen": 1385,
+  "htmlMd5": "cf3005652308bf240dc5655b9eafef3f",
+  "summary": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "센도스연질캡슐|A11AB|2500IU|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "ddbbddf2-8e4a-c821-6a69-077fb4a99358",
+  "expected": 4,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/4"
+  ],
+  "fetched": 4,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 4,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 4,
+  "htmlLen": 2062,
+  "htmlMd5": "72dd7c8b794bd6601a4f988a064c7eb8",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A1, B1, B2, C,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

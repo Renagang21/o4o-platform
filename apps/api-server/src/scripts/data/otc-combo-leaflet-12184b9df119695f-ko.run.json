@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "메모론에스연질캡슐|A11JC|2밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "20455d4a-3eef-3be4-5d46-32770f31f1d8",
+  "expected": 3,
+  "anomalies": [],
+  "fetched": 3,
+  "easyCanonicalExactly1": 3,
+  "authoredConflict": 0,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1776,
+  "htmlMd5": "c7ce872e56ca1d222e20cc58354cc824",
+  "summary": "눈의 건조감 증상의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 임신수유기, 병중.병후 체력저하때, …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "stepA_inserted": 3,
+  "writeActual": {
+    "stepA_inserted": 3,
+    "demoted": 3,
+    "flipped": 3,
+    "audited": 3
+  },
+  "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "deprecatedEasy": 3,
+    "dup": 0
+  }
+}

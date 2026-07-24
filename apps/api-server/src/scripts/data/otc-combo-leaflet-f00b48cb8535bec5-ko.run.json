@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "툴스속편정|A02AX|62.45밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "e67317f7-40f3-0fa9-c67c-738a36306064",
+  "expected": 4,
+  "anomalies": [],
+  "fetched": 4,
+  "easyCanonicalExactly1": 4,
+  "authoredConflict": 0,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1884,
+  "htmlMd5": "a8c7c8da5da32012e89ea7d4678de19c",
+  "summary": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 4,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "stepA_inserted": 4,
+  "writeActual": {
+    "stepA_inserted": 4,
+    "demoted": 4,
+    "flipped": 4,
+    "audited": 4
+  },
+  "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "deprecatedEasy": 4,
+    "dup": 0
+  }
+}
