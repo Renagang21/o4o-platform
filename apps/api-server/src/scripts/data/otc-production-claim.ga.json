@@ -1047,6 +1047,186 @@
    "masters": 5,
    "op": "KO_EN",
    "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
+  },
+  {
+   "targetFp": "6175c7cfbc6b8b54",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "삐콤씨정|A11JB|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "67a6c8244150d509",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "덴파사캡슐|A01AD|캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "79456d8c2fff00c9",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "바로코민골드정|A11JB|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "7a3c740ee9e83703",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "원더칼-디츄어블정|A12AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "7ebfea340c93bee7",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "트레스오릭스훠트정|A15|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "81f555b1f8c38c77",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "복합탈시드츄어블정|A02AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "84f0ccc6e6c161bc",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "스토프정|A07AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "86ce27ed6717d145",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "비카페롤플러스정|A12AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "8d6181cd7e484a0c",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "레날민정|A11EB|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "8da10ae53a23825a",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "칼디업츄어블정|A12AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "8ed6f9fb16aa7184",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "비오라민골드정|A11JA|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "996ad30df85d3b48",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "스피자임에스정|A09AA|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "9b90a09f2962c569",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "더블락캡슐|A07FA51|캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "9f7f626fecc205eb",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "투엑스비디큐정|A11JC|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "a09214a7cfa42bfb",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "동성정로환에프정|A07XA|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "a8009ef123db1b0f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "덴타포스캡슐|A01AD|캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "add2b07bc1583454",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "비스콘틴엠800정|A11JC|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "b176b6aee4c65b4f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "애니탈삼중정|A02AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "b3c0e43517584a43",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "제스탈정|A09A|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "b69f346969f4961f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "판크론정|A09AA|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch15 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
   }
  ]
 }
