@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "slug": "nico-pat-daily",
+ "translation": {
+  "groupKey": "Nicotine|Adhesive Patch|daily",
+  "title": "Nicotine Patch (Smoking Cessation Aid)",
+  "usageLabel": "How to apply it",
+  "efficacy": "This medicine is used as an aid to smoking cessation.",
+  "usage": "Apply 1 patch every morning as soon as you get up and remove it at bedtime. With clean, washed hands, peel off one side of the backing paper and apply the patch to dry, undamaged, hairless skin (such as the buttock, upper arm or chest), then peel off the rest of the backing paper and press the patch on completely. Refer to the approved product information for the recommended dose and duration of use.",
+  "caution": "If you keep smoking while using this medicine, cardiovascular side effects caused by nicotine may occur more often and more markedly, so it should be used only by people who have stopped smoking completely. Do not use this medicine if you are hypersensitive to it, or if you have a chronic skin disease (psoriasis, chronic dermatitis, urticaria), a generalised skin disease, irritant dermatitis, unstable angina, worsening angina, a myocardial infarction within the past 3 months, the late phase of an acute infarction, severe cardiac arrhythmia, systemic hypertension, peripheral vascular disease, or cerebrovascular disease (acute stroke, cerebrovascular disorder). It must also not be used by women who are pregnant or breastfeeding, by children and adolescents under 18 years of age, or by non-smokers and occasional smokers. Consult a doctor or pharmacist before using this medicine if you have gastritis, peptic ulcer, occlusive arterial disease, stable angina, heart failure, decompensated heart failure, myocardial infarction, cardiac arrhythmia, vasospasm, uncontrolled hypertension, an arterial bypass graft or angioplasty, renal failure, hepatic failure, diabetes, hyperthyroidism, or phaeochromocytoma. Consult a doctor or pharmacist if you use this medicine together with paracetamol, caffeine, imipramine, oxazepam, pentazocine, propranolol, theophylline, warfarin, oestrogens, lignocaine, phenacetin, insulin, adrenergic antagonists (such as prazosin or labetalol), flecainide, adrenergic agonists (such as isoprenaline or phenylephrine), propoxyphene, furosemide diuretics, H2 antagonists, beta blockers, tacrine, clozapine, or ropinirole. Stop using it immediately and consult a doctor or pharmacist if you experience redness, a burning sensation, blisters, skin rash or tightness at the application site, agitation, anxiety, nervousness, insomnia, abnormal dreams, headache, dizziness, movement disorder, impaired attention, drowsiness, emotional instability, irritability, depression, confusion, tremor, palpitations, hypertension, flushing, chest pain, difficulty breathing, arrhythmia, cough, upper respiratory infection, nausea, abdominal pain, indigestion, vomiting, constipation, diarrhoea, abdominal distension, dry mouth, skin reactions at the application site, excessive sweating, skin discolouration, cutaneous vasculitis, pain or discomfort at the application site, muscle pain, arthritis, weakness, joint pain, muscle spasm, back pain, urticaria, rash, itching, angioedema or an anaphylactoid reaction. Store below 25 degrees Celsius away from moisture and light, and keep out of reach of children.",
+  "summaryTable": {
+   "Category": "Over-the-counter",
+   "Ingredient": "Nicotine",
+   "Form": "Adhesive Patch"
+  }
+ }
+}

@@ -10,6 +10,10 @@
  * dry-run 기본. apply: --apply + TOPICAL_APPLY_CONFIRM=YES (이중게이트).
  * Usage: PROXY_PORT=54xx npx tsx src/scripts/drug-otc-topical-patch-store-leaflet-batch.ts \
  *   --ingredient 케토프로펜 --form 플라스타 --title "..." --en <en.json> --effkey "…" --slugbase keto-plaster-a [--wo-id WO-...] [--apply] [--max N]
+ * 제품명에 성분이 괄호로 표기되지 않는 한방·복합 첩부제는 --ingredient 대신 --names 로 정확 제품명 집합을 지정한다(V9).
+ *   --names "시프겔한방파프카타플라스마;해동본방황제고카타플라스마" [--ingredient-label 펠비낙]
+ *   --ingredient-label 은 제품명·허가정보에 성분이 명시된 경우에만 지정한다. 미지정 시 요약표에서 성분 행을 생략하며,
+ *   원문에 없는 성분을 추정해 표기하지 않는다(공식 원문에 없는 의료 사실 생성 금지).
  *   WO ID 해석 우선순위: --wo-id > EN config(woId ?? wo) > env TOPICAL_WO_ID > 없으면 실행 중지 (하드코딩 금지)
  */
 import 'dotenv/config';
@@ -116,14 +120,14 @@ function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[�
 /** 첩부제 전용: '바르는 방법' 라벨 금지. 부착 신호가 있으면 '붙이는 방법', 그 외 '사용 방법'. */
 function usageLabelOf(u: string): string { if (/붙이|붙입|부착|첩부/.test(u)) return '붙이는 방법'; return '사용 방법'; }
 function efficacyOf(content: string): string { let sec = easySections(content || ''); if (!Object.keys(sec).length) sec = freeSections(content || ''); for (const [t, b] of Object.entries(sec)) if (/효능|효과|적응/.test(t)) return cleanText(b); return ''; }
-function composePatchKo(name: string, content: string, title: string): { html: string; missing: string[] } {
+function composePatchKo(name: string, content: string, title: string, ingredientLabel = ''): { html: string; missing: string[] } {
   let sec = easySections(content || ''); if (Object.keys(sec).length === 0) sec = freeSections(content || '');
   const get = (re: RegExp): string => { for (const [t, b] of Object.entries(sec)) if (re.test(t)) return b.trim(); return ''; };
   const efficacy = cleanText(get(/효능|효과|적응/));
   const usage = splitSentences(normalizeOralMisphrase(get(/용법|용량/), content)).join('\n\n');
   const warning = normalizeOralMisphrase(get(/^경고|(?<!주의)경고/), content); // 광과민(케토프로펜) 등 경고 섹션 보존 — 누락=안전정보 약화 금지
   const cautionRaw = normalizeOralMisphrase(get(/주의/), content); const adverse = normalizeOralMisphrase(get(/이상반응|부작용/), content);
-  const ingredientKo = ingredientOf(name), form = patchFormOf(name);
+  const ingredientKo = ingredientOf(name) || ingredientLabel, form = patchFormOf(name);
   const interact = normalizeOralMisphrase(get(/상호작용/), content);
   const cautionParts = [...splitSentences(warning), ...splitSentences(cautionRaw), ...splitSentences(interact)];
   if (adverse) cautionParts.push('이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: ' + cleanText(adverse));
@@ -139,9 +143,13 @@ interface Row { id: string; name: string; spec: string; content: string; easyId:
 async function main(): Promise<void> {
   const INGREDIENT = arg('ingredient'), FORM = arg('form'), TITLE = arg('title'), EN_FILE = arg('en'), SLUGBASE = arg('slugbase');
   const EFFKEYS = arg('effkey').split(',').map((s) => s.trim()).filter(Boolean);
+  const NAMES = arg('names').split(';').map((s) => s.trim()).filter(Boolean);
+  const ING_LABEL = arg('ingredient-label');
   const MAX = parseInt(arg('max', '9999'), 10);
   const APPLY = process.argv.includes('--apply') && process.env.TOPICAL_APPLY_CONFIRM === 'YES';
-  if (!INGREDIENT || !FORM || !TITLE || !EN_FILE || !SLUGBASE || !EFFKEYS.length) throw new Error('--ingredient --form --title --en --slugbase --effkey 필요');
+  if (!TITLE || !EN_FILE || !SLUGBASE || !EFFKEYS.length) throw new Error('--title --en --slugbase --effkey 필요');
+  // target 고정 방식은 둘 중 하나: 성분 괄호 표기(--ingredient +--form) 또는 정확 제품명 집합(--names).
+  if (!NAMES.length && (!INGREDIENT || !FORM)) throw new Error('--ingredient --form 또는 --names 필요');
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const enConfig = JSON.parse(fs.readFileSync(EN_FILE, 'utf8')) as { wo?: string; woId?: string; translation: DrugOtcEnTranslation };
   const enBuilt = buildDrugOtcEnConsumerHtml(enConfig.translation);
@@ -150,13 +158,14 @@ async function main(): Promise<void> {
   if (!WO_ID) throw new Error('WO ID 필요: --wo-id 또는 EN config의 woId/wo 또는 env TOPICAL_WO_ID 중 하나를 지정하십시오');
   const ds = new DataSource({ type: 'postgres', host: process.env.PROXY_HOST ?? '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5455', 10), username: process.env.DB_USERNAME, password: process.env.DB_PASSWORD, database: process.env.DB_NAME, entities: [], synchronize: false, logging: ['error'], ssl: false, extra: { statement_timeout: 120000 } });
   await ds.initialize();
-  const summary: any = { wo: WO_ID, ingredient: INGREDIENT, form: FORM, slugbase: SLUGBASE, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
+  const summary: any = { wo: WO_ID, ingredient: INGREDIENT || ING_LABEL, names: NAMES, form: FORM, slugbase: SLUGBASE, mode: APPLY ? 'APPLY' : 'dry-run', producedFps: [], heldFps: [], masters: 0, koWrite: 0, enWrite: 0 };
   try {
     const coarse: Row[] = await ds.query(`SELECT pm.id::text id, pm.name, pm.specification spec, es.content, es.id::text "easyId"
       FROM product_masters pm JOIN LATERAL (SELECT id, content FROM shared_product_descriptions s WHERE s.master_id=pm.id AND s.source_type=$3 AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL ORDER BY length(s.content) DESC LIMIT 1) es ON true
-      WHERE pm.name LIKE '%('||$1||')%' AND pm.name LIKE '%'||$2||'%' AND pm.name NOT LIKE '%수출%'
+      WHERE ${NAMES.length ? `pm.name = ANY($1::text[]) AND ($2='' OR pm.name LIKE '%'||$2||'%')` : `pm.name LIKE '%('||$1||')%' AND pm.name LIKE '%'||$2||'%'`}
+        AND pm.name NOT LIKE '%수출%' AND pm.name NOT LIKE '%군납%'
         AND NOT EXISTS (SELECT 1 FROM shared_product_descriptions a WHERE a.master_id=pm.id AND a.source_type IN ('mfds_drug_otc','nutrition_combo','o4o_drug_otc_topical') AND a.description_type='STORE' AND a.status='canonical' AND a.deleted_at IS NULL)
-      ORDER BY pm.id`, [INGREDIENT, FORM, EASY]);
+      ORDER BY pm.id`, [NAMES.length ? NAMES : INGREDIENT, FORM, EASY]);
     const withFp = coarse.map((r) => ({ ...r, ...fingerprintOf(r.name, r.spec, r.content) }));
     const byFp = new Map<string, Row[]>();
     for (const r of withFp) {
@@ -172,7 +181,7 @@ async function main(): Promise<void> {
       const eff = efficacyOf(rows[0].content);
       if (!EFFKEYS.some((k) => eff.includes(k))) { summary.heldFps.push({ fp, n: rows.length, reason: 'HOLD_EFF_MISMATCH', effSample: eff.slice(0, 40) }); continue; }
       const koByMaster = new Map<string, { html: string; easyId: string }>(); const koMd5 = new Set<string>(); let miss = 0;
-      for (const r of rows) { const k = composePatchKo(r.name, r.content, TITLE); if (k.missing.length) miss++; koByMaster.set(r.id, { html: k.html, easyId: r.easyId }); koMd5.add(md5(k.html)); }
+      for (const r of rows) { const k = composePatchKo(r.name, r.content, TITLE, ING_LABEL); if (k.missing.length) miss++; koByMaster.set(r.id, { html: k.html, easyId: r.easyId }); koMd5.add(md5(k.html)); }
       // 첩부제 전용 가드: 경구 표현 잔존 금지 + '바르는 방법' 라벨 혼입 금지
       if (miss || koMd5.size !== 1 || hasOralMisphrase([...koByMaster.values()][0].html)) { summary.heldFps.push({ fp, n: rows.length, reason: 'HOLD_KO', miss, md5: koMd5.size }); continue; }
       const masterIds = rows.map((r) => r.id).sort();

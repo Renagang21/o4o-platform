@@ -1,0 +1,33 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "니코스탑-10패취(니코틴)",
+  "니코프리패취(니코틴)"
+ ],
+ "form": "",
+ "slugbase": "nico-pat-stage10",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a61bea849d845e67",
+   "n": 11
+  },
+  {
+   "fp": "b6fbb29b4785d358",
+   "n": 4
+  },
+  {
+   "fp": "260acf26d6d44353",
+   "n": 3
+  },
+  {
+   "fp": "7867b38d704db949",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 21,
+ "koWrite": 84,
+ "enWrite": 42
+}

@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "니코스탑-20패취(니코틴)"
+ ],
+ "form": "",
+ "slugbase": "nico-pat-stage20",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "ed4e0a1b1d886df4",
+   "n": 8
+  },
+  {
+   "fp": "25a362526bc9fe41",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 12,
+ "koWrite": 48,
+ "enWrite": 24
+}
