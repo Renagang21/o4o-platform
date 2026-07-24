@@ -2202,6 +2202,256 @@
    "op": "oral-combo-leaflet",
    "status": "DONE",
    "note": "GA-V7 batch19 DONE (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "groupKey": "훼리큐캡슐|B03AE01|326.1밀리그램|캡슐",
+   "targetFp": "5f27faf87170664f",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 5,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "훼리탑에프캡슐|B03AE01|326.1밀리그램|캡슐",
+   "targetFp": "e166d428b3837801",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 5,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "헤모테인캡슐|B03AE01|155밀리그램|캡슐",
+   "targetFp": "e9fb1999c2ff6b38",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 5,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "신일니코틴산아미드정|A11HA01|500밀리그램|정",
+   "targetFp": "2bc8b7e25d71d783",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마그엘디연질캡슐|A11AA03|250밀리그램|연질캡슐",
+   "targetFp": "32f57c4c2cdf92f4",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "키드칼골드츄어블정|A11AA03|2밀리그램|정",
+   "targetFp": "58f373ac158ca1d0",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마이칼디정|A12AX|1139밀리그램|정",
+   "targetFp": "c0b1bcb3851f00f8",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "액티나민플러스정|A11JC|600밀리그램|정",
+   "targetFp": "c2814f0018bd5219",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마그네스디정|A12CC|940밀리그램|정",
+   "targetFp": "c33f1caa150b88ee",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "페리닥터캡슐|B03AE01|155밀리그램|캡슐",
+   "targetFp": "c5514ac316e72c77",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "비오틴골드정5밀리그램|A11HA05|5밀리그램|정",
+   "targetFp": "c5c19a5b0818aad0",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "맥스디스정|A12AX|750밀리그램|정",
+   "targetFp": "c660f9d510210ca8",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "맥스텐정|A09AA|20밀리그램|정",
+   "targetFp": "cde4c3ddbc6aa259",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "뉴믹스탈삼중정|A02AX|63.63밀리그램|정",
+   "targetFp": "cef74f4555ecabec",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "하이비날골드정|A11JB|555.6밀리그램|정",
+   "targetFp": "d0dd8309bec378b2",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알피렌연질캡슐|A11JB|92.6밀리그램|연질캡슐",
+   "targetFp": "d22f0699dce59148",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "그루타제정|A09AA|175밀리그램|정",
+   "targetFp": "d46a59f5f8834899",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "구아내정|A11JC|10밀리그램|정",
+   "targetFp": "de729e4abbd19d81",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "토코엔지연질캡슐|A11JB|500밀리그램|연질캡슐",
+   "targetFp": "ded56e0889085293",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "씨이멕스연질캡슐|A11JA|500밀리그램|연질캡슐",
+   "targetFp": "e33447a740b0cd99",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "아이비즈연질캡슐|A11JC|2밀리그램|연질캡슐",
+   "targetFp": "e45802b7fa86153c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알파파워정|A11JC|3밀리그램|정",
+   "targetFp": "e6a1b85b9cad15ad",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "비맥스메타정|A11EX|95밀리그램|정",
+   "targetFp": "e6ba77ca6bd6a4ff",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "헤모포민에스35정|B03AE10|125밀리그램|정",
+   "targetFp": "e702028500b93259",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "쎄라투연질캡슐|A11JB|250밀리그램|연질캡슐",
+   "targetFp": "ea261be8a11b6b1e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
   }
  ]
 }

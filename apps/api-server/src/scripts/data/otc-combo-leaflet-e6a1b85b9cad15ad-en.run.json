@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "알파파워정|A11JC|3밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "3a06c568-7b9e-265b-88e5-b1cfff7a3ed8",
+  "anomalies": [],
+  "targetMasters": 4,
+  "koFingerprintKinds": 1,
+  "builtLen": 3196,
+  "builtMd5": "1e8b4d210aec7098097d5b4c0a5d3322",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_flip": 4,
+    "total": 8
+  },
+  "step1_inserted": 4,
+  "step2_flipped": 4,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 4,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

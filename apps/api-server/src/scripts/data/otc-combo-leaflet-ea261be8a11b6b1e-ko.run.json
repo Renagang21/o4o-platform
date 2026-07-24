@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "쎄라투연질캡슐|A11JB|250밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "a9ab2d08-598c-2cb0-20c6-1f419a6e9f2c",
+  "expected": 4,
+  "anomalies": [],
+  "fetched": 4,
+  "easyCanonicalExactly1": 4,
+  "authoredConflict": 0,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1877,
+  "htmlMd5": "726c0ae568e85a26f18a26ff8b5de0eb",
+  "summary": "노년기의 비타민 E의 보급과 말초혈행장애, 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 4,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "stepA_inserted": 4,
+  "writeActual": {
+    "stepA_inserted": 4,
+    "demoted": 4,
+    "flipped": 4,
+    "audited": 4
+  },
+  "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "deprecatedEasy": 4,
+    "dup": 0
+  }
+}

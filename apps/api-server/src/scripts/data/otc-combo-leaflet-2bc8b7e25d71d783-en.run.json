@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "신일니코틴산아미드정|A11HA01|500밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "633c70ed-f28b-24db-9c07-936036ee7ec6",
+  "anomalies": [],
+  "targetMasters": 4,
+  "koFingerprintKinds": 1,
+  "builtLen": 1863,
+  "builtMd5": "b814f7b8b2e14f7d3bc9fb4106d8c7e3",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_flip": 4,
+    "total": 8
+  },
+  "step1_inserted": 4,
+  "step2_flipped": 4,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 4,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

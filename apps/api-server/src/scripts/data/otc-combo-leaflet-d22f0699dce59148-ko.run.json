@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "알피렌연질캡슐|A11JB|92.6밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "4f498dd2-1e84-e3ca-a380-22ee19ceba8f",
+  "expected": 4,
+  "anomalies": [],
+  "fetched": 4,
+  "easyCanonicalExactly1": 4,
+  "authoredConflict": 0,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2239,
+  "htmlMd5": "a775c66fd1a3267c733b06c8db72f5a0",
+  "summary": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 4,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "stepA_inserted": 4,
+  "writeActual": {
+    "stepA_inserted": 4,
+    "demoted": 4,
+    "flipped": 4,
+    "audited": 4
+  },
+  "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "deprecatedEasy": 4,
+    "dup": 0
+  }
+}

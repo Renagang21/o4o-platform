@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "뉴믹스탈삼중정|A02AX|63.63밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "0d27485e-d52f-6996-6a21-609527746f8b",
+  "anomalies": [],
+  "targetMasters": 4,
+  "koFingerprintKinds": 1,
+  "builtLen": 2831,
+  "builtMd5": "6b7c1557317c37bc3b991c634fccad63",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_flip": 4,
+    "total": 8
+  },
+  "step1_inserted": 4,
+  "step2_flipped": 4,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 4,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

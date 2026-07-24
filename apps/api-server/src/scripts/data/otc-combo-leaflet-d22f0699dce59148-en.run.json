@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "알피렌연질캡슐|A11JB|92.6밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "4f498dd2-1e84-e3ca-a380-22ee19ceba8f",
+  "anomalies": [],
+  "targetMasters": 4,
+  "koFingerprintKinds": 1,
+  "builtLen": 3608,
+  "builtMd5": "2a6d9c5745990a71a8a6f5a68f52bae7",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 4,
+    "STEP2_flip": 4,
+    "total": 8
+  },
+  "step1_inserted": 4,
+  "step2_flipped": 4,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 4,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

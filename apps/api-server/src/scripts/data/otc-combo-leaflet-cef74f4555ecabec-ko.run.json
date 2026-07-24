@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "뉴믹스탈삼중정|A02AX|63.63밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "0d27485e-d52f-6996-6a21-609527746f8b",
+  "expected": 4,
+  "anomalies": [],
+  "fetched": 4,
+  "easyCanonicalExactly1": 4,
+  "authoredConflict": 0,
+  "anyCanonical": 4,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1878,
+  "htmlMd5": "51855c1b88b01e75ec6b91207f181996",
+  "summary": "소화성 궤양에 따른 다음 증상의 개선: 위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 4,
+    "STEP_B_easy_demote": 4,
+    "STEP_B_authored_flip": 4,
+    "audit": 4
+  },
+  "stepA_inserted": 4,
+  "writeActual": {
+    "stepA_inserted": 4,
+    "demoted": 4,
+    "flipped": 4,
+    "audited": 4
+  },
+  "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "deprecatedEasy": 4,
+    "dup": 0
+  }
+}

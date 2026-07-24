@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "헤모테인캡슐|B03AE01|155밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "c688d0ae-930d-85dd-318f-74d8a0a3500e",
+  "anomalies": [],
+  "targetMasters": 5,
+  "koFingerprintKinds": 1,
+  "builtLen": 3342,
+  "builtMd5": "9b96aee4ac27e141b0dc128f82d38d04",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 5,
+    "STEP2_flip": 5,
+    "total": 10
+  },
+  "step1_inserted": 5,
+  "step2_flipped": 5,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 5,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}
