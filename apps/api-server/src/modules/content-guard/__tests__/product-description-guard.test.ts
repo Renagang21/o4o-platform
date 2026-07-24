@@ -608,3 +608,34 @@ describe('engine', () => {
     expect(r.postGuardStatus).toBe('NOT_APPLICABLE');
   });
 });
+
+// ── WO-O4O-HFF-LIQUID: 액상 mL 표시 기준량 차원 인지 검증 (PRE-SRC-BASIS) ──
+describe('액상 mL 기준량 (PRE-SRC-BASIS 차원 인지)', () => {
+  const liq = (over: Partial<import('../product-description-guard.types.js').GuardProductInput>): import('../product-description-guard.types.js').GuardProductInput => ({
+    candidateId: 'ml-fixture', productName: '액상제품', manufacturer: '(주)제조사', statementNo: '00000001', category: 'hff',
+    source: { mainFunction: '식이섬유 보충', baseStandard: '식이섬유 : 표시량(4,200 mg/100 mL)의 80% 이상', intake: '1일 1회 1병', caution: '', dosageForm: '액상' },
+    grounding: { declaredAmount: { value: 4200, unit: 'mg', basisAmount: 100, basisUnit: 'mL' }, serving: { unitType: 'liquid', unitWeight: null, unitWeightUnit: null, unitsPerServing: 1, servingsPerDay: 1 } } as any,
+    drafts: { ko: '', en: '' }, ...over,
+  });
+  const basisRule = (r: ReturnType<typeof runGuard>) => r.findings.find((f) => f.ruleId.startsWith('PRE-SRC-BASIS'));
+
+  it('mL 기준량 원문 ↔ mL 입력 = MATCH (UNVERIFIABLE 오탐 아님)', () => {
+    const r = runGuard(liq({}), { phase: 'pre' });
+    expect(basisRule(r)?.ruleId).toBe('PRE-SRC-BASIS-001'); // PASS(MATCH)
+    expect(r.findings.map((f) => f.ruleId)).not.toContain('PRE-SRC-BASIS-UNVERIFIABLE-003');
+  });
+  it('mL 입력 ↔ mg/g 원문(차원 불일치) = UNVERIFIABLE (숫자 우연일치 MATCH 방지)', () => {
+    const r = runGuard(liq({
+      source: { mainFunction: '식이섬유 보충', baseStandard: '식이섬유 : 표시량(4,200 mg/100 g)의 80% 이상', intake: '1일 1회 1병', caution: '', dosageForm: '분말' },
+      grounding: { declaredAmount: { value: 4200, unit: 'mg', basisAmount: 100, basisUnit: 'mL' }, serving: { unitType: 'liquid', unitWeight: null, unitWeightUnit: null, unitsPerServing: 1, servingsPerDay: 1 } } as any,
+    }), { phase: 'pre' });
+    expect(basisRule(r)?.ruleId).toBe('PRE-SRC-BASIS-UNVERIFIABLE-003');
+  });
+  it('mg/g 고형 경로는 회귀 불변 (mL 확장이 질량 검증을 바꾸지 않음)', () => {
+    const r = runGuard(liq({
+      source: { mainFunction: '아연 보충', baseStandard: '아연 : 표시량(8.5 mg/4,000 mg)의 80~150%', intake: '1일 1회 1정', caution: '', dosageForm: '정제' },
+      grounding: { declaredAmount: { value: 8.5, unit: 'mg', basisAmount: 4000, basisUnit: 'mg' }, serving: { unitType: 'tablet', unitWeight: null, unitWeightUnit: null, unitsPerServing: 1, servingsPerDay: 1 } } as any,
+    }), { phase: 'pre' });
+    expect(basisRule(r)?.ruleId).toBe('PRE-SRC-BASIS-001');
+  });
+});

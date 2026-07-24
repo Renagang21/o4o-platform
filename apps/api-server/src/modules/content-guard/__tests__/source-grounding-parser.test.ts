@@ -271,3 +271,33 @@ describe('벌크 원료 판정', () => {
     expect(isBulkMaterial(SRV.antibio).bulk).toBe(false);
   });
 });
+
+// ── WO-O4O-HFF-LIQUID: 액상 mL 기준량 지원 (parseBasis) ──────────────────────
+describe('액상 mL 기준량 (parseBasis mL 확장)', () => {
+  it('/100ml (공백 없음) 을 mL 기준량으로 읽는다', () => {
+    const r = parseBasis('식이섬유: 4200mg/100ml (표시량의 80% 이상)');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind === 'PARSED') expect(r.value).toEqual({ amount: 100, unit: 'mL' });
+  });
+  it('/250 mL (공백) 대문자 L 을 읽는다', () => {
+    const r = parseBasis('비타민C : 100 mg / 250 mL (표시량의 80~150%)');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind === 'PARSED') expect(r.value).toEqual({ amount: 250, unit: 'mL' });
+  });
+  it('전각 ㎖ 기준량을 읽는다', () => {
+    const r = parseBasis('마그네슘 : 표시량(60 mg/50 ㎖)의 90~120%');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind === 'PARSED') expect(r.value).toEqual({ amount: 50, unit: 'mL' });
+  });
+  it('"1병(100mL)" 용기 기준량을 읽는다', () => {
+    const r = parseBasis('식이섬유 : 표시량 / 1병(100mL)');
+    expect(r.kind).toBe('PARSED');
+    if (r.kind === 'PARSED') expect(r.value).toEqual({ amount: 100, unit: 'mL' });
+  });
+  it('mg/g 기준량은 회귀 불변 (mL 추가가 질량 파싱을 바꾸지 않음)', () => {
+    const a = parseBasis('아연 : 표시량(8.5 mg/4,000 mg)의 80~150%');
+    const b = parseBasis('칼슘 : 표시량(230 mg/30 g)의 80~150%');
+    expect(a.kind === 'PARSED' && a.value).toEqual({ amount: 4000, unit: 'mg' });
+    expect(b.kind === 'PARSED' && b.value).toEqual({ amount: 30, unit: 'g' });
+  });
+});

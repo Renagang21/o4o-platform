@@ -40,8 +40,15 @@ export type ParseOutcome<T> =
 export interface ParsedBasis {
   /** 표시 기준량 수치 */
   amount: number;
-  /** 'mg' | 'g' */
-  unit: 'mg' | 'g';
+  /** 'mg' | 'g' | 'mL'(액상 부피 기준량) */
+  unit: 'mg' | 'g' | 'mL';
+}
+
+/** 기준량 단위 정규화 — 'ml'/'㎖' → 'mL', 'g' 보존, 그 외 'mg'. (질량 mg/g · 부피 mL) */
+function normBasisUnit(u: string): 'mg' | 'g' | 'mL' {
+  const x = u.toLowerCase().replace(/\s/g, '');
+  if (x === 'ml' || u === '㎖') return 'mL';
+  return x === 'g' ? 'g' : 'mg';
 }
 
 export interface ParsedServing {
@@ -150,22 +157,36 @@ export function parseBasis(baseStandard: string): ParseOutcome<ParsedBasis> {
   //   "프로바이오틱스 수(2 g 당) : 표시량 이상 ( 표시량 : 215,000,000(2.15억) CFU )").
   // 이 형태를 못 읽고 ABSENT 를 돌려주면 **"다른 표기법"을 "원문에 없음"으로 단정**하게 된다
   // — 이 모듈이 막으려던 실패유형 ①(부재를 허용으로)이 파서 자신에게 재현되는 것이다.
+  // ⚠️ mL 은 viaDang("N mL당")에 넣지 않는다 — "세균수 : 1 mL당 100 이하"(미생물 한도)를
+  //    원료 기준량으로 오독한다(액상 실측: 아연 8.5mg/40ml 인데 "1 mL당" 을 40 대신 1 로 파싱 → MISMATCH 오BLOCK).
+  //    액상 mL 기준량은 반드시 슬래시형(`/40 ml`·`/1병(100mL)`)으로만 인정한다. 질량 "N g 당"은 기존대로 유지.
   const viaDang = b.match(/([\d,.]+)\s*(mg|g)\s*당/i);
   if (viaDang) {
-    return { kind: 'PARSED', value: { amount: num(viaDang[1]), unit: viaDang[2].toLowerCase() as 'mg' | 'g' }, evidence: viaDang[0] };
+    return { kind: 'PARSED', value: { amount: num(viaDang[1]), unit: normBasisUnit(viaDang[2]) }, evidence: viaDang[0] };
   }
 
   if (!/[/]/.test(b)) {
     if (!/표시량/.test(b)) return { kind: 'ABSENT', reason: '원문에 표시량 표기 없음' };
-    // 표시량은 있는데 분모를 못 찾았다 → **중량 토큰이 있으면 "못 읽은 것"이지 "없는 것"이 아니다**
-    return /[\d,.]+\s*(mg|g)\b/i.test(b)
-      ? { kind: 'PARSE_FAILED', reason: '표시량과 중량 표기는 있으나 기준량으로 연결하지 못했습니다', raw: b.slice(0, 120) }
+    // 표시량은 있는데 분모를 못 찾았다 → **중량·부피 토큰이 있으면 "못 읽은 것"이지 "없는 것"이 아니다**
+    return /[\d,.]+\s*(mg|g|mL|ml|㎖)\b/i.test(b)
+      ? { kind: 'PARSE_FAILED', reason: '표시량과 중량/부피 표기는 있으나 기준량으로 연결하지 못했습니다', raw: b.slice(0, 120) }
       : { kind: 'ABSENT', reason: '원문에 표시 기준량(분모) 표기 없음' };
   }
 
-  // 기준량이 "1포(2.5g)" 형태 — 못 읽으면 근거가 **있는데** "확정 불가" 오분류 (결손 #2)
-  const viaUnit = b.match(/[/]\s*\d*\s*(?:포|스틱|캡슐|캅셀|정)\s*\(\s*([\d,.]+)\s*(mg|g)\s*\)/i);
-  if (viaUnit) return { kind: 'PARSED', value: { amount: num(viaUnit[1]), unit: viaUnit[2].toLowerCase() as 'mg' | 'g' }, evidence: viaUnit[0] };
+  // 기준량이 "1포(2.5g)" · "1병(100mL)" 형태 — 못 읽으면 근거가 **있는데** "확정 불가" 오분류 (결손 #2)
+  const viaUnit = b.match(/[/]\s*\d*\s*(?:포|스틱|캡슐|캅셀|정|병|앰플|파우치|팩)\s*\(\s*([\d,.]+)\s*(mg|g|mL|ml|㎖)\s*\)/i);
+  if (viaUnit) return { kind: 'PARSED', value: { amount: num(viaUnit[1]), unit: normBasisUnit(viaUnit[2]) }, evidence: viaUnit[0] };
+
+  // 액상 mL 기준량은 **원료 표시량(값+단위) 바로 뒤의 슬래시**로만 인정한다 (`8.5 mg/40 mL`·`4,200mg/100ml`).
+  //   미생물 한도 "세균수 : 100 이하/1mL"(슬래시 앞이 '이하'—단위 아님)를 원료 기준량으로 오독하지 않기 위함이다.
+  //   ⚠️ 그래서 아래 numbered/bare 에는 mL 을 넣지 않는다(미생물 `/1mL` 오탐 차단). mL 은 오직 이 매처에서만.
+  const mlBasis = b.match(/([\d][\d,.]*)\s*(?:mg|g|μg|mcg|㎍|IU)\s*(?:RAE|RE|α-?TE|NE|DFE)?\s*[/]\s*([\d][\d,.]*)\s*(mL|ml|㎖)(?![a-zA-Z가-힣])/i);
+  if (mlBasis) {
+    if (isMalformedNumber(mlBasis[2])) return { kind: 'ABNORMAL', reason: `기준량 숫자 표기가 비정상입니다("${mlBasis[2]}")`, raw: b.slice(0, 120) };
+    const amount = num(mlBasis[2]);
+    if (!(amount > 0)) return { kind: 'ABNORMAL', reason: `기준량이 0 이하입니다(${amount})`, raw: b.slice(0, 120) };
+    return { kind: 'PARSED', value: { amount, unit: 'mL' }, evidence: mlBasis[0] };
+  }
 
   // `\b` 는 전각 ㎎ 뒤에서 성립하지 않는다 → normalizeSource 로 mg 화 + 부정선행 (결손 #3)
   //
@@ -181,12 +202,12 @@ export function parseBasis(baseStandard: string): ParseOutcome<ParsedBasis> {
     }
     const amount = num(numbered[1]);
     if (!(amount > 0)) return { kind: 'ABNORMAL', reason: `기준량이 0 이하입니다(${amount})`, raw: b.slice(0, 120) };
-    return { kind: 'PARSED', value: { amount, unit: numbered[2].toLowerCase() as 'mg' | 'g' }, evidence: numbered[0] };
+    return { kind: 'PARSED', value: { amount, unit: normBasisUnit(numbered[2]) }, evidence: numbered[0] };
   }
-  // 숫자 없는 "CFU/g"|"CFU/mg" → 1 단위 기준(벌크 per-단위). viaDang/viaUnit/numbered 가 모두 실패한 경우만 도달.
+  // 숫자 없는 "CFU/g"|"CFU/mg" → 1 단위 기준(벌크 per-단위). viaDang/viaUnit/mlBasis/numbered 가 모두 실패한 경우만 도달.
   const bare = b.match(/[/]\s*(mg|g)(?![a-zA-Z가-힣])/i);
   if (!bare) return { kind: 'PARSE_FAILED', reason: '기준량 분모를 읽지 못했습니다', raw: b.slice(0, 120) };
-  return { kind: 'PARSED', value: { amount: 1, unit: bare[1].toLowerCase() as 'mg' | 'g' }, evidence: bare[0] };
+  return { kind: 'PARSED', value: { amount: 1, unit: normBasisUnit(bare[1]) }, evidence: bare[0] };
 }
 
 // ─── 섭취 ────────────────────────────────────────────────────────────────────

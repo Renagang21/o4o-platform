@@ -72,23 +72,23 @@ const SPEC_RE = new RegExp(
   '(?:표시량\\s*)?\\(?\\s*' +                                            // 표시량 접두 누락 + 선행 괄호 허용
   '([\\d][\\d,.]*)\\s*(mg|g|μg|mcg|IU)' +                                // 값 + 단위
   '\\s*(?:RAE|RE|α-?TE|NE|DFE)?\\s*' +                                   // 수식어(선택)
-  '\\/\\s*([\\d][\\d,.]*)\\s*(mg|g)\\s*\\)?' +                           // 기준량
-  // 비율(필수). 표준형 `)의 X~Y%` + 괄호형 `(표시량의 X~Y%)`(기준량 뒤 괄호 안에 표시량의+비율) 모두 허용.
-  '\\s*\\(?\\s*(?:의\\s*)?(?:표시량의\\s*)?(?:([\\d.]+\\s*[~∼\\-]\\s*[\\d.]+)\\s*%|(이상))\\s*\\)?', // 비율(필수)
+  '\\/\\s*([\\d][\\d,.]*)\\s*(mg|g|mL|ml|㎖)\\s*\\)?' +                   // 기준량(액상 mL 허용)
+  // 비율(필수). 표준형 `)의 X~Y%` + 괄호형 `(표시량의 X~Y%)` + **하한 백분율 `X% 이상`**(액상 실측) + 접미 `이상`.
+  '\\s*\\(?\\s*(?:의\\s*)?(?:표시량의\\s*)?(?:([\\d.]+\\s*[~∼\\-]\\s*[\\d.]+)\\s*%|([\\d.]+)\\s*%\\s*이상|(이상))\\s*\\)?', // 비율(필수)
   'gi',
 );
-const uNorm = (u: string): string => { const x = u.replace(/\s/g, ''); if (/^(mcg|μg)$/i.test(x)) return 'μg'; if (/^iu$/i.test(x)) return 'IU'; return x.toLowerCase() === 'g' ? 'g' : 'mg'; };
+const uNorm = (u: string): string => { const x = u.replace(/\s/g, ''); if (/^(mcg|μg)$/i.test(x)) return 'μg'; if (/^iu$/i.test(x)) return 'IU'; if (/^(ml|㎖)$/i.test(x)) return 'mL'; return x.toLowerCase() === 'g' ? 'g' : 'mg'; };
 const numOf = (s: string): number => parseFloat(s.replace(/,/g, ''));
 
 export interface SpecParse { byKey: Map<string, Spec>; unknownLabels: string[] }
 
 // 느슨한 spec-like 탐지: `라벨 [함량] : [표시량] 값단위[수식어] / 기준단위` — 비율 tail 불요.
-// 기준량이 mg|g 인 것만(오염물 `/kg` 라인 배제). SPEC_RE 가 잡지 못한 규격 라인 검출용(안전망).
+// 기준량이 mg|g|mL 인 것만(오염물 `/kg` 라인 배제). SPEC_RE 가 잡지 못한 규격 라인 검출용(안전망).
 const LOOSE_SPEC_RE = new RegExp(
   '([가-힣A-Za-z0-9()\\-·]{1,20}(?:\\s[가-힣A-Za-z0-9()\\-·]{1,12})?)' +
   '\\s*[:：]\\s*(?:표시량\\s*)?\\(?\\s*' +
   '[\\d][\\d,.]*\\s*(?:mg|g|μg|mcg|IU)\\s*(?:RAE|RE|α-?TE|NE|DFE)?\\s*' +
-  '\\/\\s*[\\d][\\d,.]*\\s*(?:mg|g)\\b',
+  '\\/\\s*[\\d][\\d,.]*\\s*(?:mg|g|mL|ml|㎖)\\b',
   'gi',
 );
 
@@ -102,7 +102,8 @@ export function parseSpecs(base: string): SpecParse {
     const label = m[1].trim(); if (NONFUNC.test(label)) continue;
     const k = classify(label); if (!k) { unknownLabels.push(label); continue; }
     if (byKey.has(k)) continue;
-    byKey.set(k, { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio: m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : '표시량 이상', evidence: m[0].trim() });
+    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : m[7] ? `${m[7].replace(/\s/g, '')}% 이상` : '표시량 이상';
+    byKey.set(k, { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio, evidence: m[0].trim() });
   }
   // 안전망: 값/기준 규격을 가졌으나 SPEC_RE 가 캡처하지 못한 라인은 소실시키지 않고 unknownLabels 로 강제 편입한다.
   // (비율 포맷을 아무리 늘려도 미지 변이는 남으므로 «파싱 못한 규격 라인 있으면 HOLD» 가 안전한 기본값.)

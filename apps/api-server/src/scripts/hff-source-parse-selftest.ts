@@ -18,23 +18,35 @@ let pass = 0, fail = 0; const fails: string[] = [];
 const ok = (cond: boolean, msg: string): void => { if (cond) pass++; else { fail++; fails.push(msg); } };
 const near = (a: number, b: number): boolean => Math.abs(a - b) < 1e-9;
 
-// ── ① parseSpecs 회귀 baseline (기존 동작 불변 증명) — 실측 캡처(2026-07-23, 편집 전) ──
-// key => value|unit|basisAmount|basisUnit. 식이섬유 흡수 등 기존 동작을 그대로 기록(고치지 않음이 목적).
-const SPECS_BASELINE: Record<string, Record<string, string>> = {
+// ── ① parseSpecs 회귀/하드닝 baseline ──
+// key => value|unit|basisAmount|basisUnit.
+//  STABLE = mg|g 기준량 · X~Y% 비율 (기존 정상 데이터) → **바이트 동일 유지 필수**(드리프트 0 증명).
+//  HARDENED = mL 기준량 · `X% 이상` 하한 백분율 (WO-...-LIQUID: SPEC_RE 확장으로 신규 매칭) → 신규 기대값.
+const SPECS_STABLE: Record<string, Record<string, string>> = {
   '프락토올리고당-라벨직접(줄바꿈형·타원료동반 공통)': { '칼슘': '230|mg|30|g', '마그네슘': '110|mg|30|g', '아연': '3.4|mg|30|g', '식이섬유': '3700|mg|30|g' },
   '㎎표기(프락토 라벨직접)': { '식이섬유': '3000|mg|4000|mg', '아연': '8.5|mg|4000|mg', '셀레늄': '55|μg|4000|mg' },
-  '차전자단독(일반라벨+fn식별, X%이상)': {},
-  '난소화성단독(ml기준+X%이상, 일반라벨+fn식별)': {},
-  '다원료동반(프락토+난소화성 원료별보존, ml기준, 일반라인 공존)': {},
-  '폴리덱스트로스단독(base일반라벨, 원료는 fn에서만)': {},
-  '총량+개별(귀리; 총·영양소는 aggregate 분리)': {},
+};
+const SPECS_HARDENED: Record<string, Record<string, string>> = {
+  '차전자단독(일반라벨+fn식별, X%이상)': { '식이섬유': '8000|mg|10000|mg' },
+  '난소화성단독(ml기준+X%이상, 일반라벨+fn식별)': { '비타민B6': '1.5|mg|100|mL', '식이섬유': '4200|mg|100|mL' },
+  '다원료동반(프락토+난소화성 원료별보존, ml기준, 일반라인 공존)': { '식이섬유': '7|g|250|mL', '비타민C': '100|mg|250|mL' },
+  '폴리덱스트로스단독(base일반라벨, 원료는 fn에서만)': { '식이섬유': '4.5|g|15|g' },
+  '총량+개별(귀리; 총·영양소는 aggregate 분리)': { '식이섬유': '13.4|g|34|g' },
 };
 for (const f of FX.fiber as Array<{ case: string; base: string }>) {
-  const base = SPECS_BASELINE[f.case]; if (!base) continue;
+  const stable = SPECS_STABLE[f.case]; const hardened = SPECS_HARDENED[f.case];
+  const expect = stable ?? hardened; if (!expect) continue;
   const sp = parseSpecs(f.base);
   const got: Record<string, string> = {};
   for (const [k, v] of sp.byKey) got[k] = `${v.value}|${v.unit}|${v.basisAmount}|${v.basisUnit}`;
-  ok(JSON.stringify(got) === JSON.stringify(base), `REG parseSpecs 변경됨 [${f.case}] expected=${JSON.stringify(base)} got=${JSON.stringify(got)}`);
+  ok(JSON.stringify(got) === JSON.stringify(expect), `${stable ? 'REG-STABLE 드리프트' : 'REG-HARDENED 불일치'} [${f.case}] expected=${JSON.stringify(expect)} got=${JSON.stringify(got)}`);
+}
+
+// ── ①b SPEC_RE 하드닝 단위 픽스처(mL 기준량 · X% 이상 · 반복행) ──
+for (const t of (FX.specHardening ?? []) as Array<{ case: string; base: string; label: string; expect: string }>) {
+  const sp = parseSpecs(t.base); const v = sp.byKey.get(t.label);
+  const got = v ? `${v.value}|${v.unit}|${v.basisAmount}|${v.basisUnit}|${v.ratio}` : 'MISS';
+  ok(got === t.expect, `SPEC-HARDEN [${t.case}] ${t.label} want=${t.expect} got=${got}`);
 }
 
 // ── ② parseFiberSources 계약 검증 ──

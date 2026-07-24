@@ -106,17 +106,21 @@ function runSourceCrossCheck(input: GuardProductInput): GuardFinding[] {
   }
 
   // ③ 표시 기준량 교차 검증
+  //   질량(mg/g) 은 mg 로 환산 비교, 부피(mL) 는 mL 로 비교한다. **차원(질량 vs 부피)이 다르면**
+  //   숫자만 우연히 일치해도 MATCH 로 오판할 수 있으므로 UNVERIFIABLE 로 강등한다(액상 mL 기준량 지원).
   const pb = parseBasis(base);
-  const declaredBasis = input.grounding.declaredAmount
-    ? input.grounding.declaredAmount.basisUnit === 'g'
-      ? input.grounding.declaredAmount.basisAmount * 1000
-      : input.grounding.declaredAmount.basisAmount
-    : undefined; // 미제공 — "없음 단언" 이 아니다
+  const da = input.grounding.declaredAmount;
+  const dimOf = (u: string): 'mass' | 'vol' => (u === 'mL' ? 'vol' : 'mass');
+  const toCanon = (amt: number, u: string): number => (u === 'g' ? amt * 1000 : amt); // mass→mg · vol→mL(그대로)
+  const declaredBasis = da ? toCanon(da.basisAmount, da.basisUnit) : undefined; // 미제공 — "없음 단언" 이 아니다
+  const declDim = da ? dimOf(da.basisUnit) : undefined;
   const parsedBasisMg: ParseOutcome<number> =
     pb.kind === 'PARSED'
-      ? { kind: 'PARSED', value: pb.value.unit === 'g' ? pb.value.amount * 1000 : pb.value.amount, evidence: pb.evidence }
+      ? declDim && dimOf(pb.value.unit) !== declDim
+        ? { kind: 'PARSE_FAILED', reason: `기준량 단위 차원 불일치(원문 ${pb.value.unit} vs 입력 ${da!.basisUnit}) — 원문 확인 필요`, raw: trunc(base, 120) }
+        : { kind: 'PARSED', value: toCanon(pb.value.amount, pb.value.unit), evidence: pb.evidence }
       : pb;
-  const cb = crossCheckNumber('표시 기준량(mg 환산)', declaredBasis, parsedBasisMg);
+  const cb = crossCheckNumber(declDim === 'vol' ? '표시 기준량(mL)' : '표시 기준량(mg 환산)', declaredBasis, parsedBasisMg);
   out.push(
     cb.status === 'NOT_DECLARED'
       ? { ruleId: 'PRE-SRC-BASIS-NOT-DECLARED-005', severity: 'INFO', status: 'PRECHECK_INFO', language: 'n/a', field: 'grounding.declaredAmount', matchedText: null, sourceEvidence: `BASE_STANDARD: ${trunc(base, 70)}`, message: cb.message, suggestedAction: '원문 파싱값을 확인하십시오.' }
