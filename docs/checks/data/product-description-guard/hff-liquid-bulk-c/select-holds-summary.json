@@ -1,0 +1,9 @@
+{
+ "total": 1683,
+ "byCode": {
+  "HOLD_NO_COMPOSABLE_SPEC": 1539,
+  "HOLD_GROUNDING": 110,
+  "HOLD_SERVING_UNCLEAR": 31,
+  "BULK": 3
+ }
+}
