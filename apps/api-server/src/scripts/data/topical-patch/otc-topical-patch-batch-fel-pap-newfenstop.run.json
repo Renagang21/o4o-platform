@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "뉴펜스탑카타플라스마",
+ "slugbase": "fel-pap-newfenstop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "d2f18832d8d8fd58",
+   "n": 4
+  },
+  {
+   "fp": "6cabe3f369968e8f",
+   "n": 2
+  },
+  {
+   "fp": "c84a23387d5c56ee",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

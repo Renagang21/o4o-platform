@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "안티푸라민쿨카타플라스마",
+ "slugbase": "fel-pap-antiphlamine-cool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "ce01141f94ef5e1a",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

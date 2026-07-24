@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "탑사인카타플라스마",
+ "slugbase": "fel-pap-topsign",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e1239b2936a2e7a1",
+   "n": 3
+  },
+  {
+   "fp": "44c433124ed88ae9",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

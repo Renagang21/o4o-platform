@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "메디파프쿨카타플라스마",
+ "slugbase": "fel-pap-medipap-cool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e1239b2936a2e7a1",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "뉴비낙플라스타",
+ "slugbase": "fel-pla-newbinac",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "5c3b8e88e28a5474",
+   "n": 7
+  }
+ ],
+ "heldFps": [],
+ "masters": 7,
+ "koWrite": 28,
+ "enWrite": 14
+}

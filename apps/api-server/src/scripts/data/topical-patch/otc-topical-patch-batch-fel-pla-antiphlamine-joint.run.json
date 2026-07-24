@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "안티푸라민조인트플라스타",
+ "slugbase": "fel-pla-antiphlamine-joint",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "ded18294a365fe4b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

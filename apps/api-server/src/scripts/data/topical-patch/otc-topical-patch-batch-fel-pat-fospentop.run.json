@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "포스펜탑첩부제",
+ "slugbase": "fel-pat-fospentop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b9a4ac7930f2ed23",
+   "n": 3
+  },
+  {
+   "fp": "49fe4464fe41de0a",
+   "n": 2
+  },
+  {
+   "fp": "b1322038a54595b6",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 7,
+ "koWrite": 28,
+ "enWrite": 14
+}

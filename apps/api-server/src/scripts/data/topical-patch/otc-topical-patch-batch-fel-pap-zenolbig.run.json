@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "제놀빅카타플라스마",
+ "slugbase": "fel-pap-zenolbig",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "2f325acad2fc56e8",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

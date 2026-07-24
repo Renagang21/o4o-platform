@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "캐롤온감더블파워카타플라스마",
+ "slugbase": "fel-pap-carol-ongam",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e1239b2936a2e7a1",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

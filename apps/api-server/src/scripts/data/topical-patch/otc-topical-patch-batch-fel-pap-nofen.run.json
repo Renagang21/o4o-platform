@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "펠비낙",
+ "form": "노펜펠비낙카타플라스마",
+ "slugbase": "fel-pap-nofen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "cc7586373a6c65b9",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}
