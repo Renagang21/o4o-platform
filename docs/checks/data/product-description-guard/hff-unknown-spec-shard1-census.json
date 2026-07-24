@@ -1,0 +1,6868 @@
+{
+ "scanned": 41261,
+ "shard1": 8509,
+ "hasUnknown": 4111,
+ "distinctLabels": 980,
+ "ranked": [
+  {
+   "label": "(표시량",
+   "count": 1699,
+   "withKnownPartner": 0,
+   "sample": "(표시량",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg3의합",
+   "count": 482,
+   "withKnownPartner": 84,
+   "sample": "Rg3의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "아연",
+   "count": 301,
+   "withKnownPartner": 38,
+   "sample": "(11) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민D",
+   "count": 204,
+   "withKnownPartner": 23,
+   "sample": "(4) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민B6",
+   "count": 197,
+   "withKnownPartner": 30,
+   "sample": "(9) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민B1",
+   "count": 189,
+   "withKnownPartner": 30,
+   "sample": "(13) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "식이섬유",
+   "count": 176,
+   "withKnownPartner": 62,
+   "sample": "식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민B2",
+   "count": 168,
+   "withKnownPartner": 25,
+   "sample": "(14) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "코로솔산",
+   "count": 164,
+   "withKnownPartner": 102,
+   "sample": "(3) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "비타민E",
+   "count": 152,
+   "withKnownPartner": 24,
+   "sample": "(3) 비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": "나이아신",
+   "count": 150,
+   "withKnownPartner": 23,
+   "sample": "(8) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민C",
+   "count": 139,
+   "withKnownPartner": 31,
+   "sample": "(5) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "판토텐산",
+   "count": 137,
+   "withKnownPartner": 25,
+   "sample": "(7) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "셀레늄",
+   "count": 118,
+   "withKnownPartner": 13,
+   "sample": "(6) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "엽산",
+   "count": 118,
+   "withKnownPartner": 29,
+   "sample": "(23) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "비오틴",
+   "count": 113,
+   "withKnownPartner": 22,
+   "sample": "(24) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "망간",
+   "count": 106,
+   "withKnownPartner": 20,
+   "sample": "(17) 망간",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민B12",
+   "count": 104,
+   "withKnownPartner": 19,
+   "sample": "(19) 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민A",
+   "count": 97,
+   "withKnownPartner": 24,
+   "sample": "(21) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "크롬",
+   "count": 88,
+   "withKnownPartner": 21,
+   "sample": "(15) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민K",
+   "count": 77,
+   "withKnownPartner": 14,
+   "sample": "(20) 비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": "조단백질",
+   "count": 75,
+   "withKnownPartner": 23,
+   "sample": "조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "g)",
+   "count": 72,
+   "withKnownPartner": 36,
+   "sample": "g)",
+   "classifyHit": false
+  },
+  {
+   "label": "구리",
+   "count": 66,
+   "withKnownPartner": 16,
+   "sample": "(16) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "몰리브덴",
+   "count": 65,
+   "withKnownPartner": 14,
+   "sample": "(18) 몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "셀렌",
+   "count": 65,
+   "withKnownPartner": 24,
+   "sample": "(7) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "최종제품",
+   "count": 63,
+   "withKnownPartner": 1,
+   "sample": "최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "DHA의합",
+   "count": 61,
+   "withKnownPartner": 3,
+   "sample": "DHA의 합",
+   "classifyHit": true
+  },
+  {
+   "label": "모나콜린K",
+   "count": 55,
+   "withKnownPartner": 36,
+   "sample": "모나콜린 K",
+   "classifyHit": false
+  },
+  {
+   "label": "칼슘",
+   "count": 52,
+   "withKnownPartner": 6,
+   "sample": "(3) 칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "2)식이섬유",
+   "count": 50,
+   "withKnownPartner": 13,
+   "sample": "2) 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "마그네슘",
+   "count": 46,
+   "withKnownPartner": 4,
+   "sample": "(4) 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "총-Hydroxycitricacid",
+   "count": 44,
+   "withKnownPartner": 3,
+   "sample": "총(-)-Hydroxycitric acid",
+   "classifyHit": true
+  },
+  {
+   "label": "요오드",
+   "count": 41,
+   "withKnownPartner": 4,
+   "sample": "(25) 요오드",
+   "classifyHit": true
+  },
+  {
+   "label": "대두이소플라본",
+   "count": 39,
+   "withKnownPartner": 28,
+   "sample": "대두이소플라본(비배당체로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "히알루론산",
+   "count": 37,
+   "withKnownPartner": 25,
+   "sample": "히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1의합",
+   "count": 37,
+   "withKnownPartner": 3,
+   "sample": "Rb1의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "아스타잔틴",
+   "count": 37,
+   "withKnownPartner": 26,
+   "sample": "아스타잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "총다당체",
+   "count": 37,
+   "withKnownPartner": 13,
+   "sample": "총 다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "로사빈",
+   "count": 35,
+   "withKnownPartner": 28,
+   "sample": "로사빈",
+   "classifyHit": false
+  },
+  {
+   "label": "포스파티딜세린",
+   "count": 34,
+   "withKnownPartner": 25,
+   "sample": "포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "루테인",
+   "count": 32,
+   "withKnownPartner": 5,
+   "sample": "(3) 루테인",
+   "classifyHit": true
+  },
+  {
+   "label": "-최종제품",
+   "count": 31,
+   "withKnownPartner": 0,
+   "sample": "- 최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "플라보놀배당체",
+   "count": 30,
+   "withKnownPartner": 5,
+   "sample": "플라보놀 배당체",
+   "classifyHit": true
+  },
+  {
+   "label": "의합",
+   "count": 30,
+   "withKnownPartner": 5,
+   "sample": "의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "포스콜린",
+   "count": 28,
+   "withKnownPartner": 23,
+   "sample": "포스콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "코엔자임Q10",
+   "count": 27,
+   "withKnownPartner": 3,
+   "sample": "(2) 코엔자임Q10",
+   "classifyHit": true
+  },
+  {
+   "label": "실리마린",
+   "count": 26,
+   "withKnownPartner": 2,
+   "sample": "(2) 실리마린",
+   "classifyHit": true
+  },
+  {
+   "label": "총안토시아노사이드",
+   "count": 25,
+   "withKnownPartner": 4,
+   "sample": "총 안토시아노사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "키토산",
+   "count": 24,
+   "withKnownPartner": 11,
+   "sample": "키토산",
+   "classifyHit": false
+  },
+  {
+   "label": "표시량",
+   "count": 24,
+   "withKnownPartner": 1,
+   "sample": "표시량",
+   "classifyHit": false
+  },
+  {
+   "label": "프락토올리고당",
+   "count": 23,
+   "withKnownPartner": 1,
+   "sample": "(2) 프락토올리고당",
+   "classifyHit": true
+  },
+  {
+   "label": "3)식이섬유",
+   "count": 23,
+   "withKnownPartner": 17,
+   "sample": "3) 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "Ellagicacid",
+   "count": 22,
+   "withKnownPartner": 14,
+   "sample": "Ellagic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "로르산",
+   "count": 22,
+   "withKnownPartner": 17,
+   "sample": "로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "안트라퀴논계화합물",
+   "count": 21,
+   "withKnownPartner": 13,
+   "sample": "안트라퀴논계화합물(무수바바로인으로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)코로솔산",
+   "count": 20,
+   "withKnownPartner": 14,
+   "sample": "3) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "총모나콜린K",
+   "count": 19,
+   "withKnownPartner": 15,
+   "sample": "총 모나콜린K",
+   "classifyHit": false
+  },
+  {
+   "label": "총폴리페놀",
+   "count": 19,
+   "withKnownPartner": 6,
+   "sample": "총 폴리페놀",
+   "classifyHit": false
+  },
+  {
+   "label": "엘라그산",
+   "count": 18,
+   "withKnownPartner": 9,
+   "sample": "엘라그산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)코로솔산",
+   "count": 18,
+   "withKnownPartner": 16,
+   "sample": "2) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "크레아틴모노하이드레이트",
+   "count": 18,
+   "withKnownPartner": 0,
+   "sample": "크레아틴 모노하이드레이트",
+   "classifyHit": false
+  },
+  {
+   "label": "Chlorogenicacid",
+   "count": 18,
+   "withKnownPartner": 3,
+   "sample": "Chlorogenic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "DamulinA",
+   "count": 18,
+   "withKnownPartner": 13,
+   "sample": "Damulin A",
+   "classifyHit": false
+  },
+  {
+   "label": "2)엘라그산",
+   "count": 17,
+   "withKnownPartner": 15,
+   "sample": "2) 엘라그산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)아연",
+   "count": 17,
+   "withKnownPartner": 3,
+   "sample": "3) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "커큐민",
+   "count": 17,
+   "withKnownPartner": 9,
+   "sample": "커큐민",
+   "classifyHit": false
+  },
+  {
+   "label": "Glabridin",
+   "count": 17,
+   "withKnownPartner": 10,
+   "sample": "Glabridin",
+   "classifyHit": false
+  },
+  {
+   "label": "카테킨",
+   "count": 16,
+   "withKnownPartner": 4,
+   "sample": "(3) 카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "(표시량의",
+   "count": 16,
+   "withKnownPartner": 0,
+   "sample": "(표시량의",
+   "classifyHit": false
+  },
+  {
+   "label": "타우린",
+   "count": 16,
+   "withKnownPartner": 0,
+   "sample": "(4) 타우린(Taurine)",
+   "classifyHit": false
+  },
+  {
+   "label": "소포리코사이드",
+   "count": 15,
+   "withKnownPartner": 12,
+   "sample": "소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "폴리감마글루탐산",
+   "count": 15,
+   "withKnownPartner": 11,
+   "sample": "폴리감마글루탐산",
+   "classifyHit": false
+  },
+  {
+   "label": "17)철",
+   "count": 15,
+   "withKnownPartner": 15,
+   "sample": "17) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "자일로올리고당",
+   "count": 14,
+   "withKnownPartner": 12,
+   "sample": "자일로올리고당(제2법)",
+   "classifyHit": false
+  },
+  {
+   "label": "15)철",
+   "count": 14,
+   "withKnownPartner": 14,
+   "sample": "15) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "all-trans-라이코펜",
+   "count": 13,
+   "withKnownPartner": 8,
+   "sample": "all-trans-라이코펜",
+   "classifyHit": false
+  },
+  {
+   "label": "4)아연",
+   "count": 13,
+   "withKnownPartner": 2,
+   "sample": "4) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "-aminobutyricacid",
+   "count": 13,
+   "withKnownPartner": 9,
+   "sample": "-aminobutyric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "acid함량",
+   "count": 12,
+   "withKnownPartner": 10,
+   "sample": "acid 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Quercetin",
+   "count": 12,
+   "withKnownPartner": 9,
+   "sample": "Quercetin",
+   "classifyHit": false
+  },
+  {
+   "label": "후코잔틴",
+   "count": 12,
+   "withKnownPartner": 4,
+   "sample": "후코잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "푸닉산",
+   "count": 12,
+   "withKnownPartner": 4,
+   "sample": "푸닉산",
+   "classifyHit": false
+  },
+  {
+   "label": "4)철",
+   "count": 12,
+   "withKnownPartner": 9,
+   "sample": "4) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)조단백질",
+   "count": 11,
+   "withKnownPartner": 5,
+   "sample": "2) 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "옥타코사놀",
+   "count": 11,
+   "withKnownPartner": 1,
+   "sample": "(3) 옥타코사놀",
+   "classifyHit": true
+  },
+  {
+   "label": "합-최종제품",
+   "count": 11,
+   "withKnownPartner": 0,
+   "sample": "합 -최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "락토페린",
+   "count": 11,
+   "withKnownPartner": 5,
+   "sample": "락토페린",
+   "classifyHit": false
+  },
+  {
+   "label": "원료성제품",
+   "count": 11,
+   "withKnownPartner": 0,
+   "sample": "원료성제품",
+   "classifyHit": false
+  },
+  {
+   "label": "16)철",
+   "count": 11,
+   "withKnownPartner": 11,
+   "sample": "16) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "S1-casein)",
+   "count": 10,
+   "withKnownPartner": 8,
+   "sample": "S1-casein)(f91-100)",
+   "classifyHit": false
+  },
+  {
+   "label": "엠에스엠",
+   "count": 10,
+   "withKnownPartner": 0,
+   "sample": "(2) 엠에스엠(MSM)",
+   "classifyHit": true
+  },
+  {
+   "label": "총플라보노이드",
+   "count": 10,
+   "withKnownPartner": 0,
+   "sample": "총 플라보노이드",
+   "classifyHit": true
+  },
+  {
+   "label": "감마리놀렌산",
+   "count": 10,
+   "withKnownPartner": 0,
+   "sample": "감마리놀렌산",
+   "classifyHit": true
+  },
+  {
+   "label": "-코로솔산",
+   "count": 10,
+   "withKnownPartner": 8,
+   "sample": "- 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "Cinnamicacid",
+   "count": 10,
+   "withKnownPartner": 1,
+   "sample": "Cinnamic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Shanzhisidemethylester",
+   "count": 10,
+   "withKnownPartner": 1,
+   "sample": "Shanzhiside methylester",
+   "classifyHit": false
+  },
+  {
+   "label": "Nodakenin",
+   "count": 10,
+   "withKnownPartner": 1,
+   "sample": "(5) Nodakenin",
+   "classifyHit": false
+  },
+  {
+   "label": "-aminobutyricacid)",
+   "count": 10,
+   "withKnownPartner": 0,
+   "sample": "-aminobutyric acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)로사빈",
+   "count": 10,
+   "withKnownPartner": 8,
+   "sample": "2) 로사빈",
+   "classifyHit": false
+  },
+  {
+   "label": "함유유지",
+   "count": 9,
+   "withKnownPartner": 6,
+   "sample": "함유 유지",
+   "classifyHit": false
+  },
+  {
+   "label": "디엑콜",
+   "count": 9,
+   "withKnownPartner": 1,
+   "sample": "디엑콜(Dieckol)",
+   "classifyHit": false
+  },
+  {
+   "label": "유래되는다당체",
+   "count": 9,
+   "withKnownPartner": 6,
+   "sample": "유래되는 다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "-Pro-Val-Gly-Pro-Ser",
+   "count": 9,
+   "withKnownPartner": 7,
+   "sample": "-Pro-Val-Gly-Pro-Ser",
+   "classifyHit": false
+  },
+  {
+   "label": "공액리놀레산의합)함량",
+   "count": 9,
+   "withKnownPartner": 4,
+   "sample": "공액리놀레산의 합)함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1및Rg3의합",
+   "count": 9,
+   "withKnownPartner": 4,
+   "sample": "Rb1및Rg3의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "리놀렌산",
+   "count": 9,
+   "withKnownPartner": 2,
+   "sample": "(2) 리놀렌산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민E",
+   "count": 9,
+   "withKnownPartner": 1,
+   "sample": "3)비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": "methylester",
+   "count": 8,
+   "withKnownPartner": 5,
+   "sample": "methyl ester",
+   "classifyHit": false
+  },
+  {
+   "label": "EleutherosideE",
+   "count": 8,
+   "withKnownPartner": 5,
+   "sample": "Eleutheroside E",
+   "classifyHit": false
+  },
+  {
+   "label": "비타민D3",
+   "count": 8,
+   "withKnownPartner": 7,
+   "sample": "비타민D3",
+   "classifyHit": false
+  },
+  {
+   "label": "WithanosideIV",
+   "count": 8,
+   "withKnownPartner": 6,
+   "sample": "Withanoside IV",
+   "classifyHit": false
+  },
+  {
+   "label": "베타카로틴",
+   "count": 8,
+   "withKnownPartner": 1,
+   "sample": "(3) 베타카로틴",
+   "classifyHit": true
+  },
+  {
+   "label": "L-테아닌",
+   "count": 8,
+   "withKnownPartner": 3,
+   "sample": "(3) L-테아닌",
+   "classifyHit": true
+  },
+  {
+   "label": "KBA의합",
+   "count": 8,
+   "withKnownPartner": 8,
+   "sample": "KBA의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Paeoniflorin",
+   "count": 8,
+   "withKnownPartner": 3,
+   "sample": "2) Paeoniflorin",
+   "classifyHit": false
+  },
+  {
+   "label": "in-7-O-diglucuronide",
+   "count": 8,
+   "withKnownPartner": 3,
+   "sample": "in-7-O-diglucuronide",
+   "classifyHit": false
+  },
+  {
+   "label": "총지아잔틴",
+   "count": 8,
+   "withKnownPartner": 0,
+   "sample": "총 지아잔틴",
+   "classifyHit": true
+  },
+  {
+   "label": "3)철",
+   "count": 8,
+   "withKnownPartner": 6,
+   "sample": "3) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "anidin-3-O-glucoside",
+   "count": 8,
+   "withKnownPartner": 7,
+   "sample": "anidin-3-O-glucoside",
+   "classifyHit": false
+  },
+  {
+   "label": "데커신",
+   "count": 8,
+   "withKnownPartner": 5,
+   "sample": "데커신",
+   "classifyHit": false
+  },
+  {
+   "label": "g(기타유래다당체",
+   "count": 8,
+   "withKnownPartner": 4,
+   "sample": "g (기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "5)비타민B6",
+   "count": 8,
+   "withKnownPartner": 1,
+   "sample": "5)비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "2)로르산",
+   "count": 8,
+   "withKnownPartner": 6,
+   "sample": "2) 로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "베타글루칸",
+   "count": 7,
+   "withKnownPartner": 4,
+   "sample": "베타글루칸",
+   "classifyHit": false
+  },
+  {
+   "label": "L-카르니틴",
+   "count": 7,
+   "withKnownPartner": 2,
+   "sample": "L-카르니틴",
+   "classifyHit": false
+  },
+  {
+   "label": "4)코로솔산",
+   "count": 7,
+   "withKnownPartner": 5,
+   "sample": "4) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)로르산",
+   "count": 7,
+   "withKnownPartner": 7,
+   "sample": "3) 로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "7)철",
+   "count": 7,
+   "withKnownPartner": 5,
+   "sample": "7) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)포스파티딜세린",
+   "count": 7,
+   "withKnownPartner": 6,
+   "sample": "2) 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "Isorhamnetin",
+   "count": 7,
+   "withKnownPartner": 5,
+   "sample": "Isorhamnetin",
+   "classifyHit": false
+  },
+  {
+   "label": "Oleanonicacid",
+   "count": 7,
+   "withKnownPartner": 0,
+   "sample": "Oleanonic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Gallicacid",
+   "count": 7,
+   "withKnownPartner": 5,
+   "sample": "Gallic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "이상(표시량",
+   "count": 7,
+   "withKnownPartner": 0,
+   "sample": "이상(표시량",
+   "classifyHit": false
+  },
+  {
+   "label": "4)비타민B2",
+   "count": 7,
+   "withKnownPartner": 1,
+   "sample": "4)비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "acid의합",
+   "count": 7,
+   "withKnownPartner": 6,
+   "sample": "acid(KBA)의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "인지질",
+   "count": 7,
+   "withKnownPartner": 2,
+   "sample": "인지질(아세톤불용물로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "Pyrogallol)",
+   "count": 7,
+   "withKnownPartner": 4,
+   "sample": "Pyrogallol)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)조단백질",
+   "count": 6,
+   "withKnownPartner": 4,
+   "sample": "3) 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "헤스페리딘",
+   "count": 6,
+   "withKnownPartner": 2,
+   "sample": "(2) 헤스페리딘",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg3",
+   "count": 6,
+   "withKnownPartner": 0,
+   "sample": "Rg3",
+   "classifyHit": false
+  },
+  {
+   "label": "루틴",
+   "count": 6,
+   "withKnownPartner": 3,
+   "sample": "루틴(Rutin)",
+   "classifyHit": false
+  },
+  {
+   "label": "6)아연",
+   "count": 6,
+   "withKnownPartner": 1,
+   "sample": "6) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "3)히알루론산",
+   "count": 6,
+   "withKnownPartner": 5,
+   "sample": "3) 히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "5)철",
+   "count": 6,
+   "withKnownPartner": 6,
+   "sample": "5) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "합최종제품",
+   "count": 6,
+   "withKnownPartner": 0,
+   "sample": "합 (가)최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "14)철",
+   "count": 6,
+   "withKnownPartner": 6,
+   "sample": "14) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "글루코실세라미드",
+   "count": 6,
+   "withKnownPartner": 6,
+   "sample": "글루코실세라미드",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민B1",
+   "count": 6,
+   "withKnownPartner": 1,
+   "sample": "3)비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "6)비타민B12",
+   "count": 6,
+   "withKnownPartner": 2,
+   "sample": "6)비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "연질캡슐2)비타민D",
+   "count": 6,
+   "withKnownPartner": 1,
+   "sample": "연질캡슐 2)비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "7)구리",
+   "count": 6,
+   "withKnownPartner": 1,
+   "sample": "7)구리",
+   "classifyHit": true
+  },
+  {
+   "label": "10)셀렌",
+   "count": 6,
+   "withKnownPartner": 1,
+   "sample": "10)셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "6)철",
+   "count": 6,
+   "withKnownPartner": 6,
+   "sample": "6) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "20g(기타유래다당체",
+   "count": 6,
+   "withKnownPartner": 0,
+   "sample": "20 g(기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "4)비타민B6",
+   "count": 6,
+   "withKnownPartner": 3,
+   "sample": "4) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "Formononetin",
+   "count": 5,
+   "withKnownPartner": 3,
+   "sample": "Formononetin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)키토산",
+   "count": 5,
+   "withKnownPartner": 3,
+   "sample": "2) 키토산",
+   "classifyHit": false
+  },
+  {
+   "label": "-glucan)",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "-glucan)",
+   "classifyHit": false
+  },
+  {
+   "label": "Pinoresinoldiglucoside",
+   "count": 5,
+   "withKnownPartner": 4,
+   "sample": "Pinoresinol diglucoside",
+   "classifyHit": false
+  },
+  {
+   "label": "acidB",
+   "count": 5,
+   "withKnownPartner": 0,
+   "sample": "acid B",
+   "classifyHit": false
+  },
+  {
+   "label": "키토올리고당",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "키토올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "3)Nodakenin",
+   "count": 5,
+   "withKnownPartner": 0,
+   "sample": "3) Nodakenin",
+   "classifyHit": false
+  },
+  {
+   "label": "4)나이아신",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "4) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "이소비텍신함량",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "이소비텍신 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "및Rg3의합",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "및 Rg3의합",
+   "classifyHit": false
+  },
+  {
+   "label": "단백",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "단백",
+   "classifyHit": false
+  },
+  {
+   "label": "분말조단백질",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "분말 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "하이포잔틴",
+   "count": 5,
+   "withKnownPartner": 3,
+   "sample": "하이포잔틴(Hypoxanthine)",
+   "classifyHit": false
+  },
+  {
+   "label": "(기타다당체",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "(기타다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "4)비타민B1",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "4) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "총프로시아니딘함량",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "총프로시아니딘 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민C",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "3) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "4)비타민K",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "4)비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": "5)베타카로틴",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "5)베타카로틴",
+   "classifyHit": true
+  },
+  {
+   "label": "6)비오틴",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "6)비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "8)크롬",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "8)크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "9)몰리브덴",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "9)몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "-Ala-Val-Gly-Pro-Ala",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "-Ala-Val-Gly-Pro-Ala",
+   "classifyHit": false
+  },
+  {
+   "label": "MSM",
+   "count": 5,
+   "withKnownPartner": 0,
+   "sample": "(2) MSM",
+   "classifyHit": true
+  },
+  {
+   "label": "Verbascoside",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "Verbascoside",
+   "classifyHit": false
+  },
+  {
+   "label": "in-3-O-sambubioside의합",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "in-3-O-sambubioside의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "7)판토텐산",
+   "count": 5,
+   "withKnownPartner": 3,
+   "sample": "7)판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "g)이상최종제품",
+   "count": 5,
+   "withKnownPartner": 0,
+   "sample": "g)이상 (나)최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "클로로겐산",
+   "count": 5,
+   "withKnownPartner": 3,
+   "sample": "클로로겐산",
+   "classifyHit": false
+  },
+  {
+   "label": "Rhaponticin",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "(3) Rhaponticin",
+   "classifyHit": false
+  },
+  {
+   "label": "4)식이섬유",
+   "count": 5,
+   "withKnownPartner": 4,
+   "sample": "4) 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "-철",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "- 철",
+   "classifyHit": false
+  },
+  {
+   "label": "PanduratinA",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "Panduratin A",
+   "classifyHit": false
+  },
+  {
+   "label": "이상(기타유래다당체",
+   "count": 5,
+   "withKnownPartner": 1,
+   "sample": "이상 (기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "kg)",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "kg)",
+   "classifyHit": false
+  },
+  {
+   "label": "GABA)",
+   "count": 5,
+   "withKnownPartner": 0,
+   "sample": "GABA)",
+   "classifyHit": false
+  },
+  {
+   "label": "5)비타민D",
+   "count": 5,
+   "withKnownPartner": 2,
+   "sample": "5) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "3)비타민B2",
+   "count": 5,
+   "withKnownPartner": 4,
+   "sample": "3) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "5)코로솔산",
+   "count": 5,
+   "withKnownPartner": 5,
+   "sample": "5)코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "9)철",
+   "count": 5,
+   "withKnownPartner": 4,
+   "sample": "9) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "Silymarin",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "Silymarin",
+   "classifyHit": false
+  },
+  {
+   "label": "Eliagicacid",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "Eliagic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Ecdysterone",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "Ecdysterone",
+   "classifyHit": false
+  },
+  {
+   "label": "carnosol의합",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "carnosol의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "Naringin",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "Naringin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)락토페린",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "2) 락토페린",
+   "classifyHit": false
+  },
+  {
+   "label": "-Hyp-Gly-Pro-Ala-Gly",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "-Hyp-Gly-Pro-Ala-Gly",
+   "classifyHit": false
+  },
+  {
+   "label": "2)프락토올리고당",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "2) 프락토올리고당",
+   "classifyHit": true
+  },
+  {
+   "label": "Quinicacid",
+   "count": 4,
+   "withKnownPartner": 1,
+   "sample": "Quinic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Citricacid",
+   "count": 4,
+   "withKnownPartner": 1,
+   "sample": "Citric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "합)함량",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "합) 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "2)테르피놀렌",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "2) 테르피놀렌",
+   "classifyHit": false
+  },
+  {
+   "label": "3)3-카렌",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "3) 3-카렌",
+   "classifyHit": false
+  },
+  {
+   "label": "4)리모넨",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "4) 리모넨",
+   "classifyHit": false
+  },
+  {
+   "label": "단백질",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "2)자일로올리고당",
+   "count": 4,
+   "withKnownPartner": 1,
+   "sample": "2) 자일로올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "-로사빈",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "- 로사빈(Rosavin)",
+   "classifyHit": false
+  },
+  {
+   "label": "20)철",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "20) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)철",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "2) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "Gly-Prodipeptide",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "Gly-Pro dipeptide",
+   "classifyHit": false
+  },
+  {
+   "label": "총-Hydroxycitiricacid",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "총(-)-Hydroxycitiric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "5)비타민B2",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "5) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "7)비오틴",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "7) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "5)아연",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "5) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "cetylbritannilactone",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "cetylbritannilactone",
+   "classifyHit": false
+  },
+  {
+   "label": "Rosmarinicacid",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "Rosmarinic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Rhaponticin",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "2) Rhaponticin",
+   "classifyHit": false
+  },
+  {
+   "label": "식이섬유함량",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "식이섬유 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "중포스파티딜콜린",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "중 포스파티딜콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1합",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "Rb1 합",
+   "classifyHit": false
+  },
+  {
+   "label": "2)소포리코사이드",
+   "count": 4,
+   "withKnownPartner": 1,
+   "sample": "2) 소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제2)비타민C",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "제피정제 2)비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "구연산",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "구연산(Citric acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "EGCG)",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "EGCG)(mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "티로신",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "티로신",
+   "classifyHit": false
+  },
+  {
+   "label": "알라닌",
+   "count": 4,
+   "withKnownPartner": 3,
+   "sample": "알라닌",
+   "classifyHit": false
+  },
+  {
+   "label": "4)망간",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "4)망간",
+   "classifyHit": true
+  },
+  {
+   "label": "팔밋올레산",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "팔밋올레산(Palmitoleic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "18)철",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "18) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "5)판토텐산",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "5) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "AKBA함량",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "AKBA 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "curcuminoids함량",
+   "count": 4,
+   "withKnownPartner": 4,
+   "sample": "curcuminoids 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "8)판토텐산",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "8) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "Rg3의합계",
+   "count": 4,
+   "withKnownPartner": 0,
+   "sample": "Rg3의 합계",
+   "classifyHit": false
+  },
+  {
+   "label": "우라실",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "(2) 우라실(Uracil)",
+   "classifyHit": false
+  },
+  {
+   "label": "6)비타민B6",
+   "count": 4,
+   "withKnownPartner": 2,
+   "sample": "6) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "-원료성제품",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "- 원료성제품",
+   "classifyHit": false
+  },
+  {
+   "label": "2)알콕시글리세롤",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "2) 알콕시글리세롤",
+   "classifyHit": false
+  },
+  {
+   "label": "3)단백질",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "3) 단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "2)퀘르세틴",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "2) 퀘르세틴",
+   "classifyHit": false
+  },
+  {
+   "label": "벤질헥사데칸아미드",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "벤질헥사데칸아미드",
+   "classifyHit": false
+  },
+  {
+   "label": "Gastrodin",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "Gastrodin",
+   "classifyHit": false
+  },
+  {
+   "label": "21)철",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "21) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "B1함량",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "B1 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "B2함량",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "B2 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "B6함량",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "B6 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Hydrangenol함량",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "Hydrangenol 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Astragalin",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "Astragalin",
+   "classifyHit": false
+  },
+  {
+   "label": "p-Coumaricacid",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "p-Coumaric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "가스트로딘",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "가스트로딘(Gastrodin)",
+   "classifyHit": false
+  },
+  {
+   "label": "이하아연",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "이하 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민D",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B6",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B2",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "Monohydrate함량",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "Monohydrate 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "er-Trp-Val-Glu",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "er-Trp-Val-Glu(SWVE)",
+   "classifyHit": false
+  },
+  {
+   "label": "Luteolin",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "Luteolin(정제1)",
+   "classifyHit": false
+  },
+  {
+   "label": "Isoorientin",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "Isoorientin(정제1)",
+   "classifyHit": false
+  },
+  {
+   "label": "미드",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "미드(Glucosylceramide)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)포스콜린",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "3) 포스콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "이상아연",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "이상 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "2)Quercetin",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "2) Quercetin",
+   "classifyHit": false
+  },
+  {
+   "label": "-glucan",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "-glucan",
+   "classifyHit": false
+  },
+  {
+   "label": "protocatechuicacid",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "protocatechuic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "curcumin",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "curcumin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Glabridin",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "2) Glabridin",
+   "classifyHit": false
+  },
+  {
+   "label": "13)철",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "13) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "Secoxyloganin",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "Secoxyloganin",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg3합",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "Rg3 합",
+   "classifyHit": false
+  },
+  {
+   "label": "2)감마-오리자놀",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "2) 감마-오리자놀",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민B6",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "3) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "6)비타민C",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "6) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "콘드로이친황산나트륨",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "콘드로이친 황산나트륨",
+   "classifyHit": false
+  },
+  {
+   "label": "6)비타민D",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "6) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "3)로사빈",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "3) 로사빈",
+   "classifyHit": false
+  },
+  {
+   "label": "3)나이아신",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "3) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "차전자피식이섬유",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "차전자피 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "1-Deoxynojirimycin",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "1-Deoxynojirimycin",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제코로솔산",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "제피정제 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)포스콜린",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "2) 포스콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "EGCG",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "EGCG(에피갈로카테킨갈레이트)",
+   "classifyHit": false
+  },
+  {
+   "label": "6)나이아신",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "6) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "-식이섬유",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "- 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "8)철",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "8) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "액상2)나이아신",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "액상 2)나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "시프롤린",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "시프롤린(Hydroxyproline)",
+   "classifyHit": false
+  },
+  {
+   "label": "프롤린의합",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "프롤린(Proline)의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "(기타유래다당체",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "(기타유래 다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "총프로시아니딘",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "총 프로시아니딘",
+   "classifyHit": false
+  },
+  {
+   "label": "Veratricacid",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "Veratric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "퀸산",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "퀸산(Quinic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)텍토크리신",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "2) 텍토크리신",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg3의합)",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "Rg3의 합)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)리놀렌산",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "2) 리놀렌산",
+   "classifyHit": false
+  },
+  {
+   "label": "cycloalliin",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "(2) cycloalliin",
+   "classifyHit": false
+  },
+  {
+   "label": "10)엽산",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "10) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "총폴라보노이드",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "총 폴라보노이드",
+   "classifyHit": false
+  },
+  {
+   "label": "대두이소플라본비배당체",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "대두이소플라본 비배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "7)나이아신",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "7) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "2)Formononetin",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "2) Formononetin",
+   "classifyHit": false
+  },
+  {
+   "label": "인지질중포스파티딜콜린",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "인지질중 포스파티딜콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "Gly-Pro-Hyp",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "Gly-Pro-Hyp(GPH)",
+   "classifyHit": false
+  },
+  {
+   "label": "8)비타민B6",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "8) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "난소화성말토덱스트린식이섬유",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "난소화성말토덱스트린 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "연질캡슐로르산",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "연질캡슐 로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)코엔자임Q10",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "2) 코엔자임Q10",
+   "classifyHit": true
+  },
+  {
+   "label": "플라보노이드함량",
+   "count": 3,
+   "withKnownPartner": 1,
+   "sample": "플라보노이드 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "g(기타다당체",
+   "count": 3,
+   "withKnownPartner": 3,
+   "sample": "g (기타다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "소포리코사이드함량",
+   "count": 3,
+   "withKnownPartner": 2,
+   "sample": "소포리코사이드 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "5)크롬",
+   "count": 3,
+   "withKnownPartner": 0,
+   "sample": "5) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": ")진세노사이드Rg1과Rb1및Rg3의합최종제품",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": ")진세노사이드Rg1과Rb1및Rg3의합 (가)최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "6)비타민B2",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "6) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "7)아연",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "7) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "총HCA",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "총 HCA",
+   "classifyHit": true
+  },
+  {
+   "label": "퀘르세틴함량",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "퀘르세틴 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제소포리코사이드",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "제피정제 (2)소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "폴라보놀배당체",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "폴라보놀 배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "판두라틴A",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "(2) 판두라틴A",
+   "classifyHit": false
+  },
+  {
+   "label": "D-pinitol",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "D-pinitol",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb3의합",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "Rb3의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "Scopoletin",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "Scopoletin",
+   "classifyHit": false
+  },
+  {
+   "label": "홍삼",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "홍삼",
+   "classifyHit": false
+  },
+  {
+   "label": "이하비타민B1",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "monohydrate함량",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "monohydrate 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "HamabiwalactoneB",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "Hamabiwalactone B",
+   "classifyHit": false
+  },
+  {
+   "label": "뮤코다당단·백",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "뮤코다당단·백",
+   "classifyHit": false
+  },
+  {
+   "label": "토카테츄산",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "토카테츄산(Protocatechuic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg3의합계로서",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "Rg3의 합계로서",
+   "classifyHit": false
+  },
+  {
+   "label": "3)판토텐산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "3) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "mg)",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)엠에스엠",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "2) 엠에스엠(MSM)",
+   "classifyHit": true
+  },
+  {
+   "label": "-Oryzanol)",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "-Oryzanol)",
+   "classifyHit": false
+  },
+  {
+   "label": "비타민12",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "비타민12",
+   "classifyHit": false
+  },
+  {
+   "label": "-lycopene",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "(all-trans)-lycopene",
+   "classifyHit": false
+  },
+  {
+   "label": "Cyanidin-3-glucoside",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "Cyanidin-3-glucoside",
+   "classifyHit": false
+  },
+  {
+   "label": "글루코실세라마이드",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "글루코실세라마이드",
+   "classifyHit": false
+  },
+  {
+   "label": "3)아스타잔틴",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "3) 아스타잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "Hydroxycitricacid",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "Hydroxycitric acid",
+   "classifyHit": true
+  },
+  {
+   "label": "7)코로솔산",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "7) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "퀘르세틴",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "퀘르세틴(quercetin)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)바릴티로신",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "2) 바릴티로신",
+   "classifyHit": false
+  },
+  {
+   "label": "6)요오드",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "6)요오드",
+   "classifyHit": true
+  },
+  {
+   "label": "7)망간",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "7)망간",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민c",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "비타민 c",
+   "classifyHit": true
+  },
+  {
+   "label": "스쿠알렌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "스쿠알렌",
+   "classifyHit": false
+  },
+  {
+   "label": "락추로스",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "락추로스(Lactulose)",
+   "classifyHit": false
+  },
+  {
+   "label": "4)아스타잔틴",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "4) 아스타잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "7)비타민D",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "7) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "2)실리마린",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "2) 실리마린",
+   "classifyHit": true
+  },
+  {
+   "label": "N-아세틸글루코사민",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "N-아세틸글루코사민",
+   "classifyHit": true
+  },
+  {
+   "label": "Rg1의합",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "Rg1의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "테아닌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "(2) 테아닌",
+   "classifyHit": true
+  },
+  {
+   "label": "7)셀렌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "7) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "4)비타민D",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "4) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "루테인함량",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "루테인 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "4)요오드",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "4)요오드",
+   "classifyHit": true
+  },
+  {
+   "label": "5)망간",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "5)망간",
+   "classifyHit": true
+  },
+  {
+   "label": "Hydroxy-l-isoleucine",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "Hydroxy-l-isoleucine",
+   "classifyHit": false
+  },
+  {
+   "label": "3)D-pinitol",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "3) D-pinitol",
+   "classifyHit": false
+  },
+  {
+   "label": "-히알루론산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "- 히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)쉬잔드린",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "2) 쉬잔드린",
+   "classifyHit": false
+  },
+  {
+   "label": "HCA함량",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "(2)HCA함량",
+   "classifyHit": true
+  },
+  {
+   "label": "acid전체합",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "acid 전체합",
+   "classifyHit": false
+  },
+  {
+   "label": "코로솔산함량",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "코로솔산 함량(mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "5)아스타잔틴",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "5) 아스타잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "10)아연",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "10) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "-칼륨",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "- 칼륨",
+   "classifyHit": false
+  },
+  {
+   "label": "진세노사이드",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "진세노사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "오틴",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "오 틴",
+   "classifyHit": false
+  },
+  {
+   "label": "12)철",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "12) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)커큐민",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "2) 커큐민",
+   "classifyHit": false
+  },
+  {
+   "label": "베타클루칸",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "베타클루칸",
+   "classifyHit": false
+  },
+  {
+   "label": "히알루론산나트륨",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "히알루론산나트륨",
+   "classifyHit": false
+  },
+  {
+   "label": "2)폴리감마글루탐산",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "2) 폴리감마글루탐산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)데커신",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "2) 데커신",
+   "classifyHit": false
+  },
+  {
+   "label": "앤고로사이드C",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "앤고로사이드 C",
+   "classifyHit": false
+  },
+  {
+   "label": "대두이소플라본배당체",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "(3) 대두이소플라본배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "3)L-테아닌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "3) L-테아닌",
+   "classifyHit": true
+  },
+  {
+   "label": "13)셀렌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "13) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "이상코로솔산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이상 (5)코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "acid)의합",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "acid)의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "안토시아노사이드함량",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "안토시아노사이드 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "4)옥타코사놀",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "4) 옥타코사놀",
+   "classifyHit": true
+  },
+  {
+   "label": "6)셀렌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "6) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "3)NAG",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "3) NAG",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg1과Rb1의합",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "Rg1과Rb1의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "칼륨",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "칼륨",
+   "classifyHit": false
+  },
+  {
+   "label": "조단백질함량",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "조단백질 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "함량",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "(GABA) 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "철함량",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "철 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "2)아연",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "2) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민E(표시량",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "비타민E(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "4)로사빈",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "4) 로사빈",
+   "classifyHit": false
+  },
+  {
+   "label": "-나이아신",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "- 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "-판토텐산",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "- 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "-아연",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "- 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "자일리톨",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "자일리톨",
+   "classifyHit": false
+  },
+  {
+   "label": "2)미리세틴",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "2) 미리세틴",
+   "classifyHit": false
+  },
+  {
+   "label": "3)루테올린",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "3) 루테올린",
+   "classifyHit": false
+  },
+  {
+   "label": "-비타민B1",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "- 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "-비타민B2",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "- 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "-비타민B6",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "- 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "Paeoniflorin",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "Paeoniflorin",
+   "classifyHit": false
+  },
+  {
+   "label": "9)비타민B1",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "9) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "10)비타민B2",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "10) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "리코사이드",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "리코사이드(Sophorocoside)",
+   "classifyHit": false
+  },
+  {
+   "label": "카데킨",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "카데킨",
+   "classifyHit": false
+  },
+  {
+   "label": "에피갈로카테킨갈레이트",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "에피갈로카테킨갈레이트 (EGCG)",
+   "classifyHit": true
+  },
+  {
+   "label": "2)비타민C",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "2) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "7)셀레늄",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "7) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "12)비타민D",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "12) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "17)엽산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "17) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "및Rg3합",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "및 Rg3합",
+   "classifyHit": false
+  },
+  {
+   "label": "7)비타민B2",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "7) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "6)엽산",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "6) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "6)판토텐산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "6) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "8)비타민D",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "8) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "8-Prenylnaringenin",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "8-Prenylnaringenin",
+   "classifyHit": false
+  },
+  {
+   "label": "3)EGCG",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "3) EGCG",
+   "classifyHit": false
+  },
+  {
+   "label": "p-coumaricacid",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "p-coumaric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "uteolin-7-glucoside)",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "uteolin-7-glucoside)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)L-카르니틴",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "3) L-카르니틴",
+   "classifyHit": false
+  },
+  {
+   "label": "이하옥타코사놀",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이하 옥타코사놀",
+   "classifyHit": true
+  },
+  {
+   "label": "레늄",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "레 늄",
+   "classifyHit": false
+  },
+  {
+   "label": "알리인",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "(4) 알리인",
+   "classifyHit": false
+  },
+  {
+   "label": "테르피놀렌",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "테르피놀렌(Terpinolene)",
+   "classifyHit": false
+  },
+  {
+   "label": "3-Carene",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "(3) 3-Carene",
+   "classifyHit": false
+  },
+  {
+   "label": "리모넨",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "리모넨(Limonene)",
+   "classifyHit": false
+  },
+  {
+   "label": "이하나이아신",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이하 (5)나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "이하판토텐산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이하 (6)판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "이하엽산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "이하 (12)엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "글리시리진산",
+   "count": 2,
+   "withKnownPartner": 2,
+   "sample": "글리시리진산(Glycyrrhizic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "7)엽산",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "7) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "8)비오틴",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "8) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "9)비타민A",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "9) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "ycyl-L-prolyl-",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "ycyl-L-prolyl-(VGPG)",
+   "classifyHit": false
+  },
+  {
+   "label": "10)비오틴",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "10) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "7-Dimethylesculetin",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "7-Dimethylesculetin",
+   "classifyHit": false
+  },
+  {
+   "label": "연질캡슐2)셀렌",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "연질캡슐 2)셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "6)셀레늄",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "6) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "5)비타민C",
+   "count": 2,
+   "withKnownPartner": 0,
+   "sample": "5) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "5)마그네슘",
+   "count": 2,
+   "withKnownPartner": 1,
+   "sample": "5) 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "DHA함유유지",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "DHA 함유유지",
+   "classifyHit": true
+  },
+  {
+   "label": "진세노사이드Rg1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "진세노사이드 Rg1",
+   "classifyHit": false
+  },
+  {
+   "label": "CompoundK",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Compound K",
+   "classifyHit": false
+  },
+  {
+   "label": "진세노사이드의합",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "진세노사이드의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "23)철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "23) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)최종제품",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "글리코실세라미드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "글리코실세라미드",
+   "classifyHit": false
+  },
+  {
+   "label": "4)로르산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Rb1",
+   "classifyHit": false
+  },
+  {
+   "label": "티모퀴논",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "티모퀴논(Thymoquinone)",
+   "classifyHit": false
+  },
+  {
+   "label": "리놀렌산의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "리놀렌산의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "또는황산염",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "또는 황산염",
+   "classifyHit": false
+  },
+  {
+   "label": "PGG",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) PGG",
+   "classifyHit": false
+  },
+  {
+   "label": "쿠메스테롤",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "쿠메스테롤",
+   "classifyHit": false
+  },
+  {
+   "label": "플라보노이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "플라보노이드 (mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "-Hydroxy-L-isoleucin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "-Hydroxy-L-isoleucin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)필수지방산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 필수지방산",
+   "classifyHit": false
+  },
+  {
+   "label": "글라브리딘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "글라브리딘",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "5)엽산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "1)최종제품",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "1)최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "라우린산함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "라우린산 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "-amninobutyricacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "-amninobutyric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "한다2)조단백질",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "한다 2)조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "비타민6",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "비타민6",
+   "classifyHit": false
+  },
+  {
+   "label": "뮤코다당·단백",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "뮤코다당·단백",
+   "classifyHit": false
+  },
+  {
+   "label": "음성비타민C",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "음성 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민E",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "이하망간",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 망간",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "2)비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "이상(표시량의",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 (표시량의",
+   "classifyHit": false
+  },
+  {
+   "label": "6)히알루론산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "6) 히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "분말라피노스",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "분말 (2)라피노스",
+   "classifyHit": false
+  },
+  {
+   "label": "8)아스타잔틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "8) 아스타잔틴",
+   "classifyHit": false
+  },
+  {
+   "label": "Glucosyloeramide",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Glucosyloeramide",
+   "classifyHit": false
+  },
+  {
+   "label": "3)난소화성말토덱스트린식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)난소화성말토덱스트린 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "msm",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "msm",
+   "classifyHit": true
+  },
+  {
+   "label": "제피정제2)유리딘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "제피정제 2)유리딘",
+   "classifyHit": false
+  },
+  {
+   "label": "3)만노스",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3)만노스",
+   "classifyHit": false
+  },
+  {
+   "label": "4)아시아티코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4)아시아티코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "2)미퀠리아닌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 미퀠리아닌",
+   "classifyHit": false
+  },
+  {
+   "label": "3)갈산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 갈산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Gly-Pro-Hyp",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) Gly-Pro-Hyp",
+   "classifyHit": false
+  },
+  {
+   "label": "레오누린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "레오누린",
+   "classifyHit": false
+  },
+  {
+   "label": "표시량의(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "표시량의 (표시량",
+   "classifyHit": false
+  },
+  {
+   "label": "연질캅셀2)총다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "연질캅셀 2)총다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "이상(기타유래원료다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상(기타유래원료 다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "폴리덱스트로스식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "폴리덱스트로스 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "3)프락토올리고당",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 프락토올리고당",
+   "classifyHit": true
+  },
+  {
+   "label": "Chicoricacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Chicoric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Totalpolyphenol",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Total polyphenol",
+   "classifyHit": false
+  },
+  {
+   "label": "성분로르산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "성분 (가)로르산",
+   "classifyHit": false
+  },
+  {
+   "label": "이상홍삼제품",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 홍삼제품",
+   "classifyHit": false
+  },
+  {
+   "label": "합계로서표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "합계로서 표시량",
+   "classifyHit": false
+  },
+  {
+   "label": "미리스트올레산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "미리스트올레산(Mynistoleic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)루틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 루틴",
+   "classifyHit": false
+  },
+  {
+   "label": "판두라틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "판두라틴(Panduratin A)",
+   "classifyHit": false
+  },
+  {
+   "label": "플라노볼배당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "플라노볼 배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "노다케닌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "노다케닌(Nodakenin)",
+   "classifyHit": false
+  },
+  {
+   "label": "lycosin-7-glucoside)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "lycosin-7-glucoside)",
+   "classifyHit": false
+  },
+  {
+   "label": "시아니딘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "시아니딘",
+   "classifyHit": false
+  },
+  {
+   "label": "Gly-Pro-dipeptide",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Gly-Pro-dipeptide",
+   "classifyHit": false
+  },
+  {
+   "label": "이상)(기타원료유래다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상) (기타원료유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "연질캡슐비타민K",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "연질캡슐 (2)비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": "-자일리톨함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 자일리톨함량",
+   "classifyHit": false
+  },
+  {
+   "label": "19)철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "19) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "22)철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "22) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "2)아시아티코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 아시아티코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "2)라폰티신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 라폰티신",
+   "classifyHit": false
+  },
+  {
+   "label": "a-linolenicacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "a-linolenic acid(연질캡슐)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)헤스페리딘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 헤스페리딘",
+   "classifyHit": false
+  },
+  {
+   "label": "세린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "세린",
+   "classifyHit": false
+  },
+  {
+   "label": "글리신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "글리신",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Naringin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) Naringin",
+   "classifyHit": false
+  },
+  {
+   "label": "3)Hesperidin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) Hesperidin",
+   "classifyHit": false
+  },
+  {
+   "label": "5)Caffeine",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) Caffeine",
+   "classifyHit": false
+  },
+  {
+   "label": "4)EGCG",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) EGCG",
+   "classifyHit": false
+  },
+  {
+   "label": "경질캅슐제2)Puerarin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "경질캅슐제 2)Puerarin",
+   "classifyHit": false
+  },
+  {
+   "label": "Isoorientin함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Isoorientin 함량(mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "Luteolin함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Luteolin함량(mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "정제키토산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "정제 키토산",
+   "classifyHit": false
+  },
+  {
+   "label": "코팅정제2)비타민C",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "코팅정제 2)비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "이하3)아연",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "이하 3)아연",
+   "classifyHit": true
+  },
+  {
+   "label": "5)셀렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "4)Paeoniflorin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) Paeoniflorin",
+   "classifyHit": false
+  },
+  {
+   "label": "3)루틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 루틴(Rutin)",
+   "classifyHit": false
+  },
+  {
+   "label": "알리인함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "알리인 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "3)Glabridin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) Glabridin",
+   "classifyHit": false
+  },
+  {
+   "label": "7-Dimethyesculetin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "7-Dimethyesculetin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)티로신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 티로신",
+   "classifyHit": false
+  },
+  {
+   "label": "3)알라닌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 알라닌",
+   "classifyHit": false
+  },
+  {
+   "label": "핵산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "핵산",
+   "classifyHit": false
+  },
+  {
+   "label": "홍경천추출물",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "홍경천추출물(로사빈으로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "데쿠르신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "데쿠르신",
+   "classifyHit": false
+  },
+  {
+   "label": "사우치논",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "사우치논",
+   "classifyHit": false
+  },
+  {
+   "label": "쉬잔드린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "쉬잔드린",
+   "classifyHit": false
+  },
+  {
+   "label": "2)치코르산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 치코르산",
+   "classifyHit": false
+  },
+  {
+   "label": "Oleuropein",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Oleuropein",
+   "classifyHit": false
+  },
+  {
+   "label": "L-아르기닌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "L-아르기닌",
+   "classifyHit": false
+  },
+  {
+   "label": "pyrogallol)",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "pyrogallol)",
+   "classifyHit": false
+  },
+  {
+   "label": "전체합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "전체 합",
+   "classifyHit": false
+  },
+  {
+   "label": "2)PGG",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) PGG",
+   "classifyHit": false
+  },
+  {
+   "label": "공액리놀레산함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "공액리놀레산함량",
+   "classifyHit": false
+  },
+  {
+   "label": "로즈마리산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "로즈마리산(Rosmarinic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "7-Dimethylesculetin)",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "7-Dimethylesculetin)",
+   "classifyHit": false
+  },
+  {
+   "label": "정제2)비타민C",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "정제 2)비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "7)철분",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "7)철분",
+   "classifyHit": true
+  },
+  {
+   "label": "이하3)나이아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 3)나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "2)감마리놀렌산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 감마리놀렌산",
+   "classifyHit": true
+  },
+  {
+   "label": "5)Nodakenin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) Nodakenin",
+   "classifyHit": false
+  },
+  {
+   "label": "6)비타민E",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "6) 비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": "4)코엔자임Q10",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 코엔자임Q10",
+   "classifyHit": true
+  },
+  {
+   "label": "13)비타민A",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "13) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "2)칼슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2)칼 슘",
+   "classifyHit": true
+  },
+  {
+   "label": "3)사포나린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 사포나린",
+   "classifyHit": false
+  },
+  {
+   "label": "4)비타민C",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "8)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "3)클로로겐산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 클로로겐산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)아스타진틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 아스타진틴",
+   "classifyHit": false
+  },
+  {
+   "label": "5)셀레늄",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "베타카로틴함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "베타카로틴 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "프라보놀배당체",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "프라보놀 배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "2)마그네슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "8)철분",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8)철분",
+   "classifyHit": true
+  },
+  {
+   "label": "제피정제철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "제피정제 철",
+   "classifyHit": false
+  },
+  {
+   "label": "3)소포리코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "9)조단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "9) 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "2)루테인",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 루테인",
+   "classifyHit": true
+  },
+  {
+   "label": "4)비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "3)Isorhamnetin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) Isorhamnetin",
+   "classifyHit": false
+  },
+  {
+   "label": "리놀레산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "(2) 리놀레산",
+   "classifyHit": false
+  },
+  {
+   "label": "베타시토스테롤",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "(3) 베타시토스테롤",
+   "classifyHit": false
+  },
+  {
+   "label": "8)나이아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "11)셀레늄",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "13)판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "13) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "15)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "15) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "9)소포리코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "9) 소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "스피루리나",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "스피루리나",
+   "classifyHit": false
+  },
+  {
+   "label": "피로갈롤",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "피로갈롤",
+   "classifyHit": false
+  },
+  {
+   "label": "배당체의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "배당체의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "2)핵산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 핵산",
+   "classifyHit": false
+  },
+  {
+   "label": "공액리놀레산의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "공액리놀레산의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "총-hydroxycitricacid",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총(-)-hydroxycitric acid",
+   "classifyHit": true
+  },
+  {
+   "label": "분말비타민B1(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "분말 비타민B1(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": ")판토텐산(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 판토텐산(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민B6(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민B6(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민C(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민C(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": ")L-테아닌(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") L-테아닌(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "1-Deoxynojirimycin함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "1-Deoxynojirimycin 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Dimethylesculetin함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Dimethylesculetin 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "액체진세노사이드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액체 진세노사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "이상비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": ")아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "2)비타민A",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "합함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "합 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "헤마토커쿠스추출물",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "헤마토커쿠스추출물(아스타잔틴 으로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "액상2)폴리덱스트로스",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 2)폴리덱스트로스",
+   "classifyHit": false
+  },
+  {
+   "label": "이상난소화성말토덱스트린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 난소화성말토덱스트린",
+   "classifyHit": true
+  },
+  {
+   "label": "제외)베타글루칸",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "제외) (3)베타글루칸",
+   "classifyHit": false
+  },
+  {
+   "label": "분말총다당체",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "분말 (2)총다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "피니톨",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "피니톨",
+   "classifyHit": false
+  },
+  {
+   "label": "4)limonene",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) limonene",
+   "classifyHit": false
+  },
+  {
+   "label": "2)terpinolene",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) terpinolene",
+   "classifyHit": false
+  },
+  {
+   "label": "3)3-carene",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 3-carene",
+   "classifyHit": false
+  },
+  {
+   "label": "-PGA",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "-PGA",
+   "classifyHit": false
+  },
+  {
+   "label": "2)비텍신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 비텍신(Vitexin)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)글라브리딘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 글라브리딘",
+   "classifyHit": false
+  },
+  {
+   "label": "이상폴리감마글루탐산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "이상 폴리감마글루탐산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)식이섬유함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)식이섬유 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "캡슐비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "캡슐 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "(3비타민C",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "3)총HCA",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 총HCA",
+   "classifyHit": true
+  },
+  {
+   "label": "액상2)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 2)아연",
+   "classifyHit": true
+  },
+  {
+   "label": "3)요오드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)요오드",
+   "classifyHit": true
+  },
+  {
+   "label": "공액리놀레산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "공액리놀레산",
+   "classifyHit": false
+  },
+  {
+   "label": "디글루코시드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "디글루코시드(Pinoresinol diglucoside)",
+   "classifyHit": false
+  },
+  {
+   "label": "11)마그네슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "12)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "12) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "14)망간",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "14) 망간",
+   "classifyHit": true
+  },
+  {
+   "label": "3)대두이소플라본",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 대두이소플라본",
+   "classifyHit": false
+  },
+  {
+   "label": "Hydroxy-L-isoleucine",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Hydroxy-L-isoleucine",
+   "classifyHit": false
+  },
+  {
+   "label": "이상L-테아닌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 L-테아닌",
+   "classifyHit": true
+  },
+  {
+   "label": "8)코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "8) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "이상(기타원료유래다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상(기타원료유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": ")3)판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 3)판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": ")4)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 4)비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": ")5)비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 5)비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": ")6)비타민B6",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 6)비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": ")7)비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 7)비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": ")8)철",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 8)철",
+   "classifyHit": false
+  },
+  {
+   "label": ")3)비타민E",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 3)비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": ")4)비타민K",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 4)비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": ")5)베타카로틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 5)베타카로틴",
+   "classifyHit": true
+  },
+  {
+   "label": ")6)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 6)비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": ")7)구리",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 7)구리",
+   "classifyHit": true
+  },
+  {
+   "label": ")8)크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 8)크롬",
+   "classifyHit": true
+  },
+  {
+   "label": ")9)몰리브덴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 9)몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": ")10)셀렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 10)셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": ")3)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 3)아연",
+   "classifyHit": true
+  },
+  {
+   "label": ")4)요오드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 4)요오드",
+   "classifyHit": true
+  },
+  {
+   "label": ")5)망간",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 5)망간",
+   "classifyHit": true
+  },
+  {
+   "label": "비세닌-2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "비세닌-2(Vicenin-2)",
+   "classifyHit": false
+  },
+  {
+   "label": "이하마그네슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민B6",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": ")비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": ")엽산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": ")칼슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ") 칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "코르솔산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "코르솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "7)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "7) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "8)비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "2)셀레늄",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "4)몰리브덴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "5)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "음성코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "음성 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "L-Leucine",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3) L-Leucine",
+   "classifyHit": false
+  },
+  {
+   "label": "L-Lysine",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(4) L-Lysine",
+   "classifyHit": false
+  },
+  {
+   "label": "L-Leucylglycine",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "L-Leucylglycine",
+   "classifyHit": false
+  },
+  {
+   "label": "산화아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "산화아연",
+   "classifyHit": true
+  },
+  {
+   "label": "사포나린함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "사포나린 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "총-Hydroxycitricacid함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총(-)-Hydroxycitric acid함량",
+   "classifyHit": true
+  },
+  {
+   "label": "30g이상판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "30g이상 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "이하루테인",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 (7)루테인",
+   "classifyHit": true
+  },
+  {
+   "label": "11)철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "11) 철",
+   "classifyHit": false
+  },
+  {
+   "label": "Protocatechuicacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Protocatechuic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Curcumin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Curcumin",
+   "classifyHit": false
+  },
+  {
+   "label": "-Glabridin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- Glabridin",
+   "classifyHit": false
+  },
+  {
+   "label": "C함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "C 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "라이코펜함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(all-trans)라이코펜 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "-엽산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "-비오틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "-칼슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "-마그네슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "-구리",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "-몰리브덴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "-크롬",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "1-9)락토페린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "1-9) 락토페린",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제키토올리고당",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "제피정제 (2)키토올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "음성포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "음성 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "CaHMBmonohydrate",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "CaHMB monohydrate",
+   "classifyHit": false
+  },
+  {
+   "label": "L-주석산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3) L-주석산",
+   "classifyHit": false
+  },
+  {
+   "label": "감마오리자놀",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "감마오리자놀",
+   "classifyHit": false
+  },
+  {
+   "label": "11)조단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "11) 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "-비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "-비타민C",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "-단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "경질캡슐철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "경질캡슐 철",
+   "classifyHit": false
+  },
+  {
+   "label": "정제2)칼슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "정제 2)칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "2)카테킨",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "EGCG함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "EGCG 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "3)카테킨",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "안트라퀘논계화합물",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "안트라퀘논계화합물(무수바바로인으로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "없음조단백질",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "없음 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "코로콜산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(4) 코로콜산",
+   "classifyHit": false
+  },
+  {
+   "label": "2-3)L-테아닌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2-3) L-테아닌",
+   "classifyHit": true
+  },
+  {
+   "label": "Cryptotanshinone",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Cryptotanshinone",
+   "classifyHit": false
+  },
+  {
+   "label": "5)나이아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "6)망간",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "6) 망간",
+   "classifyHit": true
+  },
+  {
+   "label": "9)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "9) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "10)비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "10) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "11)비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "13)비타민B6",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "13) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "14)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "14) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "15)비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "15) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "16)구리",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "16) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "chlorogenicacid",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "chlorogenic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "3)포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "2)키토올리고당",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 키토올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "중키토바이오스",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "중 키토바이오스",
+   "classifyHit": false
+  },
+  {
+   "label": "Sphingomyelin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Sphingomyelin",
+   "classifyHit": false
+  },
+  {
+   "label": "정제2)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "정제2)",
+   "classifyHit": false
+  },
+  {
+   "label": "-acetyl-rac-glycerol함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "-acetyl-rac-glycerol 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "테인",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "테 인",
+   "classifyHit": false
+  },
+  {
+   "label": "5)루테인",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "5) 루테인",
+   "classifyHit": true
+  },
+  {
+   "label": "7)마그네슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "7) 마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "8)N-아세틸글루코사민",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "8) N-아세틸글루코사민",
+   "classifyHit": true
+  },
+  {
+   "label": "혼합분말조단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "혼합분말 조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1의함",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Rb1의 함",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제알파-망고스틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "제피정제 (2)알파-망고스틴",
+   "classifyHit": false
+  },
+  {
+   "label": "갈랑긴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "(3)갈랑긴",
+   "classifyHit": false
+  },
+  {
+   "label": "유래다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "유래 다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "4)코로콜산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 코로콜산",
+   "classifyHit": false
+  },
+  {
+   "label": "Cordycepin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) Cordycepin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)갈산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 갈산",
+   "classifyHit": false
+  },
+  {
+   "label": "-요요드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "- 요요드",
+   "classifyHit": false
+  },
+  {
+   "label": "오노닌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3) 오노닌(Ononin)",
+   "classifyHit": false
+  },
+  {
+   "label": "정제3)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "정제3)",
+   "classifyHit": false
+  },
+  {
+   "label": "이상비타민D(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이상 비타민D(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "이하엽산(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 엽산(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "이하철(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 철(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B1(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B1(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B2(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B2(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비타민B6(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비타민B6(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "10)크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "10) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "EPA와DHA합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) EPA와DHA합",
+   "classifyHit": true
+  },
+  {
+   "label": "3)총-Hydroxycitricacid",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)총(-)-Hydroxycitric acid",
+   "classifyHit": true
+  },
+  {
+   "label": "제피정제자일로올리고당",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "제피정제 자일로올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "30분이내키토산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "30분이내 키토산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "11)엽산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "12)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "12) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "2)All-trans-라이코펜",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2)All-trans-라이코펜",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Dieckol",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) Dieckol",
+   "classifyHit": false
+  },
+  {
+   "label": "350mg이상아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "350mg이상 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "액상철",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 철",
+   "classifyHit": false
+  },
+  {
+   "label": "분말포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "분말 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "lsorhamnetin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3) lsorhamnetin",
+   "classifyHit": false
+  },
+  {
+   "label": "Rb1d의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Rb1d의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "Rg1및Rg3의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Rg1및Rg3의합",
+   "classifyHit": false
+  },
+  {
+   "label": "분말베타글루칸",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "분말 (2)베타글루칸",
+   "classifyHit": false
+  },
+  {
+   "label": "오리자놀함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "오리자놀 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "2)Fustin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) Fustin",
+   "classifyHit": false
+  },
+  {
+   "label": "2)EPA와DHA의합",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) EPA와DHA의합",
+   "classifyHit": true
+  },
+  {
+   "label": "감마아미노부틸산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) 감마아미노부틸산",
+   "classifyHit": false
+  },
+  {
+   "label": "Glycitin의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Glycitin의 합(mg)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)코로솔산함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2)코로솔산 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "에필갈로카테킨갈레이트",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "에필갈로카테킨갈레이트(EGCG)",
+   "classifyHit": true
+  },
+  {
+   "label": "코엔자임Q10함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "코엔자임Q10함량",
+   "classifyHit": true
+  },
+  {
+   "label": "4)비오틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "2)비타민B1",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "5)비타민B12",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "5) 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "3)바티민A",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 바티민A",
+   "classifyHit": false
+  },
+  {
+   "label": "Quercetin함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Quercetin 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "Isorhamnetin함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Isorhamnetin 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "디에콜함량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "디에콜(Dieckol) 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "식물스테롤",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "식물스테롤",
+   "classifyHit": false
+  },
+  {
+   "label": "농축액진세노사이드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "농축액 진세노사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "배당체",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "배당체(flavonol glycoside)",
+   "classifyHit": false
+  },
+  {
+   "label": "이하소포리코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "이하 소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "4)PGG",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) PGG",
+   "classifyHit": false
+  },
+  {
+   "label": "옥타코사놀최종제품",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "옥타코사놀 최종제품",
+   "classifyHit": true
+  },
+  {
+   "label": "총플라보이드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총 플라보이드",
+   "classifyHit": false
+  },
+  {
+   "label": "캅셀2)키토산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "캅셀 2)키토산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)홍삼",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 홍삼",
+   "classifyHit": false
+  },
+  {
+   "label": "7)비타민D3",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "7) 비타민D3",
+   "classifyHit": false
+  },
+  {
+   "label": "2)스쿠알렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 스쿠알렌",
+   "classifyHit": false
+  },
+  {
+   "label": "이하셀레늄",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 (7)셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "리나린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) 리나린(Linarin)",
+   "classifyHit": false
+  },
+  {
+   "label": "음성3)철",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "음성 3)철",
+   "classifyHit": false
+  },
+  {
+   "label": "-Coumaricacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "-Coumaric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "코팅정제2)포스콜린",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "코팅정제 2)포스콜린",
+   "classifyHit": false
+  },
+  {
+   "label": "총-HCA",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총(-)-HCA",
+   "classifyHit": true
+  },
+  {
+   "label": "10)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "10) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "11)비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "음성식이섬유",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "음성 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "정제코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "정제 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "디메틸설폰",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "디메틸설폰",
+   "classifyHit": true
+  },
+  {
+   "label": "acidC)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "acid C)",
+   "classifyHit": false
+  },
+  {
+   "label": "총Hydroxycitricaci",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "총(-)Hydroxycitric aci",
+   "classifyHit": true
+  },
+  {
+   "label": "크롬함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "크롬 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "9)코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "9) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "아연함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "아연 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "2)p-쿠마르산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) p-쿠마르산",
+   "classifyHit": false
+  },
+  {
+   "label": "리고당분말",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "리고당분말(개별인정형2009-80호)",
+   "classifyHit": false
+  },
+  {
+   "label": "AKBA",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "AKBA",
+   "classifyHit": false
+  },
+  {
+   "label": "Totalcurcuminoids",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Total curcuminoids",
+   "classifyHit": false
+  },
+  {
+   "label": "0이하포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "0이하 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "밀크씨슬(표시량",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "밀크씨슬(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "4)Quercetin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) Quercetin",
+   "classifyHit": false
+  },
+  {
+   "label": "5)Isorhamnetin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5)Isorhamnetin",
+   "classifyHit": false
+  },
+  {
+   "label": "4)셀렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "2)프라보늘배당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2)프라보늘 배당체",
+   "classifyHit": false
+  },
+  {
+   "label": "2)퀸산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 퀸산",
+   "classifyHit": false
+  },
+  {
+   "label": "3)구연산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "3) 구연산",
+   "classifyHit": false
+  },
+  {
+   "label": "1)식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "1) 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "9)비타민C",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "9) 비타민C",
+   "classifyHit": true
+  },
+  {
+   "label": "바닐릭산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "바닐릭산",
+   "classifyHit": false
+  },
+  {
+   "label": "-linolenicacid",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "-linolenic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "2)마그네숨",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 마그네숨",
+   "classifyHit": false
+  },
+  {
+   "label": "시알산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "시알산(Sialic acid)",
+   "classifyHit": false
+  },
+  {
+   "label": "Pro-Ala-Gly-Pro-Arg)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Pro-Ala-Gly-Pro-Arg)",
+   "classifyHit": false
+  },
+  {
+   "label": "Stachyose",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Stachyose",
+   "classifyHit": false
+  },
+  {
+   "label": "Eleutheroside",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Eleutheroside",
+   "classifyHit": false
+  },
+  {
+   "label": "경질캅셀식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "경질캅셀 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "4)Ecdysterone",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) Ecdysterone",
+   "classifyHit": false
+  },
+  {
+   "label": "2)단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "2-2)Quercetin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2-2) Quercetin",
+   "classifyHit": false
+  },
+  {
+   "label": "2-3)Isorhamnetin",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2-3) Isorhamnetin",
+   "classifyHit": false
+  },
+  {
+   "label": "4)셀레늄",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 셀레늄",
+   "classifyHit": true
+  },
+  {
+   "label": "5)구리",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "2)클로로겐산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 클로로겐산",
+   "classifyHit": false
+  },
+  {
+   "label": "캅셀2)칼슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "캅셀 2)칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "3)마그네슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "2)알란토인",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 알란토인",
+   "classifyHit": false
+  },
+  {
+   "label": "3)로즈마린산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 로즈마린산",
+   "classifyHit": false
+  },
+  {
+   "label": "05이하7)코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "05이하 7)코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "알파리놀렌산의합",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "알파리놀렌산의 합",
+   "classifyHit": false
+  },
+  {
+   "label": "Cryptotanshinon",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Cryptotanshinon",
+   "classifyHit": false
+  },
+  {
+   "label": "3)N-아세틸글루코사민",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) N-아세틸글루코사민",
+   "classifyHit": true
+  },
+  {
+   "label": "분말2)조단백질",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "분말 2)조단백질",
+   "classifyHit": false
+  },
+  {
+   "label": "Hyroxycitricacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Hyroxycitric acid",
+   "classifyHit": false
+  },
+  {
+   "label": "kg)카테킨",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "kg) 카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "kg)프락토올리고당",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "kg) 프락토올리고당",
+   "classifyHit": true
+  },
+  {
+   "label": "000mg아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "000mg 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "감마리놀렌산(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "감마리놀렌산(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민D(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "비타민D(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "아연(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "아연(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "플라보놀배당체(표시량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "플라보놀배당체(표시량",
+   "classifyHit": true
+  },
+  {
+   "label": "gRE)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "gRE)",
+   "classifyHit": false
+  },
+  {
+   "label": "액상아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 (2)아연",
+   "classifyHit": true
+  },
+  {
+   "label": "10)티로신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "10) 티로신",
+   "classifyHit": false
+  },
+  {
+   "label": "11)알라닌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "11) 알라닌",
+   "classifyHit": false
+  },
+  {
+   "label": "20g)(기타원료유래다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "20g)(기타원료유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "음성크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "음성 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "WithaferinA",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Withaferin A",
+   "classifyHit": false
+  },
+  {
+   "label": "4)비타민E",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4)비타민E",
+   "classifyHit": true
+  },
+  {
+   "label": "액상2)마그네슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "액상 2)마그네슘",
+   "classifyHit": true
+  },
+  {
+   "label": "2)나이아신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "액상2)총다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 2)총다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "2)리나린",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 리나린(Linarin)",
+   "classifyHit": false
+  },
+  {
+   "label": "제피정제2)카테킨",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "제피정제 2)카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "8)비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8)비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "9)판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "9)판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "3)몰리브덴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "4)크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4)크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "5)비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "5)비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "6)비타민K",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "6)비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": "액상2)히알루론산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "액상 2)히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "조단백",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "조단백",
+   "classifyHit": false
+  },
+  {
+   "label": ")안트라퀴논계화합물",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ")안트라퀴논계화합물(무수바바인으로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "6)코로솔산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "6) 코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "beta-D-glucose)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "beta-D-glucose)",
+   "classifyHit": false
+  },
+  {
+   "label": "음성비타민D",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "음성 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "-비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "알코올함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "알코올 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "비타민B6함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "비타민B6 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "비타민E함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "비타민E 함량",
+   "classifyHit": true
+  },
+  {
+   "label": "틸리아닌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "틸리아닌(Tilianin)",
+   "classifyHit": false
+  },
+  {
+   "label": "All-trans-라이코펜",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "All-trans-라이코펜",
+   "classifyHit": false
+  },
+  {
+   "label": "몰리드덴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "몰리드덴",
+   "classifyHit": false
+  },
+  {
+   "label": "총츨라보노이드",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총 츨라보노이드",
+   "classifyHit": false
+  },
+  {
+   "label": "2)판토텐산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "9)구리",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "9) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "디에콜",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "디에콜(Dieckol)",
+   "classifyHit": false
+  },
+  {
+   "label": "2)히알루론산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "비텍신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "비텍신(Vitexin)",
+   "classifyHit": false
+  },
+  {
+   "label": "이상3)프락토올리고당",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "이상 3)프락토올리고당",
+   "classifyHit": true
+  },
+  {
+   "label": "녹갈색과립식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "녹갈색과립 (2)식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "-Gastrodin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- Gastrodin",
+   "classifyHit": false
+  },
+  {
+   "label": "이내비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이내 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "없음비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "없음 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "이하비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "이하셀렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "이하크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "-토코페릴아세테이트)",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "-토코페릴아세테이트)",
+   "classifyHit": false
+  },
+  {
+   "label": "9)크롬",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "9) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "10)나이아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "10) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "11)아연",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 아연",
+   "classifyHit": true
+  },
+  {
+   "label": "12)판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "12) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "14)비타민B6",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "14) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "15)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "15) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "16)비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "16) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "18)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "18) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "4)Nodakenin",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) Nodakenin",
+   "classifyHit": false
+  },
+  {
+   "label": "총-HCA함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "총(-)-HCA함량",
+   "classifyHit": true
+  },
+  {
+   "label": "100g)",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "100g)",
+   "classifyHit": false
+  },
+  {
+   "label": "원형정제비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "원형정제 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "GallicAcid",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Gallic Acid",
+   "classifyHit": false
+  },
+  {
+   "label": "과립식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "과립 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "씨폴리놀감태주정추출물",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "씨폴리놀감태주정추출물(Dieckol 로서)",
+   "classifyHit": false
+  },
+  {
+   "label": "8)망간",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "8) 망간",
+   "classifyHit": true
+  },
+  {
+   "label": "11)판토텐산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 판토텐산",
+   "classifyHit": true
+  },
+  {
+   "label": "13)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "13) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "14)구리",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "14) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "15)비타민B12",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "15) 비타민B12",
+   "classifyHit": true
+  },
+  {
+   "label": "16)비타민B6",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "16) 비타민B6",
+   "classifyHit": true
+  },
+  {
+   "label": "17)비타민K",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "17) 비타민K",
+   "classifyHit": true
+  },
+  {
+   "label": "18)비타민B1",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "18) 비타민B1",
+   "classifyHit": true
+  },
+  {
+   "label": "19)비타민B2",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "19) 비타민B2",
+   "classifyHit": true
+  },
+  {
+   "label": "20)엽산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "20) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "이소비텍신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(2) 이소비텍신",
+   "classifyHit": false
+  },
+  {
+   "label": "안드로그라폴라이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "안드로그라폴라이드",
+   "classifyHit": false
+  },
+  {
+   "label": "2)베타글루칸",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 베타글루칸",
+   "classifyHit": false
+  },
+  {
+   "label": "Corosolicacid",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "Corosolic acid",
+   "classifyHit": false
+  },
+  {
+   "label": "Arabinose의합",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "Arabinose의 합",
+   "classifyHit": false
+  },
+  {
+   "label": ")(기타유래다당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": ")(기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "살라시놀",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "살라시놀(salacinol)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)옥타코사놀",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3)옥타코사놀",
+   "classifyHit": true
+  },
+  {
+   "label": "베타글루칸함량",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "베타글루칸 함량",
+   "classifyHit": false
+  },
+  {
+   "label": "2)이소비텍신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "2) 이소비텍신",
+   "classifyHit": false
+  },
+  {
+   "label": "지방족알코올",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "지방족 알코올",
+   "classifyHit": false
+  },
+  {
+   "label": "4)포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 포스파티딜세린",
+   "classifyHit": false
+  },
+  {
+   "label": "분말2)칼슘",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "분말 2)칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "4총모나콜린K",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4 총모나콜린K",
+   "classifyHit": false
+  },
+  {
+   "label": "바릴티로신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "(3) 바릴티로신",
+   "classifyHit": false
+  },
+  {
+   "label": "분말식이섬유",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "분말 (2)식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "연질캡슐2)리놀렌산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "연질캡슐 2)리놀렌산",
+   "classifyHit": false
+  },
+  {
+   "label": "6)자일로올리고당",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "6) 자일로올리고당",
+   "classifyHit": false
+  },
+  {
+   "label": "코팅정제2)로사빈",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "코팅정제 2)로사빈",
+   "classifyHit": false
+  },
+  {
+   "label": "2)L-카르니틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) L-카르니틴",
+   "classifyHit": false
+  },
+  {
+   "label": "4)갈산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 갈산",
+   "classifyHit": false
+  },
+  {
+   "label": "oleuropein",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "oleuropein",
+   "classifyHit": false
+  },
+  {
+   "label": "4)총모나콜린K",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 총모나콜린K",
+   "classifyHit": false
+  },
+  {
+   "label": "및Rg3의합최종제품",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "및Rg3의합 (가)최종제품",
+   "classifyHit": false
+  },
+  {
+   "label": "이상히알루론산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "이상 히알루론산",
+   "classifyHit": false
+  },
+  {
+   "label": "기타유래다당체",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "-홍삼",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 홍삼(최종제품)",
+   "classifyHit": false
+  },
+  {
+   "label": "캅셀)",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "캅셀)",
+   "classifyHit": false
+  },
+  {
+   "label": "3)비타민A",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "3) 비타민A",
+   "classifyHit": true
+  },
+  {
+   "label": "4)카테킨",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 카테킨",
+   "classifyHit": true
+  },
+  {
+   "label": "9)나이아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "9) 나이아신",
+   "classifyHit": true
+  },
+  {
+   "label": "4)베타카로틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "4) 베타카로틴",
+   "classifyHit": true
+  },
+  {
+   "label": "프로토카테츄산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "프로토카테츄산",
+   "classifyHit": false
+  },
+  {
+   "label": "9)셀렌",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "9) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "10)비타민D",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "10) 비타민D",
+   "classifyHit": true
+  },
+  {
+   "label": "11)비오틴",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "11) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "아데노신",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "(3) 아데노신(갈색경질캡슐)",
+   "classifyHit": false
+  },
+  {
+   "label": "15g(기타유래다당체",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "15g (기타유래다당체",
+   "classifyHit": false
+  },
+  {
+   "label": "4)소포리코사이드",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 소포리코사이드",
+   "classifyHit": false
+  },
+  {
+   "label": "4)칼슘",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 칼슘",
+   "classifyHit": true
+  },
+  {
+   "label": "8)셀렌",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "8) 셀렌",
+   "classifyHit": true
+  },
+  {
+   "label": "11)크롬",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "11) 크롬",
+   "classifyHit": true
+  },
+  {
+   "label": "12)몰리브덴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "12) 몰리브덴",
+   "classifyHit": true
+  },
+  {
+   "label": "16)비오틴",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "16) 비오틴",
+   "classifyHit": true
+  },
+  {
+   "label": "17)구리",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "17) 구리",
+   "classifyHit": true
+  },
+  {
+   "label": "19)엽산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "19) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "젤리식이섬유",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "젤리 식이섬유",
+   "classifyHit": true
+  },
+  {
+   "label": "대두이소플라본비배당체로서",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "대두이소플라본 비배당체로서",
+   "classifyHit": false
+  },
+  {
+   "label": "텍토크리신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "텍토크리신(Tectochrysin)",
+   "classifyHit": false
+  },
+  {
+   "label": "4)팔밋올레산",
+   "count": 1,
+   "withKnownPartner": 1,
+   "sample": "4) 팔밋올레산",
+   "classifyHit": false
+  },
+  {
+   "label": "2)플라보놀배당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "2) 플라보놀배당체",
+   "classifyHit": true
+  },
+  {
+   "label": "14)엽산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "14) 엽산",
+   "classifyHit": true
+  },
+  {
+   "label": "연질캡슐플라보놀배당체",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "연질캡슐 (2)플라보놀배당체",
+   "classifyHit": true
+  },
+  {
+   "label": "이하코엔자임Q10",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "이하 (4)코엔자임Q10",
+   "classifyHit": true
+  },
+  {
+   "label": "0이하코로솔산",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "0이하 (7)코로솔산",
+   "classifyHit": false
+  },
+  {
+   "label": "밀리아신",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "밀리아신(Miliacin)",
+   "classifyHit": false
+  },
+  {
+   "label": "-포스파티딜세린",
+   "count": 1,
+   "withKnownPartner": 0,
+   "sample": "- 포스파티딜세린",
+   "classifyHit": false
+  }
+ ]
+}
