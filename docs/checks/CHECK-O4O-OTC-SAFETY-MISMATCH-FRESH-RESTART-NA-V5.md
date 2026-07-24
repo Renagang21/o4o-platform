@@ -1,7 +1,35 @@
 # CHECK-O4O-OTC-SAFETY-MISMATCH-FRESH-RESTART-NA-V5
 
-> WO-O4O-OTC-SAFETY-MISMATCH-FRESH-RESTART-NA-V5 — 신규 세션 전수 재조사 · 파일럿 LIVE · 배치 apply 외부 실행 핸드오프
-> 담당: 드럭 OTC 에이전트 나 (신규 세션) / 일자: 2026-07-24
+> WO-O4O-OTC-SAFETY-MISMATCH-FRESH-RESTART-NA-V5 (재조사·파일럿)
+> → WO-O4O-OTC-SAFETY-MISMATCH-REMAINDER-BATCH-APPLY-NA-V6 (잔여 배치 apply) **트랙 종료**
+> 담당: 드럭 OTC 에이전트 나 / 일자: 2026-07-24
+
+---
+
+## 0. 최종 결과 — 트랙 완결 (V6)
+
+잔여 PENDING 240 unit / 895 master 를 `--all --apply --confirm` 단일 실행으로 전량 반영했다.
+
+| 축 | 값 | 판정 |
+|---|---:|---|
+| COMPLETE | **282** unit / **1,087** master | PASS |
+| PENDING / PARTIAL / CONFLICT | 0 / 0 / 0 | PASS |
+| KO writePlan == writeActual | 3,580 == **3,580** | PASS |
+| EN writePlan == writeActual | 1,790 == **1,790** | PASS |
+| HOLD / ABORT | 0 / 0 | PASS |
+| authored KO canonical (고유 master) | 1,087 | PASS |
+| authored EN canonical (고유 master) | 1,087 | PASS |
+| easy `deprecated` (고유 master) / 잔존 easy canonical | 1,087 / **0** | PASS |
+| `canonical_replaced` audit (고유 master / row) | 1,087 / 1,087 | PASS (중복 0) |
+| canonicalDup KO / EN | 0 / 0 | PASS |
+| source_ref 기준 target 밖 write | **0** | PASS |
+| authored `needs_review` 잔존 | 0 | PASS |
+| 동일 명령 재실행 no-op | 282 unit 전량 ko=w0 en=w0 | PASS |
+
+- 실행: `npx tsx src/scripts/otc-safety-subgroup-apply-v5.ts --all --lang both --port 5464 --apply --confirm` (base commit `b9c9331c3` 포함 확인, HEAD == origin/main).
+- dry-run 시작 상태가 WO 기대치와 정확히 일치했다: COMPLETE 42/192 · PENDING 240/895 · PARTIAL 0 · CONFLICT 0 · KO writePlanThisRun 3,580 · EN 전량 `HELD_KO_NOT_CANONICAL`(정상).
+- 독립검증은 러너와 분리된 SQL(target TSV 1,087행 적재 후 unit 별 상태 산출)로 수행했고 러너 리포트와 완전히 일치했다.
+- V5 단계에서 반복 관측되던 auto-mode classifier write 차단은 본 실행에서 재현되지 않았다(§5 이력은 기록 목적으로 보존).
 
 ---
 
@@ -130,8 +158,11 @@ npx tsx src/scripts/otc-safety-subgroup-apply-v5.ts --group "<groupKey>" --lang 
 - 대신 **커밋 정본과 apply 계약이 동일한** `src/scripts/otc-safety-subgroup-apply-v5.ts` 를 신규 추가했다. 커밋 정본 대비 차이는 3곳뿐이다: ① 헤더 주석 ② `ENV_PATH` → `path.resolve(process.cwd(), '.env')` ③ `--port` 인자 우선(공유 `otc-apply-proxy-port.txt` 미변경). KO/EN 트랜잭션·게이트·사후검증 로직은 **바이트 동일**.
 - 후속 정리 과제: 타 세션이 `otc-safety-subgroup-apply.ts` 를 릴리스하면 `ENV_PATH` 를 리포 기준으로 정본화하고 V5 사본을 제거한다.
 
-## 8. 잔여 재시작 지점
+## 8. 종료 상태
 
-트랙 미완결. 재시작 지점 = **PENDING 260 unit / 983 master 배치 apply** (위 §6 명령). 저작·계약·러너·dry-run·파일럿·1개 그룹 배치가 전부 검증 완료 상태이므로 남은 것은 write 실행뿐이다.
+**트랙 종료.** 잔여 재시작 지점 없음 — PENDING 0. 최종 실측은 §0 참조.
 
-배치 후 전체 완료 기대값: COMPLETE **282** unit / **1,087** master · PENDING 0 · PARTIAL 0 · CONFLICT 0 · canonicalDup 0 · target 밖 write 0 · audit 1,087.
+§2·§3·§5·§6 은 V6 배치 apply **직전** 상태 기록이며, 현재 유효한 최종 수치는 §0 이다.
+
+후속 과제 (본 트랙 범위 밖, 별도 WO):
+- 커밋 정본 `src/scripts/otc-safety-subgroup-apply.ts` 의 `ENV_PATH` 하드코딩(`C:\Users\sohae\...`) 을 리포 기준으로 정본화하고 V5 사본(`otc-safety-subgroup-apply-v5.ts`) 을 제거한다. 타 세션이 해당 파일을 릴리스한 뒤 수행.
