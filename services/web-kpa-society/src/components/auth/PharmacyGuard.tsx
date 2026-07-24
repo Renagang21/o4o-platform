@@ -5,20 +5,22 @@
  *   공통 `StoreOwnerGuard` (`@o4o/store-ui-core`) 를 사용하도록 정렬.
  *   KPA-specific 동작은 본 wrapper 에서 유지:
  *     1. `isPlatformOnlyUser` (admin/operator 단독 계정) → 차단 카드 즉시 표시
- *        (stale recovery API 호출 회피 — 운영자/관리자는 stale 이 아니라 매장 경영자가 아님)
- *     2. stale JWT recovery — `getMyRequestsCached()` 로 approved 여부 확인 후
- *        approved 시 `checkAuth()` 으로 세션 갱신 (StoreOwnerGuard `staleRecovery` prop)
- *     3. MembershipGate 로 접근 grant 시 children 감싸기
+ *     2. MembershipGate 로 접근 grant 시 children 감싸기
+ *
+ * WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+ *   약국 서비스 별도 신청(pharmacy-requests) 폐지에 따라, pharmacy-request 기반
+ *   stale JWT recovery(`getMyRequestsCached`)를 제거한다. 매장 운영 권한은 약국 경영자
+ *   회원 승인(Path B) 시 자동 부여되며, 세션 갱신은 재로그인/마이페이지 checkAuth 로 회복된다.
+ *   role/`user.isStoreOwner` 플래그만으로 접근을 판정한다.
  *
  * 평가 우선순위:
- *   loading > !auth > directAccess > platformOnly card > staleRecovery > denial
+ *   loading > !auth > directAccess > platformOnly card > denial
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { StoreOwnerGuard } from '@o4o/store-ui-core';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
-import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 import { MembershipGate } from './MembershipGate';
 
 interface PharmacyGuardProps {
@@ -28,12 +30,6 @@ interface PharmacyGuardProps {
 const Loading = (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
     <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
-  </div>
-);
-
-const RecoveryLoading = (
-  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-    <p style={{ color: '#64748B' }}>약국 승인 상태 확인 중...</p>
   </div>
 );
 
@@ -55,7 +51,7 @@ const PlatformOnlyCard = (
 );
 
 export function PharmacyGuard({ children }: PharmacyGuardProps) {
-  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) return Loading;
@@ -80,15 +76,6 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
       loadingNode={Loading}
       denialFallback="/pharmacy"
       membershipGate={MembershipGate}
-      staleRecovery={{
-        check: async () => {
-          const items = await getMyRequestsCached();
-          return items.some((r) => r.status === 'approved');
-        },
-        refreshSession: () => checkAuth(),
-        loadingNode: RecoveryLoading,
-        fallback: '/pharmacy',
-      }}
     >
       {children}
     </StoreOwnerGuard>

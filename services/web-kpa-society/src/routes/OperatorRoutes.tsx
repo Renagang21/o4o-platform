@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -155,8 +155,9 @@ export function OperatorRoutes() {
           {/* WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1: 회원 관리 (KpaMember 기반) */}
           <Route path="members" element={<MemberManagementPage />} />
 
-          {/* 약국 서비스 신청 관리 (WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1) */}
-          <Route path="pharmacy-requests" element={<PharmacyRequestManagementPage />} />
+          {/* WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+              약국 서비스 별도 신청·승인 흐름 폐지 → pharmacy-requests 라우트 제거.
+              (직접 URL 진입은 하단 catch-all 로 /operator 리다이렉트) */}
 
           {/* 상품 판매 신청 관리 (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1) */}
           <Route path="product-applications" element={<ProductApplicationManagementPage />} />

@@ -15,7 +15,7 @@ export { default as ForumAnalyticsDashboard } from './ForumAnalyticsDashboard';
 export { default as MemberManagementPage } from './MemberManagementPage';
 export { default as ContentManagementPage } from './ContentManagementPage';
 export { default as AuditLogPage } from './AuditLogPage';
-export { default as PharmacyRequestManagementPage } from './PharmacyRequestManagementPage';
+// WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1: PharmacyRequestManagementPage 제거
 export { default as ProductApplicationManagementPage } from './ProductApplicationManagementPage';
 export { default as CommunityManagementPage } from './CommunityManagementPage';
 export { default as QualificationRequestsPage } from './QualificationRequestsPage';

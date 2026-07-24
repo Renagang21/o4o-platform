@@ -58,9 +58,11 @@ export type NotificationType =
   | 'member.registration_approved'   // 신청자: 회원가입 승인
   | 'member.registration_rejected'   // 신청자: 회원가입 반려
   // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
-  | 'pharmacy.request_submitted'     // 운영자: 약국 개설 신청 접수
-  | 'pharmacy.request_approved'      // 신청자: 약국 개설 신청 승인
-  | 'pharmacy.request_rejected'      // 신청자: 약국 개설 신청 반려
+  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //   약국 서비스 별도 신청 폐지로 신규 emit 없음(emitter 제거됨). 과거 알림 row 판독 위해 union 유지 — deprecated.
+  | 'pharmacy.request_submitted'     // [deprecated] 운영자: 약국 개설 신청 접수
+  | 'pharmacy.request_approved'      // [deprecated] 신청자: 약국 개설 신청 승인
+  | 'pharmacy.request_rejected'      // [deprecated] 신청자: 약국 개설 신청 반려
   // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1: 판매자 모집 신청자 알림
   | 'recruitment.application_approved'     // 판매자: 모집 신청 승인
   | 'recruitment.application_rejected'     // 판매자: 모집 신청 반려

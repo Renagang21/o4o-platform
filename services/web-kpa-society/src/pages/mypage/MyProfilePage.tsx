@@ -16,7 +16,9 @@ import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
 import { mypageApi, type ProfileResponse } from '../../api';
-import { pharmacyRequestApi, type PharmacyRequest } from '../../api/pharmacyRequestApi';
+// WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+//   약국 서비스 별도 신청(pharmacyRequestApi) 흐름 폐지 → import 제거.
+//   매장 운영 권한은 약국 경영자 회원 승인(Path B) 시 자동 부여된다.
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
@@ -27,27 +29,6 @@ import { colors, typography } from '../../styles/theme';
 //   - pending: 가장 최근 신청이 검토 중
 //   - approved: 가장 최근 신청이 승인 완료
 //   - rejected: 가장 최근 신청이 반려 (재신청 가능)
-type StoreOwnerCapStatus = 'unknown' | 'unsubmitted' | 'pending' | 'approved' | 'rejected';
-
-const STORE_OWNER_STATUS_LABELS: Record<Exclude<StoreOwnerCapStatus, 'unknown'>, string> = {
-  unsubmitted: '미신청',
-  pending: '승인 대기',
-  approved: '승인 완료',
-  rejected: '반려',
-};
-
-/** 가장 최근(updated_at 기준) 신청의 status 로 capability 상태 도출 */
-function deriveStoreOwnerStatus(items: PharmacyRequest[], hasStoreOwnerRole: boolean): StoreOwnerCapStatus {
-  // role 이 이미 부여돼 있으면 신청 여부와 무관하게 '승인 완료' (캐시/조회 실패 안전망)
-  if (hasStoreOwnerRole) return 'approved';
-  if (!items || items.length === 0) return 'unsubmitted';
-  const latest = [...items].sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''))[0];
-  if (latest.status === 'approved') return 'approved';
-  if (latest.status === 'pending') return 'pending';
-  if (latest.status === 'rejected') return 'rejected';
-  return 'unsubmitted';
-}
-
 // WO-O4O-KPA-PHARMACY-OWNER-DIRECT-CHANGE-GUARD-V1:
 //   pharmacy_owner 는 직역 select 에서 직접 선택 불가 (자동 부여 / pharmacy_request 승인 경로로만 진입).
 //   현재 직역이 이미 pharmacy_owner 인 사용자는 아래 select 렌더 시 별도 옵션으로 현재 값만 표시.
@@ -143,8 +124,6 @@ export function MyProfilePage() {
   });
 
   // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1: 매장 운영 권한 capability 상태
-  const [storeOwnerStatus, setStoreOwnerStatus] = useState<StoreOwnerCapStatus>('unknown');
-  const [storeOwnerStatusLoading, setStoreOwnerStatusLoading] = useState(false);
 
   // WO-O4O-KPA-MYPAGE-CAPABILITY-CARD-AUTO-ALIGN-V1:
   //   자동 store_owner 부여 정책 도입 후, role 보유 사용자에게는 capability 신청 UI 미표시.
@@ -166,29 +145,10 @@ export function MyProfilePage() {
     if (user) loadData();
   }, [user]);
 
-  // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1:
-  //   매장 운영 권한 상태 fetch — pharmacist info 가 있는 사용자(직역 탭이 노출되는 사용자)에 한해.
-  //   /pharmacy-requests/my 엔드포인트는 인증된 모든 사용자에게 본인 신청을 반환.
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    setStoreOwnerStatusLoading(true);
-    pharmacyRequestApi.getMyRequests()
-      .then((res) => {
-        if (cancelled) return;
-        const items = res?.data?.items || [];
-        setStoreOwnerStatus(deriveStoreOwnerStatus(items, hasStoreOwnerRole));
-      })
-      .catch(() => {
-        if (cancelled) return;
-        // 조회 실패 시 role 기반으로만 판단 (네트워크/권한 문제 graceful)
-        setStoreOwnerStatus(hasStoreOwnerRole ? 'approved' : 'unknown');
-      })
-      .finally(() => {
-        if (!cancelled) setStoreOwnerStatusLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, [user]);
+  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //   약국 서비스 별도 신청 상태 fetch 폐지. 매장 운영 권한(kpa:store_owner)은
+  //   약국 경영자 회원 승인(Path B) 시 자동 부여되며, 별도 신청 상태를 조회하지 않는다.
+  //   화면에는 role 보유 여부(hasStoreOwnerRole)만으로 분기한다.
 
   const loadData = async () => {
     try {
@@ -778,47 +738,24 @@ export function MyProfilePage() {
                   <div style={styles.capabilitySection}>
                     <div style={styles.capabilityHeader}>
                       <h4 style={styles.capabilityTitle}>매장 운영</h4>
-                      {storeOwnerStatus !== 'unknown' && (
-                        <span
-                          style={{
-                            ...styles.capabilityBadge,
-                            ...(storeOwnerStatus === 'approved' ? styles.capabilityBadgeApproved
-                              : storeOwnerStatus === 'pending' ? styles.capabilityBadgePending
-                              : storeOwnerStatus === 'rejected' ? styles.capabilityBadgeRejected
-                              : styles.capabilityBadgeUnsubmitted),
-                          }}
-                        >
-                          {STORE_OWNER_STATUS_LABELS[storeOwnerStatus]}
-                        </span>
-                      )}
-                      {storeOwnerStatusLoading && storeOwnerStatus === 'unknown' && (
-                        <span style={styles.capabilityBadgeLoading}>확인 중...</span>
-                      )}
                     </div>
+                    {/* WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+                        약국 서비스 별도 신청 흐름 폐지. 매장 운영 권한은 약국 경영자 회원
+                        승인 시 자동 부여되므로 안내만 제공하고 신청 버튼은 노출하지 않는다. */}
                     <p style={styles.capabilityDesc}>
-                      내 매장 / Store HUB 이용은 별도의 매장 운영 승인 절차가 필요합니다.
-                      위 직역(활동 유형)은 회원 본인 소개 정보이며, 매장 운영과는 다릅니다.
+                      약국 경영자 회원으로 승인되면 내 매장 / Store HUB 등 매장 기능을
+                      별도 신청 없이 자동으로 사용할 수 있습니다.
+                      위 직역(활동 유형)은 회원 본인 소개 정보입니다.
                     </p>
                     {/* WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 3):
                         자동 활성화 prerequisite 부족 안내 — 사용자가 운영자의 silent skip 을 인지할 수 있도록. */}
                     {isMissingActivationBusinessData && (
                       <div style={styles.activationWarning}>
-                        ⚠ 매장 운영 활성화에 필요한 정보(사업자번호, 약국명)가 부족합니다.
+                        ⚠ 매장 운영 자동 활성화에 필요한 정보(사업자번호, 약국명)가 부족합니다.
                         위 직역 정보 섹션에서 사업자 정보를 입력해 주세요.
                       </div>
                     )}
-                    {storeOwnerStatus === 'unsubmitted' && (
-                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>매장 운영 신청 →</Link>
-                    )}
-                    {storeOwnerStatus === 'pending' && (
-                      <Link to="/pharmacy" style={styles.capabilityCtaSecondary}>내 신청 보기</Link>
-                    )}
-                    {storeOwnerStatus === 'approved' && (
-                      <Link to="/store" style={styles.capabilityCtaPrimary}>내 매장으로 이동 →</Link>
-                    )}
-                    {storeOwnerStatus === 'rejected' && (
-                      <Link to="/pharmacy" style={styles.capabilityCtaPrimary}>다시 신청하기 →</Link>
-                    )}
+                    <Link to="/join/pharmacy" style={styles.capabilityCtaSecondary}>약국 경영자 회원 안내 →</Link>
                   </div>
                 </>
               )}

@@ -1825,12 +1825,13 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
     {
       step: '04',
       title: '매장·회원 지원과 커뮤니티 운영',
-      routeLabel: '/operator/{members, pharmacy-requests, forum-management, lms, surveys}',
+      routeLabel: '/operator/{members, forum-management, lms, surveys}',
       description:
-        '회원·약국 신청을 승인하고 포럼·LMS·설문 등 커뮤니티 활동을 운영합니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
+        '회원 신청을 승인하고 포럼·LMS·설문 등 커뮤니티 활동을 운영합니다. 약국 경영자 회원을 승인하면 매장 운영 권한이 함께 부여됩니다. 운영자는 매장과 회원에게 운영 서비스를 제공하는 사업자입니다.',
       items: [
-        { label: '회원 관리', detail: '/operator/members — 가입 승인·역할·자격 관리' },
-        { label: '약국 신청 승인', detail: '/operator/pharmacy-requests — 매장 가입 처리' },
+        // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+        //   별도 '약국 신청 승인'(/operator/pharmacy-requests) 폐지 → 약국 경영자 회원 승인(회원 관리)에서 매장 권한 자동 부여.
+        { label: '회원 관리', detail: '/operator/members — 가입 승인·역할·자격 관리 (약국 경영자 승인 시 매장 권한 자동 부여)' },
         { label: '포럼 관리', detail: '/operator/forum-management — 포럼 개설 승인·콘텐츠' },
         { label: 'LMS 강의 운영', detail: '/operator/lms — 강의 개설·강사·커리큘럼' },
         { label: '설문 운영', detail: '/operator/surveys — 설문 작성·배포·응답 분석' },

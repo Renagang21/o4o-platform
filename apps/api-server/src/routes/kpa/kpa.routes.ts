@@ -67,7 +67,9 @@ import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './c
 // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
 import { createContactRequestHandler, listContactRequestsHandler, updateContactRequestStatusHandler } from './controllers/contact-request.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
-import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
+// WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+//   약국 서비스 별도 신청(pharmacy-requests) 폐지 — 매장 운영 권한은 약국 경영자 회원 승인(Path B, member.controller)에서 자동 부여.
+//   controller/route mount 제거. 이력 보존을 위해 KpaPharmacyRequest 엔티티/마이그레이션은 유지(별도 cleanup WO).
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
 import { createPharmacyInfoController } from '../o4o-store/controllers/pharmacy-info.controller.js';
@@ -360,9 +362,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     }
   }));
 
-  // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
-  // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
-  router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
+  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //   '/pharmacy-requests' 라우트 폐지 (신청/승인/반려/알림 전량 제거).
+  //   매장 운영 권한은 약국 경영자 회원 승인(Path B)에서 자동 부여된다.
 
   // Legal Documents routes (WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V3)
   router.use('/', createLegalDocumentsController(dataSource, coreRequireAuth as any, requireKpaScope));

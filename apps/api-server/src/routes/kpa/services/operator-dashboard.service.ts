@@ -7,7 +7,7 @@
  *
  * 책임:
  *   - 기존 /operator/summary 의 17 query 동일 재사용 (3 module service + 14 raw)
- *   - 추가 6 보조 query (members pending / pharmacy-requests pending / store stats /
+ *   - 추가 6 보조 query (members pending / event-offer(organization_product_listings) pending / store stats /
  *     product-applications pending / [admin] total members / [admin] organization-join pending)
  *   - frontend `buildKpaOperatorConfig` (services/web-kpa-society/src/pages/operator/operatorConfig.ts) 의
  *     5-Block 조립 logic 을 backend 로 그대로 포트 — Adapter WO 단계에서 frontend 가
@@ -83,7 +83,7 @@ interface SummaryShape {
     forcedExpirySoon: number;
   };
   recentActivity: Array<{
-    type: 'member_join' | 'pharmacy_request' | 'application' | 'org_join';
+    type: 'member_join' | 'application' | 'org_join';
     label: string;
     timestamp: string;
     status: string;
@@ -93,7 +93,9 @@ interface SummaryShape {
 interface SecondaryCounts {
   pendingMembers: number;
   totalMembers: number;
-  pharmacyRequestCount: number;
+  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //   약국 서비스 신청 pending 폐지 → 이벤트 오퍼(organization_product_listings) 승인 대기로 대체.
+  eventOfferPendingCount: number;
   productApplicationPendingCount: number;
   serviceApplicationCount: number;
   storeStats: { totalStores: number; activeStores: number } | null;
@@ -125,7 +127,6 @@ async function fetchSummaryShape(
     membershipPendingCount,
     forcedExpirySoonCount,
     recentMemberRows,
-    recentPharmacyRows,
     recentApplicationRows,
     recentOrgJoinRows,
   ] = await Promise.all([
@@ -194,11 +195,6 @@ async function fetchSummaryShape(
       ORDER BY m.created_at DESC LIMIT 10
     `).catch(() => []),
     dataSource.query(`
-      SELECT id, pharmacy_name, status, created_at
-      FROM kpa_pharmacy_requests
-      ORDER BY created_at DESC LIMIT 5
-    `).catch(() => []),
-    dataSource.query(`
       SELECT a.id, u.name as applicant_name, a.status, a.created_at
       FROM kpa_applications a
       LEFT JOIN users u ON u.id = a.user_id
@@ -219,14 +215,6 @@ async function fetchSummaryShape(
     recentActivity.push({
       type: 'member_join',
       label: `${r.name || '(이름 없음)'} ${typeLabel} 가입`,
-      timestamp: r.created_at,
-      status: r.status,
-    });
-  }
-  for (const r of (recentPharmacyRows as any[]) || []) {
-    recentActivity.push({
-      type: 'pharmacy_request',
-      label: `${r.pharmacy_name || '약국'} 서비스 신청`,
       timestamp: r.created_at,
       status: r.status,
     });
@@ -291,7 +279,9 @@ async function fetchSecondaryCounts(
   isAdmin: boolean,
 ): Promise<SecondaryCounts> {
   // KPA Member pending = kpa_members.status='pending' (어드민 API 와 같은 source).
-  // 약국 서비스 신청 pending = kpa_pharmacy_requests.status='pending'.
+  // 이벤트 오퍼 승인 대기 = organization_product_listings.status='pending' (service_key='kpa-society').
+  //   WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1: 약국 서비스 신청 pending 대체.
+  //   EventOfferService.countPendingListings 와 동일 쿼리(신규 통계 없음).
   // 상품 신청 pending = kpa_product_applications.status='pending' (operator-product-applications/stats endpoint 와 동일).
   // 매장 통계 = organization_service_enrollments service_code='kpa-society' active count (간단 통계).
   // (admin) 전체 회원 = kpa_members count.
@@ -299,7 +289,7 @@ async function fetchSecondaryCounts(
 
   const [
     pendingMembersRows,
-    pharmacyRequestRows,
+    eventOfferPendingRows,
     productAppPendingRows,
     storeCountRows,
     totalMembersRows,
@@ -309,7 +299,8 @@ async function fetchSecondaryCounts(
       SELECT COUNT(*) AS count FROM kpa_members WHERE status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
-      SELECT COUNT(*) AS count FROM kpa_pharmacy_requests WHERE status = 'pending'
+      SELECT COUNT(*) AS count FROM organization_product_listings
+      WHERE service_key = 'kpa-society' AND status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
       SELECT COUNT(*) AS count FROM kpa_product_applications WHERE status = 'pending'
@@ -334,7 +325,7 @@ async function fetchSecondaryCounts(
 
   return {
     pendingMembers: parseInt(pendingMembersRows[0]?.count || '0', 10),
-    pharmacyRequestCount: parseInt(pharmacyRequestRows[0]?.count || '0', 10),
+    eventOfferPendingCount: parseInt(eventOfferPendingRows[0]?.count || '0', 10),
     productApplicationPendingCount: parseInt(productAppPendingRows[0]?.count || '0', 10),
     storeStats: {
       totalStores: parseInt(storeCountRows[0]?.total_count || '0', 10),
@@ -356,7 +347,7 @@ function buildConfig(
     pendingMembers,
     totalMembers,
     serviceApplicationCount,
-    pharmacyRequestCount,
+    eventOfferPendingCount,
     productApplicationPendingCount,
   } = secondary;
 
@@ -396,11 +387,13 @@ function buildConfig(
       link: '/operator/signage/hq-media',
     },
     {
-      key: 'pharmacy-requests',
-      label: '약국 서비스 신청',
-      value: pharmacyRequestCount,
-      status: pharmacyRequestCount > 0 ? 'warning' : 'neutral',
-      link: '/operator/pharmacy-requests',
+      // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+      //   약국 서비스 신청 KPI 폐지 → 이벤트 오퍼 승인 대기로 대체 (frontend key='event-offers').
+      key: 'event-offers',
+      label: '이벤트 오퍼 승인 대기',
+      value: eventOfferPendingCount,
+      status: eventOfferPendingCount > 0 ? 'warning' : 'neutral',
+      link: '/operator/event-offers',
     },
     {
       key: 'product-applications',
@@ -426,7 +419,9 @@ function buildConfig(
               serviceApplicationCount > 0
                 ? ('warning' as const)
                 : ('neutral' as const),
-            link: '/operator/pharmacy-requests',
+            // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+            //   폐지된 /operator/pharmacy-requests → 조직 가입 요청(ai-service-apps 와 동일 route)로 정렬.
+            link: '/operator/organization-requests',
           },
         ]
       : []),
@@ -456,21 +451,21 @@ function buildConfig(
       link: '/operator/forum-management',
     });
   }
-  if (pharmacyRequestCount > 0) {
+  if (eventOfferPendingCount > 0) {
     const level: AiSummaryItem['level'] =
-      pharmacyRequestCount > 5
+      eventOfferPendingCount > 5
         ? 'critical'
-        : pharmacyRequestCount > 2
+        : eventOfferPendingCount > 2
           ? 'warning'
           : 'info';
     aiSummary.push({
-      id: 'ai-pharmacy-requests',
+      id: 'ai-event-offers',
       message:
-        pharmacyRequestCount > 3
-          ? `약국 서비스 신청 ${pharmacyRequestCount}건 긴급 — 승인 처리가 필요합니다.`
-          : `약국 서비스 신청 ${pharmacyRequestCount}건 대기 — 검토해 주세요.`,
+        eventOfferPendingCount > 3
+          ? `이벤트 오퍼 ${eventOfferPendingCount}건 긴급 — 승인 처리가 필요합니다.`
+          : `이벤트 오퍼 ${eventOfferPendingCount}건 승인 대기 — 검토해 주세요.`,
       level,
-      link: '/operator/pharmacy-requests',
+      link: '/operator/event-offers',
     });
   }
   if (productApplicationPendingCount > 0) {
@@ -548,12 +543,12 @@ function buildConfig(
       link: '/operator/signage/hq-media',
     });
   }
-  if (pharmacyRequestCount > 0) {
+  if (eventOfferPendingCount > 0) {
     actionQueue.push({
-      id: 'aq-pharmacy-requests',
-      label: '약국 서비스 신청 검토',
-      count: pharmacyRequestCount,
-      link: '/operator/pharmacy-requests',
+      id: 'aq-event-offers',
+      label: '이벤트 오퍼 승인 검토',
+      count: eventOfferPendingCount,
+      link: '/operator/event-offers',
     });
   }
   if (productApplicationPendingCount > 0) {
@@ -569,7 +564,7 @@ function buildConfig(
       id: 'aq-service-apps',
       label: '서비스 신청 검토',
       count: serviceApplicationCount,
-      link: '/operator/pharmacy-requests',
+      link: '/operator/organization-requests',
     });
   }
 
@@ -616,7 +611,6 @@ function buildConfig(
   //   기존 emoji 또는 미매핑 lucide-name 은 회귀 0.
   const quickActions: QuickActionItem[] = [
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: 'users' },
-    { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: 'clipboard-list' },
     { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: 'shopping-cart' },
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: 'megaphone' },
@@ -642,7 +636,7 @@ function buildConfig(
  * Fetch all KPA operator dashboard data and assemble 5-Block config.
  *
  * - `/operator/summary` 와 동일한 17 query 재사용 (3 module service + 14 raw)
- * - 추가 6 보조 query (members pending / pharmacy-requests pending / store stats /
+ * - 추가 6 보조 query (members pending / event-offer pending / store stats /
  *   product-applications pending / [admin] total members / [admin] organization-join)
  * - frontend `buildKpaOperatorConfig` 의 5-Block 조립 logic 동일 적용
  *

@@ -1,16 +1,19 @@
 /**
  * PharmacyPage - 약국경영 게이트 페이지
  *
- * WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1:
- *   STORE_OWNER_ROLES 보유 시 /store 리다이렉트.
- *   미보유 시 API 신청 상태(approved/pending/rejected/none)로 안내.
+ * WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+ *   약국 서비스 별도 신청(pharmacyRequestApi) 흐름 폐지.
+ *   매장 운영 권한(kpa:store_owner)은 약국 경영자 회원 승인(Path B) 시 자동 부여된다.
+ *   본 게이트는 별도 신청 상태를 조회하지 않고 role 만으로 분기한다:
+ *     - 미로그인            → 로그인 안내
+ *     - 관리자/운영자       → 접근 불가 안내
+ *     - store_owner 보유    → /store 리다이렉트
+ *     - 그 외 회원          → 약국 경영자 회원 안내 (신청 버튼 없음)
  */
 
-import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
-import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 import { ROLES } from '../../lib/role-constants';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
@@ -20,54 +23,12 @@ const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_
 export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'rejected' | 'none' | 'error'>('loading');
-  const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
   // WO-O4O-KPA-STOREOWNER-GUARD-CANONICAL-ALIGNMENT-V1:
   //   PharmacyGuard / HubGuard 와 동일한 dual-check 적용.
-  //   stale JWT 시 user.isStoreOwner (KPA context) fallback 으로 회복 → 자동 부여 사용자의
-  //   /pharmacy/approval 강제 redirect 방지.
+  //   stale JWT 시 user.isStoreOwner (KPA context) fallback 으로 회복.
   const hasStoreRole = !!user && isStoreOwnerDual(user.roles, ROLES.KPA_STORE_OWNER, user.isStoreOwner);
-
-  useEffect(() => {
-    if (!user || isAdminOrOperator) {
-      setApprovalStatus('none');
-      return;
-    }
-    // 이미 결과가 있으면 재요청 불필요
-    if (approvalStatus !== 'loading') return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        const items = await getMyRequestsCached();
-        if (cancelled) return;
-        const approved = items.find((r) => r.status === 'approved');
-        if (approved) {
-          setApprovalStatus('approved');
-        } else if (items.some((r) => r.status === 'pending')) {
-          setApprovalStatus('pending');
-        } else if (items.some((r) => r.status === 'rejected')) {
-          setApprovalStatus('rejected');
-        } else {
-          setApprovalStatus('none');
-        }
-      } catch (err: any) {
-        if (!cancelled) {
-          const status = err?.status || err?.response?.status;
-          console.error('[PharmacyPage] getMyRequests failed:', status, err?.message);
-          if (status === 401) {
-            setApprovalError('인증이 만료되었습니다. 페이지를 새로고침해 주세요.');
-          } else {
-            setApprovalError(err?.message || '승인 상태를 확인할 수 없습니다.');
-          }
-          setApprovalStatus('error');
-        }
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user, isAdminOrOperator, approvalStatus]);
 
   // 1. 미로그인
   if (!user) {
@@ -130,157 +91,50 @@ export function PharmacyPage() {
     );
   }
 
+  // 3. store_owner 보유 → 매장으로 이동
   if (hasStoreRole) {
     return <Navigate to="/store" replace />;
   }
 
-  // 3. API 로딩 중
-  if (approvalStatus === 'loading') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <p style={styles.desc}>승인 상태 확인 중...</p>
+  // 4. 그 외 회원 → 약국 경영자 회원 안내 (별도 신청 없음)
+  //    WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //    별도 "매장 운영 신청" 폼을 제공하지 않고, 회원 승인 시 자동 이용됨을 안내한다.
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <div style={styles.iconWrap}>
+            <span style={styles.icon}>💊</span>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 4. 승인 완료 — role 미반영 시 새로고침 안내 (hasStoreRole=true면 위에서 리다이렉트됨)
-  if (approvalStatus === 'approved') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>✅</span>
-            </div>
-            <h1 style={styles.title}>승인이 완료되었습니다</h1>
-            <p style={styles.desc}>
-              약국 서비스 이용이 승인되었습니다.<br />
-              세션이 갱신되도록 잠시 후 페이지를 새로고침해 주세요.
+          <h1 style={styles.title}>약국 경영자 회원 안내</h1>
+          <p style={styles.desc}>
+            약국 경영자 회원으로 승인되면 내 매장 / Store HUB 등 매장 기능을
+            <strong> 별도 신청 없이 자동으로</strong> 사용할 수 있습니다.<br />
+            약국 경영자 회원 신청·승인 절차는 아래 안내를 참고해 주세요.
+          </p>
+          <div style={styles.infoBox}>
+            <p style={styles.infoText}>
+              • 약국 경영자(pharmacy_owner) 회원으로 신청하고 사업자 정보(사업자번호·약국명)를 등록합니다.<br />
+              • 운영자가 회원을 승인하면 약국 조직 생성과 매장 운영 권한 부여가 함께 완료됩니다.<br />
+              • 승인 후에는 별도 신청 없이 내 매장으로 바로 진입할 수 있습니다.
             </p>
-            <div style={styles.actions}>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                style={styles.joinBtn}
-              >
-                새로고침
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                style={styles.backBtn}
-              >
-                돌아가기
-              </button>
-            </div>
+          </div>
+          <div style={styles.actions}>
+            <Link to="/join/pharmacy" style={styles.joinBtn}>
+              약국 경영자 회원 안내
+            </Link>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              style={styles.backBtn}
+            >
+              돌아가기
+            </button>
           </div>
         </div>
       </div>
-    );
-  }
-
-  // 5. 대기 중 → 대기 안내 화면
-  if (approvalStatus === 'pending') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>⏳</span>
-            </div>
-            <h1 style={styles.title}>승인 대기 중입니다</h1>
-            <p style={styles.desc}>
-              약국 서비스 이용 신청이 접수되었습니다.<br />
-              운영자 승인 후 이용하실 수 있습니다.
-            </p>
-            <div style={styles.actions}>
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                style={styles.backBtn}
-              >
-                돌아가기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 5.5 반려 → 재신청 안내
-  if (approvalStatus === 'rejected') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>❌</span>
-            </div>
-            <h1 style={styles.title}>신청이 반려되었습니다</h1>
-            <p style={styles.desc}>
-              약국 서비스 신청이 반려되었습니다.<br />
-              반려 사유를 확인하신 후 다시 신청해 주세요.
-            </p>
-            <div style={styles.actions}>
-              <Link to="/pharmacy/approval" style={styles.joinBtn}>
-                다시 신청하기
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                style={styles.backBtn}
-              >
-                돌아가기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 6. API 에러 → 새로고침 안내
-  if (approvalStatus === 'error') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>⚠️</span>
-            </div>
-            <h1 style={styles.title}>상태 확인에 실패했습니다</h1>
-            <p style={styles.desc}>
-              {approvalError || '승인 상태를 확인할 수 없습니다.'}
-            </p>
-            <div style={styles.actions}>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                style={styles.joinBtn}
-              >
-                새로고침
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                style={styles.backBtn}
-              >
-                돌아가기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 7. 미신청 → 신청 게이트로 이동
-  return <Navigate to="/pharmacy/approval" replace />;
+    </div>
+  );
 }
 
 export default PharmacyPage;
@@ -363,6 +217,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '0.813rem',
     color: colors.neutral600,
-    lineHeight: 1.6,
+    lineHeight: 1.8,
   },
 };

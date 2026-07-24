@@ -95,7 +95,6 @@ export function createOperatorSummaryController(
       forcedExpirySoonCount,
       // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: recentActivity
       recentMemberRows,
-      recentPharmacyRows,
       recentApplicationRows,
       recentOrgJoinRows,
     ] = await Promise.all([
@@ -179,11 +178,6 @@ export function createOperatorSummaryController(
         ORDER BY m.created_at DESC LIMIT 10
       `).catch(() => []),
       dataSource.query(`
-        SELECT id, pharmacy_name, status, created_at
-        FROM kpa_pharmacy_requests
-        ORDER BY created_at DESC LIMIT 5
-      `).catch(() => []),
-      dataSource.query(`
         SELECT a.id, u.name as applicant_name, a.status, a.created_at
         FROM kpa_applications a
         LEFT JOIN users u ON u.id = a.user_id
@@ -209,14 +203,8 @@ export function createOperatorSummaryController(
         status: r.status,
       });
     }
-    for (const r of (recentPharmacyRows as any[]) || []) {
-      recentActivity.push({
-        type: 'pharmacy_request',
-        label: `${r.pharmacy_name || '약국'} 서비스 신청`,
-        timestamp: r.created_at,
-        status: r.status,
-      });
-    }
+    // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+    //   약국 서비스 별도 신청 폐지 → recentActivity 의 pharmacy_request 항목 제거.
     for (const r of (recentApplicationRows as any[]) || []) {
       recentActivity.push({
         type: 'application',
@@ -281,7 +269,7 @@ export function createOperatorSummaryController(
    *
    * Cross-service 5-Block dashboard 응답 (`OperatorDashboardConfig`).
    *   - 기존 /operator/summary 의 17 query 재사용 (3 module service + 14 raw)
-   *   - 추가 6 보조 query (members pending / pharmacy-requests pending / store stats /
+   *   - 추가 6 보조 query (members pending / event-offer pending / store stats /
    *     product-applications pending / [admin] total members / [admin] organization-join)
    *   - frontend `buildKpaOperatorConfig` 의 5-Block 조립 logic 동일 적용
    *   - isAdmin role-aware (KPI 2 / AI summary 1 / Action Queue 1 / Quick Actions 3 추가)
