@@ -30,7 +30,7 @@ import { mapFunctionEnC } from './hff-sf-c-en-overlay.js';
 import { NUTRIENT_META, FUNCTIONAL_META, fnBelongsTo, mapFunctionEn } from './hff-nutrient-registry.js';
 import { composeSf, type SfSeed } from './hff-sf-compose.js';
 import { specLabels, isNonFunctionalLabel, NFK_LABELS, NFK_INGREDIENTS, NFK_INGREDIENT_FN, nfkFnBelongsTo, mapFunctionEnNfk, splitHangulItems, fnCoverageResidue } from './hff-nfk-c-registry.js';
-import { UIR_LABELS, UIR_INGREDIENTS, UIR_INGREDIENT_FN, uirFnBelongsTo, extractFunctionsUir, mapFunctionEnUir } from './hff-uir-c-registry.js';
+import { UIR_LABELS, UIR_INGREDIENTS, UIR_INGREDIENT_FN, UIR_NONFUNC, uirFnBelongsTo, extractFunctionsUir, mapFunctionEnUir } from './hff-uir-c-registry.js';
 
 function stableHash(s: string): number { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 
@@ -83,7 +83,7 @@ function keyOfLabel(label: string): { key: string; viaUir: boolean } | null {
 
 /** 비기능 규격 라벨 판정 — 원문 표기의 공백 변형(`성 상`)까지 흡수. */
 function nonFunctional(label: string): boolean {
-  return isNonFunctionalLabel(label) || isNonFunctionalLabel(label.replace(/\s+/g, ''));
+  return isNonFunctionalLabel(label) || isNonFunctionalLabel(label.replace(/\s+/g, '')) || UIR_NONFUNC.test(label);
 }
 
 /** 기능성 KO/EN 해소 — UIR 추출기(«…에 필요» 형 포함) + UIR→NFK→C overlay→공용 EN 폴백. */

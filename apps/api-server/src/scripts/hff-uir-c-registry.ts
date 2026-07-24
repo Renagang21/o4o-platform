@@ -38,13 +38,35 @@ export const UIR_LABELS: Array<{ re: RegExp; key: string }> = [
   // 지표성분 표기 제품이 전량 미해소였다(단일 라벨 129건 = WO 의 «같은 원인 100건 이상» 보완 트리거).
   // 원문 실측: 해당 제품군의 공식 기능성은 «전립선 건강의 유지» 로 일관되며, 그 외 문장이 있으면 FN 게이트가 HOLD 한다.
   { re: /^로르산/, key: '쏘팔메토열매추출물' },
+  // ─── WO-O4O-HFF-UNREGISTERED-INDICATOR-REMAINDER-C-V1 — 지표성분 라벨(원료명과 다름) ───
+  // 홍국 — 규격 라벨 = 지표성분 «모나콜린 K». 공용 SF 는 원료명 라벨(`홍국`)만 인식해 지표성분 표기 제품이 미해소였다.
+  { re: /^모나콜린/, key: '홍국' },
+  // 프로폴리스 — 정량 라벨 «총 플라보노이드»(공용 classify 인식) + 확인 라벨 «계피산 / 파라(ρ)-쿠마르산»(미해소)이 공존.
+  // 확인 라벨만 미해소여서 프로폴리스 제품이 전량 UNKNOWN_SPEC_LABEL 이었다. 두 확인 라벨을 프로폴리스로 해소한다.
+  { re: /^계피산|쿠마르산/, key: '프로폴리스' },
+  // 대두이소플라본 — 규격 라벨 «대두이소플라본(비배당체로서)». 뼈 건강 고시형. (방광 배뇨기능 개별인정형은 FN 게이트가 HOLD)
+  { re: /^대두이소플라본/, key: '대두이소플라본' },
+  // 홍경천 추출물 — 규격 라벨 = 지표성분 «로사빈(Rosavin)».
+  { re: /^로사빈/, key: '홍경천' },
+  // 회화나무열매 추출물 — 규격 라벨 = 지표성분 «소포리코사이드».
+  { re: /^소포리코사이드/, key: '회화나무열매' },
+  // 폴리감마글루탐산 — 규격 라벨 원료명 단독. (체내 칼슘흡수 촉진 — 칼슘 동반 제품은 MULTI 로 HOLD)
+  { re: /^폴리감마글루탐산/, key: '폴리감마글루탐산' },
 ];
+
+/** C 전용 비기능 규격 라벨 — 공용 NONFUNC 미포함분(곰팡이독소 한도 등). build 의 nonFunctional() 에 OR 로 결합. */
+export const UIR_NONFUNC = /시트리닌|citrinin/i;
 
 /** 신규 key 의 원료 메타(공용 registry 에 존재하지 않는 것만). */
 export const UIR_INGREDIENTS: Record<string, SfIngredient> = {
   '단백질': { key: '단백질', slug: 'protein', displayKo: '단백질', displayEn: 'Protein', labelRe: /조단백질?|단백질/, statusHint: 'READY' },
   '칼륨': { key: '칼륨', slug: 'potassium', displayKo: '칼륨', displayEn: 'Potassium', labelRe: /칼륨/, statusHint: 'READY' },
   '크레아틴': { key: '크레아틴', slug: 'creatine', displayKo: '크레아틴', displayEn: 'Creatine', labelRe: /크레아틴/, statusHint: 'READY' },
+  // 지표성분형 신규 원료(공용 registry 미존재). 홍국·프로폴리스는 공용 SF/FUNCTIONAL_META 로 해소되므로 미등재.
+  '대두이소플라본': { key: '대두이소플라본', slug: 'soy-isoflavone', displayKo: '대두이소플라본', displayEn: 'Soy isoflavones', labelRe: /대두이소플라본/, statusHint: 'READY' },
+  '홍경천': { key: '홍경천', slug: 'rhodiola-rosea', displayKo: '홍경천추출물', displayEn: 'Rhodiola rosea extract', labelRe: /로사빈|홍경천/, statusHint: 'READY' },
+  '회화나무열매': { key: '회화나무열매', slug: 'sophora-fruit', displayKo: '회화나무열매추출물', displayEn: 'Sophora japonica fruit extract', labelRe: /소포리코사이드|회화나무/, statusHint: 'READY' },
+  '폴리감마글루탐산': { key: '폴리감마글루탐산', slug: 'poly-gamma-glutamic-acid', displayKo: '폴리감마글루탐산', displayEn: 'Poly-γ-glutamic acid', labelRe: /폴리감마글루탐산/, statusHint: 'READY' },
 };
 
 /** key 별 **공식 기능성 집합** — 전부 실제 MAIN_FNCTN 원문에서 확인된 문구. */
@@ -62,6 +84,13 @@ export const UIR_INGREDIENT_FN: Record<string, string[]> = {
   '알로에전잎': ['배변활동 원활에 도움을 줄 수 있음'],
   '빌베리추출물': ['눈의 피로 개선에 도움을 줄 수 있음'],
   '쏘팔메토열매추출물': ['전립선 건강의 유지에 도움을 줄 수 있음', '전립선 건강 유지에 도움을 줄 수 있음'],
+  // ─── 지표성분형(WO-...-INDICATOR-REMAINDER-C-V1) — 전부 실 MAIN_FNCTN 원문 확인 ───
+  '홍국': ['혈중 콜레스테롤 개선에 도움을 줄 수 있음'],
+  '프로폴리스': ['항산화에 도움을 줄 수 있음', '구강에서의 항균작용에 도움을 줄 수 있음', '항산화·구강에서의 항균작용에 도움을 줄 수 있음'],
+  '대두이소플라본': ['뼈 건강에 도움을 줄 수 있음', '뼈 건강에 도움을 줌'],
+  '홍경천': ['스트레스로 인한 피로 개선에 도움을 줄 수 있음', '스트레스로 인한 피로개선에 도움을 줄 수 있음'],
+  '회화나무열매': ['갱년기 여성의 건강에 도움을 줄 수 있음'],
+  '폴리감마글루탐산': ['체내 칼슘흡수 촉진에 도움을 줄 수 있음'],
 };
 
 const UIR_FN_NORM: Record<string, Set<string>> = {};
@@ -115,11 +144,24 @@ const UIR_FN_EN: Array<{ re: RegExp; en: string }> = [
   // 쏘팔메토 열매 추출물 — 공용 FUNCTION_MAP 은 조사 없는 «전립선 건강 유지» 형만 인식하므로
   // 원문 표기(«전립선 건강의 유지») 를 정본으로 직접 매핑한다(의미 동일 보존).
   { re: /^전립선건강의?유지에도움을줄수있음$/, en: 'May help maintain prostate health' },
+  // ─── 지표성분형 — 공용 FUNCTION_MAP 이 null 반환하는 문장만 정본 추가(홍국 혈중콜레스테롤·프로폴리스 항산화/구강항균은 공용 폴백 사용) ───
+  // 대두이소플라본
+  { re: /^뼈건강에도움을(줄수있음|줌)$/, en: 'May help support bone health' },
+  // 홍경천 (스트레스로 인한 피로 개선 — 공백 유무 동일 정규화)
+  { re: /^스트레스로인한피로개선에도움을줄수있음$/, en: 'May help improve stress-related fatigue' },
+  // 회화나무열매
+  { re: /^갱년기여성의?건강에도움을줄수있음$/, en: "May help support women's health during menopause" },
+  // 폴리감마글루탐산
+  { re: /^체내칼슘흡수촉진에도움을줄수있음$/, en: 'May help promote calcium absorption in the body' },
 ];
 
 /** KO 기능성 문장 → EN 정본. 미매핑이면 null(호출부에서 HOLD). */
 export function mapFunctionEnUir(ko: string): string | null {
-  const n = norm(ko);
+  // 원문 표기 잔재(«홍경천추출물:» / «기능성내용:» 접두, «(기타기능Ⅱ)»·«(제2등급)» 접미)만 제거 후 정본 문장 매칭.
+  // ko 본체는 호출부에서 그대로 보존되므로(커버리지·FN집합 게이트 무훼손) EN 매핑 단계에서만 정규화한다.
+  const n = norm(ko)
+    .replace(/^[가-힣a-z0-9·]{1,25}?(?:추출물|분말|제품|함유유지|엑스|농축액|내용):/, '')
+    .replace(/\((?:기타기능|생리활성기능|기능성|제?\d+등급)[^)]*\)$/, '');
   const hit = UIR_FN_EN.find((x) => x.re.test(n));
   return hit ? hit.en : null;
 }

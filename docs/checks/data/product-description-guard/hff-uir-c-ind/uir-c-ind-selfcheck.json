@@ -1,0 +1,52 @@
+{
+ "shard": 2,
+ "skip": 0,
+ "limit": 0,
+ "funnel": {
+  "scanned": 41261,
+  "inShard": 13767,
+  "promoted": 4468,
+  "taken": 0,
+  "masterExists": 0,
+  "dup": 0,
+  "liquid": 2277,
+  "unknownLabel": 1021,
+  "noKey": 718,
+  "multiIngredient": 3835,
+  "notUirLane": 1360,
+  "noMeta": 0,
+  "noFunction": 2,
+  "fnResidue": 8,
+  "fnNotOfficial": 18,
+  "foreignFn": 0,
+  "enPending": 7,
+  "composeHold": 14,
+  "specDirty": 0,
+  "guardBlock": 3,
+  "guardReview": 17,
+  "eligible": 19,
+  "target": 19
+ },
+ "distKey": {
+  "홍경천": 5,
+  "회화나무열매": 9,
+  "프로폴리스": 3,
+  "대두이소플라본": 2
+ },
+ "holdReason": {
+  "MULTI_INGREDIENT": 3835,
+  "UNKNOWN_SPEC_LABEL": 1021,
+  "NO_FUNCTIONAL_KEY": 718,
+  "COMPOSE_SERVING_PARSE_FAILED": 13,
+  "FN_NOT_OFFICIAL": 18,
+  "GUARD_REVIEW": 17,
+  "NO_FUNCTION": 2,
+  "FN_COVERAGE_INCOMPLETE": 8,
+  "GROUNDING_PENDING_EN": 7,
+  "GUARD_BLOCKED": 3,
+  "COMPOSE_SERVING_ABSENT": 1
+ },
+ "chunks": [
+  19
+ ]
+}
