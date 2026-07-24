@@ -1,0 +1,51 @@
+{
+ "shard": 2,
+ "skip": 0,
+ "limit": 1000,
+ "funnel": {
+  "scanned": 41261,
+  "inShard": 13767,
+  "noBracket": 7903,
+  "promoted": 2164,
+  "taken": 0,
+  "masterExists": 0,
+  "dup": 0,
+  "liquid": 1623,
+  "notNfkLane": 3158,
+  "cUnknownLabel": 134,
+  "stillNoKey": 190,
+  "multiIngredient": 97,
+  "noMeta": 0,
+  "noFunction": 3,
+  "fnResidue": 40,
+  "fnNotOfficial": 31,
+  "foreignFn": 6,
+  "enPending": 78,
+  "composeHold": 346,
+  "specDirty": 0,
+  "guardBlock": 11,
+  "guardReview": 21,
+  "eligible": 1,
+  "target": 1
+ },
+ "distKey": {
+  "홍삼": 1
+ },
+ "holdReason": {
+  "COMPOSE_SERVING_PARSE_FAILED": 336,
+  "GROUNDING_PENDING_EN": 78,
+  "FN_COVERAGE_INCOMPLETE": 40,
+  "FN_NOT_OFFICIAL": 31,
+  "C_UNKNOWN_SPEC_LABEL": 134,
+  "STILL_NO_FUNCTIONAL_KEY": 190,
+  "MULTI_INGREDIENT": 97,
+  "GUARD_BLOCKED": 11,
+  "COMPOSE_SERVING_ABSENT": 10,
+  "GUARD_REVIEW": 21,
+  "FOREIGN_FN": 6,
+  "NO_FUNCTION": 3
+ },
+ "chunks": [
+  1
+ ]
+}

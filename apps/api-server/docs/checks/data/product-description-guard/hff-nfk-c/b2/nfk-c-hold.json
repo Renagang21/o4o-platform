@@ -1,0 +1,6766 @@
+[
+ {
+  "stmt": "20040020029569",
+  "name": "람노수스유산균씨(C)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017784",
+  "name": "Nutriforte Lactoghurt",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2017278201630",
+  "name": "17종혼합유산균 LH",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015162101",
+  "name": "명품쾌변큐플러스",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "식이섬유",
+  "residue": "배변활동원활"
+ },
+ {
+  "stmt": "200700170351961",
+  "name": "토트랑 피부유산균베이비 캡슐",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음 (생리활성기능 2등급)"
+  ]
+ },
+ {
+  "stmt": "2004001601196",
+  "name": "디노비타C츄어블캔디",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "202400280951",
+  "name": "파라카제이유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059203",
+  "name": "닥터트루 프리미엄 패밀리 분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100182204",
+  "name": "아비스모 면역n간 (ABISMO IMMUNITY & LIVER)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "홍삼"
+  ]
+ },
+ {
+  "stmt": "20240028095199",
+  "name": "7종혼합유산균알파-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017122",
+  "name": "혼합유산균H",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017288023661",
+  "name": "간에좋은 프리미엄 밀크씨슬",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020071364",
+  "name": "칼로톡 피치맛",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "나이아신"
+  ]
+ },
+ {
+  "stmt": "20040020029289",
+  "name": "6종제일혼합유산균와이",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095247",
+  "name": "유산균엠(M)-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017031130",
+  "name": "APIC 대두배아열수추출물등 복합물",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20120019007164",
+  "name": "금단미인 해우소 초",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "가르시니아",
+   "비타민C",
+   "판토텐산"
+  ]
+ },
+ {
+  "stmt": "20040017059178",
+  "name": "씨엘에스0420(CLS0420) 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029320",
+  "name": "9종라비센슬림에스유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029718",
+  "name": "2종혼합유산균비에스(BS)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2022000924315",
+  "name": "Personalized ProbioTM 3",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "202500115271",
+  "name": "MILK THISTLE-RICE Blend Powder",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "밀크씨슬"
+ },
+ {
+  "stmt": "20190016403207",
+  "name": "메노락토 오리진",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "갱년기 여성 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095296",
+  "name": "11종혼합유산균디아이(DI)-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202000047463",
+  "name": "엠디레시피 유산균",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20172880236117",
+  "name": "이너셋 간건강 밀크씨슬 파워",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20130020008470",
+  "name": "생각나",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "은행잎",
+  "miss": [
+   "은행잎 추출물 - 기억력 개선·혈행 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200400200073069",
+  "name": "위힐스+",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Glabridin"
+  ]
+ },
+ {
+  "stmt": "2004001706783",
+  "name": "라바텍 프로바이오틱스(LAVATECT Probiotics)",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015104179",
+  "name": "유단백가수분해물(락티움)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809548",
+  "name": "8종알파혼합유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002005615",
+  "name": "바이오게르마늄 효모",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "조단백질(%)"
+  ]
+ },
+ {
+  "stmt": "20130020008316",
+  "name": "싸이언티픽 액티브 엽산",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "아연",
+   "비타민B6",
+   "비타민B12",
+   "비타민C",
+   "비타민D",
+   "엽산"
+  ]
+ },
+ {
+  "stmt": "20240028095349",
+  "name": "6종혼합유산균디아이(DI)-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020046279",
+  "name": "웰러스글루코사민",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001601257",
+  "name": "갈락토올리고당 분말(네오고스-P70)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "갈락토올리고당 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020029372",
+  "name": "에시도필러스유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200500200052",
+  "name": "PBN0190유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017928",
+  "name": "Oslonka Junior",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029315",
+  "name": "17종더프로바이오츄유산균디아이(DI)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2024002809529",
+  "name": "19종혼합유산균엠지(MG)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008487",
+  "name": "혈당 앤 비피더스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "바나바잎추출물"
+  ]
+ },
+ {
+  "stmt": "2015001001810",
+  "name": "베리프로 프로바이오틱스(BB)-100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201600075158",
+  "name": "씨엠디정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095303",
+  "name": "18종혼합유산균디아이(DI)-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202200191615",
+  "name": "코롬방비타민C 블루베리맛",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "2022001309351",
+  "name": "더이로운 혈행개선",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성"
+  ]
+ },
+ {
+  "stmt": "200400200023455",
+  "name": "7종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2013001712846",
+  "name": "락티카제이바실루스 람노수스 유산균 분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017726",
+  "name": "Duolac Mix PFX1",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20040020029806",
+  "name": "혼합유산균a-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20172880236133",
+  "name": "미쾌변",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017059304",
+  "name": "다니스코VB 7종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002003466",
+  "name": "성균옥타코사놀",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015162467",
+  "name": "닥터노하우 눈엔 루테인 분말",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "루테인",
+   "비타민A"
+  ]
+ },
+ {
+  "stmt": "20040020029676",
+  "name": "혼합유산균21-디아이(DI)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2018001231023",
+  "name": "슬림플래닛 녹차카테킨 500mg 플러스",
+  "reason": "GUARD_REVIEW:E-NAME-DERIVED-GROUNDED-002",
+  "key": "녹차"
+ },
+ {
+  "stmt": "202200048188",
+  "name": "바이온 웰아웃 투",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "식이섬유"
+  ]
+ },
+ {
+  "stmt": "20040017017253",
+  "name": "바디튠 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008600",
+  "name": "칼마아디프리미엄골드",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "마그네슘",
+   "비타민D",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2011001701995",
+  "name": "타요 키즈 프로락토 D 아연",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020029757",
+  "name": "9종혼합유산균비엔(BN)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029620",
+  "name": "2종혼합유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2016000600757",
+  "name": "비엘1 씨케이디비005(에이) (BL1 CKDB005(A))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008476",
+  "name": "혈당N바나바 1.3",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "바나바잎추출물",
+   "크롬",
+   "아연",
+   "셀레늄",
+   "비타민B1"
+  ]
+ },
+ {
+  "stmt": "20040020029839",
+  "name": "락티스세미 GEN3013",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2021000227316",
+  "name": "정진 수진단(壽珍丹)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "녹차",
+  "miss": [
+   "기능성 내용 : 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017014513",
+  "name": "생생건강유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029323",
+  "name": "17종수퍼세븐틴유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040015110564",
+  "name": "파미스마그네슘100",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "마그네슘",
+   "비타민B1",
+   "비타민B6"
+  ]
+ },
+ {
+  "stmt": "202400247571",
+  "name": "머슬킹콩 크레아틴",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "크레아틴 모노하이드레이트 함량"
+  ]
+ },
+ {
+  "stmt": "200400170171343",
+  "name": "4종 혼합유산균 2011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201300171325",
+  "name": "비타블로썸 닥터메가비타민c3000파인",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "20040020029557",
+  "name": "19종혼합유산균디아이(DI)-3900",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20100016005460",
+  "name": "Mixed Probiotics 10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070281",
+  "name": "유산균 가세리 휴민디",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020046314",
+  "name": "리드지멘큐(Q)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라(p)-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "20040020029784",
+  "name": "3종혼합유산균에이치에프(HF)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029255",
+  "name": "12종혼합유산균 엘디(LD)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029554",
+  "name": "10종혼합유산균디아이(DI)3-2200",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "201800124666",
+  "name": "너에게활력드림!비타민C",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "2018001205650",
+  "name": "다이어트 유산균 비에날씬",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "Lactobacillus gasseri BNR17(제2017-6호) : 체지방 감소에 도움을 줄 수 있음(생리활성기능), 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "2004001507051",
+  "name": "유산균 애시도필러스 비에프8401(BF8401)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017014520",
+  "name": "유산균 프로바이오틱스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017014547",
+  "name": "혼합유산균분말3종",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029402",
+  "name": "플란타김치유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017288023631",
+  "name": "뉴트리 디-데이 플러스 칼슘 앤 비타민D",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2011001701964",
+  "name": "타요 아이비타C+아연",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029819",
+  "name": "락티스유산균-3000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020006372",
+  "name": "에스(S)라인다이어트CLA",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400152925",
+  "name": "선인삼성분클래식",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "인삼",
+  "residue": "피로회복"
+ },
+ {
+  "stmt": "20190016403146",
+  "name": "와이셀라 면역 이뮨 프로바이오틱스",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역 기능에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029134",
+  "name": "혼합유산균-50",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "1 유산균 증식 및 유해균 억제 2 배변활동원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2024002809598",
+  "name": "10종혼합유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017909",
+  "name": "11종 혼합유산균 2011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001901911",
+  "name": "탐나는 쾌변",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "식이섬유",
+  "miss": [
+   "혈중 콜레스테롤 개선"
+  ]
+ },
+ {
+  "stmt": "20040020046294",
+  "name": "웰러스엽산",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2011002009977",
+  "name": "홍삼분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002002218",
+  "name": "지구스피루리나에스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070469",
+  "name": "비피더스균BGN4-2000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001704637",
+  "name": "유플러스 혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2023000783522",
+  "name": "장모닝",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095378",
+  "name": "플란타김치유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020031382",
+  "name": "4년근 홍삼분말6",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20110017019177",
+  "name": "인지력 건강엔 포스파티딜세린",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "포스파티딜세린",
+   "비타민A",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "비타민D",
+   "비타민E",
+   "비타민K",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2004001901440",
+  "name": "고투카원",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "키토올리고당",
+   "비타민C"
+  ]
+ },
+ {
+  "stmt": "20040020029525",
+  "name": "4종혼합유산균에스에이치에이(A)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2015001201345",
+  "name": "유니비이 수용성 프로폴리스 분말 400",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200700170352811",
+  "name": "제타 바이오 감마 3",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "운동수행능력 향상에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20130020008516",
+  "name": "면역 멀티 비타민",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민A",
+   "비타민D",
+   "비타민E",
+   "비타민C",
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "엽산",
+   "비타민B12",
+   "비오틴",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2014002002358",
+  "name": "참한삼 홍삼진 매일한포 브이아이피",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029733",
+  "name": "7종비티에프(BTF)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029626",
+  "name": "2종혼합유산균-1000(MG4706+MG4715)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020024301",
+  "name": "셀티바 프로바이오틱 다이어트 토탈 케어",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : 체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017017861",
+  "name": "Derma Plus",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균의 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029635",
+  "name": "애니말리스비피더스균알(R)-2000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017031223",
+  "name": "AP 콜라겐 효소분해 펩타이드",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Gly-Pro-Hyp(mg/g)"
+  ]
+ },
+ {
+  "stmt": "202300010423",
+  "name": "홍경천추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "로사빈(Rosavin)"
+  ]
+ },
+ {
+  "stmt": "20040020029157",
+  "name": "17종알파혼합유산균-10",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "1 유산균 증식 및 유해균 억제 2 배변활동원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20180012056111",
+  "name": "더 프로바이오틱스 채움 133",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "과채유래유산균(L.plantarum CJLP133)(제2013-11호) : 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "20040020029560",
+  "name": "훼칼리유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2023002721138",
+  "name": "4종 혼합유산균 WB-5,000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029509",
+  "name": "훼시움유산균-100엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017278201637",
+  "name": "유기농 프락토올리고당 A",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "식이섬유",
+  "miss": [
+   "장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017006954",
+  "name": "마린 마그네슘",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "마그네슘",
+  "residue": "에너지이용에필요"
+ },
+ {
+  "stmt": "20040020029514",
+  "name": "7종혼합유산균알파-엘(L)2",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "202200211982",
+  "name": "테이크핏 당케어",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "단백질 함량(g)"
+  ]
+ },
+ {
+  "stmt": "2020000474632",
+  "name": "메타포뮬러 시그니처 메타 셀레늄 200",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "셀레늄"
+ },
+ {
+  "stmt": "2020001635422",
+  "name": "유디 간건강 밀크씨슬(UD LIVER HEALTH MILK THISTLE)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "나이아신",
+   "판토텐산"
+  ]
+ },
+ {
+  "stmt": "20040020001416",
+  "name": "히알루론산&비타민C",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "히알루론산",
+   "비타민C"
+  ]
+ },
+ {
+  "stmt": "202100163716",
+  "name": "브레인 알파",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "홍삼",
+   "테아닌"
+  ]
+ },
+ {
+  "stmt": "200400160315",
+  "name": "네오클로렐라정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200082767",
+  "name": "드시모네 캡슐 플러스",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균 증식, 유해균 억제, 배변활동 원활 - 장 면역을 조절하여 장 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095220",
+  "name": "9종알파혼합유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202200092437",
+  "name": "마이크로바이옴 5",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015162356",
+  "name": "올바른 프로바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040017017733",
+  "name": "Duolac Mixture 8HT",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "2019001431769",
+  "name": "SKPith 녹차 추출물(SKPith 綠茶提取物)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "녹차",
+  "miss": [
+   "기능성 내용 : 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095361",
+  "name": "가제리유산균-L(엘)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001429",
+  "name": "인지기능엔 흰목이",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "유리딘",
+   "만노스"
+  ]
+ },
+ {
+  "stmt": "200400170211908",
+  "name": "장순이",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040017059307",
+  "name": "SNZ1969 프로바이오틱스 캡슐",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095104",
+  "name": "17종혼합유산균디아이(DI)3-2200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200201021",
+  "name": "락티브 베베&키즈 츄어블 비타민D3 1000IU",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "*비타민칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20110017019169",
+  "name": "시에트랩 데이케어(오미자맛)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029426",
+  "name": "7종알파혼합유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029739",
+  "name": "17종혼합유산균에이치(H)-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059106",
+  "name": "닥터프로바 패밀리용믹스",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029276",
+  "name": "11종우먼유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200400200061306",
+  "name": "R3 팻번 플러스 프로바이오틱스",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095250",
+  "name": "6종혼합유산균디아이(DI)-3400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095351",
+  "name": "16종알파혼합유산균에이(A)-4000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017823",
+  "name": "듀오락 아이비에스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017643",
+  "name": "락티카제이바실루스 람노수스 유산균 DP",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029387",
+  "name": "카이유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015162110",
+  "name": "장건강 프리미엄 프리바이오틱스 프락토올리고당",
+  "reason": "FOREIGN_FN",
+  "key": "식이섬유",
+  "fn": [
+   "유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017017841",
+  "name": "PROGUTIC LactoVitamin METABOLIC Immune",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200061585",
+  "name": "다이어트 유산균 비에날씬",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017067111",
+  "name": "Probiotics Fermented Garlic Extract Powder",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Cycloalliin 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040017017313",
+  "name": "혼합유산균8K",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029629",
+  "name": "17종혼합유산균디아이(DI)-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20190016024113",
+  "name": "포스파티딜세린 & 징코",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "포스파티딜세린",
+   "은행잎"
+  ]
+ },
+ {
+  "stmt": "200400200201071",
+  "name": "뉴로글래드 우먼스 프리미엄 프로바이오틱스",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "20040020046291",
+  "name": "웰러스판토텐산",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20130020008665",
+  "name": "에스프레소맛 다이어트",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "가르시니아"
+  ]
+ },
+ {
+  "stmt": "201900142132",
+  "name": "조인시스트",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Linarin 함량 (mg/g)"
+  ]
+ },
+ {
+  "stmt": "20240028095374",
+  "name": "퍼멘텀유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017667",
+  "name": "락티플란티바실루스 플란타룸 PMO 08",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20110017019167",
+  "name": "동국 포스파티딜세린",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "포스파티딜세린",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "200400200201396",
+  "name": "덴마크 유산균 골드",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809576",
+  "name": "2종혼합유산균비에스(BS)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2021001637113",
+  "name": "홍삼메시마플러스",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "2014001710736",
+  "name": "프로바이오틱스 HY7718",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201900096221",
+  "name": "L. plantarum IM76과  B. longum IM55 복합물(NVP1703)",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 코상태 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20130020008654",
+  "name": "칼마디 칼슘 마그네슘 아연 비타민D K2",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "마그네슘",
+   "아연",
+   "비타민D",
+   "비타민K"
+  ]
+ },
+ {
+  "stmt": "2014002002393",
+  "name": "태극삼분말9",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "인삼"
+ },
+ {
+  "stmt": "20110017019198",
+  "name": "지엘프로바이오틱스 슬림",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "202100141037",
+  "name": "천마추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "가스트로딘 (Gastrodin) 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020046283",
+  "name": "웰러스아연",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20180012174208",
+  "name": "락토핏 솔루션 노즈",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 코상태 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20110020078101",
+  "name": "인삼분말",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "인삼",
+  "miss": [
+   "면역력 증진, 피로개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040019002120",
+  "name": "SF태극삼분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "인삼"
+ },
+ {
+  "stmt": "2015001001854",
+  "name": "AT프로바이오틱스 100B",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029590",
+  "name": "11종혼합유산균디아이(DI)-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170549",
+  "name": "레스퀵라이트발포정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017006884",
+  "name": "바이탈슬림 다이어트 하비탈출",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Damulin A"
+  ]
+ },
+ {
+  "stmt": "20040015162438",
+  "name": "엠플러스 장건강/면역캡슐",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020029154",
+  "name": "함소아유산균7",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20110020099121",
+  "name": "장쿨",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001504730",
+  "name": "레인보우 13종 혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020020488",
+  "name": "츄어블유산균 마마파파",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029298",
+  "name": "5종트루락유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017017548",
+  "name": "Duolac chewable 7.1 F",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "유익한유산균증식유익한유산균증식유익한유산균증식유익한유산균증식유익한유산균증식유익한유산균증식"
+ },
+ {
+  "stmt": "2004002003444",
+  "name": "에리즈칼슘",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029401",
+  "name": "플란타김치유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017885",
+  "name": "Lactobex Strong",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균의 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2004001601183",
+  "name": "바이오톤",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "옥타코사놀"
+ },
+ {
+  "stmt": "20040017067106",
+  "name": "혼합유산균12종",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "20040020029542",
+  "name": "10종혼합유산균디아이(DI)2-2300",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029308",
+  "name": "12종락포엘맥스유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2009001702387",
+  "name": "콜마 6종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200201378",
+  "name": "메디타민 장건강 유산균 프로바이오틱스",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095181",
+  "name": "플란타김치유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015110550",
+  "name": "티이아이-프로바이오틱스",
+  "reason": "GUARD_REVIEW:PRE-SRC-CFU-UNVERIFIABLE-003",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201900041703",
+  "name": "하이드로피에스HP30 (에이치피삼공)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "포스파티딜세린"
+ },
+ {
+  "stmt": "200400200062179",
+  "name": "쓰리핏 유산균 다이어트",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "Bifidobacterium breve B-3 프로바이오틱스(제2023-2호) : 체지방 감소에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "20110020099185",
+  "name": "그리뮤에 멀티비타민&미네랄 16종",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "엽산",
+   "아연",
+   "비타민B12",
+   "비오틴",
+   "마그네슘",
+   "망간",
+   "비타민C",
+   "비타민D",
+   "셀레늄",
+   "크롬",
+   "몰리브덴"
+  ]
+ },
+ {
+  "stmt": "20040020016616",
+  "name": "락토베이스(LACTO-BASE)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017419",
+  "name": "혼합유산균8Z(DUOLAC LH+BG+LR)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020046297",
+  "name": "HCA다이어트",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2019000437345",
+  "name": "제트맥스크레아틴 크레아퓨어",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Creatine Monohydrate 함량",
+   "Dicyandiamide 함량(mg/kg)",
+   "Dihydrotriazine 함량"
+  ]
+ },
+ {
+  "stmt": "2004001508163",
+  "name": "당 케어",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001517114",
+  "name": "뼈건강 칼마디",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "마그네슘",
+   "망간",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "200700170352442",
+  "name": "타히보 추출물(Tabetri®)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Veratric acid(mg/g)"
+  ]
+ },
+ {
+  "stmt": "200400150709",
+  "name": "비피더스균 롱검 보리",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015107814",
+  "name": "키토케어플러스",
+  "reason": "FOREIGN_FN",
+  "key": "키토올리고당",
+  "fn": [
+   "혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "201900141294",
+  "name": "JBK329(BR)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015107724",
+  "name": "오하나 스피루리나",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "201800123106",
+  "name": "베타밀프로틴쉐이크",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20150010018136",
+  "name": "헬시부트 브레인&프로바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소야사포닌 I (mg/800mg)"
+  ]
+ },
+ {
+  "stmt": "20130020008635",
+  "name": "트러스펙트 당케어 듀얼 밸런스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "바나바잎추출물"
+  ]
+ },
+ {
+  "stmt": "20240028095285",
+  "name": "19종혼합유산균디아이(DI)2-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001701376",
+  "name": "녹십초하와이안스피루리나",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040016020165",
+  "name": "일동서유헌비티-11프리미엄",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "TMCA(Trimethoxy cinnamic acid)(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020029663",
+  "name": "19종혼합유산균디아이(DI)-2200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017851",
+  "name": "LactoVital Capsule",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2015001001858",
+  "name": "17종혼합유산균 200B GN",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029264",
+  "name": "8종혼합유산균에스에이치티(SHT)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200396",
+  "name": "고려인삼차",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "202000099728",
+  "name": "진정주 메가B",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "엽산",
+   "비타민B12",
+   "비오틴",
+   "비타민C"
+  ]
+ },
+ {
+  "stmt": "20040017017842",
+  "name": "PROGUTIC LactoVitamin DESTRESS-Sachet",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균의 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "202400266321",
+  "name": "CIALM LP유산균분말(원료)",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100165236",
+  "name": "과채유래유산균 CJLP-243 (2000)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029567",
+  "name": "17종혼합유산균디아이(DI)2-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100163713",
+  "name": "삼명장 2.0.6 백세파워",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "MSM",
+   "칼슘"
+  ]
+ },
+ {
+  "stmt": "20240028095334",
+  "name": "플란타럼유산균에스엠(SM)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095256",
+  "name": "6종알파혼합유산균에이(A)-3300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095331",
+  "name": "살리바리우스유산균알(R)-200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008419",
+  "name": "제너럴 셀(general sell)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민D",
+   "셀레늄",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2013001712834",
+  "name": "혼합유산균 골드",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029347",
+  "name": "비피도브레브균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095172",
+  "name": "17종혼합유산균엠지(MG)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110017019160",
+  "name": "히카츄(HCA CHEW)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "비타민B6",
+   "아연",
+   "셀레늄",
+   "망간"
+  ]
+ },
+ {
+  "stmt": "20110020099260",
+  "name": "슬림핏",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "녹차",
+   "바나바잎추출물"
+  ]
+ },
+ {
+  "stmt": "2004001518922",
+  "name": "스위트 굿데일리홍삼",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "2013001800615",
+  "name": "올스타웨이 단백질 분말 초코맛",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809547",
+  "name": "8종알파혼합유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029673",
+  "name": "5종혼합유산균디아이(DI)2-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002003486",
+  "name": "NRC스피루리나",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095383",
+  "name": "애니말리스비피더스균알(R)-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070500",
+  "name": "하이락 비피더스 베이직",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "200900150477",
+  "name": "혼합유산균 엠4",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20040017017485",
+  "name": "유산균 14B",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809541",
+  "name": "8종혼합유산균디아이(DI)-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017039647",
+  "name": "락토케어 골드 유산균",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "2022001309332",
+  "name": "오것 O'gut",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "200400200022704",
+  "name": "수국잎열수추출물(리세린지®)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Hydrangenol 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040017017535",
+  "name": "유산균 12B",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001705922",
+  "name": "이에프(EF)-2 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095164",
+  "name": "19종혼합유산균알파-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2009001504728",
+  "name": "김치유산균 알비케이 분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2011001701947",
+  "name": "순한 유산균",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20240028095196",
+  "name": "17종혼합유산균디아이(DI)3-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2020000474618",
+  "name": "다담은 바이오틱스",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095338",
+  "name": "19종혼합유산균디아이(DI)-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015104135",
+  "name": "비피스앤(N)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20240028095358",
+  "name": "9종라비센슬림에스유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029485",
+  "name": "17종알파혼합유산균비(B)-3700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2015001001884",
+  "name": "17종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201600080351",
+  "name": "저스트핏(Just fit) 슬림플러스",
+  "reason": "FOREIGN_FN",
+  "key": "가르시니아",
+  "fn": [
+   "배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040015162418",
+  "name": "앨트헬스 스피루리나",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "총페오포르바이트(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "20040017006570",
+  "name": "닥터 키즈 DHA 플러스 아이",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "루테인",
+   "오메가3"
+  ]
+ },
+ {
+  "stmt": "20040020029844",
+  "name": "플란타럼세미 MG207",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "202500261441",
+  "name": "락티플란티 플란타럼유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029421",
+  "name": "5종혼합유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20120019007225",
+  "name": "피어나S정",
+  "reason": "GUARD_REVIEW:D-CLAIM-GROUNDED-002,D-CLAIM-GROUNDED-002",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "200400170171194",
+  "name": "애터미 키즈 프로바이오틱스 혼합 분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20172880193397",
+  "name": "퀸세라번 나이트 버닝",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20150010018148",
+  "name": "뇌 유산균",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소야사포닌 I (mg/800mg)"
+  ]
+ },
+ {
+  "stmt": "20040017017820",
+  "name": "뉴트리라이트 인테스티플로라7 프로바이오틱스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200600200033232",
+  "name": "DCN 퍼펙트 알티지 오메가3",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017781",
+  "name": "Duolac TCA Premix 2(2037)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20040020071338",
+  "name": "깐깐한비타민B콤플렉스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095283",
+  "name": "17종혼합유산균디아이(DI)3-2900",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002003437",
+  "name": "보리싹맥류약엽엽록소함유제품",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017059139",
+  "name": "알지가드 7종혼합유산균(RG guard)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059308",
+  "name": "6종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061452",
+  "name": "바이오 10억 생유산균",
+  "reason": "GUARD_BLOCKED:H-COUNT-MISMATCH-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020031532",
+  "name": "태극삼분말7",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029572",
+  "name": "플란타럼유산균씨(C)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029571",
+  "name": "플란타럼유산균에스엠(SM)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20100016005319",
+  "name": "7종 프로바이오틱스 씨티에스씨(CTSC)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200700170352500",
+  "name": "hy 프로바이오틱스 다이어트",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095265",
+  "name": "19종혼합유산균디아이(DI)2-4000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095200",
+  "name": "10종알파혼합유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029714",
+  "name": "17종혼합유산균디아이(DI)3-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008374",
+  "name": "아마디 365",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "아연",
+   "마그네슘",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "20240028095236",
+  "name": "5종혼합유산균브이(V)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200201551",
+  "name": "비피더스 100억 밸런스 유산균",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095127",
+  "name": "17종혼합유산균알파-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170061666",
+  "name": "여에스더 엘라스틴 슈퍼 액티브 2.0",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Glycine, L-Valylglycyl-L-prolyl-"
+  ]
+ },
+ {
+  "stmt": "20120019007189",
+  "name": "금단미인 온 비포어",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6"
+  ]
+ },
+ {
+  "stmt": "20172880193366",
+  "name": "모큐락",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001504712",
+  "name": "5종 혼합유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "2019000948376",
+  "name": "올인원 우리가족 멀티비타민",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "아연",
+   "판토텐산",
+   "비타민D",
+   "비타민B1"
+  ]
+ },
+ {
+  "stmt": "200400200034",
+  "name": "헬스칼슘",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "칼슘",
+  "residue": "뼈와치아형성에필요정상적인혈액응고에필요뼈와치아형성에필요정상적인혈액응고에필요"
+ },
+ {
+  "stmt": "20040020031444",
+  "name": "대동 6년근 고려삼분",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001901020",
+  "name": "유청단백지질추출물에이치",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017006553",
+  "name": "코박사",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "갈산(GALLIC ACID)(2.2mg/2,000mg)",
+   "엘라그산(ELLAGIC ACID)(2.5mg/2,000mg)"
+  ]
+ },
+ {
+  "stmt": "20040020029652",
+  "name": "17종혼합유산균디아이(DI)5-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070485",
+  "name": "비피도 3종 혼합 유산균 비아이-4000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20190016403166",
+  "name": "메노락토 프로바이오틱스",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "갱년기 여성 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2013001712867",
+  "name": "락토코쿠스 락티스 WK 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400150831020",
+  "name": "에브리데이 프로바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20240028095286",
+  "name": "19종혼합유산균디아이(DI)-3500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029869",
+  "name": "퍼멘텀세미 MG4717",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095332",
+  "name": "메디오젠 포뮬라 17종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095175",
+  "name": "17종더프로바이오츄유산균디아이(DI)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059228",
+  "name": "피드혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029813",
+  "name": "엘플란타럼 PL62(L.plantarum PL62)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20110020099171",
+  "name": "청순 다이어트",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095271",
+  "name": "2종혼합유산균-1000(MG4706+MG4715)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201728802365",
+  "name": "장앤장",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017536",
+  "name": "유산균 4H",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2019000948371",
+  "name": "솔루티오 우먼",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "히알루론산",
+   "비타민B1",
+   "비타민B6",
+   "비타민E",
+   "아연",
+   "판토텐산",
+   "나이아신",
+   "셀레늄",
+   "망간",
+   "비타민B2",
+   "크롬",
+   "비타민D",
+   "비타민K",
+   "비오틴",
+   "엽산",
+   "비타민B12"
+  ]
+ },
+ {
+  "stmt": "20240028095139",
+  "name": "엘플란타럼 PL62(L.plantarum PL62)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029574",
+  "name": "7종혼합유산균알파-3700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020020210",
+  "name": "클로렐라",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "201600122306",
+  "name": "잇츠라인(It's line)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029284",
+  "name": "9종혼합유산균비에프엘",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110017019192",
+  "name": "경남제약 인지력케어 포스파티딜세린",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "포스파티딜세린",
+   "비타민D",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029742",
+  "name": "17종혼합유산균더블유(W)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2019001640373",
+  "name": "동결건조누에분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "1-deoxynojirimycin"
+  ]
+ },
+ {
+  "stmt": "20040020029642",
+  "name": "19종혼합유산균디아이(DI)-4300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170061752",
+  "name": "비피움 비쓰리 다이어트 데일리",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020046329",
+  "name": "레이디스가르시니아",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "가르시니아"
+ },
+ {
+  "stmt": "20040015162423",
+  "name": "슈퍼바이오틱스 면역스퀘어",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "아연",
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "2004001701375",
+  "name": "녹십초스피루리나정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200082775",
+  "name": "새싹보리추출물(Rexcliver®)(제2023-20호)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "사포나린"
+  ]
+ },
+ {
+  "stmt": "20240028095168",
+  "name": "6종혼합유산균-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029789",
+  "name": "비피도 복합물 B300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008677",
+  "name": "쾌변슬림솔루션 프리미엄 골드",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "가르시니아"
+  ]
+ },
+ {
+  "stmt": "2018001231061",
+  "name": "슬림다이어트 큐",
+  "reason": "GUARD_REVIEW:E-NAME-DERIVED-GROUNDED-002,E-NAME-DERIVED-GROUNDED-002,E-NAME-DERIVED-GROUNDED-002",
+  "key": "가르시니아"
+ },
+ {
+  "stmt": "20040020046332",
+  "name": "안티팻가르시니아핫",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002003131",
+  "name": "홍아짱아",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029331",
+  "name": "락티스유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170171120",
+  "name": "락티카제이바실루스 람노수스 유산균 3010",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095229",
+  "name": "파마비오 에프(Pharmavio-F)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001507072",
+  "name": "유산균 불가리쿠스 비에이치 04",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20130020008653",
+  "name": "간 건강 밀크씨슬 활력 플러스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "엽산",
+   "비타민B12",
+   "비오틴"
+  ]
+ },
+ {
+  "stmt": "2004001705962",
+  "name": "굿락혼합유산균-케이(K)10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008475",
+  "name": "컷팅츄",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "가르시니아",
+   "비타민D",
+   "비타민B1",
+   "비타민B2",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "비타민C",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040017006748",
+  "name": "웰메가 간건강 밀크씨슬",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "셀레늄",
+   "비타민C",
+   "나이아신",
+   "판토텐산",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "20240028095128",
+  "name": "지비(GB)멀티유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017640",
+  "name": "락티카제이바실루스 파라카제이 유산균 DP",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400151071279",
+  "name": "리블러드365",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성(U/g)"
+  ]
+ },
+ {
+  "stmt": "20140017002631",
+  "name": "노즈케어 NOSE CARE",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 코상태 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029355",
+  "name": "비피롱비피더스균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040016020185",
+  "name": "프로젝트 혈행케어 알티지오메가3",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "오메가3",
+   "비타민E"
+  ]
+ },
+ {
+  "stmt": "2004001505582",
+  "name": "난황레시틴(PL60)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "인지질",
+   "인지질 중 포스파티딜콜린",
+   "콜레스테롤(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "2012001701032",
+  "name": "당앤고 알파",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017006834",
+  "name": "시네트롤 자몽 오렌지 다이어트",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Narigin",
+   "Hesperidin",
+   "Naringin/Hesperidin 비율"
+  ]
+ },
+ {
+  "stmt": "2024002809551",
+  "name": "8종혼합유산균디아이(DI)-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095397",
+  "name": "카이유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029608",
+  "name": "메디오젠 포뮬라 17종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008276",
+  "name": "생생 인지력 포스파티딜세린",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민D",
+   "비타민E",
+   "포스파티딜세린"
+  ]
+ },
+ {
+  "stmt": "20100018018134",
+  "name": "크레아퓨어 크레아틴 모노 하이드레이트",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "크레아틴 모노하이드레이트"
+  ]
+ },
+ {
+  "stmt": "200400170171316",
+  "name": "11종 혼합유산균 3011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001381",
+  "name": "센서티브 장케어",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040017059190",
+  "name": "혼합유산균 디더블유1(DW1)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095305",
+  "name": "녹십자웰빙디(D)7종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029721",
+  "name": "Prolac complex MED-01",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110017019189",
+  "name": "튼튼유산균프리미엄",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "아연",
+   "나이아신"
+  ]
+ },
+ {
+  "stmt": "2004001509019",
+  "name": "하이키드 유산균 7",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "아연",
+   "셀레늄",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "201000170076",
+  "name": "테아닌",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2021001637131",
+  "name": "천마니 발효천마진액골드",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20100016005192",
+  "name": "혼합유산균 11티(T)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095231",
+  "name": "써모스유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200398",
+  "name": "고려홍삼차",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2016000600762",
+  "name": "엘피 씨케이디비008(에이) (LP CKDB008(A))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017288023662",
+  "name": "데일리쾌변",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029691",
+  "name": "12종혼합유산균디아이(DI)-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029666",
+  "name": "17종혼합유산균디아이(DI)3-2900",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095133",
+  "name": "7종복합유산균엠지(MG)-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201728802191",
+  "name": "애터미 홍삼단",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029612",
+  "name": "함소아유산균12",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2020000474631",
+  "name": "메타 셀레늄 200",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "셀레늄"
+ },
+ {
+  "stmt": "201500021529",
+  "name": "RXGIN 홍천웅",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "로사빈"
+  ]
+ },
+ {
+  "stmt": "2016000600778",
+  "name": "엘에프 씨케이디비012(에이) (LF CKDB012(A))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061281",
+  "name": "핏",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "지표성분"
+  ]
+ },
+ {
+  "stmt": "20040020029874",
+  "name": "8종혼합유산균-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200071697",
+  "name": "그린 철분",
+  "reason": "NO_FUNCTION",
+  "key": "철"
+ },
+ {
+  "stmt": "20040020028483",
+  "name": "신기소101",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2013001712861",
+  "name": "락토코쿠스 락티스 유산균 케이에스",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095223",
+  "name": "12종혼합유산균-제트(z)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2016000600785",
+  "name": "비엘지 에이비 씨케이디비004 (BLG AB CKDB004)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20120019007218",
+  "name": "닥터리버스트레스케어프리미엄",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "테아닌",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "나이아신"
+  ]
+ },
+ {
+  "stmt": "20040020029520",
+  "name": "10종혼합유산균-디(D)2",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017017633",
+  "name": "Duolac Detox",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20130020008481",
+  "name": "슬림풀 모닝",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "녹차",
+   "비타민C",
+   "비타민E",
+   "셀레늄",
+   "비타민D",
+   "나이아신",
+   "비타민B1",
+   "판토텐산",
+   "비타민A",
+   "비타민B2",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "201728802363",
+  "name": "장생단플러스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020031280",
+  "name": "천일고려태극흑삼분말캡슐플래티넘",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017068177",
+  "name": "징코플러스Q10(Ginkgo PLUS Q10)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "은행잎",
+   "코엔자임Q10",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029655",
+  "name": "17종혼합유산균디엔(DN)-2200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059211",
+  "name": "에이치엠피(HMP)-17",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029828",
+  "name": "10종혼합유산균-2300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029728",
+  "name": "5종혼합유산균디아이(DI)-2300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008439",
+  "name": "쾌변엔 식이섬유 유산균",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "200400170171300",
+  "name": "혼합유산균 4에스(S)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070376",
+  "name": "닥터에디션 이지프로",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200081721",
+  "name": "나토칸골드 2000",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성"
+  ]
+ },
+ {
+  "stmt": "20040017059128",
+  "name": "알지가드 혼합유산균 12(RG guard)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070453",
+  "name": "비피도9종혼합유산균비피락-2500",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20120019007204",
+  "name": "다빔 배변&다이어트 솔루션",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "안트라퀴논계화합물(무수바바로인으로서)(20mg/3400 mg)"
+  ]
+ },
+ {
+  "stmt": "20040020006395",
+  "name": "씨엘에이골드",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400151071253",
+  "name": "카보엑스정",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "2021001827721",
+  "name": "비타민D 2000IU",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20040020071349",
+  "name": "레스퀵라이트 발포정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017015169",
+  "name": "핼런스 클로렐라",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001504744",
+  "name": "7종 혼합유산균 알비",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017039633",
+  "name": "핏핏",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "총 다당체",
+   "알로인A와 B의 합으로서(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "2019000910515",
+  "name": "나토엔자임",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성"
+  ]
+ },
+ {
+  "stmt": "200400170171311",
+  "name": "17종 혼합유산균 3011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170171332",
+  "name": "4종 혼합유산균 아이엔",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2019000910513",
+  "name": "케이비엘697(KBL697) 장용성캡슐",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020001333",
+  "name": "팜플러스350",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "판토텐산",
+   "엽산",
+   "비타민B12",
+   "마그네슘",
+   "셀레늄",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040017017747",
+  "name": "Duolac Mix LH, LR, BG, LC, LP",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20130020008444",
+  "name": "스트롱본칼슘",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "20040020029805",
+  "name": "17종혼합유산균엠지(MG)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001339",
+  "name": "대두추출물등 복합물(메노세라)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "대두이소플라본(비배당체로서) 함량(mg/g)",
+   "8-Prenylnaringenin 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "2019001431741",
+  "name": "PARABIOTICS",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001507086",
+  "name": "유산균 파라카제이 오케이",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400150831090",
+  "name": "웰빙낫도",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성"
+  ]
+ },
+ {
+  "stmt": "20040020029790",
+  "name": "5종혼합유산균MG-4000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110017019185",
+  "name": "슬림 다이어트 아메리카노맛",
+  "reason": "GUARD_REVIEW:E-NAME-DERIVED-GROUNDED-002,E-NAME-DERIVED-GROUNDED-002,E-NAME-DERIVED-GROUNDED-002",
+  "key": "가르시니아"
+ },
+ {
+  "stmt": "20040020029404",
+  "name": "플란타럼유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029704",
+  "name": "유산균브이(V)3-1000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040015110559",
+  "name": "옵티몬",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B2",
+   "비타민E",
+   "마그네슘"
+  ]
+ },
+ {
+  "stmt": "20130020008281",
+  "name": "카보컷슬림정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200061083",
+  "name": "비타민B컴플렉스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B1",
+   "비타민B6",
+   "나이아신",
+   "판토텐산",
+   "비타민B2",
+   "비타민B12",
+   "비오틴"
+  ]
+ },
+ {
+  "stmt": "2004001901436",
+  "name": "키토올리고당-LC",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "키토올리고당",
+   "비타민C"
+  ]
+ },
+ {
+  "stmt": "201728801541",
+  "name": "녹차추출물",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "녹차"
+ },
+ {
+  "stmt": "20130020008495",
+  "name": "BNS혈당엔바나바",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "바나바잎추출물",
+   "아연",
+   "비타민B1"
+  ]
+ },
+ {
+  "stmt": "20040020029767",
+  "name": "뉴트리아이 유산균 - 8",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809525",
+  "name": "12종혼합유산균분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029830",
+  "name": "우먼밸런스프로바이오틱스MG-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029877",
+  "name": "퍼멘텀유산균MG-1000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029835",
+  "name": "훼칼리스세미 MG5206",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029118",
+  "name": "혼합유산균알파-엘(L)2",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "1 유산균 증식 및 유해균 억제 2 배변활동원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095317",
+  "name": "살리바리우스유산균알(R)-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001703723",
+  "name": "포도과피 효소발효추출물(KL-GEFE)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200900200032",
+  "name": "슬림메이트 바",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001706742",
+  "name": "수용성홍경천추출물-S",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "기능성분 함량"
+  ]
+ },
+ {
+  "stmt": "2009001504721",
+  "name": "레몬분리3종혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029599",
+  "name": "17종혼합유산균에이치(H)-2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029596",
+  "name": "살리바리우스유산균알(R)-200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015104144",
+  "name": "칼슘마그네슘디",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029518",
+  "name": "유한17종혼합유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20130020008484",
+  "name": "어뉴엠 도나 진 (A NEW M DONNA JIN)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소포리코사이드"
+  ]
+ },
+ {
+  "stmt": "200400200071594",
+  "name": "오메가3&루테인골드",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "오메가3",
+   "루테인"
+  ]
+ },
+ {
+  "stmt": "2004001801179",
+  "name": "인삼(태극삼)분말",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "인삼",
+  "fn": [
+   "뼈 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200400200071972",
+  "name": "밀크씨슬+",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "나이아신",
+   "셀레늄",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2012001507948",
+  "name": "유산균발효완두단백분말CKDHC",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "조단백질"
+  ]
+ },
+ {
+  "stmt": "200700170351679",
+  "name": "배초향 추출물(아가트리(Agatri))",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "틸리아닌"
+  ]
+ },
+ {
+  "stmt": "20140017002183",
+  "name": "11종 혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170171119",
+  "name": "락토코쿠스 락티스 유산균 3010",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20140017002654",
+  "name": "알고케어 뉴트리션 콜레스테롤 케어",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017059281",
+  "name": "비.브레베-100비(B.breve-100B)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029336",
+  "name": "루테리유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017278201620",
+  "name": "혼합유산균 VL8",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2012001900744",
+  "name": "파워멀티칸-5",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "오메가3",
+   "아연",
+   "망간",
+   "비타민A"
+  ]
+ },
+ {
+  "stmt": "20130020008296",
+  "name": "싸이언티픽 비오틴",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비오틴",
+   "비타민C",
+   "판토텐산"
+  ]
+ },
+ {
+  "stmt": "20240028095162",
+  "name": "6종혼합유산균디아이(DI)-3200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2020000474620",
+  "name": "마이크로바이옴 밸런스",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017006554",
+  "name": "파워루테인7",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민E",
+   "비타민B2",
+   "비타민B6",
+   "아연",
+   "망간",
+   "루테인",
+   "비타민A"
+  ]
+ },
+ {
+  "stmt": "200400200201583",
+  "name": "애피더스 위너바이옴",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "2014002002347",
+  "name": "고려태극인삼분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20150010018108",
+  "name": "알로에겔 발효 포스트바이오틱스 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002005029",
+  "name": "키토올리고당분말 70",
+  "reason": "FOREIGN_FN",
+  "key": "키토올리고당",
+  "fn": [
+   "체지방감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029857",
+  "name": "플란타럼세미 DM083",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20120019007223",
+  "name": "'간'편함을 누리다 밀크씨슬 간 肝",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "셀레늄",
+   "나이아신",
+   "아연",
+   "비타민A",
+   "판토텐산",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "20040020029549",
+  "name": "17종혼합유산균디아이(DI)-2300",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040015083938",
+  "name": "뺄래2",
+  "reason": "FOREIGN_FN",
+  "key": "콜레우스포스콜리",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)"
+  ]
+ },
+ {
+  "stmt": "20130020008399",
+  "name": "시그니처 파워 글루코사민 골드",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민D",
+   "비타민B6",
+   "아연",
+   "글루코사민"
+  ]
+ },
+ {
+  "stmt": "2018001231040",
+  "name": "슬림플래닛 녹차카테킨 500mg 애프터밀",
+  "reason": "GUARD_REVIEW:E-NAME-DERIVED-GROUNDED-002",
+  "key": "녹차"
+ },
+ {
+  "stmt": "2004002003138",
+  "name": "천일고려태극인삼분말캅셀골드",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020006444",
+  "name": "감마리놀렌산함유유지",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "감마리놀렌산",
+  "residue": "혈행개선"
+ },
+ {
+  "stmt": "20040017006807",
+  "name": "커스텀바이오 비타민D부족엔 2000+",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20040020029578",
+  "name": "19종혼합유산균디아이(DI)-3600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017715",
+  "name": "베이비 프로바이오틱(Baby Probiotic)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20240028095259",
+  "name": "8종혼합유산균디아이(DI)-2600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20100016005401",
+  "name": "보령 당앤락 혈당 앤 유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001706755",
+  "name": "홍경천추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "기능성분 함량"
+  ]
+ },
+ {
+  "stmt": "20040017015238",
+  "name": "여춘女春",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소포리코사이드",
+   "철"
+  ]
+ },
+ {
+  "stmt": "2014001710715",
+  "name": "프로바이오틱스 HY7207",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "주된 기능성 - 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029800",
+  "name": "9종혼합유산균디아이(DI)2-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2012001701043",
+  "name": "칼슘박사키즈",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001705939",
+  "name": "장(腸)유래 5종혼합유산균(Intestine5 Probiotics)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809532",
+  "name": "비피더스4종혼합분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029552",
+  "name": "에시도필러스유산균-2500",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20130020008671",
+  "name": "미드밀 골든타임",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "20130020008271",
+  "name": "진솔한이유 비타민D",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "202100165233",
+  "name": "과채유래유산균 CJLP-243",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2020001635419",
+  "name": "UD유디 구강프로폴리스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라(ρ)-쿠마르산",
+   "계피산",
+   "디에틸렌그리콜"
+  ]
+ },
+ {
+  "stmt": "2004002005038",
+  "name": "해국추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "클로로겐산(Chlorogenic acid) 함량"
+  ]
+ },
+ {
+  "stmt": "20240028095135",
+  "name": "12종혼합유산균알파-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20160006007128",
+  "name": "바이크롬 간 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "비알콜성 간손상으로부터 간 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20100016005372",
+  "name": "마이랩 유산균 1",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017706",
+  "name": "듀오자임플러스",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균의 증식 및 유해균 억제.배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095329",
+  "name": "메디오젠 포뮬라 10종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015162358",
+  "name": "유산균 키즈 디펜덤 (Probiotics Kids Defendum)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020001425",
+  "name": "밀크씨슬&비타민",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "나이아신",
+   "판토텐산",
+   "비타민B12",
+   "비오틴",
+   "엽산",
+   "밀크씨슬"
+  ]
+ },
+ {
+  "stmt": "200400200201067",
+  "name": "테아닌",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "테아닌"
+ },
+ {
+  "stmt": "20240028095109",
+  "name": "19종혼합유산균디아이(DI)-3900",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2013001800618",
+  "name": "런웨이프로틴 아이솔레이트",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170877",
+  "name": "저분자콜라겐펩타이드NS",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Gly-Pro dipeptide(mg/g)",
+   "카드륨(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "201900142131",
+  "name": "그린세라-에프(F)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Secoxyloganin 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "2004001606151",
+  "name": "HK표고버섯균사체 비타민D 플러스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "베타글루칸 (mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040017038216",
+  "name": "갱년기N우먼비바",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소포리코사이드"
+  ]
+ },
+ {
+  "stmt": "2014001710739",
+  "name": "프로바이오틱스 HY7718-700B",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001518928",
+  "name": "홍삼스틱플러스",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20040017015325",
+  "name": "모두의 단백질 더the23 프로틴",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "조단백질"
+  ]
+ },
+ {
+  "stmt": "2024002809596",
+  "name": "8종혼합유산균디아이(DI)2-2600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2021001827727",
+  "name": "식후혈당상승 억제엔 프리미엄 혈당건강 바나바",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "바나바잎추출물",
+   "크롬",
+   "아연",
+   "셀레늄",
+   "비타민B12",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "200400200505",
+  "name": "키토산분말",
+  "reason": "FOREIGN_FN",
+  "key": "키토산",
+  "fn": [
+   "혈중 콜레스테롤 개선･체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020046312",
+  "name": "관절N글루코사민",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "글루코사민",
+  "miss": [
+   "관절 및 연골 건강에 도움"
+  ]
+ },
+ {
+  "stmt": "20240028095211",
+  "name": "19종혼합유산균알파-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017782",
+  "name": "Duolac TCA Premix 1(2063)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20130020008436",
+  "name": "리빙케어 N-아세틸글루코사민",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "글루코사민",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "200400170171318",
+  "name": "11종 혼합유산균 1011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029696",
+  "name": "에스피씨헬스가드유산균에스알파-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020020463",
+  "name": "배가슬림(倍加Slim)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020020618",
+  "name": "프리로바이오틱스5.0",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001326",
+  "name": "기억력개선케어",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "은행잎"
+ },
+ {
+  "stmt": "20140017002662",
+  "name": "장건강 100억 쿨멜팅 유산균",
+  "reason": "GUARD_BLOCKED:H-COUNT-MISMATCH-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809534",
+  "name": "훼시움유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029726",
+  "name": "8종혼합유산균디아이(DI)2-2600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029761",
+  "name": "8종혼합유산균디아이(DI)-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001519183",
+  "name": "에너 브이(V)5000",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "마그네슘",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "2023002721123",
+  "name": "락토5종 KBL-6,700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020031130",
+  "name": "로얄레드g",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001900950",
+  "name": "클로렐라 A+(Chlorella Active+)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015039194",
+  "name": "한창락 프리미엄",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015162102",
+  "name": "고려홍삼차(Korea Redginseng Tea)",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "인삼",
+  "fn": [
+   "혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음",
+   "기억력 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2024002809585",
+  "name": "17종혼합유산균-디(D)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170171334",
+  "name": "6종 혼합유산균 엠오",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029319",
+  "name": "17종라비센패밀리유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001901023",
+  "name": "포스파티딜세린맥스90",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "포스파티딜세린"
+ },
+ {
+  "stmt": "2017288003010",
+  "name": "지초추출물",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170171331",
+  "name": "락티카제이바실루스 람노수스 유산균 디피 2011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070438",
+  "name": "비피도 3종 혼합 유산균 비아이-2000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170061798",
+  "name": "롱비타C",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "200900200044",
+  "name": "고려홍삼정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017006987",
+  "name": "셀티바 피크노제놀",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "총 프로시아니딘"
+  ]
+ },
+ {
+  "stmt": "20040017059164",
+  "name": "19종혼합유산균-알에스 200비 뉴(19종혼합유산균-RS 200B New)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061174",
+  "name": "보라지유",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "감마리놀렌산"
+ },
+ {
+  "stmt": "20240028095288",
+  "name": "혼합유산균21-디아이(DI)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008463",
+  "name": "당케어 혈당 앤 유산균",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "식이섬유"
+  ]
+ },
+ {
+  "stmt": "20040015110604",
+  "name": "메가데이스피루리나",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2022000924316",
+  "name": "Personalized ProbioTM 4",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001901017",
+  "name": "유청단백지질추출물",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029795",
+  "name": "17종혼합유산균디아이(DI)3-2300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095116",
+  "name": "펜타락토 15종 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017006838",
+  "name": "시네트롤 브이세븐",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Narigin",
+   "Hesperidin",
+   "Naringin/Hesperidin 비율"
+  ]
+ },
+ {
+  "stmt": "2011001701970",
+  "name": "아침엔 유산균",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "체내산소운반과혈액생성에필요에너지생성에필요칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "2004001900913",
+  "name": "대상 웰라이프 클로렐라",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017889",
+  "name": "NRC 7 strain mixture",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균의 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2022000481814",
+  "name": "메타 클린업(meta cleanup)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "안트라퀴논계화합물(무수바바로인으로서)"
+  ]
+ },
+ {
+  "stmt": "20190009483409",
+  "name": "프로폴리스추출물 13%",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라(p)-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "2013001930410",
+  "name": "제너럴 밸런스 식물성 프로바이오틱스 파워",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "성 상"
+  ]
+ },
+ {
+  "stmt": "200800170041",
+  "name": "구아바잎추출물 등 복합물(BENDU381)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2015001000285",
+  "name": "론지텔롬 프로케어 I",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029558",
+  "name": "유한17종혼합유산균-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029824",
+  "name": "15종혼합유산균감마-2500",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029417",
+  "name": "혼합유산균알파-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202500265575",
+  "name": "헛개나무과병·오미자박추출복합물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "미리세틴(mg/g)",
+   "쉬잔드린(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020071358",
+  "name": "에버비타메가도스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809552",
+  "name": "8종혼합유산균지엔엠(GNM)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017736",
+  "name": "Duolac Mix H2",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20120019007186",
+  "name": "플라우먼-S",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "대두이소플라본(mg/1800 mg)"
+  ]
+ },
+ {
+  "stmt": "20040020046318",
+  "name": "웰러스크롬",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070441",
+  "name": "유산균 플란타룸 ND88-2000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002001830",
+  "name": "DS-BIO 미인이 먹는 비타민C",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "20120019007170",
+  "name": "플라우먼",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "대두이소플라본(mg/1800 mg)"
+  ]
+ },
+ {
+  "stmt": "20040017059162",
+  "name": "이에프-200비(EF-200B)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095277",
+  "name": "3종혼합유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020020471",
+  "name": "헬스와이즈와이즈클로렐라",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001504743",
+  "name": "레인보우 9종혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809538",
+  "name": "2종혼합유산균엠지(MG)-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020006566",
+  "name": "가르시니아 HCA",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "가르시니아",
+  "miss": [
+   "탄수화물에서 지방으로 합성되는것을 억제하여 체지방 감소에 도움을 줌"
+  ]
+ },
+ {
+  "stmt": "20172880193232",
+  "name": "지평책",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "가르시니아"
+  ]
+ },
+ {
+  "stmt": "2019001431726",
+  "name": "6종 혼합유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015100177",
+  "name": "인삼분말 9",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095195",
+  "name": "17종혼합유산균디아이(DI)2-3300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100141034",
+  "name": "현삼추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "앤고로사이드 C(Angoroside C) 함량(mg/g)"
+  ]
+ },
+ {
+  "stmt": "2013001800612",
+  "name": "가이스머슬게이너",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017155",
+  "name": "혼합유산균P",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029228",
+  "name": "9종혼합유산균 비알",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201400171073",
+  "name": "한국야쿠르트 혼합 프로바이오틱스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170061766",
+  "name": "위타민 리포좀 비타민C",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "200400200062091",
+  "name": "피부면역 유산균 캡슐",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "과채유래유산균제호"
+ },
+ {
+  "stmt": "201100160064",
+  "name": "유산균발효굴추출물 (FGO)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "타우린( Taurine) 함량 (mg/g)",
+   "마비성 패독(mg/kg)",
+   "설사성 패독(mg/kg)",
+   "기억상실성 패독(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "20130020008643",
+  "name": "DR.KWON 글루타치온 플러스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "비타민D",
+   "셀레늄",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040015083865",
+  "name": "밀웜프로틴",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "조단백질"
+  ]
+ },
+ {
+  "stmt": "2015001000250",
+  "name": "제노뮨 디오케이",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20240028095187",
+  "name": "엔트리6종 유산균혼합분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029842",
+  "name": "19종혼합유산균SE-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061654",
+  "name": "다이어트 유산균 비에날씬 알엑스(RX)",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "Lactobacillus gasseri BNR17 : 체지방감소에 도움을 줄 수 있음(생리활성기능)"
+  ]
+ },
+ {
+  "stmt": "2009002002010",
+  "name": "청인 삼락",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020071315",
+  "name": "코스메힐 헬씨 화이트 에퍼글로우",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095260",
+  "name": "9종혼합유산균디아이(DI)-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029526",
+  "name": "10종에스에이치유산균비(B)-2000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095299",
+  "name": "17종혼합유산균에이치(H)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029275",
+  "name": "우아닥터 10",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20130020008464",
+  "name": "락토 프리미엄 바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20130020008501",
+  "name": "제니스칼 팻킬 슬림 샷",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Rosmarinic acid",
+   "1-Deoxynojirimycin",
+   "6,7-Dimethylesculetin"
+  ]
+ },
+ {
+  "stmt": "20240028095356",
+  "name": "17종알파혼합유산에이(A)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001701438",
+  "name": "혼합유산균5",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017014627",
+  "name": "지지투 마이크로바이옴",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017006904",
+  "name": "바이탈슬림 다이어트 올인원 나이트",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170061337",
+  "name": "지웨이 뼈건강엔 칼마디 칼슘 마그네슘 비타민D 4000IU",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "마그네슘",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "20040020029445",
+  "name": "19종혼합유산균알파-2000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095327",
+  "name": "메디오젠 포뮬라 12종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029593",
+  "name": "메디오젠 포뮬라 12종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2010001521942",
+  "name": "뽀로로 삼부커스로 만든 비타민C+아연(엘더베리맛)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095314",
+  "name": "9종혼합유산균메가-3900",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2014001700259",
+  "name": "UC유산균혼합분말 9종",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095238",
+  "name": "5종혼합유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001703840",
+  "name": "고려홍삼분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017713",
+  "name": "혼합유산균 휴먼믹스(Protexin Human Mix)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "2015001001857",
+  "name": "17종혼합유산균 RS-200B GN",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029744",
+  "name": "17종혼합유산균알파-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017348",
+  "name": "혼합유산균8X",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2013001702356",
+  "name": "RE POOP",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "식이섬유"
+ },
+ {
+  "stmt": "20110020099132",
+  "name": "고려은단 흑삼",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029783",
+  "name": "JBK329(BR)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2018001246688",
+  "name": "홍관보골드",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Ser-Trp-Val-Glu"
+  ]
+ },
+ {
+  "stmt": "20240028095140",
+  "name": "이앤17종유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200700170353070",
+  "name": "밀배유추출물 CM",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400200082879",
+  "name": "바이오코어 피부면역 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200400170171309",
+  "name": "락티카제이바실루스 카제이 유산균 1010 엠(M)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170061851",
+  "name": "YDY 피크노제놀 큐텐",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "201100150717",
+  "name": "혈당바이오",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070282",
+  "name": "유산균 헬베티쿠스 비에이치14",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002002221",
+  "name": "지구스피루리나 에이II",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070265",
+  "name": "유산균 써모필러스 비에이치05",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20130020008624",
+  "name": "HK나토키나제",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성(U/g)"
+  ]
+ },
+ {
+  "stmt": "20100016005235",
+  "name": "8종 혼합유산균 엘에스(LS)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029433",
+  "name": "8종알파혼합유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2019001407136",
+  "name": "관절선생",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "MSM",
+   "글루코사민",
+   "칼슘"
+  ]
+ },
+ {
+  "stmt": "2010001521952",
+  "name": "온가족혼합생유산균프로프리바이오틱스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20130020008410",
+  "name": "액티브 녹용 & 산호칼슘",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민D",
+   "비타민K",
+   "나이아신",
+   "칼슘",
+   "철",
+   "셀레늄"
+  ]
+ },
+ {
+  "stmt": "20040015083994",
+  "name": "웰업 프로바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20240028095207",
+  "name": "19종혼합유산균디아이(DI)2-3300",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029796",
+  "name": "10종 로얄 프로바이오틱스",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029100",
+  "name": "람노서스 엘알 유산균",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "유익한유산균증식"
+ },
+ {
+  "stmt": "200400170061068",
+  "name": "헬쓰플랜 센스엽산",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "엽산",
+  "residue": "세포와혈액생성에필요태아신경관의정상발달에필요"
+ },
+ {
+  "stmt": "2004001706785",
+  "name": "라바텍 프로바이오틱스 9(LAVATECT Probiotics 9)",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008433",
+  "name": "비오틴10000",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비오틴",
+   "비타민B1",
+   "비타민B2",
+   "판토텐산",
+   "비타민B6",
+   "아연",
+   "셀레늄"
+  ]
+ },
+ {
+  "stmt": "20040017067103",
+  "name": "라바텍프로바이오틱스-에스",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002007434",
+  "name": "흑삼분말",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20190009105419",
+  "name": "라이프케어 생유산균 골드",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "201500120557",
+  "name": "제트 솔루션 원큐",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "식이섬유"
+ },
+ {
+  "stmt": "20040017059155",
+  "name": "10종 혼합유산균-200비(200B)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029430",
+  "name": "9종알파혼합유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017006923",
+  "name": "바이탈썸 비타민D",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "2024002809583",
+  "name": "12종혼합유산균알파-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2018001231037",
+  "name": "프로틴파워츄어블정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015110555",
+  "name": "빼요팻다이어트",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "키토산",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6",
+   "비타민C"
+  ]
+ },
+ {
+  "stmt": "20040015110592",
+  "name": "데일리비타민",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "20040017017646",
+  "name": "락토코쿠스 락티스 피엘 186",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2005002000511",
+  "name": "PBN훼시움유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2009001517112",
+  "name": "착한비타민C+",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "20120017002118",
+  "name": "비타민D 2000IU",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20040020001435",
+  "name": "식물성알티지오메가3",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "오메가3",
+   "비타민E"
+  ]
+ },
+ {
+  "stmt": "2020001620228",
+  "name": "락티브 인지력 하이솔루션 포스파티딜세린PS",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "포스파티딜세린",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "202200092434",
+  "name": "마이크로바이옴 2",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015104271",
+  "name": "비타민D",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민D",
+  "residue": "칼슘과인이흡수되고이용되는데필요"
+ },
+ {
+  "stmt": "20040015094126",
+  "name": "고려홍삼정프리미엄",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "2004001705956",
+  "name": "굿락혼합유산균ALB-10B",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015094138",
+  "name": "삼대인 간보천",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "비타민B1",
+   "비타민B6"
+  ]
+ },
+ {
+  "stmt": "20100016005377",
+  "name": "마이랩 유산균 6",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20160006007102",
+  "name": "비엘 씨에이 씨케이디비005(엠) (BL CA CKDB005(M))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2009001504714",
+  "name": "사과박 3종 혼합유산균",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20040020029675",
+  "name": "플란타김치유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029665",
+  "name": "18종혼합유산균디아이(DI)-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809586",
+  "name": "17종혼합유산균알파-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002005256",
+  "name": "실크단백질 산가수분해물(Sil-Q1)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "세린(mg/g)",
+   "글리신(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020001401",
+  "name": "수면케어",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "감마오리자놀"
+  ]
+ },
+ {
+  "stmt": "20040020029464",
+  "name": "17종혼합유산균알파-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001706741",
+  "name": "바이오-이소플라본",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "기능성분 함량"
+  ]
+ },
+ {
+  "stmt": "2004001900937",
+  "name": "대상 클로렐라 S",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029708",
+  "name": "19종혼합유산균디아이(DI)-4000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095124",
+  "name": "9종알파혼합유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20120019007220",
+  "name": "+ 뼈건강",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "폴리감마글루탐산(mg/5.6 g)"
+  ]
+ },
+ {
+  "stmt": "20120019007237",
+  "name": "락토스킨케어",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "비타민D",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20240028095157",
+  "name": "에소코 프로바이오틱스(essoco probiotics)-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061905",
+  "name": "셀티바 프로바이오틱 다이어트",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : 체지방 감소에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "2024002809589",
+  "name": "19종혼합유산균알파-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20120019007185",
+  "name": "올나잇 밀크씨슬 9플러스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "밀크씨슬",
+   "셀레늄",
+   "나이아신",
+   "아연",
+   "엽산",
+   "판토텐산",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "201728602081",
+  "name": "하루애(愛) 비타",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "2004001518925",
+  "name": "진 하루홍삼스틱",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20040017017836",
+  "name": "KUK Rumania 4 strain mix",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020006323",
+  "name": "다이어트 씨.엘.에이",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029617",
+  "name": "유한 뉴오리진 베이비 프리미엄골드 프로바이오틱스 콤플렉스",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200071978",
+  "name": "지엘에이 콤플렉스 GLA COMPLEX",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "감마리놀렌산",
+   "비타민E"
+  ]
+ },
+ {
+  "stmt": "2020001201681",
+  "name": "콜레스테롤 개선 마늘",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "알리인"
+  ]
+ },
+ {
+  "stmt": "20040020029392",
+  "name": "파라카제이유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170171367",
+  "name": "비피락토골드캡슐",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "프로바이오틱스: 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "202100141031",
+  "name": "트리플프로폴리스추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라(ρ)-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "2015001204923",
+  "name": "천지양통홍삼분말",
+  "reason": "GUARD_BLOCKED:PRE-SRC-BULK-004",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20040017059122",
+  "name": "장대원키즈용포뮬라(7종)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바오틱스 수"
+  ]
+ },
+ {
+  "stmt": "2017278206813",
+  "name": "다운케어슬림",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "식이섬유",
+   "가르시니아"
+  ]
+ },
+ {
+  "stmt": "20040020029773",
+  "name": "2종혼합유산균디아이(DI)-2400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001701794",
+  "name": "Lacto-B(락토비)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2017288023672",
+  "name": "멀티비타민 키즈",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20130020008630",
+  "name": "오라맥스 G(Oramax G)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "철"
+  ]
+ },
+ {
+  "stmt": "2018001231034",
+  "name": "메디타민 트루퍼포먼스 포우먼",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001706760",
+  "name": "대두이소플라본-에스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "대두이소플라본(비배당체로서)"
+  ]
+ },
+ {
+  "stmt": "2004001900947",
+  "name": "대상 클로렐라 AQ",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "202300040005",
+  "name": "오믹셀 단케메아",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002000176",
+  "name": "그린체 세라피",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Glucosylceramide(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20240028095150",
+  "name": "4종혼합유산균오(O)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100163715",
+  "name": "뽀로로 천마니 홍삼 튼튼",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "200400200229",
+  "name": "지구스피루리나 엘Ⅱ",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017059167",
+  "name": "10종혼합유산균-제이제이(JJ)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2014002002374",
+  "name": "6년근 홍삼정 더 프리미엄 스틱 33",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20240028095179",
+  "name": "6종제일혼합유산균와이",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809573",
+  "name": "19종혼합유산균알파-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2009001702368",
+  "name": "12S-블렌드-200 (12S-Blend-200)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110020099100",
+  "name": "스타르칸",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Quercetin"
+  ]
+ },
+ {
+  "stmt": "20172880236135",
+  "name": "비움톡스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029614",
+  "name": "10종혼합유산균디아이(DI)-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017006534",
+  "name": "테아닌",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "테아닌",
+   "비타민B6"
+  ]
+ },
+ {
+  "stmt": "20040017014552",
+  "name": "광동 장 건강엔 생유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001507071",
+  "name": "유산균 퍼멘텀 오케이",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020046311",
+  "name": "클린업",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "식이섬유",
+  "residue": "배변활동원활"
+ },
+ {
+  "stmt": "201400151162",
+  "name": "인삼다당체추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Galactose와 Arabinose의 합(mg/g)",
+   "카드뭄(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "20040020029878",
+  "name": "10종혼합유산균-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059145",
+  "name": "12종혼합유산균-알에스 200비(12종혼합유산균-RS 200B)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2015001001863",
+  "name": "다니스코 5종혼합유산균 100B",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095115",
+  "name": "루테리유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2015001001864",
+  "name": "12종혼합유산균 RS-100B GN",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017873",
+  "name": "KUK Poland-Maspex 8Z mixture",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음",
+   "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "201900143178",
+  "name": "특허혼합유산균 9종",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015110570",
+  "name": "티이아이-프로바이오틱스(분말)",
+  "reason": "GUARD_REVIEW:PRE-SRC-CFU-UNVERIFIABLE-003",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001706735",
+  "name": "사임당이소플라본",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "기능성분 함량"
+  ]
+ },
+ {
+  "stmt": "20240028095190",
+  "name": "11종혼합유산균 아이(I)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008447",
+  "name": "시그니처파워칼슘골드",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "칼슘",
+  "residue": "뼈와치아형성에필요정상적인혈액응고에필요"
+ },
+ {
+  "stmt": "201900041705",
+  "name": "하이드로피에스씨 HPC30 (에이치피씨삼공)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "포스파티딜세린"
+ },
+ {
+  "stmt": "20040020040110",
+  "name": "가온비 이뮨밸런스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029588",
+  "name": "19종혼합유산균디아이(DI)젠-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029865",
+  "name": "비피덤세미 MG731",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017006848",
+  "name": "메노락토 프로바이오틱스",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "갱년기 여성 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2023002721146",
+  "name": "8종 혼합유산균 WB-3,000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202200190761",
+  "name": "전호잎추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "지표성분 함량"
+  ]
+ },
+ {
+  "stmt": "20130020008435",
+  "name": "앤오온(NO/ON)",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민D",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029375",
+  "name": "17종알파혼합유산균디(D)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040017017942",
+  "name": "Gold 5 premix",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200071971",
+  "name": "일동 라이프케어 프라임 루테인",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "루테인",
+   "비타민A",
+   "비타민E"
+  ]
+ },
+ {
+  "stmt": "20040020046309",
+  "name": "웰러스옥타코사놀",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095263",
+  "name": "17종알파혼합유산균비(B)-3700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029391",
+  "name": "파라카제이유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001314",
+  "name": "혈행개선솔루션",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "피브린용해효소활성"
+  ]
+ },
+ {
+  "stmt": "2017286020922",
+  "name": "바이오 큐텐(Bio Q10)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "코엔자임Q10"
+ },
+ {
+  "stmt": "20040017059243",
+  "name": "프로바용 5종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061578",
+  "name": "메노락토",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "갱년기 여성 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2014001710735",
+  "name": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물 FS",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "(제2019-4호) 체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2024002809537",
+  "name": "2종혼합유산균엠디오(MDO)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001704966",
+  "name": "에이에스큐-지오 ASQ-GO",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "알콕시글리세롤",
+   "바틸알콜"
+  ]
+ },
+ {
+  "stmt": "2018001226821",
+  "name": "베타글루칸분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "베타글루칸 (β-glucan) (mg/g)"
+  ]
+ },
+ {
+  "stmt": "2020001620211",
+  "name": "여에스더 스킨케어 포뮬러 다이렉트 2.0",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095380",
+  "name": "락티스유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2015000802111",
+  "name": "8030칼슘프리미엄츄어블",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "201900140711",
+  "name": "동결건조마늘분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "알리인(Alliin) 함량 가) 원료성 제품"
+  ]
+ },
+ {
+  "stmt": "20040016034157",
+  "name": "맘편한 어린이 칼슘 마그네슘 아연 비타민D",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "비타민D",
+   "아연",
+   "마그네슘"
+  ]
+ },
+ {
+  "stmt": "2015001001897",
+  "name": "파프리카 발효 포스트바이오틱스 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095320",
+  "name": "10종혼합유산균디아이(DI)2-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001601268",
+  "name": "홍어껍질콜라겐펩타이드",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "기능(지표)성분"
+  ]
+ },
+ {
+  "stmt": "20040020006553",
+  "name": "화이토릭스",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "비타민B1",
+   "비타민B2",
+   "비타민B6"
+  ]
+ },
+ {
+  "stmt": "2004001606156",
+  "name": "HK 쏘팔메토 업 (UP)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "로르산"
+  ]
+ },
+ {
+  "stmt": "20240028095103",
+  "name": "17종유산균-엠디(MD)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2024002809542",
+  "name": "10종혼합유산균디아이(DI)-2600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095340",
+  "name": "5종혼합유산균디아이(DI)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200800200115",
+  "name": "폴리감마글루탐산",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809595",
+  "name": "루테리유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020028514",
+  "name": "진솔한 이유",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "비타민E"
+ },
+ {
+  "stmt": "20130020008448",
+  "name": "포에버레이디",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "소포리코사이드"
+  ]
+ },
+ {
+  "stmt": "200600200032684",
+  "name": "펠렛_홍삼",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "2024002809522",
+  "name": "5종혼합유산균엔씨(NC)-100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001705928",
+  "name": "씨엘피0611-100비(CLP0611-100B) 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200626",
+  "name": "천일고려인삼정캡슐",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004001701756",
+  "name": "유산균11A",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095212",
+  "name": "아임비오핑크19종유산균복합체",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20160006007117",
+  "name": "비엘 피에스 씨케이디비005(비)(BL PS CKDB005(B))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029446",
+  "name": "17종유산균-엠디(MD)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095182",
+  "name": "플란타김치유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2016000600786",
+  "name": "비엘지 엔비엠7-1 (BLG NBM7-1)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2019001431720",
+  "name": "13종 바이오시아혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202100163718",
+  "name": "앰지관절2000프리미엄",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "MSM",
+   "칼슘"
+  ]
+ },
+ {
+  "stmt": "20040017017596",
+  "name": "Duolac protexin mix",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2005002000553",
+  "name": "녹차추출물 디지티이(DGTE)",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "녹차"
+ },
+ {
+  "stmt": "20040015107696",
+  "name": "제너럴밸런스 씨포뮬라",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095385",
+  "name": "파라카제이유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170679",
+  "name": "상어연골 뮤코다당단백",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "단백질과 콘드로이친 황산의 비울"
+  ]
+ },
+ {
+  "stmt": "201900065562",
+  "name": "털부처꽃추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "오리엔틴(Orientin)(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20240028095346",
+  "name": "4종혼합유산균에스에이치에이(A)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017656",
+  "name": "Duolac F4",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20240028095255",
+  "name": "5종혼합유산균씨(C)-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2022000481857",
+  "name": "슬로비움(SLOW:VIUM)",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "식이섬유",
+  "miss": [
+   "차전자피식이섬유 : 가)혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2017278206886",
+  "name": "프로폴리스망고스틴껍질복합물(덴티케어)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "갈랑긴(Galangin)(mg/g)",
+   "알파-망고스틴(α-mangostin)(mg/g)",
+   "파라(P)-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "20040020029748",
+  "name": "17종혼합유산균디(D)2-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029636",
+  "name": "애니말리스비피더스균알(R)-1000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2004001801167",
+  "name": "홍삼분말(IS)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "원료성제품"
+  ]
+ },
+ {
+  "stmt": "200400170171131",
+  "name": "5종 혼합유산균 1011",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20180012174481",
+  "name": "바이오리브 킬팻 다이어트 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "체지방 감소에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2023002721140",
+  "name": "7종 혼합유산균 WB-3,000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029545",
+  "name": "엔트리6종 유산균혼합분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029713",
+  "name": "닥스바이옴 6종 혼합 유산균 3",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202400175754",
+  "name": "덴프락(DENPLAC)7종 혼합유산균 분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001510787",
+  "name": "스피루리나",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2018000312528",
+  "name": "프로게이너 헤비머슬 아이소웨이",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "조단백질"
+  ]
+ },
+ {
+  "stmt": "200400200061968",
+  "name": "표고버섯균사체 AHCC 에스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "α-glucan (mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020034113",
+  "name": "차전자피식이섬유",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2005002000541",
+  "name": "락토피 프로젝트 D(LACTOPY PROJECT D)",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음 (생리활성기능 2등급)"
+  ]
+ },
+ {
+  "stmt": "202000143331",
+  "name": "국민락토케이엠투(KM2)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070271",
+  "name": "유산균 루테리 비에이치11",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029586",
+  "name": "16종혼합유산균디아이(DI)-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001518937",
+  "name": "진세노 25 스틱",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "홍삼",
+  "fn": [
+   "일일섭취량",
+   "4~80 mg"
+  ]
+ },
+ {
+  "stmt": "2004001705925",
+  "name": "씨엘피0611(CLP0611)유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070422",
+  "name": "비피더스균락티스에이디011(AD011)분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029602",
+  "name": "17종혼합유산균디아이(DI)3-2800",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2013001712819",
+  "name": "락티카제이바실루스 파라카제이 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20160006007119",
+  "name": "엘피2 씨케이디비008(비)(LP2 CKDB008(B))",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020001438",
+  "name": "속편한 꾸지뽕",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "루틴"
+  ]
+ },
+ {
+  "stmt": "2004001704718",
+  "name": "핑거루트추출물(판두라틴)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "판두라틴(Panduratin A)(mg/g)"
+  ]
+ },
+ {
+  "stmt": "2019001626154",
+  "name": "광동 안궁환",
+  "reason": "NO_FUNCTION",
+  "key": "아연"
+ },
+ {
+  "stmt": "20040017059212",
+  "name": "에이치엠피(HMP)-19",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095130",
+  "name": "5종혼합유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20100016005389",
+  "name": "마이락토 장쾌(MYLACTO NICE BOWEL)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2020001635428",
+  "name": "유디 장건강 100억 유산균(UD INTESTINAL HEALTH 10 BILLION PROBIOTICS)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020001410",
+  "name": "테아닌마그네슘 정제",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "테아닌",
+   "마그네슘"
+  ]
+ },
+ {
+  "stmt": "20040020029534",
+  "name": "5종혼합유산균분말에스(S)-1000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "201000160047",
+  "name": "메가놀-이피에이900알티지(MEGANOL-EPA900rTG)",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "오메가3"
+ },
+ {
+  "stmt": "20040020029686",
+  "name": "6종혼합유산균디아이(DI)-3400",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029625",
+  "name": "9종혼합유산균메가-3900",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200600200032822",
+  "name": "펠렛_밀크씨슬",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "밀크씨슬"
+ },
+ {
+  "stmt": "20040015110620",
+  "name": "로얄프로폴리스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "2014001710726",
+  "name": "프로바이오틱스 hyBL4",
+  "reason": "COMPOSE_SERVING_ABSENT",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2013001712832",
+  "name": "락티플란티바실루스 플란타룸 유산균 엘비(Lb)41",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020024525",
+  "name": "참당귀추출혼합분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "데커신(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20130020008408",
+  "name": "젬무브 생생 렉스파인 골드",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "감마리놀렌산",
+   "비타민A",
+   "비타민D",
+   "비타민E"
+  ]
+ },
+ {
+  "stmt": "2016001213734",
+  "name": "리본 부스터",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095242",
+  "name": "17종혼합유산균디아이(DI)5-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110020099176",
+  "name": "그리뮤에 멀티비타민&미네랄 19종",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "철"
+  ]
+ },
+ {
+  "stmt": "20040020046335",
+  "name": "프리오엽산철",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "철"
+  ]
+ },
+ {
+  "stmt": "2015001002110",
+  "name": "THE알로에프라임 알로에겔",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "총 다당체"
+  ]
+ },
+ {
+  "stmt": "20040015110156",
+  "name": "키드혼합유산균(수출명:GitPro)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095300",
+  "name": "17종혼합유산균에이치(H)-2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015070446",
+  "name": "비피도 3종 혼합 유산균 비아이-1000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070421",
+  "name": "비피더스균비피덤비지엔포(BGN4)분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20240028095147",
+  "name": "써모스유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200800200116",
+  "name": "청국장균배양정제물(폴리감마글루탐산칼륨)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "폴리감마글루탐산 함량"
+  ]
+ },
+ {
+  "stmt": "2011001701977",
+  "name": "스트레스케어",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민B1",
+   "판토텐산",
+   "비타민B6",
+   "비타민C",
+   "테아닌"
+  ]
+ },
+ {
+  "stmt": "20110020099217",
+  "name": "클린프로바이오틱스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "2015001001881",
+  "name": "베지&베리 프로바이오틱스 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008327",
+  "name": "다먹어트",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "대장규군"
+  ]
+ },
+ {
+  "stmt": "20140017002602",
+  "name": "바이크롬 뇌 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "노화로 인해 저하된 인지기능 개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20040020029863",
+  "name": "롱검세미 MG723",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2005002000561",
+  "name": "큐바이옴 시원한",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음 (생리활성기능 2등급)"
+  ]
+ },
+ {
+  "stmt": "2024002809570",
+  "name": "17종혼합유산균디아이(DI)-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029770",
+  "name": "아임비오컴포트 19종 유산균복합체",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2023000400018",
+  "name": "비움 S",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070450",
+  "name": "비피도6종혼합균LAC-2500",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20190016403102",
+  "name": "이너셋 허니부쉬 스킨솔루션",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "헤스페리딘(%)"
+  ]
+ },
+ {
+  "stmt": "20040015162446",
+  "name": "베가슬림 다이어트 부스터",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "다물린 A"
+  ]
+ },
+ {
+  "stmt": "20040020029827",
+  "name": "장인정신 19종 혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202000163252",
+  "name": "항균앤그린프로폴리스 필름",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "파라(ρ)-쿠마르산",
+   "계피산"
+  ]
+ },
+ {
+  "stmt": "2024002809566",
+  "name": "9종혼합유산균비엔(BN)-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029341",
+  "name": "불가리커스유산균-1000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095367",
+  "name": "락티스유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400200061955",
+  "name": "바이오코어 건강한 생 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "과채유래유산균(L.plantarum CJLP133)(제2013-11호) : 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음,"
+  ]
+ },
+ {
+  "stmt": "2024002809558",
+  "name": "10종혼합유산균디아이(DI)-2200",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017730",
+  "name": "Duolac Premix KA",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20100016005242",
+  "name": "17종 혼합유산균 3000억",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070437",
+  "name": "비피도 3종 혼합 유산균 비아이-3000",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2016000751534",
+  "name": "설포플렉스 정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040015070492",
+  "name": "비피더스 4종 혼합유산균 IBS-6000",
+  "reason": "GUARD_BLOCKED:PRE-SRC-BULK-004",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029764",
+  "name": "락티스유산균-4000",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20240028095295",
+  "name": "10종혼합유산균디아이(DI)-3000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202200191616",
+  "name": "코롬방비타민C 체리맛",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "2009002002048",
+  "name": "체인징S(에스)1",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "프로바이오틱스"
+  ]
+ },
+ {
+  "stmt": "20040020029581",
+  "name": "19종혼합유산균디아이(DI)2-2700",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017617",
+  "name": "Europa(MIX4EST)",
+  "reason": "NO_FUNCTION",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040016020173",
+  "name": "비엘멀티맥스",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "총 모나콜린 K",
+   "활성형 모나콜린 K",
+   "시트리닌(mg/kg)"
+  ]
+ },
+ {
+  "stmt": "20040020029841",
+  "name": "락티스세미 MG5604",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040015110582",
+  "name": "칼슈모어 칼슘보충용",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "칼슘",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "20040020029871",
+  "name": "람노서스세미 MG4706",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400150704",
+  "name": "지근억비피더스베이비",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2024002809557",
+  "name": "10종혼합유산균디아이(DI)-2100",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001706728",
+  "name": "글루코사민분말-비에이",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "2004002000166",
+  "name": "그린체 다이어트 씨엘에이 CLA",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029436",
+  "name": "10종알파혼합유산균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029821",
+  "name": "12종혼합유산균비(B)-2600",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2011001701968",
+  "name": "빠샤메카드 아이비타C+아연",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "비타민C",
+   "아연"
+  ]
+ },
+ {
+  "stmt": "20040020029833",
+  "name": "베이비 비피더스 4종혼합유산균-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002002543",
+  "name": "까마귀쪽나무열매주정추출물 케이",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Hamabiwalactone B(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020029461",
+  "name": "12종혼합유산균알파-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20120019007167",
+  "name": "우리아이 킹왕짱",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "비타민C",
+   "셀레늄",
+   "아연",
+   "비타민B6",
+   "비타민B1",
+   "비타민B2"
+  ]
+ },
+ {
+  "stmt": "200400150831382",
+  "name": "장건강 프로바이오틱스",
+  "reason": "GUARD_REVIEW:PRE-SRC-CFU-UNVERIFIABLE-003,Q-TRUNCATED-PARTIAL-005",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2009001504727",
+  "name": "2종 혼합유산균-11",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "202100162843",
+  "name": "프라임 홍삼핏(PRIME RED GINSENG FIT)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "20130020008547",
+  "name": "고려천흑삼분말캡슐",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "홍삼",
+  "miss": [
+   "면역력 증진, 피로개선에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "200400152926",
+  "name": "선인삼성분골드",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "인삼",
+  "residue": "피로회복"
+ },
+ {
+  "stmt": "20240028095159",
+  "name": "피비(PB)유산균MG-2000",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001601265",
+  "name": "뮤코다당단백분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "단백질과 콘드로이친황산의 비율"
+  ]
+ },
+ {
+  "stmt": "20240028095167",
+  "name": "유한 17종 유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "202000047469",
+  "name": "엔포위즈 지오 유산균",
+  "reason": "GUARD_BLOCKED:D-CLAIM-UNGROUNDED-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029356",
+  "name": "비피롱비피더스균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20130020008607",
+  "name": "코어 슬림 샷",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Rosmarinic acid",
+   "1-Deoxynojirimycin",
+   "6,7-Dimethylesculetin"
+  ]
+ },
+ {
+  "stmt": "2008002005329",
+  "name": "고려흑삼정",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "200400170061477",
+  "name": "코어리셋 제로다이어트",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Naringin",
+   "Hesperidin",
+   "Naringin/Hesperidin 비율"
+  ]
+ },
+ {
+  "stmt": "2004001900280",
+  "name": "발효홍삼진캡슐",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20190009483270",
+  "name": "장핏 온가족 유산균",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029850",
+  "name": "불가리쿠스세미 MG515",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20110017019197",
+  "name": "비타민C 3000",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "비타민C",
+  "residue": "철의흡수에필요"
+ },
+ {
+  "stmt": "20240028095293",
+  "name": "7종혼합유산균디아이(DI)-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040020029350",
+  "name": "비피도비피덤균-엘(L)2",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017017718",
+  "name": "Duolac Mix pharmaserv",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "20040017017468",
+  "name": "유산균 14C",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20240028095373",
+  "name": "플란타럼유산균-10",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004001601262",
+  "name": "작약추출물 등 혼합물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Paeoniflorin (mg/g)",
+   "1-O-acetylbritannilactone (mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020029605",
+  "name": "7종혼합유산균디아이(DI)-2500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200500160372",
+  "name": "프락토올리고당분말",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "함량"
+  ]
+ },
+ {
+  "stmt": "20240028095241",
+  "name": "12종알파혼합유산균에이(A)-3500",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200400170171102",
+  "name": "듀오락 100억 스틱 유(U)",
+  "reason": "GUARD_BLOCKED:H-COUNT-MISMATCH-001",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2004002003539",
+  "name": "인삼분말",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029814",
+  "name": "라비센8종혼합유산균",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "200900170231",
+  "name": "식이섬유엘티플러스",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040020029759",
+  "name": "8종혼합유산균디아이(DI)-2900",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2022000924310",
+  "name": "Mylacto Minuman serbuk rasa peach",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20040017017671",
+  "name": "9GV1",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활"
+  ]
+ },
+ {
+  "stmt": "2016000600742",
+  "name": "이에프 얼라이브핏(EF AliveFIT) 003",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "201900164039",
+  "name": "뿌리깊은6년근홍삼정골드스틱",
+  "reason": "GUARD_REVIEW:PRE-SRC-BASIS-UNVERIFIABLE-003",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "2023000229627",
+  "name": "리아나 생기 플러스 (Liana Sengki Plus)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "철"
+  ]
+ },
+ {
+  "stmt": "20040017017341",
+  "name": "4종 혼합유산균 1511",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "2018001246615",
+  "name": "슈퍼프로바이오틱스17",
+  "reason": "MULTI_INGREDIENT",
+  "keys": [
+   "프로바이오틱스",
+   "비타민D"
+  ]
+ },
+ {
+  "stmt": "2015001201224",
+  "name": "임자엽추출물",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "Ursolic acid(%)"
+  ]
+ },
+ {
+  "stmt": "20040020020505",
+  "name": "락토모니카",
+  "reason": "FN_COVERAGE_INCOMPLETE",
+  "key": "프로바이오틱스",
+  "residue": "*프로바이오틱스"
+ },
+ {
+  "stmt": "20040017059169",
+  "name": "뉴 히게이아 5종혼합유산균-100비(100B)",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "프로바이오틱스"
+ },
+ {
+  "stmt": "20040017061105",
+  "name": "인디안구스베리·새싹보리추출복합물(IB Complex)",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "엘라그산(Ellagic acid)(mg/g)",
+   "사포나린(Saponarin)(mg/g)"
+  ]
+ },
+ {
+  "stmt": "20040020029860",
+  "name": "플란타럼세미 LRCC5318",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동원활, 장건강에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "2014002007313",
+  "name": "셀티아이 50플러스(CellTi 50+)",
+  "reason": "STILL_NO_FUNCTIONAL_KEY"
+ },
+ {
+  "stmt": "20120019007158",
+  "name": "헤파-두",
+  "reason": "C_UNKNOWN_SPEC_LABEL",
+  "labels": [
+   "베타글루칸(mg/1920 mg)"
+  ]
+ },
+ {
+  "stmt": "20040017017870",
+  "name": "NRC 5 strain mixture",
+  "reason": "GROUNDING_PENDING_EN",
+  "key": "프로바이오틱스",
+  "miss": [
+   "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음"
+  ]
+ },
+ {
+  "stmt": "20160012278118",
+  "name": "홍삼분말",
+  "reason": "COMPOSE_SERVING_PARSE_FAILED",
+  "key": "홍삼"
+ },
+ {
+  "stmt": "200400200082596",
+  "name": "피부면역 유산균",
+  "reason": "FN_NOT_OFFICIAL",
+  "key": "프로바이오틱스",
+  "fn": [
+   "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+  ]
+ }
+]

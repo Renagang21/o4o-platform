@@ -1,0 +1,20 @@
+{
+  "tag": "batch:hff-sf-batch-nfk-c-shard2-b2",
+  "createdMasters": [
+    "5eea7d87-11e9-4f8e-838d-ecfa7f0db2a4"
+  ],
+  "createdSpd": [
+    "0051d3c8-f179-4d7d-a80d-fe0e64919c06",
+    "c3def6f2-4d83-48e9-8450-9f20426308e7"
+  ],
+  "candIds": [
+    "00fca1cc-fa3f-44cd-b4a8-764af9c03536"
+  ],
+  "snapshot": [
+    {
+      "candidateId": "00fca1cc-fa3f-44cd-b4a8-764af9c03536",
+      "stmt": "202300287851",
+      "prev_status": "pending"
+    }
+  ]
+}
