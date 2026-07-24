@@ -18,8 +18,12 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+// WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1:
+//   수제 인라인 선택 바 → O4O 표준 ActionBar(@o4o/ui). 동작·API 무변경.
+import { ActionBar } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
 import {
   getCatalog,
@@ -411,31 +415,30 @@ export function HubB2BCatalogPage() {
         <span>이 화면은 현재 공급 가능한 상품만 표시됩니다. 공급자 등록 전체 상품과는 범위가 다를 수 있습니다.</span>
       </div>
 
-      {/* WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: ActionBar — 선택 항목 있을 때만 표시 */}
-      {selectedKeys.size > 0 && (
-        <div style={styles.actionBar}>
-          <span style={{ fontSize: 13, color: colors.neutral700 }}>
-            {selectedKeys.size}개 선택됨
-            {notAddedSelectedCount > 0 && notAddedSelectedCount < selectedKeys.size && ` (미추가 ${notAddedSelectedCount}개)`}
-          </span>
-          <div style={{ flex: 1 }} />
-          <button
-            type="button"
-            onClick={handleBulkAdd}
-            disabled={bulkAdding}
-            style={{ ...styles.actionBarBtn, opacity: bulkAdding ? 0.6 : 1 }}
-          >
-            {bulkAdding ? '추가 중...' : `내 약국에 추가 (${notAddedSelectedCount || selectedKeys.size}건)`}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedKeys(new Set())}
-            style={styles.actionBarClearBtn}
-          >
-            선택 해제
-          </button>
-        </div>
-      )}
+      {/* WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: ActionBar — 선택 항목 있을 때만 표시
+          WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1: 표준 ActionBar 로 교체 */}
+      <ActionBar
+        selectedCount={selectedKeys.size}
+        onClearSelection={() => setSelectedKeys(new Set())}
+        statusInfo={
+          notAddedSelectedCount > 0 && notAddedSelectedCount < selectedKeys.size
+            ? `미추가 ${notAddedSelectedCount}개`
+            : undefined
+        }
+        actions={[
+          {
+            key: 'bulk-add',
+            label: bulkAdding ? '추가 중...' : `내 약국에 추가 (${notAddedSelectedCount || selectedKeys.size}건)`,
+            onClick: handleBulkAdd,
+            variant: 'primary',
+            icon: <Plus size={14} />,
+            loading: bulkAdding,
+            disabled: bulkAdding,
+            group: 'actions',
+            visible: selectedKeys.size > 0,
+          },
+        ]}
+      />
 
       {/* 결과 카운트 */}
       {!loading && !error && products.length > 0 && (

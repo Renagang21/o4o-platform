@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { Download, X, ExternalLink, Video } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { hubContentApi } from '../../api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
@@ -288,26 +288,9 @@ export function HubVideoLibraryPage() {
             onRowClick={(row) => setSelectedItem(row)}
           />
 
+          {/* WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1: 수제 이전/다음 → 표준 Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">
-                {page} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
           )}
         </>
       )}

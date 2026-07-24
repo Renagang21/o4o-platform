@@ -33,7 +33,7 @@ import { Link } from 'react-router-dom';
 import { Plus, X, ExternalLink, Monitor, ListVideo } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { hubContentApi } from '../../api/hubContent';
@@ -476,31 +476,16 @@ export function HubSignageLibraryPage() {
             onRowClick={(row) => setSelectedItem(row)}
           />
 
-          {/* Pagination */}
+          {/* Pagination
+              WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1: 수제 이전/다음 → 표준 Pagination.
+              sourceFilter !== 'all' 은 클라이언트 필터링이라 서버 페이지 이동을 노출하지 않는 기존 조건 유지. */}
           {totalPages > 1 && sourceFilter === 'all' && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => viewTab === 'media'
-                  ? setMediaPage(p => Math.max(1, p - 1))
-                  : setPlaylistPage(p => Math.max(1, p - 1))
-                }
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">{currentPage} / {totalPages}</span>
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => viewTab === 'media'
-                  ? setMediaPage(p => p + 1)
-                  : setPlaylistPage(p => p + 1)
-                }
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onPageChange={(p) => viewTab === 'media' ? setMediaPage(p) : setPlaylistPage(p)}
+              total={viewTab === 'media' ? mediaTotal : playlistTotal}
+            />
           )}
         </>
       )}

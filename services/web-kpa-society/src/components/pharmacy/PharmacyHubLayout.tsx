@@ -83,13 +83,14 @@ const HUB_MENU_GROUPS: HubMenuGroup[] = [
     { label: '동영상', path: '/store-hub/video', icon: Video, description: '운영자 게시 동영상 · 내 약국으로 가져가기 · QR 연결' },
     // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 운영자 타블렛 화면 원본 진열 + 매장 독립 사본 가져오기
     //   가져온 사본은 기존 '태블릿 화면 제작'(/store/commerce/tablet-displays) 목록에 표시 — 별도 사본 관리 화면 없음.
+    // WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1:
+    //   독립 '디지털 사이니지' 그룹 제거 → '사이니지 콘텐츠'를 경영지원 하위로 이동.
+    //   화면 송출 계열(사이니지 → 태블렛) 업무 흐름 순으로 배치. route/API/권한 무변경.
+    { label: '사이니지 콘텐츠', path: '/store-hub/signage', icon: MonitorPlay, description: '매장 화면 송출 콘텐츠 · 플레이리스트' },
     { label: '태블렛 화면', path: '/store-hub/screen-set', icon: MonitorSmartphone, description: '운영자·공급자 제작 태블렛 화면 · 내 매장 사본으로 가져오기' },
   ]},
   { label: '약국 자료함', items: [
     { label: '콘텐츠 가져오기', path: '/store-hub/content', icon: Files, description: 'CMS 콘텐츠 탐색 · 내 약국으로 복사' },
-  ]},
-  { label: '디지털 사이니지', items: [
-    { label: '사이니지 콘텐츠', path: '/store-hub/signage', icon: MonitorPlay, description: '매장 화면 송출 콘텐츠 · 플레이리스트' },
   ]},
 ];
 
