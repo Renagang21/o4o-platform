@@ -370,7 +370,7 @@ function buildConfig(
       label: '포럼 요청 대기',
       value: forumPendingCount,
       status: forumPendingCount > 0 ? 'warning' : 'neutral',
-      link: '/operator/forum-management',
+      link: '/operator/forum-requests',
     },
     {
       key: 'content',
@@ -448,7 +448,7 @@ function buildConfig(
       id: 'ai-forum-requests',
       message: `포럼 개설 요청 ${forumPendingCount}건 대기 — 검토가 필요합니다.`,
       level: forumPendingCount > 5 ? 'warning' : 'info',
-      link: '/operator/forum-management',
+      link: '/operator/forum-requests',
     });
   }
   if (eventOfferPendingCount > 0) {
@@ -524,7 +524,7 @@ function buildConfig(
       id: 'aq-forum',
       label: '포럼 요청 검토',
       count: forumPendingCount,
-      link: '/operator/forum-management',
+      link: '/operator/forum-requests',
     });
   }
   if (contentDraftCount > 0) {
@@ -613,8 +613,8 @@ function buildConfig(
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: 'users' },
     { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: 'shopping-cart' },
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
-    { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: 'megaphone' },
-    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: 'message-square' },
+    { id: 'qa-news', label: '공지사항', link: '/operator/content', icon: 'megaphone' },
+    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-requests', icon: 'message-square' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor-play' },
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
     { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: 'badge-percent' },

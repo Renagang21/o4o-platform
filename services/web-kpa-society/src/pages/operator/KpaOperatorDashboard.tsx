@@ -181,7 +181,7 @@ function buildKpaAxesFromConfig(
       tone: 'blue',
       metrics: [
         { label: '회원 승인', value: pendingMembers, href: '/operator/members', warn: pendingMembers > 0 },
-        { label: '포럼 요청', value: forumPending, href: '/operator/forum-management', warn: forumPending > 0 },
+        { label: '포럼 요청', value: forumPending, href: '/operator/forum-requests', warn: forumPending > 0 },
         { label: '콘텐츠 대기', value: contentPending, href: '/operator/content', warn: contentPending > 0 },
       ],
       links: [
