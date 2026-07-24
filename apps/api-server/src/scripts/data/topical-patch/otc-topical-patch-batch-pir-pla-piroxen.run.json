@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "피록시캄",
+ "form": "피록센플라스타",
+ "slugbase": "pir-pla-piroxen",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "d8b2efee6a758b55",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

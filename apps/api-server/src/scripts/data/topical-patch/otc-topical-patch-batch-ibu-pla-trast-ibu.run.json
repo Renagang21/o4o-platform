@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "이부프로펜",
+ "form": "트라스트이부플라스타",
+ "slugbase": "ibu-pla-trast-ibu",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "d5b1c315c8ec46ae",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

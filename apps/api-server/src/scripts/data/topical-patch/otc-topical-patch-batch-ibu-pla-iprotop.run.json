@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "이부프로펜",
+ "form": "이프로탑플라스타",
+ "slugbase": "ibu-pla-iprotop",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "258100597b64e702",
+   "n": 3
+  },
+  {
+   "fp": "51a62ab160ae714b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

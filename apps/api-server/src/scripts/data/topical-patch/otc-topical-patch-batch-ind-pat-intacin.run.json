@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "인도메타신",
+ "form": "인타신첩부제",
+ "slugbase": "ind-pat-intacin",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e202ed4c39975dd4",
+   "n": 3
+  },
+  {
+   "fp": "ce2e0b75eadb7801",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

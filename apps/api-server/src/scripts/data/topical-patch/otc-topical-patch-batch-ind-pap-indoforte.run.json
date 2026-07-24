@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "인도메타신",
+ "form": "인도포르테카타플라스마",
+ "slugbase": "ind-pap-indoforte",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "42fa4a717d7bce99",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

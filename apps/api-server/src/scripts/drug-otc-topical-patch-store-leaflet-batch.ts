@@ -89,14 +89,27 @@ const STORE_FOOT_KO = '이 안내는 제품 이해를 돕기 위한 매장용 �
 /** 원문 전체 맥락이 피부 외용(첩부 포함)으로 명확한 경우에 한해 원문 데이터의 경구 오기를 외용 표현으로 정규화. 첩부 신호(붙이/부착/첩부) 포함. */
 function normalizeOralMisphrase(text: string, fullContent: string): string {
   if (!/외용으로만|외용으로 사용|도포|바르|바릅|발라|붙이|붙입|부착|첩부/.test(stripTags(fullContent || ''))) return text;
-  return text.replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
+  return text
+    // '외용으로만 사용하고 복용하지 마십시오' → '사용하지 마십시오'로 바꾸면 문장이 자기모순이 되므로 '먹지'로 정규화한다.
+    .replace(/(외용으로(만)? 사용(하고|하며)) 복용하지 마십시오/g, '$1 먹지 마십시오')
+    .replace(/복용하지 마십시오/g, '사용하지 마십시오').replace(/복용을 (즉각 )?중지/g, '사용을 $1중지')
     .replace(/복용하기 전에/g, '사용하기 전에')
+    .replace(/복용하여도/g, '사용하여도').replace(/복용하더라도/g, '사용하더라도')
     .replace(/복용한 경우/g, '먹었을 경우').replace(/(잘못|실수로) 삼킨 경우/g, '$1 먹었을 경우').replace(/이 약을 삼킨 경우/g, '이 약을 먹었을 경우')
     .replace(/삼키지 마십시오/g, '먹지 마십시오').replace(/삼키지 않도록/g, '먹지 않도록')
     .replace(/내복용/g, '먹는 용도')
     .replace(/다른 약을 복용하고 있(을|는) 경우/g, '다른 약을 사용하고 있$1 경우')
     .replace(/함께 복용 시/g, '함께 사용 시')
     .replace(/병용\(함께 복용,? ?\(?사용\)?\)/g, '병용(함께 사용)'); // '병용(함께 복용, 사용)'/'병용(함께 복용(사용))' 괄호 주해 정규화 — 사용은 복용을 포괄(약화 아님)
+}
+/**
+ * 첩부제 본문의 경구 오기 탐지 게이트.
+ * 병용 주의 대상인 '경구약(아스피린·이부프로펜·진통제·혈압강하제 등) 복용' 언급은 원문의 안전정보이므로
+ * 삭제·완화 대상이 아니다. 본문은 원문 그대로 두고 탐지에서만 제외한다.
+ */
+function hasOralMisphrase(html: string): boolean {
+  const residual = (html || '').replace(/(아스피린|이부프로펜|진통제|혈압강하제|다른 약물?)[^.<]{0,20}복용/g, '');
+  return /복용|삼키|바르는 방법/.test(residual);
 }
 function cleanText(s: string): string { return (s || '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim(); }
 function splitSentences(s: string): string[] { return cleanText(s).split(/(?<=[가-힣])\.(?=\S)/).map((x) => x.trim()).filter(Boolean).map((x) => /[.!?]$/.test(x) ? x : x + '.'); }
@@ -161,7 +174,7 @@ async function main(): Promise<void> {
       const koByMaster = new Map<string, { html: string; easyId: string }>(); const koMd5 = new Set<string>(); let miss = 0;
       for (const r of rows) { const k = composePatchKo(r.name, r.content, TITLE); if (k.missing.length) miss++; koByMaster.set(r.id, { html: k.html, easyId: r.easyId }); koMd5.add(md5(k.html)); }
       // 첩부제 전용 가드: 경구 표현 잔존 금지 + '바르는 방법' 라벨 혼입 금지
-      if (miss || koMd5.size !== 1 || /복용|삼키|바르는 방법/.test([...koByMaster.values()][0].html)) { summary.heldFps.push({ fp, n: rows.length, reason: 'HOLD_KO', miss, md5: koMd5.size }); continue; }
+      if (miss || koMd5.size !== 1 || hasOralMisphrase([...koByMaster.values()][0].html)) { summary.heldFps.push({ fp, n: rows.length, reason: 'HOLD_KO', miss, md5: koMd5.size }); continue; }
       const masterIds = rows.map((r) => r.id).sort();
       const qr = ds.createQueryRunner(); await qr.connect(); await qr.startTransaction();
       try {

@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "살리실산",
+ "form": "재우스오라쿠고에이취플라스타",
+ "slugbase": "sal-pla-jaeus-orakugo",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "38e1462a62468fdf",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

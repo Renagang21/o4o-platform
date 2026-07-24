@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "이부프로펜",
+ "form": "맨담이부쿨플라스타",
+ "slugbase": "ibu-pla-mendam-cool",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "3f0e8018c01cbd90",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

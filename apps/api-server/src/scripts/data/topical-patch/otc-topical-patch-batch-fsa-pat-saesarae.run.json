@@ -1,0 +1,37 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "퓨시드산나트륨",
+ "form": "새사래첩부제",
+ "slugbase": "fsa-pat-saesarae",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f6f16a3306b8991f",
+   "n": 4
+  },
+  {
+   "fp": "c07c4e7cbae3845d",
+   "n": 4
+  },
+  {
+   "fp": "b15938263079be8b",
+   "n": 3
+  },
+  {
+   "fp": "b85628a8c0a60bc6",
+   "n": 3
+  },
+  {
+   "fp": "db7dfcfdf1571e82",
+   "n": 2
+  },
+  {
+   "fp": "9647c1aa01680e09",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 18,
+ "koWrite": 72,
+ "enWrite": 36
+}

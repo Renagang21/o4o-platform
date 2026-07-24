@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "이부프로펜",
+ "form": "안티푸라민빅파워플라스타",
+ "slugbase": "ibu-pla-antiphlamine-bigpower",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8c601210a85f7e34",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

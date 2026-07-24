@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "인도메타신",
+ "form": "단아팬에프카타플라스마",
+ "slugbase": "ind-pap-danapan",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "42fa4a717d7bce99",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

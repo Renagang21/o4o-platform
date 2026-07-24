@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "피록시캄",
+ "form": "트라스트플라스타",
+ "slugbase": "pir-pla-trast",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "0844e9fa8cb0af51",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

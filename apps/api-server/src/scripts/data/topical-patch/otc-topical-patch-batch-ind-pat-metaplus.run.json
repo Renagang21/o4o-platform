@@ -1,0 +1,17 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
+ "ingredient": "인도메타신",
+ "form": "메타플러스첩부제",
+ "slugbase": "ind-pat-metaplus",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a7fcd3011129b60b",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}
