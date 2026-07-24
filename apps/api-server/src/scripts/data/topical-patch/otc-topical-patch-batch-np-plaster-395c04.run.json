@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "제일동전파프플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-395c04",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "03c72d7c4e8a3f1e",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

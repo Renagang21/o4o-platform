@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "모키쿨플라스타",
+  "버물리플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-042eba",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "48912a29d506f9c3",
+   "n": 10
+  },
+  {
+   "fp": "53b33dfb971f3962",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 14,
+ "koWrite": 56,
+ "enWrite": 28
+}

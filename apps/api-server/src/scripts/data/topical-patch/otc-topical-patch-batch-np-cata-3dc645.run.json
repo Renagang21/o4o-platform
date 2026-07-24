@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "에프벡스한방카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-3dc645",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "52cfb20dfe03e5c5",
+   "n": 2
+  },
+  {
+   "fp": "595c44d1e8aaba6b",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

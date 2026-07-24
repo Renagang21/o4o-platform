@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "써버쿨플라스타",
+  "베노터치힐러플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-2ad97d",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "425e778128f06b21",
+   "n": 4
+  },
+  {
+   "fp": "2452b745e96ad3f5",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

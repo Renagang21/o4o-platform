@@ -1,0 +1,32 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "안티푸라민더블파워카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-8fa92e",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "e8ab083cfc0391fa",
+   "n": 2
+  },
+  {
+   "fp": "a5d64bef9262723b",
+   "n": 1
+  },
+  {
+   "fp": "b77e3770bc63c385",
+   "n": 1
+  },
+  {
+   "fp": "1f92dd30f976b6c8",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 5,
+ "koWrite": 20,
+ "enWrite": 10
+}

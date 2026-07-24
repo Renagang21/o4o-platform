@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "팝업플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-b1fd71",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "7f890c656d34c674",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

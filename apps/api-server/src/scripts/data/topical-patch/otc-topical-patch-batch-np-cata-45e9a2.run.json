@@ -1,0 +1,33 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "사니크린카타플라스마",
+  "사니크린카타플라스마(대형)"
+ ],
+ "form": "",
+ "slugbase": "np-cata-45e9a2",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "afa26461a5daa0b7",
+   "n": 7
+  },
+  {
+   "fp": "537a924948a4f43d",
+   "n": 4
+  },
+  {
+   "fp": "bebcdde83ca0bc69",
+   "n": 2
+  },
+  {
+   "fp": "67905a1afa6cbec0",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 14,
+ "koWrite": 56,
+ "enWrite": 28
+}

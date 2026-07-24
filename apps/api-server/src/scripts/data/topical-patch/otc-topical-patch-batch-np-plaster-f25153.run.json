@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "안티푸라민쿨파워플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-f25153",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "2b9036c15fd7213a",
+   "n": 2
+  },
+  {
+   "fp": "165598a8c4de59d7",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

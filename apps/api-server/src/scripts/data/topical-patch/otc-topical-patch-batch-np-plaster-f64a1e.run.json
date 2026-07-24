@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "하니동전파스플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-f64a1e",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "311938930a060a6f",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

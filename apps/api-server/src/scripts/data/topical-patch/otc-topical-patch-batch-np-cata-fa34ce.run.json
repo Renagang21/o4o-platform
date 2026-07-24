@@ -1,0 +1,32 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "캐네펜카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-fa34ce",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "6838d54bd81481e0",
+   "n": 4
+  },
+  {
+   "fp": "8e1758dc8227491b",
+   "n": 2
+  },
+  {
+   "fp": "4c9c89092c37cbbd",
+   "n": 2
+  },
+  {
+   "fp": "9bcb228b5d5ac0a2",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

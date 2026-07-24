@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "노펜미니플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-c25d9a",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "58f23be13047fcff",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

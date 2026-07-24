@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "크린팝카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-8921bc",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "949e67bf807f37c0",
+   "n": 4
+  },
+  {
+   "fp": "39a35b95078a834e",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

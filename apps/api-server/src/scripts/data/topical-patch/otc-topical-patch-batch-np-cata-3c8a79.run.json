@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "제놀원카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-3c8a79",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "27e50db89bbf67c0",
+   "n": 3
+  },
+  {
+   "fp": "8ff92e359677eedb",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

@@ -1,0 +1,33 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "제일한방파프진카타플라스마",
+  "제일한방파프수에스카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-08d424",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "6e7fc96b66057787",
+   "n": 4
+  },
+  {
+   "fp": "090f51796dfed4a0",
+   "n": 3
+  },
+  {
+   "fp": "cef6875d843eb824",
+   "n": 2
+  },
+  {
+   "fp": "2811d3541e6eadd7",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 11,
+ "koWrite": 44,
+ "enWrite": 22
+}

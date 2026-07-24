@@ -1,0 +1,29 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "케토톱플라스타",
+  "케토톱플라스타14매",
+  "케토톱플라스타2매",
+  "케토톱플라스타34매",
+  "케토톱플라스타6매",
+  "케토톱플라스타7매"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-a29ce6",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "3f11be35ff889326",
+   "n": 5
+  },
+  {
+   "fp": "b12322abb9b18809",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

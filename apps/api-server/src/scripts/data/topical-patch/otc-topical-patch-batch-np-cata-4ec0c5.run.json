@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "부채표한방파프플러스카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-4ec0c5",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "1a08d45a13ef33cb",
+   "n": 1
+  },
+  {
+   "fp": "f1b1dfbfd37fd214",
+   "n": 1
+  },
+  {
+   "fp": "fecf17bddc454a58",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

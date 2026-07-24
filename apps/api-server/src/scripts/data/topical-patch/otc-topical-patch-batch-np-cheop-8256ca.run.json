@@ -1,0 +1,37 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "펠비낙",
+ "names": [
+  "맨담펠비낙첩부제",
+  "중외펠비낙첩부제"
+ ],
+ "form": "",
+ "slugbase": "np-cheop-8256ca",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "bbfea59c0dc51da3",
+   "n": 3
+  },
+  {
+   "fp": "dfb711975d7ba3c3",
+   "n": 2
+  },
+  {
+   "fp": "fe5dd05790dba24f",
+   "n": 2
+  },
+  {
+   "fp": "169f5e0aed2108c9",
+   "n": 2
+  },
+  {
+   "fp": "bbd9b6fae3b4a606",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

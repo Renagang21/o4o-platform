@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "혈강고카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-5b5e40",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "9a521fcfea983ddd",
+   "n": 2
+  },
+  {
+   "fp": "8a3417c7379684e5",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

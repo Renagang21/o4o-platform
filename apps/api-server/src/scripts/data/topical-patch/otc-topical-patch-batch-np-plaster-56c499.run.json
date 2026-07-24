@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "이치레스큐플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-56c499",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "3ece465943b7b3c5",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

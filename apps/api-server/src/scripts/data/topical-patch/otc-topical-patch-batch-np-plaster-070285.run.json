@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "한방동의고플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-070285",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "cffbe7aad1d948b9",
+   "n": 4
+  },
+  {
+   "fp": "1a65ec048f7c9c7c",
+   "n": 3
+  },
+  {
+   "fp": "56b74f72e19c9f49",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

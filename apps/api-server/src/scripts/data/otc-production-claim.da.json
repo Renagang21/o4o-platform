@@ -2,9 +2,9 @@
   "_doc": "WO-O4O-OTC-TOPICAL-SPECIAL-FORM-CONTINUOUS-PRODUCTION-DA-V6 — 에이전트 다 claim. 자기 소유 1개 파일. selection→commit→push→fetch→교집합 재확인. 충돌=먼저 commit 우선. 타 claim/config 미접촉. 트랙=피부 외용제(topical skin) ingredient×form 단위 선점.",
   "schemaVersion": 1,
   "owner": "agent-da",
-  "round": "topical-patch-remainder-v8-2026-07-24",
+  "round": "topical-patch-full-corpus-v9-2026-07-24",
   "track": "TOPICAL_SKIN_STORE_LEAFLET",
-  "verdict": "ROUND_DONE",
+  "verdict": "TRACK_COMPLETE",
   "claims": [
     {
       "groupKey": "무피로신|연고",
@@ -560,7 +560,115 @@
       "status": "DONE",
       "wo": "WO-O4O-OTC-TOPICAL-PATCH-REMAINDER-CONTINUOUS-PRODUCTION-DA-V8",
       "note": "V8 완료 4 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "니코틴|패치(금연보조)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 63,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 니코틴 패치 63 master KO+EN LIVE — 63 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "성분미표기|파프(카타플라스마)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 334,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 무괄호 한방·복합 진통·소염 파프 — 334 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "성분미표기|플라스타",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 74,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 무괄호 진통·소염 플라스타 — 74 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "성분미표기|플라스타(살충·가려움)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 33,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 벌레 물린 데·가려움 플라스타 — 33 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "펠비낙|첩부제",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 16,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 펠비낙 첩부제 — 16 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "성분미표기|경고제",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 9,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 진통·소염 경고제 — 9 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "니코틴|패치(무괄호 잔여)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 3,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 금연보조 패치 잔여 — 3 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "케토프로펜|플라스타",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 3,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 케토프로펜 플라스타 — 3 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "펠비낙|파프",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 3,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 펠비낙 파프 — 3 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "성분미표기|첩부제",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 3,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 진통·소염 첩부제 — 3 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "펠비낙|플라스타",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 2,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 펠비낙 플라스타 — 2 master KO+EN LIVE (dup0/drift0/no-op0)"
+    },
+    {
+      "groupKey": "살리실산|경고제(티눈·굳은살)",
+      "sourceType": "o4o_drug_otc_topical",
+      "masters": 2,
+      "op": "KO_EN",
+      "status": "DONE",
+      "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+      "note": "V9 티눈·굳은살 경고제 — 2 master KO+EN LIVE (dup0/drift0/no-op0)"
     }
   ],
-  "note": "리도카인 성기용·점막 인접=후순위(WO 지시). 경구용 겔(알마게이트·스멕타이트·알루미늄겔 등)=topical 아님, effkey+원문 route로 배제. 케토프로펜·플루르비프로펜·디클로페낙 첩부제 대형 풀은 우선순위 소진 후 별도 선점 예정."
+  "note": "V9 로 첩부제(patch/plaster/cataplasma/경고제) 트랙 완결. 잔여 214 master 는 수출용 203·군납 7·보건소용 3·비매품 1 로 전량 생산 제외 정책 대상. 생산 가능 후보 0."
 }

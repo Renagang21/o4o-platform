@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "종근당공파스플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-571259",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "7d9fef3c23894d0a",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

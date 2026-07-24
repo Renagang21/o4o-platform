@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "더생우쿵카오경고제"
+ ],
+ "form": "",
+ "slugbase": "np-gyeonggo-9f868e",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c29651b679fe9ab3",
+   "n": 9
+  }
+ ],
+ "heldFps": [],
+ "masters": 9,
+ "koWrite": 36,
+ "enWrite": 18
+}

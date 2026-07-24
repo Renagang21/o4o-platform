@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "케펨공파스플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-e6e60f",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "fa4c50a9fef11268",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

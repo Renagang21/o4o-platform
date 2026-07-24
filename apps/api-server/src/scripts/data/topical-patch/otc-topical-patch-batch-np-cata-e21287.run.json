@@ -1,0 +1,21 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "지피동의고카타플라스마",
+  "천우동의고카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-e21287",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "bf4ad47f0e2df0d9",
+   "n": 6
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "멘소래담딥액션카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-183dcc",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "0ba7d1ad732627f3",
+   "n": 2
+  },
+  {
+   "fp": "d8789c95c6692dea",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 4,
+ "koWrite": 16,
+ "enWrite": 8
+}

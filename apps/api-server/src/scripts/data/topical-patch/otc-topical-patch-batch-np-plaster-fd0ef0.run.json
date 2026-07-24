@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "광동만수고골드플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-fd0ef0",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "8d4ee1ac9ab2a3ce",
+   "n": 3
+  },
+  {
+   "fp": "ebd980b313062341",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

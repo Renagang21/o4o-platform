@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "신신파스아렉스마일드카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-02f650",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "a1f9c05fb37e76e2",
+   "n": 4
+  },
+  {
+   "fp": "59dc6ae4f71a77c6",
+   "n": 4
+  },
+  {
+   "fp": "9439ba52cf78b3dd",
+   "n": 4
+  }
+ ],
+ "heldFps": [],
+ "masters": 12,
+ "koWrite": 48,
+ "enWrite": 24
+}

@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "케펨쿨앤핫플라스타"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-c27c98",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "773cf6b28c2de6ad",
+   "n": 1
+  },
+  {
+   "fp": "dff1cf2536eca281",
+   "n": 1
+  },
+  {
+   "fp": "bfb314ea84133f5b",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}

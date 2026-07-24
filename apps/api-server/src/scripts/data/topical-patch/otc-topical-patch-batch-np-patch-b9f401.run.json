@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "니코스탑30패취"
+ ],
+ "form": "",
+ "slugbase": "np-patch-b9f401",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "0c3dd6c2af4c34e2",
+   "n": 1
+  }
+ ],
+ "heldFps": [],
+ "masters": 1,
+ "koWrite": 4,
+ "enWrite": 2
+}

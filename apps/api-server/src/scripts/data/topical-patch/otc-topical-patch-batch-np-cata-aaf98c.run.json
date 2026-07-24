@@ -1,0 +1,34 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "동의고카타플라스마",
+  "맨담한방고카타플라스마",
+  "한방경보고카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-aaf98c",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "1c840fb64e8272b5",
+   "n": 2
+  },
+  {
+   "fp": "5b584c42f7897af5",
+   "n": 2
+  },
+  {
+   "fp": "3ef9fb7445b84f6a",
+   "n": 2
+  },
+  {
+   "fp": "b6ce4087de759ee9",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 8,
+ "koWrite": 32,
+ "enWrite": 16
+}

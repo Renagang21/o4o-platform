@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "고닐고포르테경고제"
+ ],
+ "form": "",
+ "slugbase": "np-gyeonggo-d5666f",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "b00c624bb88f556d",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 2,
+ "koWrite": 8,
+ "enWrite": 4
+}

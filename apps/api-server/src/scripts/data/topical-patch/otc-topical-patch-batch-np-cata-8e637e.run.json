@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "맨담듀오임팩카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-8e637e",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "08422200dcdddc49",
+   "n": 3
+  },
+  {
+   "fp": "d52879d9eb421a1d",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

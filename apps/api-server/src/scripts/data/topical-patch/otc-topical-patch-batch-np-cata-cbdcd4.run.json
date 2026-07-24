@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "한방동의고카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-cbdcd4",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "c6f6e5823f717b0c",
+   "n": 4
+  },
+  {
+   "fp": "1951dd513749514e",
+   "n": 3
+  },
+  {
+   "fp": "cc538dd17d7f7de1",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 10,
+ "koWrite": 40,
+ "enWrite": 20
+}

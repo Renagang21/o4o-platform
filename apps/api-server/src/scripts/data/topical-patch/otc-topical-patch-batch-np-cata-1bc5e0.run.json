@@ -1,0 +1,24 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "",
+ "names": [
+  "한방파프탑카타플라스마"
+ ],
+ "form": "",
+ "slugbase": "np-cata-1bc5e0",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "f3e43abe46a4cd94",
+   "n": 4
+  },
+  {
+   "fp": "be5db0a678103718",
+   "n": 2
+  }
+ ],
+ "heldFps": [],
+ "masters": 6,
+ "koWrite": 24,
+ "enWrite": 12
+}

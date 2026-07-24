@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-OTC-TOPICAL-PATCH-FULL-CORPUS-COMPLETION-DA-V9",
+ "ingredient": "케토프로펜",
+ "names": [
+  "하루펜플라스타(케토프로펜)"
+ ],
+ "form": "",
+ "slugbase": "np-plaster-3b8c58",
+ "mode": "APPLY",
+ "producedFps": [
+  {
+   "fp": "dc754ab753b9a51c",
+   "n": 3
+  }
+ ],
+ "heldFps": [],
+ "masters": 3,
+ "koWrite": 12,
+ "enWrite": 6
+}
