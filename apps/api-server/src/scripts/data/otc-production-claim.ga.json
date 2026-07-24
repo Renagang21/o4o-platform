@@ -2452,6 +2452,256 @@
    "op": "oral-combo-leaflet",
    "status": "DONE",
    "note": "GA-V8 batch20 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "잔타뉴정|A02AD01|185밀리그램|정",
+   "targetFp": "ebb01fdaa808e920",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "센도스연질캡슐|A11AB|2500IU|연질캡슐",
+   "targetFp": "ed490d35e8268e20",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마이어스콕골드정|A11JC|206.5밀리그램|정",
+   "targetFp": "ee4088b5a7c6b90f",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "프로콘틴600정|A11EX|600밀리그램|정",
+   "targetFp": "ef65f018cb4ed7a1",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "툴스속편정|A02AX|62.45밀리그램|정",
+   "targetFp": "f00b48cb8535bec5",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "네프비타정|A11EB|60밀리그램|정",
+   "targetFp": "f576751aeea596d3",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "칼디플러스정|A12AX|750밀리그램|정",
+   "targetFp": "f684ad5fd7a98c9e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "헤모퀸탑연질캡슐|B03AE10|200밀리그램|연질캡슐",
+   "targetFp": "f8520b33fa40811e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "비타포린정|A11JA|50밀리그램|정",
+   "targetFp": "f924adfe928ddd68",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "나노민연질캡슐|A11BA|20밀리그램|연질캡슐",
+   "targetFp": "fbd2330cf1996027",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "테스톤지-플러스연질캡슐|A11AB|75밀리그램|연질캡슐",
+   "targetFp": "fbfe4f6c55adf819",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 4,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "칼시맥스500정|A12AX|1250밀리그램|정",
+   "targetFp": "05536cd072f6435c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "디카테오정|A12AX|1500밀리그램|정",
+   "targetFp": "06389def001bb65c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "칼디텍츄어블정|A12AX|1500밀리그램|정",
+   "targetFp": "078d5577722ef116",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "조인본콘드로800정|A11JC|800밀리그램|정",
+   "targetFp": "08100e52ccf322d9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "조인탑200연질캡슐|A11JC|200밀리그램|연질캡슐",
+   "targetFp": "0c6192027b3447c8",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "비스콘틴800정|A11JC|800밀리그램|정",
+   "targetFp": "0d96a79d6faf4e67",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "애드민플러스정|A12AX|250밀리그램|정",
+   "targetFp": "0fe5349d9c805461",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "위앤정|A02AD01|450밀리그램|정",
+   "targetFp": "1024b371543243a4",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "보위황정|A02AH|200밀리그램|정",
+   "targetFp": "12038548ec0e9e11",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "메모론에스연질캡슐|A11JC|2밀리그램|연질캡슐",
+   "targetFp": "12184b9df119695f",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알부골드연질캡슐|A11JC|20밀리그램|연질캡슐",
+   "targetFp": "14b4ad6265ab30c3",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "에코파워600정|A11JC|600밀리그램|정",
+   "targetFp": "155556c9266e6a12",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "디카맥스디플러스정|A12AX|750밀리그램|정",
+   "targetFp": "15b824f4f686e473",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "바이타민마하정|A11JC|100밀리그램|정",
+   "targetFp": "1666318431751143",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V8 batch21 CLAIMED (2026-07-25, sohae)"
   }
  ]
 }
