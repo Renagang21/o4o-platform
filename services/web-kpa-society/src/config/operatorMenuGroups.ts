@@ -38,10 +38,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    // WO-O4O-KPA-OPERATOR-DASHBOARD-MENU-IA-AND-ROUTE-REFINE-V1:
-    //   '판매자 모집 노출 승인'(/operator/recruitment-exposure) 은 노출 승인 backend 부재
-    //   준비중(B안) placeholder → sidebar 노출 제거. route/page 는 보존(직접 접근 시 준비중 안내).
-    //   backend 실기능 확정 시 재노출.
+    // WO-O4O-KPA-SELLER-RECRUITMENT-OPERATOR-APPROVAL-FLOW-RESTORE-V1:
+    //   판매자 모집 노출 승인 복원. 직전 정비의 "backend 부재 placeholder" 판단은 오진 —
+    //   승인 기능은 실재한다: proxy `/api/v1/kpa/operator/recruitment-exposure`(requireKpaScope
+    //   'kpa:operator', serviceKey='kpa-society' 고정) → setRecruitmentExposure(SERVICE_MISMATCH 가드·
+    //   idempotent). 공급자 create=exposure_status PENDING 기본, browse/apply=APPROVED 강제.
+    //   페이지(RecruitmentExposureApprovalPage)·라우트도 이미 live. GP/KCos 는 계속 노출 중이었고 KPA 만 회귀.
+    //   유통 기능(운영자 승인 필요)이며 콘텐츠 무승인 게시와 별개.
+    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
   ],
   // WO-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1: 상품 현황 (view-only, 서비스 전역 조회).
   //   GP/KCos 와 동일한 products/orders 그룹/라벨.
