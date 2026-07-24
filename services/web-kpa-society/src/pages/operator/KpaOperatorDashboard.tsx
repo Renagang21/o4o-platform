@@ -167,7 +167,9 @@ function buildKpaAxesFromConfig(
   const forumPending = getKpiValue(config.kpis, 'forum');
   const contentPending = getKpiValue(config.kpis, 'content');
   const productApplicationPending = getKpiValue(config.kpis, 'product-applications');
-  const pharmacyRequest = getKpiValue(config.kpis, 'pharmacy-requests');
+  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
+  //   약국 서비스 신청 KPI 폐지 → 이벤트 오퍼 승인 대기로 대체.
+  const eventOfferPending = getKpiValue(config.kpis, 'event-offers');
   const totalStores = storeStats?.totalStores ?? 0;
 
   return [
@@ -196,7 +198,7 @@ function buildKpaAxesFromConfig(
       tone: 'emerald',
       metrics: [
         { label: '상품 신청', value: productApplicationPending, href: '/operator/product-applications', warn: productApplicationPending > 0 },
-        { label: '약국 서비스', value: pharmacyRequest, href: '/operator/pharmacy-requests', warn: pharmacyRequest > 0 },
+        { label: '이벤트 오퍼 승인', value: eventOfferPending, href: '/operator/event-offers', warn: eventOfferPending > 0 },
         { label: '등록 매장', value: totalStores, href: '/operator/stores', warn: false },
       ],
       links: [
