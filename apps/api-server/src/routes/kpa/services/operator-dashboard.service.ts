@@ -97,6 +97,10 @@ interface SecondaryCounts {
   //   약국 서비스 신청 pending 폐지 → 이벤트 오퍼(organization_product_listings) 승인 대기로 대체.
   eventOfferPendingCount: number;
   productApplicationPendingCount: number;
+  // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
+  //   판매자 모집 노출 승인 대기 = neture_partner_recruitments.exposure_status='pending'
+  //   (service_id='kpa-society' scope). 운영자 승인 큐(proxy GET ?exposureStatus=pending) 와 동일 조건.
+  recruitmentExposurePendingCount: number;
   serviceApplicationCount: number;
   storeStats: { totalStores: number; activeStores: number } | null;
 }
@@ -291,6 +295,7 @@ async function fetchSecondaryCounts(
     pendingMembersRows,
     eventOfferPendingRows,
     productAppPendingRows,
+    recruitmentExposurePendingRows,
     storeCountRows,
     totalMembersRows,
     serviceAppRows,
@@ -304,6 +309,13 @@ async function fetchSecondaryCounts(
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
       SELECT COUNT(*) AS count FROM kpa_product_applications WHERE status = 'pending'
+    `).catch(() => [{ count: '0' }]),
+    // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
+    //   read-only count. service_id='kpa-society' AND exposure_status='pending' — 운영자 승인 큐 목록과
+    //   동일 조건(getRecruitmentsForExposureReview: serviceId + exposureStatus, status/삭제 조건 없음).
+    dataSource.query(`
+      SELECT COUNT(*) AS count FROM neture_partner_recruitments
+      WHERE service_id = 'kpa-society' AND exposure_status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
       SELECT
@@ -327,6 +339,7 @@ async function fetchSecondaryCounts(
     pendingMembers: parseInt(pendingMembersRows[0]?.count || '0', 10),
     eventOfferPendingCount: parseInt(eventOfferPendingRows[0]?.count || '0', 10),
     productApplicationPendingCount: parseInt(productAppPendingRows[0]?.count || '0', 10),
+    recruitmentExposurePendingCount: parseInt(recruitmentExposurePendingRows[0]?.count || '0', 10),
     storeStats: {
       totalStores: parseInt(storeCountRows[0]?.total_count || '0', 10),
       activeStores: parseInt(storeCountRows[0]?.active_count || '0', 10),
@@ -349,6 +362,7 @@ function buildConfig(
     serviceApplicationCount,
     eventOfferPendingCount,
     productApplicationPendingCount,
+    recruitmentExposurePendingCount,
   } = secondary;
 
   const contentDraftCount = summary.content.pendingDraft;
@@ -401,6 +415,16 @@ function buildConfig(
       value: productApplicationPendingCount,
       status: productApplicationPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/product-applications',
+    },
+    {
+      // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
+      //   판매자 모집 노출 승인 대기(유통 기능). RecruitmentExposureApprovalPage 기본 탭=pending 이므로
+      //   canonical route 만으로 노출 대기 목록 진입.
+      key: 'recruitment-exposure',
+      label: '판매자 모집 승인 대기',
+      value: recruitmentExposurePendingCount,
+      status: recruitmentExposurePendingCount > 0 ? 'warning' : 'neutral',
+      link: '/operator/recruitment-exposure',
     },
     ...(isAdmin
       ? [
@@ -477,6 +501,17 @@ function buildConfig(
           : `상품 신청 ${productApplicationPendingCount}건 대기 — 검토해 주세요.`,
       level: productApplicationPendingCount > 3 ? 'warning' : 'info',
       link: '/operator/product-applications',
+    });
+  }
+  if (recruitmentExposurePendingCount > 0) {
+    aiSummary.push({
+      id: 'ai-recruitment-exposure',
+      message:
+        recruitmentExposurePendingCount > 3
+          ? `판매자 모집 노출 승인 ${recruitmentExposurePendingCount}건 긴급 — 검토가 필요합니다.`
+          : `판매자 모집 노출 승인 ${recruitmentExposurePendingCount}건 대기 — 검토해 주세요.`,
+      level: recruitmentExposurePendingCount > 3 ? 'warning' : 'info',
+      link: '/operator/recruitment-exposure',
     });
   }
   if (contentDraftCount > 0) {
@@ -557,6 +592,16 @@ function buildConfig(
       label: '상품 신청 검토',
       count: productApplicationPendingCount,
       link: '/operator/product-applications',
+    });
+  }
+  if (recruitmentExposurePendingCount > 0) {
+    // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
+    //   0건이면 Queue 미노출(조건부 push). 클릭 시 실제 승인 콘솔(기본 pending 탭)로 이동.
+    actionQueue.push({
+      id: 'aq-recruitment-exposure',
+      label: '판매자 모집 노출 승인 검토',
+      count: recruitmentExposurePendingCount,
+      link: '/operator/recruitment-exposure',
     });
   }
   if (isAdmin && serviceApplicationCount > 0) {
