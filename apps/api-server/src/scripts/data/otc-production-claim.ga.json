@@ -867,6 +867,186 @@
    "masters": 7,
    "op": "KO_EN",
    "note": "GA-V6-2 batch13 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0 → DONE 2026-07-24 KO+EN LIVE 독립검증 GREEN"
+  },
+  {
+   "targetFp": "e530d144f54871bf",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "미니메이드정|A08AX|정",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "ee28633e7a5eed1c",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "트레스탄츄정|A15|정",
+   "masters": 7,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "1b7cccc0402d7dc8",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "모앤캡슐|D11AX|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "20d8ed89e214e81d",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "훼스탈플러스정|A09A|정",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "2e4225c9924b550a",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "판다모캡슐|D11AX|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "3da722c81b581b0f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "이튼돌플러스캡슐|A01AD|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "4fc49192468169d4",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "속편엔이중정|A09A|정",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "57692a7723807e11",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "복합파자임이중정|A09A|정",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "9053f22ece1b5ee7",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "트레스탄캡슐|A15|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "a7dd2657282f9587",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "덴티에프캡슐|A01AD|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "b1a39fa8d29232b8",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "이덴트플러스캡슐|A01AD|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "c506a7ed5f65c916",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "이모나캡슐|A01AD|캡슐",
+   "masters": 6,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "02eb435a230f204f",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "이가덱스캡슐|A01AD|캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "1404759f012bc15d",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "콜다운연질캡슐|C10B|연질캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "25b075bfcd043094",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "아로마에프캡슐|A01AD|캡슐",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "2adaeff9ec92af65",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "큐자임정|A09A|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "317acacfa802ee04",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "트랜미정|D11AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "32b68a4506229b67",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "베루본에스정|A07AX|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "5c4f9cc44f44c115",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "카베진코와알파정|A09A|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
+  },
+  {
+   "targetFp": "600dcb9c85bdeef6",
+   "agent": "GA",
+   "status": "CLAIMED",
+   "groupKey": "비올씨정|A11EB|정",
+   "masters": 5,
+   "op": "KO_EN",
+   "note": "GA-V6-2 batch14 claim (2026-07-24) — READY 판정 · 나·다 claim 교집합 0"
   }
  ]
 }
