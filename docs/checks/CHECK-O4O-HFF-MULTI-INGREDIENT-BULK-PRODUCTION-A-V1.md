@@ -12,6 +12,8 @@
 - shard: `stableHash(STTEMNT_NO) % 3 === 0` (shard 0) — 타 에이전트(B/C) 충돌 회피 축. 외부 조회·수정 없음.
 - 미선점: `matched_product_master_id IS NULL` · STORE canonical `o4o_hff_generated` SPD 없음 ·
   `mfds_permit_number` 기보유 master 없음.
+- 규모: shard 0 후보 **13,743** 중 선점·기승격 4,130 을 제외한 **9,613 건이 평가 대상**이다
+  (= 생산 692 + HOLD 8,921).
 - 직전 [`CHECK-O4O-HFF-NOBRACKET-BULK-PRODUCTION-A-V1`](CHECK-O4O-HFF-NOBRACKET-BULK-PRODUCTION-A-V1.md) 이
   **noBracket 만** 다뤘으므로, 본 WO 는 **`[원료]` 브래킷 구조를 포함한 전 도메인 다원료**를 새로 개방한다.
 
@@ -100,7 +102,8 @@ VERDICT: PASS
 
 ## 6. HOLD (상위 원인)
 
-재실행 시 target **0** — 현재 규칙 하에서 shard 0 다원료 안전 후보 소진.
+평가 9,613 중 생산 692 를 제외한 **8,921 건이 HOLD** 이며, 재실행 시 target **0** —
+현재 규칙 하에서 shard 0 안전 후보 소진.
 
 | 원인 | 건수 | 성격 |
 |---|---:|---|
@@ -116,7 +119,8 @@ VERDICT: PASS
 
 ## 7. 남은 후보
 
-shard 0 총 13,743 · 선점·기승격 4,822 → **미생산 8,921**, 전량 위 HOLD 사유에 해당.
+shard 0 총 13,743 · 선점·기승격 4,822(본 WO 692 승격 후) → **미생산 8,921**, 전량 §6 HOLD 사유에 해당.
+(본 WO 착수 시점 기준으로는 선점·기승격 4,130 · 평가 9,613.)
 
 후속 조건(별도 WO · 공용 모듈 변경 필요):
 - 프로바이오틱스 CFU · 홍삼 지표성분 · 개별인정형 추출물 라벨 registry 확장 → `LABEL_UNMAPPED` 2,179
