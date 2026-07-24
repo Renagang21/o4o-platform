@@ -63,6 +63,15 @@ ProductMaster 오연결 0 · 기능성 오귀속/누락 0 · canonical/rollback 
 - data: `docs/checks/data/product-description-guard/hff-liquid-bulk-c/` — target-liquid-pass · rollback-manifest · liquid-census · review-hold · select-holds-summary.
 - 본 문서.
 
+## 7. 재생산 (mL 기준량 하드닝 후 — 2026-07-25)
+
+- 선행: 공용 parser/Guard mL 기준량 검증 commit `72d78afc9`([`CHECK-...-ML-BASIS-HARDENING-V1`](CHECK-O4O-HFF-SOURCE-PARSER-ML-BASIS-HARDENING-V1.md)). 이전 REVIEW_LATER(mL 기준량 자동검증 실패) 해소.
+- fresh not-taken shard-2(9,220, 기존 60 제외) 재선정 → pool 102 → **Guard PASS 90**(전량 mL 기준량) → generate 90.
+- dry-run→apply COMMIT: masters 90 · **DB write 360** · canonicalDup 0 · skipped 0 · postVerifyPass ✓.
+- 독립검증: masters90·spdKo90·spdEn90·candLinked90·sourceHff180 · **independentVerifyPass ✓**.
+- 총량↔원료량 분리 유지(예: 식이섬유 4.2g / 표시 기준 500mL당). manifest `hff-liq2-s2c-apply-rollback-manifest.json`.
+- **액상 shard-2 누적 LIVE = 150** (60 고형기준 + 90 mL기준). 잔여 12 held(genuine MISMATCH/UNVERIFIABLE).
+
 ---
 
-*stmt-shard 2 · 액상·용기분할 단일 기능성 · 공용 무수정 · PASS-only · 신규 LIVE 60 · DB write 240 · 총량↔원료량 분리 · 독립검증 PASS · A/B 교집합 0.*
+*stmt-shard 2 · 액상·용기분할 단일 기능성 · PASS-only · 신규 LIVE 60+90=150 · 총량↔원료량 분리 · 독립검증 PASS · A/B 교집합 0. mL 재생산은 parser/Guard commit 72d78afc9 기준.*
