@@ -17,11 +17,14 @@
  *   super_admin 대상 변경은 super_admin 만(SUPER_ADMIN_ONLY). 목록 응답에 비밀번호·해시 없음.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { Loader2, KeyRound, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Loader2, KeyRound, ShieldCheck, RefreshCw, Pencil } from 'lucide-react';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
+
+const MAX_ROLE_BADGES = 2;
 
 interface AdminAccount {
   id: string;
@@ -44,6 +47,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function AdminAccountsSettings() {
+  const navigate = useNavigate();
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -158,13 +162,41 @@ export default function AdminAccountsSettings() {
     }
   };
 
-  const columns: O4OColumn<AdminAccount>[] = [
+  // 행 선택 토글 (BaseTable 은 header select-all 만 자동 렌더 — row 체크박스는 _select 컬럼 render 로 제공)
+  const toggleRow = useCallback((id: string) => {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const columns: O4OColumn<AdminAccount>[] = useMemo(() => [
+    {
+      // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
+      //   행 체크박스 — BaseTable selectable 은 header select-all 만 자동. row 는 _select 컬럼 render 필요.
+      key: '_select',
+      header: '',
+      system: true,
+      width: 44,
+      align: 'center',
+      render: (_: unknown, a: AdminAccount) => (
+        <input
+          type="checkbox"
+          checked={selectedKeys.has(a.id)}
+          onChange={() => toggleRow(a.id)}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+          aria-label={`${a.email} 선택`}
+        />
+      ),
+    },
     {
       key: 'name',
       header: '이름 / 이메일',
       sortable: true,
-      sortAccessor: (a) => a.name,
-      render: (_, a) => (
+      sortAccessor: (a: AdminAccount) => a.name,
+      render: (_: unknown, a: AdminAccount) => (
         <div>
           <div className="flex items-center gap-1.5 font-medium text-o4o-text-primary">
             {isSuper(a) && <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />}
@@ -177,13 +209,23 @@ export default function AdminAccountsSettings() {
     {
       key: 'roles',
       header: '역할',
-      render: (_, a) => (
-        <div className="flex flex-wrap gap-1">
-          {a.roles.map((r) => (
-            <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
-          ))}
-        </div>
-      ),
+      width: 220,
+      // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
+      //   과밀 방지 — 대표 2개만 배지, 나머지는 +N. title 로 전체 역할 확인.
+      render: (_: unknown, a: AdminAccount) => {
+        const shown = a.roles.slice(0, MAX_ROLE_BADGES);
+        const rest = a.roles.length - shown.length;
+        return (
+          <div className="flex flex-wrap items-center gap-1" title={a.roles.join(', ')}>
+            {shown.map((r) => (
+              <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
+            ))}
+            {rest > 0 && (
+              <span className="inline-block px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-600 font-medium" title={a.roles.join(', ')}>+{rest}</span>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: 'status',
@@ -218,11 +260,19 @@ export default function AdminAccountsSettings() {
       key: '_actions',
       header: '',
       width: 56,
-      system: true,
+      system: 'last',
       align: 'center',
-      render: (_, a) => (
+      render: (_: unknown, a: AdminAccount) => (
         <RowActionMenu
           actions={[
+            {
+              // 역할 변경은 RBAC Role Assignment 화면(계정 편집)으로 연결 — 본 탭은 역할 표시만.
+              key: 'edit',
+              label: '수정 (역할 관리)',
+              icon: <Pencil size={14} />,
+              variant: 'primary',
+              onClick: () => navigate(`/users/${a.id}/edit`),
+            },
             {
               key: 'password',
               label: '비밀번호 재설정',
@@ -240,7 +290,7 @@ export default function AdminAccountsSettings() {
         />
       ),
     },
-  ];
+  ], [selectedKeys, busyId, toggleRow, navigate]);
 
   return (
     <div className="space-y-4">
