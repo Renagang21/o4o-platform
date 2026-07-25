@@ -28,7 +28,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  OperatorDashboardLayout,
   type OperatorDashboardConfig,
   type KpiItem,
 } from '@o4o/operator-ux-core';
@@ -39,6 +38,7 @@ import {
 } from '@o4o/operator-core-ui';
 import { operatorApi } from '../../api/operator';
 import { getAccessToken } from '../../contexts/AuthContext';
+import KpaOperatorDashboardLayout from '../../components/kpa-operator/KpaOperatorDashboardLayout';
 
 const PLATFORM_API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -124,22 +124,17 @@ export default function KpaOperatorDashboard() {
 
   const axes = buildKpaAxesFromConfig(config, storeStats);
 
-  // WO-O4O-OPERATOR-DASHBOARD-ABOVE-BLOCK-SLOT-V1:
-  //   GuideCard + AxisNavigation 의 시각 위치는 유지하되 렌더 책임만 공통 layout slot 으로 이관.
-  //   (GuideCard 위치/무게 조정은 후속 별도 WO — 이번 P2 는 구조 공통화만.)
   return (
-    <OperatorDashboardLayout
-      config={{
-        ...config,
-        aboveBlocks: (
-          <>
-            {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 카드 (공통 컴포넌트, 가이드 링크는 KPA route 주입) */}
-            <OperatorRoleGuideCard guideHref="/guide/for/operator" />
-            {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 (frontend 유지 — I3 정합) */}
-            {axes.length > 0 && <AxisNavigationSection axes={axes} />}
-          </>
-        ),
-      }}
+    <KpaOperatorDashboardLayout
+      config={config}
+      auxiliary={
+        <>
+          {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
+          {axes.length > 0 && <AxisNavigationSection axes={axes} />}
+          {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 카드 */}
+          <OperatorRoleGuideCard guideHref="/guide/for/operator" />
+        </>
+      }
     />
   );
 }
