@@ -1,0 +1,1284 @@
+{
+ "wo": "WO-O4O-OTC-ORAL-COMBO-FINAL-SHARD-A-GA-V9",
+ "generatedFrom": "prodscreen.sohae (READY undone pickable)",
+ "summary": {
+  "total_fp": 209,
+  "total_master": 627,
+  "A": {
+   "fp": 70,
+   "master": 210
+  },
+  "B": {
+   "fp": 70,
+   "master": 210
+  },
+  "C": {
+   "fp": 69,
+   "master": 207
+  },
+  "method": "LPT: sort(master DESC, fp ASC) → greedy assign to least-loaded shard(tie A<B<C). deterministic·reproducible."
+ },
+ "shards": {
+  "A": [
+   {
+    "fp": "1886f154add7e883",
+    "atc": "A11JC",
+    "strength": "300밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "뉴로친연질캡슐"
+   },
+   {
+    "fp": "1b05c7fed570aea9",
+    "atc": "A11EX",
+    "strength": "50밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "비타콤보정"
+   },
+   {
+    "fp": "1fbbf510ea1aa8ee",
+    "atc": "A11JB",
+    "strength": "770밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "마그토닉연질캡슐"
+   },
+   {
+    "fp": "24034e401415f77e",
+    "atc": "A12AX",
+    "strength": "475밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "본에이디에스정"
+   },
+   {
+    "fp": "263c482cdd8998ca",
+    "atc": "A11JC",
+    "strength": "1155밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "콘드로친정"
+   },
+   {
+    "fp": "2c4c8d0e4a6af575",
+    "atc": "A12AX",
+    "strength": "250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "에버칼디정"
+   },
+   {
+    "fp": "2e9a6e3d4346951a",
+    "atc": "A02AD01",
+    "strength": "160밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "알마트린정"
+   },
+   {
+    "fp": "324f731a402f9d3c",
+    "atc": "A11JC",
+    "strength": "500밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "씨엠지뷰플러스연질캡슐"
+   },
+   {
+    "fp": "333df4714f9bb514",
+    "atc": "A12AX",
+    "strength": "1250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "고칼디정"
+   },
+   {
+    "fp": "358e3ace9863a8db",
+    "atc": "A11JC",
+    "strength": "1155밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "메가콘로엠정"
+   },
+   {
+    "fp": "387a2666285312cf",
+    "atc": "A11EX",
+    "strength": "600밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "탑콘도르600정"
+   },
+   {
+    "fp": "3a4ff9d4125265d6",
+    "atc": "A11A",
+    "strength": "51.6밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "메가트루액티브정"
+   },
+   {
+    "fp": "3c9c20d03f9105ef",
+    "atc": "A11JC",
+    "strength": "500밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "아이비즈헬스연질캡슐"
+   },
+   {
+    "fp": "40c6205f26fee47d",
+    "atc": "A13A",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "광동리버샷정"
+   },
+   {
+    "fp": "45209005858ddf1c",
+    "atc": "A11JC",
+    "strength": "50밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "임팩타민프리미엄정"
+   },
+   {
+    "fp": "461e9192ee994d4e",
+    "atc": "A11JA",
+    "strength": "60밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "파워쎈연질캡슐"
+   },
+   {
+    "fp": "4ddadea2eb2ac7aa",
+    "atc": "A12AX",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "칼디원정"
+   },
+   {
+    "fp": "514fd6594b94cc54",
+    "atc": "A11JC",
+    "strength": "400밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "차엠지연질캡슐"
+   },
+   {
+    "fp": "536fce28f97e10c0",
+    "atc": "A12AX",
+    "strength": "750밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "본디칼플러스정"
+   },
+   {
+    "fp": "55929ffb5723a2a9",
+    "atc": "A12AX",
+    "strength": "250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "본에디칼정"
+   },
+   {
+    "fp": "592ae89328abef02",
+    "atc": "A12AX",
+    "strength": "475밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "보니카디정"
+   },
+   {
+    "fp": "5b2dd790dfa8b5c4",
+    "atc": "A11AB",
+    "strength": "10밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "진셀몬큐텐정"
+   },
+   {
+    "fp": "5bbd45464019a57b",
+    "atc": "A11EC",
+    "strength": "50밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "임팩타민정"
+   },
+   {
+    "fp": "656673310c5eb3f6",
+    "atc": "A11EX",
+    "strength": "600밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "콘트라민정"
+   },
+   {
+    "fp": "66c6aba36c63440a",
+    "atc": "B03AE01",
+    "strength": "275밀리그램",
+    "form": "캡슐",
+    "size": 3,
+    "name": "훼로모아캡슐"
+   },
+   {
+    "fp": "6ad463edaba02b5c",
+    "atc": "A11JC",
+    "strength": "510밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "조인본골드정"
+   },
+   {
+    "fp": "6c6037fac8f47447",
+    "atc": "A11JB",
+    "strength": "92.6밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "톨시렌연질캡슐"
+   },
+   {
+    "fp": "6f67d557c6e196d8",
+    "atc": "A11JC",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "벤티메가나이스정"
+   },
+   {
+    "fp": "7233e173ffd9ef3e",
+    "atc": "B03AE10",
+    "strength": "125밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "헤모포스정"
+   },
+   {
+    "fp": "73a22fe97f5dea51",
+    "atc": "A11JA",
+    "strength": "0.4밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "테라비타연질캡슐"
+   },
+   {
+    "fp": "775caeeb47524ed1",
+    "atc": "A12AX",
+    "strength": "750밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "모아칼연질캡슐"
+   },
+   {
+    "fp": "7d0f30268e591ade",
+    "atc": "A02AD03",
+    "strength": "500밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "대웅바이오알마게이트정500밀리그램"
+   },
+   {
+    "fp": "7df787de659b9647",
+    "atc": "A11JC",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "아로나민케어에이치티정"
+   },
+   {
+    "fp": "809942823d732ae9",
+    "atc": "A12AX",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "칼페온정"
+   },
+   {
+    "fp": "825778c0cf2c4bf5",
+    "atc": "A11JC",
+    "strength": "500밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "투와이스골드연질캡슐"
+   },
+   {
+    "fp": "85d658146fb0ee65",
+    "atc": "A02AX",
+    "strength": "50밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "유니자임정"
+   },
+   {
+    "fp": "8968f16d7d3e3ad7",
+    "atc": "A11JC",
+    "strength": "500밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "엠지플러스큐연질캡슐"
+   },
+   {
+    "fp": "8bdcf7ec8197a62c",
+    "atc": "A11EX",
+    "strength": "100밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "벤포액티브연질캡슐"
+   },
+   {
+    "fp": "9085fd3ce00b3279",
+    "atc": "A11JB",
+    "strength": "0.666밀리그램",
+    "form": "캡슐",
+    "size": 3,
+    "name": "징크셀플러스캡슐"
+   },
+   {
+    "fp": "92a601b273858644",
+    "atc": "A12AX",
+    "strength": "875밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "디카맥스500/350정"
+   },
+   {
+    "fp": "94724badbac80a3d",
+    "atc": "A12AX",
+    "strength": "1250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "본디칼맥스정"
+   },
+   {
+    "fp": "9853a2f2c7d7d5a3",
+    "atc": "A11EX",
+    "strength": "600밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "빅콘에프600정"
+   },
+   {
+    "fp": "9c79de1e46356e7f",
+    "atc": "A11JC",
+    "strength": "75밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "비타씬-플러스정"
+   },
+   {
+    "fp": "a19de46e70753ea1",
+    "atc": "A12AX",
+    "strength": "170밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "파워본앤킹연질캡슐"
+   },
+   {
+    "fp": "a4fcbb024da1a871",
+    "atc": "A11JC",
+    "strength": "110밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "비엘비정"
+   },
+   {
+    "fp": "a79f372ea06aa2ba",
+    "atc": "A11JC",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "렛잇비프로원정"
+   },
+   {
+    "fp": "aac6be98e94d3384",
+    "atc": "A02AD03",
+    "strength": "500밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "일양바이오알마게이트정500밀리그램"
+   },
+   {
+    "fp": "b05c9600262a3e9c",
+    "atc": "A11JC",
+    "strength": "51.55밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "구바파정"
+   },
+   {
+    "fp": "b4cb515fdf045bfe",
+    "atc": "A12AX",
+    "strength": "250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "칼디온정"
+   },
+   {
+    "fp": "bc676f076a7d9179",
+    "atc": "A11AA03",
+    "strength": "215밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "메가트루포커스정"
+   },
+   {
+    "fp": "c157907589d8104f",
+    "atc": "A11JC",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "액티진정"
+   },
+   {
+    "fp": "c394e94099af5b08",
+    "atc": "A11JC",
+    "strength": "51.55밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "맥스케어정"
+   },
+   {
+    "fp": "c6aebf61349443a2",
+    "atc": "A12AX",
+    "strength": "263.15밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "지노칼골드정"
+   },
+   {
+    "fp": "c9de2f69a55e1b18",
+    "atc": "A11JC",
+    "strength": "350밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "마그포스맥스연질캡슐"
+   },
+   {
+    "fp": "caccefffb9910091",
+    "atc": "A11EX",
+    "strength": "600밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "콘디에스정"
+   },
+   {
+    "fp": "cfdb350ff614ce0d",
+    "atc": "A11JB",
+    "strength": "618.6밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "하이타민골드정"
+   },
+   {
+    "fp": "d22278659b6cad03",
+    "atc": "A11JC",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "모아비액티브정"
+   },
+   {
+    "fp": "d7f5a76f7c466bc2",
+    "atc": "A09AA",
+    "strength": "175밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "위엔자임유디정"
+   },
+   {
+    "fp": "dca7025b80a21266",
+    "atc": "A12AX",
+    "strength": "250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "알카본정"
+   },
+   {
+    "fp": "e08f7033b7ace997",
+    "atc": "A11JC",
+    "strength": "15밀리그램",
+    "form": "캡슐",
+    "size": 3,
+    "name": "바이오파워캡슐"
+   },
+   {
+    "fp": "e353dab2773e2afd",
+    "atc": "A11JC",
+    "strength": "50밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "맥스케어베타정"
+   },
+   {
+    "fp": "e5ab71e9f4d6d011",
+    "atc": "A11JC",
+    "strength": "250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "액티진비티에스정"
+   },
+   {
+    "fp": "e7d429d4dec31e6a",
+    "atc": "A12AX",
+    "strength": "1250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "알카본플러스정"
+   },
+   {
+    "fp": "ea12e301e4e8640b",
+    "atc": "A11DB",
+    "strength": "30밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "알파플러스정"
+   },
+   {
+    "fp": "ed6c983cb75b4f16",
+    "atc": "A11EB",
+    "strength": "100밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "원스타민정"
+   },
+   {
+    "fp": "ef5047ae19be977d",
+    "atc": "A13A",
+    "strength": "10밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "아민파워정"
+   },
+   {
+    "fp": "f3b796c5099291b7",
+    "atc": "A12AX",
+    "strength": "1250밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "디카렉정"
+   },
+   {
+    "fp": "f602968a26602838",
+    "atc": "A11EX",
+    "strength": "90밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "콘티박스디연질캡슐"
+   },
+   {
+    "fp": "fb744e09c3eb31e9",
+    "atc": "A11EX",
+    "strength": "500밀리그램",
+    "form": "연질캡슐",
+    "size": 3,
+    "name": "셀비콤연질캡슐"
+   },
+   {
+    "fp": "fdf821956039c773",
+    "atc": "A11JC",
+    "strength": "800밀리그램",
+    "form": "정",
+    "size": 3,
+    "name": "콘드라맥스800정"
+   }
+  ],
+  "B": [
+   {
+    "fp": "18f384fe86efde08",
+    "size": 3,
+    "name": "콜레시움정"
+   },
+   {
+    "fp": "1d022647bc810624",
+    "size": 3,
+    "name": "메디다제정"
+   },
+   {
+    "fp": "1fe4179cedba18b7",
+    "size": 3,
+    "name": "비나폴로100정"
+   },
+   {
+    "fp": "251b4fd9d0f6a527",
+    "size": 3,
+    "name": "이노엔비타메진캡슐"
+   },
+   {
+    "fp": "298bd9747b6644c1",
+    "size": 3,
+    "name": "비타미니아정"
+   },
+   {
+    "fp": "2cb42f1a921dc43f",
+    "size": 3,
+    "name": "와이디1000연질캡슐"
+   },
+   {
+    "fp": "310e35f63b975766",
+    "size": 3,
+    "name": "디카듀오정100/1000"
+   },
+   {
+    "fp": "329d4d271cb45d0c",
+    "size": 3,
+    "name": "칼디쓰리정"
+   },
+   {
+    "fp": "34f3d9b01439756c",
+    "size": 3,
+    "name": "싸이타민플러스정"
+   },
+   {
+    "fp": "3733c6cc1bf088b5",
+    "size": 3,
+    "name": "칼디쓰리플러스정"
+   },
+   {
+    "fp": "3890e957d945faff",
+    "size": 3,
+    "name": "하드칼씨플러스정"
+   },
+   {
+    "fp": "3adf589cf31204ec",
+    "size": 3,
+    "name": "콘트라스300연질캡슐"
+   },
+   {
+    "fp": "3d3ffa6aaabdd627",
+    "size": 3,
+    "name": "빅스코민에프정"
+   },
+   {
+    "fp": "4137e64a0d92dbc2",
+    "size": 3,
+    "name": "디카킴디정"
+   },
+   {
+    "fp": "459a79cf21836b27",
+    "size": 3,
+    "name": "아로나민케어콤플렉스정"
+   },
+   {
+    "fp": "4a78bb0e161a4b87",
+    "size": 3,
+    "name": "파워비큐콘티뉴800정"
+   },
+   {
+    "fp": "4e8fdb83d4431556",
+    "size": 3,
+    "name": "하드칼츄어블정"
+   },
+   {
+    "fp": "52c1ddb473699131",
+    "size": 3,
+    "name": "훼리너프캡슐"
+   },
+   {
+    "fp": "53e031a41d3f221f",
+    "size": 3,
+    "name": "마그아민골드연질캡슐"
+   },
+   {
+    "fp": "57f77624b7b798eb",
+    "size": 3,
+    "name": "유한비타민씨디정"
+   },
+   {
+    "fp": "59966e7d54fa1eb7",
+    "size": 3,
+    "name": "마그비감마연질캡슐"
+   },
+   {
+    "fp": "5b68198ca3246202",
+    "size": 3,
+    "name": "유어칼큐정"
+   },
+   {
+    "fp": "5efdaaa0c27a3973",
+    "size": 3,
+    "name": "마이메가플러스정"
+   },
+   {
+    "fp": "659ef74011a92f19",
+    "size": 3,
+    "name": "아진팜정"
+   },
+   {
+    "fp": "67ca0f62ee740832",
+    "size": 3,
+    "name": "판키아제정"
+   },
+   {
+    "fp": "6b462bc2527e27c2",
+    "size": 3,
+    "name": "케어칼디엠정"
+   },
+   {
+    "fp": "6c9ae59ab958251d",
+    "size": 3,
+    "name": "안티노을연질캡슐"
+   },
+   {
+    "fp": "70fcbeb701cdc0b9",
+    "size": 3,
+    "name": "마그비액티브정"
+   },
+   {
+    "fp": "723bb14f2a957ca2",
+    "size": 3,
+    "name": "칼디텍정"
+   },
+   {
+    "fp": "747256cbccc0e0e6",
+    "size": 3,
+    "name": "메빌정"
+   },
+   {
+    "fp": "78889098ea3953e6",
+    "size": 3,
+    "name": "비타콘틴600정"
+   },
+   {
+    "fp": "7dc32a6b40a46709",
+    "size": 3,
+    "name": "현대아라비정"
+   },
+   {
+    "fp": "7ebf808da201fda8",
+    "size": 3,
+    "name": "벤포비타100정"
+   },
+   {
+    "fp": "82276aa5f6885378",
+    "size": 3,
+    "name": "본탑600골드정"
+   },
+   {
+    "fp": "8502cbd0a70c6302",
+    "size": 3,
+    "name": "비바원정"
+   },
+   {
+    "fp": "864c962f88832f59",
+    "size": 3,
+    "name": "훼스탈슈퍼자임정"
+   },
+   {
+    "fp": "8993ddd52540e27e",
+    "size": 3,
+    "name": "뉴트리액티브정"
+   },
+   {
+    "fp": "8bdf35980b3e1c9f",
+    "size": 3,
+    "name": "칼비타디정"
+   },
+   {
+    "fp": "90d7ce806b2f4a47",
+    "size": 3,
+    "name": "엑셀렌비정"
+   },
+   {
+    "fp": "938198fa032ed4de",
+    "size": 3,
+    "name": "청안하이뷰연질캡슐"
+   },
+   {
+    "fp": "94d040ee968e26aa",
+    "size": 3,
+    "name": "신신케어타민정"
+   },
+   {
+    "fp": "99a5f3559bebda1b",
+    "size": 3,
+    "name": "파워조인에스600정"
+   },
+   {
+    "fp": "9e8b99449c5f8f4c",
+    "size": 3,
+    "name": "우르솔연질캡슐"
+   },
+   {
+    "fp": "a3e21a77a6944b63",
+    "size": 3,
+    "name": "판토마그정"
+   },
+   {
+    "fp": "a568264a83567a97",
+    "size": 3,
+    "name": "액티콤연질캡슐"
+   },
+   {
+    "fp": "a8284dd2708f777e",
+    "size": 3,
+    "name": "마그랑비연질캡슐"
+   },
+   {
+    "fp": "ade06a133f08ad25",
+    "size": 3,
+    "name": "투엑스비엠큐정"
+   },
+   {
+    "fp": "b2bfe17983fee8c0",
+    "size": 3,
+    "name": "훼로바맘스케어정"
+   },
+   {
+    "fp": "b57a487e57b76529",
+    "size": 3,
+    "name": "글루타에스정"
+   },
+   {
+    "fp": "be9e50e8d134dbbf",
+    "size": 3,
+    "name": "파워비타연질캡슐"
+   },
+   {
+    "fp": "c1eb730c9500a4aa",
+    "size": 3,
+    "name": "디카테오엘씨정"
+   },
+   {
+    "fp": "c3ff46c9f20e226a",
+    "size": 3,
+    "name": "마그페롤플러스연질캡슐"
+   },
+   {
+    "fp": "c8e5e81d2a5be531",
+    "size": 3,
+    "name": "카세롤연질캡슐"
+   },
+   {
+    "fp": "c9eebe7e5ac08cca",
+    "size": 3,
+    "name": "헤모포민큐캡슐"
+   },
+   {
+    "fp": "cc7afc7e9ddc7f85",
+    "size": 3,
+    "name": "코드비타연질캡슐"
+   },
+   {
+    "fp": "d070d8d8b5083db7",
+    "size": 3,
+    "name": "현대아라미정"
+   },
+   {
+    "fp": "d24678289f638d93",
+    "size": 3,
+    "name": "맥스타민프리미엄정"
+   },
+   {
+    "fp": "dafb028e570c2dba",
+    "size": 3,
+    "name": "마이렉스정"
+   },
+   {
+    "fp": "dcbf5dd38c5ab9cb",
+    "size": 3,
+    "name": "파워킹연질캡슐"
+   },
+   {
+    "fp": "e0a3b78fdcf8aad3",
+    "size": 3,
+    "name": "벡크정"
+   },
+   {
+    "fp": "e3c9a4c5c5289b9a",
+    "size": 3,
+    "name": "세롤진정"
+   },
+   {
+    "fp": "e750a86e65b16d99",
+    "size": 3,
+    "name": "마이칼큐정"
+   },
+   {
+    "fp": "e811c3b9c02984d0",
+    "size": 3,
+    "name": "콘드로센정"
+   },
+   {
+    "fp": "ec973701397f2c52",
+    "size": 3,
+    "name": "베타셀민연질캡슐"
+   },
+   {
+    "fp": "ee068d6c00a2354a",
+    "size": 3,
+    "name": "마그감마맥스연질캡슐"
+   },
+   {
+    "fp": "f24613c7ac134013",
+    "size": 3,
+    "name": "파밀라제정"
+   },
+   {
+    "fp": "f45c12af5eafe065",
+    "size": 3,
+    "name": "테라빅정"
+   },
+   {
+    "fp": "f7095fa9ef4fc64f",
+    "size": 3,
+    "name": "타스나비타정"
+   },
+   {
+    "fp": "fbe2dda5deb407a3",
+    "size": 3,
+    "name": "조인브이플러스정"
+   },
+   {
+    "fp": "ff4e25aec37d64b0",
+    "size": 3,
+    "name": "베아틴정"
+   }
+  ],
+  "C": [
+   {
+    "fp": "1a7a148e266cbe1c",
+    "size": 3,
+    "name": "본디칼정"
+   },
+   {
+    "fp": "1f0269685bce4f9f",
+    "size": 3,
+    "name": "큐텐훌연질캡슐"
+   },
+   {
+    "fp": "20d2ebbdf3bd32e7",
+    "size": 3,
+    "name": "쎄이칼정(수출명:칼슘포르트씨디(CalciumFortCD))"
+   },
+   {
+    "fp": "25d8a762067ba83a",
+    "size": 3,
+    "name": "스카이비백정"
+   },
+   {
+    "fp": "299235cefbdfd98f",
+    "size": 3,
+    "name": "비타제트플러스정"
+   },
+   {
+    "fp": "2d4008481b44252c",
+    "size": 3,
+    "name": "겔티-포르테연질캡슐"
+   },
+   {
+    "fp": "310f47f4a20ef6b1",
+    "size": 3,
+    "name": "렛잇비프로정"
+   },
+   {
+    "fp": "32ce5f7869e21b4e",
+    "size": 3,
+    "name": "파워콘친골드연질캡슐"
+   },
+   {
+    "fp": "358c220b7db16c84",
+    "size": 3,
+    "name": "포인타민정"
+   },
+   {
+    "fp": "37599c6dcdf867a6",
+    "size": 3,
+    "name": "뉴란스플러스정"
+   },
+   {
+    "fp": "38d8787980a9dde6",
+    "size": 3,
+    "name": "본투본연질캡슐"
+   },
+   {
+    "fp": "3be487163a6cf496",
+    "size": 3,
+    "name": "글로칼디정"
+   },
+   {
+    "fp": "4097cbf9689444f3",
+    "size": 3,
+    "name": "판스틴정"
+   },
+   {
+    "fp": "44a15789a2cc1596",
+    "size": 3,
+    "name": "빅콘에스600정"
+   },
+   {
+    "fp": "460f42726570ca9b",
+    "size": 3,
+    "name": "프리번정"
+   },
+   {
+    "fp": "4b000dafc008898a",
+    "size": 3,
+    "name": "마그포에이드연질캡슐"
+   },
+   {
+    "fp": "512eefc8b284e381",
+    "size": 3,
+    "name": "고운자임맘정"
+   },
+   {
+    "fp": "52c2ccb1ef320086",
+    "size": 3,
+    "name": "지엘알마게이트정500밀리그램"
+   },
+   {
+    "fp": "5574f1679c7d4a9d",
+    "size": 3,
+    "name": "하이카디정"
+   },
+   {
+    "fp": "583babaf9d4154b8",
+    "size": 3,
+    "name": "빅톤에프연질캡슐"
+   },
+   {
+    "fp": "59b498de40781f29",
+    "size": 3,
+    "name": "에버칼정"
+   },
+   {
+    "fp": "5b71840c557a6bec",
+    "size": 3,
+    "name": "브이텐연질캡슐"
+   },
+   {
+    "fp": "65030d8586b0083a",
+    "size": 3,
+    "name": "코큐민연질캡슐"
+   },
+   {
+    "fp": "65f7a64b45e2570a",
+    "size": 3,
+    "name": "투헬스연질캡슐"
+   },
+   {
+    "fp": "69dce344e39edb1d",
+    "size": 3,
+    "name": "디카맥스에브리원정"
+   },
+   {
+    "fp": "6bc944c88ba2a521",
+    "size": 3,
+    "name": "엘비페롤플러스정"
+   },
+   {
+    "fp": "6e8e4f9413f7c94e",
+    "size": 3,
+    "name": "유칼본정"
+   },
+   {
+    "fp": "71a8bb9722d92af2",
+    "size": 3,
+    "name": "디카돌정"
+   },
+   {
+    "fp": "726cb639c9554366",
+    "size": 3,
+    "name": "엔비100정"
+   },
+   {
+    "fp": "76d3eafc108f6b1c",
+    "size": 3,
+    "name": "유미칼디정"
+   },
+   {
+    "fp": "7a50a84f4d17d00c",
+    "size": 3,
+    "name": "프라스칼-디정750밀리그람"
+   },
+   {
+    "fp": "7df0b33e1a6602b7",
+    "size": 3,
+    "name": "티엔코드아이연질캡슐"
+   },
+   {
+    "fp": "802761625b2013b3",
+    "size": 3,
+    "name": "멘토비엠정"
+   },
+   {
+    "fp": "823766c16ba7698f",
+    "size": 3,
+    "name": "칼엠디정"
+   },
+   {
+    "fp": "850d843f4751ec79",
+    "size": 3,
+    "name": "아로비타정"
+   },
+   {
+    "fp": "86d3a8652919f73d",
+    "size": 3,
+    "name": "마그비맥스연질캡슐"
+   },
+   {
+    "fp": "8a6630a39783fa61",
+    "size": 3,
+    "name": "시트큐정"
+   },
+   {
+    "fp": "8ec3a230948541a2",
+    "size": 3,
+    "name": "엑세라민프로정"
+   },
+   {
+    "fp": "912cec7ec2490a67",
+    "size": 3,
+    "name": "이엠지연질캡슐"
+   },
+   {
+    "fp": "93a712777d86a988",
+    "size": 3,
+    "name": "마이메가100정"
+   },
+   {
+    "fp": "950a9d4306b2590c",
+    "size": 3,
+    "name": "유한비타민씨정1000mg"
+   },
+   {
+    "fp": "9ae48e5f9e32d709",
+    "size": 3,
+    "name": "파워씨연질캡슐"
+   },
+   {
+    "fp": "a139c90dc4ddb2e3",
+    "size": 3,
+    "name": "테라400정"
+   },
+   {
+    "fp": "a4632d4b0bba4aa2",
+    "size": 3,
+    "name": "메코이에프정"
+   },
+   {
+    "fp": "a6b9e8da2b1a1b34",
+    "size": 3,
+    "name": "하드칼츄어블이지정"
+   },
+   {
+    "fp": "a9eb4cfd78dc1bcb",
+    "size": 3,
+    "name": "마그맥스연질캡슐"
+   },
+   {
+    "fp": "aee20f539427c7b5",
+    "size": 3,
+    "name": "제스쿨정"
+   },
+   {
+    "fp": "b38830d6abcff470",
+    "size": 3,
+    "name": "팜편안디정"
+   },
+   {
+    "fp": "b9ce69b0e5b523ac",
+    "size": 3,
+    "name": "혈앤보알파연질캡슐"
+   },
+   {
+    "fp": "bf7ceff3e9385103",
+    "size": 3,
+    "name": "아로나민케어리피정"
+   },
+   {
+    "fp": "c35fa54dd5bfebca",
+    "size": 3,
+    "name": "알보칼디정"
+   },
+   {
+    "fp": "c45cc7f220e2e255",
+    "size": 3,
+    "name": "아로나민실버액티브정"
+   },
+   {
+    "fp": "c94b3957727fa4e3",
+    "size": 3,
+    "name": "비맥스메타비정"
+   },
+   {
+    "fp": "ca590b4c6f409824",
+    "size": 3,
+    "name": "쎈파워비타연질캡슐"
+   },
+   {
+    "fp": "cd047deb0c326aa0",
+    "size": 3,
+    "name": "마미센스정"
+   },
+   {
+    "fp": "d09f82a9e0b2cedb",
+    "size": 3,
+    "name": "제이웰라민연질캡슐"
+   },
+   {
+    "fp": "d52fd46682ec30e5",
+    "size": 3,
+    "name": "리액타민연질캡슐"
+   },
+   {
+    "fp": "dbe867f5b65aa9eb",
+    "size": 3,
+    "name": "썬팩타민연질캡슐"
+   },
+   {
+    "fp": "df10cd6a9b8f5acc",
+    "size": 3,
+    "name": "마그비연질캡슐"
+   },
+   {
+    "fp": "e0ec6042402e5fda",
+    "size": 3,
+    "name": "네오신정"
+   },
+   {
+    "fp": "e48c466102f90599",
+    "size": 3,
+    "name": "엠지파워연질캡슐"
+   },
+   {
+    "fp": "e77581b451718cfa",
+    "size": 3,
+    "name": "엑티본연질캡슐"
+   },
+   {
+    "fp": "e8f53d5d9dfe19dc",
+    "size": 3,
+    "name": "쎄이네슘골드연질캡슐"
+   },
+   {
+    "fp": "ec9ce314356fad23",
+    "size": 3,
+    "name": "서울알마게이트정"
+   },
+   {
+    "fp": "ef2f62cb439041c9",
+    "size": 3,
+    "name": "벤포벨에스정"
+   },
+   {
+    "fp": "f26432182e5c98dd",
+    "size": 3,
+    "name": "싸이타민정"
+   },
+   {
+    "fp": "f530c4400cdc8bd2",
+    "size": 3,
+    "name": "마그벤맥스연질캡슐"
+   },
+   {
+    "fp": "f748b252ba07ff26",
+    "size": 3,
+    "name": "일양아이콤연질캡슐"
+   },
+   {
+    "fp": "fcfe9274a6b5ffe5",
+    "size": 3,
+    "name": "바이타비플러스정"
+   }
+  ]
+ }
+}

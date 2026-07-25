@@ -2702,6 +2702,13 @@
    "op": "oral-combo-leaflet",
    "status": "DONE",
    "note": "GA-V8 batch21 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "SHARD-A (70 fp / 210 master) — otc-combo-shard-assignment-ga-v9.json",
+   "agent": "GA",
+   "op": "oral-combo-leaflet",
+   "status": "CLAIMED",
+   "note": "GA-V9 SHARD-A owner. A=가/B=나/C=다. LPT master-balanced 결정론 분할. shard A 선(先) apply → 완료 후 나에게 write-owner 인계."
   }
  ]
 }
