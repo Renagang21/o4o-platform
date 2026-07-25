@@ -2707,8 +2707,8 @@
    "groupKey": "SHARD-A (70 fp / 210 master) — otc-combo-shard-assignment-ga-v9.json",
    "agent": "GA",
    "op": "oral-combo-leaflet",
-   "status": "CLAIMED",
-   "note": "GA-V9 SHARD-A owner. A=가/B=나/C=다. LPT master-balanced 결정론 분할. shard A 선(先) apply → 완료 후 나에게 write-owner 인계."
+   "status": "DONE",
+   "note": "GA-V9 SHARD-A owner. A=가/B=나/C=다. LPT master-balanced 결정론 분할. shard A 선(先) apply → 완료 후 나에게 write-owner 인계. 2026-07-25 완료: 70fp/210master KO+EN LIVE, 독립검증 GREEN, 재실행 no-op(dbWrite 0), write-owner 나 인계 (shardAStatus.status=DONE / 95c2aefba·cbda7a0da)."
   },
   {
    "groupKey": "뉴로친연질캡슐|A11JC|300밀리그램|연질캡슐",
