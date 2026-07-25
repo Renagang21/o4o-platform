@@ -1307,5 +1307,28 @@
   },
   "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
   "writeOwnerHandoff": "가 → 나 (나: shard B 시작 가능. shard A LIVE write 완료·commit·push 완료.)"
+ },
+ "shardBStatus": {
+  "status": "DONE",
+  "completedBy": "agent-NA",
+  "machine": "sohae",
+  "date": "2026-07-25",
+  "fp": 70,
+  "master": 210,
+  "koWriteT": 840,
+  "enWriteT": 420,
+  "independentVerify": {
+   "ko_auth": 210,
+   "en_canon": 210,
+   "en_needs_review": 0,
+   "easy_deprecated": 210,
+   "easy_still_canonical": 0,
+   "ko_dup": 0,
+   "en_dup": 0,
+   "audit": 210,
+   "targetOutsideWrite": 0
+  },
+  "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
+  "writeOwnerHandoff": "나 → 다 (다: shard C 시작 가능. shard B LIVE write·commit·push 완료.)"
  }
 }

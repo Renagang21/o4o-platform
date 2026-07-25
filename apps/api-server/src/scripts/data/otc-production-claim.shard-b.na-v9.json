@@ -6,7 +6,7 @@
  "track": "ORAL_MULTI_INGREDIENT_STORE_LEAFLET",
  "shard": "B",
  "shardSource": "otc-combo-shard-assignment-ga-v9.json (commit d4ad68c70, method: LPT master-balanced 3-split, deterministic)",
- "verdict": "CLAIMED",
+ "verdict": "DONE",
  "disjointnessProof": {
   "A/B/C_mutual_intersection": {
    "AB": 0,
@@ -30,7 +30,7 @@
    "name": "콜레시움정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "1d022647bc810624",
@@ -38,7 +38,7 @@
    "name": "메디다제정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "1fe4179cedba18b7",
@@ -46,7 +46,7 @@
    "name": "비나폴로100정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "251b4fd9d0f6a527",
@@ -54,7 +54,7 @@
    "name": "이노엔비타메진캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "298bd9747b6644c1",
@@ -62,7 +62,7 @@
    "name": "비타미니아정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "2cb42f1a921dc43f",
@@ -70,7 +70,7 @@
    "name": "와이디1000연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "310e35f63b975766",
@@ -78,7 +78,7 @@
    "name": "디카듀오정100/1000",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "329d4d271cb45d0c",
@@ -86,7 +86,7 @@
    "name": "칼디쓰리정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "34f3d9b01439756c",
@@ -94,7 +94,7 @@
    "name": "싸이타민플러스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "3733c6cc1bf088b5",
@@ -102,7 +102,7 @@
    "name": "칼디쓰리플러스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "3890e957d945faff",
@@ -110,7 +110,7 @@
    "name": "하드칼씨플러스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "3adf589cf31204ec",
@@ -118,7 +118,7 @@
    "name": "콘트라스300연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "3d3ffa6aaabdd627",
@@ -126,7 +126,7 @@
    "name": "빅스코민에프정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "4137e64a0d92dbc2",
@@ -134,7 +134,7 @@
    "name": "디카킴디정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "459a79cf21836b27",
@@ -142,7 +142,7 @@
    "name": "아로나민케어콤플렉스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "4a78bb0e161a4b87",
@@ -150,7 +150,7 @@
    "name": "파워비큐콘티뉴800정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "4e8fdb83d4431556",
@@ -158,7 +158,7 @@
    "name": "하드칼츄어블정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "52c1ddb473699131",
@@ -166,7 +166,7 @@
    "name": "훼리너프캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "53e031a41d3f221f",
@@ -174,7 +174,7 @@
    "name": "마그아민골드연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "57f77624b7b798eb",
@@ -182,7 +182,7 @@
    "name": "유한비타민씨디정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "59966e7d54fa1eb7",
@@ -190,7 +190,7 @@
    "name": "마그비감마연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "5b68198ca3246202",
@@ -198,7 +198,7 @@
    "name": "유어칼큐정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "5efdaaa0c27a3973",
@@ -206,7 +206,7 @@
    "name": "마이메가플러스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "659ef74011a92f19",
@@ -214,7 +214,7 @@
    "name": "아진팜정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "67ca0f62ee740832",
@@ -222,7 +222,7 @@
    "name": "판키아제정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "6b462bc2527e27c2",
@@ -230,7 +230,7 @@
    "name": "케어칼디엠정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "6c9ae59ab958251d",
@@ -238,7 +238,7 @@
    "name": "안티노을연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "70fcbeb701cdc0b9",
@@ -246,7 +246,7 @@
    "name": "마그비액티브정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "723bb14f2a957ca2",
@@ -254,7 +254,7 @@
    "name": "칼디텍정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "747256cbccc0e0e6",
@@ -262,7 +262,7 @@
    "name": "메빌정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "78889098ea3953e6",
@@ -270,7 +270,7 @@
    "name": "비타콘틴600정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "7dc32a6b40a46709",
@@ -278,7 +278,7 @@
    "name": "현대아라비정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "7ebf808da201fda8",
@@ -286,7 +286,7 @@
    "name": "벤포비타100정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "82276aa5f6885378",
@@ -294,7 +294,7 @@
    "name": "본탑600골드정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "8502cbd0a70c6302",
@@ -302,7 +302,7 @@
    "name": "비바원정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "864c962f88832f59",
@@ -310,7 +310,7 @@
    "name": "훼스탈슈퍼자임정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "8993ddd52540e27e",
@@ -318,7 +318,7 @@
    "name": "뉴트리액티브정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "8bdf35980b3e1c9f",
@@ -326,7 +326,7 @@
    "name": "칼비타디정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "90d7ce806b2f4a47",
@@ -334,7 +334,7 @@
    "name": "엑셀렌비정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "938198fa032ed4de",
@@ -342,7 +342,7 @@
    "name": "청안하이뷰연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "94d040ee968e26aa",
@@ -350,7 +350,7 @@
    "name": "신신케어타민정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "99a5f3559bebda1b",
@@ -358,7 +358,7 @@
    "name": "파워조인에스600정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "9e8b99449c5f8f4c",
@@ -366,7 +366,7 @@
    "name": "우르솔연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "a3e21a77a6944b63",
@@ -374,7 +374,7 @@
    "name": "판토마그정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "a568264a83567a97",
@@ -382,7 +382,7 @@
    "name": "액티콤연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "a8284dd2708f777e",
@@ -390,7 +390,7 @@
    "name": "마그랑비연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "ade06a133f08ad25",
@@ -398,7 +398,7 @@
    "name": "투엑스비엠큐정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "b2bfe17983fee8c0",
@@ -406,7 +406,7 @@
    "name": "훼로바맘스케어정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "b57a487e57b76529",
@@ -414,7 +414,7 @@
    "name": "글루타에스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "be9e50e8d134dbbf",
@@ -422,7 +422,7 @@
    "name": "파워비타연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "c1eb730c9500a4aa",
@@ -430,7 +430,7 @@
    "name": "디카테오엘씨정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "c3ff46c9f20e226a",
@@ -438,7 +438,7 @@
    "name": "마그페롤플러스연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "c8e5e81d2a5be531",
@@ -446,7 +446,7 @@
    "name": "카세롤연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "c9eebe7e5ac08cca",
@@ -454,7 +454,7 @@
    "name": "헤모포민큐캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "cc7afc7e9ddc7f85",
@@ -462,7 +462,7 @@
    "name": "코드비타연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "d070d8d8b5083db7",
@@ -470,7 +470,7 @@
    "name": "현대아라미정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "d24678289f638d93",
@@ -478,7 +478,7 @@
    "name": "맥스타민프리미엄정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "dafb028e570c2dba",
@@ -486,7 +486,7 @@
    "name": "마이렉스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "dcbf5dd38c5ab9cb",
@@ -494,7 +494,7 @@
    "name": "파워킹연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "e0a3b78fdcf8aad3",
@@ -502,7 +502,7 @@
    "name": "벡크정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "e3c9a4c5c5289b9a",
@@ -510,7 +510,7 @@
    "name": "세롤진정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "e750a86e65b16d99",
@@ -518,7 +518,7 @@
    "name": "마이칼큐정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "e811c3b9c02984d0",
@@ -526,7 +526,7 @@
    "name": "콘드로센정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "ec973701397f2c52",
@@ -534,7 +534,7 @@
    "name": "베타셀민연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "ee068d6c00a2354a",
@@ -542,7 +542,7 @@
    "name": "마그감마맥스연질캡슐",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "f24613c7ac134013",
@@ -550,7 +550,7 @@
    "name": "파밀라제정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "f45c12af5eafe065",
@@ -558,7 +558,7 @@
    "name": "테라빅정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "f7095fa9ef4fc64f",
@@ -566,7 +566,7 @@
    "name": "타스나비타정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "fbe2dda5deb407a3",
@@ -574,7 +574,7 @@
    "name": "조인브이플러스정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   },
   {
    "targetFp": "ff4e25aec37d64b0",
@@ -582,7 +582,32 @@
    "name": "베아틴정",
    "masters": 3,
    "op": "KO_EN",
-   "status": "CLAIMED"
+   "status": "DONE"
   }
- ]
+ ],
+ "completion": {
+  "status": "DONE",
+  "liveApplyBy": "main (orchestrator)",
+  "date": "2026-07-25",
+  "fp": 70,
+  "master": 210,
+  "writeActual": {
+   "koWriteT": 840,
+   "enWriteT": 420
+  },
+  "independentVerify": {
+   "ko_auth": 210,
+   "en_canon": 210,
+   "en_needs_review": 0,
+   "easy_deprecated": 210,
+   "easy_still_canonical": 0,
+   "ko_dup": 0,
+   "en_dup": 0,
+   "audit": 210,
+   "targetOutsideWrite": 0
+  },
+  "noop": "ALL ALREADY_COMPLETE (dbWrite 0) — first/mid/last fp 샘플 확인",
+  "verdict": "GREEN",
+  "writeOwnerHandoff": "나 → 다 (다: shard C 시작 가능)"
+ }
 }

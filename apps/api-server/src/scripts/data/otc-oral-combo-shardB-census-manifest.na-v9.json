@@ -1008,5 +1008,30 @@
     "8ed5405b-b3be-4021-be01-c23a2ce42faa"
    ]
   }
- ]
+ ],
+ "status": "DONE",
+ "completion": {
+  "status": "DONE",
+  "liveApply": "main",
+  "date": "2026-07-25",
+  "fp": 70,
+  "master": 210,
+  "writeActual": {
+   "koWriteT": 840,
+   "enWriteT": 420
+  },
+  "independentVerify": {
+   "ko_auth": 210,
+   "en_canon": 210,
+   "en_needs_review": 0,
+   "easy_deprecated": 210,
+   "easy_still_canonical": 0,
+   "ko_dup": 0,
+   "en_dup": 0,
+   "audit": 210,
+   "targetOutsideWrite": 0
+  },
+  "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
+  "verdict": "GREEN"
+ }
 }
