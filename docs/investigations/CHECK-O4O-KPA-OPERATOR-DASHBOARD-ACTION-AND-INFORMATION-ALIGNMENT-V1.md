@@ -111,10 +111,27 @@ Frontend `/operator/*` 전체는 operator role guard 아래에 있고 backend da
 | API production build (`tsc -p tsconfig.build.json`) | PASS |
 | KPA web production build | PASS |
 | API 전체 `tsc --noEmit` | 기존 OTC/HFF script 오류로 FAIL; 이번 변경 파일 관련 오류 0 |
-| 배포 | 커밋/push 후 기록 |
-| 운영 smoke | 배포 후 기록 |
+| 배포 | PASS — GitHub Actions run `30145565555` |
+| 운영 smoke | PASS |
 
 전체 API typecheck의 기존 오류는 `drug-otc-*`, `hff-*` script의 중복 선언·타입 불일치이며 이번 WO 파일과 무관하다. 배포 경로와 동일한 API production build는 통과했다.
+
+### 7.1 배포·운영 smoke
+
+- 구현 commit: `cdb09f22c0c1112560bebe3760d45c1111e07fd1`
+- API deploy workflow: `Deploy API Server (Cloud Run)` run `30145565555` 성공
+- Cloud Run revision: `o4o-core-api-02880-h9t`
+- serving image: `api-server:cdb09f22c0c1112560bebe3760d45c1111e07fd1`
+- `/health`: `alive`
+- KPA 운영 계정 로그인: 성공
+- `/api/v1/kpa/operator/dashboard`: HTTP 200, `success=true`
+- 운영 응답 KPI: 9개, `signage-media`와 `signage-playlists` 모두 존재
+- 운영 응답 Quick Action: admin 겸용 계정 기준 8개(공통 6 + admin 전용 2), 동일 link 중복 0
+- 현재 대기 데이터가 0이어서 Action Queue 응답은 0개 — count가 있을 때만 노출하는 기존 조건과 일치
+- `https://kpa-society.co.kr/operator`: HTTP 200, 앱 root 정상
+- 신규 revision `severity>=ERROR` 로그: 0건
+
+인앱 브라우저는 현재 세션에 연결된 browser instance가 없어 사용할 수 없었다. 대신 운영 계정 인증 dashboard API, 공개 operator entry, Cloud Run serving image/revision과 error log를 직접 검증했다.
 
 ## 8. 변경·Git 상태
 
@@ -132,4 +149,4 @@ Frontend `/operator/*` 전체는 operator role guard 아래에 있고 backend da
 
 위 기존 파일은 수정·stage·commit하지 않는다.
 
-Commit SHA, 배포 revision, smoke 결과는 push 및 운영 검증 후 본 문서에 갱신한다.
+구현 commit은 `cdb09f22c0c1112560bebe3760d45c1111e07fd1`이며, 본 배포·smoke 결과 기록은 후속 docs-only commit으로 반영한다.
