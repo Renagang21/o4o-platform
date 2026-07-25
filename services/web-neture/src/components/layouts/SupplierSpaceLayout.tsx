@@ -16,14 +16,10 @@ import {
   Home,
   Package,
   ShoppingCart,
-  FlaskConical,
-  CreditCard,
   MessageSquare,
   Boxes,
-  Tag,
-  Megaphone,
-  MonitorSmartphone,
   Settings,
+  FileText,
   ChevronRight,
   ChevronDown,
   Menu,
@@ -54,105 +50,66 @@ type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 //   - 모든 항목은 실제 라우트로 연결 (데드링크 0). 기존 실기능 메뉴(Finance/Community) 유지.
 const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
-    label: 'Overview',
+    label: '공급자 홈',
     icon: Home,
-    items: [{ label: 'Dashboard', path: '/supplier/dashboard', exact: true }],
+    items: [{ label: '대시보드', path: '/supplier/dashboard', exact: true }],
   },
   {
-    label: '제품 관리',
+    label: '상품',
     icon: Package,
     // WO-O4O-NETURE-SUPPLIER-MENU-ASSISTANT-IA-CLEANUP-V1: IA 권장안 D 정렬.
     //   상품 등록 도우미→등록 도우미, B2B 콘텐츠→제품 콘텐츠 관리.
     //   CSV Import 는 독립 주요 메뉴에서 제거(대량 등록으로 흡수) — 라우트 /supplier/csv-import 는
     //   보존(직접 접근 시 안전 안내+대량 등록 CTA). 메뉴 진입점만 제거.
     items: [
-      { label: '제품 목록', path: '/supplier/products' },
-      { label: '제품 등록', path: '/supplier/products/register' },
+      { label: '상품 목록', path: '/supplier/products' },
+      { label: '상품 등록', path: '/supplier/products/register' },
       { label: '대량 등록', path: '/supplier/products/bulk' },
       { label: '등록 도우미', path: '/supplier/products/import-assistant' },
-      { label: '제품 콘텐츠 관리', path: '/supplier/b2b-content' },
-      // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1:
-      //   매장 경영자용 STORE 설명서 서비스 진입점(1차: 안내). B2B(공급자→판매자)와 별개.
-      { label: '매장용 설명서', path: '/supplier/store-descriptions' },
     ],
   },
   {
-    label: '공급 오퍼',
-    icon: Boxes,
-    items: [{ label: '공급 오퍼', path: '/supplier/supply-offers' }],
-  },
-  {
-    // WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C:
-    //   공급자 소유 Screen Set(canonical 아님) 제작 → 대상 매장 HUB 게시. 매장은 가져가 독립 사본 생성.
-    label: '매장용 태블렛',
-    icon: MonitorSmartphone,
-    items: [{ label: '매장용 태블렛 콘텐츠', path: '/supplier/tablet-screen-sets' }],
-  },
-  {
-    // WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1:
-    //   공급자 소유 사이니지(YouTube 연결) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감.
-    label: '디지털 사이니지',
-    icon: MonitorSmartphone,
-    // 단일 항목 그룹은 item 라벨로 렌더되므로 라벨을 그룹명과 동일하게 유지.
-    items: [{ label: '디지털 사이니지', path: '/supplier/signage' }],
-  },
-  {
-    // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
-    label: '판매자 모집',
-    icon: Megaphone,
-    items: [{ label: '모집 현황', path: '/supplier/recruitments' }],
-  },
-  {
-    label: '유통참여형 펀딩',
-    icon: FlaskConical,
+    label: '콘텐츠',
+    icon: FileText,
     items: [
-      { label: '펀딩 목록', path: '/supplier/market-trial' },
-      { label: '새 펀딩 개설', path: '/supplier/market-trial/new' },
+      { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
+      { label: '매장용 설명서', path: '/supplier/store-descriptions' },
+      { label: '태블렛', path: '/supplier/tablet-screen-sets' },
+      { label: '디지털 사이니지', path: '/supplier/signage' },
     ],
   },
   {
-    label: '이벤트 오퍼',
-    icon: Tag,
-    items: [{ label: '이벤트 오퍼', path: '/supplier/event-offers' }],
+    label: '유통',
+    icon: Boxes,
+    items: [
+      { label: '공급 오퍼', path: '/supplier/supply-offers' },
+      { label: '판매자 모집', path: '/supplier/recruitments' },
+      { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
+      { label: '이벤트 오퍼', path: '/supplier/event-offers' },
+    ],
   },
   {
-    label: '주문·배송',
+    label: '주문·정산',
     icon: ShoppingCart,
     items: [
       { label: '주문 현황', path: '/supplier/orders' },
       { label: '재고 관리', path: '/supplier/inventory' },
+      { label: '정산 내역', path: '/supplier/settlements' },
+      { label: '파트너 수수료', path: '/supplier/partner-commissions' },
     ],
   },
   {
-    label: '정산',
-    icon: CreditCard,
+    label: '커뮤니티',
+    icon: MessageSquare,
     items: [
-      { label: '정산 내역', path: '/supplier/settlements' },
-      { label: 'Partner Commissions', path: '/supplier/partner-commissions' },
+      { label: '공급자 포럼', path: '/supplier/forum' },
+      { label: '내 포럼', path: '/supplier/my-forum' },
     ],
   },
   {
     label: '설정',
     icon: Settings,
     items: [{ label: '공급자 정보', path: '/mypage/business-profile' }],
-  },
-  // WO-O4O-SUPPLIER-CONTENT-PRODUCER-UI-CLEANUP-V1 (2026-05-23):
-  //   "Content > Library" 메뉴 제거. 공급자는 O4O **공통 canonical 콘텐츠**의 내부 Producer 가 아니다 —
-  //   canonical 흐름은 "공급자 → 오프라인 전달 → Operator 등록/검수 → HUB" 이다.
-  //   /supplier/library 라우트 자체는 유지 (북마크·링크 호환). 메뉴 진입점만 차단.
-  //
-  // WO-O4O-SUPPLIER-SCREEN-SET-POLICY-AND-TARGET-SCHEMA-V1 (2026-07-21) 적용 범위 정정:
-  //   위 "Producer 아님" 은 **canonical 콘텐츠에 한정**한다. 공급자는 자기 상품과 사용이 허용된
-  //   콘텐츠로 **공급자 소유 Screen Set**(canonical 아님)을 제작해 **인증된 대상 매장 HUB** 에 제공할 수 있다
-  //   (매장은 가져오기→독립 사본. 공급자 원본은 공개 URL·QR 미발급, 매장 사본 원격 수정·회수 불가).
-  //   → 일반 자료함(Content > Library) 부활이 아니며, 이 메뉴 차단은 그대로 유지한다.
-  {
-    label: 'Community',
-    icon: MessageSquare,
-    items: [
-      { label: 'Forum', path: '/supplier/forum' },
-      { label: '내 포럼', path: '/supplier/my-forum' },
-    ],
   },
 ];
 
@@ -167,6 +124,18 @@ export default function SupplierSpaceLayout() {
 
   const isItemActive = (path: string, exact?: boolean) => {
     if (exact) return pathname === path;
+    if (path === '/supplier/orders') {
+      return pathname === '/supplier/orders' || pathname.startsWith('/supplier/orders/');
+    }
+    if (path === '/supplier/recruitments') {
+      return pathname === '/supplier/recruitments' || pathname.startsWith('/supplier/recruitments/');
+    }
+    if (path === '/supplier/market-trial') {
+      return pathname === '/supplier/market-trial' || pathname.startsWith('/supplier/market-trial/');
+    }
+    if (path === '/supplier/forum') {
+      return pathname === '/supplier/forum' || pathname.startsWith('/supplier/forum/');
+    }
     return pathname === path || pathname.startsWith(path + '/');
   };
 
