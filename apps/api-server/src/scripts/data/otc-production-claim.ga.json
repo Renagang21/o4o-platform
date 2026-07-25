@@ -3209,6 +3209,206 @@
    "op": "oral-combo-leaflet",
    "status": "DONE",
    "note": "GA-V9 shardA batch23 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "액티진정|A11JC|100밀리그램|정",
+   "targetFp": "c157907589d8104f",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "맥스케어정|A11JC|51.55밀리그램|정",
+   "targetFp": "c394e94099af5b08",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "지노칼골드정|A12AX|263.15밀리그램|정",
+   "targetFp": "c6aebf61349443a2",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마그포스맥스연질캡슐|A11JC|350밀리그램|연질캡슐",
+   "targetFp": "c9de2f69a55e1b18",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "콘디에스정|A11EX|600밀리그램|정",
+   "targetFp": "caccefffb9910091",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "하이타민골드정|A11JB|618.6밀리그램|정",
+   "targetFp": "cfdb350ff614ce0d",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "모아비액티브정|A11JC|100밀리그램|정",
+   "targetFp": "d22278659b6cad03",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "위엔자임유디정|A09AA|175밀리그램|정",
+   "targetFp": "d7f5a76f7c466bc2",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알카본정|A12AX|250밀리그램|정",
+   "targetFp": "dca7025b80a21266",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "바이오파워캡슐|A11JC|15밀리그램|캡슐",
+   "targetFp": "e08f7033b7ace997",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "맥스케어베타정|A11JC|50밀리그램|정",
+   "targetFp": "e353dab2773e2afd",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "액티진비티에스정|A11JC|250밀리그램|정",
+   "targetFp": "e5ab71e9f4d6d011",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알카본플러스정|A12AX|1250밀리그램|정",
+   "targetFp": "e7d429d4dec31e6a",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알파플러스정|A11DB|30밀리그램|정",
+   "targetFp": "ea12e301e4e8640b",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "원스타민정|A11EB|100밀리그램|정",
+   "targetFp": "ed6c983cb75b4f16",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "아민파워정|A13A|10밀리그램|정",
+   "targetFp": "ef5047ae19be977d",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "디카렉정|A12AX|1250밀리그램|정",
+   "targetFp": "f3b796c5099291b7",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "콘티박스디연질캡슐|A11EX|90밀리그램|연질캡슐",
+   "targetFp": "f602968a26602838",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "셀비콤연질캡슐|A11EX|500밀리그램|연질캡슐",
+   "targetFp": "fb744e09c3eb31e9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "콘드라맥스800정|A11JC|800밀리그램|정",
+   "targetFp": "fdf821956039c773",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch24 KO+EN LIVE — shard A 완결 (2026-07-25, sohae)"
   }
  ]
 }
