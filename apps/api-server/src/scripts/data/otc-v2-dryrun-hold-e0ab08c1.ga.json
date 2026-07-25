@@ -1,0 +1,78 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-V2-SHARED-RUNNER-V1",
+ "runner": "otc-v2-store-leaflet-runner.shared.ts",
+ "ssot": "otc-remaining-shard-assignment-ssot-v2.json",
+ "census": "otc-remaining-full-corpus-census-v2.json",
+ "baseCommit": "81b39da72",
+ "shard": "ga",
+ "mode": "dry-run",
+ "dbWrite": 0,
+ "apply": false,
+ "supportedRoutes": [
+  "oral",
+  "oromucosal",
+  "topical",
+  "ophthalmic",
+  "nasal",
+  "vaginal",
+  "rectal"
+ ],
+ "ssotDeclared": {
+  "fingerprints": 238,
+  "masters": 839,
+  "routes": {
+   "oral": 634,
+   "ophthalmic": 112,
+   "topical": 79,
+   "oromucosal": 14
+  }
+ },
+ "processed": {
+  "fingerprints": 1,
+  "masters": 2
+ },
+ "gates": {
+  "fpReproduced": 2,
+  "fpFailed": 0,
+  "fpReproductionRate": 1,
+  "admittedGroups": 0,
+  "groupsWithAnomalies": 1,
+  "canonicalDup": 0,
+  "completeIntersection": 0,
+  "blockedFpInInput": 0,
+  "blockedMasterInInput": 0,
+  "siteAmbiguousInInput": 0,
+  "outOfShardMasters": 0
+ },
+ "writePlan": {
+  "ko_4T": 0,
+  "en_2T": 0,
+  "total": 0
+ },
+ "routeTally": {},
+ "groups": [
+  {
+   "fp": "e0ab08c1797832bf",
+   "gencode": "227703ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "d5414925-02b0-85cb-f573-e1ff5ed5d75c",
+   "fpOk": 2,
+   "fpBad": 0,
+   "easyCanonical1": 2,
+   "authoredConflict": 0,
+   "enCanonical": 0,
+   "koWritePlan": 8,
+   "enWritePlan": 4,
+   "anomalies": [
+    "KO 필수필드 누락 caution"
+   ],
+   "koHtmlMd5": "d41d8cd98f00b204e9800998ecf8427e",
+   "koHtmlLen": 0
+  }
+ ],
+ "anomalies": [
+  "[e0ab08c1797832bf] KO 필수필드 누락 caution"
+ ]
+}
