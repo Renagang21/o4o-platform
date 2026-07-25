@@ -22,9 +22,6 @@
   "manifestMatch": true,
   "expectedMatch": true,
   "orderBlockers": [
-   "선행 shard 'ga' KO apply 미완료",
-   "선행 shard 'ga' EN apply 미완료",
-   "선행 shard 'ga' 독립검증 미완료",
    "선행 shard 'na' KO apply 미완료",
    "선행 shard 'na' EN apply 미완료",
    "선행 shard 'na' 독립검증 미완료"
@@ -43,9 +40,6 @@
   },
   "blockers": [
    "apply 순서 충족",
-   "선행 shard 'ga' KO apply 미완료",
-   "선행 shard 'ga' EN apply 미완료",
-   "선행 shard 'ga' 독립검증 미완료",
    "선행 shard 'na' KO apply 미완료",
    "선행 shard 'na' EN apply 미완료",
    "선행 shard 'na' 독립검증 미완료"
