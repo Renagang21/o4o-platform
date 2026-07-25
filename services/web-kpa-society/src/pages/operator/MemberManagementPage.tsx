@@ -43,7 +43,7 @@ import {
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getBusinessEntityTypeLabel } from '@o4o/types';
 import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
-import { apiClient } from '../../api/client';
+import { apiClient, coreApiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -285,7 +285,11 @@ export default function MemberManagementPage() {
       if (!userId) {
         throw new Error('사용자 정보를 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.');
       }
-      await apiClient.put(`/operator/members/${userId}`, { password });
+      // WO-O4O-KPA-SERVICE-OPERATOR-MANAGEMENT-INFORMATION-AUDIT-V1:
+      //   비밀번호 변경은 플랫폼 공통 operator 콘솔 API(`/api/v1/operator/members/:userId`) 다.
+      //   kpa 전용 apiClient(base `/api/v1/kpa`) 로 호출하면 `/api/v1/kpa/operator/members/:userId`
+      //   → 404 (해당 라우트 미존재, 프로덕션 probe 확인). base 없는 coreApiClient 사용.
+      await coreApiClient.put(`/operator/members/${userId}`, { password });
     },
   }), []);
 
