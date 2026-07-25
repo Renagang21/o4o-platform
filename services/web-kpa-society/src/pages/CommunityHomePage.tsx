@@ -193,12 +193,17 @@ export function CommunityHomePage() {
       .finally(() => setLatestLoading(false));
   }, [latestTab]);
 
+  // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
+  //   공지 데이터는 `/home/notices` → cms_contents 다. 기존 href `/content/{id}` 는
+  //   kpa_contents 상세를 조회하는 경로라 클릭 시 "콘텐츠를 찾을 수 없습니다" 가 떴다.
+  //   KPA 에는 cms_contents 를 표시하는 공개 상세 라우트가 없으므로(=/content/notice 는
+  //   /content 로 redirect) 잘못된 링크를 노출하지 않고 비링크로 표시한다.
+  //   NewsNoticesSection 이 href 없는 항목을 이미 지원하며, K-Cosmetics 도 동일 방식이다.
   const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
     id: n.id,
     title: n.title,
     date: n.publishedAt || n.createdAt,
     isPinned: n.isPinned,
-    href: `/content/${n.id}`,
   }));
 
   const iconCls = `flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`;

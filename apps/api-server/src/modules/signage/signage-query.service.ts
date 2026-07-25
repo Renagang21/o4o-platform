@@ -28,6 +28,9 @@ export class SignageQueryService {
 
     const media = await this.dataSource.query(`
       SELECT sm.id, sm.name, sm."mediaType", sm."sourceUrl" as url, sm."thumbnailUrl", sm.duration, sm.metadata,
+             -- WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1: 소비처가 공개 상세
+             -- (/signage/media/:id) 연결 가능 여부를 판정할 수 있도록 source/scope 노출 (additive).
+             sm.source, sm.scope,
              sm."createdAt", u.name as "uploaderName"
       FROM signage_media sm
       LEFT JOIN users u ON u.id = sm."createdByUserId"

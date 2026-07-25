@@ -991,7 +991,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
             type: 'course', id: r.id, title: r.title,
             authorName: r.author_name ?? undefined,
             createdAt: new Date(r.created_at).toISOString(),
-            href: `/lms/courses/${r.id}`,
+            // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
+            //   프론트 canonical 라우트는 `/lms/course/:id` 다 (App.tsx). 기존 `/lms/courses/:id` 는
+            //   API 경로 형태를 그대로 내보낸 것으로 라우트가 없어 NotFoundPage 로 떨어졌다.
+            href: `/lms/course/${r.id}`,
           });
         }
       })());
@@ -1045,11 +1048,21 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       tasks.push((async () => {
         const signageData = await signageService.listForHome(perLimit, 0);
         for (const m of signageData.media) {
+          // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
+          //   기존에는 전 항목이 허브(`/signage`)로 이동해 어느 항목을 눌러도 같은 화면이었다.
+          //   개별 상세 라우트 `/signage/media/:id` 는 이미 존재하고 id 도 동일 엔티티
+          //   (signage_media.id) 이므로 연결한다. 단, 공개 상세 API
+          //   (GET /api/signage/:serviceKey/public/media/:id) 는 scope='global' +
+          //   source IN ('hq','supplier','community') 만 반환하므로, 그 조건을 만족하지 않는
+          //   항목(예: source='store')은 상세로 보내면 404 가 된다 → 기존 허브 이동을 유지한다.
+          const source = (m as any).source;
+          const isPubliclyViewable =
+            (m as any).scope === 'global' && ['hq', 'supplier', 'community'].includes(source);
           items.push({
             type: 'signage', id: m.id, title: m.name,
             authorName: (m as any).uploaderName ?? undefined,
             createdAt: new Date(m.createdAt).toISOString(),
-            href: `/signage`,
+            href: isPubliclyViewable ? `/signage/media/${m.id}` : `/signage`,
           });
         }
       })());
