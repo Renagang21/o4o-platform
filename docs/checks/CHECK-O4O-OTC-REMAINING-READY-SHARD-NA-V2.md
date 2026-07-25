@@ -1,18 +1,25 @@
-# CHECK-O4O-OTC-REMAINING-READY-SHARD-NA-V2 — 나 V2 shard 착수 전 검증 · 러너 관문 불일치 보고
+# CHECK-O4O-OTC-REMAINING-READY-SHARD-NA-V2 — 나 V2 shard dry-run GREEN · apply 대기
 
 WO: `WO-O4O-OTC-REMAINING-READY-SHARD-NA-V2` · 일자: 2026-07-25 · 담당: **드럭 OTC 에이전트 나**
-기준 commit: **`81b39da72`** (HEAD == 기준 commit, origin/main 동기) · SSOT: `otc-remaining-shard-assignment-ssot-v2.json` (라)
-성격: **read-only 착수 전 검증.** **DB write 0** · apply 0 · 저작 0 · claim 미선점.
+기준 commit: V2 census/SSOT **`81b39da72`** · 공용 러너 **`3447b2323`** (HEAD == `3447b2323`, origin/main 동기)
+러너: `otc-v2-store-leaflet-runner.shared.ts` (**공용 — 미수정**) · 독립검증기: `otc-remaining-v2-verify.na.mjs` (자기 소유)
+성격: **dry-run + 샘플 + 독립검증.** **DB write 0** · apply 0.
 
 ---
 
 ## 0. 결론
 
-> **shard 검증 전량 PASS. 단, 생산 착수 전 해소 필요 2건.**
+> **나 V2 shard dry-run GREEN — apply 대기(가 독립검증 완료 후).**
 >
-> 1. **나 V2 shard 오프라인 게이트 10/10 PASS** — 240 fp / 839 master, distinct 839, ga·da 교집합 0, 금지 대상 접촉 0 (§1).
-> 2. **🚫 정본 러너가 V2 와 구조적으로 비호환** — `otc-oral-combo-store-leaflet-runner.ga.ts` 의 **fingerprint 재현 게이트**와 **route oral 강제 게이트**가 V2 전 그룹에서 `ABORT` 를 발생시킨다. **가·나·다 3 shard 공통 문제이며 apply 1순위인 가가 먼저 부딪힌다** (§3).
-> 3. **DB 채널 미배치** — `apps/api-server/.env` 아직 없음. dry-run·저작 착수 불가 (§4).
+> | 축 | 결과 |
+> |---|---|
+> | dry-run 게이트 | **10/10 PASS** · 이상 0 · admitted 240/240 |
+> | 독립검증(러너 분리) | **13/13 GREEN** |
+> | 샘플(route별 2, 9건) | **전건 클린** — fp재현·라벨·경구동사·수치 |
+> | writePlan | KO 3,356 (4T) + EN 1,678 (2T) = **5,034** |
+> | **DB write** | **0** |
+>
+> 착수 전 제기했던 BLOCKER 2건 **모두 해소**: ① 러너 비호환 → 다 세션이 **공용 V2 러너 신규 작성**(`3447b2323`)으로 해결(V1 러너는 미수정 보존), ② `.env` 미배치 → 사용자 배치 완료.
 
 ---
 
@@ -60,7 +67,21 @@ WO: `WO-O4O-OTC-REMAINING-READY-SHARD-NA-V2` · 일자: 2026-07-25 · 담당: **
 
 > V1 shard SSOT·READY 는 본 세션에서 **생산 목적 사용 0**. 직전 [NA-V1 CHECK](CHECK-O4O-OTC-REMAINING-READY-SHARD-NA-V1.md) 는 생산 미착수로 종료됐으므로 V1 잔재 write 0.
 
-## 3. 🚫 정본 러너 ↔ V2 구조적 비호환 (착수 전 해소 필요)
+---
+
+> ## ⓘ §3~§7 은 **착수 전(2026-07-25 오전) 기록**이며 **전부 해소됐다.**
+> 최신 상태는 **§8~§14 실행 기록**이다. 아래는 이력 보존 목적으로 남긴다.
+>
+> | 착수 전 항목 | 현재 |
+> |---|---|
+> | §3 러너 비호환 (해소안 A/B/C 제안) | **해소** — 다 세션이 공용 V2 러너 신규 작성(`3447b2323`). 제안 A~C 는 채택되지 않았고, V1 러너는 **미수정 보존**이라는 취지만 반영됨 |
+> | §4 `.env` 미배치 | **해소** — 사용자 배치 완료 |
+> | §5 claim 미선점 | dry-run 완료. **SSOT 가 fp 단위 소유를 확정**하므로 별도 claim 파일 없이 진행(교집합 0 실측 확인) |
+> | §6 “dry-run 미실행 / BLOCKER 2건” | **§13 보고 요약으로 대체** |
+
+---
+
+## 3. 🚫 정본 러너 ↔ V2 구조적 비호환 (착수 전 — **해소됨**)
 
 `apps/api-server/src/scripts/otc-oral-combo-store-leaflet-runner.ga.ts` 는 KO(easy→authored 교체)+EN 을 담당하는 **정본 러너**이나, V2 대상에 대해 **모든 그룹에서 `ABORT`** 한다. 이상 1건이라도 있으면 하드 중단(`:118`, `:214`).
 
@@ -125,3 +146,137 @@ V2 SSOT 가 fp 단위로 나 소유를 확정(교집합 0 게이트)하여 충�
 | `_msm.mjs` · `_msmx.mjs` | 미접촉 |
 | `git add .` / reset / clean / stash | 미사용 — path-specific add |
 | 자기 산출물 | 본 CHECK 1건 |
+
+---
+
+# ▣ 실행 기록 (공용 V2 러너, base `3447b2323`)
+
+## 8. dry-run — 게이트 10/10 PASS
+
+```
+../../node_modules/.bin/tsx src/scripts/otc-v2-store-leaflet-runner.shared.ts --selftest
+../../node_modules/.bin/tsx src/scripts/otc-v2-store-leaflet-runner.shared.ts --shard=na --dry-run
+```
+
+- selftest **PASS** — fp 재현(제품명 미개입) · route resolver · 경로별 KO/EN · 수치 보존 · 차단 게이트 · 앵커 분리.
+
+| 게이트 | 실측 | 기대 | 판정 |
+|---|---:|---:|:---:|
+| processed fp / master | 240 / 839 | 240 / 839 | ✅ |
+| `fpReproduced` | **839** | 839 | ✅ |
+| `fpFailed` (재현율 1.0) | 0 | 0 | ✅ |
+| `admittedGroups` | **240** | 240 | ✅ |
+| `groupsWithAnomalies` | 0 | 0 | ✅ |
+| `canonicalDup` | **0** | 0 | ✅ |
+| `completeIntersection` (기존 완료분) | **0** | 0 | ✅ |
+| `blockedFpInInput` / `blockedMasterInInput` | 0 / 0 | 0 | ✅ |
+| `siteAmbiguousInInput` (CLQ·CDS·CSI) | **0** | 0 | ✅ |
+| `outOfShardMasters` | 0 | 0 | ✅ |
+| `anomalies` 배열 | **0건** | 0 | ✅ |
+
+**writePlan**: `ko_4T` 3,356 (= 839 × 4: insert+demote+flip+audit) · `en_2T` 1,678 (= 839 × 2: insert+flip) · **합계 5,034** · `dbWrite 0`.
+
+**routeTally == ssotDeclared 완전 일치**:
+
+| route | fp | master |
+|---|---:|---:|
+| oral | 200 | 626 |
+| topical | 27 | 136 |
+| ophthalmic | 10 | 52 |
+| vaginal | 2 | 15 |
+| oromucosal | 1 | 10 |
+| **합계** | **240** | **839** |
+
+## 9. HOLD_SOURCE 분리 — **0건**
+
+WO 지시(“필수 축 없는 그룹은 추정 보완하지 말고 HOLD_SOURCE 분리”)에 대해 **분리 대상 0**. 2중 확인:
+
+- 러너: `admittedGroups 240 / 240` — 축 부족으로 탈락한 그룹 없음.
+- 독립검증기(§10 [5]): 효능 축 839/839 · 용법 축 839/839 · 주의 축 839/839.
+
+→ **추정 보완 0** (보완이 필요한 그룹 자체가 없음).
+
+## 10. 독립검증 (러너와 분리된 SELECT — 13/13 GREEN)
+
+```
+node src/scripts/otc-remaining-v2-verify.na.mjs
+```
+
+러너 코드를 공유하지 않는 별도 SQL·별도 프로세스 검증기.
+
+| # | 게이트 | 실측 / 기대 |
+|---:|---|---|
+| 1 | product_masters 존재 | 839 / 839 |
+| 2 | `drug_category='otc'` | 839 / 839 |
+| 3 | easy ko canonical 정확히 1 | 839 / 839 |
+| 4 | authored ko canonical | 0 / 0 |
+| 5 | en canonical | 0 / 0 |
+| 6 | needs_review | 0 / 0 |
+| 7 | canonicalDup | 0 / 0 |
+| 8 | **gencode SSOT == DB 일치** | **839 / 839** |
+| 9 | fp 내 gencode 이질 그룹 | 0 / 0 |
+| 10~13 | easy canonical 총수 · 효능 · 용법 · 주의 축 | 839 / 839 (각) |
+
+> gencode 연결은 러너 계약 VERBATIM — `product_identifiers.MFDS_CODE` → `product_candidates.raw_payload->>'mfdsCode'` → `raw_payload->'source'->>'일반명코드(성분명코드)'`. (MFDS_CODE 직접 조인 0건 함정 회피.)
+
+## 11. 샘플 검증 (`--emit-sample --per-route=2`, 9건 — 전건 클린)
+
+| route | fp | gencode | master | fp재현 | usageLabel | 경구동사 혼입 | 수치 누락 | 이상 |
+|---|---|---|---:|:---:|---|:---:|:---:|:---:|
+| oral | `bc1aa74c…` | 293300AGN | 21 | ✅ | 복용 안내 | false | 0 | 0 |
+| oral | `98df9466…` | 101403ASS | 13 | ✅ | 복용 안내 | false | 0 | 0 |
+| topical | `49370119…` | 345300CCM | 18 | ✅ | 사용 안내 | false | 0 | 0 |
+| topical | `062d2209…` | 197632COM | 13 | ✅ | 사용 안내 | false | 0 | 0 |
+| ophthalmic | `92c1d93e…` | 561003COS | 15 | ✅ | 사용 안내 | false | 0 | 0 |
+| ophthalmic | `2e408cd1…` | D49002COS | 11 | ✅ | 사용 안내 | false | 0 | 0 |
+| vaginal | `6c61420d…` | 338800CTB | 12 | ✅ | 사용 안내 | false | 0 | 0 |
+| vaginal | `7decfdc8…` | 137403CTB | 3 | ✅ | 사용 안내 | false | 0 | 0 |
+| oromucosal | `f5bb540f…` | A88102AMS | 10 | ✅ | 사용 안내 | false | 0 | 0 |
+
+**내용 충실성 정독(vaginal `338800CTB` 예시)** — 비경구 최고 위험군을 직접 대조:
+
+| 축 | 공식 원문 | 저작 KO | 판정 |
+|---|---|---|:---:|
+| 효능 | 이 약은 **세균성질증**에 사용합니다. | 동일 | ✅ 질환명 보존 |
+| 용법 | 성인은 **1회 1정, 1일 1회 질내 깊숙이 삽입**합니다. | 동일 | ✅ 수치·투여부위 보존 |
+| 주의 | 과민증 금기 · 질 전용(내복 금지) · 라텍스/고무 제품 약화 | 3항 전량 | ✅ 강도 보존 |
+| 라벨 | — | **사용 안내**(비경구) | ✅ DR-019 계약 |
+
+- `routeCheck.officialNumerics` = `["1일","1정","1회"]` · `missingInComposed` = `[]` → **수치 누락 0**.
+- summaryTable “선택 포인트”가 **일반명코드 기준 안내**(“제품명이 아니라 성분과 함량으로 확인하세요”)로 V2 identity 원칙과 정합. 신규 의료 사실 **0**.
+- 매장 약사 문의 안내 유지.
+
+## 12. 산출물
+
+| 파일 | 성격 |
+|---|---|
+| `src/scripts/data/otc-v2-dryrun-manifest.na.json` | dry-run 매니페스트(240 그룹 · 게이트 · writePlan) |
+| `src/scripts/data/otc-v2-samples.na.json` | 샘플 9건(route별 2) |
+| `src/scripts/otc-remaining-v2-verify.na.mjs` | 나 전용 독립검증기(read-only) |
+| 본 CHECK | 기록 |
+
+**공용 러너 `otc-v2-store-leaflet-runner.shared.ts` 미수정** (읽기·실행만). 수정 필요 사항 **없음** — 나 shard 전 route(oral·topical·ophthalmic·vaginal·oromucosal)에서 이상 0.
+
+## 13. 다음 단계 — apply 대기
+
+WO 순서: **가 dry-run PASS → 가 LIVE apply → 가 독립검증 완료 보고 → 나 apply → 다**.
+
+- 나는 **dry-run 까지 완료**. apply 는 **가 독립검증 완료 보고 수신 후** 착수한다.
+- apply 시 예상 write: **KO 3,356 + EN 1,678 = 5,034** (dry-run writePlan 과 일치해야 하며, 불일치 시 중지).
+- 현 러너는 **dry-run 전용**(apply 경로 없음) → apply 단계에서 다 세션의 apply 지원 러너 반영 필요.
+
+## 14. 준수 / 금지
+
+| 항목 | 결과 |
+|---|---|
+| 공용 러너 수정 | **0** (읽기·실행만, 수정 요청 사항 없음) |
+| `.env` 생성·수정·삭제 / 값 출력 | **0 / 0** (키 이름만 확인) |
+| 루트 `.env` | 미사용 |
+| V1 READY / V1 shard | 생산 사용 0 |
+| 자기 V2 shard 외 대상 | 미접촉 (`outOfShardMasters 0`) |
+| CLQ/CDS/CSI 651 · 빅콘에스600정 | **접근 0** (`siteAmbiguousInInput 0` · `blockedMasterInInput 0`) |
+| HOLD_* / SPLIT / EXCLUDE | 접근 0 |
+| 기존 완료분 | 교집합 **0** |
+| 라 census·SSOT | 미수정 |
+| `git add .` / reset / clean / stash | 미사용 — path-specific add |
+| **DB write** | **0** |
