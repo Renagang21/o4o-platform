@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Package,
   AlertTriangle,
@@ -35,6 +35,8 @@ const STATUS_CONFIG: Record<InventoryStatus, { label: string; color: string; bgC
 };
 
 export default function SupplierInventoryPage() {
+  const location = useLocation();
+  const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/dashboard' : '/account/supplier';
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -125,7 +127,7 @@ export default function SupplierInventoryPage() {
     <div>
       {/* Header */}
       <div style={styles.header}>
-        <Link to="/account/supplier" style={styles.backLink}>
+        <Link to={backPath} style={styles.backLink}>
           <ArrowLeft size={16} /> 대시보드
         </Link>
         <h1 style={styles.title}>재고 관리</h1>

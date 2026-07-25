@@ -432,11 +432,11 @@ const QUICK_LINKS = [
   { label: '상품 관리', path: '/supplier/products' },
   // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
   { label: '매장용 설명서', path: '/supplier/store-descriptions' },
-  { label: '주문 관리', path: '/supplier/orders' },
+  { label: '주문 현황', path: '/supplier/orders' },
+  { label: '재고 관리', path: '/supplier/inventory' },
   { label: '유통참여형 펀딩', path: '/supplier/market-trial' },
   { label: '라이브러리', path: '/supplier/library' },
-  { label: '판매자 신청', path: '/supplier/requests' },
-  { label: '정산 현황', path: '/supplier/orders' },
+  { label: '정산 내역', path: '/supplier/settlements' },
   { label: '사업자 정보', path: '/mypage/business-profile' },
 ];
 
@@ -446,6 +446,10 @@ function inferActionPath(action: string, navigate: (path: string) => void) {
     navigate('/supplier/products');
   } else if (lower.includes('주문') || lower.includes('order')) {
     navigate('/supplier/orders');
+  } else if (lower.includes('재고') || lower.includes('inventory')) {
+    navigate('/supplier/inventory');
+  } else if (lower.includes('정산') || lower.includes('settlement')) {
+    navigate('/supplier/settlements');
   } else if (lower.includes('라이브러리') || lower.includes('콘텐츠') || lower.includes('content')) {
     navigate('/supplier/library');
   } else if (lower.includes('판매자') || lower.includes('seller') || lower.includes('신청')) {

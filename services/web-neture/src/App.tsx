@@ -810,6 +810,9 @@ function App() {
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1 */}
               <Route path="/supplier/recruitments/:recruitmentId" element={<SupplierRecruitmentDetailPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
+              <Route path="/supplier/orders/:id" element={<SupplierOrderDetailPage />} />
+              <Route path="/supplier/inventory" element={<SupplierInventoryPage />} />
+              <Route path="/supplier/settlements" element={<SupplierSettlementsPage />} />
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />

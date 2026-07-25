@@ -118,12 +118,18 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: '주문·배송',
     icon: ShoppingCart,
-    items: [{ label: '주문 현황', path: '/supplier/orders' }],
+    items: [
+      { label: '주문 현황', path: '/supplier/orders' },
+      { label: '재고 관리', path: '/supplier/inventory' },
+    ],
   },
   {
-    label: 'Finance',
+    label: '정산',
     icon: CreditCard,
-    items: [{ label: 'Partner Commissions', path: '/supplier/partner-commissions' }],
+    items: [
+      { label: '정산 내역', path: '/supplier/settlements' },
+      { label: 'Partner Commissions', path: '/supplier/partner-commissions' },
+    ],
   },
   {
     label: '설정',

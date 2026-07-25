@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Store, Package, Truck, ExternalLink, User, ShieldCheck } from 'lucide-react';
 import { supplierApi, CARRIERS, getTrackingUrl, SHIPMENT_STATUS_LABELS } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem, Shipment } from '../../lib/api';
@@ -101,6 +101,8 @@ function SectionCard({ title, icon, children }: { title: string; icon: React.Rea
 
 export default function SupplierOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/orders' : '/account/supplier/orders';
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -219,7 +221,7 @@ export default function SupplierOrderDetailPage() {
       <div style={styles.notFound}>
         <h2 style={styles.notFoundTitle}>주문을 찾을 수 없습니다</h2>
         <p style={styles.notFoundText}>주문번호를 확인해 주세요.</p>
-        <Link to="/account/supplier/orders" style={styles.backLink}>
+        <Link to={backPath} style={styles.backLink}>
           <ArrowLeft size={16} />
           주문 목록으로 돌아가기
         </Link>
@@ -238,7 +240,7 @@ export default function SupplierOrderDetailPage() {
   return (
     <div>
       {/* Back Link */}
-      <Link to="/account/supplier/orders" style={styles.backNav}>
+      <Link to={backPath} style={styles.backNav}>
         <ArrowLeft size={16} />
         주문 목록
       </Link>

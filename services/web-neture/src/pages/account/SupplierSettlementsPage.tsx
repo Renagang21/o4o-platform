@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   supplierApi,
@@ -78,6 +78,8 @@ const FILTER_TABS: { label: string; value: SettlementStatus | undefined }[] = [
 // ============================================================================
 
 export default function SupplierSettlementsPage() {
+  const location = useLocation();
+  const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/dashboard' : '/account/supplier';
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [kpi, setKpi] = useState<SettlementKpi>({
     pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0,
@@ -137,7 +139,7 @@ export default function SupplierSettlementsPage() {
   return (
     <div>
       {/* Back Link */}
-      <Link to="/account/supplier" style={styles.backNav}>
+      <Link to={backPath} style={styles.backNav}>
         <ArrowLeft size={16} />
         대시보드
       </Link>
