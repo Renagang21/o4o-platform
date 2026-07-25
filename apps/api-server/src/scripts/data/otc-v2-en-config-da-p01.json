@@ -1,0 +1,268 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-SHARD-DA-V2-LIVE-APPLY-V1",
+ "shard": "da",
+ "part": "p01",
+ "note": "EN 저작 페이로드. 무절단 공식 원문(otc-v2-authoring-source-full.da.json) 기준. usageLabel 은 러너가 route 로 주입한다.",
+ "groups": [
+  {
+   "fp": "63a0c1a85e66164c",
+   "title": "Oral liquid (A65403ALQ)",
+   "efficacy": "This is an over-the-counter medicine used as an adjunctive treatment for asthenia (functional weakness).",
+   "usage": "Adults: take 1 sachet (1 g) at a time, 3 times a day, diluted in water. Children aged 6 years and over: take 1 sachet (1 g) at a time, 2 times a day, diluted in water. Do not use this medicine for more than 4 weeks.",
+   "caution": "Do not take this medicine if the user is an infant under 6 years of age, if you are pregnant or may be pregnant, or if you are breast-feeding.\n\nWhen this medicine is given to a child, give it under the guidance and supervision of a guardian. Keep to the stated dosage and schedule. If there is no improvement in symptoms after about 1 month of use, consult a doctor or a pharmacist.\n\nRarely, mild gastrointestinal disturbance and the like may occur at the start of treatment.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Adjunctive treatment of asthenia (functional weakness)",
+    "Choosing a product": "Products with the same generic-name code (A65403ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "895c92cb66e7c439",
+   "title": "Tablet (A04400ATB)",
+   "efficacy": "This is an over-the-counter medicine used to relieve the various symptoms of a cold (runny nose, blocked nose, sneezing, sore throat, chills, fever, joint pain, headache and muscle pain).",
+   "usage": "Adults: take 1 tablet at a time, 3 times a day, 30 minutes after meals.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or a pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\n\nVery rarely, serious skin reactions that may be fatal — acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis — have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it immediately.\n\nDo not exceed the maximum daily dose of acetaminophen (4,000 mg). It may cause liver damage. Do not take this medicine together with other products that contain acetaminophen.\n\nDo not take this medicine if you have hypersensitivity to this medicine or have had it in the past, if you have had an asthma attack after taking another antipyretic analgesic or cold medicine, if the user is a child under 2 years of age, if you are taking an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinsonian medicine and the like) or stopped taking one within the past 2 weeks, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if the user is an infant or a child under 15 years of age who has, or is suspected of having, chickenpox or influenza; if you have an allergic constitution or have had an allergic reaction to a medicine (for example fever, rash, joint pain, asthma or itching); if you have liver disease, kidney disease, heart disease, thyroid disease, diabetes, high blood pressure, gastric or duodenal ulcer, glaucoma (for example eye pain or blurred vision) or difficulty passing urine; if you are debilitated or have a high fever; if you have persistent or recurring stomach problems such as heartburn, stomach discomfort or stomach pain, or have ulcer or bleeding problems; if you are pregnant or may be pregnant, or are breast-feeding; or if you have a cough associated with smoking, asthma, chronic bronchitis or emphysema, a cough with excessive phlegm, a cough that lasts or returns for more than 1 week, a chronic cough, or a cough accompanied by fever, rash or persistent headache.\n\nKeep to the stated dosage and schedule. Drowsiness may occur after taking this medicine, so take care when driving or operating machinery. If there is no improvement after 5 to 6 doses, stop taking this medicine immediately and consult a doctor or a pharmacist.\n\nDo not take this medicine together with oral medicines that contain an antitussive (cough suppressant), an expectorant (phlegm medicine), another cold medicine, an antipyretic analgesic, a sedative or an antihistamine (oral medicines for rhinitis, motion-sickness medicines, allergy medicines). Consult a doctor or a pharmacist before taking it with barbiturates, tricyclic antidepressants, alcohol or flucloxacillin. Do not drink alcohol while taking this medicine.\n\nIf rash, redness (congested and reddened skin), itching, nausea or vomiting, loss of appetite, constipation, swelling, difficulty passing urine, thirst (persistent or severe), dizziness, high anion gap metabolic acidosis, or — rarely — signs of shock (hives, swelling and chest tightness immediately after taking the medicine, together with a pale face, cold hands and feet, cold sweat and difficulty breathing), Stevens-Johnson syndrome (mucocutaneous ocular syndrome), toxic epidermal necrolysis (Lyell's syndrome: severe symptoms such as high fever with rash, redness and burn-like blistering), asthma, general lassitude, jaundice (yellowing of the skin or the whites of the eyes) or interstitial pneumonia (cough, shortness of breath, difficulty breathing, fever) appear, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Relief of cold symptoms (runny nose, blocked nose, sneezing, sore throat, chills, fever, joint pain, headache, muscle pain)",
+    "Choosing a product": "Products with the same generic-name code (A04400ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7f8ef2945180c662",
+   "title": "Eye drops (D36900COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, as a supplement to tears (dry eyes), for discomfort while wearing hard or soft contact lenses, and for blurred vision (for example when there is a lot of eye discharge).",
+   "usage": "Instil 1 to 2 drops into the eye at a time, 4 to 5 times a day.",
+   "caution": "Before using this medicine, consult a doctor or a pharmacist if you have severe eye pain, if you have had an allergic reaction to an eye medicine (redness of the eye, itching, swelling, rash, reddening and the like), or if you have glaucoma.\n\nUse this medicine only in the eye. If blurred vision is not improved by this medicine, or if there is no improvement in symptoms after about 2 weeks of use, stop using it immediately and consult a doctor or a pharmacist.\n\nTake care not to let the tip of the container touch the eyelid or the eyelashes, because eye discharge, mould and the like may contaminate or cloud the solution. Do not use the solution if it has become cloudy. To prevent contamination, avoid sharing the product with others where possible. After opening, use the container once immediately, then discard the remaining solution and the container straight away. Keep to the stated dosage and schedule.\n\nIf redness of the eye, itching or swelling appears, stop using this medicine immediately and consult a doctor or a pharmacist. In people who wear hard contact lenses, if there is a lot of discharge such as eye mucus and, rarely, the lens becomes cloudy, stop using this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, supplementing tears (dry eyes), discomfort when wearing contact lenses, blurred vision",
+    "Choosing a product": "Products with the same generic-name code (D36900COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "39d0471a04b135fb",
+   "title": "Plaster (C37200CPL)",
+   "efficacy": "This is an over-the-counter medicine used for stiff shoulders, low back pain, muscle pain, muscle fatigue, bruises, sprains, joint pain and mild frostbite.",
+   "usage": "Attach the plaster to the affected area (the diseased site) several times a day.",
+   "caution": "Do not use this medicine around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer and the like, or on wounded skin.\n\nBefore using this medicine, consult a doctor or a pharmacist if you have had an allergic reaction to a medicine or a cosmetic, if you have an allergic constitution, if you have severe wet or eroded (macerated) skin, or if you are pregnant or may be pregnant.\n\nKeep to the stated dosage and schedule. Use this medicine externally only. When it is used for a child, use it under the guidance and supervision of a guardian. Clean the skin of the affected area before attaching the plaster. If your skin is particularly delicate, do not attach the plaster to the same place over and over again.\n\nIf rash, redness (congested and reddened skin), itching, dermatitis, pigmentation, peeling of the skin or pain appears, stop using this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Plaster",
+    "What it is for": "Stiff shoulders, low back pain, muscle pain and fatigue, bruises, sprains, joint pain, mild frostbite",
+    "Choosing a product": "Products with the same generic-name code (C37200CPL) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "5ecdaf5565a4c9c7",
+   "title": "Oral liquid (145506ALQ)",
+   "efficacy": "This is an over-the-counter medicine used to improve the symptoms of indigestion (abdominal bloating, delayed digestion, belching and nausea).",
+   "usage": "Adults: take 0.5 g at a time, 3 times a day, before meals.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, glaucoma, obstruction of the urinary tract, the prostate or the bile duct, gallstones, or acute or chronic liver disease.\n\nKeep to the stated dosage and schedule. If there is no improvement in symptoms after about 2 weeks of use, stop taking this medicine immediately and consult a doctor or a pharmacist.\n\nConsult a doctor or a pharmacist before taking this medicine together with reserpine derivatives or cholagogues.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Indigestion (abdominal bloating, delayed digestion, belching, nausea)",
+    "Choosing a product": "Products with the same generic-name code (145506ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "17660505d66de392",
+   "title": "Capsule (166501ACH)",
+   "efficacy": "This is an over-the-counter medicine used for drug poisoning.",
+   "usage": "Adults: take 1 to 2 capsules (50 to 100 mg) at a time, 1 to 3 times a day. The dose may be increased or decreased as appropriate according to age and symptoms.",
+   "caution": "Do not take this medicine if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have hypersensitivity to Yellow No. 203 or quinoline yellow WS aluminium lake, or have had an allergic reaction to them.\n\nIf rash, loss of appetite, nausea, vomiting or stomach pain — which occur rarely — appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Drug poisoning",
+    "Choosing a product": "Products with the same generic-name code (166501ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "48c367cad1704f83",
+   "title": "Capsule (A26900ACH)",
+   "efficacy": "This is an over-the-counter medicine used for difficulty passing urine caused by an enlarged prostate, for residual urine and the feeling of residual urine, and for frequent urination.",
+   "usage": "Adults: take 2 capsules at a time, 3 times a day.",
+   "caution": "Before taking this medicine, consult a doctor or a pharmacist if you have hypersensitivity to this medicine. Keep to the stated dosage and schedule.\n\nOccasionally, transient stomach pain, heartburn, a feeling of fullness in the stomach, loss of appetite, nausea or transient headache may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Difficulty passing urine, residual urine and frequent urination due to an enlarged prostate",
+    "Choosing a product": "Products with the same generic-name code (A26900ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "0ba794babcb41411",
+   "title": "Cream (339600CCM)",
+   "efficacy": "This is an over-the-counter medicine used to relieve pain and inflammation from bruises and sprains.",
+   "usage": "Apply an appropriate amount to the affected area, once to several times a day.",
+   "caution": "Do not use this medicine on wounds or mucous membranes, or on areas that are being treated with radiotherapy.\n\nBefore using this medicine, consult a doctor or a pharmacist if you are pregnant or may be pregnant, or if you are breast-feeding.\n\nKeep to the stated dosage and schedule. When it is used for a child, use it under the guidance and supervision of a guardian. Use this medicine externally only; it must not be used internally. Take care not to let it get into the eyes; if it does, rinse the eyes with water immediately. If there is no improvement in symptoms after 5 to 6 days of use, stop using this medicine and consult a doctor or a pharmacist.\n\nRarely, an allergic skin rash may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Cream",
+    "What it is for": "Pain and inflammation from bruises and sprains",
+    "Choosing a product": "Products with the same generic-name code (339600CCM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "8e55617a0ffa1fe9",
+   "title": "Capsule (166201ACH)",
+   "efficacy": "This is an over-the-counter medicine used for mild to moderate osteoarthritis (degenerative arthritis).",
+   "usage": "Adults: take 2 capsules (500 mg) at a time, 3 times a day, for 6 weeks.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, acute joint pain, or a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have asthma, if the user is under 18 years of age, if you are pregnant or may be pregnant or are breast-feeding, if you have liver impairment or kidney impairment, if you have hypersensitivity to Yellow No. 5, or if you have diabetes or are at risk of cardiovascular disease.\n\nBefore taking this medicine, consult a doctor or a pharmacist about taking it together with warfarin, tetracycline, penicillin or chloramphenicol.\n\nIf headache, tiredness, drowsiness, nausea or vomiting, abdominal pain, indigestion, constipation, diarrhoea, eczema, itching or rash appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Mild to moderate osteoarthritis (degenerative arthritis)",
+    "Choosing a product": "Products with the same generic-name code (166201ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "d6c16c9426065701",
+   "title": "Tablet (101401ATB)",
+   "efficacy": "This is an over-the-counter medicine used for fever and pain caused by a cold, and for headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "Children aged 12 years and under: take the recommended dose 1 time, when needed, every 4 to 6 hours. Take this medicine at the lowest effective dose for the shortest possible period, and do not take it more than 5 times in 1 day (75 mg/kg). If the body weight is known, dosing by body weight (10 to 15 mg/kg) is more appropriate. For the recommended dose for each age group, refer to the approved product information.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or a pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\n\nThis medicine contains aspartame, which is metabolised in the body to phenylalanine, so it must not be taken by people with phenylketonuria who need to restrict their phenylalanine intake.\n\nVery rarely, serious skin reactions that may be fatal — acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis — have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it immediately.\n\nDo not exceed the maximum daily dose of acetaminophen (4,000 mg). It may cause liver damage. Do not take this medicine together with other products that contain acetaminophen.\n\nDo not take this medicine if you have hypersensitivity to this medicine, peptic ulcer, a severe blood disorder, severe liver impairment, severe kidney impairment or severely reduced heart function; if you have aspirin-induced asthma (asthma attacks triggered by non-steroidal anti-inflammatory medicines) or have had it in the past; if you are taking barbiturates or tricyclic antidepressants; if you have drunk alcohol; or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have or have had liver impairment or kidney impairment, if you have had a peptic ulcer, if you have or have had a blood disorder, if you have a tendency to bleed, if you have abnormal heart function, if you have had a hypersensitivity reaction, if you have bronchial asthma, if the user is an older person or a child under 2 years of age, or if you are pregnant or breast-feeding.\n\nDo not take this medicine together with other products containing acetaminophen, with barbiturates, with tricyclic antidepressants or with alcohol. Consult a doctor or a pharmacist before taking it with warfarin, lithium, thiazide diuretics, other anti-inflammatory analgesics or flucloxacillin.\n\nIf shock (difficulty breathing, hives and the like), anaphylactoid symptoms (difficulty breathing, flushing of the whole body, angioedema, hives and the like), an asthma attack, low platelet count, granulocytopenia, haemolytic anaemia, methaemoglobinaemia, reduced platelet function (prolonged bleeding time), cyanosis, nausea, vomiting, loss of appetite, skin rash, Stevens-Johnson syndrome (mucocutaneous ocular syndrome), toxic epidermal necrolysis (Lyell's syndrome), high anion gap metabolic acidosis, raised AST, raised ALT, itchy rash or fixed drug eruption appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Fever and pain from a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain, rheumatic pain",
+    "Choosing a product": "Products with the same generic-name code (101401ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "64d14fa05ce50a91",
+   "title": "Enteric-coated capsule (111001ACE)",
+   "efficacy": "This is an over-the-counter medicine used to inhibit the formation of blood clots in myocardial infarction, cerebral infarction and unstable angina, to inhibit the formation of blood clots after coronary artery bypass grafting (CABG) or percutaneous transluminal coronary angioplasty (PTCA), and to reduce cardiovascular risk in high-risk patients (patients with combined risk factors such as a family history of ischaemic heart disease, high blood pressure, high blood cholesterol, obesity or diabetes).",
+   "usage": "Adults: take 1 capsule at a time, once a day. Because this is an enteric-coated capsule, it may be taken before a meal with plenty of water.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine or to other salicylate preparations, peptic ulcer, aspirin-induced asthma (asthma attacks triggered by non-steroidal anti-inflammatory analgesics and the like) or a history of it, haemophilia, severe liver impairment, severe kidney impairment, heart failure or a tendency to bleed; if you are also being given methotrexate at a dose of 15 milligrams or more per week (15 mg/week); or if you are in the third trimester of pregnancy.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have kidney impairment, abnormal cardiovascular circulation, liver impairment, abnormal heart function, a blood disorder or bronchial asthma; if you are about to have surgery; if the user is an infant aged 3 years or under; if you have had hypersensitivity to analgesics, anti-inflammatory medicines or antirheumatic medicines or have had another allergic disease; if the user is an older person; if you have glucose-6-phosphate dehydrogenase deficiency; or if you have hypersensitivity to Yellow No. 5.\n\nTake care not to damage the enteric coating of this medicine. If you are going to have surgery (including dental surgery), tell the doctor in charge that you are taking an aspirin preparation and ask for advice.\n\nDo not use this medicine together with other non-steroidal anti-inflammatory analgesics or salicylate preparations, or with high-dose methotrexate. Consult a doctor or a pharmacist before taking it with anticoagulants, thrombolytics or other platelet aggregation inhibitors, haemostatics, diabetes medicines (insulin preparations, tolbutamide and the like), uricosuric medicines (benzbromarone, probenecid), lithium preparations, selective serotonin reuptake inhibitors, digoxin, systemic corticosteroid preparations (except hydrocortisone used as replacement therapy for Addison's disease), angiotensin-converting enzyme inhibitors, valproic acid or alkalising agents (for example sodium bicarbonate, magnesium carbonate). Taking it together with alcohol may increase damage to the lining of the digestive tract and prolong bleeding time.\n\nIf signs of shock (for example difficulty breathing, generalised flushing, angioedema or hives), an asthma attack, redness of the skin, itching, a blocked nose, cardiac or respiratory disturbance, or — occasionally — rash, swelling, hives, rhinitis symptoms or conjunctivitis appear, or — rarely — toxic epidermal necrolysis (Lyell's syndrome), Stevens-Johnson syndrome (mucocutaneous ocular syndrome), exfoliative dermatitis, aplastic anaemia, anaemia, low white blood cell count, low platelet count, reduced platelet function (prolonged bleeding time), ringing in the ears, deafness, dizziness, headache, agitation or liver impairment appear, or — very rarely — temporary liver damage with raised liver transaminases, kidney impairment, acute kidney failure, hyperventilation, metabolic acidosis, excessive lowering of body temperature, collapse or cold limbs appear, stop taking this medicine immediately and consult a doctor or a pharmacist. Loss of appetite, heartburn, stomach pain, nausea and vomiting may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Enteric-coated capsule",
+    "What it is for": "Inhibition of blood clot formation in myocardial infarction, cerebral infarction and unstable angina, and after CABG or PTCA; reduction of cardiovascular risk in high-risk patients",
+    "Choosing a product": "Products with the same generic-name code (111001ACE) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "ba9767bc62a31307",
+   "title": "Oral liquid (A74901ALQ)",
+   "efficacy": "This is an over-the-counter medicine used as an adjunctive treatment for indigestion caused by impaired liver function.",
+   "usage": "Adults: take 15 to 30 mL a day (3 to 6 g as L-arginine hydrochloride). Children: take 10 to 15 mL a day (2 to 3 g as L-arginine hydrochloride). Take the dose with a cup of water before meals.",
+   "caution": "Do not take this medicine if you have severe liver failure or obstruction of the bile duct.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have diabetes, or if you have hypersensitivity to caramel or have had a reaction to it.\n\nKeep to the stated dosage and schedule. Use this medicine by mouth only; it must not be used for injection. If there is no improvement in symptoms after about 1 month of use, consult a doctor or a pharmacist.\n\nIf diarrhoea or abdominal pain appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Adjunctive treatment of indigestion caused by impaired liver function",
+    "Choosing a product": "Products with the same generic-name code (A74901ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "e0934f687699024b",
+   "title": "Orally dissolving film (387201ATD)",
+   "efficacy": "This is an over-the-counter medicine used for nausea, vomiting and dizziness caused by motion sickness.",
+   "usage": "Adolescents aged 12 years and over and adults: place 1 to 2 films on the tongue once a day and let them dissolve; once dissolved, do not hold the medicine in the mouth but swallow it straight away. To prevent motion sickness, use it 1 hour before boarding.",
+   "caution": "Do not use this medicine if you have hypersensitivity to diphenylmethane-type medicines (dimenhydrinate, buclizine hydrochloride and the like), if you are pregnant or may be pregnant or are breast-feeding, if the user is a child under 12 years of age, or if you have narrow-angle glaucoma or difficulty passing urine such as an enlarged prostate.\n\nBefore using this medicine, consult a doctor or a pharmacist if you have hypersensitivity to a medicine, if the user is an adolescent aged 12 years and over or an older person, or if you have asthma or a respiratory disease (asthma, emphysema, chronic bronchitis).\n\nKeep to the stated dosage and schedule. Drowsiness may occur after use, so take care when driving or operating machinery.\n\nDo not use this medicine together with alcohol, sedatives, tranquillisers, other anti-emetics, cold medicines, antipyretic analgesics, antihistamines, antitussives and expectorants, or monoamine oxidase inhibitors (MAO inhibitors). Avoid alcoholic drinks while using this medicine.\n\nIf dizziness, rash, redness (congested and reddened skin), itching, difficulty passing urine, or increased or persistent dry mouth appears, stop using this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Orally dissolving film",
+    "What it is for": "Nausea, vomiting and dizziness caused by motion sickness",
+    "Choosing a product": "Products with the same generic-name code (387201ATD) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "10b88e870f102194",
+   "title": "Powder (C25800APD)",
+   "efficacy": "This is an over-the-counter medicine used for drinking too much, heartburn, acid belching, overeating, stomach pain, stomach discomfort, indigestion, promoting digestion, loss of appetite, a weak stomach, excess stomach acid, a feeling of fullness in the stomach and abdomen, nausea (queasiness, hangover, nausea after drinking alcohol), vomiting, a burning feeling in the chest, belching and a feeling of heaviness in the stomach.",
+   "usage": "Adults and people aged 15 years and over: take 1 sachet at a time. Children aged 8 to 14 years: take 1/2 sachet at a time. Take the dose 3 times a day, after meals or between meals.",
+   "caution": "Do not take this medicine if you are receiving dialysis, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have kidney impairment.\n\nKeep to the stated dosage and schedule. When it is given to a child, give it under the guidance and supervision of a guardian. Do not take this medicine for a long period. If there is no improvement in symptoms after about 2 weeks of use, stop taking it immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Powder",
+    "What it is for": "Heartburn, indigestion, excess stomach acid, stomach pain and discomfort, overeating, nausea, vomiting, belching",
+    "Choosing a product": "Products with the same generic-name code (C25800APD) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "57e8823f844900b6",
+   "title": "Tablet (188602ATB)",
+   "efficacy": "This is an over-the-counter medicine used for peripheral neuropathy.",
+   "usage": "Adults: take 3 tablets (1,500 μg) a day, divided into 3 doses.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, or a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you are pregnant or breast-feeding.\n\nKeep to the stated dosage and schedule. If there is no improvement after about 1 month of use, or if symptoms get worse, consult a doctor or a pharmacist.\n\nConsult a doctor or a pharmacist if you are taking most antibiotics, including chloramphenicol and aminoglycosides, or methotrexate, pyrimethamine, colchicine, phenytoin, phenobarbital, primidone or para-aminosalicylic acid; if you are taking an H2 receptor antagonist over a long period; or if you have been drinking large amounts of alcohol for 2 weeks or more.\n\nIf loss of appetite, nausea, diarrhoea or rash appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Peripheral neuropathy",
+    "Choosing a product": "Products with the same generic-name code (188602ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "8a6b13fd92670d9a",
+   "title": "Syrup (533000ASY)",
+   "efficacy": "This is an over-the-counter medicine used for the cough and phlegm of acute and chronic respiratory disease (bronchitis, pharyngolaryngitis, nasopharyngitis and the like), and for influenza in children and cough during a cold.",
+   "usage": "Children aged 3 to 12 years: take 5 mL at a time. Adults and people aged 12 years and over: take 10 mL at a time. Usually take the dose 3 times a day. The dose may be increased or decreased as appropriate according to age and symptoms.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, gastric or duodenal ulcer, glaucoma, or a lower urinary tract obstructive disease such as an enlarged prostate, or if the user is a premature baby or a newborn.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have raised pressure inside the eye, an overactive thyroid, stenosing peptic ulcer or pyloroduodenal obstruction, a circulatory disease or a cardiovascular disease such as high blood pressure, epilepsy, bronchitis, bronchiectasis or asthma, or liver disease; if the user is an older person; or if you are pregnant or may be pregnant or are breast-feeding.\n\nAvoid adding other medicines to the solution of this medicine. Drowsiness may occur after taking this medicine, so take care when driving or operating machinery.\n\nConsult a doctor or a pharmacist before using it together with oral antibiotics (amoxicillin, cefuroxime, doxycycline, erythromycin, thiamphenicol), alcohol, central nervous system depressants or chlorpheniramine.\n\nIf signs of shock (cyanosis, difficulty breathing, chest discomfort, a fall in blood pressure and the like), aplastic anaemia or agranulocytosis — which occur rarely — appear, stop taking this medicine immediately and consult a doctor or a pharmacist.\n\nRarely, nausea, vomiting, inflammation of the mouth, heartburn, diarrhoea, hives, itching, rash, headache, ringing in the ears, bronchial spasm, fast heartbeat, high blood pressure, confusion, rash, photosensitivity, exfoliative dermatitis, hives, spasm, muscle weakness, incoordination, sedation, drowsiness, nervousness, restlessness, double vision, insomnia, dizziness, ringing in the ears, vestibular disturbance, euphoria, emotional instability, hysteria, tremor, neuritis, impaired coordination, abnormal sensation, neglect, reduced concentration, lassitude, thirst, heartburn, loss of appetite, indigestion, nausea, vomiting, abdominal pain, constipation, frequent urination, difficulty passing urine, urinary retention, dryness of the nose or airways, thickening of bronchial secretions, wheezing, blocked nose, haemolytic anaemia, low platelet count, chills, abnormal sweating, chest pain, tiredness and menstrual disturbance may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Syrup",
+    "What it is for": "Cough and phlegm in acute and chronic respiratory disease, influenza in children, cough during a cold",
+    "Choosing a product": "Products with the same generic-name code (533000ASY) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "be43e2e3b0ba3151",
+   "title": "Tablet (162603ATB)",
+   "efficacy": "This is an over-the-counter medicine used for folic acid supplementation for the primary prevention of neural tube defects in the foetus in women who are planning a pregnancy, and for folic acid supplementation when the intake of folic acid from food is insufficient.",
+   "usage": "Take 1 tablet once a day. Women who are planning a pregnancy should take it from 1 month before pregnancy until 3 months after becoming pregnant.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, pernicious anaemia or megaloblastic anaemia due to vitamin B12 deficiency, or a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have had a neural tube defect in a previous pregnancy. Keep to the stated dosage and schedule.\n\nConsult a doctor or a pharmacist before taking this medicine together with p-aminosalicylic acid, oral contraceptives, dihydrofolate reductase inhibitors (methotrexate, trimethoprim and the like), hydantoins such as phenytoin, antiepileptic medicines containing carbamazepine, primidone or phenobarbital, sulfasalazine, or cholestyramine.\n\nIf redness of the skin, skin rash, itching, general lassitude, difficulty breathing, loss of appetite, nausea or vomiting, swelling, weight loss, gastrointestinal disturbance, changes in sleep, poor concentration, hyperactivity, irritability, agitation, depression, confusion, impaired judgement or another central nervous system disturbance appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Folic acid supplementation to help prevent neural tube defects, and when folic acid intake from food is insufficient",
+    "Choosing a product": "Products with the same generic-name code (162603ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "06825a30b14d6a36",
+   "title": "Tablet (105902ATB)",
+   "efficacy": "This is an over-the-counter medicine used for the antacid action and the improvement of symptoms in gastric and duodenal ulcer, gastritis and excess stomach acid.",
+   "usage": "Adults: take 1 to 2 tablets (300 to 600 mg) at a time, 3 times a day, between meals. The dose is increased or decreased as appropriate according to age and symptoms.",
+   "caution": "Do not take this medicine if you are receiving dialysis.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you have phosphate deficiency or kidney impairment, or have had kidney disease. Do not take this medicine continuously over a long period.\n\nDo not take this medicine together with tetracycline antibiotics. Because of the adsorbing action of this medicine, or the rise in pH in the digestive tract and body fluids, it may affect the absorption and excretion of medicines taken with it.\n\nOccasionally constipation and, rarely, nausea and vomiting may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Gastric and duodenal ulcer, gastritis, excess stomach acid — antacid action and symptom relief",
+    "Choosing a product": "Products with the same generic-name code (105902ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "434307686d12e676",
+   "title": "Oral liquid (C05800ALQ)",
+   "efficacy": "This is an over-the-counter medicine used for loss of appetite, a feeling of fullness in the stomach, indigestion, overeating, an upset stomach, nausea and vomiting.",
+   "usage": "Adults and people aged 15 years and over: take 1 bottle at a time. Ages 11 years to under 15 years: 2/3 bottle at a time. Ages 8 years to under 11 years: 1/2 bottle at a time. Ages 5 years to under 8 years: 1/3 bottle at a time. Ages 3 years to under 5 years: 1/4 bottle at a time. Ages 1 year to under 3 years: 1/5 bottle at a time. Take the dose 3 times a day after meals. Leave at least 4 hours between doses.",
+   "caution": "Do not give this medicine to a baby under 3 months of age.\n\nBefore taking this medicine, consult a doctor or a pharmacist if you are pregnant or may be pregnant, if the user is a baby under 1 year of age, or if you are on a sodium-restricted diet.\n\nKeep to the stated dosage and schedule. When it is given to a child, give it under the guidance and supervision of a guardian. If there is no improvement in symptoms after about 1 month of use, stop taking it immediately and consult a doctor or a pharmacist.\n\nIf weakness, cramp of the arms or legs, or paralysis appears, stop taking this medicine immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Loss of appetite, feeling of fullness in the stomach, indigestion, overeating, upset stomach, nausea, vomiting",
+    "Choosing a product": "Products with the same generic-name code (C05800ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7e3e360cb39eb3f9",
+   "title": "Enteric-coated capsule (473502ACE)",
+   "efficacy": "This is an over-the-counter medicine used to regulate the bowel and for constipation, loose stools, a feeling of fullness in the abdomen and abnormal fermentation in the intestine.",
+   "usage": "Adults and children aged 12 years and over: take 1 to 2 capsules (125 to 250 mg) at a time, 1 to 3 times a day.",
+   "caution": "Do not take this medicine if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nKeep to the stated dosage and schedule. When it is given to a child, give it under the guidance and supervision of a guardian. If there is no improvement in symptoms after about 1 month of use, stop taking it immediately and consult a doctor or a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Enteric-coated capsule",
+    "What it is for": "Regulating the bowel, constipation, loose stools, abdominal fullness, abnormal fermentation in the intestine",
+    "Choosing a product": "Products with the same generic-name code (473502ACE) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  }
+ ]
+}
