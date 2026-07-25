@@ -124,6 +124,16 @@ export default function SupplierSpaceLayout() {
 
   const isItemActive = (path: string, exact?: boolean) => {
     if (exact) return pathname === path;
+    // WO-O4O-NETURE-SUPPLIER-SIDEBAR-PRODUCTION-SMOKE-CLOSEOUT-V1:
+    //   '상품 목록'(/supplier/products) 은 형제 메뉴(register/bulk/import-assistant) 의 prefix 라
+    //   generic fallback 으로는 하위 경로에서 함께 활성되어 중복 활성이 발생한다.
+    //   자체 메뉴가 없는 하위 경로만 각각 가장 가까운 메뉴에 귀속시킨다(그룹 자동 열림 유지).
+    if (path === '/supplier/products') {
+      return pathname === '/supplier/products' || pathname === '/supplier/products/library';
+    }
+    if (path === '/supplier/products/register') {
+      return pathname === '/supplier/products/register' || pathname === '/supplier/products/new';
+    }
     if (path === '/supplier/orders') {
       return pathname === '/supplier/orders' || pathname.startsWith('/supplier/orders/');
     }
