@@ -1330,5 +1330,48 @@
   },
   "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
   "writeOwnerHandoff": "나 → 다 (다: shard C 시작 가능. shard B LIVE write·commit·push 완료.)"
+ },
+ "shardCStatus": {
+  "status": "DONE",
+  "completedBy": "agent-DA",
+  "machine": "sohae",
+  "date": "2026-07-25",
+  "fp": 68,
+  "master": 204,
+  "koWriteT": 816,
+  "enWriteT": 408,
+  "independentVerify": {
+   "ko_auth": 204,
+   "en_canon": 204,
+   "en_needs_review": 0,
+   "easy_deprecated": 204,
+   "easy_still_canonical": 0,
+   "ko_dup": 0,
+   "en_dup": 0,
+   "audit": 204,
+   "targetOutsideWrite": 0,
+   "en_korean_contam": 0
+  },
+  "hold_source": {
+   "fp": 1,
+   "master": 3,
+   "name": "빅콘에스600정",
+   "fpid": "44a15789a2cc1596",
+   "reason": "원문 효능/용법/주의 섹션 부재",
+   "untouched": true
+  },
+  "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
+  "writeOwnerHandoff": "다 최종 해제 — 경구 복합 shard C LIVE write·commit·push 완료. shard A/B/C 전체 완결.",
+  "fullCorpusCensus": {
+   "total_master": 624,
+   "ko_canonical": 624,
+   "en_canonical": 624,
+   "easy_deprecated": 624,
+   "easy_still_canonical": 0,
+   "en_needs_review": 0,
+   "canonicalDup": 0,
+   "audit": 624,
+   "en_korean_contam": 0
+  }
  }
 }

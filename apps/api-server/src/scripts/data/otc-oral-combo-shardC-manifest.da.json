@@ -512,5 +512,31 @@
    "masters": 3,
    "sourceRef": "e0d01d99-4754-383f-ef8d-efd6c741e636"
   }
- ]
+ ],
+ "status": "DONE",
+ "writeActual": {
+  "ko": 816,
+  "en": 408,
+  "total": 1224
+ },
+ "independentVerify": {
+  "ko_canonical": 204,
+  "en_canonical": 204,
+  "easy_deprecated": 204,
+  "easy_still_canonical": 0,
+  "audit": 204,
+  "canonicalDup": 0,
+  "en_needs_review": 0,
+  "targetOutsideWrite": 0,
+  "en_korean_contam": 0
+ },
+ "noop": "ALL ALREADY_COMPLETE (dbWrite 0)",
+ "fullCorpusCensus": {
+  "A": 210,
+  "B": 210,
+  "C": 204,
+  "produced": 624,
+  "hold_source": 3,
+  "ssot_total": 627
+ }
 }
