@@ -20,6 +20,11 @@ interface UnifiedMenuItem {
   exact?: boolean;
   /** true = admin 역할에게만 표시 */
   adminOnly?: boolean;
+  /**
+   * WO-O4O-KPA-OPERATOR-STORES-MENU-VISUAL-SECTION-V1:
+   * 지정 시 이 항목 위에 그룹 내부 구획 라벨(비클릭)을 렌더. filterMenu 가 rest 로 보존 → 렌더러 소비.
+   */
+  sectionLabel?: string;
 }
 
 /**
@@ -62,9 +67,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   //   운영자는 QR "템플릿" 작성. 실제 QR slug 는 매장 가져가기 시 발급 (Phase 3-B 의
   //   store_qr_codes INSERT). canonical 항목명 'QR-code' 유지.
   stores: [
-    { label: '매장 관리', path: '/operator/stores' },
+    // WO-O4O-KPA-OPERATOR-STORES-MENU-VISUAL-SECTION-V1:
+    //   같은 stores 그룹 안에서 '매장 운영'(관리·채널) 과 '매장 HUB 자료'(게시 콘텐츠) 를 비클릭
+    //   구획 라벨로 시각 구분. 그룹·route·권한·순서 불변, 각 구획 첫 항목에만 sectionLabel 지정.
+    { label: '매장 관리', path: '/operator/stores', sectionLabel: '매장 운영' },
     { label: '채널 관리', path: '/operator/store-channels' },
-    { label: '매장 HUB 블로그', path: '/operator/blog' },
+    { label: '매장 HUB 블로그', path: '/operator/blog', sectionLabel: '매장 HUB 자료' },
     { label: '매장 HUB POP', path: '/operator/pop' },
     { label: '매장 HUB QR-code', path: '/operator/qr' },
     // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 매장 HUB 동영상 (운영자 게시 → 매장 가져가기 → QR 연결)

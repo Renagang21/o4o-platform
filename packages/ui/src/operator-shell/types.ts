@@ -17,6 +17,13 @@ export interface OperatorMenuItem {
   path: string;
   /** true이면 정확 일치에서만 활성 (Dashboard 등) */
   exact?: boolean;
+  /**
+   * WO-O4O-KPA-OPERATOR-STORES-MENU-VISUAL-SECTION-V1:
+   * 지정 시 이 항목 위에 그룹 내부 구획 라벨(비클릭)을 렌더한다. 그룹을 나누지 않고
+   * 동일 그룹 안에서 성격이 다른 업무를 시각적으로 구분하기 위한 additive 힌트.
+   * 미지정(대부분)이면 기존 렌더 그대로 — 4서비스 무영향.
+   */
+  sectionLabel?: string;
 }
 
 /**

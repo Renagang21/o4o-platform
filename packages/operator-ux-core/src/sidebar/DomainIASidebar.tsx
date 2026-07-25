@@ -85,6 +85,17 @@ export interface DomainIASidebarProps {
   domainIAConfig?: OperatorDomainIAConfig;
 }
 
+// ─── Group-internal section label (WO-O4O-KPA-OPERATOR-STORES-MENU-VISUAL-SECTION-V1) ──
+//   그룹을 나누지 않고 동일 그룹 안에서 업무 구획을 시각 구분하는 비클릭 라벨.
+//   하위 항목(pl-14)과 정렬. 한국어라 uppercase 미적용(도메인 헤딩과 동일 방침).
+function SectionLabel({ label }: { label: string }) {
+  return (
+    <div className="pl-14 pr-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide text-gray-400 select-none">
+      {label}
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────
 
 export function DomainIASidebar({
@@ -248,18 +259,20 @@ export function DomainIASidebar({
                 {group.items.map((item) => {
                   const itemActive = isItemActive(item.path, item.exact);
                   return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={onNavigate}
-                      className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
-                        itemActive
-                          ? 'text-blue-600 bg-blue-50 font-medium'
-                          : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
+                    <div key={item.path}>
+                      {item.sectionLabel && <SectionLabel label={item.sectionLabel} />}
+                      <Link
+                        to={item.path}
+                        onClick={onNavigate}
+                        className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
+                          itemActive
+                            ? 'text-blue-600 bg-blue-50 font-medium'
+                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -346,18 +359,20 @@ export function DomainIASidebar({
                     {group.items.map((item) => {
                       const itemActive = isItemActive(item.path, item.exact);
                       return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          onClick={onNavigate}
-                          className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
-                            itemActive
-                              ? 'text-blue-600 bg-blue-50 font-medium'
-                              : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                          }`}
-                        >
-                          {item.label}
-                        </Link>
+                        <div key={item.path}>
+                          {item.sectionLabel && <SectionLabel label={item.sectionLabel} />}
+                          <Link
+                            to={item.path}
+                            onClick={onNavigate}
+                            className={`block pl-14 pr-4 py-2 text-[13px] transition-colors ${
+                              itemActive
+                                ? 'text-blue-600 bg-blue-50 font-medium'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        </div>
                       );
                     })}
                   </div>
