@@ -12,7 +12,20 @@
   "master": 3,
   "name": "빅콘에스600정",
   "fpid": "44a15789a2cc1596",
-  "reason": "ko-compose SKIP: 원문 효능/용법/주의 섹션 부재"
+  "reason": "HOLD_SOURCE — 공식 효능·주의·이상반응은 존재하나 공식 용법·용량이 부재함. 용법 1축 미확보로 authored 설명서 저작 불가하며 용법 추정은 금지한다.",
+  "reasonCorrectedBy": "WO-O4O-OTC-BIGCON-HOLD-REASON-MANIFEST-SYNC-DA-V1 (2026-07-25) — otc-oral-combo-shardC-hold-source.da.json 과 동기화. HOLD 상태·fp·master 불변, DB write 0.",
+  "sourceAxes": {
+   "efficacy": "PRESENT",
+   "caution": "PRESENT",
+   "adverseReaction": "PRESENT",
+   "usageDosage": "ABSENT"
+  },
+  "easyDrugCandidate": {
+   "itemSeq": "201404702",
+   "candidateId": "6be75b79",
+   "matchStatus": "unmatched"
+  },
+  "detailRef": "otc-oral-combo-shardC-hold-source.da.json"
  },
  "writePlan": {
   "ko_4T": 816,
