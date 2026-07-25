@@ -362,8 +362,8 @@ function buildConfig(
 
   const contentDraftCount = summary.content.pendingDraft;
   const forumPendingCount = summary.forum.pendingRequests;
-  const signagePendingCount =
-    summary.signage.pendingMedia + summary.signage.pendingPlaylists;
+  const signageMediaPendingCount = summary.signage.pendingMedia;
+  const signagePlaylistPendingCount = summary.signage.pendingPlaylists;
 
   // Block 1: KPI Grid — Action Required Only
   const kpis: KpiItem[] = [
@@ -389,11 +389,18 @@ function buildConfig(
       link: '/operator/content',
     },
     {
-      key: 'signage',
-      label: '사이니지 검수 대기',
-      value: signagePendingCount,
-      status: signagePendingCount > 0 ? 'warning' : 'neutral',
+      key: 'signage-media',
+      label: '사이니지 미디어 대기',
+      value: signageMediaPendingCount,
+      status: signageMediaPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/signage/hq-media',
+    },
+    {
+      key: 'signage-playlists',
+      label: '사이니지 플레이리스트 대기',
+      value: signagePlaylistPendingCount,
+      status: signagePlaylistPendingCount > 0 ? 'warning' : 'neutral',
+      link: '/operator/signage/hq-playlists',
     },
     {
       // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
@@ -508,12 +515,20 @@ function buildConfig(
       link: '/operator/content',
     });
   }
-  if (signagePendingCount > 0) {
+  if (signageMediaPendingCount > 0) {
     aiSummary.push({
-      id: 'ai-signage-pending',
-      message: `사이니지 ${signagePendingCount}건 검수 대기 — 확인이 필요합니다.`,
-      level: signagePendingCount > 3 ? 'warning' : 'info',
+      id: 'ai-signage-media-pending',
+      message: `사이니지 미디어 ${signageMediaPendingCount}건 대기 — 확인이 필요합니다.`,
+      level: signageMediaPendingCount > 3 ? 'warning' : 'info',
       link: '/operator/signage/hq-media',
+    });
+  }
+  if (signagePlaylistPendingCount > 0) {
+    aiSummary.push({
+      id: 'ai-signage-playlists-pending',
+      message: `사이니지 플레이리스트 ${signagePlaylistPendingCount}건 대기 — 확인이 필요합니다.`,
+      level: signagePlaylistPendingCount > 3 ? 'warning' : 'info',
+      link: '/operator/signage/hq-playlists',
     });
   }
   // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
@@ -547,12 +562,20 @@ function buildConfig(
       link: '/operator/content',
     });
   }
-  if (signagePendingCount > 0) {
+  if (signageMediaPendingCount > 0) {
     actionQueue.push({
-      id: 'aq-signage',
-      label: '사이니지 검수 대기',
-      count: signagePendingCount,
+      id: 'aq-signage-media',
+      label: '사이니지 미디어 확인',
+      count: signageMediaPendingCount,
       link: '/operator/signage/hq-media',
+    });
+  }
+  if (signagePlaylistPendingCount > 0) {
+    actionQueue.push({
+      id: 'aq-signage-playlists',
+      label: '사이니지 플레이리스트 확인',
+      count: signagePlaylistPendingCount,
+      link: '/operator/signage/hq-playlists',
     });
   }
   if (eventOfferPendingCount > 0) {
@@ -626,17 +649,14 @@ function buildConfig(
   //   ActionIcon 의 Phase A fallback 은 유지되므로 GlycoPharm/K-Cos/Neture 의
   //   기존 emoji 또는 미매핑 lucide-name 은 회귀 0.
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: 'users' },
-    { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: 'shopping-cart' },
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
-    { id: 'qa-news', label: '공지사항', link: '/operator/content', icon: 'megaphone' },
-    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-requests', icon: 'message-square' },
+    { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: 'home' },
+    { id: 'qa-content-hub', label: '콘텐츠 허브 관리', link: '/operator/docs', icon: 'package' },
+    { id: 'qa-lms', label: '강의 관리', link: '/operator/lms', icon: 'clipboard-list' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor-play' },
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
-    { id: 'qa-event-offers', label: '이벤트 오퍼', link: '/operator/event-offers', icon: 'badge-percent' },
     ...(isAdmin
       ? [
-          { id: 'qa-community', label: 'Home 편집', link: '/operator/community', icon: 'home' },
           { id: 'qa-roles', label: '역할 관리', link: '/operator/roles', icon: 'key' },
           { id: 'qa-audit', label: '감사 로그', link: '/operator/audit-logs', icon: 'scroll-text' },
         ]
