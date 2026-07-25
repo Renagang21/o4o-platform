@@ -1,11 +1,14 @@
 /**
- * SupplierPartnerCommissionsPage - 공급자 파트너 커미션 정책 관리
+ * SupplierPartnerCommissionsPage - 공급자 파트너 수수료 정책 관리
  *
  * Work Order: WO-O4O-SUPPLIER-COMMISSION-MANAGER-V1
+ * WO-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-UI-LOCALIZATION-V1: 화면 문구 한국어화(frontend-only).
+ *   데이터 계약 무변경 — 저장값은 제품별 **단위당 고정 수수료(원)** 이며 비율(%)·파트너별 분기가 없다.
+ *   따라서 화면에도 "수수료율"·"파트너" 컬럼을 만들지 않는다.
  *
  * 기능:
- * - 커미션 정책 목록 (제품별 fixed commission per unit)
- * - 커미션 정책 생성 / 수정 / 삭제
+ * - 수수료 정책 목록 (제품별 단위당 고정 수수료)
+ * - 수수료 정책 생성 / 수정 / 삭제
  * - 기간 겹침 검증 (서버 사이드)
  * - 이미 사용된 정책 삭제 금지
  */
@@ -29,11 +32,20 @@ function getStatus(c: SupplierPartnerCommission): CommissionStatus {
   return 'active';
 }
 
+// 상태는 저장된 ENUM 이 아니라 start_date/end_date 로부터 파생된다(getStatus).
+// 따라서 활성/비활성이 아니라 적용 기간 기준 어휘를 쓴다.
 const STATUS_CONFIG: Record<CommissionStatus, { label: string; color: string; bg: string }> = {
-  active: { label: 'Active', color: '#16a34a', bg: '#dcfce7' },
-  scheduled: { label: 'Scheduled', color: '#2563eb', bg: '#dbeafe' },
-  expired: { label: 'Expired', color: '#64748b', bg: '#f1f5f9' },
+  active: { label: '적용 중', color: '#16a34a', bg: '#dcfce7' },
+  scheduled: { label: '적용 예정', color: '#2563eb', bg: '#dbeafe' },
+  expired: { label: '종료됨', color: '#64748b', bg: '#f1f5f9' },
 };
+
+/** 서버 오류 코드 → 사용자 문구. 미지정 코드는 원문을 노출하지 않고 일반 문구로 대체한다. */
+function commissionErrorMessage(code: string | undefined, fallback: string): string {
+  if (code === 'DATE_OVERLAP') return '적용 기간이 기존 정책과 겹칩니다.';
+  if (code === 'IN_USE') return '이미 사용된 정책은 삭제할 수 없습니다.';
+  return fallback;
+}
 
 export default function SupplierPartnerCommissionsPage() {
   const [commissions, setCommissions] = useState<SupplierPartnerCommission[]>([]);
@@ -93,9 +105,10 @@ export default function SupplierPartnerCommissionsPage() {
   };
 
   const handleSubmit = async () => {
-    if (!editingId && !formProductId) { setError('제품을 선택하세요'); return; }
-    if (!formAmount || Number(formAmount) <= 0) { setError('커미션 금액을 입력하세요'); return; }
-    if (!formStartDate) { setError('시작일을 입력하세요'); return; }
+    if (!editingId && !formProductId) { setError('제품을 선택해 주세요.'); return; }
+    if (!formAmount) { setError('단위당 수수료를 입력해 주세요.'); return; }
+    if (Number(formAmount) <= 0) { setError('단위당 수수료는 0보다 커야 합니다.'); return; }
+    if (!formStartDate) { setError('적용 시작일을 입력해 주세요.'); return; }
 
     setSubmitting(true);
     setError('');
@@ -107,7 +120,7 @@ export default function SupplierPartnerCommissionsPage() {
           end_date: formEndDate || null,
         });
         if (!result.success) {
-          setError(result.error === 'DATE_OVERLAP' ? '기간이 기존 정책과 겹칩니다' : result.error || 'Failed');
+          setError(commissionErrorMessage(result.error, '수수료 정책 저장에 실패했습니다.'));
           return;
         }
       } else {
@@ -118,7 +131,7 @@ export default function SupplierPartnerCommissionsPage() {
           end_date: formEndDate || undefined,
         });
         if (!result.success) {
-          setError(result.error === 'DATE_OVERLAP' ? '기간이 기존 정책과 겹칩니다' : result.error || 'Failed');
+          setError(commissionErrorMessage(result.error, '수수료 정책 저장에 실패했습니다.'));
           return;
         }
       }
@@ -130,10 +143,11 @@ export default function SupplierPartnerCommissionsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('이 커미션 정책을 삭제하시겠습니까?')) return;
+    // 서버 동작이 hard delete 이므로 '삭제' 어휘를 유지한다 (비활성/보관 아님).
+    if (!confirm('이 수수료 정책을 삭제하시겠습니까?\n삭제 후에는 되돌릴 수 없습니다.')) return;
     const result = await supplierCommissionApi.remove(id);
     if (!result.success) {
-      toast.error(result.error === 'IN_USE' ? '이미 사용된 정책은 삭제할 수 없습니다' : result.error || 'Failed');
+      toast.error(commissionErrorMessage(result.error, '수수료 정책 삭제에 실패했습니다.'));
       return;
     }
     fetchData();
@@ -145,10 +159,10 @@ export default function SupplierPartnerCommissionsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1E293B', margin: 0 }}>
-            Partner Commissions
+            파트너 수수료
           </h1>
           <p style={{ fontSize: '14px', color: '#64748B', marginTop: '4px' }}>
-            파트너에게 제공할 커미션 정책을 관리합니다
+            파트너에게 지급할 제품별 수수료 정책을 설정하고 관리합니다.
           </p>
         </div>
         <button
@@ -160,7 +174,7 @@ export default function SupplierPartnerCommissionsPage() {
             fontWeight: 600, cursor: 'pointer',
           }}
         >
-          <Plus size={16} /> Add Commission
+          <Plus size={16} /> 수수료 정책 추가
         </button>
       </div>
 
@@ -172,7 +186,7 @@ export default function SupplierPartnerCommissionsPage() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#1E293B', margin: 0 }}>
-              {editingId ? 'Edit Commission' : 'Add Commission'}
+              {editingId ? '수수료 정책 수정' : '수수료 정책 추가'}
             </h3>
             <button onClick={resetForm} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
               <X size={20} />
@@ -208,7 +222,7 @@ export default function SupplierPartnerCommissionsPage() {
             {/* Commission Per Unit */}
             <div>
               <label style={{ fontSize: '13px', fontWeight: 500, color: '#475569', marginBottom: '6px', display: 'block' }}>
-                Commission / unit (원)
+                단위당 수수료 (원)
               </label>
               <input
                 type="number"
@@ -227,7 +241,7 @@ export default function SupplierPartnerCommissionsPage() {
             {/* Start Date */}
             <div>
               <label style={{ fontSize: '13px', fontWeight: 500, color: '#475569', marginBottom: '6px', display: 'block' }}>
-                시작일
+                적용 시작일
               </label>
               <input
                 type="date"
@@ -244,7 +258,7 @@ export default function SupplierPartnerCommissionsPage() {
             {/* End Date */}
             <div>
               <label style={{ fontSize: '13px', fontWeight: 500, color: '#475569', marginBottom: '6px', display: 'block' }}>
-                종료일 (선택)
+                적용 종료일 (선택)
               </label>
               <input
                 type="date"
@@ -278,7 +292,7 @@ export default function SupplierPartnerCommissionsPage() {
               opacity: submitting ? 0.7 : 1,
             }}>
               <Check size={14} />
-              {submitting ? '저장 중...' : editingId ? '수정' : '생성'}
+              {submitting ? '저장 중...' : '저장'}
             </button>
           </div>
         </div>
@@ -287,7 +301,7 @@ export default function SupplierPartnerCommissionsPage() {
       {/* Commission List */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
-          Loading...
+          불러오는 중...
         </div>
       ) : commissions.length === 0 ? (
         <div style={{
@@ -295,9 +309,9 @@ export default function SupplierPartnerCommissionsPage() {
           backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #e2e8f0',
         }}>
           <DollarSign size={48} style={{ color: '#cbd5e1', margin: '0 auto 16px' }} />
-          <p style={{ fontSize: '16px', fontWeight: 500, color: '#64748b' }}>등록된 커미션 정책이 없습니다</p>
+          <p style={{ fontSize: '16px', fontWeight: 500, color: '#64748b' }}>등록된 파트너 수수료 정책이 없습니다.</p>
           <p style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
-            Add Commission 버튼을 눌러 첫 커미션 정책을 만들어보세요
+            수수료 정책 추가 버튼을 눌러 첫 정책을 등록하세요.
           </p>
         </div>
       ) : (
@@ -309,12 +323,12 @@ export default function SupplierPartnerCommissionsPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={thStyle}>Product</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>Commission / unit</th>
-                  <th style={thStyle}>Start date</th>
-                  <th style={thStyle}>End date</th>
-                  <th style={thStyle}>Status</th>
-                  <th style={{ ...thStyle, textAlign: 'center' }}>Edit</th>
+                  <th style={thStyle}>제품</th>
+                  <th style={{ ...thStyle, textAlign: 'right' }}>단위당 수수료</th>
+                  <th style={thStyle}>적용 시작일</th>
+                  <th style={thStyle}>적용 종료일</th>
+                  <th style={thStyle}>상태</th>
+                  <th style={{ ...thStyle, textAlign: 'center' }}>작업</th>
                 </tr>
               </thead>
               <tbody>
@@ -400,11 +414,11 @@ export default function SupplierPartnerCommissionsPage() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px' }}>
                     <div>
-                      <span style={{ color: '#94a3b8' }}>Commission</span>
+                      <span style={{ color: '#94a3b8' }}>단위당 수수료</span>
                       <div style={{ fontWeight: 600, color: '#1E293B' }}>{Number(c.commission_per_unit).toLocaleString()}원</div>
                     </div>
                     <div>
-                      <span style={{ color: '#94a3b8' }}>기간</span>
+                      <span style={{ color: '#94a3b8' }}>적용 기간</span>
                       <div style={{ color: '#475569' }}>
                         {c.start_date.split('T')[0]} ~ {c.end_date ? c.end_date.split('T')[0] : '무기한'}
                       </div>
