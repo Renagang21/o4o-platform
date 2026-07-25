@@ -156,8 +156,12 @@ export default function SupplierPartnerCommissionsPage() {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div>
+      {/* 모바일(390px)에서 버튼 라벨이 3줄로 쪼개지는 문제 → 헤더 wrap + 버튼 nowrap */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        flexWrap: 'wrap', gap: '12px', marginBottom: '24px',
+      }}>
+        <div style={{ flex: '1 1 260px', minWidth: 0 }}>
           <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#1E293B', margin: 0 }}>
             파트너 수수료
           </h1>
@@ -172,6 +176,7 @@ export default function SupplierPartnerCommissionsPage() {
             padding: '10px 18px', borderRadius: '8px', border: 'none',
             backgroundColor: '#2563EB', color: 'white', fontSize: '14px',
             fontWeight: 600, cursor: 'pointer',
+            whiteSpace: 'nowrap', flexShrink: 0,
           }}
         >
           <Plus size={16} /> 수수료 정책 추가
