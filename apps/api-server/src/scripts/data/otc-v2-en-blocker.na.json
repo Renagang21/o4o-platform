@@ -1,0 +1,50 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-SHARD-NA-V2-LIVE-APPLY-V1",
+ "shard": "na",
+ "readOnly": true,
+ "dbWrite": 0,
+ "title": "EN apply 차단 1건 — 공용 러너 normalize 의 하이픈 범위 병합 아티팩트",
+ "summary": "나 shard 240 fp 중 1 fp 가 EN 수치 보존 게이트를 통과할 수 없다. 원인은 저작 품질이 아니라 동결된 공용 러너의 산식이다. 러너 수정 금지 규칙에 따라 임의 우회하지 않고 기록만 남긴다.",
+ "blocked": [
+  {
+   "fp": "a9b1afc879e1aec6",
+   "gencode": "101342ASY",
+   "route": "oral",
+   "form": "시럽",
+   "masters": 5,
+   "masterIds": [
+    "20d8e000-f18e-4059-930e-96dd0669c005",
+    "6b29da48-5053-408b-8a1a-d265dc79cbbb",
+    "a321b203-939a-4426-a266-f88b4486a66f",
+    "a73aae9d-4c36-4e00-b3d5-b11f66254bc1",
+    "b355d74a-387e-4dde-8a08-17b838467110"
+   ],
+   "officialDosageFragment": "만 12세 이하의 소아는 1회 권장용량을 4-6시간마다 필요 시 복용합니다.",
+   "mechanism": [
+    "otc-v2-store-leaflet-runner.shared.ts:76 normalize() 가 [-–—] 를 ',' 로 치환한다 → '4-6시간' → '4,6시간'",
+    "missingNumericsEn(runner:306) 의 수량 정규식 (\\d+(?:[.,]\\d+)?) 이 '4,6' 을 하나의 수량값으로 포착한다",
+    "runner:309 이 콤마를 제거해 요구 토큰이 '46' 이 된다 (천단위 구분자 제거 목적의 처리)",
+    "missingNumericsEn 은 EN 텍스트를 normalize 하지 않고 리터럴 대조하므로, EN 에 '46' 이 그대로 있어야만 통과한다",
+    "EN_NUM_WORDS 에 '46' 항목 없음 → 숫자 단어형 우회 불가"
+   ],
+   "impact": "renderEn 이 'EN 용법 수량 누락 1: 46' 이상을 반환 → runApply(lang=en) 이 해당 fp 에서 throw → 나 EN apply 전체 중지",
+   "koImpact": "없음. composeKo/missingNumerics 는 원문·산출물 양쪽을 동일하게 normalize 하므로 '4,6시간' 토큰이 양쪽에 존재한다. 나 dry-run KO 게이트가 이미 GREEN.",
+   "authoredEn": "정본 원문대로 'every 4 to 6 hours' 로 저작했다. 게이트 통과 목적으로 '46' 을 써넣는 것은 공식 원문에 없는 수치를 만드는 행위이므로 하지 않았다.",
+   "options": [
+    "A. 별도 WO 로 공용 러너 missingNumericsEn 교정 — 콤마로 병합된 범위 토큰을 분해해 대조(예: '4,6' → 4 와 6). ga·da shard 에는 동일 패턴 0건이므로 회귀 위험 낮음. 권장.",
+    "B. 이 1 fp(5 master) 를 나 EN apply 대상에서 제외 — SSOT/러너 eligible 집합 변경이 필요해 현 규칙(라 census/SSOT 수정 금지, 러너 수정 금지)과 충돌.",
+    "C. EN 본문에 '46' 삽입 — 공식 원문에 없는 수치 생성. 콘텐츠 작성 불변 원칙 위반이므로 채택하지 않는다."
+   ],
+   "decisionOwner": "사용자"
+  }
+ ],
+ "scanScope": "나 shard 240 fp 전수 스캔 결과 동일 아티팩트는 본 1건뿐. 가 shard(237 fp) 동일 패턴 0건.",
+ "coverageEffect": {
+  "authoredFp": 240,
+  "authoredMaster": 839,
+  "enGatePassFp": 239,
+  "enGatePassMaster": 834,
+  "enGateBlockedFp": 1,
+  "enGateBlockedMaster": 5
+ }
+}
