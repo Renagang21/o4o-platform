@@ -1,0 +1,44 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-V2-SHARED-RUNNER-APPLY-SUPPORT-V1",
+ "runner": "otc-v2-store-leaflet-runner.shared.ts",
+ "baseCommit": "3447b2323",
+ "shard": "ga",
+ "lang": "ko",
+ "dbWrite": 0,
+ "preflight": {
+  "shard": "ga",
+  "eligibleGroups": 237,
+  "eligibleMasters": 837,
+  "holdGroups": 1,
+  "holdMasters": 2,
+  "fpReproduced": 839,
+  "fpFailed": 0,
+  "canonicalDup": 0,
+  "completeIntersection": 0,
+  "blockedFp": 0,
+  "blockedMaster": 0,
+  "siteAmbiguous": 0,
+  "outOfShardMasters": 0,
+  "manifestMatch": true,
+  "expectedMatch": true,
+  "orderBlockers": [],
+  "gates": {
+   "target fp/master == dry-run manifest": true,
+   "HOLD 대상 제외": true,
+   "fingerprint 재현 100%": true,
+   "shard 밖 master 0": true,
+   "기존 완료분 교집합 0": true,
+   "CLQ/CDS/CSI 혼입 0": true,
+   "빅콘에스600정 혼입 0": true,
+   "pre-apply canonicalDup 0": true,
+   "예상 write == 실측 계획": true,
+   "apply 순서 충족": true
+  },
+  "blockers": [],
+  "writePlan": {
+   "ko": 3348,
+   "en": 1674,
+   "total": 5022
+  }
+ }
+}

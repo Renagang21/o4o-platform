@@ -1,0 +1,268 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-SHARD-GA-V2-LIVE-APPLY-V1",
+ "shard": "ga",
+ "part": "p01",
+ "note": "EN authored from the official Korean source (indication/dosage/caution). No new medical facts, no softening of diseases, symptoms or warnings. usageLabel is injected by the shared runner from the route.",
+ "groups": [
+  {
+   "fp": "664ad2a5254cde33",
+   "title": "Syrup (415702ASY)",
+   "efficacy": "This is an over-the-counter medicine used for constipation.",
+   "usage": "Adults: at the start of treatment, take 30 mL once a day, with breakfast or with dinner. In most patients, after a few days the maintenance dose is 15 mL, taken 1 time in 1 day. In children the average dose is 0.375 mL per kg of body weight in 1 day: ages 1 to 6 years, 3.75 to 7.5 mL a day; ages 6 to 12 years, 7.5 to 15 mL a day; ages 12 to 16 years, 15 to 30 mL a day. Because the response differs from person to person, the dose for a person with constipation must be adjusted to the amount needed for 1 bowel movement a day. This medicine may be mixed with a hot or cold drink, cereal or pudding.",
+   "caution": "Do not take this medicine if you have hypersensitivity to this medicine, intestinal obstruction (blocked bowel), abdominal pain or bleeding of unknown cause, faecal impaction, galactosaemia, an incision of the ileum or rectum, inflammatory bowel disease (ulcerative colitis, Crohn's disease and the like) or a colostomy, or if you are breast-feeding.\n\nBefore taking this medicine, consult a pharmacist if you are pregnant or may be pregnant, if the user is an infant, a young child or an older person, if the user is debilitated, or if there is fluid and electrolyte imbalance or chronic constipation.\n\nIt is advisable to maintain an adequate fluid intake every day. Keep to the stated dosage and schedule. If constipation does not improve after about 1 week of use, stop taking this medicine and consult a pharmacist.\n\nConsult a pharmacist before use with thiazide diuretics, corticosteroids, carbenoxolone, amphotericin B, cardiac glycosides, or alpha-glucosidase inhibitors (acarbose, voglibose).",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Syrup",
+    "What it is for": "Constipation",
+    "Choosing a product": "Products with the same generic-name code (415702ASY) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "4b7594d2a9c16c3c",
+   "title": "Eye Drops (D49001COS)",
+   "efficacy": "This is an over-the-counter medicine used for dryness of the eye (discomfort, stinging pain, irritation) or eye fatigue caused by wind, smoke, air pollution, dust, dry heat, air conditioning, air travel or prolonged computer use.",
+   "usage": "When needed, instil 1 drop into each eye, 1 or more times a day as required. After instillation, discard the remaining solution and the container.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain, if you have ever had an allergic reaction to an eye medicine (for example redness of the eye, itching, swelling, rash or reddening), or if you have glaucoma.\n\nKeep to the stated dosage and schedule. Use this medicine for instillation into the eye only. Wash your hands thoroughly before use. To prevent contamination, do not share it with others. If symptoms become worse, or if they last for 3 days or more, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Dry eye and eye fatigue caused by wind, smoke, pollution, dust, dry heat, air conditioning, air travel or long computer use",
+    "Choosing a product": "Products with the same generic-name code (D49001COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "d5818a48deed8016",
+   "title": "Plaster (C03400CPL)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of pain and inflammation of bruises, stiff shoulder and rheumatic pain.",
+   "usage": "Clean the affected area and let it dry, then apply 1 patch, 1 time in 1 day. If necessary, hold it in place with a bandage or adhesive plaster.",
+   "caution": "Do not use this medicine on eczema, on dermatitis caused by lacquer or similar plants, or on broken skin.\n\nBefore using this medicine, consult a pharmacist if you have or have had an allergy to a medicine or a cosmetic, if you have an allergic constitution, if the area is severely wet or eroded, if you are pregnant or may be pregnant, or if you are breast-feeding.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. For external use only. If symptoms do not improve after 5 to 6 days of use, stop using it and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Plaster",
+    "What it is for": "Pain and inflammation of bruises, stiff shoulder and rheumatic pain",
+    "Choosing a product": "Products with the same generic-name code (C03400CPL) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "24b0ab03427684d8",
+   "title": "Eye Drops (332600COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of eye irritation and redness of the eye.",
+   "usage": "Instil 1 to 2 drops into the eye, 4 times in 1 day. After instillation, discard the remaining solution and the container immediately (single-use eye drops only).",
+   "caution": "Do not use this medicine if you have hypersensitivity to it or if you have closed-angle glaucoma.\n\nBefore using this medicine, consult a pharmacist if the user is an infant or a child, if you have a severe cardiovascular disease such as cardiac arrhythmia, if you have high blood pressure that is not well controlled, or if you have diabetes with a possibility of diabetic ketoacidosis.\n\nUse this medicine for instillation into the eye only. To prevent contamination, avoid sharing it with others. After opening, use it once immediately and discard the remaining solution and the container at once (single-use eye drops only). If symptoms do not improve after 3 days or more of use, stop using it and consult a pharmacist.\n\nConsult a pharmacist before use together with a monoamine oxidase (MAO) inhibitor.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of eye irritation and redness",
+    "Choosing a product": "Products with the same generic-name code (332600COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "f64282c23fc32d56",
+   "title": "Eye Drops (228606COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of burning, irritation and discomfort caused by dry eye or by exposure to wind and sun, and for the prevention of eye irritation.",
+   "usage": "When needed, instil 1 to 2 drops into the affected eye, then discard the remaining solution and the container. If another eye drop is used at the same time, allow an interval of at least 15 minutes between them to avoid a dilution effect.",
+   "caution": "For external use only.\n\nDo not reuse after a single use; always discard the remaining solution and the container.\n\nTo avoid contamination, do not let the tip of the container touch any surface.\n\nDo not use the solution if its colour has changed or if it has become cloudy.\n\nTemporary blurring of vision may occur, so take care when driving or operating dangerous machinery until your vision is clear again.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort from dry eye or exposure to wind and sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (228606COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "d61c88d00499a9cb",
+   "title": "Ointment (A23900COM)",
+   "efficacy": "This is an over-the-counter medicine used for eczema, heat rash, itching of the skin, allergic skin disease, burns and frostbite.",
+   "usage": "Apply an appropriate amount to the affected area, 2 to 3 times in 1 day.",
+   "caution": "Do not use this medicine on chickenpox, athlete's foot, tinea or suppurating (pus-forming) areas, on mucous membranes such as the conjunctiva of the eye, or over wide areas of the face.\n\nBefore using this medicine, consult a pharmacist if you have ever had an allergy to a medicine or a cosmetic, if the affected area is extensive, severely wet or badly eroded, or if you are pregnant or may be pregnant.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. Use this medicine externally only; do not take it by mouth.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Ointment",
+    "What it is for": "Eczema, heat rash, itching of the skin, allergic skin disease, burns and frostbite",
+    "Choosing a product": "Products with the same generic-name code (A23900COM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "4780976d089e70ef",
+   "title": "Cream (A07800CCM)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of minor (mild) muscle pain.",
+   "usage": "Apply an appropriate amount to the affected area, 3 to 4 times in 1 day.",
+   "caution": "Do not use this medicine around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer or similar plants, on broken skin, or in infants aged 30 months or younger.\n\nBefore using this medicine, consult a pharmacist if you have hypersensitivity to this medicine or to a cosmetic, or if the area is severely wet or badly eroded.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. For external use only. Take care to keep it out of the eyes.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Cream",
+    "What it is for": "Temporary relief of minor muscle pain",
+    "Choosing a product": "Products with the same generic-name code (A07800CCM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "93fc28632d8a94bd",
+   "title": "Eye Drops (A73600COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, for supplementing tears (dryness of the eye), for discomfort while wearing hard or soft contact lenses, and for blurred or gritty eyes (for example when there is a lot of eye discharge).",
+   "usage": "Instil 1 to 2 drops per dose, 4 to 5 times in 1 day, increasing or decreasing the frequency appropriately according to symptoms. After instillation, discard the remaining solution and the container.",
+   "caution": "Do not use this medicine if you have severe eye pain, if you have ever had an allergic reaction to an eye medicine (redness of the eye, itching, swelling), or if you have glaucoma.\n\nWhen used for a child, use it under the supervision of a guardian. Use this medicine for instillation into the eye only. Keep to the stated dosage and schedule. To prevent contamination, avoid sharing it with others. After opening, use it once immediately and discard the remaining solution and the container at once. If symptoms do not improve after about 2 weeks of use, consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, tear supplementation (dry eye), discomfort with contact lenses, blurred or gritty eyes",
+    "Choosing a product": "Products with the same generic-name code (A73600COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "2a6e05bf8a532211",
+   "title": "Tablet (172301ATB)",
+   "efficacy": "This is an over-the-counter medicine used for gastric and duodenal ulcer, oesophageal spasm, pyloric spasm, gastritis, enteritis, intestinal colic, spastic constipation, functional diarrhoea, cholecystitis, cholangitis, cholelithiasis (gallstones), biliary dyskinesia, sequelae after cholecystectomy, urinary stones, cystitis and dysmenorrhoea (menstrual pain).",
+   "usage": "Adults: take 1 to 2 tablets (10 to 20 mg) per dose, 3 to 5 times in 1 day. The dose may be increased or decreased appropriately according to age and symptoms.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, glaucoma, a functional narrowing of the gastrointestinal tract such as pyloric stenosis, paralytic or obstructive ileus, myasthenia gravis, megacolon, irregular tachycardia, severe heart disease, haemorrhagic colitis, or difficulty passing urine due to prostatic hyperplasia, or if you are pregnant, may be pregnant or are breast-feeding.\n\nBefore taking this medicine, consult a pharmacist if you have bacterial diarrhoea, congestive heart failure, arrhythmia, ulcerative colitis, hyperthyroidism, if you are in a high-temperature environment, if you have prostatic hyperplasia, or if you are an older person.\n\nAfter taking this medicine, disturbance of visual accommodation and dizziness may occur, so take care when driving or operating machinery.\n\nConsult a pharmacist before taking this medicine together with phenothiazine medicines, tricyclic or tetracyclic antidepressants, MAO inhibitors, antihistamines, antipsychotics, quinidine, amantadine, anticholinergic medicines such as disopyramide and other anticholinergics (tiotropium, ipratropium, atropine-like compounds), dopamine antagonists such as metoclopramide, or beta agonists.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Gastric and duodenal ulcer, oesophageal and pyloric spasm, gastritis, enteritis, intestinal colic, spastic constipation, functional diarrhoea, biliary disorders, urinary stones, cystitis and menstrual pain",
+    "Choosing a product": "Products with the same generic-name code (172301ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "b76e1472fb05523e",
+   "title": "Oral Solution (D05901ALQ)",
+   "efficacy": "This is an over-the-counter medicine used as adjunctive treatment for indigestion caused by impaired liver function.",
+   "usage": "Adults: take 2 to 3 bottles (40 to 60 mL) in 1 day. Children: take 1 bottle (20 mL) in 1 day. Take it before meals with a glass of water.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, severe hepatic failure (loss of liver function), obstruction of the bile duct, or myocardial infarction now or in the past.\n\nBefore taking this medicine, consult a pharmacist if you have diabetes.\n\nKeep to the stated dosage and schedule. Take this medicine by mouth only. If symptoms do not improve after about 1 month of use, consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral solution",
+    "What it is for": "Adjunctive treatment of indigestion caused by impaired liver function",
+    "Choosing a product": "Products with the same generic-name code (D05901ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "614026ae648df6df",
+   "title": "Oral Suspension (105201ASS)",
+   "efficacy": "This is an over-the-counter medicine used for its antacid action and for the improvement of symptoms in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain and acid eructation (sour belching).",
+   "usage": "Adults and children aged 12 years and older: take 1 to 1.5 g per dose, 3 times in 1 day, 30 minutes to 1 hour after meals. If necessary, 1 further dose may be taken before bedtime.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, Alzheimer's disease, haemorrhoids, fluid retention (swelling), pregnancy toxaemia, diarrhoea, or undiagnosed gastrointestinal bleeding.\n\nBefore taking this medicine, consult a pharmacist if you have kidney impairment, if you are physically weak, if you are on a diet low in phosphorus, if you have a disorder of digestion and absorption, if you are an older person, if you have signs of gastrointestinal bleeding such as vomiting of blood or black stools, or if you are pregnant, may be pregnant or are breast-feeding.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. If symptoms do not improve after about 2 weeks of use, stop taking it immediately and consult a pharmacist.\n\nDo not take a tetracycline antibiotic while you are taking this medicine. Before taking this medicine, consult a pharmacist if you are taking a non-steroidal anti-inflammatory analgesic, an ulcer medicine, a digitalis preparation, chlorpromazine, lansoprazole, prednisolone, penicillin, a quinolone, an iron (Fe) salt preparation, or a salicylate.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral suspension",
+    "What it is for": "Antacid action and symptom relief in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain and acid eructation",
+    "Choosing a product": "Products with the same generic-name code (105201ASS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "b78514c002411e60",
+   "title": "Cream (546600CCM)",
+   "efficacy": "This is an over-the-counter medicine used for fungal skin infections (tinea, cutaneous candidiasis, tinea versicolor) accompanied by clinical signs such as inflammation, itching and eczema.",
+   "usage": "Apply an appropriate amount to the affected area, 1 to 2 times in 1 day (in the morning, or in the morning and the evening).",
+   "caution": "Do not use this medicine if you have hypersensitivity to it; on skin infections (tuberculosis, syphilis, herpes zoster, herpes simplex, chickenpox, vaccinia); on eczematous otitis externa with perforation of the eardrum; on ulcers (except Behcet's disease); on deep second-degree or more severe burns and frostbite; on perioral dermatitis, acne vulgaris, rosacea, syphilis, tuberculosis or skin vaccine reactions; on broken skin; or over wide areas (10 % or more of the body surface).\n\nBefore using this medicine, consult a pharmacist if you are pregnant, may be pregnant or are breast-feeding, if the user is an infant or a young child, or if you have or have had hypersensitivity to propylene glycol.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. Use it externally only; do not take it by mouth. If it is used on the genital area together with latex contraceptives (condoms and vaginal suppositories), it may damage them and may reduce their safety and effectiveness.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Cream",
+    "What it is for": "Fungal skin infections (tinea, cutaneous candidiasis, tinea versicolor) with inflammation, itching or eczema",
+    "Choosing a product": "Products with the same generic-name code (546600CCM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "dff04bff9f188ece",
+   "title": "Syrup (180801ASY)",
+   "efficacy": "This is an over-the-counter medicine used for chronic constipation, constipation in infants and children, and constipation after childbirth.",
+   "usage": "For chronic constipation in adults: take 15 to 30 mL a day before breakfast for the first 2 to 3 days, then continue with 10 to 15 mL in 1 day. In severe cases up to 45 mL may be taken. Children aged 7 to 14 years: take 15 mL a day for the first 2 to 3 days, then continue with 10 mL a day. Young children aged 1 to 6 years: 5 to 10 mL a day. Infants under 12 months: 5 mL a day.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, inflammatory bowel disease (ulcerative colitis, Crohn's disease), gastrointestinal obstruction, abdominal pain of unknown cause, if you are on a low-galactose diet (galactosaemia), if you have perforation of the digestive tract or a risk of it, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a pharmacist if you are pregnant, may be pregnant or are breast-feeding, if the user is an infant, a young child or an older person, or if there is diabetes, fructose intolerance, fluid and electrolyte imbalance, acute gastritis or chronic constipation.\n\nConsult a pharmacist if you are taking an alpha-glucosidase inhibitor such as acarbose, a broad-spectrum antibiotic, a diuretic, a corticoid, amphotericin B, a cardiac glycoside or an antacid.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Syrup",
+    "What it is for": "Chronic constipation, constipation in infants and children, and constipation after childbirth",
+    "Choosing a product": "Products with the same generic-name code (180801ASY) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "083b0fd3e62cb1f8",
+   "title": "Tablet (185401ATB)",
+   "efficacy": "This is an over-the-counter medicine used for allergic rhinitis (sneezing, blocked nose, itching, burning of the eyes) and for chronic idiopathic urticaria (hives of unknown cause).",
+   "usage": "Adults and children aged 12 years and older: take 1 tablet (10 mg), 1 time in 1 day. Children aged 6 to under 12 years: if body weight is 30 kg or more, take 1 tablet (10 mg) 1 time in 1 day; if body weight is 30 kg or less, take 1/2 tablet (5 mg) 1 time in 1 day. The dose may be increased or decreased appropriately according to age and symptoms.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, if the user is a child under 6 years of age, if you are pregnant or breast-feeding, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a pharmacist if you have liver impairment or renal failure.\n\nWhile you are taking this medicine, do not take it together with cimetidine, erythromycin, ketoconazole, quinidine, fluconazole, fluoxetine or other medicines that inhibit liver metabolism.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Allergic rhinitis (sneezing, blocked nose, itching, burning of the eyes) and chronic idiopathic urticaria",
+    "Choosing a product": "Products with the same generic-name code (185401ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "232b2e5a160f6767",
+   "title": "Eye Drops (228604COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of burning, irritation and discomfort caused by dry eye or by exposure to wind and sun, and for the prevention of eye irritation.",
+   "usage": "When needed, instil 1 to 2 drops into the affected eye, then discard the remaining solution and the container. If another eye drop is used at the same time, allow an interval of at least 15 minutes between them to avoid a dilution effect.",
+   "caution": "For external use only.\n\nDo not reuse after a single use; always discard the remaining solution and the container.\n\nTo avoid contamination, do not let the tip of the container touch any surface.\n\nDo not use the solution if its colour has changed or if it has become cloudy.\n\nTemporary blurring of vision may occur, so take care when driving or operating dangerous machinery until your vision is clear again.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort from dry eye or exposure to wind and sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (228604COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7fe2f9672b69f527",
+   "title": "Powder (B54500APD)",
+   "efficacy": "This is an over-the-counter medicine used for excessive drinking, heartburn, gastric eructation (belching), overeating, stomach pain, stomach discomfort, indigestion, promotion of digestion, loss of appetite, weak stomach, excess stomach acid, a feeling of fullness in the stomach and upper abdomen and back, nausea (queasiness, hangover, nausea after drinking alcohol), vomiting, a burning feeling in the chest, belching and a feeling of heaviness in the stomach.",
+   "usage": "Adults and those aged 15 years and older: take 1 sachet per dose. Children aged 8 to 14 years: take 1/2 sachet per dose. Take it 3 times in 1 day, after meals or between meals.",
+   "caution": "Do not take this medicine if you are receiving dialysis, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\n\nBefore taking this medicine, consult a pharmacist if you have impaired kidney function.\n\nKeep to the stated dosage and schedule. When used for a child, use it under the supervision of a guardian. Do not take it for a long period.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Powder",
+    "What it is for": "Excess stomach acid, heartburn, indigestion, stomach pain and discomfort, nausea, vomiting, belching and loss of appetite",
+    "Choosing a product": "Products with the same generic-name code (B54500APD) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "9d499d9958b5004c",
+   "title": "Tablet (302600ATB)",
+   "efficacy": "This is an over-the-counter medicine used for calcium deficiency and other supplementation of calcium, for supplementation of vitamin D during pregnancy and breast-feeding, during growth and in old age, and for the prevention of poor development of bones and teeth and of rickets.",
+   "usage": "Adults: take 1 tablet per dose, 1 to 2 times in 1 day.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, if the user is an infant under 12 months of age, or if there is hypercalcaemia (an excess of calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, kidney stones or severe renal failure.\n\nBefore taking this medicine, consult a pharmacist if the child gets a lot of sunlight and eats a normal diet, if you are pregnant, may be pregnant or are breast-feeding, if the user is a premature baby or a young child, if there is impaired heart or circulatory function, hypoproteinaemia, a history of kidney stones, or hypersensitivity now or in the past to Yellow No. 5.\n\nKeep to the stated dosage and schedule. If symptoms do not improve after about 1 month of use, stop taking it immediately and consult a pharmacist.\n\nDo not take this medicine together with phosphate salts, calcium salts, oral tetracycline preparations, antacids, fluoroquinolone antibiotics or levothyroxine. Consult a pharmacist before taking it together with cardiac glycosides, anti-aldosterone medicines or triamterene. Avoid tannin-containing drinks such as green tea and black tea while taking it and just before and after taking it.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Calcium and vitamin D supplementation, and prevention of poor bone and tooth development and of rickets",
+    "Choosing a product": "Products with the same generic-name code (302600ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "e2c3fe42d5fd6871",
+   "title": "Eye Drops (D55402COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of burning, irritation and discomfort caused by dry eye or by exposure to wind and sun, and for the prevention of eye irritation.",
+   "usage": "When needed, instil 1 to 2 drops into the affected eye, then discard the remaining solution and the container. If another eye drop is used at the same time, allow an interval of at least 15 minutes between them to avoid a dilution effect.",
+   "caution": "For external use only.\n\nDo not reuse after a single use; always discard the remaining solution and the container.\n\nTo avoid contamination, do not let the tip of the container touch any surface.\n\nDo not use the solution if its colour has changed or if it has become cloudy.\n\nTemporary blurring of vision may occur, so take care when driving or operating dangerous machinery until your vision is clear again.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort from dry eye or exposure to wind and sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (D55402COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "62f69fad720fa8f7",
+   "title": "Oral Solution (A74602ALQ)",
+   "efficacy": "This is an over-the-counter medicine used as adjunctive therapy for symptoms of mental and physical asthenia (weakness) and as adjunctive therapy during a period of recovery (a state of amino acid deficiency).",
+   "usage": "Adults and those aged 12 years and older: take 5 g, 1 time in 1 day. Morning is the preferred time, but it may also be taken before bedtime, and it may be taken with a small amount of water.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, severe impairment of kidney or liver function, or myocardial infarction.\n\nBefore taking this medicine, consult a pharmacist if you have a problem with urinary retention, if you are pregnant, may be pregnant or are breast-feeding, if you will be taking it continuously for 15 days or more, or if you have hypersensitivity to caramel.\n\nKeep to the stated dosage and schedule.\n\nDo not take this medicine together with antipsychotic medicines or sleeping medicines.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral solution",
+    "What it is for": "Adjunctive therapy for mental and physical asthenia and during recovery (amino acid deficiency)",
+    "Choosing a product": "Products with the same generic-name code (A74602ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "80a9e5a89b0e2d85",
+   "title": "Syrup (A31500ASY)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of the various symptoms of a cold (runny nose, blocked nose, sneezing, sore throat, chills, fever, headache, joint pain and muscle pain) and for the relief of the various symptoms of hay fever (pollen allergic rhinitis) and of other upper respiratory tract allergies (runny nose, sneezing, itching of the eyes, nose and throat, and watering eyes).",
+   "usage": "Adolescents and adults aged 12 years and older: take 1 sachet every 4 to 6 hours when needed. Do not take more than 4 sachets in 24 hours. Dissolve 1 sachet in about 250 mL of hot water that is not boiling and drink it within 10 to 15 minutes.",
+   "caution": "If you regularly drink three or more glasses of alcohol a day, consult a pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\n\nVery rarely, serious skin reactions that may be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of hypersensitivity appears after taking this medicine, stop taking it immediately.\n\nDo not exceed the maximum daily dose of acetaminophen (4,000 mg). It may cause liver damage. Do not take it together with other products that contain acetaminophen.\n\nDo not take this medicine if you have hypersensitivity to it; if you have had, or have a history of, an asthma attack caused by another antipyretic analgesic (non-steroidal anti-inflammatory analgesic) or by a cold medicine; if you have severe cardiac insufficiency, high blood pressure, peptic ulcer, a severe blood disorder, severe liver impairment, severe kidney impairment, diabetes, epilepsy or glucose-6-phosphate dehydrogenase deficiency; if you are taking an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and the like) or have stopped taking one within the past 2 weeks; if you have phaeochromocytoma; if you are an older person with confusion; or if you have a hereditary problem such as fructose intolerance, glucose-galactose malabsorption or sucrase deficiency.\n\nBefore taking this medicine, consult a pharmacist if you have obstructive vascular disease (Raynaud's syndrome), a constitution prone to allergy, liver impairment, kidney impairment, a history of peptic ulcer, a blood disorder, a tendency to bleed, emphysema, asthma, chronic bronchitis, a cough with a lot of sputum, thyroid disease, prostatic hyperplasia, if you are on a sodium-restricted diet, if you have glaucoma or pre-eclampsia, if you are pregnant, may be pregnant or are breast-feeding, if you are an older person, if you have a high fever, or if you have hypersensitivity to Yellow No. 5.\n\nKeep to the stated dosage and schedule. Drowsiness, dizziness, reduced vision and impairment of cognition and psychomotor function may occur after taking it, so take care when driving or operating machinery.\n\nDo not take this medicine together with other products containing acetaminophen, MAO inhibitors (antidepressants, antipsychotics, mood stabilisers, antiparkinson medicines and the like), antitussive-expectorants, other cold medicines, antipyretic analgesics, sedatives, antihistamines, other sympathomimetic medicines, tricyclic antidepressants, antihypertensive medicines (vasodilators, beta blockers, debrisoquine, guanethidine, reserpine, methyldopa and the like), barbiturates, metoclopramide, domperidone, cholestyramine, warfarin, coumarin anticoagulants, chloramphenicol, zidovudine, probenecid, digoxin and other cardiac glycosides, or ergot alkaloids (ergotamine, methysergide).\n\nIf any of the following occur, stop taking this medicine immediately and consult a pharmacist: acute generalised exanthematous pustulosis, Stevens-Johnson syndrome, toxic epidermal necrolysis, a severe sore throat, or a sore throat lasting 2 days or more with fever, headache, rash, nausea or vomiting; cough, nasal congestion, drowsiness, dizziness, dry mouth, fatigue, headache, insomnia, irritability, nervousness, tachycardia, palpitations, sleep disturbance, constipation, diarrhoea, abdominal distension; signs of shock (difficulty breathing, flushing of the whole body, angioedema, urticaria and the like), thrombocytopenia, granulocytopenia, haemolytic anaemia (destruction of red blood cells), methaemoglobinaemia, reduced platelet function (prolonged bleeding time), hypersensitivity reactions (facial swelling, sweating, low blood pressure, shock), nausea, loss of appetite, gastrointestinal bleeding, peptic ulcer and perforation, excessive lowering of body temperature, collapse, coldness of the arms and legs, raised blood pressure, reflex bradycardia, mydriasis (dilated pupils), delayed urination, painful urination, or palpitations.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Syrup (hot drink sachet)",
+    "What it is for": "Relief of cold symptoms and of symptoms of hay fever and other upper respiratory allergies",
+    "Choosing a product": "Products with the same generic-name code (A31500ASY) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  }
+ ]
+}
