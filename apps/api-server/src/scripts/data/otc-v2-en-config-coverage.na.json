@@ -1,0 +1,39 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-SHARD-NA-V2-LIVE-APPLY-V1",
+ "shard": "na",
+ "readOnly": true,
+ "dbWrite": 0,
+ "configs": [
+  "otc-v2-en-config-na-p01.json",
+  "otc-v2-en-config-na-p02.json",
+  "otc-v2-en-config-na-p03.json",
+  "otc-v2-en-config-na-p04.json",
+  "otc-v2-en-config-na-p05.json",
+  "otc-v2-en-config-na-p06.json",
+  "otc-v2-en-config-na-p07.json",
+  "otc-v2-en-config-na-p08.json",
+  "otc-v2-en-config-na-p09.json",
+  "otc-v2-en-config-na-p10.json",
+  "otc-v2-en-config-na-p11.json",
+  "otc-v2-en-config-na-p12.json"
+ ],
+ "entries": 240,
+ "eligible": {
+  "fp": 240,
+  "master": 839
+ },
+ "hold": {
+  "fp": 0,
+  "master": 0
+ },
+ "covered": {
+  "fp": 240,
+  "master": 839
+ },
+ "missingFp": 0,
+ "extraFp": 0,
+ "expectedEnWriteT": 1678,
+ "requiredEnWriteT": 1678,
+ "verdict": "COMPLETE",
+ "failures": []
+}
