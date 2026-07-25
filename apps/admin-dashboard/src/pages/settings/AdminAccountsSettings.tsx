@@ -1,15 +1,27 @@
 /**
- * AdminAccountsSettings — 관리자 계정 안전 유지관리 탭
- * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1
+ * AdminAccountsSettings — 관리자 계정 표준 목록 + 안전 유지관리
  *
- * 최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태 확인 + 비밀번호 재설정(새 값만) + 활성 토글.
- * 기존 비밀번호는 조회/표시하지 않는다. 역할 변경은 RBAC Role Assignment 화면에서 관리(본 탭은 표시만).
- * 서버측 보호: 본인 비활성/마지막 super_admin 비활성/super_admin 대상 변경 권한 — backend 가 enforce.
+ * WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1 (원본)
+ * WO-O4O-ADMIN-ADMIN-ACCOUNTS-STANDARD-TABLE-AND-CRUD-V1:
+ *   수동 <table> → O4O 표준 목록(BaseTable + FilterBar + RowActionMenu). 검색·상태·역할 필터,
+ *   단건/일괄 활성화·비활성화, 비밀번호 재설정(기존 계약 재사용).
+ *
+ *   ⚠️ 중지 조건 #4 발동(부트스트랩 migration 이 특정 계정에 super_admin 재부여:
+ *      ActivateAdminUser→sohae2100 / BootstrapCanonicalSeedAccounts→super-admin@o4o.com):
+ *      WO 규정에 따라 "표준 목록 전환 + 안전한 기존 액션(list/비밀번호/활성토글/일괄토글)"까지만 구현.
+ *      계정 생성(POST /admin/users)·이름·이메일 수정(PUT /admin/users/:id)·역할 할당 CRUD 는
+ *      코드 미구현, CHECK 설계 보고로 남긴다.
+ *
+ * SSOT = role_assignments (RBAC F9). 역할 변경은 좌측 RBAC Role Assignment 화면. 본 탭은 역할 표시만.
+ * 서버측 보호(backend enforce): 본인 비활성(SELF_LOCK) / 마지막 super_admin 비활성(LAST_SUPER_ADMIN) /
+ *   super_admin 대상 변경은 super_admin 만(SUPER_ADMIN_ONLY). 목록 응답에 비밀번호·해시 없음.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { Loader2, KeyRound, ShieldCheck, Users } from 'lucide-react';
+import { Loader2, KeyRound, ShieldCheck, RefreshCw } from 'lucide-react';
+import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 
 interface AdminAccount {
   id: string;
@@ -26,11 +38,24 @@ const MIN_PW = 8;
 const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' }) : '—');
 const isSuper = (a: AdminAccount) => a.roles.includes('platform:super_admin');
 
+const STATUS_OPTIONS = [
+  { value: 'active', label: '활성' },
+  { value: 'inactive', label: '비활성' },
+];
+
 export default function AdminAccountsSettings() {
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  // 필터·선택
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('');
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState('');
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   // 비밀번호 재설정 모달
   const [pwTarget, setPwTarget] = useState<AdminAccount | null>(null);
@@ -54,18 +79,63 @@ export default function AdminAccountsSettings() {
 
   useEffect(() => { load(); }, [load]);
 
+  // 목록에 등장하는 역할 → 필터 옵션
+  const roleOptions = useMemo(() => {
+    const set = new Set<string>();
+    accounts.forEach((a) => a.roles.forEach((r) => set.add(r)));
+    return Array.from(set).sort().map((r) => ({ value: r, label: r }));
+  }, [accounts]);
+
+  const filtered = useMemo(() => {
+    const kw = search.trim().toLowerCase();
+    return accounts.filter((a) => {
+      if (kw && !(a.name.toLowerCase().includes(kw) || a.email.toLowerCase().includes(kw) || a.roles.some((r) => r.toLowerCase().includes(kw)))) return false;
+      if (statusFilter === 'active' && !a.isActive) return false;
+      if (statusFilter === 'inactive' && a.isActive) return false;
+      if (roleFilter && !a.roles.includes(roleFilter)) return false;
+      return true;
+    });
+  }, [accounts, search, statusFilter, roleFilter]);
+
+  const setStatus = async (acct: AdminAccount, next: boolean): Promise<boolean> => {
+    const res = await authClient.api.patch(`/admin/platform-accounts/${acct.id}/status`, { isActive: next });
+    if (res.data?.success) return true;
+    toast.error(res.data?.error || `${acct.email}: 상태 변경 실패`);
+    return false;
+  };
+
   const toggleStatus = async (acct: AdminAccount) => {
     const next = !acct.isActive;
     if (!window.confirm(`${acct.email} 계정을 ${next ? '활성화' : '비활성화'} 하시겠습니까?`)) return;
     setBusyId(acct.id);
     try {
-      const res = await authClient.api.patch(`/admin/platform-accounts/${acct.id}/status`, { isActive: next });
-      if (res.data?.success) { toast.success(res.data.message || '상태가 변경되었습니다.'); await load(); }
-      else toast.error(res.data?.error || '상태 변경에 실패했습니다.');
+      if (await setStatus(acct, next)) { toast.success('상태가 변경되었습니다.'); await load(); }
     } catch (e: any) {
       toast.error(e?.response?.data?.error || '상태 변경에 실패했습니다.');
     } finally {
       setBusyId(null);
+    }
+  };
+
+  // 일괄 활성/비활성 — 기존 status API 반복. 본인/마지막 super_admin 은 backend 가 개별 차단(집계).
+  const handleBulk = async () => {
+    if (!bulkAction || selectedKeys.size === 0) { toast.error('작업과 대상을 선택해 주세요.'); return; }
+    const next = bulkAction === 'activate';
+    const targets = accounts.filter((a) => selectedKeys.has(a.id) && a.isActive !== next);
+    if (targets.length === 0) { toast('변경할 대상이 없습니다.'); return; }
+    if (!window.confirm(`${targets.length}개 계정을 ${next ? '활성화' : '비활성화'} 하시겠습니까?`)) return;
+    setBulkBusy(true);
+    try {
+      const results = await Promise.allSettled(targets.map((a) => setStatus(a, next)));
+      const ok = results.filter((r) => r.status === 'fulfilled' && r.value === true).length;
+      const fail = targets.length - ok;
+      if (fail === 0) toast.success(`${ok}개 계정 상태 변경 완료`);
+      else toast.error(`${fail}개 실패 (성공 ${ok}개) — 본인/마지막 super_admin 등은 보호됩니다.`);
+      setSelectedKeys(new Set());
+      setBulkAction('');
+      await load();
+    } finally {
+      setBulkBusy(false);
     }
   };
 
@@ -79,7 +149,7 @@ export default function AdminAccountsSettings() {
     setPwSaving(true);
     try {
       const res = await authClient.api.patch(`/admin/platform-accounts/${pwTarget.id}/password`, { newPassword: pw1 });
-      if (res.data?.success) { toast.success(res.data.message || '비밀번호가 재설정되었습니다.'); setPwTarget(null); setPw1(''); setPw2(''); }
+      if (res.data?.success) { toast.success('비밀번호가 재설정되었습니다.'); setPwTarget(null); setPw1(''); setPw2(''); }
       else toast.error(res.data?.error || '비밀번호 재설정에 실패했습니다.');
     } catch (e: any) {
       toast.error(e?.response?.data?.error || '비밀번호 재설정에 실패했습니다.');
@@ -88,84 +158,159 @@ export default function AdminAccountsSettings() {
     }
   };
 
+  const columns: O4OColumn<AdminAccount>[] = [
+    {
+      key: 'name',
+      header: '이름 / 이메일',
+      sortable: true,
+      sortAccessor: (a) => a.name,
+      render: (_, a) => (
+        <div>
+          <div className="flex items-center gap-1.5 font-medium text-o4o-text-primary">
+            {isSuper(a) && <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />}
+            {a.name}
+          </div>
+          <div className="text-xs text-slate-500">{a.email}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'roles',
+      header: '역할',
+      render: (_, a) => (
+        <div className="flex flex-wrap gap-1">
+          {a.roles.map((r) => (
+            <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: 90,
+      align: 'center',
+      sortable: true,
+      sortAccessor: (a) => (a.isActive ? 'active' : 'inactive'),
+      render: (_, a) => (
+        <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${a.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+          {a.isActive ? '활성' : '비활성'}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      width: 110,
+      sortable: true,
+      sortAccessor: (a) => a.createdAt,
+      render: (_, a) => <span className="text-slate-500">{fmt(a.createdAt)}</span>,
+    },
+    {
+      key: 'lastLoginAt',
+      header: '마지막 로그인',
+      width: 120,
+      sortable: true,
+      sortAccessor: (a) => a.lastLoginAt || '',
+      render: (_, a) => <span className="text-slate-500">{fmt(a.lastLoginAt)}</span>,
+    },
+    {
+      key: '_actions',
+      header: '',
+      width: 56,
+      system: true,
+      align: 'center',
+      render: (_, a) => (
+        <RowActionMenu
+          actions={[
+            {
+              key: 'password',
+              label: '비밀번호 재설정',
+              icon: <KeyRound size={14} />,
+              onClick: () => openPwModal(a),
+            },
+            {
+              key: 'toggle',
+              label: a.isActive ? '비활성화' : '활성화',
+              variant: a.isActive ? 'danger' : 'primary',
+              disabled: busyId === a.id,
+              onClick: () => toggleStatus(a),
+            },
+          ]}
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Users className="w-5 h-5 text-blue-600" />
-        <h2 className="text-lg font-bold text-o4o-text-primary">관리자 계정</h2>
-      </div>
-      <p className="text-sm text-o4o-text-secondary">
-        최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태를 확인하고, 비밀번호 재설정과 활성 여부를 관리합니다.
-        기존 비밀번호는 조회·표시되지 않습니다. <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
-      </p>
-
-      {loading ? (
-        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
-      ) : error ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}</div>
-      ) : accounts.length === 0 ? (
-        <div className="text-center py-16 text-sm text-slate-400">표시할 관리자 계정이 없습니다.</div>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium">이름 / 이메일</th>
-                <th className="px-4 py-3 text-left font-medium">역할</th>
-                <th className="px-4 py-3 text-left font-medium">상태</th>
-                <th className="px-4 py-3 text-left font-medium">생성일</th>
-                <th className="px-4 py-3 text-left font-medium">마지막 로그인</th>
-                <th className="px-4 py-3 text-right font-medium">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {accounts.map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 font-medium text-o4o-text-primary">
-                      {isSuper(a) && <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />}
-                      {a.name}
-                    </div>
-                    <div className="text-xs text-slate-500">{a.email}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {a.roles.map((r) => (
-                        <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${a.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                      {a.isActive ? '활성' : '비활성'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">{fmt(a.createdAt)}</td>
-                  <td className="px-4 py-3 text-slate-500">{fmt(a.lastLoginAt)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => openPwModal(a)}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                      >
-                        <KeyRound className="w-3.5 h-3.5" /> 비밀번호 재설정
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busyId === a.id}
-                        onClick={() => toggleStatus(a)}
-                        className={`px-2.5 py-1.5 text-xs font-medium rounded-lg disabled:opacity-50 ${a.isActive ? 'text-rose-700 border border-rose-200 hover:bg-rose-50' : 'text-emerald-700 border border-emerald-200 hover:bg-emerald-50'}`}
-                      >
-                        {busyId === a.id ? '처리 중…' : a.isActive ? '비활성화' : '활성화'}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h2 className="text-lg font-bold text-o4o-text-primary">관리자 계정</h2>
+          <p className="mt-1 text-sm text-o4o-text-secondary">
+            최고/플랫폼 관리자 계정의 로그인 ID·역할·활성 상태를 확인하고, 비밀번호 재설정과 활성 여부를 관리합니다.
+            기존 비밀번호는 조회·표시되지 않습니다. <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
+          </p>
         </div>
+        <button type="button" onClick={load} disabled={loading}
+          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> 새로고침
+        </button>
+      </div>
+
+      {error ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}</div>
+      ) : loading ? (
+        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
+      ) : (
+        <>
+          <div className="bg-white rounded-lg border border-gray-200 p-3">
+            <FilterBar
+              searchPlaceholder="이름 · 이메일 · 역할 검색"
+              searchValue={search}
+              onSearchChange={setSearch}
+              filters={[
+                { key: 'status', placeholder: '전체 상태', options: STATUS_OPTIONS },
+                { key: 'role', placeholder: '전체 역할', options: roleOptions },
+              ]}
+              filterValues={{ status: statusFilter, role: roleFilter }}
+              onFilterChange={(k, v) => { if (k === 'status') setStatusFilter(v); else if (k === 'role') setRoleFilter(v); }}
+            >
+              <select
+                value={bulkAction}
+                onChange={(e) => setBulkAction(e.target.value)}
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white"
+              >
+                <option value="">일괄 작업</option>
+                <option value="activate">활성화</option>
+                <option value="deactivate">비활성화</option>
+              </select>
+              <button
+                type="button"
+                onClick={handleBulk}
+                disabled={selectedKeys.size === 0 || !bulkAction || bulkBusy}
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white hover:bg-gray-50 disabled:opacity-40"
+              >
+                {bulkBusy ? '처리 중…' : `적용 (${selectedKeys.size})`}
+              </button>
+            </FilterBar>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <BaseTable<AdminAccount>
+              columns={columns}
+              data={filtered}
+              rowKey={(a) => a.id}
+              tableId="admin-accounts-list"
+              persistState
+              columnVisibility
+              selectable
+              selectedKeys={selectedKeys}
+              onSelectionChange={setSelectedKeys}
+              emptyMessage="표시할 관리자 계정이 없습니다."
+            />
+          </div>
+        </>
       )}
 
       {/* 비밀번호 재설정 모달 */}
