@@ -1,0 +1,588 @@
+{
+ "_doc": "WO-O4O-OTC-ORAL-COMBO-FINAL-SHARD-B-NA-V7 — 에이전트 나 claim. GA-V9 shard 분할 SSOT(otc-combo-shard-assignment-ga-v9.json, 에이전트 가 생성·commit d4ad68c70)의 shard B 채택. 경구 복합성분 매장용 설명서 공식 원문 근거 신규 저작(KO 교체 + EN 신규). source_ref=uuid(md5(\"otc-combo-leaflet:\"+targetFp)) 결정론 앵커. path-specific commit. 타 claim(ga·da) 미접촉.",
+ "schemaVersion": 1,
+ "owner": "agent-na",
+ "round": "oral-combo-final-shard-b-na-v7-2026-07-25",
+ "track": "ORAL_MULTI_INGREDIENT_STORE_LEAFLET",
+ "shard": "B",
+ "shardSource": "otc-combo-shard-assignment-ga-v9.json (commit d4ad68c70, method: LPT master-balanced 3-split, deterministic)",
+ "verdict": "CLAIMED",
+ "disjointnessProof": {
+  "A/B/C_mutual_intersection": {
+   "AB": 0,
+   "BC": 0,
+   "AC": 0
+  },
+  "B_vs_ga_targetFp(287)": 0,
+  "B_vs_ga_sourceRef": 0,
+  "B_vs_na_existing_sourceRef(8, NUTRITION_COMBO_EN_ONLY round)": 0,
+  "B_vs_da(81, TOPICAL_SKIN o4o_drug_otc_topical, route!=oral)": 0,
+  "note": "shard B fp(70)·master(210) 모두 정확히 1 shard. ga/da/na 기존 claim 어느 축(fp·sourceRef·track)과도 교집합 0."
+ },
+ "summary": {
+  "fp": 70,
+  "master": 210
+ },
+ "claims": [
+  {
+   "targetFp": "18f384fe86efde08",
+   "sourceRef": "c5b1bee0-3a0c-7018-d909-d81678e94736",
+   "name": "콜레시움정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "1d022647bc810624",
+   "sourceRef": "6d58b00e-e623-2735-1143-eb44ef0b4fea",
+   "name": "메디다제정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "1fe4179cedba18b7",
+   "sourceRef": "ee4e5492-5309-5c41-43ae-ec61bdc20efe",
+   "name": "비나폴로100정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "251b4fd9d0f6a527",
+   "sourceRef": "6b771426-7f65-94c5-7894-f521288e2f62",
+   "name": "이노엔비타메진캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "298bd9747b6644c1",
+   "sourceRef": "e2cd3fa5-b8e6-01be-9b17-cd9180dab18b",
+   "name": "비타미니아정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "2cb42f1a921dc43f",
+   "sourceRef": "684eae9a-ca3b-c9e4-f46e-8bf3874d36a8",
+   "name": "와이디1000연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "310e35f63b975766",
+   "sourceRef": "20331b09-82f2-968a-da4b-96fd5d9fbb0b",
+   "name": "디카듀오정100/1000",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "329d4d271cb45d0c",
+   "sourceRef": "5cff6e3c-09d3-0efd-8181-7a0a494b5e76",
+   "name": "칼디쓰리정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "34f3d9b01439756c",
+   "sourceRef": "a3f2dcbc-d549-10b5-c3d8-10d75109db0a",
+   "name": "싸이타민플러스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "3733c6cc1bf088b5",
+   "sourceRef": "fd6c34ea-0ddb-e86d-3cbb-241d788907a1",
+   "name": "칼디쓰리플러스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "3890e957d945faff",
+   "sourceRef": "ee406900-1665-e422-fa80-599f6b4521a6",
+   "name": "하드칼씨플러스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "3adf589cf31204ec",
+   "sourceRef": "534b8249-8227-385e-145f-c064fe4be50f",
+   "name": "콘트라스300연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "3d3ffa6aaabdd627",
+   "sourceRef": "a11581fe-e370-d3e9-e86e-01f486fbc6e5",
+   "name": "빅스코민에프정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "4137e64a0d92dbc2",
+   "sourceRef": "923f5d6e-00d2-74f0-4cd9-84e859526fed",
+   "name": "디카킴디정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "459a79cf21836b27",
+   "sourceRef": "9acbfa0f-ea88-57a6-fead-e99d2170bba2",
+   "name": "아로나민케어콤플렉스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "4a78bb0e161a4b87",
+   "sourceRef": "d1b414e9-4c71-aa5d-b392-c4e588b62f35",
+   "name": "파워비큐콘티뉴800정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "4e8fdb83d4431556",
+   "sourceRef": "4f3399b2-5d1b-d64e-0971-a9d29b2e8f08",
+   "name": "하드칼츄어블정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "52c1ddb473699131",
+   "sourceRef": "a6746dd4-c292-e760-7a92-cd4c1566b772",
+   "name": "훼리너프캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "53e031a41d3f221f",
+   "sourceRef": "315614a8-6789-903f-d103-ef92db22e9c7",
+   "name": "마그아민골드연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "57f77624b7b798eb",
+   "sourceRef": "4b3fe5a6-73bf-a475-b34d-5ab9c37027d6",
+   "name": "유한비타민씨디정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "59966e7d54fa1eb7",
+   "sourceRef": "aaac5eb2-1923-53cf-8f72-9c5bb66ecc7b",
+   "name": "마그비감마연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "5b68198ca3246202",
+   "sourceRef": "dae9a4ed-211f-4b94-6130-130b4f96f302",
+   "name": "유어칼큐정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "5efdaaa0c27a3973",
+   "sourceRef": "2d97f843-e425-2dad-c7a0-795d641bc93b",
+   "name": "마이메가플러스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "659ef74011a92f19",
+   "sourceRef": "b1dfa9aa-c772-c623-cb06-35989b6f82b0",
+   "name": "아진팜정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "67ca0f62ee740832",
+   "sourceRef": "cd5b1e46-144e-d8ab-5e2a-0da1ec60252b",
+   "name": "판키아제정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "6b462bc2527e27c2",
+   "sourceRef": "1e6212bb-c957-1a66-a671-eda90cd7d065",
+   "name": "케어칼디엠정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "6c9ae59ab958251d",
+   "sourceRef": "321494e2-aa2c-deff-3c69-c4d5f9d8e0a3",
+   "name": "안티노을연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "70fcbeb701cdc0b9",
+   "sourceRef": "b1adfa02-27bd-8a77-907a-fac075816978",
+   "name": "마그비액티브정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "723bb14f2a957ca2",
+   "sourceRef": "9d37a394-1f9d-6b65-4017-6db62a2efc31",
+   "name": "칼디텍정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "747256cbccc0e0e6",
+   "sourceRef": "6e1621b6-9951-d2df-b0a6-163ca7585592",
+   "name": "메빌정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "78889098ea3953e6",
+   "sourceRef": "c8d90b93-0e0b-78e8-f5cf-ca581fa1c2ae",
+   "name": "비타콘틴600정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "7dc32a6b40a46709",
+   "sourceRef": "0d56841b-c32c-3400-b358-2c598adc20da",
+   "name": "현대아라비정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "7ebf808da201fda8",
+   "sourceRef": "fca1cade-a67a-2ffb-43ca-43fe35fda06f",
+   "name": "벤포비타100정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "82276aa5f6885378",
+   "sourceRef": "2e354378-122d-1942-7441-fc0b6e20e321",
+   "name": "본탑600골드정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "8502cbd0a70c6302",
+   "sourceRef": "304cf910-b28c-8f1b-4e2a-5670658df71e",
+   "name": "비바원정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "864c962f88832f59",
+   "sourceRef": "e5473ea5-97d3-5e45-3aa9-91a4dd790e9c",
+   "name": "훼스탈슈퍼자임정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "8993ddd52540e27e",
+   "sourceRef": "7a376436-e3ee-d214-2069-2f18fbc21e6e",
+   "name": "뉴트리액티브정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "8bdf35980b3e1c9f",
+   "sourceRef": "b3a76035-5f7d-4817-a656-f3c8348f4b5c",
+   "name": "칼비타디정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "90d7ce806b2f4a47",
+   "sourceRef": "7b5c26cb-020b-602f-db01-f65f77809394",
+   "name": "엑셀렌비정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "938198fa032ed4de",
+   "sourceRef": "4fde6bbd-8832-97bf-a85b-386a4edecd8d",
+   "name": "청안하이뷰연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "94d040ee968e26aa",
+   "sourceRef": "02467f94-5b7c-da82-f889-79b29f61e88a",
+   "name": "신신케어타민정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "99a5f3559bebda1b",
+   "sourceRef": "b2ffee56-b991-353b-ea5a-e38f9782e634",
+   "name": "파워조인에스600정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "9e8b99449c5f8f4c",
+   "sourceRef": "7c8bcd9d-ace8-0706-b443-7ab2d7131934",
+   "name": "우르솔연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "a3e21a77a6944b63",
+   "sourceRef": "bf57d8da-1cd7-93ff-eef2-1ce9b286ad08",
+   "name": "판토마그정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "a568264a83567a97",
+   "sourceRef": "2f8423cd-5442-4526-2340-6b2c70236183",
+   "name": "액티콤연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "a8284dd2708f777e",
+   "sourceRef": "81217295-cbe9-437d-46da-7fd3c4c8654f",
+   "name": "마그랑비연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "ade06a133f08ad25",
+   "sourceRef": "dd11dbaa-94b4-609e-74dd-b1ba90610d0e",
+   "name": "투엑스비엠큐정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "b2bfe17983fee8c0",
+   "sourceRef": "e37e2bab-6595-004b-7392-17d3ff3481e2",
+   "name": "훼로바맘스케어정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "b57a487e57b76529",
+   "sourceRef": "cf0a6699-53a2-0426-7616-0eb9e25671bf",
+   "name": "글루타에스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "be9e50e8d134dbbf",
+   "sourceRef": "ed4bbc39-2cbc-e956-ac39-b9310679060d",
+   "name": "파워비타연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "c1eb730c9500a4aa",
+   "sourceRef": "da119376-d017-f80f-cbd0-ae7f62527f97",
+   "name": "디카테오엘씨정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "c3ff46c9f20e226a",
+   "sourceRef": "2fa6e301-3149-3896-82d3-ac77503905b3",
+   "name": "마그페롤플러스연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "c8e5e81d2a5be531",
+   "sourceRef": "3d440512-27d1-6ff7-7f91-22afaaa2d407",
+   "name": "카세롤연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "c9eebe7e5ac08cca",
+   "sourceRef": "f73f9e9f-809b-3cbd-3439-e7a7d18be1b0",
+   "name": "헤모포민큐캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "cc7afc7e9ddc7f85",
+   "sourceRef": "6cc373af-e182-e1cf-d679-dcc9f985eabd",
+   "name": "코드비타연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "d070d8d8b5083db7",
+   "sourceRef": "57e14472-c933-6e70-c3dc-8310d2159a64",
+   "name": "현대아라미정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "d24678289f638d93",
+   "sourceRef": "95b28ebe-0144-6502-0d4d-bfb99a6164e9",
+   "name": "맥스타민프리미엄정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "dafb028e570c2dba",
+   "sourceRef": "182550de-68f8-2c9a-6931-4cec648fa6eb",
+   "name": "마이렉스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "dcbf5dd38c5ab9cb",
+   "sourceRef": "a35a2e91-be20-9b4d-7d7a-c7eb68c76296",
+   "name": "파워킹연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "e0a3b78fdcf8aad3",
+   "sourceRef": "229800dd-4757-faa9-c317-b03b60169d29",
+   "name": "벡크정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "e3c9a4c5c5289b9a",
+   "sourceRef": "a4b22963-b77a-6949-fce5-fabf1095b32a",
+   "name": "세롤진정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "e750a86e65b16d99",
+   "sourceRef": "54070d4c-8ca3-54a3-3fbc-b8a69b7d1fef",
+   "name": "마이칼큐정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "e811c3b9c02984d0",
+   "sourceRef": "041eec7f-b59a-af82-b721-6cb889646dda",
+   "name": "콘드로센정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "ec973701397f2c52",
+   "sourceRef": "398008a3-2645-1285-80a7-4120d83d99ca",
+   "name": "베타셀민연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "ee068d6c00a2354a",
+   "sourceRef": "75590d0b-1c3c-fa61-e5ed-25e1b7e53c18",
+   "name": "마그감마맥스연질캡슐",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "f24613c7ac134013",
+   "sourceRef": "ff83f3dc-d741-b3fd-c1de-7194b078dba6",
+   "name": "파밀라제정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "f45c12af5eafe065",
+   "sourceRef": "078e6c52-f803-0904-8212-995b9e2b15d8",
+   "name": "테라빅정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "f7095fa9ef4fc64f",
+   "sourceRef": "c4aea7fb-61ca-5f02-35da-b43f3f4b0ffd",
+   "name": "타스나비타정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "fbe2dda5deb407a3",
+   "sourceRef": "714c78aa-477f-8a61-88de-97239dbe513d",
+   "name": "조인브이플러스정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  },
+  {
+   "targetFp": "ff4e25aec37d64b0",
+   "sourceRef": "dd97e4ff-357b-13f9-956c-b660c16d29b2",
+   "name": "베아틴정",
+   "masters": 3,
+   "op": "KO_EN",
+   "status": "CLAIMED"
+  }
+ ]
+}
