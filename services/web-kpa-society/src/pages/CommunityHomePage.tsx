@@ -292,19 +292,19 @@ export function CommunityHomePage() {
           cards={[
             {
               title: '매장 경영자',
-              description: '직원이 많지 않아도 AI · 운영자 지원 · 매장 실행 도구를 활용해 정보 전달 경쟁력을 만들 수 있습니다',
+              description: 'AI · 운영자 지원 · 매장 실행 도구 활용',
               href: '/guide/for/store-owner',
               icon: <span className={iconCls}><Store size={24} /></span>,
             },
             {
               title: '서비스 운영자',
-              description: '공급자 협력 · 자료 구성 · 매장 지원 · AI 보조를 활용해 지역 생태계를 운영합니다',
+              description: '공급자 협력 · 자료 구성 · 매장 지원',
               href: '/guide/for/operator',
               icon: <span className={iconCls}><Network size={24} /></span>,
             },
             {
               title: '커뮤니티 참여자',
-              description: '정보 · 경험 · 강의 · 콘텐츠가 실제 현장 활용으로 연결됩니다',
+              description: '정보 · 경험 · 강의 · 콘텐츠 활용',
               href: '/guide/for/member',
               icon: <span className={iconCls}><Users size={24} /></span>,
             },
@@ -327,9 +327,12 @@ export function CommunityHomePage() {
         { title: '자료실', description: '자료를 저장하고 AI 작업에 활용하세요', href: '/resources', icon: <span className={iconCls}><ResourcesIcon /></span> },
       ]}
       appEntryOnCardClick={handleCardClick}
+      // WO-O4O-KPA-MAIN-HOME-GUIDANCE-DENSITY-SIMPLIFICATION-V1:
+      //   `/guide/usage` 진입은 이 CTA 하나만 유지한다(아래 help.usageItems 의 중복 항목 제거).
+      //   description 에서 '기능별' 을 뺀 이유 — 바로 아래 '기능별 이용 방법' 카드와 같은 말을 반복했다.
       cta={{
         title: 'KPA-Society 활용이 처음이신가요?',
-        description: '서비스 구조와 기능별 이용 방법을 가이드에서 확인하세요',
+        description: '서비스 구조와 이용 방법을 가이드에서 확인하세요',
         href: '/guide/usage',
         linkLabel: '이용 가이드 보기 →',
         icon: <BookOpen size={28} className="text-primary" />,
@@ -342,9 +345,11 @@ export function CommunityHomePage() {
         // WO-O4O-KPA-HOME-OTHER-SERVICES-SECTION-ALIGNMENT-V1: 다른 서비스 블록은
         //   Home 맨 아래(valueGuideSlot 하단)로 이동했으므로 Help 슬롯에서는 숨김.
         showServices: false,
+        // WO-O4O-KPA-MAIN-HOME-GUIDANCE-DENSITY-SIMPLIFICATION-V1:
+        //   '서비스 활용 방법'(→ /guide/usage) 제거 — 바로 위 CTA 와 같은 화면으로 가는 중복 진입이었다.
+        //   목적지(/guide/usage)는 CTA 에 그대로 남아 있어 접근 경로가 사라지지 않는다.
         usageItems: [
           { title: 'O4O 개요', description: 'O4O 서비스 구조와 KPA-Society의 역할', href: '/guide/intro' },
-          { title: '서비스 활용 방법', description: '상품, 콘텐츠, 고객 응대 기반 매장 운영 방식', href: '/guide/usage' },
           { title: '기능별 이용 방법', description: '포럼, 강의, 자료실, 매장 기능 구성', href: '/guide/features' },
         ],
       }}

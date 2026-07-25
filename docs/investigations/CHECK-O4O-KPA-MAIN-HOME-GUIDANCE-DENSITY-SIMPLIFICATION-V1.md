@@ -1,0 +1,126 @@
+# CHECK-O4O-KPA-MAIN-HOME-GUIDANCE-DENSITY-SIMPLIFICATION-V1
+
+> **WO:** WO-O4O-KPA-MAIN-HOME-GUIDANCE-DENSITY-SIMPLIFICATION-V1
+> **근거 조사:** [IR-O4O-KPA-MAIN-HOME-COMMUNITY-USABILITY-AND-FLOW-AUDIT-V1](IR-O4O-KPA-MAIN-HOME-COMMUNITY-USABILITY-AND-FLOW-AUDIT-V1.md)
+> **작성일:** 2026-07-25
+> **유형:** KPA props/문구만 조정. 공용 템플릿·컴포넌트·API·DB **무변경**.
+> **상태:** ✅ 코드 완료 / tsc 0 · build 성공 — 브라우저 smoke 는 §8
+
+---
+
+## 1. 수정 전 Home 안내 블록 순서
+
+`StandardHomeTemplate` 렌더 순서(공용) — Hero → 공지/약사공론 → 최신글 → 서비스 바로가기 → **CTA** → **Help** → **valueGuideSlot**(`valueGuidePlacement='after-help'`).
+
+KPA 하단 안내 = **연속 4블록**:
+
+| # | 블록 | 제목 | 내용 | 링크 |
+|---|------|------|------|------|
+| 1 | `cta` | KPA-Society 활용이 처음이신가요? | "서비스 구조와 **기능별 이용 방법**을 가이드에서 확인하세요" / `이용 가이드 보기 →` | **`/guide/usage`** |
+| 2 | `help.usageItems` | KPA-Society 이용 가이드 | O4O 개요 / **서비스 활용 방법** / **기능별 이용 방법** 3카드 | `/guide/intro` · **`/guide/usage`** · `/guide/features` |
+| 3 | `valueGuideSlot` 상단 | 내 역할에 따른 활용 방법 | 매장 경영자 / 서비스 운영자 / 커뮤니티 참여자 3카드 | `/guide/for/{store-owner,operator,member}` |
+| 4 | `valueGuideSlot` 하단 | 다른 서비스 소개 | GlycoPharm / K-Cosmetics 2카드 | 서비스별 외부 링크 |
+
+로그인 전후 노출 조건은 4블록 모두 **동일**(조건 분기 없음). 수정 전 Home 문서 높이 **2809px**(데스크톱 1440).
+
+---
+
+## 2. 중복된 링크와 문구 (실측)
+
+배포본 DOM 의 `/guide*` 링크 전수:
+
+| 링크 | 출처 | 판정 |
+|------|------|------|
+| `/guide/usage` | **CTA** — "KPA-Society 활용이 처음이신가요? … 이용 가이드 보기 →" | **중복 ①** |
+| `/guide/usage` | **이용 가이드** — "서비스 활용 방법 / 상품, 콘텐츠, 고객 응대 기반 매장 운영 방식" | **중복 ①** |
+| `/guide/intro` | 이용 가이드 — O4O 개요 | 유지 |
+| `/guide/features` | 이용 가이드 — 기능별 이용 방법 | 유지 |
+| `/guide/for/*` ×3 | 역할 카드 | 유지(각각 다른 가이드 페이지 — route 3개 실재) |
+| `/guide/intro` | **푸터** "이용 가이드" | Home 밖(공통 푸터) — 범위 밖 |
+
+**문구 중복:** CTA description 의 "**기능별** 이용 방법" 이 바로 아래 카드 제목 "**기능별 이용 방법**" 과 같은 말을 반복.
+
+---
+
+## 3. 유지·축소·제거한 항목
+
+| 항목 | 처리 | 사유 |
+|------|:----:|------|
+| CTA 블록 (`/guide/usage` 진입) | **유지** | 더 크고 익숙한 단일 진입점. 목적지 `/guide/usage` 그대로 |
+| 이용 가이드 "서비스 활용 방법" | **제거** | CTA 와 **같은 화면(`/guide/usage`)** 으로 가는 중복 진입. 목적지는 CTA 에 남아 접근 경로 유실 없음 |
+| CTA description | **축소** | `서비스 구조와 ~~기능별~~ 이용 방법을 가이드에서 확인하세요` — 아래 카드 제목과의 반복 제거 |
+| 역할 카드 3개 | **유지 + 설명 축소** | `/guide/for/*` 3개 route 가 실재해 **설명만 반복하는 블록이 아니다**(WO §7.4). 문장형 설명 → 키워드형 |
+| 이용 가이드 블록 자체 | **유지** | 안내 블록 전부 제거 금지(WO §7.2) |
+| 다른 서비스 소개 | **유지·무변경** | 이미 Home 최하단 보조 위치. 설명 문구는 공용 컴포넌트 기본값이라 KPA 단독 수정 불가(§5) |
+| 약사공론 / 체험 계정 / Hero / 서비스 카드 | **무변경** | WO §5·§8 |
+
+**역할 카드 설명 축소 (원문 보존, 문장 padding 만 제거):**
+
+| 카드 | 변경 전 | 변경 후 |
+|------|---------|---------|
+| 매장 경영자 | 직원이 많지 않아도 AI · 운영자 지원 · 매장 실행 도구를 활용해 정보 전달 경쟁력을 만들 수 있습니다 | AI · 운영자 지원 · 매장 실행 도구 활용 |
+| 서비스 운영자 | 공급자 협력 · 자료 구성 · 매장 지원 · AI 보조를 활용해 지역 생태계를 운영합니다 | 공급자 협력 · 자료 구성 · 매장 지원 |
+| 커뮤니티 참여자 | 정보 · 경험 · 강의 · 콘텐츠가 실제 현장 활용으로 연결됩니다 | 정보 · 경험 · 강의 · 콘텐츠 활용 |
+
+> 새 설명 문구를 **추가하지 않았다**(WO §9). 기존 문구의 축약·삭제만 수행.
+
+---
+
+## 4. 변경 후 Home 섹션 순서
+
+```
+Hero(체험 계정 안내 포함) → 공지 / 약사공론 → 최신글 → 서비스 바로가기
+→ CTA(이용 가이드) → 이용 가이드(2카드) → 내 역할에 따른 활용 방법(3카드) → 다른 서비스 소개(2카드)
+```
+
+**핵심 골격 유지** — 블록 순서·위치 재배치 없음. 하단 안내 블록 수도 4개 그대로이며, 반복 진입 1개와 반복 문구만 걷어냈다.
+
+---
+
+## 5. 공용 컴포넌트 변경 여부
+
+**변경 0.** `StandardHomeTemplate` · `O4OHelpSection` · `AppEntrySection` · `CtaGuidanceSection` 전부 무수정 → GlycoPharm · K-Cosmetics · Neture **무영향**.
+
+> **중지 조건 관련 기록:** `StandardHomeTemplate` 의 `cta` 는 **required prop** 이라, CTA 블록 자체를 없애려면 공용 템플릿을 `cta?:` 로 바꿔야 한다. WO §11 "가능하면 공용 템플릿을 변경하지 않고 KPA props 에서 해결" 에 따라 **템플릿을 건드리지 않고** 중복 항목 제거로 처리했다. 블록 수 자체를 4→3 으로 줄이려면 공용 변경이 필요하므로 별도 판단 대상이다.
+
+---
+
+## 6. 변경 파일 (1)
+
+```
+services/web-kpa-society/src/pages/CommunityHomePage.tsx
+```
+
+props 값(문구·배열 항목)만 조정. 신규 상태·설정·CSS·컴포넌트 **0**.
+
+**다른 세션 WIP 미포함:** `pnpm-lock.yaml`, `apps/api-server/src/scripts/*` — 미접촉.
+
+---
+
+## 7. typecheck / build
+
+| 대상 | 명령 | 결과 |
+|------|------|------|
+| web-kpa-society | `tsc --noEmit` | ✅ **0 errors** |
+| web-kpa-society | `vite build` | ✅ 성공 (33.8s) |
+
+---
+
+## 8. 브라우저 smoke
+
+*(배포 후 기록)*
+
+---
+
+## 9. 변경하지 않은 범위
+
+```
+Home 링크 C1·C2·C3 / 콘텐츠 가져오기 C4·C6 / 자료실 C5
+약사공론 영역 · 체험 계정 안내 · Hero · 서비스 카드 종류/순서
+공용 템플릿·컴포넌트 / 콘텐츠 검색 / 태그 필수 해제
+로그인 유도 통일 / 신규 컴포넌트 체계 / 신규 API·DB·route
+```
+
+---
+
+*End of CHECK-O4O-KPA-MAIN-HOME-GUIDANCE-DENSITY-SIMPLIFICATION-V1*
