@@ -42,14 +42,23 @@ KPA 화면의 block 순서는 다음과 같다.
 - `git diff --check` — PASS
 - `pnpm --filter @o4o/web-kpa-society exec tsc --noEmit` — PASS
 - `pnpm --filter @o4o/web-kpa-society run build` — PASS
-- 배포 및 운영 smoke — 구현 커밋 배포 후 아래 이력에 기록
+- Deploy Web Services workflow — PASS (KPA만 배포, 타 web service job은 skip)
+- `https://kpa-society.co.kr/operator` — HTTP 200
+- Cloud Run service URL `/operator` — HTTP 200
+- 배포 이미지와 구현 commit SHA 일치 — PASS
+- 빈 Queue/AI 조건, block 순서, 두 역할 공통 composer 적용은 source/typecheck/build로 확인했다.
+- 데스크톱·모바일은 기존 공통 block의 responsive grid를 그대로 재사용하고 고정 폭이나
+  신규 breakpoint가 없음을 확인했다. 이 세션에 연결 가능한 인증 브라우저가 없어
+  운영 viewport의 시각적 캡처는 수행하지 못했다.
 
 ## Git·배포 이력
 
-- 설계 CHECK commit: `472f41516`
-- 구현 commit: 배포 후 기록
-- 배포 workflow/revision: 배포 후 기록
-- 운영 smoke: 배포 후 기록
+- 설계 CHECK commit: `472f41516e9cc4f04a8dd288d97848ed51a5a6b5`
+- 구현 commit: `ed3630c1430a21cb2f478b2f11c37382624c95a3`
+- 배포 workflow: `30146461632` — success
+- Cloud Run revision: `kpa-society-web-01698-rjz`
+- 배포 image: `gcr.io/netureyoutube/kpa-society-web:ed3630c1430a21cb2f478b2f11c37382624c95a3`
+- 운영 smoke: canonical/Cloud Run `/operator` HTTP 200
 
 ## 보존·제외
 
