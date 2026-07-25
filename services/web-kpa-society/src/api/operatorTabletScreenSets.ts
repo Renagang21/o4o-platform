@@ -13,10 +13,7 @@
 
 import { getAccessToken } from '../contexts/AuthContext';
 import { tryRefreshToken } from './token-refresh';
-import type {
-  ScreenSet, ScreenSetDetail, ScreenBlock,
-  O4oDescriptionSearchResult,
-} from './tabletDisplays';
+import type { ScreenSet, ScreenSetDetail, ScreenBlock, O4oDescriptionSearchResult } from './tabletDisplays';
 import type { TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import type { ScreenSetBuilderApi } from '@o4o/tablet-screen-set-editor';
 
@@ -35,7 +32,10 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   if (response.status === 401) {
     const newToken = await tryRefreshToken();
     if (newToken) {
-      response = await fetch(url, { ...options, headers: { ...headers, Authorization: `Bearer ${newToken}` } });
+      response = await fetch(url, {
+        ...options,
+        headers: { ...headers, Authorization: `Bearer ${newToken}` },
+      });
     }
   }
   if (!response.ok) {
@@ -48,9 +48,39 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   return response.json();
 }
 
-export async function fetchOperatorScreenSets(): Promise<ScreenSet[]> {
-  const res = await request<{ success: boolean; data: ScreenSet[] }>(`${BASE}`);
-  return res.data;
+export interface OperatorScreenSetListResponse {
+  data: ScreenSet[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export async function fetchOperatorScreenSets(
+  params: {
+    page?: number;
+    limit?: number;
+  } = {},
+): Promise<OperatorScreenSetListResponse> {
+  const query = new URLSearchParams({
+    page: String(params.page ?? 1),
+    limit: String(params.limit ?? 20),
+  });
+  const res = await request<{
+    success: boolean;
+    data: ScreenSet[];
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  }>(`${BASE}?${query.toString()}`);
+  return {
+    data: res.data ?? [],
+    page: res.page,
+    limit: res.limit,
+    total: res.total,
+    totalPages: res.totalPages,
+  };
 }
 
 export async function fetchOperatorScreenSet(id: string): Promise<ScreenSetDetail> {
@@ -61,7 +91,10 @@ export async function fetchOperatorScreenSet(id: string): Promise<ScreenSetDetai
 export async function createOperatorScreenSet(input: { name: string; templateKey?: string | null }): Promise<ScreenSet> {
   const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}`, {
     method: 'POST',
-    body: JSON.stringify({ name: input.name, templateKey: input.templateKey ?? undefined }),
+    body: JSON.stringify({
+      name: input.name,
+      templateKey: input.templateKey ?? undefined,
+    }),
   });
   return res.data;
 }
@@ -78,7 +111,12 @@ export async function saveOperatorScreenSetBlocks(id: string, blocks: ScreenBloc
   const res = await request<{ success: boolean; data: ScreenBlock[] }>(`${BASE}/${id}/blocks`, {
     method: 'PUT',
     body: JSON.stringify({
-      blocks: blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
+      blocks: blocks.map((b, i) => ({
+        blockType: b.blockType,
+        sortOrder: i,
+        isEnabled: b.isEnabled,
+        config: b.config,
+      })),
     }),
   });
   return res.data;
@@ -93,16 +131,22 @@ export async function previewOperatorScreenSet(input: { templateKey?: string | n
     method: 'POST',
     body: JSON.stringify({
       templateKey: input.templateKey ?? undefined,
-      blocks: input.blocks.map((b, i) => ({ blockType: b.blockType, sortOrder: i, isEnabled: b.isEnabled, config: b.config })),
+      blocks: input.blocks.map((b, i) => ({
+        blockType: b.blockType,
+        sortOrder: i,
+        isEnabled: b.isEnabled,
+        config: b.config,
+      })),
     }),
   });
   return res.data;
 }
 
 export async function searchOperatorO4oDescriptions(q: string): Promise<O4oDescriptionSearchResult[]> {
-  const res = await request<{ success: boolean; data: O4oDescriptionSearchResult[] }>(
-    `${BASE}/content-sources/o4o-descriptions?q=${encodeURIComponent(q)}`,
-  );
+  const res = await request<{
+    success: boolean;
+    data: O4oDescriptionSearchResult[];
+  }>(`${BASE}/content-sources/o4o-descriptions?q=${encodeURIComponent(q)}`);
   return res.data;
 }
 
@@ -112,8 +156,16 @@ export async function searchOperatorO4oDescriptions(q: string): Promise<O4oDescr
  *   - searchStoreContents: 매장 콘텐츠는 운영자가 조회 불가 → 항상 빈 배열(picker 에서도 store 탭 미노출).
  */
 export const operatorScreenSetBuilderApi: ScreenSetBuilderApi = {
-  create: (input) => createOperatorScreenSet({ name: input.name, templateKey: input.templateKey }),
-  update: (id, input) => updateOperatorScreenSet(id, { name: input.name, templateKey: input.templateKey }),
+  create: (input) =>
+    createOperatorScreenSet({
+      name: input.name,
+      templateKey: input.templateKey,
+    }),
+  update: (id, input) =>
+    updateOperatorScreenSet(id, {
+      name: input.name,
+      templateKey: input.templateKey,
+    }),
   saveBlocks: saveOperatorScreenSetBlocks,
   preview: previewOperatorScreenSet,
   searchO4oDescriptions: searchOperatorO4oDescriptions,

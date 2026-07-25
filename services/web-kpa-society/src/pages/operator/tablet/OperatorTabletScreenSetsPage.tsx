@@ -10,50 +10,70 @@
  * 매장/코너 적용·current 지정·공개 타블렛 URL·Screen Set QR·매장 콘텐츠 조회는 제공하지 않는다(WO 차단 조건).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Loader2, Plus, Layers, Pencil, Trash2 } from 'lucide-react';
+import { AlertCircle, Plus, Layers, Pencil, Trash2 } from 'lucide-react';
 import type { TabletKioskApi } from '@o4o/tablet-kiosk-core';
 import { TabletContentStepBuilder, templateLabel } from '@o4o/tablet-screen-set-editor';
+import { RowActionMenu } from '@o4o/ui';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import type { ScreenSet, ScreenSetDetail } from '../../../api/tabletDisplays';
-import {
-  fetchOperatorScreenSets, fetchOperatorScreenSet, removeOperatorScreenSet,
-  operatorScreenSetBuilderApi,
-} from '../../../api/operatorTabletScreenSets';
+import { fetchOperatorScreenSets, fetchOperatorScreenSet, removeOperatorScreenSet, operatorScreenSetBuilderApi } from '../../../api/operatorTabletScreenSets';
 
 type Toast = { type: 'success' | 'error'; message: string };
+const PAGE_LIMIT = 20;
 
 // 운영자 원본은 매장 상품·공개 slug 가 없다. 미리보기(previewLayoutOnly)는 previewScreen(sections)만 렌더하고
 //   fetchProducts/fetchScreen 을 호출하지 않으므로, 빈 응답 stub + placeholder slug 로 충분하다.
 const OPERATOR_PREVIEW_SLUG = 'operator-preview';
 const operatorPreviewApi: TabletKioskApi = {
-  fetchProducts: async () => ({ products: [], storeName: null } as any),
-  submitInterest: async () => { throw new Error('운영자 미리보기에서는 상담 요청을 보낼 수 없습니다.'); },
-  checkStatus: async () => { throw new Error('not-supported'); },
+  fetchProducts: async () => ({ products: [], storeName: null }) as any,
+  submitInterest: async () => {
+    throw new Error('운영자 미리보기에서는 상담 요청을 보낼 수 없습니다.');
+  },
+  checkStatus: async () => {
+    throw new Error('not-supported');
+  },
   // fetchScreen 미주입 — previewScreen 주입 시 호출되지 않음.
 };
 
 export default function OperatorTabletScreenSetsPage() {
   const [sets, setSets] = useState<ScreenSet[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   // builder=null → 리스트. builder.detail=null → 신규. builder.detail=존재 → 수정(hydrate).
-  const [builder, setBuilder] = useState<{ detail: ScreenSetDetail | null } | null>(null);
+  const [builder, setBuilder] = useState<{
+    detail: ScreenSetDetail | null;
+  } | null>(null);
 
   const previewApi = useMemo(() => operatorPreviewApi, []);
 
   const reload = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      setSets(await fetchOperatorScreenSets());
+      const result = await fetchOperatorScreenSets({ page, limit: PAGE_LIMIT });
+      setSets(result.data);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+      if (result.totalPages > 0 && page > result.totalPages) {
+        setPage(result.totalPages);
+      }
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
+      setError(e?.message || '화면 세트를 불러오지 못했습니다.');
       setSets([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page]);
 
-  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => {
+    reload();
+  }, [reload]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
@@ -66,22 +86,90 @@ export default function OperatorTabletScreenSetsPage() {
       const detail = await fetchOperatorScreenSet(id);
       setBuilder({ detail });
     } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '원본 상세를 불러오지 못했습니다.' });
+      setToast({
+        type: 'error',
+        message: e?.message || '원본 상세를 불러오지 못했습니다.',
+      });
     }
   }, []);
 
-  const handleRemove = async (set: ScreenSet) => {
-    if (busy) return;
-    if (!window.confirm(`“${set.name}” 을(를) 목록에서 제거하시겠습니까?`)) return;
-    setBusy(true);
-    try {
-      await removeOperatorScreenSet(set.id);
-      setToast({ type: 'success', message: '목록에서 제거했습니다.' });
-      await reload();
-    } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '제거하지 못했습니다.' });
-    } finally { setBusy(false); }
-  };
+  const handleRemove = useCallback(
+    async (set: ScreenSet) => {
+      if (busy) return;
+      setBusy(true);
+      try {
+        await removeOperatorScreenSet(set.id);
+        setToast({ type: 'success', message: '목록에서 제거했습니다.' });
+        await reload();
+      } catch (e: any) {
+        setToast({
+          type: 'error',
+          message: e?.message || '제거하지 못했습니다.',
+        });
+      } finally {
+        setBusy(false);
+      }
+    },
+    [busy, reload],
+  );
+
+  const columns = useMemo(
+    (): ListColumnDef<ScreenSet>[] => [
+      {
+        key: 'name',
+        header: '이름',
+        render: (_value, row) => <span className="font-medium text-slate-800">{row.name}</span>,
+      },
+      {
+        key: 'templateKey',
+        header: '템플릿',
+        render: (_value, row) => <span className="text-slate-600">{templateLabel(row.templateKey)}</span>,
+      },
+      {
+        key: 'blockCount',
+        header: '블록',
+        align: 'center',
+        width: '100px',
+        render: (_value, row) => <span className="text-slate-500">{row.blockCount ?? 0}</span>,
+      },
+      {
+        key: '_actions',
+        header: '',
+        align: 'center',
+        width: '60px',
+        system: true,
+        onCellClick: () => {},
+        render: (_value, row) => (
+          <RowActionMenu
+            disabled={busy}
+            actions={[
+              {
+                key: 'edit',
+                label: '수정',
+                icon: <Pencil className="w-4 h-4" />,
+                onClick: () => openEdit(row.id),
+              },
+              {
+                key: 'remove',
+                label: '목록에서 제거',
+                icon: <Trash2 className="w-4 h-4" />,
+                variant: 'danger',
+                loading: busy,
+                confirm: {
+                  title: '원본 제거',
+                  message: `“${row.name}” 을(를) 목록에서 제거하시겠습니까?`,
+                  confirmText: '제거',
+                  variant: 'danger',
+                },
+                onClick: () => handleRemove(row),
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+    [busy, handleRemove, openEdit],
+  );
 
   if (builder) {
     return (
@@ -89,7 +177,10 @@ export default function OperatorTabletScreenSetsPage() {
         <TabletContentStepBuilder
           initialDetail={builder.detail}
           onCancel={() => setBuilder(null)}
-          onSaved={() => { setBuilder(null); reload(); }}
+          onSaved={() => {
+            setBuilder(null);
+            reload();
+          }}
           onToast={setToast}
           previewApi={previewApi}
           storeSlug={OPERATOR_PREVIEW_SLUG}
@@ -111,58 +202,28 @@ export default function OperatorTabletScreenSetsPage() {
           <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600" /> 매장 HUB 태블렛 화면 세트 원본
           </h1>
-          <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">
-            매장에 배포할 태블렛 화면 세트 원본을 제작합니다. 여기서 만든 원본은 운영자 소유이며, 매장·코너에 직접 적용되지 않습니다.
-          </p>
+          <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">매장에 배포할 태블렛 화면 세트 원본을 제작합니다. 여기서 만든 원본은 운영자 소유이며, 매장·코너에 직접 적용되지 않습니다.</p>
         </div>
-        <button onClick={openCreate}
-          className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 inline-flex items-center gap-1.5">
+        <button onClick={openCreate} className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 inline-flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> 원본 만들기
         </button>
       </div>
 
+      {error && (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            {error}
+          </span>
+          <button type="button" onClick={reload} className="font-semibold hover:underline">
+            다시 시도
+          </button>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        {loading ? (
-          <div className="flex items-center gap-2 text-sm text-slate-400 py-10 justify-center">
-            <Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…
-          </div>
-        ) : sets.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 화면 세트를 제작해 주세요.</p>
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-[12px] text-slate-500 border-b border-slate-100 bg-slate-50/60">
-                <th className="px-4 py-2.5 font-semibold">이름</th>
-                <th className="px-4 py-2.5 font-semibold">템플릿</th>
-                <th className="px-4 py-2.5 font-semibold text-center">블록</th>
-                <th className="px-4 py-2.5 font-semibold text-right">작업</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sets.map((s) => (
-                <tr key={s.id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                  <td className="px-4 py-3 font-medium text-slate-800">{s.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{templateLabel(s.templateKey)}</td>
-                  <td className="px-4 py-3 text-center text-slate-500">{s.blockCount ?? 0}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button onClick={() => openEdit(s.id)}
-                        className="min-h-[36px] px-2.5 py-1.5 text-[13px] font-medium text-indigo-700 bg-white border border-indigo-200 rounded-lg hover:bg-indigo-50 inline-flex items-center gap-1">
-                        <Pencil className="w-3.5 h-3.5" /> 수정
-                      </button>
-                      <button onClick={() => handleRemove(s)} disabled={busy}
-                        className="min-h-[36px] px-2.5 py-1.5 text-[13px] font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-40 inline-flex items-center gap-1">
-                        <Trash2 className="w-3.5 h-3.5" /> 제거
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <DataTable<ScreenSet> columns={columns} data={sets} rowKey="id" loading={loading} emptyMessage={error ? '목록을 불러오지 못했습니다.' : '아직 만든 원본이 없습니다. ‘원본 만들기’로 매장 배포용 화면 세트를 제작해 주세요.'} tableId="kpa-operator-tablet-screen-sets" />
+        {!loading && !error && <Pagination page={page} totalPages={totalPages} total={total} onPageChange={setPage} />}
       </div>
 
       {toast && <ToastView toast={toast} />}
@@ -171,11 +232,5 @@ export default function OperatorTabletScreenSetsPage() {
 }
 
 function ToastView({ toast }: { toast: Toast }) {
-  return (
-    <div className={`fixed bottom-6 right-6 z-[1000] px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
-      toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
-    }`}>
-      {toast.message}
-    </div>
-  );
+  return <div className={`fixed bottom-6 right-6 z-[1000] px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>{toast.message}</div>;
 }

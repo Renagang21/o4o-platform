@@ -18,7 +18,7 @@
  *   (supplier / store_owner / member 차단)
  *
  * 라우트 (router 내부, 외부 mount: /api/v1/{serviceKey}/operator/screen-sets):
- *   GET    /                                  — 같은 service_key 운영자 원본 목록
+ *   GET    /?page=&limit=                     — 같은 service_key 운영자 원본 목록(서버 페이지네이션)
  *   GET    /:id                               — 단일 조회 + blocks
  *   POST   /                                  — 생성 (operator_template)
  *   PATCH  /:id                               — 이름·템플릿 수정
@@ -44,29 +44,19 @@ import { createOperatorContentSourceAdapter } from '../../platform/store-public/
 import { shapeStaticBlock, resolveTemplateKey } from '../../platform/store-public/store-public-tablet-screen.js';
 
 // 저장 허용 block_type — 매장 API 와 동일(배포 CHECK 8종). product_list 는 배치 placeholder(운영자 원본엔 실상품 없음).
-const OPERATOR_SET_BLOCK_TYPES = [
-  'idle_media', 'product_list', 'product_content',
-  'corner_description', 'health_info', 'staff_inquiry', 'qr_guide', 'content_list',
-];
+const OPERATOR_SET_BLOCK_TYPES = ['idle_media', 'product_list', 'product_content', 'corner_description', 'health_info', 'staff_inquiry', 'qr_guide', 'content_list'];
 // 신규 선택 가능 템플릿 4종(WO). legacy idle_touch_video 는 신규 선택 제외(WO 제외 조건).
 const OPERATOR_TEMPLATE_KEYS_ALLOWED = [
   'corner_information_basic_v1', // 기본 코너 안내형
-  'product_focus',               // 상품 집중형
-  'corner_overview_qr',          // 코너 소개형
-  'product_grid_qr',             // 제품 진열형
+  'product_focus', // 상품 집중형
+  'corner_overview_qr', // 코너 소개형
+  'product_grid_qr', // 제품 진열형
 ];
 
 // 응답 컬럼 — 매장 setCols 와 동일 shape(운영자 row: organization_id/supplier_id/tablet_id/public_qr_slug=NULL).
 //   QR(publicQrSlug)은 항상 NULL(운영자 원본 QR 미발급). withQrLink/ensureScreenSetQr 호출하지 않는다.
-const setCols = (p: string) =>
-  `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` +
-  `${p}supplier_id AS "supplierId", ${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
-  `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` +
-  `${p}public_qr_slug AS "publicQrSlug", ` +
-  `${p}created_by_user_id AS "createdByUserId", ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
-const blockCols = (p: string) =>
-  `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` +
-  `${p}is_visible AS "isEnabled", ${p}config, ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
+const setCols = (p: string) => `${p}id, ${p}organization_id AS "organizationId", ${p}service_key AS "serviceKey", ` + `${p}supplier_id AS "supplierId", ${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` + `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` + `${p}public_qr_slug AS "publicQrSlug", ` + `${p}created_by_user_id AS "createdByUserId", ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
+const blockCols = (p: string) => `${p}id, ${p}screen_set_id AS "screenSetId", ${p}block_type AS "blockType", ${p}sort_order AS "sortOrder", ` + `${p}is_visible AS "isEnabled", ${p}config, ${p}created_at AS "createdAt", ${p}updated_at AS "updatedAt"`;
 
 // TypeORM dataSource.query() 결과 정규화: INSERT ... RETURNING → rows 배열([{...}]) 직접 반환하지만
 //   UPDATE ... RETURNING → [rows, affectedCount] 형태로 반환한다(pg 드라이버 quirk). 두 형태 모두에서
@@ -78,19 +68,10 @@ function firstReturnedRow(result: unknown): any | null {
 }
 
 function buildAllowedRoles(serviceKey: string): PrefixedRole[] {
-  return [
-    `${serviceKey}:admin` as PrefixedRole,
-    `${serviceKey}:operator` as PrefixedRole,
-    'platform:admin',
-    'platform:super_admin',
-  ];
+  return [`${serviceKey}:admin` as PrefixedRole, `${serviceKey}:operator` as PrefixedRole, 'platform:admin', 'platform:super_admin'];
 }
 
-export function createOperatorScreenSetController(
-  dataSource: DataSource,
-  requireAuth: RequestHandler,
-  serviceKey: string,
-): Router {
+export function createOperatorScreenSetController(dataSource: DataSource, requireAuth: RequestHandler, serviceKey: string): Router {
   const router = Router();
   const allowedRoles = buildAllowedRoles(serviceKey);
 
@@ -100,11 +81,19 @@ export function createOperatorScreenSetController(
     const userId = authReq.user?.id || (authReq as any).authUser?.id;
     const roles = (authReq.user?.roles as string[] | undefined) ?? [];
     if (!userId) {
-      res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+      res.status(401).json({
+        success: false,
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
+      });
       return null;
     }
     if (!hasAnyServiceRole(roles, allowedRoles)) {
-      res.status(403).json({ success: false, error: `Operator or administrator role required for ${serviceKey}`, code: 'FORBIDDEN' });
+      res.status(403).json({
+        success: false,
+        error: `Operator or administrator role required for ${serviceKey}`,
+        code: 'FORBIDDEN',
+      });
       return null;
     }
     return userId;
@@ -113,22 +102,48 @@ export function createOperatorScreenSetController(
   // 소유·격리 조건은 각 쿼리에 인라인: origin='operator' AND service_key=<주입> AND deleted_at IS NULL.
   //   다른 서비스·매장(origin='store')·공급자(origin='supplier') 원본 접근 차단.
 
-  // GET / — 같은 service_key 운영자 원본 목록
+  // GET / — 같은 service_key 운영자 원본 목록(서버 페이지네이션)
   router.get('/', requireAuth, async (req, res) => {
     if (!requireOperator(req, res)) return;
     try {
+      const rawPage = Number.parseInt(String(req.query.page ?? '1'), 10);
+      const rawLimit = Number.parseInt(String(req.query.limit ?? '20'), 10);
+      const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+      const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 20;
+      const offset = (page - 1) * limit;
+      const where = `s.origin = 'operator' AND s.service_key = $1 AND s.deleted_at IS NULL`;
+
+      const countRows = await dataSource.query(
+        `SELECT count(*)::int AS total
+         FROM store_tablet_screen_sets s
+         WHERE ${where}`,
+        [serviceKey],
+      );
+      const total = Number(countRows?.[0]?.total ?? 0);
       const rows = await dataSource.query(
         `SELECT ${setCols('s.')},
                 (SELECT count(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
          FROM store_tablet_screen_sets s
-         WHERE s.origin = 'operator' AND s.service_key = $1 AND s.deleted_at IS NULL
-         ORDER BY s.updated_at DESC`,
-        [serviceKey],
+         WHERE ${where}
+         ORDER BY s.updated_at DESC, s.id DESC
+         LIMIT $2 OFFSET $3`,
+        [serviceKey, limit, offset],
       );
-      res.json({ success: true, data: rows });
+      res.json({
+        success: true,
+        data: rows,
+        page,
+        limit,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      });
     } catch (error: any) {
       console.error('[OperatorScreenSet] GET / error:', error);
-      res.status(500).json({ success: false, error: 'Failed to fetch screen sets', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch screen sets',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -138,7 +153,10 @@ export function createOperatorScreenSetController(
     if (!requireOperator(req, res)) return;
     try {
       const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
-      if (q.length < 2) { res.json({ success: true, data: [] }); return; }
+      if (q.length < 2) {
+        res.json({ success: true, data: [] });
+        return;
+      }
       const rows = await dataSource.query(
         `SELECT pm.id AS "masterId", pm.name, pm.barcode, pm.specification,
                 (SELECT d.summary FROM shared_product_descriptions d
@@ -157,7 +175,11 @@ export function createOperatorScreenSetController(
       res.json({ success: true, data: rows });
     } catch (error: any) {
       console.error('[OperatorScreenSet] GET /content-sources/o4o-descriptions error:', error);
-      res.status(500).json({ success: false, error: 'Failed to search o4o descriptions', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to search o4o descriptions',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -167,7 +189,9 @@ export function createOperatorScreenSetController(
   router.post('/preview', requireAuth, async (req, res) => {
     if (!requireOperator(req, res)) return;
     try {
-      let templateKey = resolveTemplateKey({ templateKey: req.body?.templateKey });
+      let templateKey = resolveTemplateKey({
+        templateKey: req.body?.templateKey,
+      });
       if (!OPERATOR_TEMPLATE_KEYS_ALLOWED.includes(templateKey)) templateKey = 'corner_information_basic_v1';
 
       const rawBlocks = Array.isArray(req.body?.blocks) ? req.body.blocks : [];
@@ -180,26 +204,54 @@ export function createOperatorScreenSetController(
           return sx - sy;
         });
 
-      const sections: Array<{ blockType: string; sortOrder: number; data: Record<string, unknown> }> = [];
+      const sections: Array<{
+        blockType: string;
+        sortOrder: number;
+        data: Record<string, unknown>;
+      }> = [];
       let order = 0;
       const contentSource = createOperatorContentSourceAdapter(dataSource);
       for (const { b } of visible) {
         const bt = b.blockType as string;
-        const config = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
+        const config = b.config && typeof b.config === 'object' && !Array.isArray(b.config) ? b.config : {};
         try {
           if (bt === 'content_list') {
             // org 인자는 store item 에만 쓰이며 operator adapter 가 store item 을 null 처리 → '' 전달.
             const items = await resolveContentListItems(contentSource, '', config);
-            if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
+            if (items.length > 0)
+              sections.push({
+                blockType: bt,
+                sortOrder: order++,
+                data: { items },
+              });
           } else if (bt === 'idle_media') {
             const parsed = parseIdleMediaConfig(config);
             if (parsed.ok) {
-              const resolved = resolveIdleMediaItems(parsed.value, { legacyIdlePlaylist: [], operatorCommon: [] });
-              const items = resolved.map((it) => ({ type: it.mediaType, url: it.url, ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}) }));
-              if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
+              const resolved = resolveIdleMediaItems(parsed.value, {
+                legacyIdlePlaylist: [],
+                operatorCommon: [],
+              });
+              const items = resolved.map((it) => ({
+                type: it.mediaType,
+                url: it.url,
+                ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}),
+              }));
+              if (items.length > 0)
+                sections.push({
+                  blockType: bt,
+                  sortOrder: order++,
+                  data: { items },
+                });
             }
           } else if (bt === 'product_content') {
-            sections.push({ blockType: bt, sortOrder: order++, data: { productRef: config.productRef ?? null, contentId: config.contentId ?? null } });
+            sections.push({
+              blockType: bt,
+              sortOrder: order++,
+              data: {
+                productRef: config.productRef ?? null,
+                contentId: config.contentId ?? null,
+              },
+            });
           } else if (bt === 'product_list') {
             // 운영자 원본엔 실상품 없음 — 뷰어 상품은 매장 적용 시점에 결정. preview 에서 생략(매장 preview 와 동일).
             continue;
@@ -212,10 +264,23 @@ export function createOperatorScreenSetController(
         }
       }
 
-      res.json({ success: true, data: { mode: 'screen_set', templateKey, screenSet: { id: 'preview', name: '(미리보기)' }, sections, tabletId: null } });
+      res.json({
+        success: true,
+        data: {
+          mode: 'screen_set',
+          templateKey,
+          screenSet: { id: 'preview', name: '(미리보기)' },
+          sections,
+          tabletId: null,
+        },
+      });
     } catch (error: any) {
       console.error('[OperatorScreenSet] POST /preview error:', error);
-      res.status(500).json({ success: false, error: 'Failed to build preview', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to build preview',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -225,12 +290,33 @@ export function createOperatorScreenSetController(
     if (!userId) return;
     try {
       const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
-      if (!name) { res.status(400).json({ success: false, error: 'Screen set name is required', code: 'SCREEN_SET_NAME_REQUIRED' }); return; }
-      if (name.length > 120) { res.status(400).json({ success: false, error: 'name too long (max 120)', code: 'VALIDATION_ERROR' }); return; }
+      if (!name) {
+        res.status(400).json({
+          success: false,
+          error: 'Screen set name is required',
+          code: 'SCREEN_SET_NAME_REQUIRED',
+        });
+        return;
+      }
+      if (name.length > 120) {
+        res.status(400).json({
+          success: false,
+          error: 'name too long (max 120)',
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
       let templateKey: string | null = null;
       if (req.body?.templateKey != null) {
         templateKey = String(req.body.templateKey);
-        if (!OPERATOR_TEMPLATE_KEYS_ALLOWED.includes(templateKey)) { res.status(400).json({ success: false, error: `invalid templateKey (allowed: ${OPERATOR_TEMPLATE_KEYS_ALLOWED.join(', ')})`, code: 'INVALID_TEMPLATE_KEY' }); return; }
+        if (!OPERATOR_TEMPLATE_KEYS_ALLOWED.includes(templateKey)) {
+          res.status(400).json({
+            success: false,
+            error: `invalid templateKey (allowed: ${OPERATOR_TEMPLATE_KEYS_ALLOWED.join(', ')})`,
+            code: 'INVALID_TEMPLATE_KEY',
+          });
+          return;
+        }
       }
       // CHK_stss_owner_scope operator 브랜치: org NULL · supplier NULL · service_key/created_by NOT NULL. status=operator_template.
       const ins = await dataSource.query(
@@ -241,11 +327,22 @@ export function createOperatorScreenSetController(
         [serviceKey, name, templateKey, userId],
       );
       const row = firstReturnedRow(ins);
-      if (!row) { res.status(500).json({ success: false, error: 'Insert returned no row', code: 'INTERNAL_ERROR' }); return; }
+      if (!row) {
+        res.status(500).json({
+          success: false,
+          error: 'Insert returned no row',
+          code: 'INTERNAL_ERROR',
+        });
+        return;
+      }
       res.status(201).json({ success: true, data: row });
     } catch (error: any) {
       console.error('[OperatorScreenSet] POST / error:', error);
-      res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create screen set',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -258,15 +355,23 @@ export function createOperatorScreenSetController(
          WHERE s.id = $1 AND s.origin = 'operator' AND s.service_key = $2 AND s.deleted_at IS NULL LIMIT 1`,
         [req.params.id, serviceKey],
       );
-      if (!rows?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
-      const blocks = await dataSource.query(
-        `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
-        [req.params.id],
-      );
+      if (!rows?.[0]) {
+        res.status(404).json({
+          success: false,
+          error: 'Screen set not found',
+          code: 'SCREEN_SET_NOT_FOUND',
+        });
+        return;
+      }
+      const blocks = await dataSource.query(`SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`, [req.params.id]);
       res.json({ success: true, data: { ...rows[0], blocks } });
     } catch (error: any) {
       console.error('[OperatorScreenSet] GET /:id error:', error);
-      res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch screen set',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -275,26 +380,54 @@ export function createOperatorScreenSetController(
     if (!requireOperator(req, res)) return;
     try {
       const id = req.params.id;
-      const owned = await dataSource.query(
-        `SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL LIMIT 1`,
-        [id, serviceKey],
-      );
-      if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL LIMIT 1`, [id, serviceKey]);
+      if (!owned?.[0]) {
+        res.status(404).json({
+          success: false,
+          error: 'Screen set not found',
+          code: 'SCREEN_SET_NOT_FOUND',
+        });
+        return;
+      }
       const sets: string[] = [];
       const params: any[] = [];
       if (typeof req.body?.name === 'string') {
         const nm = req.body.name.trim();
-        if (!nm || nm.length > 120) { res.status(400).json({ success: false, error: 'invalid name', code: 'VALIDATION_ERROR' }); return; }
-        params.push(nm); sets.push(`name = $${params.length}`);
+        if (!nm || nm.length > 120) {
+          res.status(400).json({
+            success: false,
+            error: 'invalid name',
+            code: 'VALIDATION_ERROR',
+          });
+          return;
+        }
+        params.push(nm);
+        sets.push(`name = $${params.length}`);
       }
       if (req.body?.templateKey !== undefined) {
         const tk: string | null = req.body.templateKey == null ? null : String(req.body.templateKey);
-        if (tk !== null && !OPERATOR_TEMPLATE_KEYS_ALLOWED.includes(tk)) { res.status(400).json({ success: false, error: `invalid templateKey (allowed: ${OPERATOR_TEMPLATE_KEYS_ALLOWED.join(', ')})`, code: 'INVALID_TEMPLATE_KEY' }); return; }
-        params.push(tk); sets.push(`template_key = $${params.length}`);
+        if (tk !== null && !OPERATOR_TEMPLATE_KEYS_ALLOWED.includes(tk)) {
+          res.status(400).json({
+            success: false,
+            error: `invalid templateKey (allowed: ${OPERATOR_TEMPLATE_KEYS_ALLOWED.join(', ')})`,
+            code: 'INVALID_TEMPLATE_KEY',
+          });
+          return;
+        }
+        params.push(tk);
+        sets.push(`template_key = $${params.length}`);
       }
-      if (sets.length === 0) { res.status(400).json({ success: false, error: 'no fields to update', code: 'VALIDATION_ERROR' }); return; }
+      if (sets.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'no fields to update',
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
       sets.push(`updated_at = NOW()`);
-      params.push(id); params.push(serviceKey);
+      params.push(id);
+      params.push(serviceKey);
       const upd = await dataSource.query(
         `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
          WHERE id = $${params.length - 1} AND origin = 'operator' AND service_key = $${params.length} AND deleted_at IS NULL
@@ -302,11 +435,22 @@ export function createOperatorScreenSetController(
         params,
       );
       const row = firstReturnedRow(upd);
-      if (!row) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      if (!row) {
+        res.status(404).json({
+          success: false,
+          error: 'Screen set not found',
+          code: 'SCREEN_SET_NOT_FOUND',
+        });
+        return;
+      }
       res.json({ success: true, data: row });
     } catch (error: any) {
       console.error('[OperatorScreenSet] PATCH /:id error:', error);
-      res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update screen set',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -315,28 +459,79 @@ export function createOperatorScreenSetController(
     if (!requireOperator(req, res)) return;
     try {
       const id = req.params.id;
-      const owned = await dataSource.query(
-        `SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL LIMIT 1`,
-        [id, serviceKey],
-      );
-      if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL LIMIT 1`, [id, serviceKey]);
+      if (!owned?.[0]) {
+        res.status(404).json({
+          success: false,
+          error: 'Screen set not found',
+          code: 'SCREEN_SET_NOT_FOUND',
+        });
+        return;
+      }
       const blocks = req.body?.blocks;
-      if (!Array.isArray(blocks)) { res.status(400).json({ success: false, error: 'blocks must be an array', code: 'VALIDATION_ERROR' }); return; }
+      if (!Array.isArray(blocks)) {
+        res.status(400).json({
+          success: false,
+          error: 'blocks must be an array',
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
       for (let i = 0; i < blocks.length; i++) {
         const b = blocks[i];
-        if (!b || typeof b !== 'object') { res.status(400).json({ success: false, error: `blocks[${i}] must be an object`, code: 'VALIDATION_ERROR' }); return; }
-        if (!OPERATOR_SET_BLOCK_TYPES.includes(b.blockType)) { res.status(400).json({ success: false, error: `blocks[${i}].blockType invalid (allowed: ${OPERATOR_SET_BLOCK_TYPES.join(', ')})`, code: 'INVALID_BLOCK_TYPE' }); return; }
-        if (b.config != null && (typeof b.config !== 'object' || Array.isArray(b.config))) { res.status(400).json({ success: false, error: `blocks[${i}].config must be an object`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+        if (!b || typeof b !== 'object') {
+          res.status(400).json({
+            success: false,
+            error: `blocks[${i}] must be an object`,
+            code: 'VALIDATION_ERROR',
+          });
+          return;
+        }
+        if (!OPERATOR_SET_BLOCK_TYPES.includes(b.blockType)) {
+          res.status(400).json({
+            success: false,
+            error: `blocks[${i}].blockType invalid (allowed: ${OPERATOR_SET_BLOCK_TYPES.join(', ')})`,
+            code: 'INVALID_BLOCK_TYPE',
+          });
+          return;
+        }
+        if (b.config != null && (typeof b.config !== 'object' || Array.isArray(b.config))) {
+          res.status(400).json({
+            success: false,
+            error: `blocks[${i}].config must be an object`,
+            code: 'INVALID_BLOCK_CONFIG',
+          });
+          return;
+        }
         if (b.blockType === 'idle_media') {
           const parsed = parseIdleMediaConfig(b.config);
-          if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${parsed.error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+          if (!parsed.ok && 'error' in parsed) {
+            res.status(400).json({
+              success: false,
+              error: `blocks[${i}].config: ${parsed.error}`,
+              code: 'INVALID_BLOCK_CONFIG',
+            });
+            return;
+          }
         }
         if (b.blockType === 'content_list') {
           const parsed = parseContentListConfig(b.config);
-          if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${(parsed as any).error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
+          if (!parsed.ok && 'error' in parsed) {
+            res.status(400).json({
+              success: false,
+              error: `blocks[${i}].config: ${(parsed as any).error}`,
+              code: 'INVALID_BLOCK_CONFIG',
+            });
+            return;
+          }
           // WO 차단: 운영자 원본은 매장 제작 콘텐츠(store_content)를 참조할 수 없다. o4o_product_description 만 허용.
           if (parsed.ok && parsed.value.items.some((it) => it.sourceType === 'store_content')) {
-            res.status(400).json({ success: false, error: `blocks[${i}].config: 운영자 원본은 매장 제작 콘텐츠를 사용할 수 없습니다 (O4O 표준 설명서만 허용).`, code: 'OPERATOR_STORE_CONTENT_FORBIDDEN' }); return;
+            res.status(400).json({
+              success: false,
+              error: `blocks[${i}].config: 운영자 원본은 매장 제작 콘텐츠를 사용할 수 없습니다 (O4O 표준 설명서만 허용).`,
+              code: 'OPERATOR_STORE_CONTENT_FORBIDDEN',
+            });
+            return;
           }
         }
       }
@@ -356,7 +551,11 @@ export function createOperatorScreenSetController(
       res.json({ success: true, data: updated });
     } catch (error: any) {
       console.error('[OperatorScreenSet] PUT /:id/blocks error:', error);
-      res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to save blocks',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
@@ -370,11 +569,22 @@ export function createOperatorScreenSetController(
          WHERE id = $1 AND origin = 'operator' AND service_key = $2 AND deleted_at IS NULL RETURNING id`,
         [id, serviceKey],
       );
-      if (!firstReturnedRow(del)) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      if (!firstReturnedRow(del)) {
+        res.status(404).json({
+          success: false,
+          error: 'Screen set not found',
+          code: 'SCREEN_SET_NOT_FOUND',
+        });
+        return;
+      }
       res.json({ success: true, data: { id, deleted: true } });
     } catch (error: any) {
       console.error('[OperatorScreenSet] DELETE /:id error:', error);
-      res.status(500).json({ success: false, error: 'Failed to remove screen set', code: 'INTERNAL_ERROR' });
+      res.status(500).json({
+        success: false,
+        error: 'Failed to remove screen set',
+        code: 'INTERNAL_ERROR',
+      });
     }
   });
 
