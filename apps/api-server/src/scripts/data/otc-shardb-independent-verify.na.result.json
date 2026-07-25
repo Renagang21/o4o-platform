@@ -1,0 +1,15 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-COMBO-FINAL-SHARD-B-NA-V7",
+  "expectedMasters": 210,
+  "checks": {
+    "koAuthoredCanonical": 210,
+    "koCanonicalDup": 0,
+    "easyDeprecated": 210,
+    "auditKo": 210,
+    "enCanonical": 210,
+    "enCanonicalDup": 0,
+    "targetOutsideWrite": 0,
+    "koGroupsWithMultipleContentHashes": 0
+  },
+  "verdict": "GREEN"
+}
