@@ -250,3 +250,60 @@ Get-ChildItem "$env:USERPROFILE\.codex" -Recurse -Filter "codex-windows-sandbox-
 - dependency 변경 없음.
 - git add/commit/push 없음.
 - 기존 dirty worktree 파일 수정 없음.
+
+## 15. 2026-07-25 Codex App 재점검 및 sandbox 복구
+
+- Codex CLI: `0.145.0`
+- 루트 `AGENTS.md`가 작업 시작 전 `CLAUDE.md`와 해당 범위의
+  `docs/baseline/` 문서를 읽도록 명시하므로, Codex의 `CLAUDE.md` 연결은
+  완료 상태다. 별도 `CODEX.md`나 지침 복제본은 필요하지 않다.
+- `C:\Users\sohae\.codex\config.toml`에서 이 저장소는 `trusted`로 등록되어
+  있다. 인증 파일은 조사하지 않았다.
+- 현재 Node `24.18.0`, pnpm `10.27.0`은 `package.json` engines 조건을
+  충족한다. 재현성이 필요한 작업에서는 Volta/.nvmrc 기준인 Node `22.18.0`,
+  pnpm `9.15.0`을 권장한다.
+
+Windows sandbox 실패 원인은 Codex App 실행 폴더에 helper 두 개가 빠진
+패키징/배치 문제였다. 같은 버전의 로컬 Codex standalone cache에서 다음
+파일을 Codex App의 `bin` 폴더로 복사했다.
+
+- `codex-windows-sandbox-setup.exe`
+- `codex-command-runner.exe`
+
+복구 후 escalation 없는 sandbox 환경에서 `git status --short`가 정상
+실행됨을 확인했다.
+
+Git 상태:
+
+- 브랜치: `main`
+- `git fetch origin` 완료, `main...origin/main` (ahead/behind 없음)
+- 기존 미추적 API 파일 3개는 다른 작업 세션 소유로 간주하여 보존
+- 본 CHECK 문서 외 저장소 파일 변경 없음
+- staging / commit / push 수행하지 않음
+
+## 16. 2026-07-25 사용자 승인 없는 실행 설정
+
+저장소 로컬 `.codex/config.toml`에 다음 기본값을 추가했다.
+
+```toml
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+```
+
+동작 원칙:
+
+- Codex 실행 중 권한 승인창을 표시하지 않는다.
+- 파일시스템 명령은 sandbox 제한 없이 실행할 수 있다.
+- 이 설정은 기술적 권한 경계를 완화할 뿐이며, 루트 `AGENTS.md`의 작업 범위,
+  파괴적 작업, 기존 dirty 파일 보존, Git staging/commit/push 승인 규칙은
+  그대로 적용한다.
+- 저장소를 신뢰할 수 있고 운영 규칙을 준수하는 에이전트 세션에서만
+  사용한다.
+
+검증:
+
+- Codex CLI `0.145.0`에서 저장소 설정을 로드한 `codex --version` 및
+  `codex features list` 실행 성공
+- 현재 세션 환경에서도 approval policy `never`, sandbox mode
+  `danger-full-access`가 적용된 상태임을 확인
+- 다음 새 Codex 세션부터도 저장소 로컬 기본값 적용
