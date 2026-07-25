@@ -177,16 +177,32 @@ export interface SupplierPartnerCommission {
 
 // ==================== Supplier Partner Commission API ====================
 
+/**
+ * 목록 조회 실패 sentinel.
+ * WO-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-LOAD-ERROR-CONTRACT-V1:
+ * 조회 실패를 빈 배열로 삼키면 화면에서 "정상 0건" 과 구분되지 않으므로 throw 한다.
+ * 서버 원문 대신 고정 코드만 전파하고, 원인은 console 로만 남긴다.
+ */
+export const SUPPLIER_COMMISSION_LOAD_FAILED = 'SUPPLIER_COMMISSION_LOAD_FAILED';
+
 export const supplierCommissionApi = {
   async getCommissions(): Promise<SupplierPartnerCommission[]> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/partner-commissions');
-      const result = response.data;
-      return result.data || [];
+      response = await api.get('/neture/supplier/partner-commissions');
     } catch (error) {
-      console.warn('[Supplier Commission API] Failed to fetch commissions:', error);
-      return [];
+      // 4xx / 5xx / 네트워크 오류
+      console.warn('[Supplier Commission API] Failed to fetch commissions:', extractApiError(error));
+      throw new Error(SUPPLIER_COMMISSION_LOAD_FAILED);
     }
+
+    // 200 이지만 payload 계약이 깨진 경우도 실패로 처리한다 (success=false / data 비배열)
+    const result = response.data;
+    if (!result?.success || !Array.isArray(result.data)) {
+      console.warn('[Supplier Commission API] Unexpected commissions payload shape');
+      throw new Error(SUPPLIER_COMMISSION_LOAD_FAILED);
+    }
+    return result.data as SupplierPartnerCommission[];
   },
 
   async create(data: {

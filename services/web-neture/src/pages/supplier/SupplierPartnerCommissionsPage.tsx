@@ -6,6 +6,10 @@
  *   데이터 계약 무변경 — 저장값은 제품별 **단위당 고정 수수료(원)** 이며 비율(%)·파트너별 분기가 없다.
  *   따라서 화면에도 "수수료율"·"파트너" 컬럼을 만들지 않는다.
  *
+ * WO-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-LOAD-ERROR-CONTRACT-V1:
+ *   목록 조회 실패(loadError)와 정상 0건(빈 상태)을 분리 렌더한다.
+ *   조회 실패는 `supplierCommissionApi.getCommissions()` 가 throw 하는 계약으로 전달된다.
+ *
  * 기능:
  * - 수수료 정책 목록 (제품별 단위당 고정 수수료)
  * - 수수료 정책 생성 / 수정 / 삭제
@@ -14,7 +18,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Edit2, Trash2, DollarSign, Package, X, Check } from 'lucide-react';
+import { Plus, Edit2, Trash2, DollarSign, Package, X, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   supplierCommissionApi,
@@ -51,6 +55,8 @@ export default function SupplierPartnerCommissionsPage() {
   const [commissions, setCommissions] = useState<SupplierPartnerCommission[]>([]);
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-...-LOAD-ERROR-CONTRACT-V1: 조회 실패와 정상 0건을 구분한다.
+  const [loadError, setLoadError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -65,12 +71,21 @@ export default function SupplierPartnerCommissionsPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [comms, prods] = await Promise.all([
+      // 목록 조회 실패는 throw 되므로 allSettled 로 제품 목록과 분리해 받는다.
+      // (제품 목록은 폼 보조 데이터라 기존처럼 실패해도 화면을 막지 않는다)
+      const [commsResult, prodsResult] = await Promise.allSettled([
         supplierCommissionApi.getCommissions(),
         supplierApi.getProducts(),
       ]);
-      setCommissions(comms);
-      setProducts(prods);
+
+      if (commsResult.status === 'fulfilled') {
+        setCommissions(commsResult.value);
+        setLoadError(false);
+      } else {
+        setCommissions([]);
+        setLoadError(true);
+      }
+      setProducts(prodsResult.status === 'fulfilled' ? prodsResult.value : []);
     } finally {
       setLoading(false);
     }
@@ -307,6 +322,32 @@ export default function SupplierPartnerCommissionsPage() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
           불러오는 중...
+        </div>
+      ) : loadError ? (
+        /* 조회 실패 — 빈 상태 문구를 함께 표시하지 않는다 */
+        <div style={{
+          textAlign: 'center', padding: '48px 24px',
+          backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #e2e8f0',
+        }}>
+          <AlertCircle size={40} style={{ color: '#f87171', margin: '0 auto 16px' }} />
+          <p style={{ fontSize: '16px', fontWeight: 500, color: '#475569', margin: 0 }}>
+            수수료 정책을 불러오지 못했습니다.
+          </p>
+          <p style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>
+            잠시 후 다시 시도해 주세요.
+          </p>
+          <button
+            onClick={fetchData}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              marginTop: '20px', padding: '10px 18px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#FFFFFF',
+              color: '#475569', fontSize: '14px', fontWeight: 600,
+              cursor: 'pointer', whiteSpace: 'nowrap',
+            }}
+          >
+            <RefreshCw size={14} /> 다시 시도
+          </button>
         </div>
       ) : commissions.length === 0 ? (
         <div style={{
