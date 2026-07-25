@@ -62,12 +62,21 @@
 | 대상 파일 오류 | ✅ 0 |
 | vite build | ✅ **exit 0** (`OperatorRoutes` 청크 정상 빌드, 11.4s) |
 | raw `<table>` 잔존 | ✅ 0 (grep 1건은 JSDoc 코멘트 문자열 "수동 `<table>`") |
-| 운영 smoke | ⏳ 배포 후(아래 §5) |
+| deploy-kpa-society (Cloud Run) | ✅ success (run 59bb84df5, 타 서비스 정상 skip) |
+| 운영 smoke (operator 브라우저, 프로덕션) | ✅ **PASS** — 아래 §운영 smoke |
+
+### 운영 smoke (2026-07-25, kpa-society.co.kr, operator sohae2100) — ✅ PASS
+`/operator/multilingual-product-contents` 라이브 검증:
+1. **DataTable 렌더** ✅ — 선택 체크박스(header+rows) · 정렬 컬럼(제목▴/수정일▴) · 시스템 작업 컬럼 · 5행 정상.
+2. **RowActionMenu(행 액션)** ✅ — 초안행=수정·발행 인라인 + **더보기 오버플로우에 보관**(inlineMax=2) / 보관행=수정·발행만(archive `visible !=archived` 로 hidden → 오버플로우 없음). 더보기 클릭 시 보관 액션 노출 확인.
+3. **일괄 ActionBar** ✅ — 전체선택 "5개 선택" → **"일괄 발행 (3)"**(발행 후보가 `publishedLocales>0 && status!=published` 정확 반영: 0-locale 2행 제외) · **"일괄 보관 (2)"**(미보관 초안 2행만, 보관 3행 제외). 후보 카운트로 발행 전 가드·상태 필터 로직 실증.
+4. **상태 필터** ✅ — "보관" 클릭 → 보관 3행만 표시 + 선택 초기화(ActionBar 사라짐).
+- 실제 발행/보관 **실행은 미수행**(프로덕션 PILOT 데이터 변형 회피). 단건 핸들러는 기존 `publishOperatorMlcGroup`/`archiveOperatorMlcGroup` 그대로라 회귀 없음. 가드·후보 산출은 UI 카운트로 완전 검증.
 
 ## 5. 산출물 / 후속
 
 - 변경 파일 **1** (`OperatorMultilingualContentListPage.tsx`) + 본 CHECK. **backend·route·권한·migration 0**.
-- commit: `(아래)` — path-specific(내 파일 1 + CHECK만). 배포 후 operator 브라우저 smoke(목록 렌더/필터/행 액션 메뉴/일괄 발행·보관) 별도 기록.
+- commit: `59bb84df5` — path-specific(내 파일 1 + CHECK만, `_msm*.mjs` 타 세션 스크래치 제외). 배포 success + operator 브라우저 smoke PASS(§4).
 - **후속 WO 순서**:
   1. `WO-…-OPERATOR-TABLET-SCREEN-SETS-LIST-STANDARDIZATION-V1` — #6 표준화. **선행**: 리스트 API 서버 페이지네이션(`page/limit/total`) 추가(백엔드).
   2. #7 은 카드형 큐 유지(표준화 비대상) — 변경 없음.
