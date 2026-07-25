@@ -103,6 +103,11 @@ export function StoreRecruitmentApplicationsView({ applications, loading, descri
                     <div className="text-xs text-slate-400 mt-0.5">
                       {a.supplierName && <span>{a.supplierName} · </span>}
                       {SERVICE_LABELS[a.serviceId] || a.serviceId || '-'} · 신청일 {new Date(a.appliedAt).toLocaleDateString('ko-KR')}
+                      {/* WO-O4O-KPA-SELLER-RECRUITMENT-APPLICATION-SUPPLIER-REVIEW-AND-STORE-STATUS-E2E-V1:
+                          처리일(승인·반려 일자) 표시 — payload decidedAt 재사용(additive, null이면 미표시). */}
+                      {a.decidedAt && (
+                        <> · 처리일 {new Date(a.decidedAt).toLocaleDateString('ko-KR')}</>
+                      )}
                     </div>
                   </div>
                   <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${st.cls}`}>{st.label}</span>
