@@ -1,0 +1,4514 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-V2-SHARED-RUNNER-APPLY-SUPPORT-V1",
+ "shard": "ga",
+ "lang": "ko",
+ "groups": 237,
+ "writeActual": 3348,
+ "writeExpected": 3348,
+ "match": true,
+ "reports": [
+  {
+   "fp": "664ad2a5254cde33",
+   "sourceRef": "58e656aa-9581-9ff6-6425-09b7bc07e186",
+   "expected": 28,
+   "t": 112,
+   "writeActual": {
+    "deprecated": 28,
+    "inserted": 28,
+    "flipped": 28,
+    "audited": 28
+   },
+   "post": {
+    "canonical1": 28,
+    "authored": 28,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4b7594d2a9c16c3c",
+   "sourceRef": "d68c8b63-1df6-d98b-ccdf-bb85ac122f91",
+   "expected": 17,
+   "t": 68,
+   "writeActual": {
+    "deprecated": 17,
+    "inserted": 17,
+    "flipped": 17,
+    "audited": 17
+   },
+   "post": {
+    "canonical1": 17,
+    "authored": 17,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d5818a48deed8016",
+   "sourceRef": "7e37ada0-0066-2cfa-afc1-b991dce64442",
+   "expected": 15,
+   "t": 60,
+   "writeActual": {
+    "deprecated": 15,
+    "inserted": 15,
+    "flipped": 15,
+    "audited": 15
+   },
+   "post": {
+    "canonical1": 15,
+    "authored": 15,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "24b0ab03427684d8",
+   "sourceRef": "b852f47a-3666-8a52-8e95-ca94b40a20a5",
+   "expected": 13,
+   "t": 52,
+   "writeActual": {
+    "deprecated": 13,
+    "inserted": 13,
+    "flipped": 13,
+    "audited": 13
+   },
+   "post": {
+    "canonical1": 13,
+    "authored": 13,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f64282c23fc32d56",
+   "sourceRef": "7e26bf92-e492-001e-36d4-da0fac344900",
+   "expected": 13,
+   "t": 52,
+   "writeActual": {
+    "deprecated": 13,
+    "inserted": 13,
+    "flipped": 13,
+    "audited": 13
+   },
+   "post": {
+    "canonical1": 13,
+    "authored": 13,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d61c88d00499a9cb",
+   "sourceRef": "2d6c3534-19da-ddb5-bbcf-164a0191aef5",
+   "expected": 12,
+   "t": 48,
+   "writeActual": {
+    "deprecated": 12,
+    "inserted": 12,
+    "flipped": 12,
+    "audited": 12
+   },
+   "post": {
+    "canonical1": 12,
+    "authored": 12,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4780976d089e70ef",
+   "sourceRef": "6e00b50b-0670-ad01-9f44-95d40f5eb7f8",
+   "expected": 11,
+   "t": 44,
+   "writeActual": {
+    "deprecated": 11,
+    "inserted": 11,
+    "flipped": 11,
+    "audited": 11
+   },
+   "post": {
+    "canonical1": 11,
+    "authored": 11,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "93fc28632d8a94bd",
+   "sourceRef": "1efd95c8-dcdb-0d71-1daa-d8b5868e41d2",
+   "expected": 11,
+   "t": 44,
+   "writeActual": {
+    "deprecated": 11,
+    "inserted": 11,
+    "flipped": 11,
+    "audited": 11
+   },
+   "post": {
+    "canonical1": 11,
+    "authored": 11,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2a6e05bf8a532211",
+   "sourceRef": "6b3c923e-d68e-a790-1d55-c02f769f6efa",
+   "expected": 10,
+   "t": 40,
+   "writeActual": {
+    "deprecated": 10,
+    "inserted": 10,
+    "flipped": 10,
+    "audited": 10
+   },
+   "post": {
+    "canonical1": 10,
+    "authored": 10,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b76e1472fb05523e",
+   "sourceRef": "de8556b2-7371-2ed8-ce74-d80b0ba4b8d7",
+   "expected": 10,
+   "t": 40,
+   "writeActual": {
+    "deprecated": 10,
+    "inserted": 10,
+    "flipped": 10,
+    "audited": 10
+   },
+   "post": {
+    "canonical1": 10,
+    "authored": 10,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "614026ae648df6df",
+   "sourceRef": "e0a4950d-9e70-f2e3-47d7-761e4f05698f",
+   "expected": 9,
+   "t": 36,
+   "writeActual": {
+    "deprecated": 9,
+    "inserted": 9,
+    "flipped": 9,
+    "audited": 9
+   },
+   "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b78514c002411e60",
+   "sourceRef": "71109054-437e-96c9-1e16-607ed892c7ac",
+   "expected": 9,
+   "t": 36,
+   "writeActual": {
+    "deprecated": 9,
+    "inserted": 9,
+    "flipped": 9,
+    "audited": 9
+   },
+   "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "dff04bff9f188ece",
+   "sourceRef": "65f0e2d0-cc88-8bc6-b9ee-bb0663ef06f3",
+   "expected": 9,
+   "t": 36,
+   "writeActual": {
+    "deprecated": 9,
+    "inserted": 9,
+    "flipped": 9,
+    "audited": 9
+   },
+   "post": {
+    "canonical1": 9,
+    "authored": 9,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "083b0fd3e62cb1f8",
+   "sourceRef": "06112b50-8a58-8c7a-39bb-68d06174d7cd",
+   "expected": 8,
+   "t": 32,
+   "writeActual": {
+    "deprecated": 8,
+    "inserted": 8,
+    "flipped": 8,
+    "audited": 8
+   },
+   "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "232b2e5a160f6767",
+   "sourceRef": "7d8c73f3-9e3a-c291-225e-a80a3cc71481",
+   "expected": 8,
+   "t": 32,
+   "writeActual": {
+    "deprecated": 8,
+    "inserted": 8,
+    "flipped": 8,
+    "audited": 8
+   },
+   "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7fe2f9672b69f527",
+   "sourceRef": "db8e8196-a02f-a946-8f66-b5396e295437",
+   "expected": 8,
+   "t": 32,
+   "writeActual": {
+    "deprecated": 8,
+    "inserted": 8,
+    "flipped": 8,
+    "audited": 8
+   },
+   "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9d499d9958b5004c",
+   "sourceRef": "c3fd6cab-f747-c10c-5c29-56f869f00159",
+   "expected": 8,
+   "t": 32,
+   "writeActual": {
+    "deprecated": 8,
+    "inserted": 8,
+    "flipped": 8,
+    "audited": 8
+   },
+   "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e2c3fe42d5fd6871",
+   "sourceRef": "66b13b67-4066-acbe-8e78-8535f73fe093",
+   "expected": 8,
+   "t": 32,
+   "writeActual": {
+    "deprecated": 8,
+    "inserted": 8,
+    "flipped": 8,
+    "audited": 8
+   },
+   "post": {
+    "canonical1": 8,
+    "authored": 8,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "62f69fad720fa8f7",
+   "sourceRef": "6b4d3b17-77c2-5ede-ece4-cd705587269d",
+   "expected": 7,
+   "t": 28,
+   "writeActual": {
+    "deprecated": 7,
+    "inserted": 7,
+    "flipped": 7,
+    "audited": 7
+   },
+   "post": {
+    "canonical1": 7,
+    "authored": 7,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "80a9e5a89b0e2d85",
+   "sourceRef": "d320e220-ef82-6ff5-68e4-78fae06dfd0a",
+   "expected": 7,
+   "t": 28,
+   "writeActual": {
+    "deprecated": 7,
+    "inserted": 7,
+    "flipped": 7,
+    "audited": 7
+   },
+   "post": {
+    "canonical1": 7,
+    "authored": 7,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "bcda13359a811f64",
+   "sourceRef": "d3743fc9-8e56-c8df-6add-6000cb8f86fa",
+   "expected": 7,
+   "t": 28,
+   "writeActual": {
+    "deprecated": 7,
+    "inserted": 7,
+    "flipped": 7,
+    "audited": 7
+   },
+   "post": {
+    "canonical1": 7,
+    "authored": 7,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ed26ddd430aeb3f7",
+   "sourceRef": "9aafdd36-0f6c-d3b2-4fcf-3d78a85b5d7d",
+   "expected": 7,
+   "t": 28,
+   "writeActual": {
+    "deprecated": 7,
+    "inserted": 7,
+    "flipped": 7,
+    "audited": 7
+   },
+   "post": {
+    "canonical1": 7,
+    "authored": 7,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "0052d098c3727103",
+   "sourceRef": "21da4694-6679-62ba-460b-f85b5a3afa54",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "0e60e198b81d47d3",
+   "sourceRef": "14d20ebe-f14f-f38d-21b9-b4c182b562bf",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "198e22490e736709",
+   "sourceRef": "c2ce2622-b967-3380-38e5-35cff96b09a7",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "28c1b02b2ce11efa",
+   "sourceRef": "e63e5939-c5b7-4419-432b-1bd1ede5a4ce",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2f8e132cf904133c",
+   "sourceRef": "5f8b3c74-cbe9-7fe7-2f79-51f3541f2762",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "40a838c0a8736d00",
+   "sourceRef": "f31406a7-f49c-fffa-bbee-be8cd6e31b12",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "60e3134cd33cd73e",
+   "sourceRef": "c0b513d4-76fa-f9c7-6368-ef938ed927fa",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6e5866f7d8b68878",
+   "sourceRef": "3fe0e323-5904-7d94-c216-f2c56f02848f",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7ae40fe752490db8",
+   "sourceRef": "3cabb9d5-1c8b-8036-7841-181b4fd511f6",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8b45c40b66cec385",
+   "sourceRef": "ecc08c7e-a914-54cc-3e67-82ba757d4541",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ab809aab3b143ab0",
+   "sourceRef": "aa109d42-aef9-8bbc-a0ba-3a4ed8135b4a",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "cbe886ecfa77b824",
+   "sourceRef": "2db844ec-e58d-38da-4441-4528f285b08f",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f709d99f1bc8bb3b",
+   "sourceRef": "f2fb07f4-adb3-7648-d063-4bb34a4a163b",
+   "expected": 6,
+   "t": 24,
+   "writeActual": {
+    "deprecated": 6,
+    "inserted": 6,
+    "flipped": 6,
+    "audited": 6
+   },
+   "post": {
+    "canonical1": 6,
+    "authored": 6,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2704d3b8d08cce70",
+   "sourceRef": "9667cce2-710d-6356-cb86-c5ad938cecfa",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "35a3796e8ef745cf",
+   "sourceRef": "57db5832-432c-7666-3e02-a706ed22a878",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "46c10ff20c089e6a",
+   "sourceRef": "c6a4d7a8-79b5-49a4-6da9-15ccb5998ffc",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6d4cd7b15668fa20",
+   "sourceRef": "38446d03-c5c7-7dd1-9244-350db3c0b5ec",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8177d7414fdc763c",
+   "sourceRef": "e7a103da-1070-7a60-379e-479818e60f01",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8691bae0d6ea1c23",
+   "sourceRef": "aa1fdb9d-26d2-e688-f0c1-99393f81bb9e",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8d3b2893743300c0",
+   "sourceRef": "265b65ce-71a8-5562-eab2-df6eac9d1f6f",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a9a668bf4949eaf7",
+   "sourceRef": "31a0765f-3acd-4f38-4d69-20299f52e742",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "abbce60f391d6f0c",
+   "sourceRef": "bc90fd77-7a33-e6fc-b1c5-d5eb05decf90",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b78ddb5c9ea822ec",
+   "sourceRef": "21e3e19a-c4d1-a264-7584-abd8723bc704",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c6d1632da292722e",
+   "sourceRef": "580d552f-efc7-381f-fe66-1ee31b1bec47",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e060a4b16a3e692f",
+   "sourceRef": "1e120cd3-281e-c670-4c28-a86db556265e",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f97a72d9edb4e13e",
+   "sourceRef": "223cf114-8074-11a9-fcc7-b52975c9ff13",
+   "expected": 5,
+   "t": 20,
+   "writeActual": {
+    "deprecated": 5,
+    "inserted": 5,
+    "flipped": 5,
+    "audited": 5
+   },
+   "post": {
+    "canonical1": 5,
+    "authored": 5,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "10e0dba7d3180141",
+   "sourceRef": "e5722afb-bb7c-768d-541c-fc9806ec331c",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "133c83cbcb50a60b",
+   "sourceRef": "8d6412bd-0563-f237-ef39-811590a912d8",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1825fcc845ff2634",
+   "sourceRef": "8133c14c-3fd8-75de-189e-d16557f87d6f",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1fbd19952c2ddfbc",
+   "sourceRef": "dafe55ea-191d-9cbf-3629-1aeaea647854",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "331512e90df08d9d",
+   "sourceRef": "bae64213-2e96-ff09-98bb-32bb4c0635a6",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "3809ff65776c1640",
+   "sourceRef": "ac59ea5e-faa8-6011-a04f-c297e50eed59",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "43f932cb915a6bf2",
+   "sourceRef": "45e71e43-ab84-d235-a782-541a25813379",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4ff20d8856c5883a",
+   "sourceRef": "2f4b537d-8777-1284-b6e2-58e15be2229e",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "57c7fc1032aedd7a",
+   "sourceRef": "e1315f16-38ec-f0e6-5be8-edb5953e3230",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5ace56266dc62af2",
+   "sourceRef": "598cecdc-bb60-f65e-15ba-ce15db6f1ffc",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "686f2360c857c258",
+   "sourceRef": "999a3849-a95c-3816-2840-d1731eb55149",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "79f711a861ce0ede",
+   "sourceRef": "7e4a0e54-2558-c23e-11f0-cb57c8e3d50a",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "882ed0e6ee077f14",
+   "sourceRef": "5b746ca2-7f6b-d033-b521-e790181760a6",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8c35ffe9d895a3a7",
+   "sourceRef": "468ec3eb-a5d6-5438-4122-f3df3ceab64c",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9873d5351c544046",
+   "sourceRef": "748466a1-06db-b7f3-8f47-2dacaa15b532",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9c0016c42bb39c59",
+   "sourceRef": "530d1c34-c00d-0bb6-d5fd-cb636823b08c",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a4a9c315b713584e",
+   "sourceRef": "1dbcd470-b4d8-b61f-7743-b6dbdca6c181",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "bc442da47da6e0d3",
+   "sourceRef": "3436fe62-1408-ec34-df93-36ea31fdca7f",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c4f0ac6fa84b063c",
+   "sourceRef": "cfd98602-6e04-beb9-068f-97d2306a6bdb",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d1297e388ed08c77",
+   "sourceRef": "4107bd23-d19f-adc5-2631-aad474311962",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e105a6af0e12ad80",
+   "sourceRef": "f182bd11-a97c-ef37-7500-0e9a66574705",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f2049850576ee39b",
+   "sourceRef": "5ccbbf2e-4132-bbf6-ba0a-289d061a54aa",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "fb76d814c5cc5c25",
+   "sourceRef": "2348f0e5-21ef-ebb6-b89b-83149f28dd29",
+   "expected": 4,
+   "t": 16,
+   "writeActual": {
+    "deprecated": 4,
+    "inserted": 4,
+    "flipped": 4,
+    "audited": 4
+   },
+   "post": {
+    "canonical1": 4,
+    "authored": 4,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "00b4626846f2614c",
+   "sourceRef": "25a5598e-fe33-692b-e233-45d23c78836e",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "013028bece32072c",
+   "sourceRef": "cee9befc-ad1a-609c-5f13-9a70cd3b33e7",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "02032e96ad38cf58",
+   "sourceRef": "8e3dfa2b-b9e1-33e8-4b31-28e3609c9da4",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "05804022ff3c6dd0",
+   "sourceRef": "6f839396-5249-9013-e4a5-015e6e954cd1",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "10721f47913336fc",
+   "sourceRef": "ceb65d49-8116-4fae-2a0c-2b13412b45b2",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1e6d132a3d8b0f40",
+   "sourceRef": "9e071211-4fd4-324a-acff-a3ab29769f73",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "27f250645ac90138",
+   "sourceRef": "f2c3965e-7756-3afd-6ff8-3c6fa98a3206",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "28f82ebfbdb175b4",
+   "sourceRef": "7ce81cce-71af-c2d2-ed9d-81965185688b",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2b047ce62a9b7391",
+   "sourceRef": "3dae0c7a-9a0a-1865-0b0d-c259b32c1e69",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "3818ed9dc090a910",
+   "sourceRef": "173882b9-5209-7a9a-96ea-8bb7689102e4",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4ed668e021c7980f",
+   "sourceRef": "48524350-14cb-529b-7ba9-389e16e301c0",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "580c2bceeb8b8c8f",
+   "sourceRef": "440d9584-8d73-704d-448c-56b230d97d14",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5dfb0393155d04f7",
+   "sourceRef": "78f7ce5b-9ee8-ad45-9425-aab2cb25addc",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "639fa3ce8d5bc7b9",
+   "sourceRef": "116d51d9-87e4-b5e5-eaea-ec25bf2b033e",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6785617ce9a570ad",
+   "sourceRef": "27ca78a6-9084-2188-0b1c-e48bd5b69c21",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6faa8db034e85d7a",
+   "sourceRef": "5ed3c66a-3723-b9c5-2060-05f441f6fe04",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "77aba91650acf027",
+   "sourceRef": "6f28c1da-e4f2-e575-93d9-720e0d4d270f",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7e72f2b8bf3b5514",
+   "sourceRef": "e3e6da5a-4730-504c-93bf-8073b3c36d85",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "84b75a4768633c13",
+   "sourceRef": "df8b5106-9e83-52cb-8321-e249b67da41e",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8a07953d05679af5",
+   "sourceRef": "1d323f09-e438-1ec9-ab40-867ddfecb0dc",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8df15bb31a95c7aa",
+   "sourceRef": "f01b1032-5442-3250-0692-f10a1fb1704b",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "920b0d3b0efde11c",
+   "sourceRef": "e7d2299d-2ac7-d3a0-d545-4b91721a642c",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "985628c410325026",
+   "sourceRef": "6c8d876a-6475-56c8-07ec-4a5f62a195d8",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9caa9d19dbb4c385",
+   "sourceRef": "16abe159-9839-a88f-93e8-a91e24292d26",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9e8f053da5fb7e8f",
+   "sourceRef": "ed42e34e-949e-a154-3e98-b4f2b0ae82fa",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a685879888af3a96",
+   "sourceRef": "5b0a6d70-fbe2-445e-3db9-f79361288b0f",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "aec3a42361cc34c1",
+   "sourceRef": "4e437220-38fb-b70e-ebaa-5966c8b6acc9",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b281347ee7c39276",
+   "sourceRef": "7bca897e-6a66-aea2-acfa-6ff64fee6850",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b63153f1a97ebfff",
+   "sourceRef": "fc6a6e98-59d7-0404-bbed-059148caedfd",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "bd53cf3ccbc29673",
+   "sourceRef": "3e26f9d4-9f47-78fa-6a84-9549edee9c5e",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c4776a3a25450adb",
+   "sourceRef": "d7d7ee06-896d-4bf1-42a8-8857077e5053",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d0c867af50422c7a",
+   "sourceRef": "4eb2a458-ec91-7d54-f83e-efcace0a8fd8",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d524a5bc166987b6",
+   "sourceRef": "a99df0e8-ef03-3525-ea15-355664a5db73",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e08c834e0c1e6324",
+   "sourceRef": "42e98036-a41d-4b83-beee-a3dbc5e421ce",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e3e7ccbc3b448433",
+   "sourceRef": "cc31375a-8f70-0ae2-2f84-4b3cc607ff9f",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e7882410a21ed3e0",
+   "sourceRef": "260875dd-09fb-a10e-6517-897d0d09c5a3",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f00f124a1842bef3",
+   "sourceRef": "0c2e67b8-ff8b-5ee4-6d02-ef7b01ff7a67",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "fe48948e8466af42",
+   "sourceRef": "620e7e9d-9cc5-f80e-98be-10505163415a",
+   "expected": 3,
+   "t": 12,
+   "writeActual": {
+    "deprecated": 3,
+    "inserted": 3,
+    "flipped": 3,
+    "audited": 3
+   },
+   "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "03b9b7b6c6bfb6ca",
+   "sourceRef": "b823284d-60a6-a72a-58b3-95bd923cfe2e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "04e627a1d4e19850",
+   "sourceRef": "c010db6f-fc45-b0f6-e4eb-db3c35ac1662",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "060a2aeaff738d50",
+   "sourceRef": "53ad40d8-d7a5-3303-b829-71075cf395de",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "07fc676e58209819",
+   "sourceRef": "8329f66e-a95a-3bd7-5670-10a217d2f7e5",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "0ad33a864b06101d",
+   "sourceRef": "a4d5691a-3607-5c9a-9875-e7252c817c0c",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "0e2f88b1a2606120",
+   "sourceRef": "26047331-6871-6318-5823-0d5e602442e8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "0fe95bd05e5fd230",
+   "sourceRef": "3b500bce-5123-07ff-6630-0bca4a9eeb56",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "11aab8129c76987e",
+   "sourceRef": "ff32d5bc-9644-2eec-c2cd-d92a0e1f2d9b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "132477a754646ee4",
+   "sourceRef": "7177bfe3-c6ff-5a2b-5fb2-d64c53b95d26",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "16a6777e37abc25e",
+   "sourceRef": "c077190c-7978-3b8e-b565-f6c38d46781e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1780e2a90b613283",
+   "sourceRef": "06ef91be-d5b0-99be-dce3-fd1e1fd49ad0",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "199c5a09d13a5fd4",
+   "sourceRef": "e6b04657-9f06-b15b-9443-30fa0cfca534",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1d304ec612019315",
+   "sourceRef": "6bc7363b-b8b6-d0ef-4d81-d6eb2d866ad7",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1f00f3bf5b951ebf",
+   "sourceRef": "3cefd21e-2c23-6a79-efbd-d988c4f70dec",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "22b3232d7b3822fd",
+   "sourceRef": "def415fa-b90d-013b-c12d-0e55b659dff6",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "24642329b55f8bee",
+   "sourceRef": "f42bee05-c8fa-d1bb-5647-f43d01582005",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "25f79547a6530cff",
+   "sourceRef": "de0b72ba-b5c2-836e-7fa3-ffa3521558d8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "27e876df368a0f0b",
+   "sourceRef": "2f00100f-ccf5-7078-5bbd-75b86f08bbcd",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2a89a83b34cb4d50",
+   "sourceRef": "2ff6cdaa-e03f-123d-d0e5-a3c3e7912447",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "2d30a01cfdd7790f",
+   "sourceRef": "5d7ae4b9-3cf8-56a8-3c0b-7d0e1648796b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "322640a94f769330",
+   "sourceRef": "f9928d45-69c0-ad46-e33d-da67ce348541",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "36bc82292a385b63",
+   "sourceRef": "1da6771a-93de-fbad-700b-735069e4ffb4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "391ed73ab5ffdf36",
+   "sourceRef": "7e8da542-e343-e95e-9f87-551d429d55a4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "398c975441bb5a86",
+   "sourceRef": "4af4c8e0-1f9f-2093-0ad4-2ab788c8efe5",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "3c9568aa8455dc24",
+   "sourceRef": "8b58cb43-3262-c3f1-a246-b915422a335d",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "3e4bed5f0cc1eec4",
+   "sourceRef": "43291deb-3e30-475f-7bf1-c51c7a623f41",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "414020d7c462341f",
+   "sourceRef": "3e9ebe73-0645-0aef-eb75-ea7df74de6e9",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4375e1e711575eeb",
+   "sourceRef": "418d3eb9-059d-6789-b7a5-39e5b5896d4a",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "46a00cc6178d7f7d",
+   "sourceRef": "c95aa4b9-970a-1efc-7afb-d8a7f9987829",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4ac87c161a37fac5",
+   "sourceRef": "3d0353c0-a204-2560-cc54-514668c2bb2f",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4ddd404bd69fa3e9",
+   "sourceRef": "a6b6eeb1-bd24-226f-688f-515448554c40",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "4efbaeb9a7c87943",
+   "sourceRef": "ef34591d-c377-ba2d-c22e-f0900195ca10",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "509f996acf0ccfce",
+   "sourceRef": "90fde53f-9eec-3f3a-b090-6426e30e2831",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5449774eb24976f6",
+   "sourceRef": "da83b501-6caa-77e4-a3ec-649a9e087ad8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "55e31fff8707ba18",
+   "sourceRef": "0abfdc29-3123-b711-0395-72a877c2a173",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "572a9afe8d5ac38f",
+   "sourceRef": "6b71081f-a598-8365-fb42-a7cc8afe0380",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "599a55a0b70b09b7",
+   "sourceRef": "cd9e48cf-6f57-ccc9-fd56-ed43517ba828",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5b48cc3909610017",
+   "sourceRef": "50aa2c2b-515a-e788-7643-f419a856a17b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5c436ef89c3165ae",
+   "sourceRef": "c84cb23a-14b9-e1f6-fa94-480f4e70d65a",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5e2aab81883b7826",
+   "sourceRef": "4cf1e070-487c-a543-137e-56e89eb92274",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "601ec8585d5e2ae9",
+   "sourceRef": "820ff69d-e46a-b55b-c2a5-6a2577e94903",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "62e4a46b16736224",
+   "sourceRef": "1d146866-ecd5-ceee-bcfe-a6ff801b2287",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6337fd4ef4d086f3",
+   "sourceRef": "a5a46d8d-0a98-2966-f578-c66ac56880f8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "652d8531744eac46",
+   "sourceRef": "997561e8-2d5b-5ed2-9451-700c4fa8f8c6",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "65d28adf3f4f9332",
+   "sourceRef": "a7529835-4d67-8ce6-c086-3c547f953885",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6906f13f6f8e0692",
+   "sourceRef": "15286ed7-214a-8513-42bf-8a11574da6e4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6ad32e1cb3dc37e8",
+   "sourceRef": "e84208cf-e2e1-012b-320c-15ee6d0b00aa",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "6dbf7070c9d3532d",
+   "sourceRef": "37ab6b96-95d9-76ca-a266-11ef2cbff7ed",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "70e93026d7574a52",
+   "sourceRef": "efcf26e2-5514-ea76-1cfd-94cdf098e12b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "71f5ea66a6415fee",
+   "sourceRef": "1a03c59c-419e-7577-9d4f-a8a26fa04ec8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7480c049866094c1",
+   "sourceRef": "acaa678f-60e9-ed2d-9ade-b7caab344f30",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "757587c91d29beb5",
+   "sourceRef": "ba26be58-738a-20a2-d657-8d012eee0b20",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "769dab523a9759dd",
+   "sourceRef": "1874d7f6-4005-d7c1-9f48-8b1766f99bc3",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7aabb3e6fd8ac3a7",
+   "sourceRef": "8664736b-1d67-f88c-e246-5d2b6640abf2",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7cbbccb4a39c276e",
+   "sourceRef": "b3fb547f-0dc5-2b5d-7601-a585819b73f3",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "7ef06fde3f94150d",
+   "sourceRef": "8bd75c7f-d3d0-f0f2-129e-50b34defc245",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "803735a1ec6084c3",
+   "sourceRef": "3fdf37a0-7066-911f-59ac-39b733ab627e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "82f4164a16ab3693",
+   "sourceRef": "40c12c60-198d-04ee-a9b5-799849c0c3ae",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "83ac010b3cb9a082",
+   "sourceRef": "b484a957-eb58-62a2-905b-78f05e676146",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "84c3d845f7da758b",
+   "sourceRef": "7d72a366-6c86-94f0-e5f7-8b49e40cf541",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "86a50a4e54601f45",
+   "sourceRef": "a39fe8a1-e302-1460-500b-e1334f20f1aa",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "873c4551fca8a7ff",
+   "sourceRef": "af517e46-c030-cf17-53a0-9605bc0d7c7e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8b3de31e6949c5e2",
+   "sourceRef": "4e5c4ab9-92dc-ff89-0b99-4afb1780eafb",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8db9e572ee81f0a3",
+   "sourceRef": "784a3ab9-5318-a19b-0dbe-45d842da04b2",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "8ee567781d1b65af",
+   "sourceRef": "a03acd4c-3090-7611-9e99-9c41998bba80",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "91dfbe433659aee4",
+   "sourceRef": "3b945d41-8eb8-1b06-e605-5e8e3f86da0f",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "94f53c7dd28dd80c",
+   "sourceRef": "488deb33-6932-dfbc-8bde-516341a40daf",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "97a69c83668bfb4e",
+   "sourceRef": "5c8256d0-120c-cccd-963f-cca71d0cdfbe",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "98e4b278e03ce4bb",
+   "sourceRef": "b5a889d1-4102-2670-962e-6a1046dfdf8b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "99fc187407d568be",
+   "sourceRef": "dff3b45c-58d0-f439-9159-3e834595a8e4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9b510457d7e7eb0d",
+   "sourceRef": "726bc316-ecdc-e133-763f-5b6231812fee",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9ccf2832b836c356",
+   "sourceRef": "8942e12e-4830-f804-9aef-4a1b07360589",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "9ebb6360e8bc205a",
+   "sourceRef": "bd30f053-c260-30ef-c789-8c899153bc2d",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a0c3e978acc91f6e",
+   "sourceRef": "02c33b42-13bf-aa57-aadb-a728948be8a4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a197d14bc9b002e6",
+   "sourceRef": "76b2ede1-cebc-04d7-39e4-c57d16b52c48",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a26359f91ba0e49c",
+   "sourceRef": "3081b78f-c1ba-469a-f4a3-01f557a314e3",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a4ecd9b93fa02799",
+   "sourceRef": "9dfa53b4-8b91-969d-24e5-3ff896ba420e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a6c08021a4590bbc",
+   "sourceRef": "4ff4a1fb-6a4d-c723-d222-55024fde6a91",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a8953bb2e60c6039",
+   "sourceRef": "cc99b0a2-3934-8c7d-1ca2-3f10a6b881b7",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "a9c1b4c7822275b7",
+   "sourceRef": "73adeeff-c3a0-9f12-4671-8a3d1d56f4eb",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "abe13d46ce4d4c5c",
+   "sourceRef": "bb862709-e50d-5b28-3dbe-c254867793bf",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "aceca8913c50023e",
+   "sourceRef": "3d8c8d94-db0b-c75b-444e-95b79af6235f",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "afbffd9d3596dcdf",
+   "sourceRef": "1538b6f9-1df3-d3fe-fc1c-037baa861c58",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "afed7f510181584f",
+   "sourceRef": "41f6214e-4d93-c49d-f953-aba698c5d576",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b4c185ffcc5a8489",
+   "sourceRef": "b43ba6cc-8adb-ca3e-dcba-217f3ada5c15",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b66ba0612cd0fcc2",
+   "sourceRef": "351c9313-ff31-8fe3-1165-cac92697d1b5",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b707c0510403a8bc",
+   "sourceRef": "12e7000e-09c3-bcbd-37bd-26302d0af902",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "b9ed15d5e1f1ce3b",
+   "sourceRef": "3904cdb1-c088-7186-1459-0e85039a74bc",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "badd18192eb3ec2e",
+   "sourceRef": "dfe8f065-d36d-f6ca-ddd9-c4a095299cf6",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "be194bf43c1f999a",
+   "sourceRef": "d649a6a1-ea3d-37f4-3a93-5b02eb3ddb70",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "befd7f1aebc5d7b0",
+   "sourceRef": "c218039c-b492-f4ca-6005-66fba86075b4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c18e5f0be799e408",
+   "sourceRef": "e04202d4-e849-5b40-5493-5ef8ff4d51f8",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c349ec7221c18df2",
+   "sourceRef": "a8c212cc-9735-d674-46dc-4353423fa598",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c59acfa72b07bfdf",
+   "sourceRef": "12be7aca-278b-f0cb-ce27-865954bf8a28",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c6c8559004395b34",
+   "sourceRef": "93a294b9-0021-dd17-0639-3e41e90643a9",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "c9221e2e5e63a217",
+   "sourceRef": "d7e8fa7c-b04e-1bf9-12a2-d638b10a64f0",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "cae7ce957b7961f6",
+   "sourceRef": "a76e682d-95c7-56f6-d517-089184389430",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "cc805fdb6e4881aa",
+   "sourceRef": "cbeea20b-7ff6-9279-4b08-4867236946e7",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ce22c5d06cf97312",
+   "sourceRef": "ec1ca4cd-c252-3a88-823e-567715bfe1bf",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "cf8d3eb4e1a93dd3",
+   "sourceRef": "885506dc-166b-6a05-38ec-aa9f15ecff4d",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d351f0d950243f4a",
+   "sourceRef": "7daae04e-9adb-57c7-f05f-49e267c1d289",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d4f0325f1d43f521",
+   "sourceRef": "81d60430-1c39-8f59-0aaa-def43e606a5c",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d632d6b5b2db048b",
+   "sourceRef": "ba76ea0f-79af-fd13-b44f-a3b1a7177b1a",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "d9025a1f040b565f",
+   "sourceRef": "1ad07f5f-4368-c37b-9d91-9410e8959d93",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "da07e7408b827974",
+   "sourceRef": "7dc9d9ae-4101-23ce-6e07-ab8e6ab1e42c",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "dd38195ab2e76f31",
+   "sourceRef": "9e6495ed-cb5a-523d-bdaa-d4a2595e1df7",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "de6e99500d68b2ff",
+   "sourceRef": "4b8f2bd3-6dce-7eb7-82ee-5e65fda5639e",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "dee42779a93db23b",
+   "sourceRef": "7e21e8d2-3dbb-993b-8d69-54151e2d5f20",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e27a81319ef81c84",
+   "sourceRef": "f5a44362-3448-7270-8231-8251c8e6577b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e50e1b471ac61ed5",
+   "sourceRef": "c42e4798-0c9e-a70e-f732-2f4e81ae7e1a",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "e79d5c0039f4a8fc",
+   "sourceRef": "d20d50cb-a6d7-7a56-fd36-a8eef62cd0f0",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ea906f89206e3c87",
+   "sourceRef": "71872e21-44a4-0d94-0842-dc540250257b",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "eb8543bce52dab83",
+   "sourceRef": "5d7fd7db-db70-e057-8233-158ad6c348f4",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ec0030fead49cd80",
+   "sourceRef": "aec2c192-7ac2-c68e-580e-10837680d7ca",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ecffaec3560915c1",
+   "sourceRef": "29a0ab70-44a9-9a71-e281-5396c4c1ad59",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "eecaccf7bba25a1a",
+   "sourceRef": "44744701-a552-616d-5713-532fdbd70468",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f08c634521b878e7",
+   "sourceRef": "c0944bb1-4286-eaf5-79f8-fc14160881f1",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f0efd4e0f4734fc0",
+   "sourceRef": "23ec8be2-7c30-ef80-d60c-1f9447002de7",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f1e14212086d2451",
+   "sourceRef": "126571d1-065a-1fcf-3a35-d55ad3efae69",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f2fcdcee6d853a1c",
+   "sourceRef": "1f2d3706-88b4-9537-b8d5-339cbd7149c9",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f5089291deb49ccd",
+   "sourceRef": "52acfce2-36b0-501a-a8fe-d2acc3195515",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "f6217a771dcd92e6",
+   "sourceRef": "de107d5c-27c4-ebe6-de00-a737fa9aeb4a",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "fa893a8783d7efb2",
+   "sourceRef": "9ee91fb2-e9a4-4e77-cfda-e2a09ad4cc54",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "fd41ab790f762c1c",
+   "sourceRef": "4f2977f4-509e-1821-e1aa-6d0795d13461",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "ffa622d4eb062d75",
+   "sourceRef": "a7e85ab7-5257-f62b-39bc-40558cfc0a16",
+   "expected": 2,
+   "t": 8,
+   "writeActual": {
+    "deprecated": 2,
+    "inserted": 2,
+    "flipped": 2,
+    "audited": 2
+   },
+   "post": {
+    "canonical1": 2,
+    "authored": 2,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "1cd9268bda44c81a",
+   "sourceRef": "7f3d8f5b-b84f-00be-c2c1-f04ab8fa286a",
+   "expected": 1,
+   "t": 4,
+   "writeActual": {
+    "deprecated": 1,
+    "inserted": 1,
+    "flipped": 1,
+    "audited": 1
+   },
+   "post": {
+    "canonical1": 1,
+    "authored": 1,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "5dadceed75c75ee2",
+   "sourceRef": "98946e0e-0978-6b1b-316e-36ddf826cbec",
+   "expected": 1,
+   "t": 4,
+   "writeActual": {
+    "deprecated": 1,
+    "inserted": 1,
+    "flipped": 1,
+    "audited": 1
+   },
+   "post": {
+    "canonical1": 1,
+    "authored": 1,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  },
+  {
+   "fp": "bc0165cae33e4d4a",
+   "sourceRef": "617d14c1-00d8-beb3-3436-e412c12c71d0",
+   "expected": 1,
+   "t": 4,
+   "writeActual": {
+    "deprecated": 1,
+    "inserted": 1,
+    "flipped": 1,
+    "audited": 1
+   },
+   "post": {
+    "canonical1": 1,
+    "authored": 1,
+    "easyStillCanonical": 0,
+    "dup": 0
+   },
+   "status": "APPLIED"
+  }
+ ]
+}

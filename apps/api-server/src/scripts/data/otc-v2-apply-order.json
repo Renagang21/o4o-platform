@@ -1,0 +1,25 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-V2-SHARED-RUNNER-APPLY-SUPPORT-V1",
+ "order": [
+  "ga",
+  "na",
+  "da"
+ ],
+ "status": {
+  "ga": {
+   "koApplied": true,
+   "enApplied": false,
+   "independentVerified": false
+  },
+  "na": {
+   "koApplied": false,
+   "enApplied": false,
+   "independentVerified": false
+  },
+  "da": {
+   "koApplied": false,
+   "enApplied": false,
+   "independentVerified": false
+  }
+ }
+}
