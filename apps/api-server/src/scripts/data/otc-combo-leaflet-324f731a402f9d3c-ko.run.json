@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "씨엠지뷰플러스연질캡슐|A11JC|500밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "20abcb03-c484-0802-6db0-560dc5c95231",
+  "expected": 3,
+  "anomalies": [],
+  "fetched": 3,
+  "easyCanonicalExactly1": 3,
+  "authoredConflict": 0,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2306,
+  "htmlMd5": "a8f72d76d80621cc4a8e3b7ac3ce067f",
+  "summary": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하시 노년기의 비타민 …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "stepA_inserted": 3,
+  "writeActual": {
+    "stepA_inserted": 3,
+    "demoted": 3,
+    "flipped": 3,
+    "audited": 3
+  },
+  "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "deprecatedEasy": 3,
+    "dup": 0
+  }
+}

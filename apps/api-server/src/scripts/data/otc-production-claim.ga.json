@@ -2709,6 +2709,256 @@
    "op": "oral-combo-leaflet",
    "status": "CLAIMED",
    "note": "GA-V9 SHARD-A owner. A=가/B=나/C=다. LPT master-balanced 결정론 분할. shard A 선(先) apply → 완료 후 나에게 write-owner 인계."
+  },
+  {
+   "groupKey": "뉴로친연질캡슐|A11JC|300밀리그램|연질캡슐",
+   "targetFp": "1886f154add7e883",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "비타콤보정|A11EX|50밀리그램|정",
+   "targetFp": "1b05c7fed570aea9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "마그토닉연질캡슐|A11JB|770밀리그램|연질캡슐",
+   "targetFp": "1fbbf510ea1aa8ee",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "본에이디에스정|A12AX|475밀리그램|정",
+   "targetFp": "24034e401415f77e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "콘드로친정|A11JC|1155밀리그램|정",
+   "targetFp": "263c482cdd8998ca",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "에버칼디정|A12AX|250밀리그램|정",
+   "targetFp": "2c4c8d0e4a6af575",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "알마트린정|A02AD01|160밀리그램|정",
+   "targetFp": "2e9a6e3d4346951a",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "씨엠지뷰플러스연질캡슐|A11JC|500밀리그램|연질캡슐",
+   "targetFp": "324f731a402f9d3c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "고칼디정|A12AX|1250밀리그램|정",
+   "targetFp": "333df4714f9bb514",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "메가콘로엠정|A11JC|1155밀리그램|정",
+   "targetFp": "358e3ace9863a8db",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "탑콘도르600정|A11EX|600밀리그램|정",
+   "targetFp": "387a2666285312cf",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "메가트루액티브정|A11A|51.6밀리그램|정",
+   "targetFp": "3a4ff9d4125265d6",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "아이비즈헬스연질캡슐|A11JC|500밀리그램|연질캡슐",
+   "targetFp": "3c9c20d03f9105ef",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "광동리버샷정|A13A|100밀리그램|정",
+   "targetFp": "40c6205f26fee47d",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "임팩타민프리미엄정|A11JC|50밀리그램|정",
+   "targetFp": "45209005858ddf1c",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "파워쎈연질캡슐|A11JA|60밀리그램|연질캡슐",
+   "targetFp": "461e9192ee994d4e",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "칼디원정|A12AX|100밀리그램|정",
+   "targetFp": "4ddadea2eb2ac7aa",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "차엠지연질캡슐|A11JC|400밀리그램|연질캡슐",
+   "targetFp": "514fd6594b94cc54",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "본디칼플러스정|A12AX|750밀리그램|정",
+   "targetFp": "536fce28f97e10c0",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "본에디칼정|A12AX|250밀리그램|정",
+   "targetFp": "55929ffb5723a2a9",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "보니카디정|A12AX|475밀리그램|정",
+   "targetFp": "592ae89328abef02",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "진셀몬큐텐정|A11AB|10밀리그램|정",
+   "targetFp": "5b2dd790dfa8b5c4",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "임팩타민정|A11EC|50밀리그램|정",
+   "targetFp": "5bbd45464019a57b",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "콘트라민정|A11EX|600밀리그램|정",
+   "targetFp": "656673310c5eb3f6",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
+  },
+  {
+   "groupKey": "훼로모아캡슐|B03AE01|275밀리그램|캡슐",
+   "targetFp": "66c6aba36c63440a",
+   "agent": "GA",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "op": "oral-combo-leaflet",
+   "status": "DONE",
+   "note": "GA-V9 shardA batch22 KO+EN LIVE (2026-07-25, sohae)"
   }
  ]
 }

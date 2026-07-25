@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "파워쎈연질캡슐|A11JA|60밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "17d4b1d1-0046-9287-beb2-3d3e678b809d",
+  "expected": 3,
+  "anomalies": [],
+  "fetched": 3,
+  "easyCanonicalExactly1": 3,
+  "authoredConflict": 0,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 2119,
+  "htmlMd5": "ca3f49de38faba6a34e7e517cb72fc7c",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "stepA_inserted": 3,
+  "writeActual": {
+    "stepA_inserted": 3,
+    "demoted": 3,
+    "flipped": 3,
+    "audited": 3
+  },
+  "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "deprecatedEasy": 3,
+    "dup": 0
+  }
+}
