@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "판토마그정|A12CC|290.8밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "bf57d8da-1cd7-93ff-eef2-1ce9b286ad08",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 2670,
+  "builtMd5": "6b675c06252c56e4d1822eea3f64a3f9",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "step1_inserted": 3,
+  "step2_flipped": 3,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 3,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "디카듀오정100/1000|A12AX|250밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "20331b09-82f2-968a-da4b-96fd5d9fbb0b",
+  "expected": 3,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
+  "fetched": 3,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 3,
+  "htmlLen": 1855,
+  "htmlMd5": "0c59ccfb0dce227e79f092b636b642ec",
+  "summary": "임신 ∙ 수유기, 발육기, 노년기의 비타민D 보급과 뼈, 이의 발육불량, 구루병의 예방",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

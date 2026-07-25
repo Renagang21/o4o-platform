@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "훼스탈슈퍼자임정|A09AA|60밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "e5473ea5-97d3-5e45-3aa9-91a4dd790e9c",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 2296,
+  "builtMd5": "bded6a9200567c172e7767e74a51436d",
+  "existingEnCanonical": 3,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "note": "en 이미 canonical·byte-identical — write 0"
+}

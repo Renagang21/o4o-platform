@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "훼리너프캡슐|B03AE01|150밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "a6746dd4-c292-e760-7a92-cd4c1566b772",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 2794,
+  "builtMd5": "4ef0fdd664fa480a7bee1b5e5a80b762",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "step1_inserted": 3,
+  "step2_flipped": 3,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 3,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

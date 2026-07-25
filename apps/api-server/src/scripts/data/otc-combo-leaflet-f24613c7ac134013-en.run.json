@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "파밀라제정|A09AA|175밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "ff83f3dc-d741-b3fd-c1de-7194b078dba6",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 2006,
+  "builtMd5": "a266a4f5bac94324343b4ef15c4043d7",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "step1_inserted": 3,
+  "step2_flipped": 3,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 3,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

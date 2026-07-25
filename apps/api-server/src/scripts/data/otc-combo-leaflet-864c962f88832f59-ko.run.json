@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "훼스탈슈퍼자임정|A09AA|60밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "e5473ea5-97d3-5e45-3aa9-91a4dd790e9c",
+  "expected": 3,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
+  "fetched": 3,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 3,
+  "htmlLen": 1487,
+  "htmlMd5": "73a84ab791cce1185434c7b6bf261276",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 구…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

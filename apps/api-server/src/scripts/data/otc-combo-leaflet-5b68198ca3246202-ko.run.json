@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "유어칼큐정|A12AX|475밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "dae9a4ed-211f-4b94-6130-130b4f96f302",
+  "expected": 3,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
+  "fetched": 3,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 3,
+  "htmlLen": 1801,
+  "htmlMd5": "b5217feaf12c769afcee3cfd8c5d3ecb",
+  "summary": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, …",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

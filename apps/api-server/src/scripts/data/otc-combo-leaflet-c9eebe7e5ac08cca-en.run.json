@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "헤모포민큐캡슐|B03AE01|163.05밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "f73f9e9f-809b-3cbd-3439-e7a7d18be1b0",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 3140,
+  "builtMd5": "358c43d6ae3386b35099743ff371a1fa",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "step1_inserted": 3,
+  "step2_flipped": 3,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 3,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

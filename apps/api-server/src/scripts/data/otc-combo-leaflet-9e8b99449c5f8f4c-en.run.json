@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "en",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "우르솔연질캡슐|A05AA|50밀리그램|연질캡슐",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "7c8bcd9d-ace8-0706-b443-7ab2d7131934",
+  "anomalies": [],
+  "targetMasters": 3,
+  "koFingerprintKinds": 1,
+  "builtLen": 3246,
+  "builtMd5": "f5c62e0aa09573ea6f30aecea512974e",
+  "existingEnCanonical": 0,
+  "existingEnNeedsReview": 0,
+  "plan": {
+    "STEP1_en_needs_review_INSERT": 3,
+    "STEP2_flip": 3,
+    "total": 6
+  },
+  "step1_inserted": 3,
+  "step2_flipped": 3,
+  "koUnchanged": true,
+  "post": {
+    "enCanonical": 3,
+    "enNeedsReview": 0,
+    "dup": 0
+  }
+}

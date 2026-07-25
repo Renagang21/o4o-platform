@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "훼리너프캡슐|B03AE01|150밀리그램|캡슐",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "a6746dd4-c292-e760-7a92-cd4c1566b772",
+  "expected": 3,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
+  "fetched": 3,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 3,
+  "htmlLen": 1672,
+  "htmlMd5": "a5311703741c71473206a7020c20a51d",
+  "summary": "철 결핍성 빈혈의 예방 및 치료",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

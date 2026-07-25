@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
+  "groupKey": "메디다제정|A09AA02|30밀리그램|정",
+  "sourceType": "mfds_drug_otc",
+  "sourceRef": "6d58b00e-e623-2735-1143-eb44ef0b4fea",
+  "expected": 3,
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
+  "fetched": 3,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 3,
+  "htmlLen": 1494,
+  "htmlMd5": "ec20b1d1e6495b6677282593bc727af0",
+  "summary": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 0,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
+}

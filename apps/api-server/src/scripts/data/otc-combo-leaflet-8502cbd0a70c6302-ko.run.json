@@ -1,0 +1,39 @@
+{
+  "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
+  "lang": "ko",
+  "mode": "APPLY",
+  "status": "APPLIED",
+  "dbWrite": 1,
+  "groupKey": "비바원정|A11JA|100밀리그램|정",
+  "sourceType": "mfds_drug_otc_nutrition_combo",
+  "sourceRef": "304cf910-b28c-8f1b-4e2a-5670658df71e",
+  "expected": 3,
+  "anomalies": [],
+  "fetched": 3,
+  "easyCanonicalExactly1": 3,
+  "authoredConflict": 0,
+  "anyCanonical": 3,
+  "existingAuthoredCanonical": 0,
+  "htmlLen": 1660,
+  "htmlMd5": "172d7ab42f2a47e870794a45b473205d",
+  "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통…",
+  "writePlan": {
+    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_B_easy_demote": 3,
+    "STEP_B_authored_flip": 3,
+    "audit": 3
+  },
+  "stepA_inserted": 3,
+  "writeActual": {
+    "stepA_inserted": 3,
+    "demoted": 3,
+    "flipped": 3,
+    "audited": 3
+  },
+  "post": {
+    "canonical1": 3,
+    "authored": 3,
+    "deprecatedEasy": 3,
+    "dup": 0
+  }
+}
