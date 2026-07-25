@@ -2,7 +2,7 @@
 
 > WO: `WO-O4O-KPA-SERVICE-OPERATOR-INFORMATION-AND-ROLE-VISIBILITY-AUDIT-V1`
 > Date: 2026-07-25
-> Result: **PASS (기존 정보의 최소 연결 완료)**
+> Result: **PASS (구현·배포·운영 반영 완료)**
 
 ## 1. 조사 결과
 
@@ -74,20 +74,38 @@
 | 데스크톱/모바일 공통 메뉴 및 역할 helper 연결 확인 | PASS |
 | 기존 로그아웃과 모든 기기 로그아웃 동선 정적 확인 | PASS |
 
-운영자 인증 세션이 연결된 브라우저가 없어 역할별 실제 클릭 smoke는 수행하지 않았다.
+### 배포 및 운영 smoke
+
+- 코드 commit: `43f578f3998ff0b123583b4f75f47ff7b68ec3da`
+- GitHub Actions `Deploy Web Services (Cloud Run)`: run `30144899338` PASS
+  - `deploy-kpa-society`: PASS
+  - 다른 Web 서비스: 정상 skip
+- Cloud Run revision: `kpa-society-web-01697-pfb`
+- traffic: 100%
+
+| 운영 검증 | 결과 |
+|---|---|
+| `https://kpa-society.co.kr/` | HTTP 200 |
+| 비인증 `/operator` 접근/SPA 렌더 | HTTP 200 |
+| 비인증 `/mypage/profile` 접근/SPA 렌더 | HTTP 200 |
+| 비인증 `/mypage/settings` 접근/SPA 렌더 | HTTP 200 |
+| 라이브 번들 `KPA 서비스 · 서비스 운영자 (kpa:operator)` | PASS |
+| 라이브 번들 `KPA 서비스 · 서비스 관리자 (kpa:admin)` | PASS |
+| 라이브 번들 `/mypage/profile`, `/mypage/settings` | PASS |
+| 인증 역할별 메뉴 클릭 | `NOT_RUN_NO_AUTH_BROWSER` |
+
+인앱 브라우저 연결과 인증 세션이 없어 역할별 실제 클릭 및 로그아웃 실행은 수행하지 않았다.
+로그아웃과 모든 기기 로그아웃은 기존 handler와 route가 변경되지 않았음을 코드 및 production build로 확인했다.
 
 ## 6. Git 및 작업공간 상태
 
-- 이 WO는 commit, push, deploy를 명시적으로 승인하지 않았으므로 수행하지 않았다.
-- 이 WO 파일은 stage하지 않았다.
+- 지정된 코드 3파일과 본 CHECK만 path-specific stage하여 코드 commit과 `main` push를 완료했다.
+- 배포 결과를 본 CHECK에 추가한 문서 전용 마감 commit을 별도로 남겼다.
 - 다른 세션 소유의 기존 dirty/untracked 파일을 수정하거나 stage하지 않았다.
-- 조사 중 다른 세션의 다음 staged 변경이 확인되었으며 그대로 보존했다.
-  - `apps/api-server/src/scripts/data/otc-oral-combo-shardC-manifest.da.json`
-  - `docs/checks/CHECK-O4O-OTC-BIGCON-HOLD-REASON-MANIFEST-SYNC-DA-V1.md`
 - 기존 dirty/untracked `.codex/`, API 임시 스크립트, 환경 CHECK 문서도 보존했다.
 
 ## 7. 후속
 
 - 신규 운영자 관리 시스템이나 역할 부여 기능은 필요하지 않다.
-- 역할별 실제 계정으로 데스크톱 드롭다운과 모바일 `내정보` 시트를 확인하는 운영 smoke는
-  인증 가능한 테스트 계정과 연결 브라우저가 준비될 때 수행할 수 있다.
+- 역할별 실제 계정으로 데스크톱 드롭다운과 모바일 `내정보` 시트를 확인하는 클릭 smoke만
+  인증 가능한 테스트 계정과 연결 브라우저가 준비될 때 보완할 수 있다.
