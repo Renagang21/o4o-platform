@@ -101,7 +101,6 @@ interface SecondaryCounts {
   //   판매자 모집 노출 승인 대기 = neture_partner_recruitments.exposure_status='pending'
   //   (service_id='kpa-society' scope). 운영자 승인 큐(proxy GET ?exposureStatus=pending) 와 동일 조건.
   recruitmentExposurePendingCount: number;
-  serviceApplicationCount: number;
   storeStats: { totalStores: number; activeStores: number } | null;
 }
 
@@ -298,7 +297,6 @@ async function fetchSecondaryCounts(
     recruitmentExposurePendingRows,
     storeCountRows,
     totalMembersRows,
-    serviceAppRows,
   ] = await Promise.all([
     dataSource.query(`
       SELECT COUNT(*) AS count FROM kpa_members WHERE status = 'pending'
@@ -327,12 +325,11 @@ async function fetchSecondaryCounts(
     isAdmin
       ? dataSource.query(`SELECT COUNT(*) AS count FROM kpa_members`).catch(() => [{ count: '0' }])
       : Promise.resolve([{ count: '0' }]),
-    isAdmin
-      ? dataSource.query(`
-          SELECT COUNT(*) AS count FROM kpa_approval_requests
-          WHERE entity_type IN ('organization_join', 'org_join') AND status = 'pending'
-        `).catch(() => [{ count: '0' }])
-      : Promise.resolve([{ count: '0' }]),
+    // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
+    //   '서비스 신청'(organization_join/org_join) KPI 제거 — 해당 entity_type 은 어디서도 INSERT 되지 않아
+    //   항상 0이고(실 승인 큐는 organization-join-request.controller 의 entity_type='membership' + kpa:admin),
+    //   link /operator/organization-requests 는 실재 화면 없는 dead route 였다. 조직 가입 승인 관리 UI 부재로
+    //   재배선 불가 → 대시보드 항목 제거(관리 API 는 유지, 대시보드 광고만 제거).
   ]);
 
   return {
@@ -345,7 +342,6 @@ async function fetchSecondaryCounts(
       activeStores: parseInt(storeCountRows[0]?.active_count || '0', 10),
     },
     totalMembers: parseInt(totalMembersRows[0]?.count || '0', 10),
-    serviceApplicationCount: parseInt(serviceAppRows[0]?.count || '0', 10),
   };
 }
 
@@ -359,7 +355,6 @@ function buildConfig(
   const {
     pendingMembers,
     totalMembers,
-    serviceApplicationCount,
     eventOfferPendingCount,
     productApplicationPendingCount,
     recruitmentExposurePendingCount,
@@ -435,18 +430,9 @@ function buildConfig(
             status: 'neutral' as const,
             link: '/operator/members',
           },
-          {
-            key: 'service-apps',
-            label: '서비스 신청',
-            value: serviceApplicationCount,
-            status:
-              serviceApplicationCount > 0
-                ? ('warning' as const)
-                : ('neutral' as const),
-            // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
-            //   폐지된 /operator/pharmacy-requests → 조직 가입 요청(ai-service-apps 와 동일 route)로 정렬.
-            link: '/operator/organization-requests',
-          },
+          // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
+          //   'service-apps'(서비스 신청) KPI 제거 — dead route /operator/organization-requests +
+          //   잘못된 entity_type 카운트(항상 0). 조직 가입 승인 관리 UI 부재로 재배선 불가.
         ]
       : []),
   ];
@@ -530,17 +516,8 @@ function buildConfig(
       link: '/operator/signage/hq-media',
     });
   }
-  if (isAdmin && serviceApplicationCount > 0) {
-    aiSummary.push({
-      id: 'ai-service-apps',
-      message:
-        serviceApplicationCount > 3
-          ? `서비스 신청 ${serviceApplicationCount}건 긴급 — 승인 처리가 필요합니다.`
-          : `서비스 신청 ${serviceApplicationCount}건 대기 — 검토해 주세요.`,
-      level: serviceApplicationCount > 3 ? 'warning' : 'info',
-      link: '/operator/organization-requests',
-    });
-  }
+  // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
+  //   'ai-service-apps' 제거 — dead route + 항상 0 카운트(위 KPI 제거와 동일 사유).
   aiSummary.sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
   aiSummary.splice(3);
 
@@ -604,14 +581,8 @@ function buildConfig(
       link: '/operator/recruitment-exposure',
     });
   }
-  if (isAdmin && serviceApplicationCount > 0) {
-    actionQueue.push({
-      id: 'aq-service-apps',
-      label: '서비스 신청 검토',
-      count: serviceApplicationCount,
-      link: '/operator/organization-requests',
-    });
-  }
+  // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
+  //   'aq-service-apps' 제거 — dead route + 항상 0 카운트(위 KPI/AI 제거와 동일 사유).
 
   // Block 4: Activity Log — content/forum/signage/recentActivity merge + sort + splice(15)
   const activityLog: ActivityItem[] = [];
