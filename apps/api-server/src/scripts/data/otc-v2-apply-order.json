@@ -19,9 +19,10 @@
    "note": "사후 독립검증 24/24 GREEN (postverify.na)"
   },
   "da": {
-   "koApplied": false,
-   "enApplied": false,
-   "independentVerified": false
+   "koApplied": true,
+   "enApplied": true,
+   "independentVerified": true,
+   "note": "사후 독립검증 33/33 GREEN (postverify.da) · HOLD 6master write 0 · V2 종합 2509"
   }
  }
 }
