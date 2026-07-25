@@ -1,0 +1,516 @@
+{
+ "wo": "WO-O4O-OTC-ORAL-COMBO-FINAL-SHARD-C-DA-V10",
+ "shard": "C",
+ "owner": "agent-da",
+ "ssot": "otc-combo-shard-assignment-ga-v9.json (d4ad68c70)",
+ "producible": {
+  "fp": 68,
+  "master": 204
+ },
+ "hold_source": {
+  "fp": 1,
+  "master": 3,
+  "name": "빅콘에스600정",
+  "fpid": "44a15789a2cc1596",
+  "reason": "ko-compose SKIP: 원문 효능/용법/주의 섹션 부재"
+ },
+ "writePlan": {
+  "ko_4T": 816,
+  "en_2T": 408,
+  "total_6T": 1224,
+  "formula": "master당 6T (KO 4T + EN 2T)"
+ },
+ "sourceRef_deterministic": "uuid(md5(targetFp))",
+ "sourceRef_unique": true,
+ "expected_gates": {
+  "canonicalDup": 0,
+  "target_out_write": 0,
+  "live_drift": 0,
+  "route": "oral",
+  "apply": "HELD — write-owner 인계 후"
+ },
+ "en_validation": {
+  "built": 68,
+  "missing": 0,
+  "koreanContam": 0,
+  "axisMismatch": 0
+ },
+ "groups": [
+  {
+   "fp": "1a7a148e266cbe1c",
+   "title": "본디칼정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "682ad5bb-124d-2d4d-0fa2-2c3cea07c414"
+  },
+  {
+   "fp": "1f0269685bce4f9f",
+   "title": "큐텐훌연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "02d072da-ee18-b930-a7d4-843431f9761c"
+  },
+  {
+   "fp": "20d2ebbdf3bd32e7",
+   "title": "쎄이칼정(수출명:칼슘포르트씨디(CalciumFortCD))",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "d49942b3-5c40-601a-c297-881daef3c340"
+  },
+  {
+   "fp": "25d8a762067ba83a",
+   "title": "스카이비백정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "15e52b34-69cf-558d-ec2c-4e1be633cf73"
+  },
+  {
+   "fp": "299235cefbdfd98f",
+   "title": "비타제트플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "31d7defc-7dd5-2e4d-cd84-e4a4f8848d6e"
+  },
+  {
+   "fp": "2d4008481b44252c",
+   "title": "겔티-포르테연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "29068812-0db4-4182-5410-ff67fd768d87"
+  },
+  {
+   "fp": "310f47f4a20ef6b1",
+   "title": "렛잇비프로정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "31a435a4-af0d-7405-719c-3bfcc3048b96"
+  },
+  {
+   "fp": "32ce5f7869e21b4e",
+   "title": "파워콘친골드연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "dcfb6405-e2de-5418-b99f-055da728db8a"
+  },
+  {
+   "fp": "358c220b7db16c84",
+   "title": "포인타민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "75fd7d76-5f95-53a8-dedb-f010b90d68d3"
+  },
+  {
+   "fp": "37599c6dcdf867a6",
+   "title": "뉴란스플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "3c28cbfa-66b5-b045-421f-2cc0ca4e023e"
+  },
+  {
+   "fp": "38d8787980a9dde6",
+   "title": "본투본연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "e9b56370-643c-c6ff-ddcc-123221d2051f"
+  },
+  {
+   "fp": "3be487163a6cf496",
+   "title": "글로칼디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "624baad0-35b2-f74e-22c3-e1ff1cfed24d"
+  },
+  {
+   "fp": "4097cbf9689444f3",
+   "title": "판스틴정",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "cf822602-7f96-d2b5-7120-eda36c4a6000"
+  },
+  {
+   "fp": "460f42726570ca9b",
+   "title": "프리번정",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "79a62bc4-de08-a048-8474-310a4c8e584c"
+  },
+  {
+   "fp": "4b000dafc008898a",
+   "title": "마그포에이드연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "861905a1-7892-843b-bc46-85f1aa0aef23"
+  },
+  {
+   "fp": "512eefc8b284e381",
+   "title": "고운자임맘정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "1f0e2e31-2ca0-941e-8af9-965c8acb1d66"
+  },
+  {
+   "fp": "52c2ccb1ef320086",
+   "title": "지엘알마게이트정500밀리그램",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "775ee27c-2ed2-8618-5e16-a252a4261ddf"
+  },
+  {
+   "fp": "5574f1679c7d4a9d",
+   "title": "하이카디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "4a0c7c2c-246d-7e99-f9ba-97001482dd88"
+  },
+  {
+   "fp": "583babaf9d4154b8",
+   "title": "빅톤에프연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "444d5834-0ac6-2420-af09-2da491f5b918"
+  },
+  {
+   "fp": "59b498de40781f29",
+   "title": "에버칼정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "690cfd38-16a2-9a6a-9ce3-83d89cff7bc3"
+  },
+  {
+   "fp": "5b71840c557a6bec",
+   "title": "브이텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "55622026-4c96-6209-ab00-5b10f7128464"
+  },
+  {
+   "fp": "65030d8586b0083a",
+   "title": "코큐민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "1c5b0f8d-6f0b-a089-6143-a2aad08a96bb"
+  },
+  {
+   "fp": "65f7a64b45e2570a",
+   "title": "투헬스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "52ca370e-a725-da51-dae0-b7d6c21f2544"
+  },
+  {
+   "fp": "69dce344e39edb1d",
+   "title": "디카맥스에브리원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "c531d6e4-836e-818f-6c6e-154357169698"
+  },
+  {
+   "fp": "6bc944c88ba2a521",
+   "title": "엘비페롤플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "1366bca1-210e-ca47-c3bf-3acb1ec60511"
+  },
+  {
+   "fp": "6e8e4f9413f7c94e",
+   "title": "유칼본정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "80ea83c8-3515-5490-fdf9-3a4b0b7e68ce"
+  },
+  {
+   "fp": "71a8bb9722d92af2",
+   "title": "디카돌정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "0fa86b07-4202-e648-d9df-18b97604cbb0"
+  },
+  {
+   "fp": "726cb639c9554366",
+   "title": "엔비100정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "422f8d02-7499-f461-9146-d4323d6c49ba"
+  },
+  {
+   "fp": "76d3eafc108f6b1c",
+   "title": "유미칼디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "760ec0ea-94af-49cd-4c4e-591e9f11b4fa"
+  },
+  {
+   "fp": "7a50a84f4d17d00c",
+   "title": "프라스칼-디정750밀리그람",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "c5966209-6080-2485-caab-b932114b8952"
+  },
+  {
+   "fp": "7df0b33e1a6602b7",
+   "title": "티엔코드아이연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "fa2402fb-4dea-5cff-9f3c-c776404fedc0"
+  },
+  {
+   "fp": "802761625b2013b3",
+   "title": "멘토비엠정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "a6644d33-e0ab-1906-2705-6cfa7f29e060"
+  },
+  {
+   "fp": "823766c16ba7698f",
+   "title": "칼엠디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "ebac7c67-e43d-43ea-81ff-359373db0836"
+  },
+  {
+   "fp": "850d843f4751ec79",
+   "title": "아로비타정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "bd59529c-88d0-cd89-da7c-996e678f8be2"
+  },
+  {
+   "fp": "86d3a8652919f73d",
+   "title": "마그비맥스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "b8d588ff-f97e-381b-c236-c2b8899547c8"
+  },
+  {
+   "fp": "8a6630a39783fa61",
+   "title": "시트큐정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "988fc8d9-e78a-5658-f663-fc82e06e7298"
+  },
+  {
+   "fp": "8ec3a230948541a2",
+   "title": "엑세라민프로정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "fcebd77e-0b4c-9c01-20d3-48003ed6fa8f"
+  },
+  {
+   "fp": "912cec7ec2490a67",
+   "title": "이엠지연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "6a2b401a-11bb-708c-666b-1b9be972bb0c"
+  },
+  {
+   "fp": "93a712777d86a988",
+   "title": "마이메가100정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "262da9da-df31-bf2f-eeee-c7d2dd0c3146"
+  },
+  {
+   "fp": "950a9d4306b2590c",
+   "title": "유한비타민씨정1000mg",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "7988e92a-7e00-91b1-b6a5-f84128d08b9d"
+  },
+  {
+   "fp": "9ae48e5f9e32d709",
+   "title": "파워씨연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "45a44754-8a3b-fe64-ebb7-5d7a0f8df32a"
+  },
+  {
+   "fp": "a139c90dc4ddb2e3",
+   "title": "테라400정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "5bee1fdf-47a5-0a86-e705-05a53840d337"
+  },
+  {
+   "fp": "a4632d4b0bba4aa2",
+   "title": "메코이에프정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "1319ff92-922d-25e3-ec30-8dfc43e8ebb0"
+  },
+  {
+   "fp": "a6b9e8da2b1a1b34",
+   "title": "하드칼츄어블이지정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "a352c594-3430-ae89-8ef4-9632ea1f86eb"
+  },
+  {
+   "fp": "a9eb4cfd78dc1bcb",
+   "title": "마그맥스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "e911baa1-a942-bb8b-4138-d0cc0d463407"
+  },
+  {
+   "fp": "aee20f539427c7b5",
+   "title": "제스쿨정",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "efd212ea-1aa7-693b-f717-7a4af7676fb7"
+  },
+  {
+   "fp": "b38830d6abcff470",
+   "title": "팜편안디정",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "55bba9e1-a4aa-b068-a723-6dd451a31a57"
+  },
+  {
+   "fp": "b9ce69b0e5b523ac",
+   "title": "혈앤보알파연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "96e65f97-dfdc-111d-aa0a-b11d316a55fe"
+  },
+  {
+   "fp": "bf7ceff3e9385103",
+   "title": "아로나민케어리피정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "c6e517a2-4b9c-ad95-4d88-381e5cf4680a"
+  },
+  {
+   "fp": "c35fa54dd5bfebca",
+   "title": "알보칼디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "8da176e0-77b5-8a2a-d57d-b5746cee5b25"
+  },
+  {
+   "fp": "c45cc7f220e2e255",
+   "title": "아로나민실버액티브정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "2b4bcc7e-0806-6bd4-92d1-2f6ae2c7a3b9"
+  },
+  {
+   "fp": "c94b3957727fa4e3",
+   "title": "비맥스메타비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "14304a1d-2f05-6cb9-1539-d22cf010afa1"
+  },
+  {
+   "fp": "ca590b4c6f409824",
+   "title": "쎈파워비타연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "f6bb34a3-a415-d6eb-9096-b815812823f4"
+  },
+  {
+   "fp": "cd047deb0c326aa0",
+   "title": "마미센스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "62d46fcd-febd-c2f0-6552-c6baf1900bea"
+  },
+  {
+   "fp": "d09f82a9e0b2cedb",
+   "title": "제이웰라민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "010db1ab-b603-6824-c48c-f6b49cc69c89"
+  },
+  {
+   "fp": "d52fd46682ec30e5",
+   "title": "리액타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "d9cafd57-1b79-fa9e-63ab-19344921ae4b"
+  },
+  {
+   "fp": "dbe867f5b65aa9eb",
+   "title": "썬팩타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "9936cec2-0e97-afa5-da52-1430c08b4576"
+  },
+  {
+   "fp": "df10cd6a9b8f5acc",
+   "title": "마그비연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "337b8186-c788-cd78-2659-6f3fb06457e7"
+  },
+  {
+   "fp": "e0ec6042402e5fda",
+   "title": "네오신정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "cebdfe6b-c4bc-7251-ee05-878702b293e9"
+  },
+  {
+   "fp": "e48c466102f90599",
+   "title": "엠지파워연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "46132541-916a-80ab-fa28-072a13369300"
+  },
+  {
+   "fp": "e77581b451718cfa",
+   "title": "엑티본연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "4e7dde6b-6f2b-ec7e-53f9-807863373161"
+  },
+  {
+   "fp": "e8f53d5d9dfe19dc",
+   "title": "쎄이네슘골드연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "dbc13ac4-4a45-463d-5511-3d613e6c99e1"
+  },
+  {
+   "fp": "ec9ce314356fad23",
+   "title": "서울알마게이트정",
+   "sourceType": "mfds_drug_otc",
+   "masters": 3,
+   "sourceRef": "81d0f20d-c97a-34a8-d656-60790109e1cf"
+  },
+  {
+   "fp": "ef2f62cb439041c9",
+   "title": "벤포벨에스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "14b832c3-179f-1ae9-9505-d332bcb3128d"
+  },
+  {
+   "fp": "f26432182e5c98dd",
+   "title": "싸이타민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "f0eaf6f5-07dc-ee8a-cd68-0d39d59dacd3"
+  },
+  {
+   "fp": "f530c4400cdc8bd2",
+   "title": "마그벤맥스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "c85c61e6-d7a7-31ce-7eea-0abdd5f4a414"
+  },
+  {
+   "fp": "f748b252ba07ff26",
+   "title": "일양아이콤연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "cb30ac6e-345c-f13c-0eb1-1634f65c0c6e"
+  },
+  {
+   "fp": "fcfe9274a6b5ffe5",
+   "title": "바이타비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "masters": 3,
+   "sourceRef": "e0d01d99-4754-383f-ef8d-efd6c741e636"
+  }
+ ]
+}

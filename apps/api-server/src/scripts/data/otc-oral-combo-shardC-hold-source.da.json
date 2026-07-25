@@ -1,0 +1,12 @@
+{
+ "fp": "44a15789a2cc1596",
+ "name": "빅콘에스600정",
+ "size": 3,
+ "atc": "A11EX",
+ "target_ids": [
+  "96b520aa-eb65-43cd-86bf-8bf4d442f9f0",
+  "ae6ada5f-a9ae-4cba-80d2-86225a56e672",
+  "bf9dba11-5d9f-4c4e-8e57-ca5c6054e170"
+ ],
+ "reason": "HOLD_SOURCE — ko-compose SKIP(no eff/use/cau): 공식 easy_drug 원문에 효능·용법·주의 섹션 부재. 원문 보강 전 생산 불가."
+}
