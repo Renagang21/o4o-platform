@@ -8,13 +8,21 @@
  *   링크복사, 수정 링크, 소유권/인증, 배지·날짜 매핑.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { AppreciationPanel, CommunityContentDetailView } from '@o4o/shared-space-ui';
 import type { CommunityContentBadge } from '@o4o/shared-space-ui';
 import { contentApi, type ContentItem } from '../../api/content';
 import { appreciationPanelApi } from '../../api/appreciation';
 import { useAuth } from '../../contexts/AuthContext';
+// WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1: 목록·Drawer 와 동일한 가져가기 재사용
+import { useAuthModal } from '../../contexts/LoginModalContext';
+import {
+  CONTENT_IMPORT_LABEL,
+  CONTENT_IMPORT_RESTRICTED_LABEL,
+  isContentImportRestricted,
+  importContentToStore,
+} from '../../api/contentStoreImport';
 import { toast } from '@o4o/error-handling';
 
 const CONTENT_TYPE_LABEL: Record<string, string> = {
@@ -31,6 +39,7 @@ export function ContentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { openLoginModal, setOnLoginSuccess } = useAuthModal();
 
   const [content, setContent] = useState<ContentItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +48,7 @@ export function ContentDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
   const [recommending, setRecommending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -80,6 +90,32 @@ export function ContentDetailPage() {
     }
   };
 
+  // WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1:
+  //   ContentListPage 목록/Drawer 와 동일한 동작(importContentToStore + 동일 토스트).
+  //   비로그인은 기존 KPA 로그인 모달을 열고, 성공 시 현재 상세에서 그대로 재시도한다
+  //   (URL 이동 없음 → 취소해도 상세 화면 유지).
+  const runImport = useCallback(async (contentId: string) => {
+    setImporting(true);
+    try {
+      await importContentToStore(contentId);
+      toast.success('내 자료함에 가져왔습니다');
+    } catch (e: any) {
+      toast.error(e?.message || '가져오기에 실패했습니다');
+    } finally {
+      setImporting(false);
+    }
+  }, []);
+
+  const handleImportToStore = useCallback(() => {
+    if (!content) return;
+    if (!isAuthenticated) {
+      setOnLoginSuccess(() => { runImport(content.id); });
+      openLoginModal();
+      return;
+    }
+    runImport(content.id);
+  }, [content, isAuthenticated, openLoginModal, setOnLoginSuccess, runImport]);
+
   const handleCopyLink = () => {
     if (!id) return;
     const url = `${window.location.origin}/content/${id}`;
@@ -109,6 +145,8 @@ export function ContentDetailPage() {
   }
 
   const isOwner = user?.id === content.created_by;
+  // WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1: 목록/Drawer 와 동일 판정
+  const isRestricted = isContentImportRestricted(content);
 
   const badges: CommunityContentBadge[] = [
     { text: CONTENT_TYPE_LABEL[content.content_type] || content.content_type, tone: 'primary' },
@@ -131,6 +169,16 @@ export function ContentDetailPage() {
       backSlot={<Link to="/content" style={styles.backLink}>← 목록으로</Link>}
       actionsSlot={
         <>
+          {/* WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1:
+              목록/Drawer 와 동일한 액션·라벨·restricted 정책. 별도 안내 블록 없이 기존 액션 행에 배치. */}
+          <button
+            onClick={handleImportToStore}
+            disabled={importing || isRestricted}
+            style={{ ...styles.actionBtn, ...(isRestricted ? styles.actionBtnDisabled : {}) }}
+            title={isRestricted ? '작성자가 매장 가져가기를 허용하지 않은 콘텐츠입니다' : undefined}
+          >
+            {importing ? '가져오는 중...' : isRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : `📥 ${CONTENT_IMPORT_LABEL}`}
+          </button>
           <button
             onClick={handleRecommend}
             disabled={recommending}
@@ -179,6 +227,8 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 8, cursor: 'pointer', transition: 'all 0.15s',
   },
   actionBtnActive: { color: '#dc2626', borderColor: '#fecaca', backgroundColor: '#fef2f2' },
+  // WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1: restricted 콘텐츠 비활성 표시
+  actionBtnDisabled: { color: '#94a3b8', backgroundColor: '#f8fafc', cursor: 'not-allowed' },
   actionBtnCopied: { color: '#16a34a', borderColor: '#bbf7d0', backgroundColor: '#f0fdf4' },
   editLink: {
     display: 'inline-flex', alignItems: 'center', gap: 4, padding: '8px 16px', fontSize: '0.8125rem',

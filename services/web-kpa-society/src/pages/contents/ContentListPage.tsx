@@ -26,7 +26,15 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
 import { contentApi, type ContentItem } from '../../api/content';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
+// WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1:
+//   가져가기 호출/판정/라벨을 공용 모듈로 이동 — 콘텐츠 상세(/content/:id)와 동일 동작 공유.
+//   동작·정책 변경 없음(동일 assetSnapshotApi.copy 호출).
+import {
+  CONTENT_IMPORT_LABEL,
+  CONTENT_IMPORT_RESTRICTED_LABEL,
+  isContentImportRestricted,
+  importContentToStore,
+} from '../../api/contentStoreImport';
 import { participationApi } from '../../api/participation';
 import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -164,11 +172,7 @@ function DocumentsSection({
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopying(id);
     try {
-      await assetSnapshotApi.copy({
-        sourceService: 'kpa',
-        sourceAssetId: id,
-        assetType: 'content',
-      });
+      await importContentToStore(id);
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
@@ -178,7 +182,7 @@ function DocumentsSection({
   }, []);
 
   const handleBulkCopyToStore = useCallback(async () => {
-    const selectedItems = items.filter((r) => selected.has(r.id) && (r as any).reusable_policy !== 'restricted');
+    const selectedItems = items.filter((r) => selected.has(r.id) && !isContentImportRestricted(r));
     if (selectedItems.length === 0) {
       toast.error('가져갈 수 있는 항목이 없습니다');
       return;
@@ -186,9 +190,7 @@ function DocumentsSection({
     setCopying('bulk');
     try {
       await Promise.all(
-        selectedItems.map((r) =>
-          assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: r.id, assetType: 'content' }),
-        ),
+        selectedItems.map((r) => importContentToStore(r.id)),
       );
       toast.success(`${selectedItems.length}개를 내 자료함에 가져왔습니다`);
       setSelected(new Set());
@@ -278,11 +280,11 @@ function DocumentsSection({
       render: (_v, row) => {
         const isOwner = !!(currentUserId && row.created_by === currentUserId);
         // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠는 가져가기 차단
-        const isRestricted = (row as any).reusable_policy === 'restricted';
+        const isRestricted = isContentImportRestricted(row);
         const actions: RowActionItem[] = [
           {
             key: 'copy-to-store',
-            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
+            label: isRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
             onClick: () => handleCopyToStore(row.id),
             loading: copying === row.id,
             disabled: isRestricted,
@@ -313,10 +315,10 @@ function DocumentsSection({
 
   const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
   // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: drawer 에서도 restricted 차단
-  const drawerIsRestricted = (drawerItem as any)?.reusable_policy === 'restricted';
+  const drawerIsRestricted = isContentImportRestricted(drawerItem);
   const drawerActions = drawerItem ? [
     {
-      label: drawerIsRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
+      label: drawerIsRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
       variant: 'primary' as const,
       onClick: () => handleCopyToStore(drawerItem.id),
       loading: copying === drawerItem.id,
@@ -357,7 +359,7 @@ function DocumentsSection({
                 actions={[
                   {
                     key: 'bulk-copy',
-                    label: '내 자료함 가져가기',
+                    label: CONTENT_IMPORT_LABEL,
                     onClick: handleBulkCopyToStore,
                     loading: copying === 'bulk',
                   },
