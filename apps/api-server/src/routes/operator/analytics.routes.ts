@@ -22,11 +22,14 @@ import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
+// WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1: canonical service_key('kpa-society')를
+//   role prefix 자리에 잘못 쓴 오타 교정. requireRole 은 정확 문자열 매칭이라
+//   'kpa-society:*' 는 역할 카탈로그에 0건 → 실 역할 kpa:admin / kpa:operator 로 정정.
 const requireOperatorOrAdmin = requireRole([
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
-  'kpa-society:admin', 'kpa-society:operator',
+  'kpa:admin', 'kpa:operator',
 ]);
 
 export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
