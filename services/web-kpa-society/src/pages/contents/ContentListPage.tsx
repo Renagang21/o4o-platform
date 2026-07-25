@@ -35,6 +35,8 @@ import {
   isContentImportRestricted,
   importContentToStore,
 } from '../../api/contentStoreImport';
+// WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1: 완료 CTA(단일=사본 편집 / 일괄=자료함 목록)
+import { notifyContentImported, notifyContentsImported } from '../../components/contentImportToast';
 import { participationApi } from '../../api/participation';
 import type { ParticipationSet } from '../participation/types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -169,17 +171,19 @@ function DocumentsSection({
   // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   // assetSnapshotApi.copy() — o4o_asset_snapshots 표준 자료함에 저장 (assetType='content').
   // 가져온 콘텐츠는 /library/contents 페이지에서 보이며 POP/QR/블로그 제작에서 선택 가능.
+  // WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1:
+  //   행 액션·Drawer 공용 — 복사 응답의 사본 id 로 "가져온 콘텐츠 보기" CTA 제공(자동 이동 없음).
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopying(id);
     try {
-      await importContentToStore(id);
-      toast.success('내 자료함에 가져왔습니다');
+      const res = await importContentToStore(id);
+      notifyContentImported(res?.data?.id, navigate);
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopying(null);
     }
-  }, []);
+  }, [navigate]);
 
   const handleBulkCopyToStore = useCallback(async () => {
     const selectedItems = items.filter((r) => selected.has(r.id) && !isContentImportRestricted(r));
@@ -192,14 +196,19 @@ function DocumentsSection({
       await Promise.all(
         selectedItems.map((r) => importContentToStore(r.id)),
       );
-      toast.success(`${selectedItems.length}개를 내 자료함에 가져왔습니다`);
+      // 일괄은 특정 사본으로 이동하지 않는다 — canonical 자료함 목록으로 연결
+      notifyContentsImported(
+        selectedItems.length,
+        `${selectedItems.length}개를 내 자료함에 가져왔습니다`,
+        navigate,
+      );
       setSelected(new Set());
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopying(null);
     }
-  }, [items, selected]);
+  }, [items, selected, navigate]);
 
   const handleDelete = useCallback(async (id: string) => {
     try {

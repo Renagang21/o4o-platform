@@ -23,6 +23,8 @@ import {
   isContentImportRestricted,
   importContentToStore,
 } from '../../api/contentStoreImport';
+// WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1: 완료 CTA → 사본 편집 화면
+import { notifyContentImported } from '../../components/contentImportToast';
 import { toast } from '@o4o/error-handling';
 
 const CONTENT_TYPE_LABEL: Record<string, string> = {
@@ -94,17 +96,19 @@ export function ContentDetailPage() {
   //   ContentListPage 목록/Drawer 와 동일한 동작(importContentToStore + 동일 토스트).
   //   비로그인은 기존 KPA 로그인 모달을 열고, 성공 시 현재 상세에서 그대로 재시도한다
   //   (URL 이동 없음 → 취소해도 상세 화면 유지).
+  // WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1:
+  //   복사 응답의 사본 id 로 "가져온 콘텐츠 보기" CTA 제공(자동 이동 없음 — 상세 화면 유지).
   const runImport = useCallback(async (contentId: string) => {
     setImporting(true);
     try {
-      await importContentToStore(contentId);
-      toast.success('내 자료함에 가져왔습니다');
+      const res = await importContentToStore(contentId);
+      notifyContentImported(res?.data?.id, navigate);
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setImporting(false);
     }
-  }, []);
+  }, [navigate]);
 
   const handleImportToStore = useCallback(() => {
     if (!content) return;

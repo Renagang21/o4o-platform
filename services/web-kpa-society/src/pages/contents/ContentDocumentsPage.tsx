@@ -35,6 +35,8 @@ import {
   isContentImportRestricted,
   importContentToStore,
 } from '../../api/contentStoreImport';
+// WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1: 완료 CTA(단일=사본 편집 / 일괄=자료함 목록)
+import { notifyContentImported, notifyContentsImported } from '../../components/contentImportToast';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import {
@@ -153,17 +155,19 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
   // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
   // assetSnapshotApi.copy() — o4o_asset_snapshots 표준 자료함에 저장 (assetType='content').
+  // WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1:
+  //   행 액션·Drawer 공용 — 복사 응답의 사본 id 로 "가져온 콘텐츠 보기" CTA 제공(자동 이동 없음).
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopyingId(id);
     try {
-      await importContentToStore(id);
-      toast.success('내 자료함에 가져왔습니다');
+      const res = await importContentToStore(id);
+      notifyContentImported(res?.data?.id, navigate);
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
     } finally {
       setCopyingId(null);
     }
-  }, []);
+  }, [navigate]);
 
   const handleDelete = useCallback(async (id: string) => {
     try {
@@ -197,13 +201,14 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         if (r.status === 'fulfilled') ok += 1;
         else failed += 1;
       }
-      if (ok > 0) toast.success(`${ok}개를 자료함에 가져왔습니다`);
+      // 일괄은 특정 사본으로 이동하지 않는다 — canonical 자료함 목록으로 연결
+      if (ok > 0) notifyContentsImported(ok, `${ok}개를 자료함에 가져왔습니다`, navigate);
       if (failed > 0) toast.error(`${failed}개 가져오기 실패`);
       if (skipped > 0) toast(`가져가기 불가 ${skipped}개는 제외됨`);
     } finally {
       setBulkBusy(false);
     }
-  }, [selectedKeys, items]);
+  }, [selectedKeys, items, navigate]);
 
   const handleBulkDelete = useCallback(async () => {
     if (!currentUserId) return;

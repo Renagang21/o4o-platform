@@ -35,3 +35,16 @@ export function importContentToStore(contentId: string) {
     assetType: 'content',
   });
 }
+
+// ── 가져오기 완료 후 canonical 관리 화면 (WO-O4O-KPA-CONTENT-IMPORT-COMPLETE-CANONICAL-MANAGEMENT-LINK-V1)
+//    새 route 를 만들지 않는다 — StoreContentsSelector / StoreAssetsPage 가 이미 쓰는 기존 canonical 경로다.
+//    snapshot 사본 편집은 /store/content/:snapshotId/edit (StoreContentEditPage),
+//    소유권은 서버가 organization_id 로 스코프하고 클라이언트는 PharmacyGuard 가 가드한다.
+
+/** canonical 자료함 콘텐츠 목록 — 일괄 가져오기 완료 목적지 */
+export const STORE_LIBRARY_CONTENTS_PATH = '/store/library/contents';
+
+/** 가져온 사본(o4o_asset_snapshots.id) 1건의 canonical 편집 화면 */
+export function storeContentEditPath(snapshotId: string): string {
+  return `/store/content/${snapshotId}/edit`;
+}
