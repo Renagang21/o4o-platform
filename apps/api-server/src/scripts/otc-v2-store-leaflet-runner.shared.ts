@@ -300,11 +300,20 @@ const EN_NUM_WORDS: Record<string, string[]> = {
   '7': ['seven'], '8': ['eight'], '9': ['nine'], '10': ['ten'],
   '11': ['eleven'], '12': ['twelve'],
 };
+/**
+ * 하이픈으로 쓴 **수치 범위**를 normalize 이전에 분리한다.
+ * normalize 는 census 계약상 하이픈류를 ',' 로 바꾸므로 '250-500 mg' 이 '250,500 mg' 이 되고,
+ * 아래 수량 정규식이 이를 천단위 구분자로 읽어 실재하지 않는 토큰 '250500' 을 요구하게 된다.
+ * (census fingerprint 는 normalize 를 그대로 쓰므로 본 치환은 **EN 수량 게이트 내부에만** 적용한다.
+ *  fingerprint·KO 경로·writePlan 에는 영향이 없다.)
+ */
+const EN_NUM_RANGE_HYPHEN = /(\d)\s*[-–—]\s*(\d)/g;
+
 export function missingNumericsEn(official: string, en: string): string[] {
   const lower = ' ' + en.toLowerCase().replace(/\s+/g, ' ') + ' ';
   const vals = new Set<string>();
   const re = /(\d+(?:[.,]\d+)?)\s*(세|개월|주|일|회|정|캡슐|포|매|방울|밀리그램|밀리리터|그램|시간|년|mg|ml|g|%|iu)/gi;
-  const t = normalize(official);
+  const t = normalize(official.replace(EN_NUM_RANGE_HYPHEN, '$1 ~ $2'));
   let m: RegExpExecArray | null;
   while ((m = re.exec(t))) vals.add(m[1].replace(/,/g, ''));
   return [...vals].sort().filter((v) => {
