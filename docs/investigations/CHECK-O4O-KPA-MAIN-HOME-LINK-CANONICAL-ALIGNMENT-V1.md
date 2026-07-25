@@ -155,17 +155,27 @@ WO §9 "Home API 가 href 를 생성하고 있다면 → API 에서 canonical hr
 
 ## 8. 브라우저 smoke 결과
 
-⏭️ **배포 후 수행 필요.** 변경이 backend(`/home/latest` href 생성) + frontend 양쪽이라 로컬만으로는 실제 링크를 재현할 수 없고, 프로덕션 DB 는 Cloud Run 경유로만 접근 가능하다.
+**배포:** Deploy Web Services ✅ success / Deploy API Server ✅ success (둘 다 `fde4c3616`, skip 아님)
+**대상:** `https://kpa-society.co.kr` (Playwright 실브라우저) + `https://api.neture.co.kr` (비인증 curl)
 
-배포 후 `https://kpa-society.co.kr` 에서 확인할 항목:
+| # | 항목 | 결과 | 근거 |
+|---|------|:----:|------|
+| 1 | **C1 공지 비링크** | ✅ **PASS** | 공지 행이 `<div class="ss-news-item">`, `href=null` 로 렌더. 수정 전에는 `<a href="/content/{cms id}">` 였다 |
+| 2 | **C2 강의 항목 클릭** | ⚠️ **데이터 0 — 클릭 불가** | `/home/latest?type=course` → `count=0`. 강의 탭 화면도 "등록된 글이 없습니다". prod 에 `lms_courses(status='published')` 없음 |
+| 2-b | C2 대체 검증 — 라우트 동작 | ✅ **PASS** | 수정 **전** 경로 `/lms/courses/{uuid}` → **앱 404 "페이지를 찾을 수 없습니다"** 재현. 수정 **후** 경로 `/lms/course/{uuid}` → **앱 404 아님**, LMS 상세 페이지가 뜨고 더미 id 라서 페이지 내부 "Course not found" 만 표시 |
+| 3 | **C3 사이니지 항목 클릭** | ⚠️ **데이터 0 — 클릭 불가** | `/home/latest?type=signage` → `count=0`, `/home/signage` → `media count=0`. prod 에 KPA `signage_media` 없음 |
+| 3-b | C3 대체 검증 — 라우트 동작 | ✅ **PASS** | `/signage/media/{uuid}` → 앱 404 아님. MediaDetailPage 렌더 + 페이지 내부 "미디어를 찾을 수 없습니다." + "사이니지로 돌아가기" |
+| 4 | 회귀 — 포럼/콘텐츠/자료실 링크 | ✅ **PASS** | Home 최신글 6건: 포럼 `/forum/post/{id}` 2, 콘텐츠 `/content/{id}` 1, 자료실 `/content/{id}` 3 — 수정 전과 동일 |
+| 5 | 회귀 — 목록 → 상세 진입 | ✅ **PASS** | `/forum/post/50b2a531…` 정상 렌더(제목·작성자·조회수 표시, 404 아님) |
+| 6 | 회귀 — Home 전체 렌더 | ✅ **PASS** | 섹션 7개(공지·약사공론 뉴스·최신글·서비스 바로가기·이용 가이드·역할별 활용·다른 서비스) 순서 동일, 앱 404 문구 없음 |
+| 7 | 회귀 — API 배포 후 `/home/latest` 전 타입 | ✅ **PASS** | `all`=6 · `forum`=3 · `content`=2 · `resource`=3 · notices=1, 전부 `success=true` |
+| 8 | 비로그인 데이터 경로 | ✅ **PASS** | §7 curl 은 전부 **비인증 요청** — 동일 항목 반환(엔드포인트가 `optionalAuth`). 단 **화면 렌더 확인은 로그인 세션에서 수행**했다(브라우저 프로필이 로그인 상태). 공지 href 제거는 인증 조건과 무관한 코드 경로다 |
 
-| # | 절차 | 기대 결과 |
-|---|------|-----------|
-| 1 | Home 공지 항목 클릭 | 깨진 `kpa_contents` 상세로 이동하지 않음(비링크 — 커서/이동 없음) |
-| 2 | Home 최신글 → 강의 탭 → 항목 클릭 | `/lms/course/{id}` 진입, 404 없음 |
-| 3 | Home 최신글 → 사이니지 탭 → 항목 클릭 | 공개 항목은 `/signage/media/{id}` 개별 상세 진입 |
-| 4 | 회귀 — 포럼/콘텐츠/자료실 탭 항목 클릭 | 기존과 동일하게 정상 진입 |
-| 5 | 회귀 — 비로그인/로그인 Home 렌더 | 전체 렌더 정상, 섹션 순서 동일 |
+### 8-1. C2 / C3 를 클릭으로 검증하지 못한 이유 (데이터 부재)
+
+prod KPA 에 **published 강의 0건, signage_media 0건**이다. 따라서 두 링크는 배포되었으나 **실제로 렌더되는 항목이 없어 end-to-end 클릭 검증이 불가능**하다. 대신 8-2·3-b 로 "수정 전 경로는 404, 수정 후 경로는 살아있는 라우트"임을 실브라우저로 확인했다. 데이터가 등록되면 즉시 유효해진다.
+
+부수 확인: `source`/`scope` additive 컬럼도 media 0건이라 응답에서 관측되지 않았다(로직상 항목이 있을 때만 노출).
 
 ---
 
@@ -179,7 +189,11 @@ WO §9 "Home API 가 href 를 생성하고 있다면 → API 에서 canonical hr
 | 신규 API/데이터 모델 필요 | ❌ | |
 | 다른 세션 WIP 충돌 | ❌ | 파일 중복 없음, path-specific 스테이징 |
 
-**남은 작업:** §8 브라우저 smoke (배포 후).
+**남은 작업 / 한계:**
+
+- C2·C3 는 **prod 데이터 부재(published 강의 0, signage_media 0)로 클릭 기반 end-to-end 검증 미수행**. 라우트 동작은 실브라우저로 확인(§8 2-b·3-b). 강의/사이니지 데이터가 등록되는 시점에 1회 재확인 권장.
+- 비로그인 **화면 렌더**는 미확인(브라우저 프로필이 로그인 상태). 비로그인 **데이터 경로**는 비인증 curl 로 확인(§8-8).
+- C3 는 설계상 `scope='global'` + `source IN ('hq','supplier','community')` 항목만 개별 상세로 간다. `source='store'` 항목은 의도적으로 허브 이동을 유지하므로, 향후 "사이니지 항목이 상세로 안 간다"는 관측이 있으면 **버그가 아니라 공개 가시성 조건 미충족**일 수 있다.
 
 **본 WO 에서 의도적으로 하지 않은 것 (WO §10):** Home 섹션 순서·Hero 문구·약사공론 영역·체험 계정 안내·서비스 카드 배치·이용 가이드 중복 제거·콘텐츠 상세 가져오기·자료실 정비·로그인 유도 통일·검색 추가·태그 필수 해제 — 전부 무변경.
 
