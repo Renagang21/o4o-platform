@@ -18,7 +18,11 @@ import type { NotificationItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { notificationsApi } from '../api/notifications';
-import { KpaUserMenuItems, getKpaUserDisplayName } from './KpaUserMenu';
+import {
+  getKpaServiceRoleLabel,
+  getKpaUserDisplayName,
+  KpaUserMenuItems,
+} from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
 
 function formatRelative(dateString: string): string {
@@ -276,6 +280,11 @@ export function MobileBottomNav() {
                 {getKpaUserDisplayName(user)}님
               </p>
               <p className="text-xs text-slate-500 break-all">{user?.email}</p>
+              {getKpaServiceRoleLabel(user) && (
+                <p className="mt-0.5 text-xs font-medium text-blue-700">
+                  {getKpaServiceRoleLabel(user)}
+                </p>
+              )}
             </div>
             <button
               onClick={closeSheet}

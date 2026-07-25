@@ -10,7 +10,7 @@
  * 역할 판정은 기존 SSOT(@o4o/auth-utils + lms:instructor)만 사용 — 새 권한 로직 없음.
  */
 
-import { GraduationCap, LayoutDashboard, Settings, Shield, Store } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Settings, Shield, Store, UserRound } from 'lucide-react';
 import { GlobalHeaderMenuItem } from '@o4o/ui';
 import { isOperatorOrAbove, isAdminOrAbove, isStoreOwnerDual } from '@o4o/auth-utils';
 import type { User as UserType } from '../contexts';
@@ -44,6 +44,21 @@ export function getKpaUserDisplayName(user: UserType | null): string {
   if (user.name && user.name !== user.email) return user.name;
   if (user.email) return user.email.split('@')[0];
   return '사용자';
+}
+
+/** 현재 로그인 사용자의 KPA 서비스 내 최고 유효 역할을 명시한다. */
+export function getKpaServiceRoleLabel(user: UserType | null): string | undefined {
+  const roles = user?.roles ?? [];
+  if (roles.includes('platform:super_admin')) {
+    return 'KPA 서비스 · 플랫폼 최고 관리자 (platform:super_admin)';
+  }
+  if (roles.includes('kpa:admin')) {
+    return 'KPA 서비스 · 서비스 관리자 (kpa:admin)';
+  }
+  if (roles.includes('kpa:operator')) {
+    return 'KPA 서비스 · 서비스 운영자 (kpa:operator)';
+  }
+  return undefined;
 }
 
 /**
@@ -83,6 +98,9 @@ export function KpaUserMenuItems({
       )}
       <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>
         마이페이지
+      </GlobalHeaderMenuItem>
+      <GlobalHeaderMenuItem to="/mypage/profile" icon={<UserRound className="w-4 h-4" />} onClick={onItemClick}>
+        프로필
       </GlobalHeaderMenuItem>
       <GlobalHeaderMenuItem to="/mypage/settings" icon={<Settings className="w-4 h-4" />} onClick={onItemClick}>
         설정

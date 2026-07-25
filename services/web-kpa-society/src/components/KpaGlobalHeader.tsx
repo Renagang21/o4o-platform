@@ -17,7 +17,7 @@ import { GlobalHeader } from '@o4o/ui';
 import { NotificationBell, useNotifications } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
-import { KpaUserMenuItems } from './KpaUserMenu';
+import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -115,7 +115,11 @@ export function KpaGlobalHeader() {
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.
   // side effects(creditApi, notif)는 useAuth()의 실제 user를 참조하므로 영향 없음.
   const headerUser = user
-    ? { displayName: getUserDisplayName(user), email: user.email }
+    ? {
+        displayName: getUserDisplayName(user),
+        email: user.email,
+        roleLabel: getKpaServiceRoleLabel(user),
+      }
     : isLoading
       ? { displayName: '', email: '' }
       : null;
