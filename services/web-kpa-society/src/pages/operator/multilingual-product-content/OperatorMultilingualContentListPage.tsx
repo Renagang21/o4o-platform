@@ -1,17 +1,25 @@
 /**
- * OperatorMultilingualContentListPage — 운영자 매장 HUB 다국어 상품 콘텐츠 목록
+ * OperatorMultilingualContentListPage — 운영자 매장 HUB 다국어 상품 콘텐츠 목록 (표준 테이블)
  *
- * WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
+ * WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1 (초기 수동 테이블)
+ * WO-O4O-KPA-OPERATOR-LIST-STANDARDIZATION-PRIORITY-AUDIT-V1 (2026-07-25):
+ *   수동 <table> → O4O 표준 테이블 (DataTable + ActionBar + useBatchAction +
+ *   BulkResultModal + RowActionMenu + defineActionPolicy). OperatorBlogListPage mirror.
+ *   다국어 고유 요소(HUB 노출 판정 · 발행 언어 · publish 전 발행언어 가드)는 불변 보존.
+ *   route/권한/backend API 불변.
  *
  * 운영자가 KPA 매장 HUB 에 게시할 다국어 상품 콘텐츠 ORIGINAL 목록.
  *   /operator/multilingual-product-contents
  * 작성/수정은 /operator/multilingual-product-contents/new · /:id
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Plus, Languages, Send, Archive, Pencil } from 'lucide-react';
+import { Plus, Languages, Send, Archive, Pencil } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   listOperatorMlcGroups,
   publishOperatorMlcGroup,
@@ -53,6 +61,46 @@ const HUB_VIS_LABEL: Record<HubVisibility, string> = {
   archived: '보관됨',
 };
 
+const publishedLocales = (g: OperatorMlcGroup): string[] =>
+  (g.pages || []).filter((p) => p.status === 'published').map((p) => p.locale);
+
+const hubVisibility = (g: OperatorMlcGroup): HubVisibility => {
+  if (g.status === 'archived') return 'archived';
+  if (g.status !== 'published') return 'group_draft';
+  return publishedLocales(g).length > 0 ? 'visible' : 'no_locale';
+};
+
+// ─── Action Policy (status 기반 행 액션 규칙) ─────────────────────
+// OperatorBlogListPage 패턴 mirror. 다국어는 삭제 API 없음 → edit/publish/archive 만.
+const mlcActionPolicy = defineActionPolicy<OperatorMlcGroup>('kpa:operator-mlc', {
+  inlineMax: 2,
+  rules: [
+    { key: 'edit', label: '수정' },
+    {
+      key: 'publish',
+      label: '발행',
+      variant: 'primary',
+      visible: (g) => g.status !== 'published',
+    },
+    {
+      key: 'archive',
+      label: '보관',
+      visible: (g) => g.status !== 'archived',
+      confirm: {
+        title: '콘텐츠 보관',
+        message: '보관 처리하면 매장 HUB 에서 더 이상 노출되지 않습니다. 계속할까요?',
+        confirmText: '보관',
+      },
+    },
+  ],
+});
+
+const MLC_ACTION_ICONS: Record<string, ReactNode> = {
+  edit: <Pencil className="w-4 h-4" />,
+  publish: <Send className="w-4 h-4" />,
+  archive: <Archive className="w-4 h-4" />,
+};
+
 export default function OperatorMultilingualContentListPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<OperatorMlcGroup[]>([]);
@@ -61,7 +109,15 @@ export default function OperatorMultilingualContentListPage() {
   const [statusFilter, setStatusFilter] = useState<OperatorMlcStatus | ''>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // Selection (canonical Set<string>)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Per-row loading (단건 액션 진행 표시)
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Batch hook
+  const batch = useBatchAction();
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
@@ -87,46 +143,201 @@ export default function OperatorMultilingualContentListPage() {
     loadData();
   }, [loadData]);
 
-  const handlePublish = async (id: string) => {
-    const g = items.find((x) => x.id === id);
-    if (g && publishedLocales(g).length === 0) {
+  // 필터/페이지 변경 시 선택 초기화
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page, statusFilter]);
+
+  // ── Single row actions ──────────────────────────────────────────
+  const handlePublish = useCallback(async (g: OperatorMlcGroup) => {
+    // 불변 가드: 발행된 언어 페이지 0개면 발행 불가(HUB 노출 조건).
+    if (publishedLocales(g).length === 0) {
       toast.error('발행된 언어 페이지가 없습니다. 먼저 1개 이상의 언어를 "저장 후 발행"해 주세요.');
       return;
     }
-    setBusyId(id);
+    setActionLoading(g.id);
     try {
-      await publishOperatorMlcGroup(id);
+      await publishOperatorMlcGroup(g.id);
       toast.success('발행되었습니다 — KPA 매장 HUB 에 노출됩니다');
       await loadData();
     } catch (e: any) {
       toast.error(e?.message || '발행에 실패했습니다');
     } finally {
-      setBusyId(null);
+      setActionLoading(null);
     }
-  };
+  }, [loadData]);
 
-  const handleArchive = async (id: string) => {
-    if (!window.confirm('보관 처리하면 매장 HUB 에서 더 이상 노출되지 않습니다. 계속할까요?')) return;
-    setBusyId(id);
+  const handleArchive = useCallback(async (g: OperatorMlcGroup) => {
+    setActionLoading(g.id);
     try {
-      await archiveOperatorMlcGroup(id);
+      await archiveOperatorMlcGroup(g.id);
       toast.success('보관되었습니다');
       await loadData();
     } catch (e: any) {
       toast.error(e?.message || '보관에 실패했습니다');
     } finally {
-      setBusyId(null);
+      setActionLoading(null);
     }
-  };
+  }, [loadData]);
 
-  const publishedLocales = (g: OperatorMlcGroup): string[] =>
-    (g.pages || []).filter((p) => p.status === 'published').map((p) => p.locale);
+  // ── Bulk action — status 별 선택 후보 ───────────────────────────
+  // 발행 후보: 선택 && 미발행 && 발행된 언어 1개 이상(불변 가드와 동일 조건).
+  const selectedPublishableIds = useMemo(
+    () =>
+      items
+        .filter((g) => selectedIds.has(g.id) && g.status !== 'published' && publishedLocales(g).length > 0)
+        .map((g) => g.id),
+    [items, selectedIds],
+  );
+  const selectedNotArchivedIds = useMemo(
+    () =>
+      items
+        .filter((g) => selectedIds.has(g.id) && g.status !== 'archived')
+        .map((g) => g.id),
+    [items, selectedIds],
+  );
 
-  const hubVisibility = (g: OperatorMlcGroup): HubVisibility => {
-    if (g.status === 'archived') return 'archived';
-    if (g.status !== 'published') return 'group_draft';
-    return publishedLocales(g).length > 0 ? 'visible' : 'no_locale';
-  };
+  // Bulk fan-out wrapper (기존 단건 API 재사용, client-side fan-out)
+  type BulkOp = 'publish' | 'archive';
+  const batchMlcOp = useCallback(
+    async (
+      ids: string[],
+      options?: Record<string, unknown>,
+    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
+      const op = options?.op as BulkOp | undefined;
+      if (!op) {
+        return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: 'op missing' })) } };
+      }
+      const fn = op === 'publish' ? publishOperatorMlcGroup : archiveOperatorMlcGroup;
+      const settled = await Promise.allSettled(ids.map((id) => fn(id)));
+      const results = settled.map((r, i) => {
+        const id = ids[i];
+        if (r.status === 'fulfilled') return { id, status: 'success' as const };
+        const err = r.reason as { message?: string } | null;
+        return { id, status: 'failed' as const, error: err?.message || 'Network error' };
+      });
+      return { data: { results } };
+    },
+    [],
+  );
+
+  const runBulk = useCallback(
+    async (ids: string[], op: BulkOp, opts?: { confirm?: string }) => {
+      if (ids.length === 0) return;
+      if (opts?.confirm && !window.confirm(opts.confirm)) return;
+      const result = await batch.executeBatch(batchMlcOp, ids, { op });
+      if (result.successCount > 0) {
+        setSelectedIds(new Set());
+        await loadData();
+      }
+    },
+    [batch, batchMlcOp, loadData],
+  );
+
+  const handleBulkPublish = useCallback(
+    () => runBulk(selectedPublishableIds, 'publish'),
+    [runBulk, selectedPublishableIds],
+  );
+  const handleBulkArchive = useCallback(
+    () => runBulk(selectedNotArchivedIds, 'archive', {
+      confirm: `선택한 ${selectedNotArchivedIds.length}개 콘텐츠를 보관하시겠습니까? 매장 HUB 노출이 중단됩니다.`,
+    }),
+    [runBulk, selectedNotArchivedIds],
+  );
+
+  // ── Columns ───────────────────────────────────────────────────
+  const columns: ListColumnDef<OperatorMlcGroup>[] = useMemo(() => [
+    {
+      key: 'title',
+      header: '제목',
+      sortable: true,
+      sortAccessor: (g) => g.title,
+      render: (_v, g) => (
+        <button
+          onClick={() => navigate(`/operator/multilingual-product-contents/${g.id}`)}
+          className="flex items-center gap-2 min-w-0 text-left"
+        >
+          <span className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
+            <Languages className="w-3.5 h-3.5" />
+          </span>
+          <span className="font-medium text-slate-800 truncate hover:text-blue-600">{g.title}</span>
+        </button>
+      ),
+    },
+    {
+      key: 'hubVisibility',
+      header: 'HUB 노출',
+      width: '130px',
+      render: (_v, g) => {
+        const vis = hubVisibility(g);
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${HUB_VIS_PILL[vis]}`}>
+            {HUB_VIS_LABEL[vis]}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      render: (_v, g) => (
+        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${STATUS_PILL[g.status]}`}>
+          {STATUS_LABEL[g.status]}
+        </span>
+      ),
+    },
+    {
+      key: 'locales',
+      header: '발행 언어',
+      width: '180px',
+      render: (_v, g) => {
+        const locales = publishedLocales(g);
+        return locales.length === 0 ? (
+          <span className="text-xs text-slate-400">발행 페이지 없음</span>
+        ) : (
+          <span className="text-xs text-slate-600">
+            {locales.map((l) => OPERATOR_MLC_LOCALE_LABELS[l as keyof typeof OPERATOR_MLC_LOCALE_LABELS] || l).join(' · ')}
+            <span className="text-slate-400"> ({locales.length})</span>
+          </span>
+        );
+      },
+    },
+    {
+      key: 'updatedAt',
+      header: '수정일',
+      width: '100px',
+      sortable: true,
+      sortAccessor: (g) => new Date(g.updatedAt).getTime(),
+      render: (_v, g) => (
+        <span className="text-xs text-slate-500">
+          {new Date(g.updatedAt).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '작업',
+      width: '60px',
+      align: 'center',
+      system: true,
+      render: (_v, g) => (
+        <RowActionMenu
+          actions={buildRowActions(mlcActionPolicy, g, {
+            edit: () => navigate(`/operator/multilingual-product-contents/${g.id}`),
+            publish: () => handlePublish(g),
+            archive: () => handleArchive(g),
+          }, {
+            icons: MLC_ACTION_ICONS,
+            loading: actionLoading === g.id
+              ? { edit: true, publish: true, archive: true }
+              : undefined,
+          })}
+          inlineMax={mlcActionPolicy.inlineMax}
+        />
+      ),
+    },
+  ], [navigate, handlePublish, handleArchive, actionLoading]);
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -177,123 +388,83 @@ export default function OperatorMultilingualContentListPage() {
       )}
 
       {!error && (
-        <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-7 h-7 animate-spin text-slate-300" />
-            </div>
-          ) : items.length === 0 ? (
-            <div className="py-16 text-center text-sm text-slate-400">아직 작성한 다국어 상품 콘텐츠가 없습니다</div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                  <th className="px-5 py-3 font-medium">제목</th>
-                  <th className="px-5 py-3 font-medium">HUB 노출</th>
-                  <th className="px-5 py-3 font-medium">상태</th>
-                  <th className="px-5 py-3 font-medium">발행 언어</th>
-                  <th className="px-5 py-3 font-medium">수정일</th>
-                  <th className="px-5 py-3 font-medium text-right">작업</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((g) => {
-                  const locales = publishedLocales(g);
-                  const vis = hubVisibility(g);
-                  return (
-                    <tr key={g.id} className="border-b border-slate-50 hover:bg-slate-50/60">
-                      <td className="px-5 py-3">
-                        <button
-                          onClick={() => navigate(`/operator/multilingual-product-contents/${g.id}`)}
-                          className="flex items-center gap-2 min-w-0 text-left"
-                        >
-                          <span className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
-                            <Languages className="w-3.5 h-3.5" />
-                          </span>
-                          <span className="font-medium text-slate-800 truncate hover:text-blue-600">{g.title}</span>
-                        </button>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${HUB_VIS_PILL[vis]}`}>
-                          {HUB_VIS_LABEL[vis]}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded-full border ${STATUS_PILL[g.status]}`}>
-                          {STATUS_LABEL[g.status]}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3">
-                        {locales.length === 0 ? (
-                          <span className="text-xs text-slate-400">발행 페이지 없음</span>
-                        ) : (
-                          <span className="text-xs text-slate-600">
-                            {locales.map((l) => OPERATOR_MLC_LOCALE_LABELS[l as keyof typeof OPERATOR_MLC_LOCALE_LABELS] || l).join(' · ')}
-                            <span className="text-slate-400"> ({locales.length})</span>
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3 text-xs text-slate-500">
-                        {new Date(g.updatedAt).toLocaleDateString('ko-KR')}
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => navigate(`/operator/multilingual-product-contents/${g.id}`)}
-                            className="p-1.5 rounded-md text-slate-500 hover:bg-slate-100"
-                            title="수정"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          {g.status !== 'published' && (
-                            <button
-                              onClick={() => handlePublish(g.id)}
-                              disabled={busyId === g.id}
-                              className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-50 disabled:opacity-40"
-                              title="발행"
-                            >
-                              {busyId === g.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                            </button>
-                          )}
-                          {g.status !== 'archived' && (
-                            <button
-                              onClick={() => handleArchive(g.id)}
-                              disabled={busyId === g.id}
-                              className="p-1.5 rounded-md text-amber-600 hover:bg-amber-50 disabled:opacity-40"
-                              title="보관"
-                            >
-                              <Archive className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
+        <>
+          {/* ActionBar */}
+          <ActionBar
+            selectedCount={selectedIds.size}
+            onClearSelection={() => setSelectedIds(new Set())}
+            actions={[
+              {
+                key: 'bulk-publish',
+                label: `일괄 발행 (${selectedPublishableIds.length})`,
+                onClick: handleBulkPublish,
+                variant: 'primary' as const,
+                icon: <Send className="w-3.5 h-3.5" />,
+                loading: batch.loading,
+                group: 'actions',
+                visible: selectedPublishableIds.length > 0,
+                tooltip: '선택한 콘텐츠 중 발행 가능한(발행 언어 1개 이상) 항목을 일괄 발행합니다',
+              },
+              {
+                key: 'bulk-archive',
+                label: `일괄 보관 (${selectedNotArchivedIds.length})`,
+                onClick: handleBulkArchive,
+                variant: 'default' as const,
+                icon: <Archive className="w-3.5 h-3.5" />,
+                loading: batch.loading,
+                group: 'actions',
+                visible: selectedNotArchivedIds.length > 0,
+                tooltip: '선택한 콘텐츠를 일괄 보관 (HUB 노출 중단)',
+              },
+            ]}
+          />
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-          >
-            이전
-          </button>
-          <span className="text-sm text-slate-500">{page} / {totalPages}</span>
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-          >
-            다음
-          </button>
-        </div>
+          {/* BulkResultModal */}
+          <BulkResultModal
+            open={batch.showResult}
+            onClose={() => batch.clearResult()}
+            result={batch.result}
+            onRetry={() => batch.retryFailed()}
+          />
+
+          {/* DataTable */}
+          <DataTable<OperatorMlcGroup>
+            columns={columns}
+            data={items}
+            rowKey="id"
+            loading={isLoading}
+            emptyMessage={
+              statusFilter
+                ? '해당 상태의 다국어 상품 콘텐츠가 없습니다'
+                : '아직 작성한 다국어 상품 콘텐츠가 없습니다'
+            }
+            tableId="operator-mlc-list"
+            selectable
+            selectedKeys={selectedIds}
+            onSelectionChange={setSelectedIds}
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-4">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
+              >
+                이전
+              </button>
+              <span className="text-sm text-slate-500">{page} / {totalPages}</span>
+              <button
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
+              >
+                다음
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
