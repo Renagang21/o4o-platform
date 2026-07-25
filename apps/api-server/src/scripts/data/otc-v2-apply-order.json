@@ -8,8 +8,9 @@
  "status": {
   "ga": {
    "koApplied": true,
-   "enApplied": false,
-   "independentVerified": false
+   "enApplied": true,
+   "independentVerified": true,
+   "note": "독립검증 GREEN"
   },
   "na": {
    "koApplied": false,

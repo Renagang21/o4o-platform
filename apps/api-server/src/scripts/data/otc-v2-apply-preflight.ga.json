@@ -7,42 +7,46 @@
  "dbWrite": 0,
  "preflight": {
   "shard": "ga",
-  "eligibleGroups": 0,
-  "eligibleMasters": 0,
-  "holdGroups": 238,
-  "holdMasters": 839,
-  "fpReproduced": 2,
-  "fpFailed": 837,
+  "eligibleGroups": 237,
+  "eligibleMasters": 837,
+  "holdGroups": 1,
+  "holdMasters": 2,
+  "fpReproduced": 839,
+  "fpFailed": 0,
   "canonicalDup": 0,
   "completeIntersection": 0,
   "blockedFp": 0,
   "blockedMaster": 0,
   "siteAmbiguous": 0,
   "outOfShardMasters": 0,
-  "manifestMatch": false,
-  "expectedMatch": false,
+  "manifestMatch": true,
+  "expectedMatch": true,
   "orderBlockers": [],
   "gates": {
-   "target fp/master == dry-run manifest": false,
+   "target fp/master == dry-run manifest": true,
    "HOLD 대상 제외": true,
-   "fingerprint 재현 100%": false,
+   "fingerprint 재현 100%": true,
    "shard 밖 master 0": true,
    "기존 완료분 교집합 0": true,
    "CLQ/CDS/CSI 혼입 0": true,
    "빅콘에스600정 혼입 0": true,
    "pre-apply canonicalDup 0": true,
-   "예상 write == 실측 계획": false,
-   "apply 순서 충족": true
+   "예상 write == 실측 계획": true,
+   "apply 순서 충족": true,
+   "post-KO 선행 상태 실측 일치": true
   },
-  "blockers": [
-   "target fp/master == dry-run manifest",
-   "fingerprint 재현 100%",
-   "예상 write == 실측 계획"
-  ],
+  "blockers": [],
   "writePlan": {
-   "ko": 0,
-   "en": 0,
-   "total": 0
+   "ko": 3348,
+   "en": 1674,
+   "total": 5022
+  },
+  "postKo": true,
+  "postKoState": {
+   "authoredKoCanonical": 837,
+   "easyKoCanonical": 0,
+   "koDup": 0,
+   "audit": 837
   }
  }
 }

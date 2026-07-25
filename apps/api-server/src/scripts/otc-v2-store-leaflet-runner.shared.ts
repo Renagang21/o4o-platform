@@ -538,13 +538,19 @@ export async function fetchTargetState(ds: any, allIds: string[]): Promise<Targe
   }
 
   // e약은요 원문 — census LATERAL VERBATIM
+  //
+  // status 범위만 확장한다(2026-07-25). KO apply 는 easy_drug ko canonical 을 'deprecated' 로 강등하므로,
+  // canonical 만 읽으면 **KO 적용 후 EN preflight 가 원문을 못 찾아** 전 그룹이 fp 재현 실패로 떨어진다.
+  // canonical 을 최우선 정렬해 KO apply 이전(=dry-run) 선택 결과는 완전히 동일하게 유지하고,
+  // canonical 이 사라진 post-KO 상태에서만 deprecated 원문으로 폴백한다.
+  // 원문 content 자체는 KO apply 가 건드리지 않으므로 fingerprint 산식·입력은 불변이다.
   const contentRows = retRows<{ id: string; content: string }>(await ds.query(`
     SELECT pop.id, es.content FROM (SELECT unnest($1::uuid[])::text id) pop
     JOIN LATERAL (
       SELECT content FROM shared_product_descriptions s
       WHERE s.master_id=pop.id::uuid AND s.source_type='mfds_easy_drug' AND s.description_type='STORE'
-        AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL
-      ORDER BY length(s.content) DESC LIMIT 1) es ON true`, [allIds]));
+        AND s.status IN ('canonical','deprecated') AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL
+      ORDER BY (s.status='canonical') DESC, length(s.content) DESC LIMIT 1) es ON true`, [allIds]));
   const contentByMid = new Map(contentRows.map((r) => [r.id, r.content]));
 
   // 슬롯 상태
@@ -896,24 +902,43 @@ export interface PreflightResult {
   manifestMatch: boolean; expectedMatch: boolean;
   orderBlockers: string[]; gates: Record<string, boolean>; blockers: string[];
   writePlan: { ko: number; en: number; total: number };
+  /** lang='en' 이고 같은 shard KO 가 이미 적용된 경우에만 존재한다. */
+  postKo?: boolean;
+  postKoState?: { authoredKoCanonical: number; easyKoCanonical: number; koDup: number; audit: number };
 }
 
 /**
  * apply 전 전 게이트 검증. **DB write 0.** apply 는 이 결과가 blockers 0 일 때만 진행한다.
  * dry-run 과 동일한 검증 경로(verifyGroupMasters)를 쓴다.
+ *
+ * 슬롯 기대치는 lang 에 따라 다르다(2026-07-25).
+ *  - lang='ko' (기본) : **pre-KO** 상태를 기대한다 — easy ko canonical 정확히 1 · authored 슬롯 충돌 0.
+ *  - lang='en' 이고 같은 shard 의 KO 가 이미 적용됨(ledger.koApplied) : **post-KO** 상태를 정상 선행으로
+ *    인정한다 — authored ko canonical 이 정확히 size · easy ko canonical 0. 이 분기는 슬롯 기대치만
+ *    뒤집으며 fingerprint 재현 · sourceRef · route · 수치 보존 · HOLD 제외 게이트는 그대로 적용한다.
  */
-export async function preflight(ds: any, shard: string): Promise<{ pf: PreflightResult; states: Array<{ g: V2Group; v: GroupVerdict; ko: ReturnType<typeof buildGroupKo> }>; st: TargetState }> {
+export async function preflight(ds: any, shard: string, lang: 'ko' | 'en' = 'ko'): Promise<{ pf: PreflightResult; states: Array<{ g: V2Group; v: GroupVerdict; ko: ReturnType<typeof buildGroupKo> }>; st: TargetState }> {
   const sh = loadShard(shard);
   const allIds = [...new Set(sh.groups.flatMap((g) => g.masterIds))].sort();
   const shardIdSet = new Set(allIds);
   const st = await fetchTargetState(ds, allIds);
 
+  // post-KO 모드 — EN apply 이면서 같은 shard 의 KO 가 ledger 상 완료된 경우에만 성립한다.
+  const postKo = lang === 'en' && readLedger().status[shard]?.koApplied === true;
+
   const states = sh.groups.map((g) => {
     const v = verifyGroupMasters(g, st);
     const ko = buildGroupKo(g, st);
     if (ko.source) v.anomalies.push(...ko.anomalies); else v.anomalies.push('대표 원문 없음');
-    if (v.authoredConflict > 0) v.anomalies.push(`기존 authored 슬롯 충돌 ${v.authoredConflict}`);
-    if (v.easyCanonical1 !== g.size) v.anomalies.push(`easy ko canonical 정확히1 아님 ${v.easyCanonical1}/${g.size}`);
+    if (postKo) {
+      // KO 가 정상 선행된 상태: authored ko canonical 이 master 당 정확히 1, easy ko canonical 은 0 이어야 한다.
+      if (v.authoredConflict !== g.size) v.anomalies.push(`post-KO authored ko 정확히1 아님 ${v.authoredConflict}/${g.size}`);
+      if (v.easyCanonical1 !== 0) v.anomalies.push(`post-KO easy ko canonical 잔존 ${v.easyCanonical1}`);
+      if (v.enCanonical !== 0) v.anomalies.push(`en canonical 이미 존재 ${v.enCanonical}`);
+    } else {
+      if (v.authoredConflict > 0) v.anomalies.push(`기존 authored 슬롯 충돌 ${v.authoredConflict}`);
+      if (v.easyCanonical1 !== g.size) v.anomalies.push(`easy ko canonical 정확히1 아님 ${v.easyCanonical1}/${g.size}`);
+    }
     return { g, v, ko };
   });
 
@@ -938,6 +963,40 @@ export async function preflight(ds: any, shard: string): Promise<{ pf: Preflight
         AND s.description_type='STORE' AND s.status='canonical' AND COALESCE(s.language,'ko')='en'
         AND s.deleted_at IS NULL) x`, [allIds, AUTHORED_SOURCES as unknown as string[]]));
   const completeIntersection = parseInt(cmpRows[0]?.n || '0', 10);
+
+  // post-KO 선행 상태 실측 재확인 — EN apply 직전, 적격 master 에 대해 DB 로 다시 본다.
+  // (그룹 단위 anomalies 와 별개로, shard 전체 합계를 한 번 더 대조한다.)
+  let postKoState: { authoredKoCanonical: number; easyKoCanonical: number; koDup: number; audit: number } | undefined;
+  let postKoOk = true;
+  if (postKo) {
+    const eligibleIds = eligible.flatMap((s) => s.g.masterIds);
+    const r = retRows<{ auth: string; easy: string; dup: string; aud: string }>(await ds.query(`
+      SELECT
+        (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id = ANY($1::uuid[])
+          AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.status='canonical'
+          AND s.source_type = ANY($2) AND s.deleted_at IS NULL)::text auth,
+        (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id = ANY($1::uuid[])
+          AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.status='canonical'
+          AND s.source_type='mfds_easy_drug' AND s.deleted_at IS NULL)::text easy,
+        (SELECT count(*) FROM (
+          SELECT master_id FROM shared_product_descriptions WHERE master_id = ANY($1::uuid[])
+            AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical'
+            AND deleted_at IS NULL GROUP BY 1 HAVING count(*) > 1) d)::text dup,
+        (SELECT count(*) FROM shared_product_description_audit_logs a WHERE a.master_id = ANY($1::uuid[])
+          AND a.description_type='STORE' AND a.language='ko' AND a.event_type='canonical_replaced'
+          AND a.metadata->>'newSource' = $3)::text aud`,
+      [eligibleIds, AUTHORED_SOURCES as unknown as string[], AUTHORED_SOURCE_V2]));
+    postKoState = {
+      authoredKoCanonical: parseInt(r[0]?.auth || '0', 10),
+      easyKoCanonical: parseInt(r[0]?.easy || '0', 10),
+      koDup: parseInt(r[0]?.dup || '0', 10),
+      audit: parseInt(r[0]?.aud || '0', 10),
+    };
+    postKoOk = postKoState.authoredKoCanonical === eligibleMasters
+      && postKoState.easyKoCanonical === 0
+      && postKoState.koDup === 0
+      && postKoState.audit === eligibleMasters;
+  }
 
   // dry-run manifest 대조
   const mPath = path.join(DATA_DIR, `otc-v2-dryrun-manifest.${shard}.json`);
@@ -971,6 +1030,7 @@ export async function preflight(ds: any, shard: string): Promise<{ pf: Preflight
     'pre-apply canonicalDup 0': canonicalDup === 0,
     '예상 write == 실측 계획': expectedMatch,
     'apply 순서 충족': orderBlockers.length === 0,
+    ...(postKo ? { 'post-KO 선행 상태 실측 일치': postKoOk } : {}),
   };
   const blockers = Object.entries(gates).filter(([, ok]) => !ok).map(([k]) => k).concat(orderBlockers);
 
@@ -978,7 +1038,8 @@ export async function preflight(ds: any, shard: string): Promise<{ pf: Preflight
     pf: { shard, eligibleGroups: eligible.length, eligibleMasters, holdGroups: hold.length,
       holdMasters: hold.reduce((t, s) => t + s.g.size, 0), fpReproduced, fpFailed, canonicalDup,
       completeIntersection, blockedFp, blockedMaster, siteAmbiguous, outOfShardMasters,
-      manifestMatch, expectedMatch, orderBlockers, gates, blockers, writePlan },
+      manifestMatch, expectedMatch, orderBlockers, gates, blockers, writePlan,
+      ...(postKo ? { postKo: true, postKoState } : {}) },
     states, st,
   };
 }
@@ -1162,9 +1223,13 @@ async function runApply(): Promise<void> {
   });
   await ds.initialize();
 
-  const { pf, states } = await preflight(ds, shard);
+  const { pf, states } = await preflight(ds, shard, lang);
   console.log(`APPLY-PREFLIGHT ${shard} / ${lang} — 적격 ${pf.eligibleGroups} fp / ${pf.eligibleMasters} master · HOLD ${pf.holdGroups} fp / ${pf.holdMasters} master`);
   for (const [k, ok] of Object.entries(pf.gates)) console.log(`  ${ok ? 'PASS' : '*** FAIL ***'}  ${k}`);
+  if (pf.postKo && pf.postKoState) {
+    const s = pf.postKoState;
+    console.log(`  post-KO 선행 실측 — authored ko canonical ${s.authoredKoCanonical} · easy ko canonical ${s.easyKoCanonical} · ko dup ${s.koDup} · audit ${s.audit} (대상 ${pf.eligibleMasters})`);
+  }
   console.log(`  writePlan KO ${pf.writePlan.ko} · EN ${pf.writePlan.en} · total ${pf.writePlan.total}`);
   if (pf.orderBlockers.length) for (const b of pf.orderBlockers) console.log(`  순서 차단: ${b}`);
 
