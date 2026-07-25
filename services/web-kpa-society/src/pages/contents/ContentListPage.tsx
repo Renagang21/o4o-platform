@@ -220,7 +220,11 @@ function DocumentsSection({
       width: '44px',
       align: 'center',
       onCellClick: () => {},
+      // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
+      //   restricted 는 체크박스 미표시(선택 불가) — ContentDocumentsPage 와 동일 규칙.
+      //   목록이 reusable_policy 를 반환하지 않던 동안에는 구분 자체가 불가능했다.
       render: (_v, row) => (
+        isContentImportRestricted(row) ? null : (
         <input
           type="checkbox"
           checked={selected.has(row.id)}
@@ -236,6 +240,7 @@ function DocumentsSection({
           onClick={(e) => e.stopPropagation()}
           className="w-4 h-4 accent-blue-600 cursor-pointer"
         />
+        )
       ),
     },
     {
@@ -315,7 +320,9 @@ function DocumentsSection({
 
   const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
   // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: drawer 에서도 restricted 차단
-  const drawerIsRestricted = isContentImportRestricted(drawerItem);
+  // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
+  //   상세 응답이 authoritative — 로드 전에는 목록 행으로 폴백(이제 목록도 필드를 반환)
+  const drawerIsRestricted = isContentImportRestricted(drawerDetail ?? drawerItem);
   const drawerActions = drawerItem ? [
     {
       label: drawerIsRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,

@@ -1561,9 +1561,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const [[{ total }], rows] = await Promise.all([
         dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`, params),
         dataSource.query(
+          // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
+          //   reusable_policy 누락으로 목록·Drawer·자료실의 restricted 판정이 항상 false 였다
+          //   (상세는 SELECT * 라 정확). 서버 복사 게이트는 기존 그대로이고 응답 필드만 맞춘다.
           `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
                   c.source_type, c.usage_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
-                  c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name
+                  c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name,
+                  c.reusable_policy
            FROM kpa_contents c ${where}
            ORDER BY ${orderBy}
            LIMIT $${idx} OFFSET $${idx + 1}`,

@@ -27,7 +27,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { CommunityContentSearchBar } from '@o4o/shared-space-ui';
 import { ContentRenderer } from '@o4o/content-editor';
 import { contentApi, type ContentItem } from '../../api/content';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
+// WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
+//   목록·Drawer·일괄·상세가 동일한 판정/라벨/호출을 쓰도록 공용 모듈로 정렬
+import {
+  CONTENT_IMPORT_LABEL,
+  CONTENT_IMPORT_RESTRICTED_LABEL,
+  isContentImportRestricted,
+  importContentToStore,
+} from '../../api/contentStoreImport';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import {
@@ -149,11 +156,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   const handleCopyToStore = useCallback(async (id: string) => {
     setCopyingId(id);
     try {
-      await assetSnapshotApi.copy({
-        sourceService: 'kpa',
-        sourceAssetId: id,
-        assetType: 'content',
-      });
+      await importContentToStore(id);
       toast.success('내 자료함에 가져왔습니다');
     } catch (e: any) {
       toast.error(e?.message || '가져오기에 실패했습니다');
@@ -181,20 +184,12 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
       //   restricted 항목은 사전 제외 (backend resolver 도 차단하나 client 에서 미리 거른다)
       const allIds = Array.from(selectedKeys);
       const restrictedSet = new Set(
-        items.filter((it) => it.reusable_policy === 'restricted').map((it) => it.id),
+        items.filter((it) => isContentImportRestricted(it)).map((it) => it.id),
       );
       const ids = allIds.filter((id) => !restrictedSet.has(id));
       const skipped = allIds.length - ids.length;
 
-      const results = await Promise.allSettled(
-        ids.map((id) =>
-          assetSnapshotApi.copy({
-            sourceService: 'kpa',
-            sourceAssetId: id,
-            assetType: 'content',
-          }),
-        ),
-      );
+      const results = await Promise.allSettled(ids.map((id) => importContentToStore(id)));
       // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 각 호출이 새 item 을 생성
       let ok = 0;
       let failed = 0;
@@ -243,7 +238,7 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
       align: 'center',
       system: true,
       render: (_v, row) => {
-        const isRestricted = row.reusable_policy === 'restricted';
+        const isRestricted = isContentImportRestricted(row);
         if (isRestricted) return null;
         const isChecked = selectedKeys.has(row.id);
         return (
@@ -307,11 +302,11 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
       render: (_v, row) => {
         const isOwner = !!(currentUserId && row.created_by === currentUserId);
         // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠는 가져가기 차단
-        const isRestricted = row.reusable_policy === 'restricted';
+        const isRestricted = isContentImportRestricted(row);
         const actions: RowActionItem[] = [
           {
             key: 'copy-to-store',
-            label: isRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
+            label: isRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
             onClick: () => handleCopyToStore(row.id),
             loading: copyingId === row.id,
             disabled: isRestricted,
@@ -363,10 +358,12 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
 
   const drawerIsOwner = !!(currentUserId && drawerItem && drawerItem.created_by === currentUserId);
   // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: drawer 에서도 restricted 차단
-  const drawerIsRestricted = drawerItem?.reusable_policy === 'restricted';
+  // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
+  //   상세 응답이 authoritative — 로드 전에는 목록 행으로 폴백(이제 목록도 필드를 반환)
+  const drawerIsRestricted = isContentImportRestricted(drawerDetail ?? drawerItem);
   const drawerActions = drawerItem ? [
     {
-      label: drawerIsRestricted ? '내 자료함 가져가기 (불가)' : '내 자료함 가져가기',
+      label: drawerIsRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
       variant: 'primary' as const,
       onClick: () => handleCopyToStore(drawerItem.id),
       loading: copyingId === drawerItem.id,
