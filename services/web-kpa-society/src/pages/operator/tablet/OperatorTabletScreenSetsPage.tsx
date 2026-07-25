@@ -105,11 +105,14 @@ export default function OperatorTabletScreenSetsPage() {
     <div className="p-4 lg:p-6 space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
+          {/* WO-O4O-KPA-OPERATOR-MENU-NAME-AND-FUNCTION-ALIGNMENT-V1:
+              사이드바 메뉴('매장 HUB 태블렛 화면')와 정렬 — '매장 HUB' prefix 일관(다른 5개 HUB 자료 페이지와 동일) +
+              '태블릿'→'태블렛' 철자 통일(사용자 지시 통일 완성). 기능·route 불변, '세트 원본' 성격은 부제로 보존. */}
           <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-600" /> 태블릿 화면 세트 원본
+            <Layers className="w-5 h-5 text-indigo-600" /> 매장 HUB 태블렛 화면 세트 원본
           </h1>
           <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">
-            매장에 배포할 태블릿 화면 세트 원본을 제작합니다. 여기서 만든 원본은 운영자 소유이며, 매장·코너에 직접 적용되지 않습니다.
+            매장에 배포할 태블렛 화면 세트 원본을 제작합니다. 여기서 만든 원본은 운영자 소유이며, 매장·코너에 직접 적용되지 않습니다.
           </p>
         </div>
         <button onClick={openCreate}
