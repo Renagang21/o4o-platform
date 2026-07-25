@@ -2,38 +2,28 @@
   "wo": "WO-O4O-OTC-ORAL-MULTI-INGREDIENT-STORE-LEAFLET-PRODUCTION-GA-V2",
   "lang": "ko",
   "mode": "APPLY",
-  "status": "APPLIED",
-  "dbWrite": 1,
+  "status": "ALREADY_COMPLETE",
+  "dbWrite": 0,
   "groupKey": "진셀몬큐텐정|A11AB|10밀리그램|정",
   "sourceType": "mfds_drug_otc_nutrition_combo",
   "sourceRef": "416ecf1c-c212-0794-5b59-eaf3eb800985",
   "expected": 3,
-  "anomalies": [],
+  "anomalies": [
+    "easy ko canonical 정확히1 아님 0/3"
+  ],
   "fetched": 3,
-  "easyCanonicalExactly1": 3,
-  "authoredConflict": 0,
+  "easyCanonicalExactly1": 0,
+  "authoredConflict": 3,
   "anyCanonical": 3,
-  "existingAuthoredCanonical": 0,
+  "existingAuthoredCanonical": 3,
   "htmlLen": 2592,
   "htmlMd5": "752a109ae2344466f8c106c1099d10e9",
   "summary": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B…",
   "writePlan": {
-    "STEP_A_authored_needs_review_INSERT": 3,
+    "STEP_A_authored_needs_review_INSERT": 0,
     "STEP_B_easy_demote": 3,
     "STEP_B_authored_flip": 3,
     "audit": 3
   },
-  "stepA_inserted": 3,
-  "writeActual": {
-    "stepA_inserted": 3,
-    "demoted": 3,
-    "flipped": 3,
-    "audited": 3
-  },
-  "post": {
-    "canonical1": 3,
-    "authored": 3,
-    "deprecatedEasy": 3,
-    "dup": 0
-  }
+  "note": "target 전부 이미 authored canonical(본 앵커) — write 0"
 }
