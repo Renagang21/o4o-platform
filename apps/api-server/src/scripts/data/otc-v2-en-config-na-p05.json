@@ -1,0 +1,268 @@
+{
+ "wo": "WO-O4O-OTC-REMAINING-READY-SHARD-NA-V2-LIVE-APPLY-V1",
+ "shard": "na",
+ "part": "p05",
+ "note": "공식 무절단 원문(otc-v2-authoring-source-full.na.json) grounding EN 저작. usageLabel 미포함(러너가 route 로 주입). KO 에 없는 의료 사실 추가 0.",
+ "groups": [
+  {
+   "fp": "3197e2f46a54920e",
+   "title": "Tablet (131801ATB)",
+   "efficacy": "This is an over-the-counter medicine used for hay fever (pollen allergic rhinitis), hives, itchy skin conditions (eczema, dermatitis, itching of the skin, drug eruption), allergic rhinitis, vasomotor rhinitis, sneezing, runny nose and cough caused by a nasal cold, and vasomotor swelling.",
+   "usage": "Adults: take 1 to 3 tablets (2 to 6 mg) at a time, 2 to 4 times in 1 day. Do not take more than 12 tablets (24 mg) in 1 day.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, glaucoma, or a disease that obstructs the lower urinary tract such as an enlarged prostate, or if the user is a premature baby or a newborn.\nBefore taking this medicine, consult a doctor or pharmacist if the user is a young child under 3 years of age; if you are pregnant or breast-feeding; if you are an older person; or if you have raised pressure inside the eye, an overactive thyroid, a narrowing peptic ulcer or obstruction of the pylorus and duodenum, a disease of the circulation such as high blood pressure or other cardiovascular disease, bronchitis, bronchiectasis or asthma, epilepsy, liver disease, stroke, severe coronary artery insufficiency, or seizures now or in the past.\nThis medicine may cause drowsiness after a dose, so be careful when driving or operating machinery.\n\nDo not take MAO inhibitors while you are taking this medicine.\nConsult a doctor or pharmacist if you take it together with alcohol, medicines that depress the central nervous system, or phenytoin.\n\nIf cyanosis, difficulty breathing, chest discomfort, a fall in blood pressure, seizures, confusion, aplastic anaemia, agranulocytosis, rash, a hypersensitivity reaction of the skin on exposure to sunlight, exfoliative dermatitis, hives, spasm, muscle weakness, poor coordination, sedation, drowsiness, nervousness, headache, agitation, double vision, insomnia, dizziness, tinnitus, a balance disorder, euphoria, emotional instability, hysteria, tremor, neuritis, incoordination, altered sensation, inattention, reduced concentration, malaise, thirst, heartburn, loss of appetite, indigestion, nausea, vomiting, abdominal pain, constipation, diarrhoea, frequent urination, difficulty passing urine, retention of urine, low blood pressure, palpitations, rapid heartbeat, an irregular heartbeat, extra beats, hepatitis, jaundice, dryness of the nose or the airway, thickening of bronchial secretions, wheezing, blocked nose, haemolytic anaemia, a fall in platelets, liver dysfunction, chills, abnormal sweating, chest pain, tiredness or menstrual disturbance occurs, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Hay fever, hives and itchy skin conditions, allergic and vasomotor rhinitis, and sneezing, runny nose and cough from a nasal cold",
+    "Choosing a product": "Products with the same generic-name code (131801ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "3c241a1ac1a608e0",
+   "title": "Ointment (A31800COM)",
+   "efficacy": "This is an over-the-counter medicine used for stomatitis (inflammation inside the mouth) and glossitis (inflammation of the tongue).",
+   "usage": "Apply an appropriate amount to the affected area 2 to 4 times in 1 day.",
+   "caution": "Before using this medicine, consult a doctor or pharmacist if you have hypersensitivity to medicines. Keep to the stated dosage and schedule. When it is used for a child, use it under the guidance and supervision of a guardian. Use it in the mouth only, and not for the eyes or for any other purpose. If symptoms do not improve after several days of use, stop using it immediately and consult a doctor or pharmacist.\n\nIf rash, reddening or itching occurs, stop using it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Ointment",
+    "What it is for": "Stomatitis (inflammation inside the mouth) and glossitis (inflammation of the tongue)",
+    "Choosing a product": "Products with the same generic-name code (A31800COM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "51d464e60725486b",
+   "title": "Oral liquid (A99500ALQ)",
+   "efficacy": "This is an over-the-counter medicine used for recovery from tiredness, for physical tiredness, and to supply nutrition during and after illness.",
+   "usage": "Adults: take 2 vials in 1 day, before meals. Children: take 1 vial in 1 day, in the morning. Open the upper cap, press the stopper of the powder container firmly, shake to mix and dissolve the contents, and then take it. This medicine is particularly unstable and sensitive to light, so dissolve it in the liquid immediately before taking it.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, if the user is an infant under 3 months of age, or if you have or have had a myocardial infarction.\nBefore taking this medicine, consult a doctor or pharmacist if the user is an infant under 12 months of age.\nWhen it is given to a child, give it under the guidance and supervision of a guardian.\nKeep to the stated dosage and schedule.\nFor stability, the powder in the upper container and the liquid in the lower container are kept apart, so mix and shake them immediately before a dose.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Recovery from tiredness, physical tiredness, and nutritional support during and after illness",
+    "Choosing a product": "Products with the same generic-name code (A99500ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "5a7d365f4edaf387",
+   "title": "Enteric-coated capsule (A33901ACE)",
+   "efficacy": "This is an over-the-counter medicine used for disorders of the exocrine enzymes of the pancreas (indigestion, a feeling of fullness in the stomach), chronic pancreatitis, cystic fibrosis, and digestive disturbance after surgery on the digestive tract or after removal of the pancreas.",
+   "usage": "Take 1 to 2 capsules at a time, 3 times in 1 day, with a meal and plenty of water, swallowing them without chewing. The dose may be increased or decreased as appropriate according to the individual requirement, the severity of the disease and the composition of the food. Be careful not to breathe in the powder. If it is more convenient, the capsule may be opened and the contents taken, but they must be swallowed without being chewed.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it or have had hypersensitivity to pork, or if you have acute pancreatitis or an acute flare of chronic pancreatitis.\nIf you are pregnant, may be pregnant or are breast-feeding, consult a doctor or pharmacist before taking it.\n\nIf erythema, sneezing, watering eyes, a skin rash, narrowing of the airways or abdominal pain occurs, or rarely constipation, abnormal stools, diarrhoea, nausea or vomiting, or ulceration of the mouth and around the anus (especially in children), stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Enteric-coated capsule",
+    "What it is for": "Pancreatic enzyme deficiency (indigestion, fullness), chronic pancreatitis, cystic fibrosis, and digestive problems after gastrointestinal or pancreatic surgery",
+    "Choosing a product": "Products with the same generic-name code (A33901ACE) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "5ec71a398d32db72",
+   "title": "Capsule (D94000ACH)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of the various symptoms of a cold (runny nose, blocked nose, sneezing, sore throat, cough, phlegm, chills (feeling cold and shivering), fever, headache, joint pain, muscle pain).",
+   "usage": "Adults and those aged 15 years and over: take 2 capsules at a time. Those aged 8 to 14 years: take 1 capsule at a time. Take it 3 times in 1 day, 30 minutes after meals.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\nVery rarely, serious skin reactions that can be fatal — acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis — have been reported; if a skin rash or another sign of hypersensitivity appears after a dose of this medicine, stop taking it at once.\nDo not go above the maximum daily amount of acetaminophen (4,000 mg). It may cause liver damage. Do not take it together with other products containing acetaminophen.\nIf a severe skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking it and consult a doctor or pharmacist.\n\nDo not take this medicine if you have hypersensitivity to it or have had it, if you have had asthma when taking another antipyretic analgesic or a cold medicine, if the user is an infant under 3 months of age, if you have severe or uncontrolled high blood pressure, or if you have severe acute or chronic kidney disease or kidney failure.\nBefore taking this medicine, consult a doctor or pharmacist if the user is a child under 2 years of age; if the user is an infant or a child under 15 years of age who has, or is suspected of having, chickenpox or influenza; if symptoms of ischaemic colitis (sudden abdominal pain, rectal bleeding and the like) appear in connection with the pseudoephedrine component; if you have an allergic constitution or have had allergic symptoms caused by a medicine (for example fever, rash, joint pain, asthma, itching); if you have liver disease, kidney disease, heart disease, thyroid disease, diabetes, high blood pressure, gastric or duodenal ulcer, glaucoma (for example eye pain, blurred vision) or difficulty passing urine; if you are an older person, physically weak or have a high fever; if you have heartburn, stomach discomfort, stomach pain or another stomach problem that lasts or comes back, or an ulcer or a bleeding problem; if you are pregnant, may be pregnant or are breast-feeding; or if you smoke, or have asthma, chronic bronchitis, emphysema, a cough with a lot of phlegm, a cough lasting or coming back for more than 1 week, a chronic cough, or a cough with fever, rash or a persistent headache.\nIf there is no improvement in symptoms after 5 or 6 doses, stop taking it immediately and consult a doctor or pharmacist.\nKeep to the stated dosage and schedule.\nWhen it is given to a child, give it under the guidance and supervision of a guardian.\nDrowsiness may occur after a dose, so be careful when driving or operating machinery.\n\nDo not take it together with cough and expectorant medicines, other cold medicines, antipyretic analgesics, sedatives, or oral medicines containing antihistamines (oral medicines for rhinitis, travel sickness medicines, allergy medicines).\nDo not take this medicine if you are taking an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, anti-Parkinson medicine and the like) or stopped taking one within the last 2 weeks.\nConsult a doctor or pharmacist if you take it together with medicines for diabetes, gout or arthritis, anticoagulants, steroids, barbiturates, tricyclic antidepressants or alcohol.\nDo not drink alcohol while you are taking it.\n\nIf rash or reddening, itching, nausea or vomiting, loss of appetite, constipation, oedema, difficulty passing urine, thirst (persistent or severe), dizziness, anxiety, tremor, insomnia or high anion gap metabolic acidosis occurs, or rarely shock (hives and tightness of the chest immediately after a dose, together with pallor, cold hands and feet, cold sweat and difficulty breathing), Stevens-Johnson syndrome, toxic epidermal necrolysis (severe symptoms with high fever, and a rash or reddening with burn-like blisters, on the skin of the whole body and on the mucous membranes of the mouth or eyes), asthma, generalised weakness, jaundice or interstitial pneumonia (cough with shortness of breath, difficulty breathing and fever), stop taking it immediately and consult a doctor or pharmacist.\nIf symptoms of reversible posterior encephalopathy syndrome or reversible cerebral vasoconstriction syndrome (a sudden severe headache, thunderclap headache, nausea, vomiting, confusion, seizures, visual disturbance and the like) occur, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Relief of cold symptoms — runny nose, blocked nose, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint and muscle pain",
+    "Choosing a product": "Products with the same generic-name code (D94000ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "63b8bbf197b10b37",
+   "title": "Eye drops (228632COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of the burning feeling, irritation and discomfort of dry eye or of exposure to wind and sun, and to prevent irritation of the eye.",
+   "usage": "Instil 1 to 2 drops into the affected eye as required, and after instillation discard any solution that is left together with the container. If it is used at the same time as another eye drop, leave an interval of at least 15 minutes between them to avoid a dilution effect.",
+   "caution": "Use it externally only.\nDo not use it again after a single use; the solution that is left and the container must be discarded.\nTo avoid contaminating the medicine and damaging the eye, do not let the tip of the container touch the eye or any outside surface.\nUse it only if the container is undamaged, and do not use the solution if its colour has changed or if it has become cloudy.\nVision may become temporarily blurred, so be careful when driving or operating dangerous machinery until sight is clear again.\n\nIf you have pain, a change in vision, continuing redness or a feeling of irritation, or if symptoms get worse or last for 72 hours or more, stop using it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort in dry eye or after exposure to wind and sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (228632COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "6a42b1f51dcdd043",
+   "title": "Enteric-coated tablet (E59100ATE)",
+   "efficacy": "This is an over-the-counter medicine used for indigestion, loss of appetite, overeating, a feeling of food not going down, promotion of digestion, and a feeling of fullness in the stomach caused by indigestion.",
+   "usage": "Adults: take 2 tablets at a time, 3 times in 1 day, after meals.",
+   "caution": "Children aged 7 years and under, and people with a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, must not take this medicine.\nBefore taking this medicine, consult a doctor or pharmacist if you have an allergic constitution.\nKeep to the stated dosage and schedule.\nIf there is no improvement in symptoms after about 2 weeks of use, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Enteric-coated tablet",
+    "What it is for": "Indigestion, loss of appetite, overeating, food not going down, promoting digestion and a full feeling in the stomach",
+    "Choosing a product": "Products with the same generic-name code (E59100ATE) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "73db81e5a3cdd379",
+   "title": "Tablet (101807ATB)",
+   "efficacy": "This is an over-the-counter medicine used for difficulty in bringing up sputum in bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis.",
+   "usage": "Take the following dose before a meal with a small amount of water. For acute disease, children aged 12 years and over and adults take 1 tablet (600 mg) at a time, 1 time in 1 day. For cystic fibrosis, children aged 6 years and over take 1 tablet (600 mg) at a time, 1 time in 1 day.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, if the user is an infant under 2 years of age, if you have gastric or duodenal ulcer, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant or are breast-feeding.\n\nConsult a doctor or pharmacist if you take it together with oral antibiotics (amoxicillin, cefuroxime, doxycycline, erythromycin, thiamphenicol).\n\nIf nausea, vomiting, stomatitis, heartburn, diarrhoea, hives, itching, rash, headache, tinnitus, bronchospasm (especially in people with asthma), rapid heartbeat or high blood pressure rarely occurs, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Difficulty bringing up phlegm in bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis",
+    "Choosing a product": "Products with the same generic-name code (101807ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7decfdc8a83352e2",
+   "title": "Vaginal tablet (137403CTB)",
+   "efficacy": "This is an over-the-counter medicine used for candidal vaginitis (thrush of the vagina).",
+   "usage": "Adults: insert 1 tablet (500 mg) deep into the vagina at a time, 1 time in 1 day, at bedtime.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it or have had it.\nBefore using this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant or are breast-feeding.\nDo not use this medicine during a menstrual period.\nWhile you are using this medicine, do not use tampons, vaginal douches, cleansing products or other products that are put into the vagina.\nIt is best to avoid vaginal intercourse while you are using this medicine, and a partner may become infected during intercourse.\nKeep the medicine away from the eyes.\nUse this medicine in the vagina only; it is not for internal use as a medicine that is swallowed.\nThis medicine can weaken latex and rubber products such as condoms and vaginal diaphragms, so please be careful.\n\nDo not use oral tacrolimus while you are using this medicine.\n\nIf an anaphylactic reaction, angioedema, hypersensitivity, fainting, low blood pressure, difficulty breathing, abdominal pain, nausea, rash, hives, itching, peeling of the vaginal lining, vaginal discharge, vaginal bleeding, discomfort, erythema (red patches), a burning feeling, itching or pain of the vulva and vagina, irritation at the site of use, swelling or pain occurs, stop using it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Vaginal tablet",
+    "What it is for": "Candidal vaginitis (vaginal thrush)",
+    "Choosing a product": "Products with the same generic-name code (137403CTB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7f268ccdcf43c42b",
+   "title": "Oral liquid (C80500ALQ)",
+   "efficacy": "This is an over-the-counter medicine used to prevent and relieve the dizziness, vomiting and headache of travel sickness.",
+   "usage": "Adults: to prevent travel sickness, take 1 bottle 30 minutes before boarding the vehicle or the boat, up to a limit of 3 times in 1 day. If a further dose is needed, leave an interval of at least 4 hours between doses.",
+   "caution": "Children must not take this medicine. Before taking this medicine, consult a doctor or pharmacist if you are pregnant, may be pregnant or are breast-feeding, if you are an older person, if you have hypersensitivity to medicines, if you have glaucoma (eye pain, blurred vision and the like), or if you have difficulty passing urine. Keep to the stated dosage and schedule. Drowsiness may occur after a dose, so be careful when driving or operating machinery.\n\nDo not take it together with other anti-sickness medicines, cold medicines, antipyretic analgesics, antihistamines, sedatives or cough and expectorant medicines.\n\nIf rash, reddening, itching or difficulty passing urine occurs, stop taking it immediately and consult a doctor or pharmacist. Thirst may occur.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Prevention and relief of the dizziness, vomiting and headache of travel sickness",
+    "Choosing a product": "Products with the same generic-name code (C80500ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "87ac9718850813a9",
+   "title": "Tablet (E84100ATB)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of headache, toothache, pain after a tooth extraction, sore throat, earache, joint pain, neuralgia, back pain, muscle pain, stiff or painful shoulders, bruising pain, fracture pain, sprain pain, menstrual pain (period pain) and pain from injury, and to bring down fever when there are chills (feeling cold and shivering) and a raised temperature.",
+   "usage": "Those aged 15 years and over: take 2 tablets at a time, 3 times in 1 day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. It may cause gastrointestinal bleeding.\n\nDo not take this medicine if you have hypersensitivity to it, if you have had asthma when taking its ingredients, another antipyretic analgesic or a cold medicine, or if the user is a baby under 3 months of age.\nBefore taking this medicine, consult a doctor or pharmacist if the user is an infant or a child under 15 years of age who has, or is suspected of having, chickenpox or influenza; if the user is a child under 2 years of age; if you have an allergic constitution or have had an allergic reaction (fever, rash, joint pain, asthma, itching and the like); if you have liver disease, kidney disease, heart disease, thyroid disease, diabetes, high blood pressure or oedema; if you are physically weak, have a high fever or are an older person; if you are pregnant, may be pregnant or are breast-feeding; if you have heartburn, stomach discomfort, stomach pain or another stomach problem that lasts or comes back, or an ulcer or a bleeding problem; or if you have lost a lot of body fluid through vomiting and diarrhoea or are unable to take fluid in.\nIf symptoms do not improve after 5 or 6 doses, stop taking it immediately and consult a doctor or pharmacist.\nKeep to the stated dosage and schedule.\n\nDo not take it together with other antipyretic analgesics, cold medicines or sedatives.\nConsult a doctor or pharmacist if you take it together with medicines for diabetes, gout or arthritis, anticoagulants, steroids, diuretics, preparations containing potassium, preparations containing liquorice, preparations containing glycyrrhizic acid or its salts, loop diuretics (furosemide, etacrynic acid) or thiazide diuretics.\nDo not drink alcohol while you are taking it.\n\nIf rash or reddening, itching, nausea or vomiting, loss of appetite, constipation, stomach pain, bleeding from the digestive tract, discomfort in the upper abdomen, dizziness or oedema occurs, or rarely shock (hives, swelling and tightness of the chest immediately after a dose, together with pallor, cold hands and feet, cold sweat and difficulty breathing), Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell's syndrome — severe symptoms with high fever, and a rash or reddening with burn-like blisters, on the skin of the whole body and on the mucous membranes of the mouth or eyes), asthma, pseudoaldosteronism (a fall in the amount of urine, swelling of the face, hands and feet, heavy eyelids, stiff hands, a rise in blood pressure, headache and the like) or muscle disease (weakness, cramps of the limbs, paralysis and the like), stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Headache, toothache and pain after tooth extraction, sore throat, earache, joint, nerve, back and muscle pain, stiff shoulders, injury pain and period pain, and fever",
+    "Choosing a product": "Products with the same generic-name code (E84100ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "8a085fc4f7253943",
+   "title": "Tablet (D73300ATB)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of the various symptoms of a cold (sore throat, cough, phlegm, chills (feeling cold and shivering), fever, headache, joint pain, muscle pain).",
+   "usage": "Adults: take 1 tablet at a time, 3 times in 1 day, 30 minutes after meals.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\nVery rarely, serious skin reactions that can be fatal — acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis — have been reported; if a skin rash or another sign of hypersensitivity appears after a dose of this medicine, stop taking it at once.\nDo not go above the maximum daily amount of acetaminophen (4,000 mg). It may cause liver damage. Do not take it together with other products containing acetaminophen.\n\nDo not take this medicine if you have hypersensitivity to it or have had it, if the user is an infant under 3 months of age, if you have had asthma when taking another antipyretic analgesic or a cold medicine, if you are taking an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, anti-Parkinson medicine and the like) or stopped taking one within the last 2 weeks, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.\nBefore taking this medicine, consult a doctor or pharmacist if the user is an infant or a child under 15 years of age who has, or is suspected of having, chickenpox or influenza; if the user is an infant or young child aged 3 months and over but under 2 years; if you are pregnant, may be pregnant or are breast-feeding; if you are an older person or physically weak; if you have an allergic constitution or have had allergic symptoms (fever, rash, joint pain, asthma, itching and the like); if you have liver disease, kidney disease, heart disease, thyroid disease, diabetes, high blood pressure, gastric or duodenal ulcer or a high fever; if you have heartburn, stomach discomfort, stomach pain or another stomach problem that lasts or comes back, or an ulcer or a bleeding problem; or if you have hypersensitivity to Food Yellow No. 4 or have had it.\nKeep to the stated dosage and schedule.\nDrowsiness may occur after a dose, so be careful when driving or operating machinery.\nIf there is no improvement in symptoms after 5 or 6 doses, stop taking it immediately and consult a doctor or pharmacist.\n\nDo not take it together with other products containing acetaminophen, MAO inhibitors (antidepressants, antipsychotics, mood stabilisers, anti-Parkinson medicines and the like), cough and expectorant medicines, other cold medicines, antipyretic analgesics, sedatives, or oral medicines containing antihistamines (oral medicines for rhinitis, travel sickness medicines, allergy medicines).\nConsult a doctor or pharmacist if you take it together with medicines for diabetes, gout or arthritis, anticoagulants, steroids, barbiturates, tricyclic antidepressants or alcohol.\nDo not drink alcohol while you are taking it.\n\nIf rash, reddening, itching, nausea, vomiting, loss of appetite, constipation, oedema, dizziness, anxiety, tremor, insomnia, shock (hives, swelling and tightness of the chest immediately after a dose, together with pallor, cold hands and feet, cold sweat and difficulty breathing), Stevens-Johnson syndrome, toxic epidermal necrolysis (severe symptoms with high fever, and a rash or reddening with burn-like blisters, on the skin of the whole body and on the mucous membranes of the mouth or eyes), asthma, generalised weakness, jaundice or interstitial pneumonia (cough with shortness of breath, difficulty breathing and fever) occurs, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Relief of cold symptoms — sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain",
+    "Choosing a product": "Products with the same generic-name code (D73300ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "904e0ee455c9b639",
+   "title": "Oral liquid (533700ALQ)",
+   "efficacy": "This is an over-the-counter medicine used for iron deficiency anaemia.",
+   "usage": "Take 1 bottle at a time, 2 times in 1 day. Press down firmly on the raised part of the upper cap, shake well so that the powder and the liquid mix thoroughly, then turn the upper cap to the left to open it and take the contents.",
+   "caution": "An overdose in a child aged 6 years or under can cause fatal iron poisoning, so keep it out of the reach of children.\n\nDo not take this medicine if you have hypersensitivity to it; if the user is an infant under 12 months of age; or if you have haemochromatosis (a disease in which iron is deposited in the liver and pancreas because of abnormal iron metabolism), haemosiderosis, anaemia that is not due to iron deficiency, aplastic anaemia, haemolytic anaemia (destruction of red cells), anaemia in which iron cannot be used, or chronic pancreatitis.\nBefore taking this medicine, consult a doctor or pharmacist if you have a gastrointestinal disease such as peptic ulcer, chronic ulcerative colitis or regional colitis, impaired heart or circulatory function, kidney disorder, or a low protein level in the blood.\nKeep to the stated dosage and schedule.\n\nDo not take it together with phosphates, calcium salts, oral tetracycline antibiotics or antacids.\nConsult a doctor or pharmacist if you take it together with anti-aldosterone medicines, triamterene, quinolones, penicillamine, chloramphenicol, cholestyramine, pancreatic extract, preparations such as vitamin E, or 200 mg or more of ascorbic acid (vitamin C).\nAvoid tea containing tannin, such as green tea and black tea, and milk and dairy products, during the period of use and just before and after a dose.\n\nIf hives, itching, a hypersensitivity reaction of the skin on exposure to sunlight, abdominal or stomach pain, stomach cramps, stomach discomfort, nausea, vomiting, diarrhoea, constipation, loss of appetite, fever or coma occurs, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Oral liquid",
+    "What it is for": "Iron deficiency anaemia",
+    "Choosing a product": "Products with the same generic-name code (533700ALQ) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "94c421f7cae7bdda",
+   "title": "Capsule (D53300ACH)",
+   "efficacy": "This is an over-the-counter medicine used for diarrhoea, diarrhoea with abdominal pain, a feeling of food not going down, loose stools, and vomiting with diarrhoea.",
+   "usage": "Those aged 15 years and over: take 2 capsules at a time, 3 times in 1 day, 30 minutes after meals. Leave an interval of at least 4 hours between doses.",
+   "caution": "Children aged 7 years and under, women who are pregnant or may be pregnant, women who are breast-feeding, newborn babies, and people with a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, must not take this medicine.\nBefore taking this medicine, consult a doctor or pharmacist if you have had allergic symptoms caused by a medicine (rash, reddening, itching and the like); if you have hypersensitivity to Food Yellow No. 5 or have had it; if you have diarrhoea with fever; if you are an older person; if you have blood in the stool or continuing mucus in the stool; or if you have gastric or duodenal ulcer.\nKeep to the stated dosage and schedule.\nDo not drink alcohol while you are taking it.\nDo not keep taking it for 3 days or more.\nIf there is no improvement in symptoms after several days of use, stop taking it immediately and consult a doctor or pharmacist.\n\nDo not take it together with gastrointestinal analgesic and antispasmodic medicines.\n\nIf allergic symptoms (rash, itching and the like) occur, or rarely dry mouth, or if there is acute severe diarrhoea, or diarrhoea with nausea, abdominal pain or abdominal bloating, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Diarrhoea, diarrhoea with abdominal pain, food not going down, loose stools, and vomiting with diarrhoea",
+    "Choosing a product": "Products with the same generic-name code (D53300ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "9a0ae5afba3d106d",
+   "title": "Tablet (E15700ATB)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of the various symptoms of a cold (runny nose, blocked nose, sneezing, sore throat (pain in the throat), cough, phlegm, chills (feeling cold and shivering), fever, headache, joint pain, muscle pain).",
+   "usage": "Adults (those aged 15 years and over) usually take 2 tablets at a time, 3 times in 1 day, 30 minutes after meals.",
+   "caution": "If you regularly drink three or more glasses of alcohol every day, consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. It may cause liver damage.\nVery rarely, serious skin reactions that can be fatal — acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis — have been reported; if a skin rash or another sign of hypersensitivity appears after a dose of this medicine, stop taking it at once.\nDo not go above the maximum daily amount of acetaminophen (4,000 mg). It may cause liver damage. Do not take it together with other products containing acetaminophen.\n\nDo not take this medicine if you have hypersensitivity to it, if you have had asthma when taking another antipyretic analgesic or a cold medicine, or if the user is an infant under 3 months of age.\nBefore taking this medicine, consult a doctor or pharmacist if the user is an infant or a child under 15 years of age who has, or is suspected of having, chickenpox or influenza; if the user is a child under 2 years of age; if you have an allergic constitution or have had allergic symptoms (fever, rash, joint pain, asthma, itching and the like); if you have liver disease, kidney disease, heart disease, thyroid disease, diabetes, high blood pressure, oedema, gastric or duodenal ulcer, glaucoma (eye pain, blurred vision and the like) or difficulty passing urine; if you are an older person, physically weak or have a high fever; if you have heartburn, stomach discomfort, stomach pain or another stomach problem, an ulcer or a bleeding problem; if you are pregnant, may be pregnant or are breast-feeding; or if you smoke, or have asthma, chronic bronchitis, emphysema, a cough with a lot of phlegm, a cough lasting or coming back for more than 1 week, a chronic cough, or a cough with fever, rash or a persistent headache.\nKeep to the stated dosage and schedule.\nWhen it is given to a child, give it under the guidance and supervision of a guardian.\nDrowsiness may occur after a dose, so be careful when driving or operating machinery.\nIf there is no improvement in symptoms after about 5 or 6 doses, stop taking it immediately and consult a doctor or pharmacist.\n\nDo not take it together with MAO inhibitors (antidepressants, antipsychotics, mood stabilisers, anti-Parkinson medicines and the like), cough and expectorant medicines, other cold medicines, antipyretic analgesics, sedatives, or oral medicines containing antihistamines (oral medicines for rhinitis, travel sickness medicines, allergy medicines).\nConsult a doctor or pharmacist if you take it together with medicines for diabetes, gout or arthritis, anticoagulants, steroids, barbiturates, tricyclic antidepressants, alcohol, preparations containing potassium, preparations containing liquorice, preparations containing glycyrrhizic acid or its salts, loop diuretics (furosemide, etacrynic acid) or thiazide diuretics (trichlormethiazide).\nDo not drink alcohol while you are taking it.\n\nIf rash or reddening, itching, nausea or vomiting, loss of appetite, constipation, oedema, difficulty passing urine, thirst (persistent or severe), dizziness, anxiety, tremor or insomnia occurs, or rarely shock (hives, swelling and tightness of the chest immediately after a dose, together with pallor, cold hands and feet, cold sweat and difficulty breathing), Stevens-Johnson syndrome, toxic epidermal necrolysis (Lyell's syndrome — severe symptoms with high fever, and a rash or reddening with burn-like blisters, on the skin of the whole body and on the mucous membranes of the mouth or eyes), asthma, liver dysfunction (generalised weakness, jaundice), interstitial pneumonia (cough with shortness of breath, difficulty breathing and fever), weakness, cramps of the limbs or paralysis, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Relief of cold symptoms — runny nose, blocked nose, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint and muscle pain",
+    "Choosing a product": "Products with the same generic-name code (E15700ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "9d9e1889c646983f",
+   "title": "Tablet (115401ATB)",
+   "efficacy": "This is an over-the-counter medicine used for cough in a cold, in acute and chronic bronchitis, in upper respiratory infection (pharyngitis and laryngitis) and in pulmonary tuberculosis.",
+   "usage": "Adults: take 1 to 2 tablets (20 to 40 mg) at a time, 3 times in 1 day. The dose may be increased or decreased as appropriate according to age and symptoms.",
+   "caution": "Do not take this medicine if you have hypersensitivity to it, or if you have a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking this medicine, consult a doctor or pharmacist if you are pregnant or may be pregnant, or if you are an older person. Chewing the tablet in the mouth can numb the lining of the mouth, so swallow it as it is.\n\nIf a rash or a similar reaction occurs, stop taking it immediately and consult a doctor or pharmacist. Drowsiness, dizziness, tiredness, a feeling of discomfort, loss of appetite, abdominal pain, stomach discomfort, heartburn and thirst may occur from time to time.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Tablet",
+    "What it is for": "Cough in a cold, acute and chronic bronchitis, pharyngitis and laryngitis, and pulmonary tuberculosis",
+    "Choosing a product": "Products with the same generic-name code (115401ATB) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "a15bbd42c7b85606",
+   "title": "Eye drops (198231COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis and for blepharoconjunctivitis (inflammation of the eyelid and the conjunctiva).",
+   "usage": "Instil 1 drop into the eye at a time, 2 to 6 times in 1 day. Go on using it during the period when there is a risk of the allergy being triggered, even after the symptoms have eased. The amount may be increased or decreased as appropriate according to symptoms.",
+   "caution": "Before using this medicine, consult a doctor or pharmacist if you are pregnant or breast-feeding, or if the user is a young child aged 4 years or under. Use this medicine for instillation into the eye only. When instilling it, be careful that the opening of the container does not touch the eye directly. To prevent contamination, avoid sharing it with other people as far as possible. Use it within 8 weeks of opening.\n\nA temporary burning sensation or a feeling of irritation may occur from time to time when it is instilled.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis and blepharoconjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (198231COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "a7f1b0000838f856",
+   "title": "Capsule (E60400ACH)",
+   "efficacy": "This is an over-the-counter medicine used for regulating the bowel, and for constipation, loose stools, a feeling of abdominal bloating and abnormal fermentation in the bowel.",
+   "usage": "Those aged 15 years and over: take 1 capsule at a time, 3 times in 1 day, after meals.",
+   "caution": "Children aged 7 years and under, and people with a hereditary problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, must not take this medicine.\nBefore taking this medicine, consult a doctor or pharmacist if you are under treatment by a doctor.\nKeep to the stated dosage and schedule.\nIf there is no improvement in symptoms after about 1 month of use, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Capsule",
+    "What it is for": "Regulating the bowel, and constipation, loose stools, a bloated feeling and abnormal fermentation in the bowel",
+    "Choosing a product": "Products with the same generic-name code (E60400ACH) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "af33f8d2ac3c5f5d",
+   "title": "Cream (A59900CCM)",
+   "efficacy": "This is an over-the-counter medicine used for chapped skin, for skin that has become rough, cracked and painful from cold, and for chilblains.",
+   "usage": "Apply an appropriate amount to the affected area. On hardened, thickened areas such as the hands, feet, elbows, knees and heels it works well to rub it in thoroughly after a bath or before going to bed and then to wear gloves or socks.",
+   "caution": "Infants aged 30 months and under must not use this medicine. Before using this medicine, consult a doctor or pharmacist if the user is a child, if you have hypersensitivity to medicines or cosmetics, if you have an allergic constitution, or if the skin is very moist or badly broken down. Keep to the stated dosage and schedule. When it is used for a child, use it under the guidance and supervision of a guardian. Be careful that it does not get into the eyes, and if it does, wash it out at once with water or lukewarm water. Before using it on the face or a similar area, try a small amount first on a soft part of the skin. This medicine is for external use only; it must not be swallowed.\n\nIf rash, reddening, itching or a skin disorder occurs, stop using it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Cream",
+    "What it is for": "Chapped skin, rough and cracked painful skin from cold, and chilblains",
+    "Choosing a product": "Products with the same generic-name code (A59900CCM) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "b46e380a5d882b07",
+   "title": "Lotion (A44200CLT)",
+   "efficacy": "This is an over-the-counter medicine used for the disinfection of the hands of surgeons and of health and hygiene workers at the time of surgery.",
+   "usage": "For surgical hand disinfection: every day before use, clean under the nails with a nail stick, then apply the product to clean, dry hands and nails. Pump 2 mL of the product into the palm of one hand and, with the fingers of the other hand, work it under the nails. Spread the rest evenly over the hand and up to the elbow, then pump a further 2 mL and repeat the same steps on the other hand. Pump 2 mL once more, apply it over both hands and up to the wrists, and let it dry before putting gloves on.\nFor hand disinfection by health and hygiene workers: apply it to clean, dry hands and nails. Pump 2 mL of the product into the palm of one hand. Then spread it evenly over both hands and up to the wrists, paying particular attention to the spaces between the fingers and under the nails, and let it dry without wiping it off.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, if there is a wound deeper than a break in the outer layer of the skin, or if you are pregnant or breast-feeding.\nConsult a doctor or pharmacist before using it if you have or have had an allergic disease such as asthma, or if it is to be used on broken skin (especially a burn).\nDo not swallow it or inject it; it must be used externally only.\nIt must not come into contact with the brain, the meninges, the eyes, the ears, the mouth or mucous membranes (especially the mucous membranes of the genitals), and if there is a perforated eardrum keep it away from the ear canal.\nNever touch the eyes with hands on which this medicine has been used.\nContact with the eye can cause serious damage to the cornea that may require a corneal graft (corneal erosion, loss of the surface layer or damage to the cornea, and serious permanent loss of sight), so be careful that it does not get into the eyes; if it does, wash them out at once and thoroughly with clean water.\nIt is a flammable liquid and there is a risk of burns, so let it dry before using electrical equipment.\nDo not mix it with other chemicals or with cleaning agents.\nDo not use it to disinfect surgical instruments.\n\nIts action may be blocked (inactivated), so avoid using this medicine and soap at the same time or one straight after the other.\nDo not combine it with anionic derivatives.\n\nIf irritation, sensitisation, an allergic reaction or, rarely, anaphylactic shock occurs, stop using it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Lotion",
+    "What it is for": "Disinfection of the hands of surgeons and health and hygiene workers at the time of surgery",
+    "Choosing a product": "Products with the same generic-name code (A44200CLT) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  }
+ ]
+}
