@@ -21,7 +21,8 @@
       "track": "NUTRITION_COMBO_EN_ONLY",
       "masters": 7,
       "op": "EN_ONLY",
-      "status": "CLAIMED"
+      "status": "DONE",
+      "statusNote": "장부 지연 정정(2026-07-25, DB write 0): 본 그룹은 WO-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1 에서 이미 LIVE 완결(en writePlan 14 == writeActual 14 · en canonical 7 · ko 불변 · 독립검증 PASS · 재실행 ALREADY_COMPLETE). 근거: docs/checks/CHECK-O4O-OTC-NUTRITION-COMBO-EN-ONLY-3H-PILOT-NA-V1.md §5·§10(4그룹 53 master 합계에 포함). status 만 CLAIMED 로 남아 있던 장부 미갱신이며, 신규 생산·DB write 아님."
     },
     {
       "groupKey": "비타민E|1000IU|연질캡슐",
