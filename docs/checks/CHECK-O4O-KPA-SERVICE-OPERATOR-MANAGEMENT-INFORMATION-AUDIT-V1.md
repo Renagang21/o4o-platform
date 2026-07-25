@@ -159,6 +159,24 @@ GET /api/v1/operator/members/<uuid>      → 200 success
 | typecheck (`tsc --noEmit`) | PASS (오류 0) |
 | build (`pnpm --filter @o4o/web-kpa-society build`) | PASS (13.97s) |
 
+## 8-1. 배포 및 배포 후 재검증
+
+| 항목 | 값 |
+|------|-----|
+| commit | `1bf655306` |
+| workflow | `Deploy Web Services (Cloud Run)` — conclusion **success** (run 30150132814) |
+| job | `detect-changes` success · `deploy-kpa-society` **success** (타 3서비스 skipped) |
+| Cloud Run revision | `kpa-society-web-01699-57n` |
+
+배포 후 인증 브라우저 재검증:
+
+| 검증 | 수정 전 | 수정 후 | 결과 |
+|------|---------|---------|:---:|
+| `/operator/roles` CUD UI (`platform:super_admin`) | 버튼 `새로고침` 뿐 · 헤더 5개(Actions 없음) | `새로고침` + **`새 역할 추가`** · 헤더 6개(**Actions** 포함) · 39행 | PASS |
+| 비밀번호 변경 PUT 라우팅 (`not-a-uuid`, DB 접근 전 400 분기 이용 — **write 0**) | `PUT /api/v1/kpa/operator/members/…` → **404** `Cannot PUT` | `PUT /api/v1/operator/members/…` → **400** `INVALID_USER_ID` (라우트 도달) | PASS |
+
+- 실제 비밀번호 변경은 **실행하지 않았다** — 운영 회원의 자격증명을 바꾸는 write 이므로 금지. 라우팅 도달 여부만 무해한 잘못된 id 로 검증했다.
+
 ## 9. 후속 권고
 
 | # | 항목 | 사유 |
