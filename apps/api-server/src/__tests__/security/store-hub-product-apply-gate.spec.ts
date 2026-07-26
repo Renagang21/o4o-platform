@@ -210,6 +210,133 @@ describe('POST /apply — serviceKey spoofing (HUB-P0-04)', () => {
 // HUB-P0-04 — 읽기 경로도 마운트 축을 읽는다
 // ─────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────
+// HUB-P0-02 — PRIVATE 매장 범위 (allowed_seller_ids)
+// WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1
+// ─────────────────────────────────────────────────────
+
+/** 카탈로그 목록 SQL 호출 (product_images 서브쿼리를 가진 SELECT). */
+function catalogListCall(calls: QueryCall[]): QueryCall | undefined {
+  return calls.find(c => /FROM supplier_product_offers/i.test(c.sql) && /isAdded/i.test(c.sql));
+}
+/** 카탈로그 count SQL 호출. */
+function catalogCountCall(calls: QueryCall[]): QueryCall | undefined {
+  return calls.find(c => /COUNT\(\*\)::int AS total/i.test(c.sql) && /supplier_product_offers/i.test(c.sql));
+}
+
+describe('PRIVATE seller scope (HUB-P0-02)', () => {
+  it('카탈로그 목록에 PRIVATE 매장 범위 조건이 현재 organizationId 로 바인딩된다', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+
+    await request(app).get('/pharmacy/products/catalog');
+
+    const call = catalogListCall(calls);
+    expect(call).toBeDefined();
+    expect(call!.sql).toMatch(/distribution_type\s*<>\s*'PRIVATE'/);
+    expect(call!.sql).toMatch(/=\s*ANY\(spo\.allowed_seller_ids\)/);
+    expect(call!.params).toContain(ORG_ID);
+  });
+
+  it('카탈로그 count 에도 목록과 동일한 PRIVATE 조건이 적용된다 (목록/총계 불일치 방지)', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+
+    await request(app).get('/pharmacy/products/catalog');
+
+    const list = catalogListCall(calls)!;
+    const count = catalogCountCall(calls)!;
+    expect(count.sql).toMatch(/distribution_type\s*<>\s*'PRIVATE'/);
+    expect(count.sql).toMatch(/=\s*ANY\(spo\.allowed_seller_ids\)/);
+    // 두 쿼리 모두 같은 매장 id 로 범위 판정해야 한다
+    expect(count.params).toContain(ORG_ID);
+    expect(list.params).toContain(ORG_ID);
+  });
+
+  it('신청 게이트에도 PRIVATE 매장 범위가 적용된다', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+
+    await request(app).post('/pharmacy/products/apply').send({ supplyProductId: OFFER_ID });
+
+    const call = gateCall(calls)!;
+    expect(call.sql).toMatch(/distribution_type\s*<>\s*'PRIVATE'/);
+    expect(call.sql).toMatch(/=\s*ANY\(spo\.allowed_seller_ids\)/);
+    expect(call.params).toContain(ORG_ID);
+  });
+
+  it('비허용 매장의 PRIVATE 신청은 404 OFFER_NOT_AVAILABLE (내부 사유 미노출)', async () => {
+    const calls: QueryCall[] = [];
+    // SQL 게이트에서 탈락 → 행 없음
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+
+    const res = await request(app).post('/pharmacy/products/apply').send({ supplyProductId: OFFER_ID });
+
+    expect(res.status).toBe(404);
+    expect(res.body.code).toBe('OFFER_NOT_AVAILABLE');
+    // 미승인/비활성/비허용 매장을 구별하는 코드가 새로 생기지 않았는지
+    expect(res.body.code).not.toMatch(/PRIVATE|SELLER|DISTRIBUTION/i);
+  });
+
+  it('허용 매장의 PRIVATE 은 게이트를 통과한다', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [{ distribution_type: 'PRIVATE' }], calls });
+
+    const res = await request(app).post('/pharmacy/products/apply').send({ supplyProductId: OFFER_ID });
+
+    expect(res.status).not.toBe(404);
+    expect(res.body.code).not.toBe('OFFER_NOT_AVAILABLE');
+  });
+
+  it('body/query 로 organizationId·sellerId 를 위조해도 게이트는 인증 매장 id 만 쓴다', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+    const SPOOFED = '00000000-0000-0000-0000-000000000000';
+
+    await request(app)
+      .post('/pharmacy/products/apply')
+      .send({ supplyProductId: OFFER_ID, organizationId: SPOOFED, sellerId: SPOOFED, allowed_seller_ids: [SPOOFED] });
+
+    const call = gateCall(calls)!;
+    expect(call.params).toContain(ORG_ID);
+    expect(call.params).not.toContain(SPOOFED);
+  });
+
+  // 게이트를 filter 문자열 + params.push 로 조립하므로 인덱스 산술이 어긋나면
+  // 런타임에야 "bind message supplies N parameters" 로 터진다. 정적으로 잡는다.
+  it.each([
+    ['기본', ''],
+    ['distributionType 필터', '?distributionType=PRIVATE'],
+    ['category 필터', '?category=BrandX'],
+    ['operatorView', '?operatorView=true'],
+    ['복합', '?category=BrandX&distributionType=SERVICE'],
+  ])('카탈로그 SQL 의 $N 참조가 params 길이와 일치한다 — %s', async (_label, qs) => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [], calls });
+
+    await request(app).get(`/pharmacy/products/catalog${qs}`);
+
+    for (const call of [catalogListCall(calls), catalogCountCall(calls)]) {
+      expect(call).toBeDefined();
+      const refs = [...call!.sql.matchAll(/\$(\d+)/g)].map(m => Number(m[1]));
+      expect(refs.length).toBeGreaterThan(0);
+      // 모든 $N 이 실제 파라미터 범위 안에 있어야 한다
+      expect(Math.max(...refs)).toBeLessThanOrEqual(call!.params.length);
+      expect(Math.min(...refs)).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('PUBLIC / SERVICE 는 매장 범위 검사를 받지 않는다 (첫 항으로 통과)', async () => {
+    const calls: QueryCall[] = [];
+    const app = buildApp({ serviceKey: 'kpa', offerRows: [{ distribution_type: 'PUBLIC' }], calls });
+
+    await request(app).post('/pharmacy/products/apply').send({ supplyProductId: OFFER_ID });
+
+    // 게이트 식이 PRIVATE 이 아닐 때 무조건 참이 되는 형태인지 확인
+    expect(gateCall(calls)!.sql).toMatch(/spo\.distribution_type\s*<>\s*'PRIVATE'\s*OR/);
+  });
+});
+
 describe('GET /applications · /approved — read axis derived from mount (HUB-P0-04)', () => {
   it.each([
     ['kpa', 'kpa-society'],

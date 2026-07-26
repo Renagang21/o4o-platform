@@ -92,6 +92,33 @@ function buildServiceApprovalGateSql(paramIndex: number): string {
       )`;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1 (HUB-P0-02)
+//
+// PRIVATE 매장 범위 게이트 SSOT — 목록·카운트·신청이 같은 조건을 쓴다.
+//
+// 계약은 기존 checkout 3곳에서 그대로 가져왔다(새로 정하지 않았다). 세 곳 모두 동일 술어다:
+//   kpa-checkout.controller.ts        `!allowed_seller_ids || !includes(organization.id)` → 403
+//   glycopharm/checkout.controller.ts `!allowed_seller_ids || !includes(pharmacy.id)`     → 403
+//   neture-b2b-cart-checkout.service  `!allowed_seller_ids || !includes(scope.buyerId)`   → DISTRIBUTION_DENIED
+//   ⇒ NULL 차단 · 빈 배열 차단 · 포함될 때만 허용
+//
+// 아래 SQL 한 줄이 그 의미를 정확히 재현한다 (allowed_seller_ids 는 TEXT[]):
+//   NULL        → `x = ANY(NULL)` 이 NULL  → WHERE 에서 탈락 (차단)
+//   '{}'        → `x = ANY('{}')` 가 false → 탈락 (차단)
+//   포함        → true → 통과
+// PUBLIC/SERVICE 는 첫 항으로 무조건 통과 — 기존 정책 무변경.
+//
+// 비교 축은 **organizationId** 다 (매장 측 checkout 2곳과 동일).
+// Neture 의 scope.buyerId 는 파트너 구매자 축으로 별개이며 매장 HUB 경로가 아니다.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildPrivateSellerScopeSql(paramIndex: number): string {
+  return `(
+        spo.distribution_type <> 'PRIVATE'
+        OR $${paramIndex}::text = ANY(spo.allowed_seller_ids)
+      )`;
+}
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
@@ -108,6 +135,7 @@ async function findApplicableOffer(
   dataSource: DataSource,
   offerId: string,
   approvalServiceKey: string | undefined,
+  organizationId: string,
 ): Promise<{ distribution_type: string } | null> {
   // 비-UUID 는 조회 자체가 불가능하므로 캐스팅 500 대신 '노출 불가' 로 처리한다.
   if (typeof offerId !== 'string' || !UUID_RE.test(offerId)) return null;
@@ -119,6 +147,12 @@ async function findApplicableOffer(
     gate = `AND ${buildServiceApprovalGateSql(params.length)}`;
   }
 
+  // WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1 (HUB-P0-02):
+  //   PRIVATE 은 현재 매장이 allowed_seller_ids 에 포함될 때만 신청 가능하다.
+  //   organizationId 는 requirePharmacyOwner 가 서버에서 해석한 값이며 클라이언트 입력이 아니다.
+  params.push(organizationId);
+  const sellerScope = `AND ${buildPrivateSellerScopeSql(params.length)}`;
+
   const [row] = await dataSource.query(
     `SELECT spo.distribution_type
        FROM supplier_product_offers spo
@@ -127,6 +161,7 @@ async function findApplicableOffer(
         AND spo.is_active = true
         AND s.status = 'ACTIVE'
         ${gate}
+        ${sellerScope}
       LIMIT 1`,
     params,
   );
@@ -211,6 +246,13 @@ export function createPharmacyProductsController(
       approvalFilter = `AND ${buildServiceApprovalGateSql(params.length)}`;
     }
 
+    // WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1 (HUB-P0-02):
+    //   PRIVATE 은 현재 매장이 allowed_seller_ids 에 포함될 때만 노출한다.
+    //   organizationId 는 $1 로 이미 바인딩돼 있으나(취급 여부 서브쿼리용), 파라미터 인덱스
+    //   가독성을 위해 게이트 전용으로 다시 push 한다. count 쿼리와 인덱스 계산을 분리하기 위함.
+    params.push(organizationId);
+    const sellerScopeFilter = `AND ${buildPrivateSellerScopeSql(params.length)}`;
+
     // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
     // recommended 탭은 공급자 강조 플래그(spo.is_featured) 우선 → created_at DESC fallback
     // 기존 offer_curations 의존 제거. 별도 WHERE 필터 없이 ORDER BY로 자연 fallback.
@@ -262,6 +304,7 @@ export function createPharmacyProductsController(
          ${distributionFilter}
          ${operatorFilter}
          ${approvalFilter}
+         ${sellerScopeFilter}
        ORDER BY ${orderBy}
        LIMIT $2 OFFSET $3`,
       params,
@@ -293,6 +336,11 @@ export function createPharmacyProductsController(
       countApprovalFilter = `AND ${buildServiceApprovalGateSql(countParams.length)}`;
     }
 
+    // WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1: 목록과 동일한 PRIVATE 매장 범위 게이트.
+    //   (countParams 는 operatorView 일 때만 organizationId 를 포함하므로 게이트용으로 항상 push 한다.)
+    countParams.push(organizationId);
+    const countSellerScopeFilter = `AND ${buildPrivateSellerScopeSql(countParams.length)}`;
+
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS total
        FROM supplier_product_offers spo
@@ -304,7 +352,8 @@ export function createPharmacyProductsController(
          ${countCategoryFilter}
          ${countDistributionFilter}
          ${countOperatorFilter}
-         ${countApprovalFilter}`,
+         ${countApprovalFilter}
+         ${countSellerScopeFilter}`,
       countParams,
     );
 
@@ -375,7 +424,13 @@ export function createPharmacyProductsController(
     // 종전에는 `WHERE id=$1 AND is_active=true` 만 검사해, 현재 서비스에서 승인되지 않아
     // **카탈로그에 보이지 않는 offer 도 ID 직접 지정으로 신청**할 수 있었다.
     // findApplicableOffer 가 catalog 와 같은 조건(활성 offer + 공급자 ACTIVE + 서비스 승인)을 재검증한다.
-    const offer = await findApplicableOffer(dataSource, supplyProductId, approvalServiceKeyForApply);
+    // WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1: PRIVATE 매장 범위까지 함께 검증한다.
+    const offer = await findApplicableOffer(
+      dataSource,
+      supplyProductId,
+      approvalServiceKeyForApply,
+      organizationId,
+    );
     if (!offer) {
       // WO §8: 내부 상태를 구분해 노출하지 않는다.
       throw new ApiError(404, 'Product not available for this service', 'OFFER_NOT_AVAILABLE');
