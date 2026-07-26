@@ -13,10 +13,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import { supplierApi, type SupplierLibraryItem } from '../../lib/api';
-
-/** 서버 limit 상한(neture-library.service.ts: Math.min(limit, 100))과 동일하게 맞춘다. */
-const LOOKUP_LIMIT = 100;
+import { supplierApi } from '../../lib/api';
+import { SUPPLIER_LIBRARY_ITEM_NOT_FOUND } from '../../lib/api/supplier';
 import { RichTextEditor } from '@o4o/content-editor';
 import type { EditorContent } from '@o4o/content-editor';
 
@@ -62,56 +60,44 @@ export default function SupplierLibraryFormPage() {
   const [error, setError] = useState<string | null>(null);
   // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
   //   수정 대상 조회 상태. error(조회 실패) 와 not-found(대상 없음) 를 분리한다.
-  //   out-of-range = 조회는 성공했으나 대상이 limit 범위 밖일 수 있는 경우.
+  // WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1:
+  //   단건 조회 전환으로 'out-of-range'(limit 범위 밖 가능성) 상태가 불필요해져 제거했다.
   const [loadState, setLoadState] =
-    useState<'idle' | 'loading' | 'error' | 'not-found' | 'out-of-range' | 'success'>('idle');
+    useState<'idle' | 'loading' | 'error' | 'not-found' | 'success'>('idle');
 
-  // 수정 모드: 기존 데이터 로드 (다시 시도에서도 동일 함수 재사용 — 목록 조회만 재호출)
+  // 수정 모드: 기존 데이터 로드 (다시 시도에서도 동일 함수 재사용 — 단건 조회만 재호출)
+  //
+  // WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1:
+  //   기존에는 getLibraryItems({ limit: 100 }) 후 find(id) 라서 101번째 이후 자료를
+  //   수정할 수 없었다. 단건 조회 API(GET /neture/library/:id)로 전환해
+  //   목록 pagination 위치와 무관하게 대상을 조회한다. 목록 API 는 호출하지 않는다.
   const loadItem = useCallback(async () => {
     if (!isEditMode || !id) return;
-    {
-      setLoading(true);
-      setLoadState('loading');
-      let items: SupplierLibraryItem[];
-      let total: number;
-      try {
-        // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
-        //   조회 실패는 throw 된다. 이를 not-found 로 표시하지 않는다.
-        //   단건 조회 API 가 없어 목록에서 찾는 구조는 유지한다(backend 무변경).
-        const res = await supplierApi.getLibraryItems({ limit: LOOKUP_LIMIT });
-        items = res.items;
-        total = res.total;
-      } catch {
-        setLoadState('error');
-        setLoading(false);
-        return;
-      }
-      const item = items.find((i) => i.id === id);
-      if (item) {
-        const isDocument = item.contentType === 'document';
-        const existingHtml = isDocument
-          ? ((item.blocks?.[0] as Record<string, unknown>)?.content as string) || ''
-          : '';
-        setFormData({
-          title: item.title,
-          description: item.description || '',
-          contentType: isDocument ? 'document' : 'media',
-          fileUrl: isDocument ? '' : item.fileUrl,
-          fileName: isDocument ? '' : item.fileName,
-          fileSize: isDocument ? '' : String(item.fileSize),
-          mimeType: isDocument ? '' : item.mimeType,
-          documentHtml: existingHtml,
-          category: item.category || '',
-          isPublic: item.isPublic,
-        });
-        setLoadState('success');
-      } else if (total > items.length) {
-        // 조회는 성공했으나 대상이 조회 범위(limit) 밖일 수 있다.
-        // "없음" 으로 단정하지 않는다 — 후속 WO 대상(§CHECK 참조).
-        setLoadState('out-of-range');
-      } else {
-        setLoadState('not-found');
-      }
+    setLoading(true);
+    setLoadState('loading');
+    try {
+      const item = await supplierApi.getLibraryItem(id);
+      const isDocument = item.contentType === 'document';
+      const existingHtml = isDocument
+        ? ((item.blocks?.[0] as Record<string, unknown>)?.content as string) || ''
+        : '';
+      setFormData({
+        title: item.title,
+        description: item.description || '',
+        contentType: isDocument ? 'document' : 'media',
+        fileUrl: isDocument ? '' : item.fileUrl,
+        fileName: isDocument ? '' : item.fileName,
+        fileSize: isDocument ? '' : String(item.fileSize),
+        mimeType: isDocument ? '' : item.mimeType,
+        documentHtml: existingHtml,
+        category: item.category || '',
+        isPublic: item.isPublic,
+      });
+      setLoadState('success');
+    } catch (e: any) {
+      // 404(미존재·타인 소유)만 not-found. 그 외 조회 실패는 error 로 분리한다.
+      setLoadState(e?.message === SUPPLIER_LIBRARY_ITEM_NOT_FOUND ? 'not-found' : 'error');
+    } finally {
       setLoading(false);
     }
   }, [id, isEditMode]);
@@ -221,9 +207,8 @@ export default function SupplierLibraryFormPage() {
 
   // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
   //   수정 대상 조회 실패/미존재는 빈 수정 폼 대신 전용 화면으로 분리한다.
-  if (isEditMode && (loadState === 'error' || loadState === 'not-found' || loadState === 'out-of-range')) {
+  if (isEditMode && (loadState === 'error' || loadState === 'not-found')) {
     const isError = loadState === 'error';
-    const isOutOfRange = loadState === 'out-of-range';
     return (
       <div style={{ padding: '32px', maxWidth: '720px' }}>
         <button
@@ -240,21 +225,15 @@ export default function SupplierLibraryFormPage() {
           padding: '48px 24px', textAlign: 'center',
         }}>
           <p style={{ fontSize: '15px', color: '#475569', marginBottom: '4px' }}>
-            {isError
-              ? '자료 정보를 불러오지 못했습니다.'
-              : isOutOfRange
-                ? '자료 정보를 확인할 수 없습니다.'
-                : '자료를 찾을 수 없습니다.'}
+            {isError ? '자료 정보를 불러오지 못했습니다.' : '자료를 찾을 수 없습니다.'}
           </p>
           <p style={{ fontSize: '13px', color: '#94a3b8' }}>
             {isError
               ? '잠시 후 다시 시도해 주세요.'
-              : isOutOfRange
-                ? '자료함에서 해당 자료를 열어 주세요.'
-                : '이미 삭제되었거나 접근할 수 없는 자료입니다.'}
+              : '이미 삭제되었거나 접근할 수 없는 자료입니다.'}
           </p>
           {/* not-found 는 다시 시도 대상이 아니다. */}
-          {(isError || isOutOfRange) && (
+          {isError && (
             <button
               onClick={reloadItem}
               style={{

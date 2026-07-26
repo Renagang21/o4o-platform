@@ -151,6 +151,43 @@ router.get('/library', requireAuth, requireLinkedSupplier, async (req: Request, 
 });
 
 /**
+ * GET /library/:id — 내 자료 단건 조회
+ *
+ * WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1:
+ *   수정 화면이 목록(limit 100) 을 훑어 find(id) 하던 구조를 대체한다.
+ *   `/library/public` 은 이 라우트보다 앞에 등록되어 있어 shadow 되지 않는다.
+ *   read 정책은 목록(GET /library)과 동일하게 requireLinkedSupplier 를 쓴다.
+ *   소유권은 service 의 `where: { id, supplierId }` 로 강제되며,
+ *   타인 소유·미존재는 모두 404 로 숨긴다(PATCH/DELETE 와 동일 관례).
+ */
+router.get('/library/:id', requireAuth, requireLinkedSupplier, async (req: Request, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const item = await libraryService.getByIdForSupplier(req.params.id, supplierId);
+    if (!item) {
+      res.status(404).json({ success: false, error: { code: 'ITEM_NOT_FOUND', message: 'Library item not found' } });
+      return;
+    }
+    // 목록(GET /library)과 동일한 ContentMeta 파생 (WO-NETURE-SUPPLIER-CONTENT-TABLE-MERGE-V1)
+    const data = {
+      ...item,
+      producer: 'supplier' as const,
+      producerRef: (item as any).supplierId,
+      visibility: (item as any).visibility ?? mapNetureVisibility((item as any).isPublic ?? false),
+      serviceKey: 'neture' as const,
+      contentType: (item as any).contentType ?? 'media',
+      metaStatus: (((item as any).visibility ?? mapNetureVisibility((item as any).isPublic ?? false)) === 'service'
+        ? 'published'
+        : 'draft') as 'published' | 'draft',
+    };
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('[Neture Library API] Error fetching library item:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch library item' } });
+  }
+});
+
+/**
  * POST /library — 자료 생성
  */
 router.post('/library', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {

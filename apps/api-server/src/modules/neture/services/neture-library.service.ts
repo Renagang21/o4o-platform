@@ -81,6 +81,23 @@ export class NetureLibraryService {
   }
 
   /**
+   * 단건 조회 (공급자 본인 소유만)
+   *
+   * WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1:
+   *   수정 화면이 목록(limit 100) 에서 find(id) 하던 구조를 대체한다.
+   *   소유권은 update()/delete() 와 동일하게 `where: { id, supplierId }` 로 강제하며,
+   *   타인 소유·미존재는 모두 null → 라우트에서 404 로 숨긴다(기존 관례 유지).
+   */
+  async getByIdForSupplier(id: string, supplierId: string): Promise<NetureSupplierLibraryItem | null> {
+    try {
+      return await this.repo.findOne({ where: { id, supplierId } });
+    } catch (error) {
+      logger.error('[NetureLibraryService] Error fetching item:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 공개 자료 목록 조회 (인증 불필요)
    */
   async listPublic(

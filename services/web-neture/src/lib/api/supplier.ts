@@ -59,6 +59,10 @@ export const SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED = 'SUPPLIER_REGULATED_CAT
 /** WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1 */
 export const SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED = 'SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1 */
+export const SUPPLIER_LIBRARY_ITEM_LOAD_FAILED = 'SUPPLIER_LIBRARY_ITEM_LOAD_FAILED';
+export const SUPPLIER_LIBRARY_ITEM_NOT_FOUND = 'SUPPLIER_LIBRARY_ITEM_NOT_FOUND';
+
 /** WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1 */
 export const SUPPLIER_SPOT_POLICIES_LOAD_FAILED = 'SUPPLIER_SPOT_POLICIES_LOAD_FAILED';
 export const SUPPLIER_SPOT_POLICIES_FORBIDDEN = 'SUPPLIER_SPOT_POLICIES_FORBIDDEN';
@@ -913,6 +917,30 @@ export const supplierApi = {
     // total 은 보조 필드다. 누락되어도 목록 자체는 유효하므로 실패로 보지 않는다.
     const items = result.data.items as SupplierLibraryItem[];
     return { items, total: typeof result.data.total === 'number' ? result.data.total : items.length };
+  },
+
+  /**
+   * WO-O4O-NETURE-SUPPLIER-LIBRARY-EDIT-ITEM-LOOKUP-PAGINATION-V1
+   *
+   * 수정 화면 전용 단건 조회. 목록(limit 100) 순회를 대체한다.
+   * backend 계약: 200 + data / 404 ITEM_NOT_FOUND(미존재·타인 소유) / 500.
+   * 404 만 NOT_FOUND 로 구분하고 그 외 실패는 LOAD_FAILED 로 전파한다.
+   */
+  async getLibraryItem(id: string): Promise<SupplierLibraryItem> {
+    let response;
+    try {
+      response = await api.get(`/neture/library/${encodeURIComponent(id)}`);
+    } catch (error) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      console.warn('[Supplier API] Failed to fetch library item:', extractApiError(error));
+      throw new Error(status === 404 ? SUPPLIER_LIBRARY_ITEM_NOT_FOUND : SUPPLIER_LIBRARY_ITEM_LOAD_FAILED);
+    }
+    const data = response.data?.data;
+    if (!response.data?.success || !data || typeof data !== 'object') {
+      console.warn('[Supplier API] Unexpected library item payload shape');
+      throw new Error(SUPPLIER_LIBRARY_ITEM_LOAD_FAILED);
+    }
+    return data as SupplierLibraryItem;
   },
 
   async createLibraryItem(data: {
