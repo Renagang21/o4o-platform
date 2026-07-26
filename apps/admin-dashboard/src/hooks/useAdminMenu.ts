@@ -213,7 +213,9 @@ function transformApiMenuItems(items: any[]): MenuItem[] {
       label: item.label,
       icon: getIconComponent(item.icon),
       path: item.path,
-      roles: item.roles,
+      // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
+      //   MenuItem.roles 는 어디에서도 읽히지 않는 dead metadata 라 제거했다.
+      //   메뉴 가시성 게이트는 hasMenuPermission(menuId) 이 담당한다.
       children: item.children ? transformApiMenuItems(item.children) : undefined
     };
 

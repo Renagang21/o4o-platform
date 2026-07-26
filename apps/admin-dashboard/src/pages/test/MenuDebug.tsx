@@ -8,10 +8,13 @@ export default function MenuDebug() {
   const { user } = useAuth();
   const { menuItems, userRoles, userPermissions, isLoading } = useAdminMenu();
 
-  // Test tools menu specifically
-  const toolsMenuItem = adminMenuStatic.find(m => m.id === 'tools');
-  const toolsPermission = menuPermissions.find(m => m.menuId === 'tools');
-  const hasToolsAccess = hasMenuPermission(userRoles, userPermissions, 'tools');
+  // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
+  //   기존에는 'tools' 를 하드코딩해 조사했으나, 해당 메뉴·설정이 모두 제거되어 진단 가치가 없어졌다.
+  //   현재 실제로 게이트가 적용되는 유일한 항목인 'core-users' 로 교체한다.
+  const GATED_MENU_ID = 'core-users';
+  const gatedMenuItem = adminMenuStatic.find(m => m.id === GATED_MENU_ID);
+  const gatedPermission = menuPermissions.find(m => m.menuId === GATED_MENU_ID);
+  const hasGatedAccess = hasMenuPermission(userRoles, userPermissions, GATED_MENU_ID);
 
   if (isLoading) {
     return <div className="p-8">Loading...</div>;
@@ -49,23 +52,23 @@ export default function MenuDebug() {
         </div>
       </div>
 
-      {/* Tools Menu Check */}
+      {/* Gated Menu Check — 실제 게이트가 적용되는 항목 */}
       <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">3. "도구" 메뉴 체크</h2>
+        <h2 className="text-xl font-semibold mb-4">3. 게이트 적용 메뉴 체크 ({GATED_MENU_ID})</h2>
         <div className="space-y-3 font-mono text-sm">
           <div>
-            <strong>toolsMenuItem exists:</strong> {toolsMenuItem ? '✅ Yes' : '❌ No'}
+            <strong>menuItem exists:</strong> {gatedMenuItem ? '✅ Yes' : '❌ No'}
           </div>
           <div>
-            <strong>toolsPermission config:</strong>
+            <strong>permission config:</strong>
             <pre className="mt-1 p-3 bg-white rounded">
-              {JSON.stringify(toolsPermission, null, 2)}
+              {JSON.stringify(gatedPermission, null, 2)}
             </pre>
           </div>
           <div className="text-lg">
-            <strong>hasToolsAccess:</strong>{' '}
-            <span className={hasToolsAccess ? 'text-green-600' : 'text-red-600'}>
-              {hasToolsAccess ? '✅ TRUE (보여야 함)' : '❌ FALSE (숨김)'}
+            <strong>hasAccess:</strong>{' '}
+            <span className={hasGatedAccess ? 'text-green-600' : 'text-red-600'}>
+              {hasGatedAccess ? '✅ TRUE (보여야 함)' : '❌ FALSE (숨김)'}
             </span>
           </div>
         </div>

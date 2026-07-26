@@ -40,7 +40,10 @@ export interface MenuItem {
   path?: string;
   separator?: boolean;
   children?: MenuItem[];
-  roles?: string[];
+  // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
+  //   `roles` 메타데이터 제거. 메뉴 가시성 게이트는 rolePermissions.ts 의 menuPermissions +
+  //   hasMenuPermission(menuId 기준)이 담당하며, 이 필드는 useAdminMenu 가 pass-through 할 뿐
+  //   어디에서도 읽히지 않는 dead metadata 였다(무효 형식 'platform_admin' 까지 섞여 있었음).
 }
 
 /**
@@ -65,7 +68,6 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Overview',
     icon: <LayoutDashboard className="w-5 h-5" />,
     path: '/admin',
-    roles: ['admin', 'super_admin'],
   },
 
   // ============================================
@@ -75,7 +77,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'core',
     label: 'Core',
     icon: <Shield className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       // WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1 / WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1
       // 두 entry 는 동일 RBAC SSOT (`role_assignments`) 위의 다른 facet preset:
@@ -86,7 +87,6 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'RBAC Role Assignments',
         icon: <Users className="w-4 h-4" />,
         path: '/users',
-        roles: ['super_admin', 'platform:super_admin'],
       },
       {
         id: 'core-operators',
@@ -129,7 +129,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'o4o-product-db',
     label: 'O4O 상품 DB',
     icon: <Database className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'o4o-product-db-overview',
@@ -170,7 +169,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'content',
     label: 'Content',
     icon: <FileText className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'content-overview',
@@ -211,7 +209,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'cms',
     label: 'CMS',
     icon: <Database className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'cms-contents',
@@ -269,7 +266,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'appstore',
     label: 'AppStore',
     icon: <Package className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'appstore-browse',
@@ -285,7 +281,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'forum',
     label: 'Forum',
     icon: <MessageSquare className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'forum-dashboard',
@@ -316,7 +311,6 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Services',
     icon: <Briefcase className="w-5 h-5" />,
     separator: true,
-    roles: ['admin', 'super_admin'],
   },
 
   // Yaksa (KPA)
@@ -324,7 +318,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'yaksa',
     label: 'Yaksa (KPA)',
     icon: <Activity className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'yaksa-hub',
@@ -355,7 +348,6 @@ export const adminMenuStatic: MenuItem[] = [
     id: 'digital-signage',
     label: 'Digital Signage',
     icon: <Monitor className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'signage-operations',
@@ -393,7 +385,6 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Insights',
     icon: <TrendingUp className="w-5 h-5" />,
     separator: true,
-    roles: ['admin', 'super_admin'],
   },
 
   {
@@ -401,7 +392,6 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Ops Metrics',
     icon: <Activity className="w-5 h-5" />,
     path: '/admin/ops/metrics',
-    roles: ['admin', 'super_admin'],
   },
 
 
@@ -410,14 +400,12 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Content Manager',
     icon: <Layers className="w-5 h-5" />,
     path: '/admin/service-content-manager',
-    roles: ['admin', 'super_admin', 'platform_admin'],
   },
 
   {
     id: 'reporting',
     label: 'Reports',
     icon: <ClipboardList className="w-5 h-5" />,
-    roles: ['admin', 'super_admin'],
     children: [
       {
         id: 'reporting-overview',

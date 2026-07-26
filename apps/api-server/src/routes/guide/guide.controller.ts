@@ -22,14 +22,18 @@ import { GuideContent } from './entities/guide-content.entity.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
-// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
-//   무접두 'super_admin' 은 역할 카탈로그에 정의가 없고 보유자도 0명이라 무효항 → 제거(판정 결과 불변).
-//   NOTE: 본 함수는 ':admin'/':operator' suffix 로만 판정하므로 'platform:super_admin'(suffix
-//   ':super_admin')은 여전히 통과하지 못한다. 이는 본 WO 이전부터의 기존 동작이며,
-//   권한 확대에 해당하므로 여기서 바꾸지 않는다 (IR-…-GUARD-CONSUMER-AUDIT-V1 후속 WO 대상).
+// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1: 무접두 'super_admin'(보유자 0) 무효항 제거.
+// WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
+//   canonical 누락 해소 — 본 함수는 ':admin'/':operator' suffix 로만 판정했는데
+//   'platform:super_admin' 의 suffix 는 ':super_admin' 이라 **최고 관리자가 통과하지 못했다**.
+//   플랫폼 최고 관리자는 전 서비스 상위 권한이라는 확립된 정책(role.utils.isPlatformAdmin,
+//   menuPermissions core-users 선례)과 어긋나므로 canonical 역할을 명시적으로 허용한다.
+//   서비스 역할의 허용 범위는 변경하지 않는다(기존 suffix 판정 유지).
 function isOperatorOrAbove(roles: string[]): boolean {
   return roles.some(
     (r) =>
+      r === 'platform:super_admin' ||
+      r === 'platform:admin' ||
       r.endsWith(':operator') ||
       r.endsWith(':admin') ||
       r === 'admin'

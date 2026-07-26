@@ -13,49 +13,21 @@ export interface MenuPermission {
 // Menu permission configuration without hardcoded roles
 // Roles should be fetched from database and checked dynamically
 export const menuPermissions: MenuPermission[] = [
-  // Home - All authenticated users can access
-  {
-    menuId: 'home',
-    // No specific roles - available to all authenticated users
-  },
-  // Dashboard - All authenticated users can access
+  // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
+  //   정적 메뉴 트리(admin-menu.static.tsx)와 전수 대조해 대응 항목이 없는 고아 설정 19건을 제거했다.
+  //   제거 대상: home / dashboard-home / dashboard-overview / dashboard-stats / user-management /
+  //   users / users-list / users-create / users-edit / reports / analytics / sales-reports /
+  //   settings / general-settings / logs / profile / users-profile / ui-elements / ui-components
+  //
+  //   근거: hasMenuPermission 은 메뉴 항목의 id 로만 조회되고(useAdminMenu.ts:163),
+  //   동적 메뉴(/api/v1/navigation/admin)는 Phase R1 이후 빈 배열 stub 이라 정적 트리가 유일한 소스다.
+  //   위 id 를 가진 메뉴 항목이 0건이므로 해당 설정은 평가되는 경로가 없었다.
+  //   또한 "설정 없음 = 허용" 정책(아래 hasMenuPermission)이라 제거로 접근이 좁아질 수 없다.
+  //
+  //   남긴 항목은 정적 메뉴에 실재하는 2건뿐이다: dashboard(무게이트) · core-users(실게이트).
   {
     menuId: 'dashboard',
     // No specific roles - available to all authenticated users
-  },
-  {
-    menuId: 'dashboard-home',
-    // No specific roles - available to all authenticated users
-  },
-  {
-    menuId: 'dashboard-overview',
-    // No permissions - available to all authenticated users
-  },
-  {
-    menuId: 'dashboard-stats',
-    // No permissions - available to all authenticated users
-  },
-  
-  // User Management - Permission based
-  {
-    menuId: 'user-management',
-    permissions: ['users.view']
-  },
-  {
-    menuId: 'users',
-    permissions: ['users.view']
-  },
-  {
-    menuId: 'users-list',
-    permissions: ['users.view']
-  },
-  {
-    menuId: 'users-create',
-    permissions: ['users.create']
-  },
-  {
-    menuId: 'users-edit',
-    permissions: ['users.edit']
   },
 
   // WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1:
@@ -84,32 +56,7 @@ export const menuPermissions: MenuPermission[] = [
 
   // CMS - No restriction (allow all)
   // Posts, Pages, Media - All users can view
-  
-  // Reports & Analytics
-  {
-    menuId: 'reports',
-    permissions: ['admin.analytics']
-  },
-  {
-    menuId: 'analytics',
-    permissions: ['admin.analytics']
-  },
-  {
-    menuId: 'sales-reports',
-    permissions: ['admin.analytics']
-  },
 
-  // Settings - Available to all authenticated users
-  // Note: Individual settings pages may still have their own permission checks
-  {
-    menuId: 'settings'
-    // No role restriction - menu visible to all authenticated users
-    // Each settings page should handle its own permission checks
-  },
-  {
-    menuId: 'general-settings'
-    // No role restriction
-  },
   // WO-O4O-ADMIN-MENU-PERMISSIONS-ORPHAN-CONFIG-CLEANUP-V1:
   //   system-settings / integrations / tools / import-export / database 5개 항목 제거.
   //   해당 menuId 를 가진 메뉴 항목이 admin-menu.static.tsx 에 하나도 없고(각 0건),
@@ -118,30 +65,6 @@ export const menuPermissions: MenuPermission[] = [
   //   (선행 WO-…-CANONICAL-SUPER-ADMIN-MENU-PERMISSION-FIX-V1 이 이 항목들에 canonical
   //    역할을 additive 로 추가했으나, 항목 자체가 dead config 로 확정되어 제거로 대체된다.)
   //   Appearance 는 원래 무제한(설정 없음)이라 별도 항목이 없다.
-  {
-    menuId: 'logs',
-    permissions: ['admin.logs']
-  },
-  
-  // Profile - All authenticated users
-  {
-    menuId: 'profile',
-    // No specific permissions - available to all authenticated users
-  },
-  {
-    menuId: 'users-profile',
-    // No specific permissions - available to all authenticated users
-  },
-  
-  // UI Elements - Development/Demo
-  {
-    menuId: 'ui-elements',
-    permissions: ['ui:demo']
-  },
-  {
-    menuId: 'ui-components',
-    permissions: ['ui:demo']
-  }
 ];
 
 /**
