@@ -181,7 +181,7 @@
   "volta": {
     "node": "22.18.0",
     "npm": "10.9.3",
-    "pnpm": "9.15.0"
+    "pnpm": "10.25.0"
   },
   "pnpm": {
     "//onlyBuiltDependencies": "pnpm v10 은 의존성 build script 를 기본 차단한다. sqlite3/better-sqlite3 는 네이티브 바인딩이 실제로 필요하고(미실행 시 require 실패), msw 는 테스트 전용 no-op 스크립트라 허용해 install 경고를 없앤다. Docker(apps/api-server/Dockerfile)는 package.production.json + npm install --ignore-scripts 를 쓰므로 이 설정의 영향을 받지 않는다. bcrypt 는 소스가 bcryptjs(순수 JS)만 사용하고, sharp/esbuild 는 optional platform 패키지로 동작하므로 제외한다.",
