@@ -162,6 +162,7 @@ export default function SupplierDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [opsFailed, setOpsFailed] = useState<OpsFailures>(NO_OPS_FAILURE);
+  const [approvalError, setApprovalError] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -213,7 +214,11 @@ export default function SupplierDashboardPage() {
       });
     }
     setSettlementKpi(settlementsFailed ? null : (ops[2] as PromiseFulfilledResult<SettlementKpi>).value);
-    setApproval(settled(ops[3] as PromiseSettledResult<ApprovalCounts>, null as any));
+    // WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1:
+    //   승인 카운트 실패는 이 영역만 실패로 두고 0 으로 대체하지 않는다.
+    const approvalFailed = ops[3].status === 'rejected';
+    setApprovalError(approvalFailed);
+    setApproval(approvalFailed ? null : (ops[3] as PromiseFulfilledResult<ApprovalCounts>).value);
     setProfile(settled(ops[4] as PromiseSettledResult<SupplierProfile | null>, null));
     setRecruitments(settled(ops[5] as PromiseSettledResult<SupplierRecruitment[]>, []));
     setStoreDescs(settled(ops[6] as PromiseSettledResult<SupplierStoreDescriptionDraft[]>, []));
@@ -275,6 +280,7 @@ export default function SupplierDashboardPage() {
     if (opsFailed.orders && a.key.startsWith('orders-')) return false;
     if (opsFailed.inventory && a.key.startsWith('inv-')) return false;
     if (opsFailed.settlements && a.key === 'settlement') return false;
+    if (approvalError && a.key === 'product-approval') return false;
     return true;
   });
 
@@ -455,13 +461,24 @@ export default function SupplierDashboardPage() {
           <dl className="space-y-2">
             <StatRow label="등록 상품" value={`${(kpi?.registeredProducts ?? 0).toLocaleString()}개`} />
             <StatRow label="판매 중" value={`${(kpi?.activeProducts ?? 0).toLocaleString()}개`} />
-            {approval && (
+            {/* 승인 카운트는 별도 영역 — 실패해도 등록 상품·판매 중은 그대로 표시한다 */}
+            {approvalError ? (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className="text-sm text-amber-800">승인 현황을 불러오지 못했습니다.</span>
+                <button
+                  onClick={fetchData}
+                  className="text-xs font-medium text-amber-800 underline hover:text-amber-900"
+                >
+                  다시 시도
+                </button>
+              </div>
+            ) : approval ? (
               <>
                 <StatRow label="승인 완료" value={`${approval.approved.toLocaleString()}개`} />
                 <StatRow label="승인 대기" value={`${approval.pending.toLocaleString()}개`} />
                 <StatRow label="승인 미요청" value={`${approval.unrequested.toLocaleString()}개`} />
               </>
-            )}
+            ) : null}
           </dl>
           <Link
             to="/supplier/supply-offers"

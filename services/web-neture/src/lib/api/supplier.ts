@@ -46,6 +46,31 @@ export const SUPPLIER_ORDERS_LOAD_FAILED = 'SUPPLIER_ORDERS_LOAD_FAILED';
 export const SUPPLIER_INVENTORY_LOAD_FAILED = 'SUPPLIER_INVENTORY_LOAD_FAILED';
 export const SUPPLIER_SETTLEMENTS_LOAD_FAILED = 'SUPPLIER_SETTLEMENTS_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED = 'SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED';
+
+/** 상품 승인 탭 카운트 — 필드명은 backend 응답 그대로다(unrequested 등). */
+export interface SupplierApprovalCounts {
+  total: number;
+  unrequested: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+}
+
+/** 정상 0 은 유효값이다. 필수 카운트가 모두 숫자일 때만 성공으로 인정한다. */
+function isValidApprovalCounts(value: unknown): value is SupplierApprovalCounts {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.total === 'number' &&
+    typeof v.unrequested === 'number' &&
+    typeof v.pending === 'number' &&
+    typeof v.approved === 'number' &&
+    typeof v.rejected === 'number'
+  );
+}
+
 /**
  * 상세 조회용 — backend 가 미존재를 404 로 명시 반환한다.
  *   주문   ORDER_NOT_FOUND (supplier-order.controller)
@@ -627,15 +652,20 @@ export const supplierApi = {
     hasDescription?: string;
     barcodeSource?: string;
     completenessStatus?: string;
-  }): Promise<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> {
+  }): Promise<SupplierApprovalCounts> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/products/approval-counts', { params });
-      const result = response.data;
-      return result.data || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
+      response = await api.get('/neture/supplier/products/approval-counts', { params });
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch approval counts:', error);
-      return { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
+      console.warn('[Supplier API] Failed to fetch approval counts:', extractApiError(error));
+      throw new Error(SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED);
     }
+    const result = response.data?.data;
+    if (!isValidApprovalCounts(result)) {
+      console.warn('[Supplier API] Unexpected approval counts payload shape');
+      throw new Error(SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED);
+    }
+    return result;
   },
 
   // WO-NETURE-SUPPLIER-EXCEL-LIST-V1: Batch update

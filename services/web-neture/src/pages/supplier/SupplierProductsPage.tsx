@@ -25,6 +25,7 @@ import {
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
+import type { SupplierApprovalCounts } from '../../lib/api/supplier';
 import ProductDetailDrawer from './ProductDetailDrawer';
 // WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1
 import { getAllowedOfferActions, getDrugSupplyGate, getSupplierProductTypeLabel, SUPPLIER_OFFER_ACTION_META, buildOfferActionUrl, type SupplierOfferAction } from '../../lib/supplierProductTypes';
@@ -640,7 +641,10 @@ export default function SupplierProductsPage() {
   // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: 승인요청 전 탭 추가
   type ApprovalTab = 'all' | 'unrequested' | 'pending' | 'approved' | 'rejected';
   const [activeTab, setActiveTab] = useState<ApprovalTab>('all');
-  const [tabCounts, setTabCounts] = useState({ total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 });
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1:
+  //   null = 아직 못 불러옴(로딩/실패). 0 카운트와 구분한다.
+  const [tabCounts, setTabCounts] = useState<SupplierApprovalCounts | null>(null);
+  const [countsError, setCountsError] = useState(false);
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
@@ -1090,15 +1094,24 @@ export default function SupplierProductsPage() {
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: fetch tab counts
   // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1:
   // count도 rows와 동일한 보조 필터/검색어를 적용하여 기준 일치
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1:
+  //   카운트 조회 실패는 throw 된다. 목록(loadError)과 **독립된** 상태로 관리해
+  //   한쪽 실패가 다른 쪽을 덮어쓰지 않게 한다. 실패 시 0 으로 표시하지 않는다.
   const fetchTabCounts = useCallback(async () => {
-    const counts = await supplierApi.getApprovalCounts({
-      keyword: keyword || undefined,
-      hasImage: filterHasImage || undefined,
-      hasDescription: filterHasDescription || undefined,
-      barcodeSource: filterBarcodeSource || undefined,
-      completenessStatus: filterCompleteness || undefined,
-    });
-    setTabCounts(counts);
+    setCountsError(false);
+    try {
+      const counts = await supplierApi.getApprovalCounts({
+        keyword: keyword || undefined,
+        hasImage: filterHasImage || undefined,
+        hasDescription: filterHasDescription || undefined,
+        barcodeSource: filterBarcodeSource || undefined,
+        completenessStatus: filterCompleteness || undefined,
+      });
+      setTabCounts(counts);
+    } catch {
+      setTabCounts(null);
+      setCountsError(true);
+    }
   }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
 
   useEffect(() => {
@@ -1350,11 +1363,11 @@ export default function SupplierProductsPage() {
       {/* Approval Status Tabs (WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1) */}
       <div className="flex border-b border-slate-200 mb-3">
         {([
-          { key: 'all' as ApprovalTab, label: '전체', count: tabCounts.total },
-          { key: 'unrequested' as ApprovalTab, label: '승인요청 전', count: tabCounts.unrequested },
-          { key: 'pending' as ApprovalTab, label: '승인 요청 중', count: tabCounts.pending },
-          { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts.approved },
-          { key: 'rejected' as ApprovalTab, label: '거절', count: tabCounts.rejected },
+          { key: 'all' as ApprovalTab, label: '전체', count: tabCounts?.total },
+          { key: 'unrequested' as ApprovalTab, label: '승인요청 전', count: tabCounts?.unrequested },
+          { key: 'pending' as ApprovalTab, label: '승인 요청 중', count: tabCounts?.pending },
+          { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts?.approved },
+          { key: 'rejected' as ApprovalTab, label: '거절', count: tabCounts?.rejected },
         ]).map((tab) => (
           <button
             key={tab.key}
@@ -1369,11 +1382,25 @@ export default function SupplierProductsPage() {
             <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
               activeTab === tab.key ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
             }`}>
-              {tab.count}
+              {/* 조회 실패·미수신 시 0 이 아니라 '—' 로 표시한다 */}
+              {tab.count ?? '—'}
             </span>
           </button>
         ))}
       </div>
+
+      {/* 카운트 실패 안내 — 탭 자체와 상품 목록 접근은 막지 않는다 */}
+      {countsError && (
+        <div className="flex flex-wrap items-center gap-2 mb-3 text-xs text-amber-800">
+          <span>승인 현황을 불러오지 못했습니다.</span>
+          <button
+            onClick={fetchTabCounts}
+            className="underline font-medium hover:text-amber-900"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
 
       {/* Filter Chips */}
       <div className="flex flex-wrap gap-2 mb-3">
