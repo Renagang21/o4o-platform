@@ -1,0 +1,2822 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-PRODUCTION-CENSUS-AND-APPROVAL-PROPOSAL-V1",
+  "artifact": "nonoral-approval-proposal",
+  "status": "PROPOSAL — 승인 전 생산 금지",
+  "agent": "na",
+  "readOnly": true,
+  "dbWrite": 0,
+  "sourceCensus": "otc-unproduced-ready-split-proposal-v1.json",
+  "censusCommit": "6ca15aa81",
+  "contractReuse": {
+    "parsing": "otc-unproduced-large-census.ts VERBATIM",
+    "professionalUse": "otc-external-site-professional-use-separation-audit.ts VERBATIM (3719b8280)",
+    "safetyFingerprint": "10축 — indication·dosage·caution·numeric·age·duration·contraindication·codeIngredientStrength·codeForm·route"
+  },
+  "input": {
+    "fingerprints": 115,
+    "masters": 657,
+    "routes": {
+      "topical": 437,
+      "ophthalmic": 159,
+      "oromucosal": 40,
+      "vaginal": 21
+    }
+  },
+  "verdictTally": {
+    "HOLD_MULTI_ROUTE": {
+      "fingerprints": 1,
+      "masters": 2
+    },
+    "HOLD_ROUTE": {
+      "fingerprints": 10,
+      "masters": 53
+    },
+    "READY_NONORAL": {
+      "fingerprints": 104,
+      "masters": 602
+    }
+  },
+  "ready": {
+    "fingerprints": 104,
+    "masters": 602,
+    "routes": {
+      "topical": {
+        "fingerprints": 56,
+        "masters": 390
+      },
+      "ophthalmic": {
+        "fingerprints": 34,
+        "masters": 159
+      },
+      "oromucosal": {
+        "fingerprints": 7,
+        "masters": 32
+      },
+      "vaginal": {
+        "fingerprints": 7,
+        "masters": 21
+      }
+    }
+  },
+  "writePlan": {
+    "perMaster": {
+      "ko": 4,
+      "en": 2,
+      "total": 6
+    },
+    "ko": 2408,
+    "en": 1204,
+    "total": 3612
+  },
+  "gates": {
+    "G1_inputFp": 115,
+    "G1_inputMaster": 657,
+    "G1_distinctMaster": 657,
+    "G1_matchesWO": true,
+    "G2_routeTally": {
+      "topical": 437,
+      "ophthalmic": 159,
+      "oromucosal": 40,
+      "vaginal": 21
+    },
+    "G2_routeMatchesWO": true,
+    "G3_sourceComplete": 0,
+    "G4_fpInternalMismatch": 0,
+    "G5_professionalUse": 0,
+    "G6_multiRoute": 2,
+    "G7_liveIntersectionMaster": 0,
+    "G7_liveIntersectionFp": 0,
+    "G7_liveIntersectionSourceRef": 0,
+    "G8_authoredCanonical": 0,
+    "G8_enCanonical": 0,
+    "G9_recCount": 657,
+    "G9_noLoss": true,
+    "G10_dbWrite": 0
+  },
+  "allGatesPass": true,
+  "fpInternalMismatch": [],
+  "intersections": {
+    "byMaster": [],
+    "byFingerprint": [],
+    "bySourceRef": [],
+    "byAuthoredCanonical": [],
+    "byEnCanonical": []
+  },
+  "runnerReuse": {
+    "sharedV2Runner": {
+      "file": "otc-v2-store-leaflet-runner.shared.ts",
+      "supportedRoutes": [
+        "oral",
+        "oromucosal",
+        "topical",
+        "ophthalmic",
+        "nasal",
+        "vaginal",
+        "rectal"
+      ],
+      "verdict": "ROUTE_OK — 본 모집단 4 route 전부 지원. 단 입력이 V2 SSOT·V2 5축 fp 기준"
+    },
+    "externalSiteSplitProduction": {
+      "file": "otc-external-site-split-production.ts",
+      "verdict": "SHAPE_OK_ROUTE_GAP — 승인 SSOT + 9축 안전지문 입력 형태가 본 산출물과 동일하나, RECOVERY_ROUTE_PROFILE 에 ophthalmic 프로파일이 없다",
+      "missingRouteProfile": [
+        "ophthalmic"
+      ],
+      "note": "ROUTE_LABEL_KO 는 CLQ/CDS/CSI 제형 미확정 대비 폴백이다. 본 모집단은 제형이 접미로 확정되므로 폴백 불필요"
+    },
+    "requiredChange": "ophthalmic RouteProfile(usageLabel·EN 문구) 추가 — 공용 자산이므로 다 세션 요청 대상"
+  },
+  "productionUnits": {
+    "policy": "route 계약 차이로 2단위 분리 (WO 생산 단위 원칙의 예시안과 일치). fingerprint 그룹 분할 0",
+    "unit1": {
+      "name": "피부·구강·질",
+      "routes": [
+        "topical",
+        "oromucosal",
+        "vaginal"
+      ],
+      "fingerprints": 70,
+      "masters": 443,
+      "writeTotal": 2658,
+      "runner": "otc-external-site-split-production.ts 계약 재사용 가능 (route profile 기존 보유)"
+    },
+    "unit2": {
+      "name": "점안",
+      "routes": [
+        "ophthalmic"
+      ],
+      "fingerprints": 34,
+      "masters": 159,
+      "writeTotal": 954,
+      "runner": "ophthalmic RouteProfile 추가 후 동일 계약 사용"
+    },
+    "writeOwner": "단일 에이전트로 순차 처리 가능 (unit1 → unit2)"
+  },
+  "groups": [
+    {
+      "fp": "0a73d615e9a36877",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 68,
+      "proposalFps": [
+        "0a73d615e9a36877"
+      ],
+      "masterIds": [
+        "077a94b7-881f-4747-b72c-4ec8f8803bc6",
+        "1ae5c153-4f65-493e-8e20-249bf8a71791",
+        "1c331b01-3b8f-49ee-91f2-7facbdaa4988",
+        "1f8fde08-2ff9-4393-925f-1c886c816759",
+        "24b4ddb5-9819-49fa-8c7d-7aa57234fa44",
+        "27ba5669-5a91-4cd2-94ef-1a95dbd2bbee",
+        "2b18d343-50d5-48e8-9942-be44da441def",
+        "317b1a92-70e6-4b87-9f95-f9cf921bcbb0",
+        "376e9516-e760-4b9c-87dd-971048b4b6ad",
+        "384bf5ca-e298-49da-9dee-8c818226e05d",
+        "39d87df8-a87e-4ad5-9d3d-e87e3849c6f1",
+        "403db8e6-7b81-4774-a8c8-75b5a8459e0b",
+        "48f4e09e-44ed-4132-9d9c-3f85708c4ddd",
+        "4c8e4c85-ab88-4c02-91dd-595cf9ae42e7",
+        "4eb34ffd-7ce7-4d0f-96b4-16251bd26220",
+        "58ad4453-ae76-48fb-afbd-b043bbbbdd0e",
+        "5a138905-44de-4d54-b8ea-48ffc2562581",
+        "5ad2fd2d-a35f-4240-88e9-a35b26b676d6",
+        "5cf90319-e6e7-4647-a79a-4ee24cbcef46",
+        "5d5ca005-ffc0-42e3-bbb9-94f9b7923fb2",
+        "6f033c21-447b-434a-a7ba-734340383d86",
+        "6f23fa4d-e35b-4eb4-8edc-a1c327aaf9ce",
+        "70b2aab7-da58-4120-a2ca-3fbca38c20f7",
+        "7ba0409a-3b25-479a-90df-d91c762b87c1",
+        "80d59d3b-286c-44bd-8f0d-08a702e7ad07",
+        "8196c379-1a68-44ed-9d49-fa14013d1f5d",
+        "84707060-5bea-4bd7-a730-07ca5ff7617d",
+        "8485ca6c-2cf2-4dec-8dd9-5df3275990c7",
+        "86e41589-f26e-4278-87a9-30db718876c1",
+        "87de2f38-d39e-459e-9812-b75d8698c340",
+        "897382b8-b951-4353-bc0a-64c869d47a10",
+        "8980c41a-015d-461b-bfd8-99378e0b309a",
+        "8be31075-a8e3-4aa1-b879-8e245e5bc777",
+        "8c367cde-55e2-41e8-bbe9-bb2da9743e01",
+        "8d549e2d-19c0-444a-8004-867a003b008a",
+        "918fce90-b99d-4020-9c1e-5a7ed8500be4",
+        "91a1a99b-4294-4365-96e5-9f751f4356ec",
+        "930a33bf-e821-439b-96dc-55ca68818358",
+        "9cc5b4b4-34fe-406a-9fe5-638fba39de6f",
+        "a0cf2f3b-cfc7-48fd-b872-9de54d77e926",
+        "a22e2d40-e3dd-46e6-970d-7bbc560083f3",
+        "a2627b86-c593-4819-addc-93d749de688b",
+        "a56e2e06-cf65-4a4f-b809-3e83a9cdfeff",
+        "a6e829a7-948a-4261-aad7-549c71590a51",
+        "a779b176-4a7e-46d7-9037-752abbdb2b5c",
+        "abe74128-a1b8-418a-9add-a3ece0e47a48",
+        "aea8e3c9-2ac0-4255-b18f-841b63803de5",
+        "b14ad1dd-7784-4b11-b0d8-5fe0383adf03",
+        "b25891d4-d124-49e4-ad29-403bb6ebb57c",
+        "c2b02d4e-16f6-4ca3-8710-2f7125c602fa",
+        "c9ec3c32-1a0e-491f-8d3f-0542a070c65f",
+        "cce1d711-4ea7-49ce-80c4-71d4b2d79b2c",
+        "cd0c9d24-8ac6-426b-88a6-7c4e742beb72",
+        "cdef2614-e45d-40c7-a668-4e8721b23ab6",
+        "d1ba31b1-4897-42dd-b441-b02f3803a651",
+        "d7dd18cd-7584-48c5-b3b2-5a6e9a92d7c3",
+        "dde2ff0a-8ada-496d-bfbe-1626f84c6238",
+        "e246b545-b49a-464b-bb32-f2bf82ada159",
+        "e322d0e5-6d31-490d-905e-85edd8853b86",
+        "e4487a01-f921-433e-997a-09afa091f6c4",
+        "e551b409-a4e6-4976-ae2b-77ee4817850e",
+        "e6de3fa9-2178-4a42-8625-ae3cb1db1785",
+        "f476c87a-4564-4180-90b2-af9a5ed9e4b0",
+        "f9aa975d-9dec-4302-a471-d45c972ee3ae",
+        "fb4790a8-5b6c-4458-aa6d-922c3f585055",
+        "fc913d89-0016-4a8d-a1db-44d763e98f76",
+        "fd1f4c93-f60b-4c8c-9553-4c71415b73dc",
+        "fedd2147-7f69-4c27-bb5d-b413a91a77cb"
+      ]
+    },
+    {
+      "fp": "713bd9cf71b4ce20",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 46,
+      "proposalFps": [
+        "713bd9cf71b4ce20"
+      ],
+      "masterIds": [
+        "05e2f460-b5ad-44fc-861f-b27b87e56b6d",
+        "0fb08acc-0bc0-4273-bfd2-38cc9a7fb220",
+        "131fa852-aca7-4960-a423-072b7b8d9b05",
+        "16348d5e-540d-45de-9ed5-4ba7f78aa539",
+        "1a948fb3-a47e-48bd-9a8e-36a93c6cc5a7",
+        "22d2c01f-5c41-4c92-9854-e7b824653553",
+        "295a4c65-6736-4592-a922-71834e0ba4fc",
+        "31fcaaed-fd98-463c-a500-17de953fdf64",
+        "37b5cb13-33ef-4f5e-9c82-665d19c54c39",
+        "3d1fc55c-8f86-47c4-8df6-03ab08d5c7f1",
+        "3d48ceed-3fd7-4803-a41a-f0c429c35520",
+        "403e54f1-6d14-44ee-a22e-58cd0e3e650b",
+        "43e500da-dfe9-46a8-b0a2-e5c98ea5373a",
+        "44b3d735-34ba-4f57-8813-b0228c4a79c0",
+        "47509dd3-a238-4002-894b-88d93970677d",
+        "4a3d6d9b-f6fe-4592-9d8a-18211e39a14a",
+        "4ee8a65e-e17d-4579-8e5d-576459184ba7",
+        "52539c92-cbd7-4086-b7fa-3eebec5b25d0",
+        "569ba9bc-5ede-4c10-92d1-d0125a10e010",
+        "5f2dcc1f-36d6-4195-a208-aea74df2c560",
+        "62bc6e37-6832-408e-95fa-61caf607330b",
+        "6caaeacc-e856-4f26-b92f-b6c121a94104",
+        "74244f61-40d1-4453-bfe3-8be46f01fada",
+        "748bef15-31e3-4f00-8904-a11e775dcb24",
+        "74eb3ba6-0760-4877-966c-451d5e46ae39",
+        "79951776-f2ca-4aca-b435-89cc9da99e89",
+        "7ad6cc14-36aa-4914-abb0-ba790f8e3800",
+        "7b4c55be-3968-4cc4-9c5a-277cd8bb9af2",
+        "80d5f6bd-37ff-46b1-9323-f572a4b90d6e",
+        "8d471055-68d1-4a9f-9e61-9ad7a1057e75",
+        "99006981-d3ad-48d1-8a10-eeef1c81441c",
+        "993e5562-efdd-4754-ab2c-ce8297d3d532",
+        "b99ecda3-cbe0-459e-b7d7-7dca4b92a085",
+        "bd5744eb-c2a4-4d44-bf73-fa3418d2c731",
+        "c0947402-d9d4-4fcd-82d6-13d27c4afb20",
+        "c16c3e50-33fd-4b0d-b3cf-07d13ae60cc5",
+        "cfec8870-324f-49a5-992c-ee1d3e16382b",
+        "d8203cbb-67bf-4341-87e4-facba7cb209a",
+        "d886d361-a21e-4b5a-b4ef-d4c560b7db7f",
+        "eb5434a3-43ee-4070-a225-bed2b726936f",
+        "ec0b3674-e365-4106-997c-06698d7b5e5d",
+        "fad5e3bc-2f12-45bf-8f02-85c868f7cf3b",
+        "fb922a65-f96e-49dc-a97c-ee6a2ecc3e6a",
+        "fe0ecb6e-0368-43a8-919b-e472ad17250c",
+        "ff54e1c3-3874-48a0-a8ff-c3c59c414e47",
+        "ff77e90b-be94-4ffa-8b65-3a478bc00ce7"
+      ]
+    },
+    {
+      "fp": "71c52233fb91edef",
+      "gencode": "A57100CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 19,
+      "proposalFps": [
+        "71c52233fb91edef"
+      ],
+      "masterIds": [
+        "05c7521c-06fc-4ebc-beae-467bad5db6d6",
+        "0ba77dbe-dea9-4223-ba28-8bebc954fb31",
+        "1e837fc6-beb6-4658-aec9-2bd785a8dc53",
+        "2a9ca019-970d-4229-bcaa-4692ad316b81",
+        "368f569a-8c47-4077-b7e9-70204313c922",
+        "4d4fc3e3-0dce-4a33-9f68-8ed9ecbb024b",
+        "58f386dc-9841-4853-9c19-28f7475d452f",
+        "5b9b5242-19ca-46af-aa8d-aa97849da085",
+        "6b60bc26-5e93-4391-a2f0-f56f0892f3a9",
+        "81b4b188-834d-4411-b67f-913d4b0f1179",
+        "8ea1994e-dbb4-4e46-8cbd-eac9d79f4abe",
+        "8ed8669b-964c-4251-895e-0917b67cc32f",
+        "9394a984-f362-4e8f-b73e-e10d048bae1d",
+        "9b80f096-060d-41b7-9989-d3f86d7c6aa0",
+        "c160910e-7f6a-44a8-904c-1afdc4eb9979",
+        "c265509b-8cde-44fc-9444-d95789437485",
+        "d65eb215-e407-48a3-8e26-758a1b58c363",
+        "e20c839d-62c6-433b-86b0-67e0616b2869",
+        "eda5b3b5-488a-4a3c-b4af-f256d2c4b2fb"
+      ]
+    },
+    {
+      "fp": "08491da02a0cbf9d",
+      "gencode": "A26400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 17,
+      "proposalFps": [
+        "08491da02a0cbf9d"
+      ],
+      "masterIds": [
+        "293d4663-4cbb-4b16-8b18-8a75a2ac5dd7",
+        "2d628e2f-caf1-4f7e-b044-4a71328e61fb",
+        "5cff71a3-d22d-4258-9312-1f460dc973c5",
+        "65c534b7-b8b4-42f8-a0a1-d7e58ad57103",
+        "672abc44-61d6-4640-9014-66a619e7a9ce",
+        "6793a7c6-308d-4260-8db5-2780c26568c9",
+        "8222f913-e627-43a7-b148-91fb548f4b54",
+        "958578ba-cebb-47c0-825f-f98a0e7b2a69",
+        "bf5304c8-b16c-4016-9cf8-2a633d2b56dc",
+        "c4af1336-289a-4e74-a493-314cf97d8d39",
+        "d3cbb509-b1b7-4842-a36f-e39bba239660",
+        "db10462d-6512-4818-8b31-e7823ca4e568",
+        "ddc828aa-a5e7-4640-a6d9-21732a683a9a",
+        "e3bf22b9-ec46-4203-b88c-b3b74c9930cd",
+        "f229977f-bc27-4378-9d39-2c56ef9b274a",
+        "f606dc00-f92c-4b45-9457-605d6c9d6914",
+        "fae93aa5-add7-4157-b309-04abbf71b4c0"
+      ]
+    },
+    {
+      "fp": "81e81be4178744f9",
+      "gencode": "346500COM",
+      "suffix": "COM",
+      "route": "topical",
+      "form": "연고",
+      "site": "cutaneous",
+      "size": 17,
+      "proposalFps": [
+        "81e81be4178744f9"
+      ],
+      "masterIds": [
+        "34abd2af-5723-40ec-a741-dd90c4872420",
+        "3eb0e98a-0686-4d14-9023-85f41ee30b2d",
+        "55227db6-518b-4070-a828-07dbdd81b8e0",
+        "6bf94f59-2496-4335-828d-d3a431cfa545",
+        "715f854a-b3ea-4db8-bbd9-f5999db2fef2",
+        "78f797ec-5255-43da-9389-81928ee39d9d",
+        "855f885b-21cc-4879-8753-51b346a9beb9",
+        "8e7620da-ad0c-452e-86e9-4041e2f8c1de",
+        "a56b5430-3d69-4811-bb14-6f8b1dca4b8c",
+        "aa862a0d-6fc8-449d-b14e-43a0a9c425d6",
+        "b7763867-c688-4df9-aa03-b078681dd5f0",
+        "d1c58b2c-c01d-496d-9650-be29e3ff8d05",
+        "daa43a23-4314-4c91-a289-696099c0ca0a",
+        "eac491f4-527e-4e66-a7cd-2d47df2aa464",
+        "ef360a33-0280-44a7-9bda-cf7cf94ae5ea",
+        "efbb67ad-5113-4add-9502-31985e836aac",
+        "ffb155c2-de41-4e9c-83f0-90d545261e36"
+      ]
+    },
+    {
+      "fp": "8828c09746b29f38",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 17,
+      "proposalFps": [
+        "8828c09746b29f38"
+      ],
+      "masterIds": [
+        "0c215c9d-4ee2-4650-82c6-dd0d468c0e53",
+        "0db0392d-4465-4f7f-8c6c-c965b4b263fd",
+        "2f8b8717-dde6-4a98-894f-322075ed19a9",
+        "30d6f3f5-71cc-428e-a336-cb1a207a34e8",
+        "33f630d7-b183-4056-950e-7cc39f410b32",
+        "531437d2-0d0b-407d-8c86-c2a0d9082375",
+        "5e2708c9-e146-486b-86c6-291109061775",
+        "65980fcc-61cf-4afe-ac5f-54dd2ad25a04",
+        "780b0f54-887d-4407-bddb-041841493409",
+        "8d41af25-e40f-42bd-9f1a-68c9ac7c9873",
+        "94383a4a-1705-4d53-91aa-5ec30db34013",
+        "9577ff3f-bd37-4074-98ff-d3dca71ada33",
+        "9981cc2b-7548-4815-8b41-551401d6c9df",
+        "a205a279-403e-410a-a658-96df0a3d0741",
+        "b396227b-fffe-45c6-9972-6f7b0efd032a",
+        "f0f5e196-1c77-4bad-8fe8-18806cc52139",
+        "f874a331-7992-472c-adc1-2be951ed4de2"
+      ]
+    },
+    {
+      "fp": "2175a2ba89dbc58b",
+      "gencode": "A08500COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 16,
+      "proposalFps": [
+        "2175a2ba89dbc58b"
+      ],
+      "masterIds": [
+        "33c2a35e-8eaf-4412-80be-94bc7ef2800a",
+        "4f99bea7-ff56-438f-a27a-715c6417d71b",
+        "603bc971-9947-4aa3-be95-ab6e567f59f9",
+        "61c3524d-3fbf-47b3-9c10-a05b48a4555c",
+        "6d3c07da-7db8-43fe-a449-ef4cffeda5ae",
+        "7c744788-ae56-44f5-8c35-f32ab67428a5",
+        "7cc0aaa6-b7a4-4c0b-843c-a107ceec5019",
+        "9b401c06-b08a-4d68-9ff4-5d31c3acc35e",
+        "a30a7b8b-28c4-49af-a1e4-f4cecfae04fc",
+        "b323c0ff-5449-4ef4-8b92-ccafd998fe92",
+        "b60e3461-eacc-4a30-97f0-33d86b3a9cd5",
+        "c263d1d7-af29-4d50-b08e-a31234d18a03",
+        "c46e1ddb-9b71-4441-8a30-80467be33f85",
+        "e3515618-9832-42dc-9677-daad27d07a1e",
+        "ed65c36d-ac86-4609-910d-4692b5b913c7",
+        "f71947ce-b610-4b79-a8d1-2874d6e098ef"
+      ]
+    },
+    {
+      "fp": "b7c4fa0644d3fdb8",
+      "gencode": "180137COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 14,
+      "proposalFps": [
+        "b7c4fa0644d3fdb8"
+      ],
+      "masterIds": [
+        "113b11fe-9da2-4109-9767-e28c4690240e",
+        "13a0354b-124d-4c73-ae0b-a3e0f5c8b776",
+        "3ffe88d7-aaab-41fd-9332-f89f71b9e19a",
+        "4d774af3-2695-4db3-8e0b-108cf0127f3b",
+        "5b8b4c95-9b3d-4d13-a21a-0c7cd13f2e56",
+        "8dfe8ba0-efb9-4346-90cd-ed7805119557",
+        "9d8f903e-0282-4ac8-b09e-7392bf797b1f",
+        "b47339fb-1402-4a0f-bbc3-b2b7d0a483df",
+        "bee125d6-1557-4dfb-b0f4-a9736602ce17",
+        "c0171a31-3fd2-4c92-895d-866985d76bb6",
+        "d635d262-2b69-4606-a2b0-a3e91c5ca63d",
+        "d847df9e-171a-408d-99bd-08240acc3882",
+        "ed505119-2b83-4b4e-bbff-201d730e75c6",
+        "fb7925c2-df1b-4e1c-8885-576e8162af57"
+      ]
+    },
+    {
+      "fp": "248982a68b2ad690",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 13,
+      "proposalFps": [
+        "248982a68b2ad690"
+      ],
+      "masterIds": [
+        "1322c30c-03eb-46f0-a438-5a092c59a364",
+        "18b15420-1a41-4465-9fb5-ad56572df387",
+        "1db01a32-5ffc-4914-a535-675e53c3d366",
+        "3166a016-05ad-4b30-960b-f0eae5ef671d",
+        "4aa1a3a9-9b89-417d-8020-f405d4ea2fd4",
+        "50be7ac7-b035-493b-8aa3-04f72a4a9378",
+        "53f60cd7-3000-45fe-9694-dd1805993683",
+        "5a26efbc-284f-49fe-986a-46ea43e12d67",
+        "61e9b51e-bd75-4845-a039-8287bf9bfed8",
+        "6c865e67-3599-4a7c-890e-d9a04df06e97",
+        "9354c802-02e3-4415-9c14-fae520ab6fec",
+        "9b7f7aa3-f39a-4f14-9fdd-6510f76764d6",
+        "aa20ace2-52a7-42f8-8097-b208f6ff5eb6"
+      ]
+    },
+    {
+      "fp": "2e697b803cc3a553",
+      "gencode": "A18500CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 12,
+      "proposalFps": [
+        "2e697b803cc3a553"
+      ],
+      "masterIds": [
+        "031e6e29-2fc4-4aa3-a526-2e52260ac83c",
+        "35f1c76a-e16b-46c4-938b-f3ac3d9c4a5b",
+        "3a8792ab-7e40-4cce-9e20-95926202cbde",
+        "3e45e081-a893-40a8-8072-a4d947e8b70f",
+        "41b94dbe-7ffe-41a0-95d7-0de72c540037",
+        "4a74dc91-99ee-4fb5-b3ee-3174754fb295",
+        "8cc25ab0-95e5-4cfe-bba9-5099c290b5e4",
+        "8f1a9bd6-1f51-4dae-a020-f3ef95d404ec",
+        "91f2c858-6321-4ac7-adb8-e39359f5ee25",
+        "a1ec1ae7-4ef8-494e-b375-fcd769e33d49",
+        "aeadbf76-d3f2-4922-a771-e7e32316b237",
+        "d48e617f-db29-4e57-8f1c-ffe998f0eba7"
+      ]
+    },
+    {
+      "fp": "130e0c721590505f",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 11,
+      "proposalFps": [
+        "130e0c721590505f"
+      ],
+      "masterIds": [
+        "0d2934a5-eb67-4167-a492-79ce0fa63c5e",
+        "47f3ad0e-42a8-41a4-861b-eb5436fee494",
+        "4833a0e5-7776-4e14-a8c3-3177578ebb75",
+        "5ba84241-3eb4-44c5-b2b8-f496511ef426",
+        "7cdffe8b-ace1-4821-bf66-2598fb2af4d4",
+        "9456d0db-8fc9-42be-9933-f3beda93f1e4",
+        "9c89f5bb-a820-49fc-89bb-615359a851e4",
+        "c2e4551d-8e54-4bff-aa8d-d6e93c34be30",
+        "e0fbb7cb-7753-4958-8b5f-c841d524b436",
+        "e4da7489-a21b-4ade-acd7-17ac1edde639",
+        "f7d058b2-00b8-43e8-a755-75343573251e"
+      ]
+    },
+    {
+      "fp": "9369c1cd55af76aa",
+      "gencode": "331800COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 11,
+      "proposalFps": [
+        "9369c1cd55af76aa"
+      ],
+      "masterIds": [
+        "03ca2239-7513-4ff8-a1e0-809ca8a13b14",
+        "04719f8c-faca-40ad-8675-631538a76e7b",
+        "25ddf5bf-85a1-4a82-876f-5be67ab04092",
+        "38e7e482-4bcf-4137-bf5b-35f2092703bb",
+        "4a24e5ce-3419-457c-928c-89445e7a4b02",
+        "6b224a9a-38af-4a1f-b436-b6487464ed48",
+        "7382de7b-c6ba-4dc1-b586-ca3370187477",
+        "8945aa2e-f258-45b8-aa5b-452cd12b01b5",
+        "9ed2eb40-6ad7-4342-9edc-e4b3666e4298",
+        "c37fcbd5-2015-4924-be5f-b8c74a4080d9",
+        "eba1922a-90b0-4574-954d-72c9117cc56a"
+      ]
+    },
+    {
+      "fp": "33535a1064bbad58",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 10,
+      "proposalFps": [
+        "33535a1064bbad58"
+      ],
+      "masterIds": [
+        "48ef86bd-6d88-4aa6-b00f-9d67669d1188",
+        "4960a989-0c6b-45d7-adc2-de03868b2fc3",
+        "8fe422f5-4c0c-40d8-8759-dbd49ebb1264",
+        "ac3f17e7-a254-4203-816d-b0579e11cebf",
+        "b9307c4a-5155-4131-a617-9d7372b112ee",
+        "dbb1088a-fd72-410d-bde6-f44b8a192b6a",
+        "dd0d19f6-2817-407b-951c-a3aa7b33ab27",
+        "ef3b05ce-e66b-472d-9dc2-916764199f2d",
+        "f08add00-3ae8-4216-8132-5301107ac012",
+        "f5efb751-779e-415a-850c-0934f6e817cb"
+      ]
+    },
+    {
+      "fp": "7784aa8b824c2922",
+      "gencode": "A08500COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 10,
+      "proposalFps": [
+        "7784aa8b824c2922"
+      ],
+      "masterIds": [
+        "035b6186-196f-445b-bc70-9b3183dbbee7",
+        "2223fafe-934f-49fc-8bd6-10a0e89bf7a0",
+        "3e51a38a-f51d-4de9-ad7d-fbfee1f261d6",
+        "5c1aa14f-9e15-4c0f-9474-c267e8699599",
+        "63fd347a-8bda-44f9-92f1-4c850199bf89",
+        "771fd8a2-5086-439b-b798-0cb1f44c7c3b",
+        "89cc04f8-31a0-424b-b9d2-afba03b612bc",
+        "b86820ce-80da-414c-bbec-07ca33e2037a",
+        "e7a74a1b-ed6b-4ac7-882c-3633d639cfb4",
+        "f4cf9e0f-1b63-4ada-9a21-cd61bfdf6a37"
+      ]
+    },
+    {
+      "fp": "90765dbaea3a1ab0",
+      "gencode": "161906ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 10,
+      "proposalFps": [
+        "90765dbaea3a1ab0"
+      ],
+      "masterIds": [
+        "06430fcb-52c3-4db3-82e2-db30ea0d2629",
+        "25b731de-642e-41a3-9dc6-79d18a73db04",
+        "48b5522b-49b6-4c88-ae87-9267bcc32339",
+        "6cefaece-f6b5-4e2a-80c1-0aa406077e40",
+        "905f97f2-af67-43ab-8868-9ee63ef5f78f",
+        "c222ef96-368e-4656-b1d2-bdde2178aaa7",
+        "dd33c9e2-1a6b-460b-abf7-ab74f6c1270e",
+        "e6f0e93d-ffc6-4e13-afa3-cac6262140b8",
+        "e7604f20-6fa0-4f04-9e3f-95a238422cf3",
+        "eeab7043-a9df-4e54-89e4-7c43564ba570"
+      ]
+    },
+    {
+      "fp": "cc60dcc7e8260ed2",
+      "gencode": "A26400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 10,
+      "proposalFps": [
+        "cc60dcc7e8260ed2"
+      ],
+      "masterIds": [
+        "04ceb1bd-6549-4dc5-8993-d1c415da27e3",
+        "0df38a11-4e32-4452-98cd-794c2fa00922",
+        "23c35ce5-6229-4769-89eb-8b02199a5c9b",
+        "2ddd0bf3-3288-4fd8-a915-5afe1e3b3d64",
+        "40353687-001f-4a17-b98c-df2d917e705a",
+        "531cd211-7640-468d-b4e5-c6ab9f9bf46e",
+        "b6441bd1-3dbd-4349-9d66-8dd6d9556641",
+        "b967ae6f-2949-49fa-bdb3-c3f8503524d7",
+        "c6ea2539-61b0-456f-a49a-6b85cb6f8c4f",
+        "e83a5069-a699-4ccf-bc43-d72780bb5acd"
+      ]
+    },
+    {
+      "fp": "0c9fda758be46afc",
+      "gencode": "102906CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 9,
+      "proposalFps": [
+        "0c9fda758be46afc"
+      ],
+      "masterIds": [
+        "2b1c1ea7-18a9-4582-a96f-b6f9da44a7f1",
+        "4c5ff475-6da5-4ce9-baaf-27a20f1b0a5e",
+        "561db0d2-9c75-4209-acf6-4b42240df575",
+        "59bdc499-b963-477a-8a0c-d5af7d15de03",
+        "67f72c6c-b658-4d90-aa74-b6facd79925e",
+        "7dfa1cb7-fd9d-4dc5-a105-22c82b500cbf",
+        "a4de6a87-f5f0-4938-9c24-0f16decd6758",
+        "dd02a4bd-d8df-4f8b-af1f-a5da201bcfd7",
+        "e4e1adf8-a466-4ec2-abb2-fe7f2160c709"
+      ]
+    },
+    {
+      "fp": "5bba497e94292643",
+      "gencode": "A57300CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 9,
+      "proposalFps": [
+        "5bba497e94292643"
+      ],
+      "masterIds": [
+        "1956637a-2154-4402-8073-a51a8c7f495f",
+        "36b3ae78-3474-486b-b318-9849ad51f65c",
+        "4e4d3491-6374-4ff2-a0dc-21446f1b04f1",
+        "70c5f173-e14d-407b-bfd5-c5254cd69c45",
+        "826a3bc4-d849-4d03-9fdf-a2c06f78b314",
+        "b6bbb2a4-5af4-4c5c-8963-180d7c199f35",
+        "b85b6637-e509-45e4-bc0c-4008a9999ddf",
+        "d8ef2654-d02c-404c-a819-6cba84467198",
+        "e91568d6-0c19-44cf-9af9-fbfc62dc775a"
+      ]
+    },
+    {
+      "fp": "7d278a24d227c451",
+      "gencode": "A18500CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 9,
+      "proposalFps": [
+        "7d278a24d227c451"
+      ],
+      "masterIds": [
+        "94ef8ca0-7f89-44e2-a338-97b4c4f7c45a",
+        "a68befa3-d6ee-4860-bb7b-53bd6291cee5",
+        "a8734baa-f894-4cbe-a203-599bfd354cfe",
+        "b3e9371c-e2f2-43d0-b9a1-07696a56364a",
+        "c4a1c950-d532-4ddf-88da-093fb8a14f2a",
+        "d44c95e2-5c02-4714-9b43-781ce1d6e1ca",
+        "d66d1a50-7ede-4e35-8169-1512f8ec0682",
+        "dc0dcbd6-0e14-44da-8ec1-0be1a21b4e12",
+        "e0f8122e-c50e-4a7c-80b4-5956c381475b"
+      ]
+    },
+    {
+      "fp": "91a8f5a3c2097654",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 9,
+      "proposalFps": [
+        "91a8f5a3c2097654"
+      ],
+      "masterIds": [
+        "2e7b5014-dca0-475d-924a-5d4768cd1281",
+        "41091763-9c65-4432-b584-6ccf95d706bb",
+        "46b9604a-d8b0-4641-9110-99e944ae83c5",
+        "83857bd8-9ee7-4ba4-9fea-a415ec55dedd",
+        "bd928e65-a3d2-45fd-8e78-e7da6d0b286e",
+        "e0a42a2e-e6d6-4094-94b4-bc0856722492",
+        "e4fd7256-cefb-4501-8d98-37fceb9ae91d",
+        "e5e11900-b4e9-4a72-b428-f516eac596a8",
+        "fc055f9f-f366-44f7-b91e-c5b009aa2e5b"
+      ]
+    },
+    {
+      "fp": "d8c7b73753dfb033",
+      "gencode": "D01300ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 9,
+      "proposalFps": [
+        "d8c7b73753dfb033"
+      ],
+      "masterIds": [
+        "09c565db-31b6-445d-8da1-151a86da2de5",
+        "0ab07ba1-a196-4194-a98e-a0eea2f47c17",
+        "204f2534-84a4-496e-84ac-cd1b45e675ed",
+        "3cde4e84-39eb-4904-a8cb-8ba2ae743150",
+        "502b452d-8e78-49bd-a60b-e513997bde00",
+        "c24b7afb-4db2-42ea-a510-cbe7fbbd6dfc",
+        "ee2213e4-7eed-4ea4-8933-ea8e040b1f86",
+        "f3edfa39-19ea-42c9-9260-23ee3a626981",
+        "ffa374d7-5d81-4f8b-be7d-049c2111a987"
+      ]
+    },
+    {
+      "fp": "456783b15f8909e9",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 6,
+      "proposalFps": [
+        "456783b15f8909e9"
+      ],
+      "masterIds": [
+        "6e124bc3-3401-44c8-beed-4df65585583e",
+        "7c2a1154-4458-431e-aea8-f21b203c3661",
+        "c16eafb0-61c0-428f-9d7e-3c6a4368d361",
+        "dae11d40-17aa-4145-a583-b7b1aed4c39c",
+        "dd7d76ad-9836-4651-bbe2-4e6d27d7fa18",
+        "efbf8a9a-7929-49fa-822d-e5d21a422208"
+      ]
+    },
+    {
+      "fp": "6556faea04cc13b3",
+      "gencode": "A57200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 6,
+      "proposalFps": [
+        "6556faea04cc13b3"
+      ],
+      "masterIds": [
+        "1cabd837-a424-4f16-93a8-fd2e8e4018df",
+        "28353c9b-a8b3-4ce6-87b4-f9d4f2fd4b76",
+        "393ba034-ad7e-45ff-8774-e43f93239f02",
+        "74f159ce-ae1d-4f28-834b-4e624f87fb6f",
+        "d0c7ab08-8464-4167-a2cf-cc21c941118e",
+        "f648b224-c8f6-42a3-b310-691f8732e7ca"
+      ]
+    },
+    {
+      "fp": "71548c12c7eb10f1",
+      "gencode": "346500COM",
+      "suffix": "COM",
+      "route": "topical",
+      "form": "연고",
+      "site": "cutaneous",
+      "size": 6,
+      "proposalFps": [
+        "71548c12c7eb10f1"
+      ],
+      "masterIds": [
+        "7362b7fb-c530-4f3b-9bdb-73de61c4cacf",
+        "79ddd226-e74b-498f-8eec-9e83603a0f73",
+        "b2f4437a-5e7a-458a-b94f-4a22fc4473f5",
+        "d08f4da8-8421-431c-9c8f-7788e9316b1e",
+        "dfdff4d3-0f52-4d74-b783-646fa32215ff",
+        "fc261116-2640-469c-a539-90ec62ea8149"
+      ]
+    },
+    {
+      "fp": "e0b9e2eda3331ee2",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 6,
+      "proposalFps": [
+        "e0b9e2eda3331ee2"
+      ],
+      "masterIds": [
+        "27c2ead6-a56c-4d7c-8dfe-adc32721e8de",
+        "6fda1885-388f-4f0b-8369-a9d8117c9087",
+        "a97e44ce-10d4-4ef0-acd1-da8904b0bf44",
+        "d502a4a0-ed64-41c1-a567-11cd9163a2af",
+        "e9b72069-6fa7-4cf2-890b-c7e0506bd51b",
+        "f2806c29-b7c6-4591-83f1-c88819d7954e"
+      ]
+    },
+    {
+      "fp": "1c33b712e12bf68c",
+      "gencode": "102906CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "1c33b712e12bf68c"
+      ],
+      "masterIds": [
+        "0c75ede9-d2a6-4f72-a9a4-34fac1f7d8cd",
+        "1b661f5c-058e-4cdf-9cad-a5850388a184",
+        "3935d1ee-7a2c-4058-96cb-574c17ccde2d",
+        "d706c491-1d09-40aa-aeb2-d400fec9f837",
+        "f6bf4f61-01f4-4330-b71c-21a58df03b79"
+      ]
+    },
+    {
+      "fp": "4b7006113fd29d95",
+      "gencode": "102935CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "4b7006113fd29d95"
+      ],
+      "masterIds": [
+        "26151e24-9be3-408e-a2d8-5534fc1d87f0",
+        "41f28bcf-ca7d-494e-96c4-560adf298189",
+        "734d6d90-2713-4d43-bc5e-c80f2d75363f",
+        "a56e2460-1d05-40dc-8a25-060c2e117782",
+        "c01bd6e5-3a7e-4543-9cb8-2af202d0f6b0"
+      ]
+    },
+    {
+      "fp": "4f55e332ebb1f301",
+      "gencode": "A57300CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "4f55e332ebb1f301"
+      ],
+      "masterIds": [
+        "2f09efaa-f327-4f32-8099-a7582f6162ef",
+        "325f7e60-7699-4372-ba74-99fab6b965bd",
+        "5e1a6d0c-c128-45e8-809b-00ccb6811767",
+        "74fd9890-edf3-4e57-a9b2-cdf574af4f79",
+        "f6caa380-8317-4b59-95ac-dc69c35e91f5"
+      ]
+    },
+    {
+      "fp": "6feec6603464312d",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "6feec6603464312d"
+      ],
+      "masterIds": [
+        "2515118a-d21a-490f-a145-cc2a94b9d2b3",
+        "26a748c9-aa19-4b85-8ec4-6a33c5de29ff",
+        "2a3dfe1e-82b2-49a9-b296-d9b9cabf9182",
+        "7bde0853-4fbc-472a-926d-0f6619ec6d3f",
+        "c7c1333e-7af7-4698-9379-947ddd75410a"
+      ]
+    },
+    {
+      "fp": "8f5f35929f858d9d",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "8f5f35929f858d9d"
+      ],
+      "masterIds": [
+        "66b2e3c2-e91b-4e44-95c3-c8f3db79369f",
+        "6c533828-d721-4b99-8674-3c0765577035",
+        "c1e5480e-db88-45bd-870f-28f34943f3c4",
+        "d76ffcc3-2184-44bf-913e-97e927388acb",
+        "faeb9287-8e26-44c3-9367-b66381aeae38"
+      ]
+    },
+    {
+      "fp": "dcad5a5e64ef5bcf",
+      "gencode": "161906ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 5,
+      "proposalFps": [
+        "dcad5a5e64ef5bcf"
+      ],
+      "masterIds": [
+        "47686564-ba11-4ad9-9d9d-dcd09265f53a",
+        "4784a1a9-1b2b-434b-b1f6-04aa53da79ab",
+        "4c9e4151-76ba-4dc2-8af7-88fa9cd823c6",
+        "ec9a589c-06a4-4d09-a0e6-b8b276ca800d",
+        "fc5e5233-a0fb-4088-9a9a-1a5d75b9b194"
+      ]
+    },
+    {
+      "fp": "df28ec6c8f9b9faf",
+      "gencode": "A18500CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 5,
+      "proposalFps": [
+        "df28ec6c8f9b9faf"
+      ],
+      "masterIds": [
+        "a62bef93-ef0c-4077-96a0-0d7eb2ec3e50",
+        "bf8cba94-245c-4054-9711-531fd94f6507",
+        "c8430e1c-c52c-45d5-8db2-beffd2434398",
+        "f500c9dd-7879-49a4-8a39-5c62d95e3398",
+        "fe5ec3b5-4a32-4d8b-a9a4-820227a7e04c"
+      ]
+    },
+    {
+      "fp": "1b28025164e0c018",
+      "gencode": "A52200COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "1b28025164e0c018"
+      ],
+      "masterIds": [
+        "111cfcff-1727-445f-a514-66481c4aa63e",
+        "32656562-d840-4476-b9e3-abb36bb85af0",
+        "b7a8c4e5-d478-47ec-87e8-7d10aa793fe9",
+        "d2125315-acbb-4807-aced-a46be3501a07"
+      ]
+    },
+    {
+      "fp": "2d5b130e0035e8e6",
+      "gencode": "392430CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "2d5b130e0035e8e6"
+      ],
+      "masterIds": [
+        "0cb69133-a3a4-437d-809c-dd3d37c11005",
+        "2304b8d9-948b-46d1-8d3b-103d545fdb56",
+        "6e9b7b66-104b-4196-be3a-6e55b1bd5f58",
+        "fbed656e-5d35-4d64-8ff0-17a07a9dbd50"
+      ]
+    },
+    {
+      "fp": "384dd85d7c9d4ab1",
+      "gencode": "392430CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "384dd85d7c9d4ab1"
+      ],
+      "masterIds": [
+        "3f654166-540c-428b-ad57-706e2139066d",
+        "5dbc0cf3-459b-45f2-abda-72f956646159",
+        "a82b64bc-9ab9-4b83-9900-dc49624b1347",
+        "ba0c36a9-e812-4adb-866b-1168b002b076"
+      ]
+    },
+    {
+      "fp": "502f7e7803703459",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "502f7e7803703459"
+      ],
+      "masterIds": [
+        "0a694478-7921-4fd3-a3a6-eeb24208af4d",
+        "6ede89ce-eda3-44f7-b4b8-51b718c7834a",
+        "90d3c6c0-b53d-43e5-bd55-852aff0b44e1",
+        "fe138a3b-4f30-483d-92ed-7233bba139ec"
+      ]
+    },
+    {
+      "fp": "50481409fd62a8ef",
+      "gencode": "124203COO",
+      "suffix": "COO",
+      "route": "ophthalmic",
+      "form": "점안겔",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "50481409fd62a8ef"
+      ],
+      "masterIds": [
+        "36c134fd-28d1-4026-858d-d30e15cd9fcb",
+        "5f95f897-e641-4a9e-8da5-b274d03ea63f",
+        "7b716083-0a28-4caf-adc6-7d9d89c0e24e",
+        "bc8b3d30-933c-4be4-84ce-292e733c4036"
+      ]
+    },
+    {
+      "fp": "5a33b4740c014afb",
+      "gencode": "228834COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "5a33b4740c014afb"
+      ],
+      "masterIds": [
+        "05b7da68-c29b-4fe9-8cd4-fc2aea89108c",
+        "6c919014-39a2-4e53-9b4d-ef926aa396be",
+        "eb9e7c59-2dc8-49b5-9f21-3b435f27df73",
+        "f5929cfa-cc7c-4a43-aa92-85cbac4af83b"
+      ]
+    },
+    {
+      "fp": "66d7698ffae52396",
+      "gencode": "102935CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "66d7698ffae52396"
+      ],
+      "masterIds": [
+        "33a3801b-639f-48e9-ada8-cc8f744289aa",
+        "76fd3a10-c20a-4bd5-adff-285879cec6c4",
+        "9a5d0a68-8bed-4bf8-9321-23242fe96b39",
+        "c3c21554-cdbb-49b1-8247-02c3b49b7606"
+      ]
+    },
+    {
+      "fp": "817fea6770e59681",
+      "gencode": "A52200COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "817fea6770e59681"
+      ],
+      "masterIds": [
+        "25f71045-189a-4da8-a2ed-e44f071fa51e",
+        "436fbcb9-7993-4224-81c8-c581e293b9c3",
+        "55c60fb1-b073-4909-914c-3b3c79d5878d",
+        "9440b169-171b-48f6-8b90-91454e31c3a2"
+      ]
+    },
+    {
+      "fp": "81bb3b7083ad11c4",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "81bb3b7083ad11c4"
+      ],
+      "masterIds": [
+        "06c9c5b9-511d-4fef-9033-fd30aa1f9ca4",
+        "2ad2516b-339d-4261-9193-6d9e5df953ad",
+        "76ecbabd-eb54-4c80-aaf2-55c2610f528d",
+        "ad8cab47-8156-412c-9d43-e4e6b4e871a4"
+      ]
+    },
+    {
+      "fp": "9bb78678769324c6",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "9bb78678769324c6"
+      ],
+      "masterIds": [
+        "057c6a06-cd6b-41be-a3e1-8ac79baa5ad2",
+        "27695b57-e7c1-4f13-9c8c-309bfa2d6637",
+        "787b62e5-f93d-4104-94dd-470e12b85b5e",
+        "b67631cb-bfe6-4bf7-b890-78790192a2a3"
+      ]
+    },
+    {
+      "fp": "a4cf00b953703bcb",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "a4cf00b953703bcb"
+      ],
+      "masterIds": [
+        "05d85294-9e1c-4259-95c0-6af57d9a5a93",
+        "0e6b5551-1396-4ace-b19d-029057d5d423",
+        "5244d1ba-07cf-4c78-9f49-a7ec7a819e66",
+        "a88e4bf3-601a-4f44-8c29-acd13cd043e8"
+      ]
+    },
+    {
+      "fp": "b8c1a9bf654cc52c",
+      "gencode": "B97100CPL",
+      "suffix": "CPL",
+      "route": "topical",
+      "form": "플라스타",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "b8c1a9bf654cc52c"
+      ],
+      "masterIds": [
+        "20976dd2-0d93-44e8-9f4e-ef7a1f5c8e8e",
+        "4882765c-2366-41c8-9609-02185a860019",
+        "5edff063-87df-476c-8ec9-6aefceb49e28",
+        "f25bdd19-0581-4aaa-9e08-f973c98e5cd9"
+      ]
+    },
+    {
+      "fp": "bb422e8b5b99d426",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "bb422e8b5b99d426"
+      ],
+      "masterIds": [
+        "2e849302-46bd-411a-bcb1-c353bb6a1ab6",
+        "64ff9245-a9ee-48f5-b6ab-93ff275e0ea1",
+        "97dad07f-d29e-46f3-b030-0fce1d6f8c7f",
+        "eda0e1f5-9fc8-46c5-8dc3-028c8b8dcc21"
+      ]
+    },
+    {
+      "fp": "c4bb1ceb3f1b6c2d",
+      "gencode": "A52200COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 4,
+      "proposalFps": [
+        "c4bb1ceb3f1b6c2d"
+      ],
+      "masterIds": [
+        "0d0d688f-65d0-45d7-aee5-e48e06eea0b8",
+        "7f16c444-7e97-4a41-9dd3-68b4c6a31b01",
+        "d4c3dbde-456e-423d-9707-7d10e027c8b8",
+        "dcb9af97-a9fa-4471-ab18-e652c3475e47"
+      ]
+    },
+    {
+      "fp": "ebcc7dd033d83737",
+      "gencode": "B23200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 4,
+      "proposalFps": [
+        "ebcc7dd033d83737"
+      ],
+      "masterIds": [
+        "40d22922-b457-4dac-8af4-cf4f8bad39bc",
+        "681d0544-b58d-42cc-82af-a211f903f0e3",
+        "7ea8cb02-12ae-478a-b2eb-85109b344100",
+        "97ced37e-644c-4710-b9e1-f7f31e8a771c"
+      ]
+    },
+    {
+      "fp": "048cc50a09e53860",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "048cc50a09e53860"
+      ],
+      "masterIds": [
+        "3d58fbcd-495c-4bcb-8458-c02bba1bd909",
+        "48d53b4d-fe00-4629-9f87-ef42081ed393",
+        "c6f97ac3-6e77-4c97-af99-2a3e69c4ff46"
+      ]
+    },
+    {
+      "fp": "0c1b08d4a378c3e3",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "0c1b08d4a378c3e3"
+      ],
+      "masterIds": [
+        "5b085b17-8374-4c19-a1c3-37533df2b351",
+        "8af3c187-6caa-4dbe-9106-518ac487d19e",
+        "aed900e8-98ee-4211-804d-3c76ad191703"
+      ]
+    },
+    {
+      "fp": "18f6046fcc71999e",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "18f6046fcc71999e"
+      ],
+      "masterIds": [
+        "39fae226-f649-4f92-b9c8-d939934e9861",
+        "879ba4dc-627b-4fef-9b73-9a86a8540bda",
+        "cdcd9a7c-a7cc-4b97-95a8-6207ac099735"
+      ]
+    },
+    {
+      "fp": "1d359c0e601dfab3",
+      "gencode": "228653COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "1d359c0e601dfab3"
+      ],
+      "masterIds": [
+        "a3bd568d-1e88-4fea-aaf0-102a71e21d97",
+        "e142b7f8-a40c-4d4f-ab63-0d99dbbae8f1",
+        "f10cc548-448e-4168-a110-84238c015c36"
+      ]
+    },
+    {
+      "fp": "2e6ffe5c7a5ffab2",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "2e6ffe5c7a5ffab2"
+      ],
+      "masterIds": [
+        "1d322877-3176-496c-ac59-9a57ead4a97d",
+        "9cf43831-7de0-46e2-808a-5e866ac8f76a",
+        "bd38241e-a9c0-4709-ac36-a863f48d02ed"
+      ]
+    },
+    {
+      "fp": "41cfffa3e295487d",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "41cfffa3e295487d"
+      ],
+      "masterIds": [
+        "48d950b2-f300-4afc-b7ce-9c57caa5467e",
+        "7c7942a5-f2cc-4a15-9e37-ffe8ae92b8c6",
+        "a6352706-c373-4202-b19d-d47e6c9f5a76"
+      ]
+    },
+    {
+      "fp": "527c326e572114a7",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "527c326e572114a7"
+      ],
+      "masterIds": [
+        "1f6fd494-5e1c-4d05-9a3a-c3fe2974674c",
+        "bdfde709-9deb-448d-839a-f788289181a4",
+        "f4096e1f-73b3-453a-b048-ea28a4669fef"
+      ]
+    },
+    {
+      "fp": "5f4235b8d0c8676a",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 3,
+      "proposalFps": [
+        "5f4235b8d0c8676a"
+      ],
+      "masterIds": [
+        "141a3f09-b3e5-454f-9144-91de038d3879",
+        "3cb1daaf-2db7-4819-a531-273b535c3d03",
+        "44c9ef74-8476-4db8-856f-64c2c7fca2cf"
+      ]
+    },
+    {
+      "fp": "6a16edf177c8be74",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 3,
+      "proposalFps": [
+        "6a16edf177c8be74"
+      ],
+      "masterIds": [
+        "32345c58-9cbc-4fab-bbb2-990580a8586c",
+        "4c559a95-76a4-4605-a13d-08307acdf645",
+        "f006aaa7-eeb8-4776-a789-9f5fb7a99580"
+      ]
+    },
+    {
+      "fp": "6d20ddaaab4a48bc",
+      "gencode": "A52200COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "6d20ddaaab4a48bc"
+      ],
+      "masterIds": [
+        "62fb65c8-bbc6-43d6-b124-5f110a813c6c",
+        "6bea7470-1b01-47dd-be4c-a9343acebdb0",
+        "efe24d60-6a97-4d30-a35f-4fc2b4612a43"
+      ]
+    },
+    {
+      "fp": "8b1243dff30c5403",
+      "gencode": "228834COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "8b1243dff30c5403"
+      ],
+      "masterIds": [
+        "35c3556c-153a-4d42-9d1d-c92e1fca117e",
+        "77dae34b-c344-4f5a-b99e-d3a7a834ccd0",
+        "ccc990f8-b555-48c2-8edd-7cb408936e49"
+      ]
+    },
+    {
+      "fp": "ab75aaddc2c342d4",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "ab75aaddc2c342d4"
+      ],
+      "masterIds": [
+        "0bf47b8f-1602-4fad-9f2e-64233d651399",
+        "17435b8e-c50d-460a-b0d5-31b621688a3d",
+        "c51de7f4-c4b5-437e-a8ab-16b6a71ef646"
+      ]
+    },
+    {
+      "fp": "ab93ddec03654396",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "ab93ddec03654396"
+      ],
+      "masterIds": [
+        "4fcaaf5e-8ce7-4c77-a484-3fc325fefc4a",
+        "8b88500e-d85e-4a6a-909c-71809228504a",
+        "baa44dc7-2846-4054-8b67-42ca03882469"
+      ]
+    },
+    {
+      "fp": "b0b1242f1726ea1f",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "b0b1242f1726ea1f"
+      ],
+      "masterIds": [
+        "0fc422ea-b08d-494b-a0fe-e0fc3d0b321f",
+        "36bc2bc7-18f0-4b10-83bf-012a7fca14c7",
+        "d17ac17f-f824-42a1-85ef-9c341d4d8cc3"
+      ]
+    },
+    {
+      "fp": "c9659ddcc4c144bf",
+      "gencode": "102935CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "c9659ddcc4c144bf"
+      ],
+      "masterIds": [
+        "05645284-7eed-41fb-8f48-ce15fae9fe44",
+        "2da014c3-2c18-4d8e-9c8e-3888692a57a0",
+        "3fb0fbc3-1666-4466-bffd-4c75824d37b0"
+      ]
+    },
+    {
+      "fp": "cac0945b55517f16",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 3,
+      "proposalFps": [
+        "cac0945b55517f16"
+      ],
+      "masterIds": [
+        "063fcd12-2125-442d-9e4d-ea523e0545f2",
+        "120f3169-3630-4252-9a8e-aeb78c5ce341",
+        "1a0157c0-b9da-42d0-93b1-c0a0c84581c1"
+      ]
+    },
+    {
+      "fp": "cd5d89fb606475a4",
+      "gencode": "228653COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "cd5d89fb606475a4"
+      ],
+      "masterIds": [
+        "5d8fd6c8-e443-4814-9f09-0b90c8817053",
+        "93292998-1487-49fc-83bb-79b2273669d5",
+        "de1f70c7-c6f7-4b3a-8e0c-1a2d13dbc6a4"
+      ]
+    },
+    {
+      "fp": "d836e36b79a92957",
+      "gencode": "A57200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "d836e36b79a92957"
+      ],
+      "masterIds": [
+        "73acb965-71b3-4829-9e74-dbbe714d0ded",
+        "c1317c11-58a0-409e-8210-98bae170e7be",
+        "def1a27a-c8cd-4afa-95ad-1bd00258ad06"
+      ]
+    },
+    {
+      "fp": "de8126ee3cb6f44a",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 3,
+      "proposalFps": [
+        "de8126ee3cb6f44a"
+      ],
+      "masterIds": [
+        "3ce6943a-089b-4c9c-9615-4300524d9a69",
+        "42d06afd-45f8-4b59-9bca-24f6dd380e21",
+        "470a681a-bbd5-4e99-8c85-8b9555d848e3"
+      ]
+    },
+    {
+      "fp": "e359930baf19f65f",
+      "gencode": "A18500CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "e359930baf19f65f"
+      ],
+      "masterIds": [
+        "2a3b431b-4598-4600-84d6-fae607fe0a15",
+        "b1de82ca-e18d-46df-b815-63568a8fdebf",
+        "c76bd78c-00c3-4660-9b68-27e281dcadca"
+      ]
+    },
+    {
+      "fp": "e59814f802ce6f0f",
+      "gencode": "102935CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "e59814f802ce6f0f"
+      ],
+      "masterIds": [
+        "35cdc8f8-3814-4deb-b856-a90a62bea1e8",
+        "924566c2-aff6-468d-bd14-d46704745394",
+        "b1d1e06a-fccc-420b-99e3-f78b60bb0124"
+      ]
+    },
+    {
+      "fp": "ec33a1e1da5b38a0",
+      "gencode": "A57300CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "ec33a1e1da5b38a0"
+      ],
+      "masterIds": [
+        "592385fb-7acd-4af3-8fe7-05e5855a4223",
+        "94e20125-6e33-4647-9dc4-984d3bcc1748",
+        "fa9eaae6-9050-4811-be51-4dc5b3afc6a8"
+      ]
+    },
+    {
+      "fp": "f59b7b1c2e80a7d2",
+      "gencode": "A18500CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "f59b7b1c2e80a7d2"
+      ],
+      "masterIds": [
+        "07441cdb-dc21-4d92-8c9c-8e6493492318",
+        "9ec1d729-cd22-43f8-9552-0981067a6ecc",
+        "d6602402-48a0-4d66-8d38-79aa17505266"
+      ]
+    },
+    {
+      "fp": "ff115a9ae4db473a",
+      "gencode": "346500COM",
+      "suffix": "COM",
+      "route": "topical",
+      "form": "연고",
+      "site": "cutaneous",
+      "size": 3,
+      "proposalFps": [
+        "ff115a9ae4db473a"
+      ],
+      "masterIds": [
+        "35c5b615-9ea0-4c00-8ecd-9787ef556ddb",
+        "a8f0f846-a5ca-4f43-b9de-2201aecf0408",
+        "c7980e8d-76c9-4f3b-992c-2638f1d45ee4"
+      ]
+    },
+    {
+      "fp": "0125eb92854260b9",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "0125eb92854260b9"
+      ],
+      "masterIds": [
+        "3a020e36-02df-4b54-a61e-2c01d420e6a5",
+        "d7f03aff-aeb7-4260-91a9-a9f7911a9afd"
+      ]
+    },
+    {
+      "fp": "075b7d9ba048443b",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 2,
+      "proposalFps": [
+        "075b7d9ba048443b"
+      ],
+      "masterIds": [
+        "6d231bd7-996b-401c-8387-b0821ba315d0",
+        "a1754267-2326-471b-9f2d-7818bdbb031f"
+      ]
+    },
+    {
+      "fp": "1789c703501b815f",
+      "gencode": "180137COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "1789c703501b815f"
+      ],
+      "masterIds": [
+        "107b7514-2417-4dc4-844e-acf81ad4d5bc",
+        "b9dbd1ff-f12f-4f33-a4a7-ae614254bd92"
+      ]
+    },
+    {
+      "fp": "1841a94833c49604",
+      "gencode": "B23200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "1841a94833c49604"
+      ],
+      "masterIds": [
+        "44e87ad7-cfba-4300-92a7-a99adf83cafd",
+        "c0101445-424c-4f6f-b24e-3397e05aad3c"
+      ]
+    },
+    {
+      "fp": "19a7284435ecef46",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "19a7284435ecef46"
+      ],
+      "masterIds": [
+        "310d0d04-f199-4846-b9b1-bf4231055caa",
+        "5f43f9f8-04c0-48bf-98ed-b18a9bbe0e4f"
+      ]
+    },
+    {
+      "fp": "1d615a120032fffd",
+      "gencode": "331800COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "1d615a120032fffd"
+      ],
+      "masterIds": [
+        "ddb75ed3-e307-4f03-903c-934cab6bd26b",
+        "e5f99385-1bb1-4b0a-b2a0-69d68dbc69e8"
+      ]
+    },
+    {
+      "fp": "1e051e72ebf96820",
+      "gencode": "180137COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "1e051e72ebf96820"
+      ],
+      "masterIds": [
+        "18b9172a-2794-4606-a312-c9e508927c33",
+        "bb4458b3-8f3c-4fa9-ac3a-c09edb32114e"
+      ]
+    },
+    {
+      "fp": "321adcea63d19542",
+      "gencode": "D01300ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 2,
+      "proposalFps": [
+        "321adcea63d19542"
+      ],
+      "masterIds": [
+        "cae65af1-ca51-428f-9f68-e6402b897b88",
+        "f78e7995-47fe-417a-ab84-b96a1b67db8e"
+      ]
+    },
+    {
+      "fp": "3fdf54c6e83b480d",
+      "gencode": "124203COO",
+      "suffix": "COO",
+      "route": "ophthalmic",
+      "form": "점안겔",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "3fdf54c6e83b480d"
+      ],
+      "masterIds": [
+        "d1461f2e-7486-4312-8eba-72781e784ef5",
+        "e66c3b9b-c642-47a9-8c00-7eb188035c54"
+      ]
+    },
+    {
+      "fp": "3fffa5590382e1eb",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 2,
+      "proposalFps": [
+        "3fffa5590382e1eb"
+      ],
+      "masterIds": [
+        "3b1e258c-984a-43ac-aa0d-2c922a78f333",
+        "54b9d33f-5711-413f-8833-ea5b5721a619"
+      ]
+    },
+    {
+      "fp": "4230f2287ea13056",
+      "gencode": "124203COO",
+      "suffix": "COO",
+      "route": "ophthalmic",
+      "form": "점안겔",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "4230f2287ea13056"
+      ],
+      "masterIds": [
+        "83fc5803-079c-44a4-9c7b-27acd469c537",
+        "bb5d607a-915e-47ed-bceb-d4e1dde831a6"
+      ]
+    },
+    {
+      "fp": "45763152d2494e37",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "45763152d2494e37"
+      ],
+      "masterIds": [
+        "0fd1c112-94af-4389-9218-ba3fe35234f3",
+        "d73f4ac5-dace-4f5d-8bb7-eb4f8cc87cae"
+      ]
+    },
+    {
+      "fp": "5aeeb9c287b0796d",
+      "gencode": "161906ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 2,
+      "proposalFps": [
+        "5aeeb9c287b0796d"
+      ],
+      "masterIds": [
+        "a98d3d02-c306-43e4-97ba-c38d2bcd090c",
+        "fb905ac1-e105-4cfc-aa64-9bbac075398e"
+      ]
+    },
+    {
+      "fp": "68d8f8f86b2d3946",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "68d8f8f86b2d3946"
+      ],
+      "masterIds": [
+        "1bdaa400-c3b0-41c7-ac0b-1764bab53f3d",
+        "83a03a0b-93a9-4849-8720-b5090c8a1f8a"
+      ]
+    },
+    {
+      "fp": "6b024e15ec2c1704",
+      "gencode": "A57200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "6b024e15ec2c1704"
+      ],
+      "masterIds": [
+        "340353a3-038f-45cb-88da-c7b243815842",
+        "94beca47-8726-4296-a6a2-cf26885bc602"
+      ]
+    },
+    {
+      "fp": "70fa837b79a1228d",
+      "gencode": "A26400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "70fa837b79a1228d"
+      ],
+      "masterIds": [
+        "3683e72e-29de-4387-82c1-ff7173e006f8",
+        "fdd87e2c-871d-461e-a9f5-d0cc33b75db9"
+      ]
+    },
+    {
+      "fp": "75fc816ef7758b02",
+      "gencode": "137401CTB",
+      "suffix": "CTB",
+      "route": "vaginal",
+      "form": "질정",
+      "site": "vaginal",
+      "size": 2,
+      "proposalFps": [
+        "75fc816ef7758b02"
+      ],
+      "masterIds": [
+        "6cb94f76-9287-4d7f-bcaf-5d65ea9c26c9",
+        "bf59e796-c5a4-401e-8c5f-29fc0a9370ab"
+      ]
+    },
+    {
+      "fp": "7e3bb7c8a23c4deb",
+      "gencode": "D01300ATO",
+      "suffix": "ATO",
+      "route": "oromucosal",
+      "form": "트로키",
+      "site": "oromucosal",
+      "size": 2,
+      "proposalFps": [
+        "7e3bb7c8a23c4deb"
+      ],
+      "masterIds": [
+        "08517cfa-a765-4146-a501-ae71f92749b9",
+        "48d83c43-2b6b-4462-9853-ee23cf73599a"
+      ]
+    },
+    {
+      "fp": "8137728114ad6559",
+      "gencode": "A87803AMS",
+      "suffix": "AMS",
+      "route": "oromucosal",
+      "form": "껌",
+      "site": "oromucosal",
+      "size": 2,
+      "proposalFps": [
+        "8137728114ad6559"
+      ],
+      "masterIds": [
+        "3661eb82-bf46-47a0-8015-01fccdcf63fe",
+        "64696ffb-7a8b-4bdc-a7e6-f2147271749e"
+      ]
+    },
+    {
+      "fp": "815a8b88b3498ef2",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "815a8b88b3498ef2"
+      ],
+      "masterIds": [
+        "569be8bb-5dce-404d-b26b-f22e9b92a53a",
+        "6aee78c7-0dc9-4b53-b6dd-6a67990672b2"
+      ]
+    },
+    {
+      "fp": "87833d620456daf7",
+      "gencode": "A57100CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "87833d620456daf7"
+      ],
+      "masterIds": [
+        "7d331a62-7aec-436d-8675-72d76d510d05",
+        "dd18f2c6-44b9-4bb3-9d4b-f2c97b3bcf02"
+      ]
+    },
+    {
+      "fp": "882bb1ca3b3fb441",
+      "gencode": "346500COM",
+      "suffix": "COM",
+      "route": "topical",
+      "form": "연고",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "882bb1ca3b3fb441"
+      ],
+      "masterIds": [
+        "725d2958-5ebe-46ed-9668-64ffecb928bb",
+        "74b8b45e-ce73-4bf2-ab4f-7cc91bfb03ac"
+      ]
+    },
+    {
+      "fp": "8c16f5460ed1a751",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "8c16f5460ed1a751"
+      ],
+      "masterIds": [
+        "650ae77a-8b62-44c3-b4d4-ef094fed809c",
+        "faab787b-5e6c-45dc-8e2b-53db5995444c"
+      ]
+    },
+    {
+      "fp": "8c661c49e6582823",
+      "gencode": "B23200CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "8c661c49e6582823"
+      ],
+      "masterIds": [
+        "21ff836d-e6ee-4436-89d9-ce508de0bfe3",
+        "b16b183d-267a-4ba8-8a9d-f3bfc70ad34b"
+      ]
+    },
+    {
+      "fp": "a5642ede188c68f6",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "a5642ede188c68f6"
+      ],
+      "masterIds": [
+        "c5d30b7d-a668-45e4-b9c1-7acf4a7be036",
+        "cd0b5c9e-9a14-46e9-9d15-177794678991"
+      ]
+    },
+    {
+      "fp": "aaad3eb9fc5b3341",
+      "gencode": "A57100CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "aaad3eb9fc5b3341"
+      ],
+      "masterIds": [
+        "d05bc83d-274d-4f99-9bc1-57ae4eb0083d",
+        "f25bbfb2-b503-49d2-8a7f-743f0bb0d719"
+      ]
+    },
+    {
+      "fp": "adf3c63a90a05189",
+      "gencode": "363700CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "adf3c63a90a05189"
+      ],
+      "masterIds": [
+        "1cbb6702-8b65-4546-a29c-436d8a4d739a",
+        "bfb085d0-cfbe-4a22-8c68-eb47b3fb8941"
+      ]
+    },
+    {
+      "fp": "b918e02d846e4065",
+      "gencode": "183807CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "b918e02d846e4065"
+      ],
+      "masterIds": [
+        "800cbbb3-80c9-4c92-bfe7-dc8fd843f347",
+        "ac42ccb6-911e-42da-b218-588b27e29aab"
+      ]
+    },
+    {
+      "fp": "baadc597c61d6771",
+      "gencode": "180138COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "baadc597c61d6771"
+      ],
+      "masterIds": [
+        "ca1014b3-1a31-4598-8b3d-993bf3a8a4a4",
+        "da04461f-0ce4-4d00-8fd4-f6fe8484a86d"
+      ]
+    },
+    {
+      "fp": "bf4a061b1a6254d6",
+      "gencode": "A11800CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "bf4a061b1a6254d6"
+      ],
+      "masterIds": [
+        "4dc9bea0-70ac-44a3-a4a0-63a041d3e420",
+        "6513ee80-8f95-4ff3-accb-6b7faf94613b"
+      ]
+    },
+    {
+      "fp": "d69affe1a4871731",
+      "gencode": "A74400COS",
+      "suffix": "COS",
+      "route": "ophthalmic",
+      "form": "점안액",
+      "site": "ophthalmic",
+      "size": 2,
+      "proposalFps": [
+        "d69affe1a4871731"
+      ],
+      "masterIds": [
+        "18c016ef-579b-4614-aaf5-c35e42d20a81",
+        "a5f79221-dcd7-4b58-822c-b443203f9fb0"
+      ]
+    },
+    {
+      "fp": "e632d571ca052291",
+      "gencode": "392430CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 2,
+      "proposalFps": [
+        "e632d571ca052291"
+      ],
+      "masterIds": [
+        "605711c3-1152-433c-ab89-d3dc908b2985",
+        "ce75d293-dd45-4497-a4cc-d5e4c9643896"
+      ]
+    },
+    {
+      "fp": "6d103adbbad1f104",
+      "gencode": "530094CCM",
+      "suffix": "CCM",
+      "route": "topical",
+      "form": "크림",
+      "site": "cutaneous",
+      "size": 1,
+      "proposalFps": [
+        "6d103adbbad1f104"
+      ],
+      "masterIds": [
+        "d77604ba-36a3-47cd-8334-1afdf5860819"
+      ]
+    }
+  ],
+  "holds": [
+    {
+      "masterId": "03c241dc-2b99-48c1-89e5-b27716d0432e",
+      "name": "로얄코티크림",
+      "proposalFp": "5400045f470707f0",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "03e4196d-8f3d-4ddf-baee-6f4a2e51b596",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "05a48eb0-2d06-4b51-98a8-3cef294ac3df",
+      "name": "니코레트껌2밀리그람(니코틴)후룻민트향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "06ca7613-9d4c-45a9-bbab-20298098c4e4",
+      "name": "메타겐크림",
+      "proposalFp": "5e815d47eede2e3a",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "0b4c7a2a-a3fb-4087-85b8-8679b54ea35c",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "0d718a37-b5b0-4618-a238-945941b7f38c",
+      "name": "메디코스팜활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "13bd64d5-e772-48db-90f5-ec667cae5958",
+      "name": "오현파마활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "16f5a50d-1661-4c05-be16-d0af4c0a147c",
+      "name": "니코레트껌2밀리그람(니코틴)과일향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "226cad9b-01e9-408d-9e17-53630ca974c2",
+      "name": "로얄코티크림",
+      "proposalFp": "5400045f470707f0",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "268b155c-3b22-4ed7-b04e-91c53f3be902",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "2c340b03-e853-4ecd-99c4-db2ef7090a6e",
+      "name": "오현파마활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "375025be-b973-4abf-ae6c-a5a9861ff082",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "399d5e39-9ec4-429d-8feb-74d773646ab5",
+      "name": "베라스톤크림",
+      "proposalFp": "1665c1728b49cbd1",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "3dd3f116-be52-456e-8e0e-f749071f5d1b",
+      "name": "로얄플러스크림",
+      "proposalFp": "5400045f470707f0",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "4b7181a4-5993-4d21-bfe7-cf4bbb0ce29e",
+      "name": "니코레트껌2밀리그람(니코틴)쿨민트향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "519d501a-9cfb-4d69-84e4-94b05ece8ef7",
+      "name": "니코레트껌2밀리그람(니코틴)민트향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "597d12f6-4bf5-4acf-8258-7a05803f67d2",
+      "name": "베라스톤크림",
+      "proposalFp": "1665c1728b49cbd1",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "600c4acb-5675-4b48-80ef-62d5bfc87d16",
+      "name": "히아로겔(히알루론산나트륨)",
+      "proposalFp": "2a05122a61f387ce",
+      "route": "topical",
+      "verdict": "HOLD_MULTI_ROUTE",
+      "reasons": [
+        "DOSAGE_SITES:cutaneous,oromucosal"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "62b3e1d5-f130-42f3-aa2e-be6626c00f69",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "62f6ae1b-380a-4953-957d-0688f94d106f",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "696224dd-64c9-4153-abe9-9726ed61bb39",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "6af26f82-2759-46de-a56e-f1f1b0309226",
+      "name": "쎄레스틴크림",
+      "proposalFp": "9c3ab58201402591",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "77de6f82-2ed1-44b5-b9d4-c69b127558b8",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "7e0587ef-2068-4039-bec0-d3638cab0c1b",
+      "name": "쎌렉스킨지크림",
+      "proposalFp": "47b6647f59ab233b",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "7e26b399-f811-4e13-a4bd-3bbca844bc73",
+      "name": "메디코스팜활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "7e9269d9-1760-4ee4-a6c5-0a34e44e431f",
+      "name": "아실로크림",
+      "proposalFp": "92de6f189175b29d",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "7f77a85d-a4ed-4ae0-99c7-fc00c7528243",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "819532a3-2b55-4bff-9cb0-dbc2e965f33a",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "8a017009-354c-4071-aa33-ed28d42f0c32",
+      "name": "니코레트껌2밀리그람(니코틴)(쿨민트향)",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "8f208eb2-220d-49df-acc4-dae45e05cbc7",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "90359178-1c3b-4078-89c5-9a907a24859c",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "91985096-51e7-4a62-8e1c-85dea5da4d53",
+      "name": "쎌렉스킨지크림",
+      "proposalFp": "47b6647f59ab233b",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "92358a5a-9ce0-428e-aa18-13a18ec8f03f",
+      "name": "베라스톤크림",
+      "proposalFp": "1665c1728b49cbd1",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "955ad880-6c71-494b-ad24-f87f5d4a2af9",
+      "name": "로얄코티크림",
+      "proposalFp": "5400045f470707f0",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "9a91ea96-8f81-425c-ac5c-3411ffc0cfc2",
+      "name": "메디코스팜활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "ab15d88d-d1e0-473a-a908-8bf47ac74716",
+      "name": "쎄레스틴크림",
+      "proposalFp": "9c3ab58201402591",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "af59fdfe-5581-40c3-837d-cf08f822517e",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "b0615452-a0e4-4b67-820c-10210f6c6795",
+      "name": "니코레트껌2밀리그람(니코틴)후레쉬민트향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "b4b9e896-f284-41f9-8657-cee04d4beb94",
+      "name": "아실로크림",
+      "proposalFp": "92de6f189175b29d",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "b981ef42-ef79-4ed1-9b3c-0cb0ba265760",
+      "name": "메타겐크림",
+      "proposalFp": "5e815d47eede2e3a",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "c4643ce7-b3ac-4bc3-86c8-44460b7a1a4a",
+      "name": "니코레트껌2밀리그람(니코틴)(쿨민트향)",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "ca790fe7-c9d0-4cdc-851c-431f52e77a75",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "cae7b85c-8bba-4572-b341-f08919c5f37f",
+      "name": "로얄플러스크림",
+      "proposalFp": "5400045f470707f0",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "d461d02d-6e20-4f4d-91a8-4dbb79ae1aab",
+      "name": "메디코스팜활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e028ec5c-61a8-4987-be9b-cccd04997047",
+      "name": "메타겐크림",
+      "proposalFp": "5e815d47eede2e3a",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e096759d-9e95-4e03-921d-a34ad7c6903c",
+      "name": "히아로겔(히알루론산나트륨)",
+      "proposalFp": "2a05122a61f387ce",
+      "route": "topical",
+      "verdict": "HOLD_MULTI_ROUTE",
+      "reasons": [
+        "DOSAGE_SITES:cutaneous,oromucosal"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e4cc6eec-8574-43d1-9931-eadd3bea7716",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e65e3193-276c-4880-8a44-827d633de13f",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e718a360-18da-41da-ae68-5f28343d72b1",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "e9fe9cf2-7a9b-497e-a168-3ed8397ca3b0",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "ec2a65ec-f311-4372-8fb3-3e87cf7af7f5",
+      "name": "득생장수고",
+      "proposalFp": "17463d5abce382d8",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "f7069d99-f899-4a01-8405-eb526abcdac1",
+      "name": "오현파마활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "f9ea60fc-856c-408e-b4eb-9dbb6225a59f",
+      "name": "득생활혈산통고",
+      "proposalFp": "fa99151d0d81d635",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "fbe9bd32-b076-49ad-842b-65b971cd918b",
+      "name": "니코레트껌2밀리그람(니코틴)민트향",
+      "proposalFp": "23f404f9ef31b2ea",
+      "route": "oromucosal",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    },
+    {
+      "masterId": "fc081388-0e4a-49be-83b2-c34cf02e98fb",
+      "name": "오현파마활혈진통고",
+      "proposalFp": "27e5dc9300e8dbd4",
+      "route": "topical",
+      "verdict": "HOLD_ROUTE",
+      "reasons": [
+        "NO_SITE_IN_DOSAGE"
+      ],
+      "proEvidence": []
+    }
+  ]
+}
