@@ -11,10 +11,18 @@
  *   - 게시된 정책 문서만 공개됨을 안내(법적 "준수 완료" 류 표현 금지).
  *   - 권한 오류(403)는 우회하지 않고 메시지로 표시.
  *
- * 스타일: 공통 모듈 관례에 따라 inline style (서비스 Tailwind purge 비의존).
+ * WO-O4O-CROSS-SERVICE-RAW-TABLE-STANDARDIZATION-BATCH-V2:
+ *   페이지 단위 표준화 — 정책 문서 목록을 표준 `DataTable`(@o4o/operator-ux-core) +
+ *   `RowActionMenu`(편집/게시·게시해제)로 전환하고, 페이지 전체 inline style 을 Tailwind 로 교체했다.
+ *   기존의 "inline style (서비스 Tailwind purge 비의존)" 관례는 표준 Tailwind 통일 결정으로 폐기.
+ *   서비스별 차이는 기존 props(serviceKey / title / enabledTabs / api)로만 처리하며
+ *   공용 컴포넌트에 서비스명 조건문·전용 CSS 를 추가하지 않는다.
+ *   편집 폼·게시 동작 계약은 변경하지 않았다.
  */
 
-import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
 import {
   POLICY_DOCUMENT_TYPES,
   type ServiceLegalProfileDto,
@@ -25,40 +33,41 @@ import {
   type ServiceLegalTabKey,
 } from './types';
 
-// ── styles ──
-const S = {
-  page: { maxWidth: 920, margin: '0 auto', padding: '24px 16px' } as CSSProperties,
-  h1: { fontSize: 22, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' } as CSSProperties,
-  lead: { color: '#64748b', fontSize: 13, lineHeight: 1.6, margin: '0 0 16px' } as CSSProperties,
-  tabs: { display: 'flex', gap: 4, borderBottom: '1px solid #e2e8f0', marginBottom: 20 } as CSSProperties,
-  tab: (active: boolean): CSSProperties => ({
-    padding: '10px 16px', fontSize: 14, fontWeight: 600, cursor: 'pointer',
-    color: active ? '#0f172a' : '#94a3b8', background: 'none', border: 'none',
-    borderBottom: active ? '2px solid #0f172a' : '2px solid transparent',
-  }),
-  card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: 20, marginBottom: 16 } as CSSProperties,
-  groupTitle: { fontSize: 13, fontWeight: 700, color: '#334155', margin: '0 0 12px' } as CSSProperties,
-  field: { marginBottom: 12 } as CSSProperties,
-  label: { display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4 } as CSSProperties,
-  input: { width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: 14, border: '1px solid #cbd5e1', borderRadius: 8 } as CSSProperties,
-  textarea: { width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: 14, border: '1px solid #cbd5e1', borderRadius: 8, minHeight: 80, fontFamily: 'inherit' } as CSSProperties,
-  btnPrimary: { padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#fff', background: '#0f172a', border: 'none', borderRadius: 8, cursor: 'pointer' } as CSSProperties,
-  btnGhost: { padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#334155', background: '#fff', border: '1px solid #cbd5e1', borderRadius: 8, cursor: 'pointer' } as CSSProperties,
-  help: { fontSize: 12, color: '#94a3b8', lineHeight: 1.6, marginTop: 10 } as CSSProperties,
-  banner: (type: 'success' | 'error'): CSSProperties => ({
-    padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16,
-    background: type === 'success' ? '#ecfdf5' : '#fef2f2',
-    color: type === 'success' ? '#047857' : '#b91c1c',
-    border: `1px solid ${type === 'success' ? '#a7f3d0' : '#fecaca'}`,
-  }),
-  table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 13 },
-  th: { textAlign: 'left' as const, padding: '8px 10px', color: '#64748b', fontWeight: 600, borderBottom: '1px solid #e2e8f0', fontSize: 12 },
-  td: { padding: '8px 10px', borderBottom: '1px solid #f1f5f9', color: '#334155' },
-  badge: (color: string, bg: string): CSSProperties => ({
-    display: 'inline-block', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600, color, background: bg,
-  }),
-  statusRow: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f5f9', fontSize: 14, color: '#334155' } as CSSProperties,
+// ── Tailwind class tokens (inline style 대체) ──
+const C = {
+  page: 'max-w-[920px] mx-auto px-4 py-6',
+  h1: 'text-xl font-bold text-slate-900 mb-1',
+  lead: 'text-sm text-slate-500 leading-relaxed mb-4',
+  tabs: 'flex gap-1 border-b border-slate-200 mb-5',
+  tab: (active: boolean) =>
+    `px-4 py-2.5 text-sm font-semibold cursor-pointer bg-transparent border-none border-b-2 ${
+      active ? 'text-slate-900 border-slate-900' : 'text-slate-400 border-transparent'
+    }`,
+  card: 'bg-white border border-slate-200 rounded-xl p-5 mb-4',
+  groupTitle: 'text-[13px] font-bold text-slate-700 mb-3',
+  field: 'mb-3',
+  label: 'block text-xs text-slate-500 mb-1',
+  input: 'w-full box-border px-2.5 py-2 text-sm border border-slate-300 rounded-lg',
+  textarea: 'w-full box-border px-2.5 py-2 text-sm border border-slate-300 rounded-lg min-h-20 font-[inherit]',
+  btnPrimary:
+    'px-4 py-2 text-sm font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 disabled:opacity-60',
+  btnGhost:
+    'px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40',
+  help: 'text-xs text-slate-400 leading-relaxed mt-2.5',
+  banner: (type: 'success' | 'error') =>
+    `px-3.5 py-2.5 rounded-lg text-sm mb-4 border ${
+      type === 'success'
+        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+        : 'bg-red-50 text-red-700 border-red-200'
+    }`,
+  statusRow: 'flex justify-between py-2.5 border-b border-slate-100 text-sm text-slate-700',
 };
+
+/** 상태 배지 — O4O 표준 Tailwind 배지 패턴 */
+function policyStatusBadge(status: string) {
+  const cls = status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-100 text-amber-800';
+  return <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${cls}`}>{status}</span>;
+}
 
 type TabKey = ServiceLegalTabKey;
 const ALL_TABS: TabKey[] = ['profile', 'policies', 'status'];
@@ -244,42 +253,70 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
     [form],
   );
 
+  // WO-…-BATCH-V2: 정책 문서 목록 컬럼. 행 액션(편집/게시·게시해제)은 RowActionMenu 로 이관.
+  const policyColumns: ListColumnDef<ServicePolicyDocumentDto>[] = [
+    { key: 'documentType', header: '유형', width: '140px', render: (_v, d) => docTypeLabel(d.documentType) },
+    { key: 'title', header: '제목', minWidth: 180, render: (_v, d) => d.title },
+    { key: 'version', header: '버전', width: '80px', render: (_v, d) => `v${d.version}` },
+    { key: 'status', header: '상태', width: '110px', render: (_v, d) => policyStatusBadge(d.status) },
+    { key: 'effectiveDate', header: '시행일', width: '110px', render: (_v, d) => fmtDate(d.effectiveDate) },
+    { key: 'publishedAt', header: '게시일', width: '110px', render: (_v, d) => fmtDate(d.publishedAt) },
+    { key: 'updatedAt', header: '수정일', width: '110px', render: (_v, d) => fmtDate(d.updatedAt) },
+    {
+      key: '_actions',
+      header: '관리',
+      width: '72px',
+      align: 'center',
+      system: true,
+      render: (_v, d) => (
+        <RowActionMenu
+          actions={[
+            { key: 'edit', label: '편집', onClick: () => openEditDoc(d) },
+            d.status === 'published'
+              ? { key: 'unpublish', label: '게시해제', onClick: () => handlePublish(d, 'unpublish') }
+              : { key: 'publish', label: '게시', onClick: () => handlePublish(d, 'publish') },
+          ]}
+        />
+      ),
+    },
+  ];
+
   return (
-    <div style={S.page}>
-      <h1 style={S.h1}>{title ?? '서비스 설정 — 법정정보·약관'}</h1>
-      <p style={S.lead}>
+    <div className={C.page}>
+      <h1 className={C.h1}>{title ?? '서비스 설정 — 법정정보·약관'}</h1>
+      <p className={C.lead}>
         서비스별 법정정보와 약관 문서를 관리합니다. 입력되지 않은 법정정보 항목은 공개 푸터에서 표시되지 않습니다.
         사업자등록번호, 통신판매업 신고번호, 대표자명, 주소 등은 실제 확인된 정보만 입력해야 합니다.
         <br />대상 서비스: <strong>{serviceKey}</strong>
       </p>
 
-      <div style={S.tabs}>
-        {showProfile && <button style={S.tab(tab === 'profile')} onClick={() => setTab('profile')}>법정정보</button>}
-        {showPolicies && <button style={S.tab(tab === 'policies')} onClick={() => setTab('policies')}>정책 문서</button>}
-        {showStatus && <button style={S.tab(tab === 'status')} onClick={() => setTab('status')}>공개 상태 확인</button>}
+      <div className={C.tabs}>
+        {showProfile && <button className={C.tab(tab === 'profile')} onClick={() => setTab('profile')}>법정정보</button>}
+        {showPolicies && <button className={C.tab(tab === 'policies')} onClick={() => setTab('policies')}>정책 문서</button>}
+        {showStatus && <button className={C.tab(tab === 'status')} onClick={() => setTab('status')}>공개 상태 확인</button>}
       </div>
 
-      {message && <div style={S.banner(message.type)}>{message.text}</div>}
+      {message && <div className={C.banner(message.type)}>{message.text}</div>}
 
       {/* ── 법정정보 탭 ── */}
       {tab === 'profile' && (
-        profileLoading ? <div style={S.card}>불러오는 중…</div> : (
+        profileLoading ? <div className={C.card}>불러오는 중…</div> : (
           <>
             {PROFILE_GROUPS.map((group) => (
-              <div key={group.title} style={S.card}>
-                <p style={S.groupTitle}>{group.title}</p>
+              <div key={group.title} className={C.card}>
+                <p className={C.groupTitle}>{group.title}</p>
                 {group.fields.map((f) => (
-                  <div key={f.key as string} style={S.field}>
-                    <label style={S.label}>{f.label}</label>
+                  <div key={f.key as string} className={C.field}>
+                    <label className={C.label}>{f.label}</label>
                     {f.multiline ? (
                       <textarea
-                        style={S.textarea}
+                        className={C.textarea}
                         value={form[f.key as string] ?? ''}
                         onChange={(e) => setForm((prev) => ({ ...prev, [f.key as string]: e.target.value }))}
                       />
                     ) : (
                       <input
-                        style={S.input}
+                        className={C.input}
                         value={form[f.key as string] ?? ''}
                         onChange={(e) => setForm((prev) => ({ ...prev, [f.key as string]: e.target.value }))}
                       />
@@ -288,14 +325,14 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
                 ))}
               </div>
             ))}
-            <div style={S.card}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#334155' }}>
+            <div className={C.card}>
+              <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
                 공개 사용(활성). 해제 시 공개 화면에서 법정정보가 표시되지 않습니다.
               </label>
-              <p style={S.help}>값이 입력되지 않은 항목은 공개 푸터에서 표시되지 않습니다. (빈 값으로 저장 가능)</p>
-              <div style={{ marginTop: 12 }}>
-                <button style={{ ...S.btnPrimary, opacity: saving ? 0.6 : 1 }} disabled={saving} onClick={handleSaveProfile}>
+              <p className={C.help}>값이 입력되지 않은 항목은 공개 푸터에서 표시되지 않습니다. (빈 값으로 저장 가능)</p>
+              <div className="mt-3">
+                <button className={C.btnPrimary} disabled={saving} onClick={handleSaveProfile}>
                   {saving ? '저장 중…' : '법정정보 저장'}
                 </button>
               </div>
@@ -307,18 +344,18 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
       {/* ── 정책 문서 탭 ── */}
       {tab === 'policies' && (
         <>
-          <div style={{ marginBottom: 12 }}>
-            <button style={S.btnPrimary} onClick={openNewDoc}>새 문서</button>
+          <div className="mb-3">
+            <button className={C.btnPrimary} onClick={openNewDoc}>새 문서</button>
           </div>
-          <p style={S.help}>게시된 정책 문서만 공개 화면에서 조회됩니다. 정책 문서는 시행일과 버전을 함께 관리하는 것을 권장합니다.</p>
+          <p className={C.help}>게시된 정책 문서만 공개 화면에서 조회됩니다. 정책 문서는 시행일과 버전을 함께 관리하는 것을 권장합니다.</p>
 
           {editing && (
-            <div style={S.card}>
-              <p style={S.groupTitle}>{editing === 'new' ? '새 정책 문서' : '정책 문서 수정'}</p>
-              <div style={S.field}>
-                <label style={S.label}>문서 유형</label>
+            <div className={C.card}>
+              <p className={C.groupTitle}>{editing === 'new' ? '새 정책 문서' : '정책 문서 수정'}</p>
+              <div className={C.field}>
+                <label className={C.label}>문서 유형</label>
                 <select
-                  style={S.input}
+                  className={C.input}
                   value={docForm.documentType}
                   disabled={editing !== 'new'}
                   onChange={(e) => setDocForm((p) => ({ ...p, documentType: e.target.value }))}
@@ -326,100 +363,70 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
                   {POLICY_DOCUMENT_TYPES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </div>
-              <div style={S.field}>
-                <label style={S.label}>제목</label>
-                <input style={S.input} value={docForm.title ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, title: e.target.value }))} />
+              <div className={C.field}>
+                <label className={C.label}>제목</label>
+                <input className={C.input} value={docForm.title ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, title: e.target.value }))} />
               </div>
-              <div style={S.field}>
-                <label style={S.label}>본문</label>
-                <textarea style={{ ...S.textarea, minHeight: 220 }} value={docForm.content ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, content: e.target.value }))} />
+              <div className={C.field}>
+                <label className={C.label}>본문</label>
+                <textarea className={`${C.textarea} min-h-[220px]`} value={docForm.content ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, content: e.target.value }))} />
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ ...S.field, flex: 1 }}>
-                  <label style={S.label}>버전</label>
-                  <input style={S.input} type="number" min={1} value={docForm.version ?? 1} onChange={(e) => setDocForm((p) => ({ ...p, version: Number(e.target.value) || 1 }))} />
+              <div className="flex gap-3">
+                <div className={`${C.field} flex-1`}>
+                  <label className={C.label}>버전</label>
+                  <input className={C.input} type="number" min={1} value={docForm.version ?? 1} onChange={(e) => setDocForm((p) => ({ ...p, version: Number(e.target.value) || 1 }))} />
                 </div>
-                <div style={{ ...S.field, flex: 1 }}>
-                  <label style={S.label}>시행일</label>
-                  <input style={S.input} type="date" value={docForm.effectiveDate ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, effectiveDate: e.target.value || null }))} />
+                <div className={`${C.field} flex-1`}>
+                  <label className={C.label}>시행일</label>
+                  <input className={C.input} type="date" value={docForm.effectiveDate ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, effectiveDate: e.target.value || null }))} />
                 </div>
               </div>
-              <div style={S.field}>
-                <label style={S.label}>변경 사유</label>
-                <input style={S.input} value={docForm.changeReason ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, changeReason: e.target.value }))} />
+              <div className={C.field}>
+                <label className={C.label}>변경 사유</label>
+                <input className={C.input} value={docForm.changeReason ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, changeReason: e.target.value }))} />
               </div>
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                <button style={{ ...S.btnPrimary, opacity: docSaving ? 0.6 : 1 }} disabled={docSaving} onClick={handleSaveDoc}>
+              <div className="flex gap-2 mt-2">
+                <button className={C.btnPrimary} disabled={docSaving} onClick={handleSaveDoc}>
                   {docSaving ? '저장 중…' : '초안 저장'}
                 </button>
-                <button style={S.btnGhost} onClick={() => setEditing(null)}>취소</button>
+                <button className={C.btnGhost} onClick={() => setEditing(null)}>취소</button>
               </div>
             </div>
           )}
 
-          <div style={S.card}>
-            {policiesLoading ? '불러오는 중…' : policies.length === 0 ? (
-              <p style={{ color: '#94a3b8', fontSize: 13, textAlign: 'center', padding: '24px 0' }}>등록된 정책 문서가 없습니다.</p>
-            ) : (
-              <table style={S.table}>
-                <thead>
-                  <tr>
-                    <th style={S.th}>유형</th><th style={S.th}>제목</th><th style={S.th}>버전</th>
-                    <th style={S.th}>상태</th><th style={S.th}>시행일</th><th style={S.th}>게시일</th><th style={S.th}>수정일</th><th style={S.th}>관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {policies.map((d) => (
-                    <tr key={d.id}>
-                      <td style={S.td}>{docTypeLabel(d.documentType)}</td>
-                      <td style={S.td}>{d.title}</td>
-                      <td style={S.td}>v{d.version}</td>
-                      <td style={S.td}>
-                        {d.status === 'published'
-                          ? <span style={S.badge('#047857', '#ecfdf5')}>published</span>
-                          : <span style={S.badge('#92400e', '#fef3c7')}>{d.status}</span>}
-                      </td>
-                      <td style={S.td}>{fmtDate(d.effectiveDate)}</td>
-                      <td style={S.td}>{fmtDate(d.publishedAt)}</td>
-                      <td style={S.td}>{fmtDate(d.updatedAt)}</td>
-                      <td style={S.td}>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <button style={S.btnGhost} onClick={() => openEditDoc(d)}>편집</button>
-                          {d.status === 'published'
-                            ? <button style={S.btnGhost} onClick={() => handlePublish(d, 'unpublish')}>게시해제</button>
-                            : <button style={S.btnGhost} onClick={() => handlePublish(d, 'publish')}>게시</button>}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          {/* WO-…-BATCH-V2: 정책 문서 목록 — 표준 DataTable + RowActionMenu.
+              읽기 위주 목록이며 일괄 작업이 정의되어 있지 않아 체크박스/ActionBar 는 두지 않는다. */}
+          <DataTable<ServicePolicyDocumentDto>
+            columns={policyColumns}
+            data={policies}
+            rowKey={(d) => d.id}
+            loading={policiesLoading}
+            emptyMessage="등록된 정책 문서가 없습니다."
+          />
         </>
       )}
 
       {/* ── 공개 상태 확인 탭 ── */}
       {tab === 'status' && (
-        <div style={S.card}>
-          <p style={S.groupTitle}>입력·게시 상태 (참고용 — 법적 준수 판정 아님)</p>
-          <div style={S.statusRow}>
+        <div className={C.card}>
+          <p className={C.groupTitle}>입력·게시 상태 (참고용 — 법적 준수 판정 아님)</p>
+          <div className={C.statusRow}>
             <span>법정정보 공개 활성</span>
             <span>{profile?.isActive !== false && profile ? '활성' : '비활성/미설정'}</span>
           </div>
-          <div style={S.statusRow}>
+          <div className={C.statusRow}>
             <span>법정정보 입력 항목 존재</span>
             <span>{profileHasAnyValue ? '입력 있음' : '확인 필요'}</span>
           </div>
-          <div style={S.statusRow}>
+          <div className={C.statusRow}>
             <span>이용약관(terms) 게시</span>
             <span>{publishedByType['terms'] ? `게시됨 (v${publishedByType['terms'].version})` : '확인 필요'}</span>
           </div>
-          <div style={S.statusRow}>
+          <div className={C.statusRow}>
             <span>개인정보처리방침(privacy) 게시</span>
             <span>{publishedByType['privacy'] ? `게시됨 (v${publishedByType['privacy'].version})` : '확인 필요'}</span>
           </div>
-          <p style={S.help}>
+          <p className={C.help}>
             "확인 필요"는 미입력/미게시를 의미합니다. 공개 푸터·정책 페이지 연동은 후속 작업에서 처리되며,
             본 화면은 입력·게시 상태만 표시합니다.
           </p>
