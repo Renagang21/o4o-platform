@@ -7,6 +7,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
 import { adminServiceApprovalApi, type ServiceApproval } from '../../lib/api';
 
 const statusLabels: Record<string, string> = {
@@ -79,6 +81,74 @@ export default function AdminServiceApprovalPage() {
     return matchStatus && matchSearch;
   });
 
+  // WO-O4O-CROSS-SERVICE-RAW-TABLE-STANDARDIZATION-BATCH-V2:
+  //   raw <table> → 표준 DataTable 컬럼 정의. 표시 내용은 기존과 동일하게 유지하고
+  //   행 액션(승인/거절/철회)만 RowActionMenu 로 이관한다(상태별 노출 분기 보존).
+  const columns: ListColumnDef<ServiceApproval>[] = [
+    {
+      key: 'productName',
+      header: '상품명',
+      minWidth: 180,
+      render: (_v, a) => (
+        <div>
+          <p className="font-medium text-slate-800">{a.productName}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{a.id.slice(0, 8)}...</p>
+        </div>
+      ),
+    },
+    { key: 'supplierName', header: '공급자', width: '140px', render: (_v, a) => a.supplierName },
+    { key: 'sellerOrg', header: '판매자', width: '140px', render: (_v, a) => a.sellerOrg || '-' },
+    { key: 'serviceId', header: '서비스', width: '120px', render: (_v, a) => a.serviceId || '-' },
+    {
+      key: 'status',
+      header: '상태',
+      width: '100px',
+      render: (_v, a) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[a.status] || 'bg-gray-100 text-gray-700'}`}>
+          {statusLabels[a.status] || a.status}
+        </span>
+      ),
+    },
+    {
+      key: 'requestedAt',
+      header: '신청일',
+      width: '110px',
+      render: (_v, a) => new Date(a.requestedAt).toLocaleDateString('ko-KR'),
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      width: '72px',
+      align: 'center',
+      system: true,
+      render: (_v, a) => {
+        const actions =
+          a.status === 'PENDING'
+            ? [
+                { key: 'approve', label: '승인', onClick: () => handleApprove(a.id) },
+                {
+                  key: 'reject',
+                  label: '거절',
+                  variant: 'danger' as const,
+                  onClick: () => setReasonModal({ id: a.id, name: a.productName, action: 'reject' }),
+                },
+              ]
+            : a.status === 'APPROVED'
+              ? [
+                  {
+                    key: 'revoke',
+                    label: '철회',
+                    variant: 'danger' as const,
+                    onClick: () => setReasonModal({ id: a.id, name: a.productName, action: 'revoke' }),
+                  },
+                ]
+              : [];
+        if (actions.length === 0) return <span className="text-slate-300">—</span>;
+        return <RowActionMenu actions={actions} disabled={actionLoading === a.id} />;
+      },
+    },
+  ];
+
   const countByStatus = (s: string) => approvals.filter((a) => a.status === s).length;
 
   return (
@@ -138,81 +208,15 @@ export default function AdminServiceApprovalPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
-            {approvals.length === 0 ? '등록된 서비스 승인 요청이 없습니다' : '검색 결과가 없습니다'}
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상품명</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">공급자</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">판매자</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">서비스</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">신청일</th>
-                <th className="text-center px-6 py-4 text-sm font-medium text-slate-500">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((a) => (
-                <tr key={a.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-800">{a.productName}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{a.id.slice(0, 8)}...</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{a.supplierName}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{a.sellerOrg || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{a.serviceId || '-'}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[a.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {statusLabels[a.status] || a.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(a.requestedAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 text-center space-x-2">
-                    {a.status === 'PENDING' && (
-                      <>
-                        <button
-                          onClick={() => handleApprove(a.id)}
-                          disabled={actionLoading === a.id}
-                          className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
-                        >
-                          {actionLoading === a.id ? '처리중...' : '승인'}
-                        </button>
-                        <button
-                          onClick={() => setReasonModal({ id: a.id, name: a.productName, action: 'reject' })}
-                          disabled={actionLoading === a.id}
-                          className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50"
-                        >
-                          거절
-                        </button>
-                      </>
-                    )}
-                    {a.status === 'APPROVED' && (
-                      <button
-                        onClick={() => setReasonModal({ id: a.id, name: a.productName, action: 'revoke' })}
-                        disabled={actionLoading === a.id}
-                        className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50"
-                      >
-                        {actionLoading === a.id ? '처리중...' : '철회'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* WO-…-BATCH-V2: raw <table> → 표준 DataTable. 로딩·빈 상태는 DataTable 이 처리한다
+          (기존 3중 분기 제거). 행 액션은 RowActionMenu 로 이관. */}
+      <DataTable<ServiceApproval>
+        columns={columns}
+        data={filtered}
+        rowKey={(a) => a.id}
+        loading={loading}
+        emptyMessage={approvals.length === 0 ? '등록된 서비스 승인 요청이 없습니다' : '검색 결과가 없습니다'}
+      />
 
       {reasonModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
