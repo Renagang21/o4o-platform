@@ -8,6 +8,7 @@
  * 정렬/렌더링/empty/loading은 BaseTable에 일임한다.
  */
 
+import { useState } from 'react';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import type { DataTableProps } from './types';
@@ -41,7 +42,28 @@ export function DataTable<T extends Record<string, any>>({
   sortBy,
   sortOrder,
   onSort,
+  // WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1
+  expandable,
+  expandedRowKeys,
+  onExpandedRowKeysChange,
+  renderExpandedRow,
+  isRowExpandable,
 }: DataTableProps<T>) {
+  // 확장 상태 — controlled(expandedRowKeys 제공) / uncontrolled(내부 state) 모두 지원.
+  // 선택(selectedKeys)과 **별도 집합**으로 관리한다.
+  const [internalExpanded, setInternalExpanded] = useState<Set<string>>(new Set());
+  const isControlledExpand = expandedRowKeys !== undefined;
+  const effectiveExpanded = isControlledExpand ? expandedRowKeys : internalExpanded;
+
+  const toggleExpanded = (key: string) => {
+    const next = new Set(effectiveExpanded);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    if (isControlledExpand) onExpandedRowKeysChange?.(next);
+    else setInternalExpanded(next);
+  };
+
+  const expandEnabled = !!expandable && !!renderExpandedRow;
   // Loading skeleton
   if (loading) {
     return (
@@ -108,10 +130,58 @@ export function DataTable<T extends Record<string, any>>({
     });
   }
 
+  // 확장 토글 컬럼 — 우측 끝에 자동 추가. 행 전체 클릭을 강제하지 않고 명시적 버튼을 제공한다.
+  if (expandEnabled) {
+    o4oColumns.push({
+      key: '_expand',
+      header: '',
+      system: true,
+      width: '44px',
+      align: 'center',
+      render: (_value, row, index) => {
+        if (isRowExpandable && !isRowExpandable(row)) return null;
+        const key = getRowKeyValue(row, rowKey, index);
+        const isOpen = effectiveExpanded.has(key);
+        return (
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            aria-label={isOpen ? '상세 접기' : '상세 펼치기'}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded(key);
+            }}
+            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300"
+          >
+            <span aria-hidden="true" className="inline-block text-xs leading-none">{isOpen ? '▲' : '▼'}</span>
+          </button>
+        );
+      },
+      onCellClick: () => {},
+    });
+  }
+
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
       <BaseTable
         columns={o4oColumns}
+        renderAfterRow={
+          expandEnabled
+            ? (row, index) => {
+                const key = getRowKeyValue(row, rowKey, index);
+                if (!effectiveExpanded.has(key)) return null;
+                if (isRowExpandable && !isRowExpandable(row)) return null;
+                return (
+                  <tr className="bg-slate-50">
+                    {/* colSpan 은 실제 표시 컬럼 수와 일치시킨다(_select/_expand 포함) */}
+                    <td colSpan={o4oColumns.length} className="px-4 py-3">
+                      {renderExpandedRow!(row)}
+                    </td>
+                  </tr>
+                );
+              }
+            : undefined
+        }
         data={data}
         rowKey={(row, index) => getRowKeyValue(row, rowKey, index)}
         headerClassName="bg-slate-50 border-b border-slate-200"

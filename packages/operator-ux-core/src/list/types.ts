@@ -98,6 +98,20 @@ export interface DataTableProps<T extends Record<string, any>> {
 
   // WO-O4O-DATATABLE-ONSORT-CONTROLLED-SORT-V1: 서버(controlled) 정렬 (additive, optional)
   /** true 면 컬럼 클릭이 onSort 로 위임되고 data 는 서버 정렬로 간주(클라이언트 재정렬 X). 미지정 시 기존 동작. */
+  // ── 행 확장 (WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1) ──
+  // additive: 아래 prop 을 하나도 주지 않으면 기존 렌더·동작이 100% 동일하다.
+  // 확장 상태는 selectedKeys(선택)와 **별도 키 집합**으로 관리한다 — 두 상태를 합치지 않는다.
+  /** 행 확장 활성화. renderExpandedRow 와 함께 사용한다 */
+  expandable?: boolean;
+  /** 펼쳐진 행 키 집합 (controlled). 미지정 시 DataTable 이 내부 상태로 관리(uncontrolled) */
+  expandedRowKeys?: Set<string>;
+  /** 확장 상태 변경 콜백 (controlled 사용 시 필수) */
+  onExpandedRowKeysChange?: (keys: Set<string>) => void;
+  /** 확장 영역 렌더러. 원본 행 바로 아래 별도 <tr> 로 렌더된다 */
+  renderExpandedRow?: (row: T) => ReactNode;
+  /** 행별 확장 가능 여부. false 면 토글 버튼을 숨긴다 (기본: 전부 확장 가능) */
+  isRowExpandable?: (row: T) => boolean;
+
   manualSort?: boolean;
   /** controlled 정렬 컬럼 key. */
   sortBy?: string;

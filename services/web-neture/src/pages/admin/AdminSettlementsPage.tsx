@@ -13,7 +13,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Calculator, Check, CreditCard, XCircle } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
+import { Calculator } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   adminSettlementApi,
@@ -140,6 +142,86 @@ export default function AdminSettlementsPage() {
     setDetail(d);
     setDetailLoading(false);
   }, [expandedId]);
+
+  // ── WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1 : 표준 DataTable 어댑터 ──
+  //   기존 expandedId(단일 확장 + 확장 시 상세 조회)를 새 Set 계약으로 이전한다.
+  //   단일 확장 의미를 유지하기 위해 Set 은 항상 0~1개만 담는다.
+  const expandedKeys = new Set(expandedId ? [expandedId] : []);
+  const handleExpandedChange = useCallback((keys: Set<string>) => {
+    const next = Array.from(keys).find((k) => k !== expandedId) ?? null;
+    // toggleExpand 가 상세 fetch/해제를 모두 담당한다(계약 불변).
+    void toggleExpand(next ?? expandedId ?? '');
+  }, [expandedId, toggleExpand]);
+
+  const renderSettlementDetail = useCallback(() => {
+    if (detailLoading) return <p style={styles.detailLoading}>주문 정보 불러오는 중...</p>;
+    if (!detail || detail.orders.length === 0) return <p style={styles.detailLoading}>주문 정보가 없습니다.</p>;
+    return (
+      <table style={styles.detailTable}>
+        <thead>
+          <tr>
+            <th style={styles.detailTh}>주문번호</th>
+            <th style={styles.detailTh}>주문자</th>
+            <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>매출</th>
+            <th style={styles.detailTh}>주문상태</th>
+            <th style={styles.detailTh}>주문일</th>
+          </tr>
+        </thead>
+        <tbody>
+          {detail.orders.map((o) => (
+            <tr key={o.order_id}>
+              <td style={styles.detailTd}>{o.order_number}</td>
+              <td style={styles.detailTd}>{o.orderer_name || '-'}</td>
+              <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{formatPrice(o.supplier_sales_amount)}원</td>
+              <td style={styles.detailTd}>{o.order_status}</td>
+              <td style={styles.detailTd}>{formatDate(o.order_date)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }, [detail, detailLoading]);
+
+  const columns: ListColumnDef<Settlement>[] = [
+    { key: 'supplier_name', header: '공급자', minWidth: 140, render: (_v, s) => s.supplier_name || s.supplier_id.slice(0, 8) },
+    { key: 'period', header: '정산 기간', width: '160px', render: (_v, s) => formatPeriod(s.period_start, s.period_end) },
+    { key: 'total_sales', header: '매출합계', width: '120px', align: 'right', render: (_v, s) => `${formatPrice(s.total_sales)}원` },
+    {
+      key: 'platform_fee', header: '수수료', width: '150px', align: 'right',
+      render: (_v, s) => <span style={{ color: '#dc2626' }}>-{formatPrice(s.platform_fee)}원 ({formatRate(s.platform_fee_rate)})</span>,
+    },
+    {
+      key: 'supplier_amount', header: '정산금액', width: '130px', align: 'right',
+      render: (_v, s) => <span style={{ fontWeight: 600 }}>{formatPrice(s.supplier_amount)}원</span>,
+    },
+    { key: 'order_count', header: '주문수', width: '80px', align: 'center', render: (_v, s) => s.order_count },
+    {
+      key: 'status', header: '상태', width: '100px', align: 'center',
+      render: (_v, s) => {
+        const st = getStatus(s.status);
+        return <span style={{ ...styles.badge, backgroundColor: st.bg, color: st.color }}>{st.label}</span>;
+      },
+    },
+    {
+      key: '_actions', header: '액션', width: '72px', align: 'center', system: true,
+      render: (_v, s) => {
+        const actions =
+          s.status === 'calculated'
+            ? [
+                { key: 'approve', label: '승인', onClick: () => handleApprove(s.id) },
+                { key: 'cancel', label: '취소', variant: 'danger' as const, onClick: () => handleCancel(s.id) },
+              ]
+            : s.status === 'approved'
+              ? [
+                  { key: 'pay', label: '지급', onClick: () => handlePay(s.id) },
+                  { key: 'cancel', label: '취소', variant: 'danger' as const, onClick: () => handleCancel(s.id) },
+                ]
+              : [];
+        if (actions.length === 0) return <span style={{ color: '#cbd5e1' }}>—</span>;
+        return <RowActionMenu actions={actions} disabled={actionLoading === s.id} />;
+      },
+    },
+  ];
 
   // ---- Calculate ----
 
@@ -284,141 +366,18 @@ export default function AdminSettlementsPage() {
         <p style={styles.emptyText}>정산 내역이 없습니다.</p>
       ) : (
         <div style={styles.tableWrapper}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>공급자</th>
-                <th style={styles.th}>정산 기간</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>매출합계</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>수수료</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>정산금액</th>
-                <th style={{ ...styles.th, textAlign: 'center' as const }}>주문수</th>
-                <th style={{ ...styles.th, textAlign: 'center' as const }}>상태</th>
-                <th style={{ ...styles.th, textAlign: 'center' as const }}>액션</th>
-                <th style={{ ...styles.th, width: '40px' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {settlements.map((s) => {
-                const st = getStatus(s.status);
-                const isExpanded = expandedId === s.id;
-                const isActioning = actionLoading === s.id;
-
-                return (
-                  <Fragment key={s.id}>
-                    <tr
-                      style={{ ...styles.row, cursor: 'pointer' }}
-                      onClick={() => toggleExpand(s.id)}
-                    >
-                      <td style={styles.td}>{s.supplier_name || s.supplier_id.slice(0, 8)}</td>
-                      <td style={styles.td}>{formatPeriod(s.period_start, s.period_end)}</td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const }}>{formatPrice(s.total_sales)}원</td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const, color: '#dc2626' }}>
-                        -{formatPrice(s.platform_fee)}원 ({formatRate(s.platform_fee_rate)})
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const, fontWeight: 600 }}>
-                        {formatPrice(s.supplier_amount)}원
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' as const }}>{s.order_count}</td>
-                      <td style={{ ...styles.td, textAlign: 'center' as const }}>
-                        <span style={{ ...styles.badge, backgroundColor: st.bg, color: st.color }}>
-                          {st.label}
-                        </span>
-                      </td>
-                      <td
-                        style={{ ...styles.td, textAlign: 'center' as const }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div style={styles.actionGroup}>
-                          {s.status === 'calculated' && (
-                            <>
-                              <button
-                                onClick={() => handleApprove(s.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.approveBtn }}
-                                title="승인"
-                              >
-                                <Check size={14} /> 승인
-                              </button>
-                              <button
-                                onClick={() => handleCancel(s.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.cancelBtn }}
-                                title="취소"
-                              >
-                                <XCircle size={14} /> 취소
-                              </button>
-                            </>
-                          )}
-                          {s.status === 'approved' && (
-                            <>
-                              <button
-                                onClick={() => handlePay(s.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.payBtn }}
-                                title="지급"
-                              >
-                                <CreditCard size={14} /> 지급
-                              </button>
-                              <button
-                                onClick={() => handleCancel(s.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.cancelBtn }}
-                                title="취소"
-                              >
-                                <XCircle size={14} /> 취소
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' as const }}>
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </td>
-                    </tr>
-
-                    {/* Expanded Detail */}
-                    {isExpanded && (
-                      <tr>
-                        <td colSpan={9} style={styles.detailCell}>
-                          {detailLoading ? (
-                            <p style={styles.detailLoading}>주문 정보 불러오는 중...</p>
-                          ) : detail && detail.orders.length > 0 ? (
-                            <table style={styles.detailTable}>
-                              <thead>
-                                <tr>
-                                  <th style={styles.detailTh}>주문번호</th>
-                                  <th style={styles.detailTh}>주문자</th>
-                                  <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>매출</th>
-                                  <th style={styles.detailTh}>주문상태</th>
-                                  <th style={styles.detailTh}>주문일</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {detail.orders.map((o) => (
-                                  <tr key={o.order_id}>
-                                    <td style={styles.detailTd}>{o.order_number}</td>
-                                    <td style={styles.detailTd}>{o.orderer_name || '-'}</td>
-                                    <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>
-                                      {formatPrice(o.supplier_sales_amount)}원
-                                    </td>
-                                    <td style={styles.detailTd}>{o.order_status}</td>
-                                    <td style={styles.detailTd}>{formatDate(o.order_date)}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          ) : (
-                            <p style={styles.detailLoading}>연결된 주문이 없습니다.</p>
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1: raw <table> → 표준 DataTable(행 확장).
+              기존 단일 확장 + 확장 시 상세 API 조회 계약(toggleExpand)을 그대로 보존한다. */}
+          <DataTable<Settlement>
+            columns={columns}
+            data={settlements}
+            rowKey={(s) => s.id}
+            expandable
+            expandedRowKeys={expandedKeys}
+            onExpandedRowKeysChange={handleExpandedChange}
+            renderExpandedRow={renderSettlementDetail}
+            emptyMessage="정산 내역이 없습니다"
+          />
         </div>
       )}
 
@@ -445,12 +404,6 @@ export default function AdminSettlementsPage() {
     </div>
   );
 }
-
-// ============================================================================
-// Fragment import (React 18)
-// ============================================================================
-
-import { Fragment } from 'react';
 
 // ============================================================================
 // Styles
