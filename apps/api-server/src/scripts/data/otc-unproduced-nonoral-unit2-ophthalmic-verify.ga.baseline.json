@@ -1,0 +1,61 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-PRODUCTION-V1",
+ "agent": "ga",
+ "unitId": "nonoral-unit-2-ophthalmic",
+ "stage": "baseline",
+ "readOnly": true,
+ "dbWrite": 0,
+ "inputs": {
+  "ssot": "otc-unproduced-nonoral-unit2-ophthalmic-approved-ssot-v1.json",
+  "ssotMd5": "35763faaed035a7ced4606b948957527",
+  "enConfig": "otc-unit2-oph-en-config-ga-all.json",
+  "enMd5": "b5e44bb715c8b2813fbe082387da508c",
+  "readinessWo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-READINESS-V1"
+ },
+ "expected": {
+  "targetMasters": 159,
+  "koAuthoredCanonical": 159,
+  "enCanonical": 159,
+  "easyDeprecated": 159,
+  "easyStillCanonical": 0,
+  "auditKo": 159,
+  "needsReviewLeft": 0,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0,
+  "holdWritten": 0,
+  "nonoralUnit1Intact": 443,
+  "oralUnitsIntact": 3699
+ },
+ "actual": {
+  "koAuthoredCanonical": 0,
+  "enCanonical": 0,
+  "easyDeprecated": 0,
+  "easyStillCanonical": 159,
+  "auditKo": 0,
+  "needsReviewLeft": 0,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0,
+  "holdWritten": 0,
+  "nonoralUnit1Intact": 443,
+  "oralUnitsIntact": 3699,
+  "targetMasters": 159
+ },
+ "checks": {
+  "targetMasters": true,
+  "koAuthoredCanonical": false,
+  "enCanonical": false,
+  "easyDeprecated": false,
+  "easyStillCanonical": false,
+  "auditKo": false,
+  "needsReviewLeft": true,
+  "canonicalDup": true,
+  "sourceRefLeak": true,
+  "enHangul": true,
+  "holdWritten": true,
+  "nonoralUnit1Intact": true,
+  "oralUnitsIntact": true
+ },
+ "allPass": false
+}

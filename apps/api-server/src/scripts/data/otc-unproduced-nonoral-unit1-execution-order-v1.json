@@ -132,15 +132,92 @@
       },
       {
         "unitId": "nonoral-unit-2",
-        "state": "UNBLOCKED",
+        "state": "GREEN",
         "precondition": "nonoral-unit-1 GREEN 충족",
         "routes": [
           "ophthalmic"
         ],
         "fingerprints": 34,
         "masters": 159,
-        "note": "착수 조건 해제. 본 WO 범위에서 점안 Unit 2 LIVE apply 는 수행하지 않는다. write-owner 지정·ophthalmic RouteProfile 반영은 별도 WO."
+        "writeOwner": "agent-ga",
+        "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-PRODUCTION-V1",
+        "readinessCommit": "92cce633e",
+        "applied": {
+          "ko": 636,
+          "en": 318,
+          "total": 954
+        },
+        "declared": {
+          "ko": 636,
+          "en": 318,
+          "total": 954
+        },
+        "inTxPostVerify": {
+          "ko": {
+            "koAuthoredCanonical": 159,
+            "easyDeprecated": 159,
+            "easyStillCanonical": 0,
+            "auditKo": 159,
+            "enCanonical": 0,
+            "needsReviewLeft": 0,
+            "canonicalDup": 0,
+            "sourceRefLeak": 0,
+            "enHangul": 0,
+            "writeActual": 636
+          },
+          "en": {
+            "koAuthoredCanonical": 159,
+            "easyDeprecated": 159,
+            "easyStillCanonical": 0,
+            "auditKo": 159,
+            "enCanonical": 159,
+            "needsReviewLeft": 0,
+            "canonicalDup": 0,
+            "sourceRefLeak": 0,
+            "enHangul": 0,
+            "writeActual": 318
+          }
+        },
+        "independentVerify": {
+          "allPass": true,
+          "checks": 15,
+          "state": "APPLIED",
+          "crossUnitInvariant": {
+            "nonoralUnit1Intact": 443,
+            "oralUnitsIntact": 3699,
+            "holdWritten": 0
+          }
+        },
+        "evidence": [
+          "otc-unproduced-nonoral-unit2-ophthalmic-apply-run.ko.json",
+          "otc-unproduced-nonoral-unit2-ophthalmic-apply-run.en.json",
+          "otc-unproduced-nonoral-unit2-ophthalmic-verify.ga.baseline.json",
+          "otc-unproduced-nonoral-unit2-ophthalmic-verify.ga.post.json",
+          "otc-unproduced-nonoral-unit2-ophthalmic-dryrun-manifest-v1.json"
+        ],
+        "note": "점안 Unit 2 LIVE 완결. write-owner=agent-ga 단독. KO → EN 순차 apply, 각 단계 단일 트랜잭션 + 커밋 전 사후검증."
       }
-    ]
+    ],
+    "trackStatus": {
+      "track": "nonoral",
+      "state": "COMPLETE",
+      "units": [
+        "nonoral-unit-1",
+        "nonoral-unit-2"
+      ],
+      "fingerprints": 104,
+      "masters": 602,
+      "writeApplied": {
+        "ko": 2408,
+        "en": 1204,
+        "total": 3612
+      },
+      "writeDeclared": {
+        "ko": 2408,
+        "en": 1204,
+        "total": 3612
+      },
+      "note": "비경구 READY 전량(104 fp / 602 master) 생산 완료. HOLD 55건은 본 트랙 범위 밖(별도 재분류 WO)."
+    }
   }
 }

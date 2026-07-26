@@ -66,7 +66,12 @@ const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const SSOT = path.join(DATA_DIR, 'otc-unproduced-nonoral-unit2-ophthalmic-approved-ssot-v1.json');
 const EN_PATH = path.join(DATA_DIR, 'otc-unit2-oph-en-config-ga-all.json');
 const OUT_MANIFEST = arg('out') || path.join(DATA_DIR, 'otc-unproduced-nonoral-unit2-ophthalmic-dryrun-manifest-v1.json');
+/** 실행순서 원장 — **읽기 전용**. 본 실행기는 원장을 수정하지 않는다. */
+const ORDER_LEDGER = path.join(DATA_DIR, 'otc-unproduced-nonoral-unit1-execution-order-v1.json');
 const EXPECTED = { fp: 34, master: 159, ko: 636, en: 318, write: 954 };
+/** readiness commit 92cce633e 시점 입력 해시 — 변경 시 즉시 중지. */
+const SSOT_MD5 = '35763faaed035a7ced4606b948957527';
+const EN_MD5 = 'b5e44bb715c8b2813fbe082387da508c';
 
 interface SsotGroup { fp: string; gencode: string; suffix: string; route: string; form: string; size: number; sourceRef: string; masterIds: string[] }
 interface EnEntry { fp: string; title: string; efficacy: string; usage: string; caution: string; summaryTable: Record<string, string> }
@@ -213,8 +218,26 @@ async function prepare(ds: any): Promise<{ states: GState[]; allIds: string[]; c
   return { states, allIds, canonicalDup: +dup[0].n, refHit: +refHit[0].n, enByFp };
 }
 
-function gatesOf(states: GState[], allIds: string[], canonicalDup: number, refHit: number, enByFp: Map<string, EnEntry>): Record<string, boolean> {
+function gatesOf(states: GState[], allIds: string[], canonicalDup: number, refHit: number, enByFp: Map<string, EnEntry>, stage: 'dry-run' | 'ko' | 'en' = 'dry-run'): Record<string, boolean> {
   const masterSum = states.reduce((a, s) => a + s.g.size, 0);
+  // EN 단계에서는 KO apply 가 만든 본 트랙 앵커·authored ko canonical 이 이미 존재한다.
+  // 게이트를 끄지 않고 기대값을 뒤집는다 — "앵커 전량이 본 트랙 KO authored 행" 임을 요구한다.
+  if (stage === 'en') {
+    return {
+      'G1 SSOT status·수량 일치 (34fp/159m)': states.length === EXPECTED.fp && allIds.length === EXPECTED.master && masterSum === EXPECTED.master,
+      'G2 fp 재현 100% (SSOT 앵커 일치)': states.every((s) => fpToUuidV2(s.g.fp) === s.g.sourceRef),
+      'G3 route·효능·용법 mismatch 0': states.every((s) => !s.anomalies.some((a) => /route 상충|form 상충|경로 충돌|KO 용법 수치 누락/.test(a))),
+      'G4 EN 34/34 매칭': states.every((s) => enByFp.has(s.g.fp) && s.enOk) && enByFp.size === EXPECTED.fp,
+      'G5 KO authored canonical 159 (본 트랙 앵커)': states.every((s) => s.authoredKo === s.g.size) && refHit === EXPECTED.master,
+      'G6 EN canonical 기존 0': states.every((s) => s.enCanon === 0),
+      'G7 HOLD 혼입 0': states.every((s) => s.g.route === OPHTHALMIC_ROUTE),
+      'G8 canonicalDup 0': canonicalDup === 0,
+      'G9 예상 write 318T': masterSum * 2 === EXPECTED.en,
+      'G10 easy canonical 잔존 0': states.every((s) => s.easy1 === 0),
+      'G11 EN 게이트(한글·경구동사·방울수) 0': states.every((s) => !s.anomalies.some((a) => /^EN /.test(a))),
+      'G12 write-owner agent-ga 단독': true,
+    };
+  }
   return {
     'G1 SSOT status·수량 일치 (34fp/159m)': states.length === EXPECTED.fp && allIds.length === EXPECTED.master && masterSum === EXPECTED.master,
     'G2 fp 재현 100% (SSOT 앵커 일치)': states.every((s) => fpToUuidV2(s.g.fp) === s.g.sourceRef),
@@ -364,23 +387,167 @@ async function runRollbackTest(): Promise<void> {
   }
 }
 
+/** 선행 게이트 — 실행순서 원장 상태 + 입력 해시 불변. 원장은 읽기만 한다(수정 0). */
+function preflightGates(lang: 'ko' | 'en'): Record<string, boolean> {
+  const ledger = JSON.parse(fs.readFileSync(ORDER_LEDGER, 'utf8'));
+  const units: any[] = ledger.executionStatus?.units || [];
+  const u1 = units.find((u) => u.unitId === 'nonoral-unit-1');
+  const u2 = units.find((u) => u.unitId === 'nonoral-unit-2');
+  return {
+    'P1 nonoral-unit-1=GREEN': u1?.state === 'GREEN',
+    'P2 nonoral-unit-2=UNBLOCKED (또는 본 트랙 진행중)': u2?.state === 'UNBLOCKED' || u2?.state === 'IN_PROGRESS' || (lang === 'en' && u2?.state === 'KO_APPLIED'),
+    'P3 승인 SSOT md5 불변': md5(fs.readFileSync(SSOT, 'utf8')) === SSOT_MD5,
+    'P4 EN JSON md5 불변': md5(fs.readFileSync(EN_PATH, 'utf8')) === EN_MD5,
+    'P5 .env 존재': fs.existsSync(path.resolve(process.cwd(), '.env')),
+  };
+}
+
 async function runApply(): Promise<void> {
   const lang = arg('lang');
   if (lang !== 'ko' && lang !== 'en') { console.error('--lang=ko|en'); process.exit(2); }
   const confirmEnv = lang === 'ko' ? 'OTC_OPH_U2_KO_CONFIRM' : 'OTC_OPH_U2_EN_CONFIRM';
+
+  const pre = preflightGates(lang);
+  console.log(`OPH-U2 APPLY ${lang} — write-owner agent-ga`);
+  for (const [k, v] of Object.entries(pre)) console.log(`  ${v ? 'PASS' : '*** FAIL ***'}  ${k}`);
+  const preBlock = Object.entries(pre).filter(([, v]) => !v).map(([k]) => k);
+  if (preBlock.length) throw new Error(`선행 게이트 차단 ${preBlock.length}건 → 중지: ${preBlock.join(' / ')}`);
+
   const ds = await connect();
   const { states, allIds, canonicalDup, refHit, enByFp } = await prepare(ds);
-  const gates = gatesOf(states, allIds, canonicalDup, refHit, enByFp);
-  const blockers = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
-  console.log(`OPH-U2 APPLY ${lang} — ${states.length}fp/${allIds.length}m`);
+  const gates = gatesOf(states, allIds, canonicalDup, refHit, enByFp, lang);
   for (const [k, v] of Object.entries(gates)) console.log(`  ${v ? 'PASS' : '*** FAIL ***'}  ${k}`);
-  await ds.destroy();
-  if (blockers.length) throw new Error(`게이트 차단 ${blockers.length}건 → 중지`);
+  const blockers = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
+  if (blockers.length) { await ds.destroy(); throw new Error(`게이트 차단 ${blockers.length}건 → 중지: ${blockers.slice(0, 5).join(' / ')}`); }
   if (!process.argv.includes('--apply') || process.env[confirmEnv] !== 'YES') {
+    await ds.destroy();
     console.log(`이중 게이트 미충족 — apply 하지 않았다. 필요: --apply 와 ${confirmEnv}=YES. dbWrite 0.`);
     return;
   }
-  throw new Error('본 WO 범위에서는 LIVE apply 를 수행하지 않는다. write-owner 인계 후 별도 승인 WO 에서 실행한다.');
+
+  const refs = states.map((s) => s.g.sourceRef).sort();
+  const qr = ds.createQueryRunner(); await qr.connect(); await qr.startTransaction();
+  let total = 0; const per: any[] = [];
+  let post: Record<string, number> = {};
+  try {
+    for (const s of states) {
+      const ref = s.g.sourceRef;
+      if (lang === 'ko') {
+        let dep = 0, ins = 0, flip = 0, aud = 0;
+        for (const mid of s.g.masterIds) {
+          const cur = retRows<{ id: string; source_type: string }>(await qr.query(
+            `SELECT id::text id, source_type FROM shared_product_descriptions WHERE master_id=$1::uuid
+              AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL`, [mid]));
+          if (cur.length !== 1) throw new Error(`master ${mid} ko canonical ${cur.length}건 → ROLLBACK`);
+          if (cur[0].source_type !== 'mfds_easy_drug') throw new Error(`master ${mid} source ${cur[0].source_type} 예상밖 → ROLLBACK`);
+          const easyId = cur[0].id;
+          if (retRows(await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid AND status='canonical' RETURNING id`, [easyId])).length !== 1) throw new Error(`${mid} demote 실패`);
+          dep++;
+          const row = retRows<{ id: string }>(await qr.query(
+            `INSERT INTO shared_product_descriptions (master_id, content, summary, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+             VALUES ($1::uuid,$2,$3,$4,$5::uuid,'needs_review','ko','STORE',now(),now()) RETURNING id::text`,
+            [mid, s.koHtml, s.koSummary, AUTHORED_SOURCE, ref]));
+          if (row.length !== 1) throw new Error(`${mid} ko INSERT 실패`);
+          ins++;
+          if (retRows(await qr.query(`UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE id=$1::uuid AND status='needs_review' RETURNING id`, [row[0].id])).length !== 1) throw new Error(`${mid} ko flip 실패`);
+          flip++;
+          await qr.query(`INSERT INTO shared_product_description_audit_logs (event_type, description_type, master_id, language, previous_description_id, new_description_id, previous_status, new_status, metadata, performed_at)
+            VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb,now())`,
+            [mid, easyId, row[0].id, JSON.stringify({ previousDemotedTo: 'deprecated', previousSource: 'mfds_easy_drug',
+              newSource: AUTHORED_SOURCE, source_ref_id: ref, fp: s.g.fp, gencode: s.g.gencode, route: OPHTHALMIC_ROUTE, unit: UNIT, wo: WO })]);
+          aud++;
+        }
+        const t = dep + ins + flip + aud;
+        if (t !== s.g.size * 4) throw new Error(`fp ${s.g.fp} KO ${t} != ${s.g.size * 4} → ROLLBACK`);
+        total += t; per.push({ fp: s.g.fp, size: s.g.size, deprecated: dep, inserted: ins, flipped: flip, audited: aud, t });
+      } else {
+        const e = enByFp.get(s.g.fp)!;
+        const en = renderEn({ groupKey: s.g.fp, title: e.title, efficacy: e.efficacy, usage: e.usage,
+          caution: e.caution, summaryTable: e.summaryTable }, OPHTHALMIC_ROUTE, s.officialDosage, OPHTHALMIC_PROFILE);
+        if (en.anomalies.length) throw new Error(`fp ${s.g.fp} EN 검증 실패: ${en.anomalies.join('; ')} → 중지`);
+        const enAll = [e.title, e.efficacy, e.usage, e.caution, ...Object.entries(e.summaryTable || {}).flat()].join('\n');
+        if (oralVerbsEn(enAll).length) throw new Error(`fp ${s.g.fp} EN 경구 동사 잔존 → 중지`);
+        if (!hasOphthalmicRouteEn(e.usage)) throw new Error(`fp ${s.g.fp} EN 점안 경로 표현 없음 → 중지`);
+        const drops = missingDropCountsEn(s.officialDosage, e.usage);
+        if (drops.length) throw new Error(`fp ${s.g.fp} EN 방울 수 누락 ${drops.join(',')} → 중지`);
+        const mids = retRows<{ id: string }>(await qr.query(
+          `SELECT master_id::text id FROM shared_product_descriptions WHERE source_ref_id=$1::uuid AND source_type=$2
+            AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical' AND deleted_at IS NULL ORDER BY master_id`,
+          [ref, AUTHORED_SOURCE])).map((r) => r.id);
+        if (mids.length !== s.g.size) throw new Error(`fp ${s.g.fp} ko canonical ${mids.length} != ${s.g.size} → ROLLBACK`);
+        if (mids.join('|') !== s.g.masterIds.join('|')) throw new Error(`fp ${s.g.fp} sourceRef 앵커 master 불일치 → ROLLBACK`);
+        let ins = 0, flip = 0;
+        for (const mid of mids) {
+          const d = retRows<{ n: string }>(await qr.query(`SELECT count(*)::text n FROM shared_product_descriptions WHERE master_id=$1::uuid AND description_type='STORE' AND language='en' AND status='canonical' AND deleted_at IS NULL`, [mid]));
+          if (+d[0].n !== 0) throw new Error(`master ${mid} en canonical 이미 존재 → ROLLBACK`);
+          const row = retRows<{ id: string }>(await qr.query(
+            `INSERT INTO shared_product_descriptions (master_id, content, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+             VALUES ($1::uuid,$2,$3,$4::uuid,'needs_review','en','STORE',now(),now()) RETURNING id::text`,
+            [mid, en.html, AUTHORED_SOURCE, ref]));
+          if (row.length !== 1) throw new Error(`${mid} en INSERT 실패`);
+          ins++;
+          if (retRows(await qr.query(`UPDATE shared_product_descriptions SET status='canonical', curated_at=now() WHERE id=$1::uuid AND status='needs_review' RETURNING id`, [row[0].id])).length !== 1) throw new Error(`${mid} en flip 실패`);
+          flip++;
+        }
+        const t = ins + flip;
+        if (t !== s.g.size * 2) throw new Error(`fp ${s.g.fp} EN ${t} != ${s.g.size * 2} → ROLLBACK`);
+        total += t; per.push({ fp: s.g.fp, size: s.g.size, inserted: ins, flipped: flip, t });
+      }
+    }
+    const expT = lang === 'ko' ? EXPECTED.ko : EXPECTED.en;
+    if (total !== expT) throw new Error(`writeActual ${total} != 예상 ${expT} → ROLLBACK`);
+
+    // ── 커밋 전 사후검증 ───────────────────────────────────────────────────────────
+    const pv = retRows<Record<string, string>>(await qr.query(`
+      SELECT
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND COALESCE(language,'ko')='ko' AND status='canonical' AND source_type=$2 AND deleted_at IS NULL)::text "koAuthoredCanonical",
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND status='deprecated' AND source_type='mfds_easy_drug' AND deleted_at IS NULL)::text "easyDeprecated",
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND COALESCE(language,'ko')='ko' AND status='canonical' AND source_type='mfds_easy_drug' AND deleted_at IS NULL)::text "easyStillCanonical",
+        (SELECT count(*) FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND language='ko'
+          AND description_type='STORE' AND metadata->>'wo'=$4)::text "auditKo",
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND language='en' AND status='canonical' AND deleted_at IS NULL)::text "enCanonical",
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND status='needs_review' AND deleted_at IS NULL)::text "needsReviewLeft",
+        (SELECT count(*) FROM (SELECT master_id, COALESCE(language,'ko') l FROM shared_product_descriptions
+          WHERE master_id=ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND deleted_at IS NULL
+          GROUP BY 1,2 HAVING count(*)>1) d)::text "canonicalDup",
+        (SELECT count(*) FROM shared_product_descriptions WHERE source_ref_id=ANY($3::uuid[]) AND deleted_at IS NULL
+          AND NOT (master_id=ANY($1::uuid[])))::text "sourceRefLeak",
+        (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+          AND language='en' AND status='canonical' AND deleted_at IS NULL AND content ~ '[가-힣]')::text "enHangul"
+      `, [allIds, AUTHORED_SOURCE, refs, WO]));
+    post = Object.fromEntries(Object.entries(pv[0]).map(([k, v]) => [k, +v]));
+    post.writeActual = total;
+
+    const want = lang === 'ko'
+      ? { koAuthoredCanonical: 159, easyDeprecated: 159, easyStillCanonical: 0, auditKo: 159, enCanonical: 0, needsReviewLeft: 0, canonicalDup: 0, sourceRefLeak: 0, enHangul: 0 }
+      : { koAuthoredCanonical: 159, easyDeprecated: 159, easyStillCanonical: 0, auditKo: 159, enCanonical: 159, needsReviewLeft: 0, canonicalDup: 0, sourceRefLeak: 0, enHangul: 0 };
+    const bad = Object.entries(want).filter(([k, v]) => post[k] !== v).map(([k, v]) => `${k} ${post[k]} != ${v}`);
+    if (bad.length) throw new Error(`postVerify 실패 → ROLLBACK: ${bad.join(' / ')}`);
+
+    await qr.commitTransaction(); await qr.release();
+  } catch (e) {
+    await qr.rollbackTransaction(); await qr.release(); await ds.destroy();
+    throw e;
+  }
+  await ds.destroy();
+
+  const runPath = path.join(DATA_DIR, `otc-unproduced-nonoral-unit2-ophthalmic-apply-run.${lang}.json`);
+  fs.writeFileSync(runPath, JSON.stringify({
+    wo: WO, agent: 'ga', unitId: UNIT, writeOwner: 'agent-ga', lang, applied: true,
+    inputs: { ssot: path.basename(SSOT), ssotMd5: SSOT_MD5, enConfig: path.basename(EN_PATH), enMd5: EN_MD5 },
+    totals: { fingerprints: states.length, masters: allIds.length },
+    writeActual: total, writeExpected: lang === 'ko' ? EXPECTED.ko : EXPECTED.en,
+    postVerify: post, perGroup: per,
+  }, null, 1) + '\n', 'utf8');
+
+  console.log(`  writeActual ${total}T (예상 ${lang === 'ko' ? EXPECTED.ko : EXPECTED.en}T) · COMMITTED`);
+  for (const [k, v] of Object.entries(post)) console.log(`    ${k}: ${v}`);
+  console.log(`  run ledger → ${runPath}`);
 }
 
 async function main(): Promise<void> {

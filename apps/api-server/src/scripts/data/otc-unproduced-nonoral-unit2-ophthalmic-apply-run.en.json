@@ -1,0 +1,272 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-READINESS-V1",
+ "agent": "ga",
+ "unitId": "nonoral-unit-2-ophthalmic",
+ "writeOwner": "agent-ga",
+ "lang": "en",
+ "applied": true,
+ "inputs": {
+  "ssot": "otc-unproduced-nonoral-unit2-ophthalmic-approved-ssot-v1.json",
+  "ssotMd5": "35763faaed035a7ced4606b948957527",
+  "enConfig": "otc-unit2-oph-en-config-ga-all.json",
+  "enMd5": "b5e44bb715c8b2813fbe082387da508c"
+ },
+ "totals": {
+  "fingerprints": 34,
+  "masters": 159
+ },
+ "writeActual": 318,
+ "writeExpected": 318,
+ "postVerify": {
+  "koAuthoredCanonical": 159,
+  "easyDeprecated": 159,
+  "easyStillCanonical": 0,
+  "auditKo": 159,
+  "enCanonical": 159,
+  "needsReviewLeft": 0,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0,
+  "writeActual": 318
+ },
+ "perGroup": [
+  {
+   "fp": "08491da02a0cbf9d",
+   "size": 17,
+   "inserted": 17,
+   "flipped": 17,
+   "t": 34
+  },
+  {
+   "fp": "2175a2ba89dbc58b",
+   "size": 16,
+   "inserted": 16,
+   "flipped": 16,
+   "t": 32
+  },
+  {
+   "fp": "b7c4fa0644d3fdb8",
+   "size": 14,
+   "inserted": 14,
+   "flipped": 14,
+   "t": 28
+  },
+  {
+   "fp": "9369c1cd55af76aa",
+   "size": 11,
+   "inserted": 11,
+   "flipped": 11,
+   "t": 22
+  },
+  {
+   "fp": "7784aa8b824c2922",
+   "size": 10,
+   "inserted": 10,
+   "flipped": 10,
+   "t": 20
+  },
+  {
+   "fp": "cc60dcc7e8260ed2",
+   "size": 10,
+   "inserted": 10,
+   "flipped": 10,
+   "t": 20
+  },
+  {
+   "fp": "e0b9e2eda3331ee2",
+   "size": 6,
+   "inserted": 6,
+   "flipped": 6,
+   "t": 12
+  },
+  {
+   "fp": "1b28025164e0c018",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "50481409fd62a8ef",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "5a33b4740c014afb",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "817fea6770e59681",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "9bb78678769324c6",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "c4bb1ceb3f1b6c2d",
+   "size": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "t": 8
+  },
+  {
+   "fp": "1d359c0e601dfab3",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "2e6ffe5c7a5ffab2",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "41cfffa3e295487d",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "6d20ddaaab4a48bc",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "8b1243dff30c5403",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "ab75aaddc2c342d4",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "ab93ddec03654396",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "cd5d89fb606475a4",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "de8126ee3cb6f44a",
+   "size": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "t": 6
+  },
+  {
+   "fp": "0125eb92854260b9",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "1789c703501b815f",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "19a7284435ecef46",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "1d615a120032fffd",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "1e051e72ebf96820",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "3fdf54c6e83b480d",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "4230f2287ea13056",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "45763152d2494e37",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "68d8f8f86b2d3946",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "70fa837b79a1228d",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "baadc597c61d6771",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  },
+  {
+   "fp": "d69affe1a4871731",
+   "size": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "t": 4
+  }
+ ]
+}
