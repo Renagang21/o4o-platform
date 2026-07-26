@@ -9,9 +9,18 @@
  * 조건이 없으면 "조건 없음"으로 표시한다.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, ShoppingCart, AlertCircle, Loader2 } from 'lucide-react';
 import { supplierProfileApi, type SupplierOrderCondition } from '../../lib/api';
+import { SUPPLIER_ORDER_CONDITION_NOT_FOUND } from '../../lib/api/supplier';
+
+/**
+ * WO-O4O-NETURE-SUPPLIER-ORDER-CONDITION-LOAD-ERROR-CONTRACT-V1
+ *   not-found  404 — 공급자 부재 또는 비활성. 재시도해도 결과가 같다.
+ *   error      401·500·네트워크·깨진 payload. 재시도 대상이다.
+ * "조건 없음" 은 success 상태에서 필드가 비었을 때만 표시한다 — 오류로 위장하지 않는다.
+ */
+type ConditionLoadState = 'idle' | 'loading' | 'error' | 'not-found' | 'success';
 
 interface Props {
   supplierId: string | null;
@@ -26,24 +35,31 @@ function formatKRW(value: number | null | undefined): string {
 }
 
 export default function SupplierConditionModal({ supplierId, fallbackName, open, onClose }: Props) {
-  const [loading, setLoading] = useState(false);
   const [data, setData] = useState<SupplierOrderCondition | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<ConditionLoadState>('idle');
+
+  // .then() 전용 흐름은 API 가 throw 하는 순간 unhandled rejection 이 된다 — try/catch 로 감싼다.
+  const loadCondition = useCallback(async () => {
+    if (!supplierId) return;
+    setLoadState('loading');
+    setData(null);
+    try {
+      const result = await supplierProfileApi.getOrderCondition(supplierId);
+      setData(result);
+      setLoadState('success');
+    } catch (e) {
+      setLoadState(
+        (e as Error)?.message === SUPPLIER_ORDER_CONDITION_NOT_FOUND ? 'not-found' : 'error',
+      );
+    }
+  }, [supplierId]);
 
   useEffect(() => {
     if (!open || !supplierId) return;
-    setLoading(true);
-    setError(null);
-    setData(null);
-    supplierProfileApi.getOrderCondition(supplierId).then((result) => {
-      if (result) {
-        setData(result);
-      } else {
-        setError('주문 조건을 불러오지 못했습니다.');
-      }
-      setLoading(false);
-    });
-  }, [open, supplierId]);
+    loadCondition();
+  }, [open, supplierId, loadCondition]);
+
+  const loading = loadState === 'loading';
 
   if (!open) return null;
 
@@ -88,14 +104,29 @@ export default function SupplierConditionModal({ supplierId, fallbackName, open,
             </div>
           )}
 
-          {error && !loading && (
-            <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg p-4 text-sm text-red-700">
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
+          {loadState === 'error' && (
+            <div className="bg-red-50 border border-red-100 rounded-lg p-4 text-sm text-red-700">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>주문 조건을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</span>
+              </div>
+              <button
+                onClick={loadCondition}
+                className="mt-3 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 text-sm hover:bg-slate-50 transition-colors"
+              >
+                다시 시도
+              </button>
             </div>
           )}
 
-          {!loading && !error && data && (
+          {loadState === 'not-found' && (
+            <div className="flex items-start gap-2 bg-slate-50 border border-slate-200 rounded-lg p-4 text-sm text-slate-600">
+              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span>공급자 정보를 확인할 수 없습니다.</span>
+            </div>
+          )}
+
+          {loadState === 'success' && data && (
             <div className="space-y-4">
               {/* 최소 주문 금액 */}
               <Row

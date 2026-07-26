@@ -71,6 +71,10 @@ export const SUPPLIER_SPOT_POLICIES_FORBIDDEN = 'SUPPLIER_SPOT_POLICIES_FORBIDDE
 export const SUPPLIER_SHIPMENT_LOAD_FAILED = 'SUPPLIER_SHIPMENT_LOAD_FAILED';
 export const SUPPLIER_SHIPMENT_ORDER_NOT_FOUND = 'SUPPLIER_SHIPMENT_ORDER_NOT_FOUND';
 
+/** WO-O4O-NETURE-SUPPLIER-ORDER-CONDITION-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_ORDER_CONDITION_LOAD_FAILED = 'SUPPLIER_ORDER_CONDITION_LOAD_FAILED';
+export const SUPPLIER_ORDER_CONDITION_NOT_FOUND = 'SUPPLIER_ORDER_CONDITION_NOT_FOUND';
+
 /** 자료 목록 + 총 건수. total 로 조회 범위(limit) 밖 존재 여부를 판단한다. */
 export interface SupplierLibraryItemsResult {
   items: SupplierLibraryItem[];
@@ -1387,14 +1391,33 @@ export const supplierProfileApi = {
   },
 
   // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1
-  async getOrderCondition(supplierId: string): Promise<SupplierOrderCondition | null> {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-ORDER-CONDITION-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인 — supplier.service.ts:528 / neture.routes.ts:246):
+   *   ACTIVE 공급자면 **항상 200 + 객체** 를 반환한다.
+   *   "조건 미설정" 은 별도 null 상태가 아니라 객체 내부 필드가 null 인 것이다.
+   *   404 SUPPLIER_NOT_FOUND 는 공급자 부재 또는 비-ACTIVE = 오류 상태다.
+   *   401 만 존재하고 403 경로는 없다.
+   * 따라서 정상 null 반환 경로가 없으므로 반환 타입에서 null 을 제거하고 실패는 throw 한다.
+   */
+  async getOrderCondition(supplierId: string): Promise<SupplierOrderCondition> {
+    let response;
     try {
-      const response = await api.get(`/neture/suppliers/${encodeURIComponent(supplierId)}/order-condition`);
-      return response.data?.data ?? null;
+      response = await api.get(`/neture/suppliers/${encodeURIComponent(supplierId)}/order-condition`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch order condition:', error);
-      return null;
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      console.warn('[Supplier API] Failed to fetch order condition:', extractApiError(error));
+      throw new Error(
+        status === 404 ? SUPPLIER_ORDER_CONDITION_NOT_FOUND : SUPPLIER_ORDER_CONDITION_LOAD_FAILED,
+      );
     }
+    const data = response.data?.data;
+    if (response.data?.success !== true || !data || typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Supplier API] Unexpected order condition payload shape');
+      throw new Error(SUPPLIER_ORDER_CONDITION_LOAD_FAILED);
+    }
+    return data as SupplierOrderCondition;
   },
 };
 
