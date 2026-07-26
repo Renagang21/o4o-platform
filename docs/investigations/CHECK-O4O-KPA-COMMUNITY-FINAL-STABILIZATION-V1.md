@@ -65,7 +65,21 @@ c.created_at    → c."createdAt" AS created_at   (응답 키는 기존 유지)
 Home 강의 탭 링크 5개(전부 canonical `/lms/course/{id}`) · **클릭 시 강의 상세 정상 진입**.
 → **C2(강의 링크)가 이제 실데이터로 완전 검증됐다.**
 
-### 3-2. ⏸️ **보고만** — Home 최신글 '사이니지' 탭이 비어 있다 (정책 판단 필요)
+### 3-2. ✅ **해소 (2026-07-26 결정 후 수정)** — Home 최신글 '사이니지' 탭이 비어 있었다
+
+> **사용자 결정:** Home 도 HUB 공유 계약과 동일하게 `hq · supplier · community` 로 정렬한다.
+> `store` 는 개별 매장 전용이라 계속 제외. **새 정책이 아니라 Home 만 오래된 출처 구성을 쓰던 불일치 수정.**
+>
+> **수정:** [kpa.routes.ts](../../apps/api-server/src/routes/kpa/kpa.routes.ts) `sources: ['hq','store']` → `['hq','supplier','community']` (커밋 `4a763d857`)
+>
+> **검증(배포 후):**
+> - `/home/latest?type=signage` **0건 → 5건**, 전부 canonical `/signage/media/{id}` 링크
+> - `/home/signage` media **0 → 5**, playlists **0 → 1**
+> - `type=all` 타입 분포에 `signage: 5` 포함
+> - 브라우저: 사이니지 탭 개별 상세 링크 5개, 클릭 시 미디어 상세 정상 렌더(제목·재생시간·"내 매장에 추가"), 허브 고정 링크 0
+> - → **선행 WO 의 C3(사이니지 개별 상세 연결)가 이제 실데이터로 완전 검증됐다**
+>
+> 아래는 결정 이전의 원 조사 기록이다.
 
 **사실:** KPA 사이니지 미디어 5건이 **전부 `source='community'`** 인데,
 Home 이 쓰는 `SignageQueryService` 의 KPA config 는 `sources: ['hq','store']` 라 전부 제외된다.
@@ -155,6 +169,15 @@ Home 이 쓰는 `SignageQueryService` 의 KPA config 는 `sources: ['hq','store'
 ---
 
 ## 9. KPA 커뮤니티 정비 종료 판단
+
+> **2026-07-26 최종:** §3-2 정책 판단이 결정·수정·검증되어 **미결 항목 0**. 아래 판단이 그대로 확정된다.
+>
+> 후속 `WO-...-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1` 에서 접근·복사 통제(비공개 콘텐츠
+> 조회/복사 차단 · 사이니지·CMS 서비스 격리 · assetType 정리 · Home 오류 구분)까지 완료됐다.
+>
+> **남은 기술 부채(KPA 범위 밖):** GlycoPharm·K-Cosmetics·Neture 가 KPA 전용 `KpaAssetResolver` 를
+> 공유 mount 하고 있어, 각 서비스 정비 시 `serviceKey` 주입형 공용 resolver 또는 서비스별 resolver 분리가
+> 필요하다. 기존 구조 문제이며 본 정비에서 확장하지 않았다.
 
 **종료 가능하다고 판단한다.**
 
