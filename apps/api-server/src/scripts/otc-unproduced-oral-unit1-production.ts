@@ -192,6 +192,13 @@ async function prepare(ds: any, stage: 'ko' | 'en'): Promise<{ states: GState[];
   const refs = groups.map((g) => fpToUuidV2(g.fp));
   const refHit = retRows<{ n: string }>(await ds.query(`
     SELECT count(*)::text n FROM shared_product_descriptions WHERE source_ref_id=ANY($1::uuid[]) AND deleted_at IS NULL`, [refs]));
+  // EN 단계에서는 KO apply 가 만든 본 트랙 앵커가 이미 존재한다.
+  // 게이트를 끄지 않고, "앵커 전량이 본 트랙 KO authored 행" 임을 확인하는 쪽으로 기대값을 뒤집는다.
+  const refOwn = retRows<{ n: string }>(await ds.query(`
+    SELECT count(*)::text n FROM shared_product_descriptions
+    WHERE source_ref_id=ANY($1::uuid[]) AND deleted_at IS NULL
+      AND description_type='STORE' AND source_type=$2 AND COALESCE(language,'ko')='ko' AND status='canonical'
+      AND master_id=ANY($3::uuid[])`, [refs, AUTHORED_SOURCE, allIds]));
 
   const states: GState[] = groups.map((g) => {
     const anomalies: string[] = [];
@@ -233,7 +240,8 @@ async function prepare(ds: any, stage: 'ko' | 'en'): Promise<{ states: GState[];
       koHtml: ko.html, koSummary: ko.summary, officialDosage: rep.official.dosage, rep };
   });
 
-  return { states, allIds, canonicalDup: +dup[0].n, extra: { sourceRefPreexisting: +refHit[0].n } };
+  return { states, allIds, canonicalDup: +dup[0].n,
+    extra: { sourceRefPreexisting: +refHit[0].n, sourceRefOwnKo: +refOwn[0].n } };
 }
 
 function gatesOf(states: GState[], allIds: string[], canonicalDup: number, extra: any, stage: 'ko' | 'en'): Record<string, boolean> {
@@ -252,7 +260,9 @@ function gatesOf(states: GState[], allIds: string[], canonicalDup: number, extra
     'G5 10축 안전지문 mismatch 0': !states.some((x) => x.anomalies.some((a) => /안전지문 축/.test(a))),
     'G6 공식 효능·용법·주의 결손 0': !states.some((x) => x.anomalies.some((a) => /원문 결손|원문 부재/.test(a))),
     'G7 route=oral 전건 일치': !states.some((x) => x.anomalies.some((a) => /route!=oral/.test(a))),
-    'G8 기존 LIVE sourceRef 교집합 0': extra.sourceRefPreexisting === 0,
+    'G8 기존 LIVE sourceRef 교집합 0': stage === 'ko'
+      ? extra.sourceRefPreexisting === 0
+      : (extra.sourceRefPreexisting === EXPECTED.master && extra.sourceRefOwnKo === EXPECTED.master),
     'G9 authored canonical 상태 정합': stage === 'ko'
       ? states.every((x) => x.authoredKo === 0 && x.enCanon === 0)
       : states.every((x) => x.authoredKo === x.g.size && x.enCanon === 0),
@@ -265,27 +275,30 @@ function gatesOf(states: GState[], allIds: string[], canonicalDup: number, extra
   };
 }
 
-async function dryRun(): Promise<void> {
-  const outPath = arg('out') || path.join(DATA_DIR, 'otc-unproduced-oral-unit1-dryrun.json');
+async function dryRun(stage: 'ko' | 'en'): Promise<void> {
+  const outPath = arg('out') || path.join(DATA_DIR,
+    stage === 'ko' ? 'otc-unproduced-oral-unit1-dryrun.json' : 'otc-unproduced-oral-unit1-dryrun.en.json');
   const ds = await connect();
-  const { states, allIds, canonicalDup, extra } = await prepare(ds, 'ko');
+  const { states, allIds, canonicalDup, extra } = await prepare(ds, stage);
   await ds.destroy();
-  const gates = gatesOf(states, allIds, canonicalDup, extra, 'ko');
+  const gates = gatesOf(states, allIds, canonicalDup, extra, stage);
   const elig = states.filter((x) => x.anomalies.length === 0);
   const eligM = elig.reduce((t, x) => t + x.g.size, 0);
   const manifest = {
     wo: WO, unitId: UNIT, producer: 'otc-unproduced-oral-unit1-production.ts',
     ssot: 'otc-unproduced-oral-unit1-approved-ssot-v1.json', approvalCommit: '8328047ac',
-    writeOwner: 'agent-da (단일)', mode: 'dry-run', dbWrite: 0, apply: false,
+    writeOwner: 'agent-da (단일)', mode: 'dry-run', stage, dbWrite: 0, apply: false,
     declared: EXPECTED, processed: { fingerprints: states.length, masters: allIds.length },
     gates,
     metrics: { fpReproduced: states.reduce((t, x) => t + x.fpOk, 0), failed: states.reduce((t, x) => t + x.bad, 0),
       eligibleGroups: elig.length, eligibleMasters: eligM, canonicalDup,
-      sourceRefPreexisting: extra.sourceRefPreexisting,
+      sourceRefPreexisting: extra.sourceRefPreexisting, sourceRefOwnKo: extra.sourceRefOwnKo,
       existingAuthoredKo: states.reduce((t, x) => t + x.authoredKo, 0),
       existingEnCanonical: states.reduce((t, x) => t + x.enCanon, 0),
       groupsWithAnomalies: states.filter((x) => x.anomalies.length).length },
-    writePlan: { ko_4T: eligM * 4, en_2T: eligM * 2, total: eligM * 6 },
+    writePlan: stage === 'ko'
+      ? { stage, ko_4T: eligM * 4, en_2T: eligM * 2, total: eligM * 6 }
+      : { stage, en_2T: eligM * 2, total: eligM * 2 },
     groups: states.map((x) => ({ fp: x.g.fp, gencode: x.g.gencode, form: x.g.form, size: x.g.size,
       sourceRef: fpToUuidV2(x.g.fp), fpOk: x.fpOk, bad: x.bad, easyCanonical1: x.easy1,
       koHtmlMd5: md5(x.koHtml), koHtmlLen: x.koHtml.length, anomalies: x.anomalies })),
@@ -294,7 +307,9 @@ async function dryRun(): Promise<void> {
   fs.writeFileSync(outPath, JSON.stringify(manifest, null, 1) + '\n', 'utf8');
   console.log(`UNIT1 DRY-RUN — fp ${states.length}/${EXPECTED.fp} · master ${allIds.length}/${EXPECTED.master}`);
   for (const [k, v] of Object.entries(gates)) console.log(`  ${v ? 'PASS' : '*** FAIL ***'}  ${k}`);
-  console.log(`  적격 ${elig.length}fp/${eligM}m · writePlan KO ${eligM * 4} + EN ${eligM * 2} = ${eligM * 6} (예상 ${EXPECTED.write}) · dbWrite 0`);
+  console.log(stage === 'ko'
+    ? `  적격 ${elig.length}fp/${eligM}m · writePlan KO ${eligM * 4} + EN ${eligM * 2} = ${eligM * 6} (예상 ${EXPECTED.write}) · dbWrite 0`
+    : `  적격 ${elig.length}fp/${eligM}m · writePlan EN ${eligM * 2} (예상 ${EXPECTED.en}) · dbWrite 0`);
   console.log(`  manifest → ${outPath}`);
   if (Object.values(gates).some((v) => !v)) process.exitCode = 1;
 }
@@ -341,9 +356,9 @@ async function runApply(): Promise<void> {
   const ds = await connect();
   const { states, allIds, canonicalDup, extra } = await prepare(ds, lang);
   const gates = gatesOf(states, allIds, canonicalDup, extra, lang);
-  const blockers = Object.entries(gates).filter(([k, v]) => !v && !(lang === 'en' && k === 'G8 기존 LIVE sourceRef 교집합 0')).map(([k]) => k);
+  const blockers = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
   console.log(`UNIT1 APPLY ${lang} — ${states.length}fp/${allIds.length}m · write-owner agent-da`);
-  for (const [k, v] of Object.entries(gates)) console.log(`  ${v ? 'PASS' : (lang === 'en' && k.startsWith('G8') ? 'SKIP(KO 앵커 생성됨)' : '*** FAIL ***')}  ${k}`);
+  for (const [k, v] of Object.entries(gates)) console.log(`  ${v ? 'PASS' : '*** FAIL ***'}  ${k}`);
   if (blockers.length) { await ds.destroy(); throw new Error(`게이트 차단 ${blockers.length}건 → 중지: ${blockers.slice(0, 5).join(' / ')}`); }
   if (!process.argv.includes('--apply') || process.env[confirmEnv] !== 'YES') {
     await ds.destroy();
@@ -504,7 +519,11 @@ async function main(): Promise<void> {
   if (process.argv.includes('--verify')) { await verify(); return; }
   const mode = arg('mode') || 'dry-run';
   if (mode === 'apply') { await runApply(); return; }
-  if (mode === 'dry-run') { await dryRun(); return; }
+  if (mode === 'dry-run') {
+    const stage = arg('lang') || 'ko';
+    if (stage !== 'ko' && stage !== 'en') { console.error('--lang=ko|en'); process.exit(2); }
+    await dryRun(stage); return;
+  }
   console.error('--mode=dry-run|apply · --lang=ko|en · --rollback-test · --verify');
   process.exit(2);
 }
