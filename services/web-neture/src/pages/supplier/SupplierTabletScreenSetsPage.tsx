@@ -61,8 +61,11 @@ function targetLabel(t: SupplierHubTargetStoreType | null | undefined): string {
 }
 
 export default function SupplierTabletScreenSetsPage() {
-  const [sets, setSets] = useState<SupplierScreenSet[]>([]);
+  // WO-O4O-NETURE-SUPPLIER-TABLET-LIST-PERSISTENT-ERROR-STATE-V1:
+  //   null = 아직 못 불러옴(로딩/실패). 정상 0건([]) 과 타입 수준에서 구분한다.
+  const [sets, setSets] = useState<SupplierScreenSet[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   // builder=null → 리스트. builder.detail=null → 신규. builder.detail=존재 → 수정(hydrate).
@@ -74,13 +77,19 @@ export default function SupplierTabletScreenSetsPage() {
 
   const previewApi = useMemo(() => supplierPreviewApi, []);
 
+  // WO-O4O-NETURE-SUPPLIER-TABLET-LIST-PERSISTENT-ERROR-STATE-V1:
+  //   기존에는 실패를 토스트로만 알리고 setSets([]) 로 남겨, 토스트가 사라지면
+  //   "정상 0건" 과 구분되지 않았다. 지속 오류 상태로 분리한다.
+  //   토스트는 보조 알림으로 유지하되 서버 원문 대신 고정 문구를 쓴다.
   const reload = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       setSets(await fetchSupplierScreenSets());
-    } catch (e: any) {
-      setToast({ type: 'error', message: e?.message || '화면 세트를 불러오지 못했습니다.' });
-      setSets([]);
+    } catch {
+      setSets(null);
+      setLoadError(true);
+      setToast({ type: 'error', message: '태블렛 화면 목록을 불러오지 못했습니다.' });
     } finally {
       setLoading(false);
     }
@@ -235,7 +244,21 @@ export default function SupplierTabletScreenSetsPage() {
           <div className="flex items-center gap-2 text-sm text-slate-400 py-10 justify-center">
             <Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…
           </div>
-        ) : sets.length === 0 ? (
+        ) : loadError ? (
+          /* 지속 오류 상태 — 토스트가 사라져도 유지된다. 빈 상태 문구는 노출하지 않는다. */
+          <div className="text-center py-12 px-4">
+            <p className="text-sm text-slate-600 leading-relaxed">
+              태블렛 화면 목록을 불러오지 못했습니다.<br />잠시 후 다시 시도해 주세요.
+            </p>
+            <button
+              type="button"
+              onClick={reload}
+              className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : !sets || sets.length === 0 ? (
           <div className="text-center py-12 px-4">
             <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 태블렛 화면 세트를 제작해 주세요.</p>
           </div>
