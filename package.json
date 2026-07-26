@@ -184,6 +184,11 @@
     "pnpm": "9.15.0"
   },
   "pnpm": {
+    "//onlyBuiltDependencies": "pnpm v10 은 의존성 build script 를 기본 차단한다. 네이티브 바인딩이 실제로 필요한 것만 허용한다. Docker(apps/api-server/Dockerfile)는 package.production.json + npm install --ignore-scripts 를 쓰므로 이 설정의 영향을 받지 않는다. bcrypt 는 소스가 bcryptjs(순수 JS)만 사용하고, sharp/esbuild 는 optional platform 패키지로 동작하므로 제외한다.",
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "sqlite3"
+    ],
     "overrides": {
       "react": "19.2.0",
       "react-dom": "19.2.0",

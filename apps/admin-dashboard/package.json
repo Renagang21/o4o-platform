@@ -7,7 +7,7 @@
     "dev": "npx vite --port 3001",
     "prebuild": "node scripts/update-version.cjs",
     "build": "vite build",
-    "postbuild": "cp public/version.json dist/version.json 2>/dev/null || echo 'version.json already copied'",
+    "postbuild": "node -e \"const fs=require('fs');if(fs.existsSync('dist')&&fs.existsSync('public/version.json'))fs.copyFileSync('public/version.json','dist/version.json')\"",
     "build:prod": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build --mode production",
     "build:with-typecheck": "tsc --noEmit && vite build",
     "preview": "npx vite preview",
