@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-ORAL-UNIT1-FINAL-PRODUCTION-V1",
+ "unitId": "oral-unit-1",
+ "dbWrite": 0,
+ "metrics": {
+  "targetMasters": 1850,
+  "koAuthoredCanonical": 1850,
+  "enCanonical": 0,
+  "easyDeprecated": 1850,
+  "easyStillCanonical": 0,
+  "needsReviewLeft": 0,
+  "auditKo": 1850,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0
+ },
+ "checks": {
+  "대상 master 1,850": true,
+  "KO authored canonical 1,850": true,
+  "easy_drug deprecated 1,850": true,
+  "easy_drug canonical 잔존 0": true,
+  "audit 1,850": true,
+  "needs_review 0": true,
+  "canonicalDup 0": true,
+  "sourceRef leak 0": true,
+  "EN 한글 0": true,
+  "EN canonical 1,850": false
+ },
+ "allPass": false
+}
