@@ -192,9 +192,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   });
 
   // APP-SIGNAGE Phase 1: shared signage query service
+  // WO-O4O-KPA-COMMUNITY-FINAL-STABILIZATION-V1 (마감):
+  //   Home 만 오래된 출처 구성(['hq','store'])을 써서 HUB 공유 계약과 불일치했다.
+  //   그 결과 KPA 사이니지 5건이 전부 source='community' 인데 Home 최신글·미리보기에서
+  //   전건 제외돼 "등록된 글이 없습니다" 로만 보였다(데이터는 존재).
+  //   HUB canonical(HubContentQueryService.querySignageMedia · 공개 목록/상세 API)과 동일하게 정렬한다:
+  //     hq(본사) · supplier(공급자) · community(회원 공개)
+  //   store 는 개별 매장 전용 자산이라 Home·HUB 공유 대상에서 계속 제외한다
+  //   (매장 간 노출·재사용 방지 — resolveSignage 의 source 게이트와 동일 기준).
   const signageService = new SignageQueryService(dataSource, {
     serviceKey: 'kpa-society',
-    sources: ['hq', 'store'],
+    sources: ['hq', 'supplier', 'community'],
   });
 
   // APP-FORUM Phase 1: shared forum query service
