@@ -99,9 +99,13 @@ export default function SupplierProfilePage() {
   const [mailOrderReportFile, setMailOrderReportFile] = useState<File | null>(null);
   const [uploadingDocument, setUploadingDocument] = useState<'business_registration' | 'bank_statement' | 'mail_order_report' | null>(null);
   // 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1)
-  const [regulatedCategories, setRegulatedCategories] = useState<SupplierRegulatedCategory[]>([]);
+  // WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
+  //   null = 조회 실패/미수신. 정상 미선택([]) 과 구분한다.
+  const [regulatedCategories, setRegulatedCategories] = useState<SupplierRegulatedCategory[] | null>(null);
   const [categoryBusy, setCategoryBusy] = useState<RegulatedCategory | null>(null);
   const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [categoriesLoadError, setCategoriesLoadError] = useState(false);
+  const [onboardingLoadError, setOnboardingLoadError] = useState(false);
 
   // Section A: 사업자 기본정보
   const [representativeName, setRepresentativeName] = useState('');
@@ -158,12 +162,24 @@ export default function SupplierProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      const [data, onboardingData, categoriesData] = await Promise.all([
+      // WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
+      //   보조 조회 2종은 실패 시 throw 한다. 영역별로 분리해 한쪽 실패가
+      //   기본 프로필이나 다른 섹션을 가리지 않게 한다.
+      const [profileRes, onboardingRes, categoriesRes] = await Promise.allSettled([
         supplierProfileApi.getProfile(),
         supplierOnboardingApi.getOnboarding(),
         supplierRegulatedCategoryApi.list(),
       ]);
-      setRegulatedCategories(categoriesData);
+      const data = profileRes.status === 'fulfilled' ? profileRes.value : null;
+      const onboardingData = onboardingRes.status === 'fulfilled' ? onboardingRes.value : null;
+      setOnboardingLoadError(onboardingRes.status === 'rejected');
+      if (categoriesRes.status === 'fulfilled') {
+        setRegulatedCategories(categoriesRes.value);
+        setCategoriesLoadError(false);
+      } else {
+        setRegulatedCategories(null);
+        setCategoriesLoadError(true);
+      }
       if (data) {
         setProfile(data);
         // Section A
@@ -276,9 +292,12 @@ export default function SupplierProfilePage() {
     }
   };
 
+  // WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
+  //   온보딩 조회만 단독 재호출한다(전체 프로필·품목군 재호출 없음).
+  //   실패해도 기존 화면 값을 비우지 않고 오류 상태만 세운다.
   const refreshOnboarding = async () => {
-    const data = await supplierOnboardingApi.getOnboarding();
-    if (data) {
+    try {
+      const data = await supplierOnboardingApi.getOnboarding();
       setOnboarding(data);
       setTaxInvoiceEmail(data.taxInvoiceEmail || '');
       setSettlementBankName(data.settlementBankName || '');
@@ -288,6 +307,20 @@ export default function SupplierProfilePage() {
       setSettlementContactEmail(data.settlementContactEmail || '');
       setMailOrderSalesStatus(data.mailOrderSalesStatus || '');
       setMailOrderSalesRegistrationNumber(data.mailOrderSalesRegistrationNumber || '');
+      setOnboardingLoadError(false);
+    } catch {
+      setOnboardingLoadError(true);
+    }
+  };
+
+  /** 품목군 조회만 단독 재호출. */
+  const refreshCategories = async () => {
+    try {
+      setRegulatedCategories(await supplierRegulatedCategoryApi.list());
+      setCategoriesLoadError(false);
+    } catch {
+      setRegulatedCategories(null);
+      setCategoriesLoadError(true);
     }
   };
 
@@ -359,9 +392,7 @@ export default function SupplierProfilePage() {
   };
 
   // === 공급 예정 품목군 핸들러 ===
-  const refreshCategories = async () => {
-    setRegulatedCategories(await supplierRegulatedCategoryApi.list());
-  };
+  // refreshCategories 는 위 보조 조회 재시도와 동일 함수를 사용한다.
 
   const handleToggleCategory = async (category: RegulatedCategory, selected: boolean, removable: boolean) => {
     setCategoryError(null);
@@ -558,6 +589,22 @@ export default function SupplierProfilePage() {
           <li><span className="font-medium text-gray-700">판매 가능 전</span> — 사업자등록증(PDF)</li>
           <li><span className="font-medium text-gray-700">정산 전</span> — 정산은행/계좌/예금주, 통장 사본(PDF), 세금계산서 이메일</li>
         </ul>
+
+        {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
+            조회 실패를 "미입력" 으로 오인시키지 않는다. 입력값은 비우지 않고 안내만 덧붙인다. */}
+        {onboardingLoadError && (
+          <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+            <p className="text-sm text-amber-900">온보딩 정보를 불러오지 못했습니다.</p>
+            <p className="mt-0.5 text-xs text-amber-800">아래 값은 최신 상태가 아닐 수 있습니다.</p>
+            <button
+              type="button"
+              onClick={refreshOnboarding}
+              className="mt-2 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
 
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -799,9 +846,24 @@ export default function SupplierProfilePage() {
           실제 판매 노출 또는 주문 가능 전 운영자 확인이 필요할 수 있습니다. 우선 공급 예정 품목군만 선택해 주세요.
         </p>
 
+        {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
+            조회 실패 시 전부 미선택으로 보이지 않도록 선택 UI 자체를 오류 UI 로 대체한다.
+            (미선택 표시 → 보류 배지 은폐 → 중복 select 유발을 모두 차단) */}
+        {categoriesLoadError ? (
+          <div className="rounded-lg border border-gray-200 p-4">
+            <p className="text-sm text-gray-700">공급 예정 품목군을 불러오지 못했습니다.</p>
+            <button
+              type="button"
+              onClick={refreshCategories}
+              className="mt-3 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : (
         <div className="space-y-3">
           {REGULATED_CATEGORY_ORDER.map((category) => {
-            const row = regulatedCategories.find((c) => c.category === category);
+            const row = (regulatedCategories ?? []).find((c) => c.category === category);
             const selected = !!row;
             const removable = !row || ['not_requested', 'rejected', 'needs_update'].includes(row.status);
             const busy = categoryBusy === category;
@@ -878,6 +940,7 @@ export default function SupplierProfilePage() {
           })}
           {categoryError && <p className="text-sm text-red-500">{categoryError}</p>}
         </div>
+        )}
       </div>
 
       {/* Section B: 담당자 정보 */}

@@ -52,6 +52,10 @@ export const SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED = 'SUPPLIER_APPROVAL_COUNTS_LO
 /** WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1 */
 export const SUPPLIER_RECRUITMENTS_LOAD_FAILED = 'SUPPLIER_RECRUITMENTS_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_ONBOARDING_LOAD_FAILED = 'SUPPLIER_ONBOARDING_LOAD_FAILED';
+export const SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED = 'SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED';
+
 /** 상품 승인 탭 카운트 — 필드명은 backend 응답 그대로다(unrequested 등). */
 export interface SupplierApprovalCounts {
   total: number;
@@ -1296,14 +1300,29 @@ export const supplierProfileApi = {
 // ==================== Supplier Onboarding API ====================
 
 export const supplierOnboardingApi = {
-  async getOnboarding(): Promise<SupplierOnboarding | null> {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인): 정상이면 **항상 200 + data 객체** 를 반환한다.
+   *   `supplier-onboarding.service.ts:74` — supplier row 를 매핑해 반환하며
+   *   "온보딩 미시작" 이라는 별도 null 상태가 없다(필드가 비어 있을 뿐).
+   *   404 `SUPPLIER_NOT_FOUND` 는 공급자 row 부재 = 오류 상태다.
+   * 따라서 null 반환 경로를 없애고 실패는 고정 코드로 throw 한다.
+   */
+  async getOnboarding(): Promise<SupplierOnboarding> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/onboarding');
-      return response.data?.data ?? null;
+      response = await api.get('/neture/supplier/onboarding');
     } catch (error) {
-      console.warn('[Supplier Onboarding API] Failed to fetch onboarding:', error);
-      return null;
+      console.warn('[Supplier Onboarding API] Failed to fetch onboarding:', extractApiError(error));
+      throw new Error(SUPPLIER_ONBOARDING_LOAD_FAILED);
     }
+    const data = response.data?.data;
+    if (!data || typeof data !== 'object') {
+      console.warn('[Supplier Onboarding API] Unexpected onboarding payload shape');
+      throw new Error(SUPPLIER_ONBOARDING_LOAD_FAILED);
+    }
+    return data as SupplierOnboarding;
   },
 
   async updateOnboarding(data: {
@@ -1424,14 +1443,24 @@ export interface SupplierRegulatedCategory {
 }
 
 export const supplierRegulatedCategoryApi = {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1
+   * backend 계약(정적 확인): 정상 미선택은 200 + `[]` 다. 실패만 throw 한다.
+   */
   async list(): Promise<SupplierRegulatedCategory[]> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/regulated-categories');
-      return response.data?.data ?? [];
+      response = await api.get('/neture/supplier/regulated-categories');
     } catch (error) {
-      console.warn('[Supplier Regulated Category API] Failed to list:', error);
-      return [];
+      console.warn('[Supplier Regulated Category API] Failed to list:', extractApiError(error));
+      throw new Error(SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED);
     }
+    const rows = response.data?.data;
+    if (!Array.isArray(rows)) {
+      console.warn('[Supplier Regulated Category API] Unexpected categories payload shape');
+      throw new Error(SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED);
+    }
+    return rows as SupplierRegulatedCategory[];
   },
 
   async select(category: RegulatedCategory): Promise<{ success: boolean; error?: string; data?: SupplierRegulatedCategory }> {
