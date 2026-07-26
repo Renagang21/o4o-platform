@@ -79,11 +79,8 @@ export const menuPermissions: MenuPermission[] = [
 
   // Forum - No restriction (allow all)
 
-  // Yaksa Tools - Permission based
-  {
-    menuId: 'yaksa-tools',
-    roles: ['admin', 'super_admin', 'pharmacist'],
-  },
+  // WO-O4O-ADMIN-MENU-PERMISSIONS-ORPHAN-CONFIG-CLEANUP-V1:
+  //   'yaksa-tools' 항목 제거 — 동일하게 대응 메뉴가 admin-menu.static.tsx 에 0건인 고아 설정.
 
   // CMS - No restriction (allow all)
   // Posts, Pages, Media - All users can view
@@ -113,37 +110,14 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'general-settings'
     // No role restriction
   },
-  // WO-O4O-ADMIN-CANONICAL-SUPER-ADMIN-MENU-PERMISSION-FIX-V1:
-  //   아래 5개 메뉴(system-settings / integrations / tools / import-export / database)는
-  //   legacy 무접두 'super_admin' 에만 열려 있어, canonical 최고 관리자 역할
-  //   'platform:super_admin' 만 보유한 계정에서 메뉴가 숨겨졌다(기능 은폐).
-  //   hasMenuPermission 은 userRoles(=role_assignments 의 raw 문자열)와 정확 비교하므로
-  //   prefix/무접두가 자동 정규화되지 않는다 — core-users 와 동일하게 두 형식을 병기한다.
-  //   additive 변경: 기존 super_admin/admin/manager 동작은 그대로 유지(legacy 제거는 후속 WO).
-  {
-    menuId: 'system-settings',
-    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
-  },
-  {
-    menuId: 'integrations',
-    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
-  },
-
-  // Appearance - No restriction (allow all)
-
-  // Tools - 관리자만 접근 가능 (앱 장터, 파일 교체 등)
-  {
-    menuId: 'tools',
-    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
-  },
-  {
-    menuId: 'import-export',
-    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
-  },
-  {
-    menuId: 'database',
-    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
-  },
+  // WO-O4O-ADMIN-MENU-PERMISSIONS-ORPHAN-CONFIG-CLEANUP-V1:
+  //   system-settings / integrations / tools / import-export / database 5개 항목 제거.
+  //   해당 menuId 를 가진 메뉴 항목이 admin-menu.static.tsx 에 하나도 없고(각 0건),
+  //   동적 메뉴(/api/v1/navigation/admin)는 Phase R1 이후 빈 배열 stub 이라 정적 트리가
+  //   유일한 소스다. 즉 hasMenuPermission 이 이 id 들로 호출되는 경로가 존재하지 않았다.
+  //   (선행 WO-…-CANONICAL-SUPER-ADMIN-MENU-PERMISSION-FIX-V1 이 이 항목들에 canonical
+  //    역할을 additive 로 추가했으나, 항목 자체가 dead config 로 확정되어 제거로 대체된다.)
+  //   Appearance 는 원래 무제한(설정 없음)이라 별도 항목이 없다.
   {
     menuId: 'logs',
     permissions: ['admin.logs']
