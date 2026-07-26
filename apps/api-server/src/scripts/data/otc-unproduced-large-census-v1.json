@@ -1,0 +1,764 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-LARGE-CENSUS-V1",
+  "status": "PROPOSAL",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "population": {
+    "otcTotal": 57572,
+    "authoredCanonicalMasters": 10542,
+    "unproducedWithOfficialSource": 9244,
+    "note": "모집단 = OTC ∧ e약은요 STORE ko canonical 보유 ∧ authored STORE canonical 미보유"
+  },
+  "verdictCounts": {
+    "READY_SPLIT": 4356,
+    "HOLD_ROUTE": 3198,
+    "EXCLUDE": 1073,
+    "HOLD_PROFESSIONAL_USE": 275,
+    "HOLD_SAFETY_VARIANCE": 193,
+    "HOLD_SOURCE": 88,
+    "HOLD_MULTI_ROUTE": 61
+  },
+  "ready": {
+    "READY_LARGE": {
+      "fingerprints": 0,
+      "masters": 0
+    },
+    "READY_SPLIT": {
+      "fingerprints": 862,
+      "masters": 4356
+    },
+    "total": {
+      "fingerprints": 862,
+      "masters": 4356
+    },
+    "routeTotals": {
+      "oral": 3699,
+      "topical": 437,
+      "ophthalmic": 159,
+      "oromucosal": 40,
+      "vaginal": 21
+    },
+    "formTotals": {
+      "정": 1591,
+      "캡슐": 762,
+      "연질캡슐": 471,
+      "크림": 377,
+      "장용정": 321,
+      "내복액": 250,
+      "점안액": 151,
+      "시럽": 132,
+      "현탁액": 100,
+      "산": 51,
+      "플라스타": 32,
+      "트로키": 30,
+      "연고": 28,
+      "질정": 21,
+      "과립": 11,
+      "껌": 10,
+      "장용캡슐": 10,
+      "점안겔": 8
+    },
+    "suffixTotals": {
+      "ATB": 1591,
+      "ACH": 762,
+      "ACS": 471,
+      "CCM": 377,
+      "ATE": 321,
+      "ALQ": 250,
+      "COS": 151,
+      "ASY": 132,
+      "ASS": 100,
+      "APD": 51,
+      "CPL": 32,
+      "ATO": 30,
+      "COM": 28,
+      "CTB": 21,
+      "AGN": 11,
+      "ACE": 10,
+      "AMS": 10,
+      "COO": 8
+    },
+    "ingredientGroupTop": [
+      {
+        "ingredientStrengthCode": "101305",
+        "masters": 62
+      },
+      {
+        "ingredientStrengthCode": "101330",
+        "masters": 10
+      },
+      {
+        "ingredientStrengthCode": "101404",
+        "masters": 33
+      },
+      {
+        "ingredientStrengthCode": "101804",
+        "masters": 246
+      },
+      {
+        "ingredientStrengthCode": "101842",
+        "masters": 11
+      },
+      {
+        "ingredientStrengthCode": "102906",
+        "masters": 14
+      },
+      {
+        "ingredientStrengthCode": "102935",
+        "masters": 15
+      },
+      {
+        "ingredientStrengthCode": "104303",
+        "masters": 28
+      },
+      {
+        "ingredientStrengthCode": "105203",
+        "masters": 4
+      },
+      {
+        "ingredientStrengthCode": "106301",
+        "masters": 97
+      },
+      {
+        "ingredientStrengthCode": "106331",
+        "masters": 16
+      },
+      {
+        "ingredientStrengthCode": "111001",
+        "masters": 171
+      },
+      {
+        "ingredientStrengthCode": "113232",
+        "masters": 28
+      },
+      {
+        "ingredientStrengthCode": "121801",
+        "masters": 18
+      },
+      {
+        "ingredientStrengthCode": "124203",
+        "masters": 8
+      },
+      {
+        "ingredientStrengthCode": "124503",
+        "masters": 13
+      },
+      {
+        "ingredientStrengthCode": "130501",
+        "masters": 177
+      },
+      {
+        "ingredientStrengthCode": "130502",
+        "masters": 12
+      },
+      {
+        "ingredientStrengthCode": "136601",
+        "masters": 10
+      },
+      {
+        "ingredientStrengthCode": "137401",
+        "masters": 21
+      },
+      {
+        "ingredientStrengthCode": "139503",
+        "masters": 24
+      },
+      {
+        "ingredientStrengthCode": "142301",
+        "masters": 122
+      },
+      {
+        "ingredientStrengthCode": "142334",
+        "masters": 27
+      },
+      {
+        "ingredientStrengthCode": "148401",
+        "masters": 6
+      },
+      {
+        "ingredientStrengthCode": "149801",
+        "masters": 5
+      }
+    ]
+  },
+  "writePlan": {
+    "perMaster": {
+      "ko": 4,
+      "en": 2,
+      "total": 6
+    },
+    "koTotal": 17424,
+    "enTotal": 8712,
+    "total": 26136
+  },
+  "productionUnitProposal": {
+    "rule": "<500 → 1 단위 / 500~1,500 → 2 단위 / >1,500 → 3 단위",
+    "readyMasters": 4356,
+    "units": 3,
+    "note": "조사 단계이므로 가·나·다 shard 를 만들지 않는다. 단위는 승인 단계에서 확정한다.",
+    "breakdown": [
+      {
+        "unit": "unit-1",
+        "fingerprints": 286,
+        "masters": 1452,
+        "write": 8712
+      },
+      {
+        "unit": "unit-2",
+        "fingerprints": 288,
+        "masters": 1452,
+        "write": 8712
+      },
+      {
+        "unit": "unit-3",
+        "fingerprints": 288,
+        "masters": 1452,
+        "write": 8712
+      }
+    ]
+  },
+  "rankings": {
+    "byMasterCount": [
+      {
+        "fp": "389e637e80b64f6b",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 193
+      },
+      {
+        "fp": "6df398bc6ab90960",
+        "kind": "READY_SPLIT",
+        "gencode": "111001ATE",
+        "route": "oral",
+        "form": "장용정",
+        "masters": 117
+      },
+      {
+        "fp": "8b4d8eada8c923b0",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 116
+      },
+      {
+        "fp": "503e71b0d820d4cc",
+        "kind": "READY_SPLIT",
+        "gencode": "106301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 79
+      },
+      {
+        "fp": "0a73d615e9a36877",
+        "kind": "READY_SPLIT",
+        "gencode": "183807CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 68
+      },
+      {
+        "fp": "30fb50bdf22bde74",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 62
+      },
+      {
+        "fp": "d2de3d7cb5bb8785",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 59
+      },
+      {
+        "fp": "4780f3e9e6e8314a",
+        "kind": "READY_SPLIT",
+        "gencode": "A49300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 50
+      },
+      {
+        "fp": "713bd9cf71b4ce20",
+        "kind": "READY_SPLIT",
+        "gencode": "363700CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 46
+      },
+      {
+        "fp": "f9f9df4296748622",
+        "kind": "READY_SPLIT",
+        "gencode": "244301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 40
+      },
+      {
+        "fp": "06b9fee614bf742f",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 37
+      },
+      {
+        "fp": "5d41ce2a0afc7de1",
+        "kind": "READY_SPLIT",
+        "gencode": "B04300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 36
+      },
+      {
+        "fp": "6fbe72c0918dd889",
+        "kind": "READY_SPLIT",
+        "gencode": "172806ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 31
+      },
+      {
+        "fp": "0bdbf76c4dcc5270",
+        "kind": "READY_SPLIT",
+        "gencode": "157301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 30
+      },
+      {
+        "fp": "d4e44347e55400d4",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 28
+      },
+      {
+        "fp": "fa21f2bfeb608a91",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 26
+      },
+      {
+        "fp": "194702cf9c02f756",
+        "kind": "READY_SPLIT",
+        "gencode": "A49300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 24
+      },
+      {
+        "fp": "b3f60b8cf8e2d355",
+        "kind": "READY_SPLIT",
+        "gencode": "111001ATE",
+        "route": "oral",
+        "form": "장용정",
+        "masters": 22
+      },
+      {
+        "fp": "02b57bfc2046ed56",
+        "kind": "READY_SPLIT",
+        "gencode": "139503ACS",
+        "route": "oral",
+        "form": "연질캡슐",
+        "masters": 20
+      },
+      {
+        "fp": "80d0a0592af86c4f",
+        "kind": "READY_SPLIT",
+        "gencode": "D06200ACS",
+        "route": "oral",
+        "form": "연질캡슐",
+        "masters": 20
+      }
+    ],
+    "byRouteSingleForm": [
+      {
+        "fp": "389e637e80b64f6b",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 193
+      },
+      {
+        "fp": "6df398bc6ab90960",
+        "kind": "READY_SPLIT",
+        "gencode": "111001ATE",
+        "route": "oral",
+        "form": "장용정",
+        "masters": 117
+      },
+      {
+        "fp": "8b4d8eada8c923b0",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 116
+      },
+      {
+        "fp": "503e71b0d820d4cc",
+        "kind": "READY_SPLIT",
+        "gencode": "106301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 79
+      },
+      {
+        "fp": "0a73d615e9a36877",
+        "kind": "READY_SPLIT",
+        "gencode": "183807CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 68
+      },
+      {
+        "fp": "30fb50bdf22bde74",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 62
+      },
+      {
+        "fp": "d2de3d7cb5bb8785",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 59
+      },
+      {
+        "fp": "4780f3e9e6e8314a",
+        "kind": "READY_SPLIT",
+        "gencode": "A49300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 50
+      },
+      {
+        "fp": "713bd9cf71b4ce20",
+        "kind": "READY_SPLIT",
+        "gencode": "363700CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 46
+      },
+      {
+        "fp": "f9f9df4296748622",
+        "kind": "READY_SPLIT",
+        "gencode": "244301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 40
+      },
+      {
+        "fp": "06b9fee614bf742f",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 37
+      },
+      {
+        "fp": "5d41ce2a0afc7de1",
+        "kind": "READY_SPLIT",
+        "gencode": "B04300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 36
+      },
+      {
+        "fp": "6fbe72c0918dd889",
+        "kind": "READY_SPLIT",
+        "gencode": "172806ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 31
+      },
+      {
+        "fp": "0bdbf76c4dcc5270",
+        "kind": "READY_SPLIT",
+        "gencode": "157301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 30
+      },
+      {
+        "fp": "d4e44347e55400d4",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 28
+      },
+      {
+        "fp": "fa21f2bfeb608a91",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 26
+      },
+      {
+        "fp": "194702cf9c02f756",
+        "kind": "READY_SPLIT",
+        "gencode": "A49300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 24
+      },
+      {
+        "fp": "b3f60b8cf8e2d355",
+        "kind": "READY_SPLIT",
+        "gencode": "111001ATE",
+        "route": "oral",
+        "form": "장용정",
+        "masters": 22
+      },
+      {
+        "fp": "02b57bfc2046ed56",
+        "kind": "READY_SPLIT",
+        "gencode": "139503ACS",
+        "route": "oral",
+        "form": "연질캡슐",
+        "masters": 20
+      },
+      {
+        "fp": "80d0a0592af86c4f",
+        "kind": "READY_SPLIT",
+        "gencode": "D06200ACS",
+        "route": "oral",
+        "form": "연질캡슐",
+        "masters": 20
+      }
+    ],
+    "largestReadyLarge": [],
+    "largestReadySplit": [
+      {
+        "fp": "389e637e80b64f6b",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 193
+      },
+      {
+        "fp": "6df398bc6ab90960",
+        "kind": "READY_SPLIT",
+        "gencode": "111001ATE",
+        "route": "oral",
+        "form": "장용정",
+        "masters": 117
+      },
+      {
+        "fp": "8b4d8eada8c923b0",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 116
+      },
+      {
+        "fp": "503e71b0d820d4cc",
+        "kind": "READY_SPLIT",
+        "gencode": "106301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 79
+      },
+      {
+        "fp": "0a73d615e9a36877",
+        "kind": "READY_SPLIT",
+        "gencode": "183807CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 68
+      },
+      {
+        "fp": "30fb50bdf22bde74",
+        "kind": "READY_SPLIT",
+        "gencode": "101804ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 62
+      },
+      {
+        "fp": "d2de3d7cb5bb8785",
+        "kind": "READY_SPLIT",
+        "gencode": "153101ACH",
+        "route": "oral",
+        "form": "캡슐",
+        "masters": 59
+      },
+      {
+        "fp": "4780f3e9e6e8314a",
+        "kind": "READY_SPLIT",
+        "gencode": "A49300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 50
+      },
+      {
+        "fp": "713bd9cf71b4ce20",
+        "kind": "READY_SPLIT",
+        "gencode": "363700CCM",
+        "route": "topical",
+        "form": "크림",
+        "masters": 46
+      },
+      {
+        "fp": "f9f9df4296748622",
+        "kind": "READY_SPLIT",
+        "gencode": "244301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 40
+      },
+      {
+        "fp": "06b9fee614bf742f",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 37
+      },
+      {
+        "fp": "5d41ce2a0afc7de1",
+        "kind": "READY_SPLIT",
+        "gencode": "B04300ALQ",
+        "route": "oral",
+        "form": "내복액",
+        "masters": 36
+      },
+      {
+        "fp": "6fbe72c0918dd889",
+        "kind": "READY_SPLIT",
+        "gencode": "172806ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 31
+      },
+      {
+        "fp": "0bdbf76c4dcc5270",
+        "kind": "READY_SPLIT",
+        "gencode": "157301ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 30
+      },
+      {
+        "fp": "d4e44347e55400d4",
+        "kind": "READY_SPLIT",
+        "gencode": "130501ATB",
+        "route": "oral",
+        "form": "정",
+        "masters": 28
+      }
+    ]
+  },
+  "holdBreakdown": {
+    "HOLD_SOURCE": {
+      "missing(caution)": 61,
+      "missing(indication)": 17,
+      "missing(indication/dosage)": 7,
+      "missing(dosage)": 3
+    },
+    "HOLD_ROUTE": {
+      "general_name_code_absent": 2320,
+      "general_name_code_ambiguous(2)": 338,
+      "general_name_code_ambiguous(3)": 146,
+      "site_not_stated(CLQ)": 133,
+      "general_name_code_ambiguous(27)": 114,
+      "suffix_not_allowlisted(CSP)": 38,
+      "suffix_not_allowlisted(AXS)": 15,
+      "site_not_stated(CSI)": 13,
+      "general_name_code_ambiguous(4)": 12,
+      "suffix_not_allowlisted(CIS)": 12,
+      "suffix_not_allowlisted(CSS)": 11,
+      "suffix_not_allowlisted(ACM)": 8,
+      "suffix_not_allowlisted(CAE)": 8,
+      "suffix_not_allowlisted(API)": 7,
+      "suffix_not_allowlisted(ATT)": 7,
+      "suffix_not_allowlisted(CGL)": 6,
+      "suffix_not_allowlisted(CPD)": 6,
+      "suffix_not_allowlisted(ATC)": 2,
+      "suffix_not_allowlisted(CEM)": 2
+    },
+    "HOLD_MULTI_ROUTE": {
+      "code_route_vs_dosage_conflict(oral)": 22,
+      "indication_dosage_site_conflict(cutaneous/oromucosal)": 16,
+      "dosage_multi_site(cutaneous/oromucosal)": 10,
+      "dosage_multi_site(nasal/oromucosal)": 7,
+      "indication_dosage_site_conflict(cutaneous/rectal)": 6
+    },
+    "HOLD_PROFESSIONAL_USE": {
+      "SURGICAL_SITE": 166,
+      "SURGEON_HAND": 109
+    },
+    "HOLD_SAFETY_VARIANCE": {
+      "no_dosage_numeric_and_no_age_basis": 193
+    },
+    "EXCLUDE": {
+      "non_retail_keyword": 1073
+    },
+    "unmappedSuffix": {
+      "CSP": 38,
+      "AXS": 15,
+      "CIS": 12,
+      "CSS": 11,
+      "ACM": 8,
+      "CAE": 8,
+      "API": 7,
+      "ATT": 7,
+      "CGL": 6,
+      "CPD": 6,
+      "ATC": 2,
+      "CEM": 2
+    }
+  },
+  "gates": {
+    "G1_otcTotal": 57572,
+    "G1_authoredCanonicalMasters": 10542,
+    "G1_populationReproduced": 9244,
+    "G1_populationSumEqualsVerdicts": true,
+    "G2_storeCanonicalInPopulation": 0,
+    "G3_liveMasterIntersection": 0,
+    "G3_liveFpIntersection": 0,
+    "G3_liveSourceRefIntersection": 0,
+    "G3_liveMasterTotal": 2877,
+    "G3_liveFpTotal": 785,
+    "G3_liveSourceRefTotal": 714,
+    "G4_duplicateMasterInGroups": 0,
+    "G4_missingMasters": 0,
+    "G5_safetyFpHeterogeneous": 0,
+    "G6_readyEvidenceMissing": 0,
+    "G7_nameBasedInference": 0,
+    "G8_professionalUseInReady": 0,
+    "G9_excludeInReady": 0,
+    "G10_unitMasterSumEqualsReady": true,
+    "dbWrite": 0
+  },
+  "allGatesPass": true,
+  "exclusionSources": {
+    "liveMasters": 2877,
+    "liveFingerprints": 785,
+    "liveSourceRefs": 714,
+    "tracks": [
+      "OTC V2 LIVE",
+      "외용 적용부위 회수 LIVE",
+      "외용 READY_SPLIT",
+      "authored STORE canonical 전량"
+    ]
+  }
+}

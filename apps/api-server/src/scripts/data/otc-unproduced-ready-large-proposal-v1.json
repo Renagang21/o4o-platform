@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-LARGE-CENSUS-V1",
+  "artifact": "ready-large-proposal",
+  "status": "PROPOSAL — 승인 전 생산 금지",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "sourceCensus": "otc-unproduced-large-census-v1.json",
+  "kind": "READY_LARGE",
+  "totals": {
+    "fingerprints": 0,
+    "masters": 0
+  },
+  "writePlan": {
+    "perMaster": {
+      "ko": 4,
+      "en": 2,
+      "total": 6
+    },
+    "total": 0
+  },
+  "groups": []
+}
