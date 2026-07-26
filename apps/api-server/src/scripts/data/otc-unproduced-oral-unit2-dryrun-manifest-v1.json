@@ -1,0 +1,3113 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-ORAL-UNIT2-PRODUCTION-READINESS-V1",
+ "agent": "ga",
+ "unitId": "oral-unit-2",
+ "readOnly": true,
+ "dbWrite": 0,
+ "apply": "NOT_PERFORMED",
+ "basedOn": {
+  "approvalCommit": "8328047ac",
+  "ssot": "otc-unproduced-oral-unit2-approved-ssot-v1.json",
+  "unit1Ssot": "otc-unproduced-oral-unit1-approved-ssot-v1.json",
+  "census": "otc-unproduced-large-census-v1.json"
+ },
+ "reuse": {
+  "runner": "otc-v2-store-leaflet-runner.shared.ts",
+  "imported": [
+   "composeKo",
+   "renderEn(게이트)",
+   "officialAxes",
+   "resolveRoute",
+   "missingNumerics",
+   "fpToUuidV2",
+   "AUTHORED_SOURCES"
+  ],
+  "modified": false
+ },
+ "fingerprintContract": {
+  "axes": [
+   "성분(코드[1-4])",
+   "함량(코드[5-6])",
+   "제형(코드[7-9])",
+   "경구 투여경로",
+   "효능·효과",
+   "용법 수치",
+   "연령",
+   "사용 기간",
+   "금기·주의사항",
+   "단일제/복합제(코드[1-6])"
+  ],
+  "formula": "H(join('|', 10 axes))",
+  "changed": false
+ },
+ "totals": {
+  "fingerprints": 374,
+  "masters": 1849
+ },
+ "writePlan": {
+  "ko": 7396,
+  "en": 3698,
+  "total": 11094
+ },
+ "reproduction": {
+  "easyCanonicalFound": 1849,
+  "gencodeSingle": 1849,
+  "gencodeMatch": 1849,
+  "routeOral": 1849,
+  "fpReproduced": 1849,
+  "fpReproductionRate": 1,
+  "axesMatched": 1849,
+  "officialAxisMissing": 0,
+  "fpAxisHeterogeneous": 0,
+  "missingAxisSample": [],
+  "fpFailSample": []
+ },
+ "exclusion": {
+  "unit1FpIntersection": 0,
+  "unit1MasterIntersection": 0,
+  "liveMasterIntersection": 0,
+  "liveSourceRefIntersection": 0,
+  "authoredCanonicalPresent": 0,
+  "canonicalDup": 0
+ },
+ "payloadReadiness": {
+  "koComposableGroups": 374,
+  "koAnomalyGroups": 0,
+  "koNumericLossGroups": 0,
+  "koSample": [
+   {
+    "fp": "0001d7183e5d7923",
+    "gencode": "D14700ATB",
+    "usageLabel": "복용 안내",
+    "numericLost": 0
+   },
+   {
+    "fp": "007689671a5fb3fd",
+    "gencode": "308000ATE",
+    "usageLabel": "복용 안내",
+    "numericLost": 0
+   },
+   {
+    "fp": "016adc64ff1c14c5",
+    "gencode": "C30800ATB",
+    "usageLabel": "복용 안내",
+    "numericLost": 0
+   }
+  ],
+  "enHarness": {
+   "hangulGate": true,
+   "oralVerbGateForNonOral": true,
+   "numericPreservationGate": true,
+   "enUsageLabel": "How to take it"
+  },
+  "enPayloadRequired": {
+   "perGroupFields": [
+    "fp",
+    "title",
+    "efficacy",
+    "usage",
+    "caution",
+    "summaryTable"
+   ],
+   "usageLabelInjectedByRunner": true,
+   "groups": 374,
+   "expectedWriteT": 3698
+  }
+ },
+ "groups": [
+  {
+   "fp": "0001d7183e5d7923",
+   "gencode": "D14700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "5a4f5761-9fda-e49a-7c17-4fd00fd4973a"
+  },
+  {
+   "fp": "007689671a5fb3fd",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "b8bcc255-5e22-567a-9175-5c55781e74f4"
+  },
+  {
+   "fp": "016adc64ff1c14c5",
+   "gencode": "C30800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "195b0ef9-fca8-bcbb-d73c-5dcddf51d013"
+  },
+  {
+   "fp": "023081dd2e94f0f5",
+   "gencode": "E46900ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "c41a4468-c023-e441-7ed2-d45717501338"
+  },
+  {
+   "fp": "02b57bfc2046ed56",
+   "gencode": "139503ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 20,
+   "sourceRef": "84fce8d3-6330-fc24-0a9b-b30bd4b86aaa"
+  },
+  {
+   "fp": "031b067d1b0344e0",
+   "gencode": "106301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "135095db-9138-e5de-cd99-490d5b753a33"
+  },
+  {
+   "fp": "034096f85d8e4f20",
+   "gencode": "A13500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 10,
+   "sourceRef": "759f688d-0336-0f89-db06-d72f1c2098c4"
+  },
+  {
+   "fp": "038e655d6b7fb812",
+   "gencode": "286200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "dac2cd82-f5ed-059a-63bb-fb12f199609d"
+  },
+  {
+   "fp": "04db3ecb1e21b7f3",
+   "gencode": "113232APD",
+   "route": "oral",
+   "form": "산",
+   "size": 5,
+   "sourceRef": "c7ab9b9f-eb74-572f-f2f3-406073fe50d2"
+  },
+  {
+   "fp": "05aa1abd0ba27ded",
+   "gencode": "D22200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "aafec193-5b79-a1ba-e9dc-fa4b6b1ef7f5"
+  },
+  {
+   "fp": "05e1fc61e9640f32",
+   "gencode": "A49300ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 14,
+   "sourceRef": "8aaff8e6-f57f-03f4-2a86-5308ce398c36"
+  },
+  {
+   "fp": "060136ba3692f881",
+   "gencode": "E61700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "727b251e-1a23-dae4-76d0-ba1649828143"
+  },
+  {
+   "fp": "06b9fee614bf742f",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 37,
+   "sourceRef": "b7362cd6-4cdf-ffca-2acb-93aa1eb46222"
+  },
+  {
+   "fp": "06e296497a7b17d7",
+   "gencode": "D39500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "4f93b04a-2831-0220-9a5a-1a6d8b66fb88"
+  },
+  {
+   "fp": "07a8042815e731ad",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "7e5a983f-4aed-9801-0d2f-bc7a08cd068c"
+  },
+  {
+   "fp": "07dbe2dbbad8a28d",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "90cbc036-4bca-2b7b-a1d3-39f44f9fdfa6"
+  },
+  {
+   "fp": "0866e8bbe0a2bba7",
+   "gencode": "157301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "63af95d9-2768-9ab9-08a9-c05f06bf4caf"
+  },
+  {
+   "fp": "09048d557f1dd08b",
+   "gencode": "C90000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "aa5b45c9-1e5a-6144-42b8-5a28dd8ff871"
+  },
+  {
+   "fp": "09476e482e2327ab",
+   "gencode": "383800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "089fb06b-fb33-8621-e135-909cc717f01a"
+  },
+  {
+   "fp": "0952b74ff8ca2759",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "3a4b4636-5846-ef8a-a579-347790a7446c"
+  },
+  {
+   "fp": "09e29c7fd03d542c",
+   "gencode": "530800ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 8,
+   "sourceRef": "f23d8879-c71d-5c60-802b-af63e8682fd7"
+  },
+  {
+   "fp": "0a37620e23fbfa20",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "a91ef8d0-6e10-372e-69df-7e8ba51355b8"
+  },
+  {
+   "fp": "0b58340578260d59",
+   "gencode": "D22300ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "71741323-111c-0a08-a911-8223e934e5a0"
+  },
+  {
+   "fp": "0bcae992b5fc6afa",
+   "gencode": "E27500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "c4d3a80b-44c8-8051-ba34-6f76836061cd"
+  },
+  {
+   "fp": "0c17c3e876c90a40",
+   "gencode": "D26500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "03bfb35e-5b54-9f46-faf0-b51466de7f28"
+  },
+  {
+   "fp": "0d697ea80eef3f62",
+   "gencode": "D76600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "dc93221e-2e87-837e-055e-29eac9d6c87e"
+  },
+  {
+   "fp": "1012383d549f5b53",
+   "gencode": "558200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "3654d0cf-cfa9-8fe1-d287-9df6f824ca19"
+  },
+  {
+   "fp": "108ee231ffb717c3",
+   "gencode": "A80500ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 4,
+   "sourceRef": "7d522cbc-8db3-aa60-43b1-2a8a7bdbe9fa"
+  },
+  {
+   "fp": "10bf6dd0c01e7545",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "0de5c39d-271a-2bdb-225f-5a6014b846bf"
+  },
+  {
+   "fp": "11e5a95b36db44a1",
+   "gencode": "A86000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "68572f04-aba2-8956-d35c-436616783e80"
+  },
+  {
+   "fp": "122a7c84059eb6d2",
+   "gencode": "D04700ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 5,
+   "sourceRef": "cd31249a-b20f-68d5-ea51-7eeccf39d91b"
+  },
+  {
+   "fp": "122b7876fc5b1154",
+   "gencode": "D14700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "1bcee6ea-784a-1d21-9c88-c295b9c466e8"
+  },
+  {
+   "fp": "13051575394f7152",
+   "gencode": "266300ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 2,
+   "sourceRef": "330156c3-5b7f-f7fc-fe57-44f68aec3b50"
+  },
+  {
+   "fp": "1313e580102d41e1",
+   "gencode": "142301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "3273aa06-950b-9d5c-b28a-3925fe318478"
+  },
+  {
+   "fp": "142f82d68304e62f",
+   "gencode": "A52600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "927caeea-a0fd-ab57-b72d-256f6283fe76"
+  },
+  {
+   "fp": "145f60a29a96654a",
+   "gencode": "D65200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "752e4e42-7d19-0a6e-f62d-65c80ebbb8b4"
+  },
+  {
+   "fp": "168580e466ef92d7",
+   "gencode": "E19400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "dee40698-a566-61fa-dc4e-c84a7970c10a"
+  },
+  {
+   "fp": "1781c83b61d27b67",
+   "gencode": "E27500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "06e6a3bf-36ce-0d37-7772-16f78d77c769"
+  },
+  {
+   "fp": "18d472636f8a3e5c",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "8f4b979b-d65f-d10f-ecd5-ab1998b4bc29"
+  },
+  {
+   "fp": "18d7be0cc3fb9d77",
+   "gencode": "A18800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "490bf084-0cf0-5e3e-0feb-eacfe1135468"
+  },
+  {
+   "fp": "18eb30a07e6f4001",
+   "gencode": "106301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "14d2a85a-f52e-6574-af0a-9e66a5f226ac"
+  },
+  {
+   "fp": "194702cf9c02f756",
+   "gencode": "A49300ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 24,
+   "sourceRef": "87dee02c-5376-464b-8d32-349ce9a464d9"
+  },
+  {
+   "fp": "198957602286abb0",
+   "gencode": "D46100ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 3,
+   "sourceRef": "2c951009-31d1-be2a-f303-74d02dbb4565"
+  },
+  {
+   "fp": "19b70414aece768f",
+   "gencode": "124503ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "83f24709-9ba5-f8a2-01af-423d8e1a904e"
+  },
+  {
+   "fp": "19dd08db5b61f620",
+   "gencode": "199501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "e7fab218-4f6f-a80a-4d0e-8b7d8617dc95"
+  },
+  {
+   "fp": "1aaf86d2c743310b",
+   "gencode": "113232APD",
+   "route": "oral",
+   "form": "산",
+   "size": 2,
+   "sourceRef": "d43f18a7-3d0b-2f67-b0a9-d5791cf562aa"
+  },
+  {
+   "fp": "1b930af8463a22ce",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "d243afad-5218-d586-2072-33035d3556d8"
+  },
+  {
+   "fp": "1c2a43bf8f8240fd",
+   "gencode": "E69000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "6ed7d1e1-faf5-6e6f-7130-b005f5cb05a4"
+  },
+  {
+   "fp": "1e6b7209aab4d6cc",
+   "gencode": "231802ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 8,
+   "sourceRef": "91fb7281-d89b-d90e-2ce9-3bf49c7e3a90"
+  },
+  {
+   "fp": "206e4e218cb5bd63",
+   "gencode": "E58200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "59023e6f-6996-a069-60a2-dd72ddd2fe30"
+  },
+  {
+   "fp": "20ad9c97d0c0d192",
+   "gencode": "D22200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "cd186575-2620-3679-b9c0-145e3ca61a87"
+  },
+  {
+   "fp": "20f95e95b797ad0a",
+   "gencode": "172802ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "9be21f99-de26-7d54-f5e2-99c410bbe7e8"
+  },
+  {
+   "fp": "20fc915a1ad22530",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "94b07f27-1d19-cdd1-41fa-2092e11303ce"
+  },
+  {
+   "fp": "21af08b6a5c2d94b",
+   "gencode": "159703ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 3,
+   "sourceRef": "0b4bfd46-44e1-3cb1-6cc6-1d83ba026a31"
+  },
+  {
+   "fp": "21dba2358cef4995",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "e1e176be-c9cf-946a-e3f4-1edf25d351a7"
+  },
+  {
+   "fp": "231e7610a127a58f",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 6,
+   "sourceRef": "c1b2a853-ad20-20fa-989d-4abe68b86022"
+  },
+  {
+   "fp": "232fda3729a9a0e1",
+   "gencode": "C96000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "2c8d99df-7e8c-b2dd-f05a-01711c541aa6"
+  },
+  {
+   "fp": "23505be8fe639b32",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "0da36bd4-b3ae-61de-57ae-6e0cfc2f8489"
+  },
+  {
+   "fp": "238e087d19c7d394",
+   "gencode": "A18600ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "6fd8346e-54f1-059c-43b8-402c5c7bd162"
+  },
+  {
+   "fp": "245ed3af50d24bdd",
+   "gencode": "149801ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "6a4066e4-02d3-585b-a698-0a8a2714cdde"
+  },
+  {
+   "fp": "2574562036ed9fba",
+   "gencode": "D53100ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "2f48cae3-0e13-50b0-48d2-e2326e7c46ca"
+  },
+  {
+   "fp": "25ee9ef2f61d3c58",
+   "gencode": "142334ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 2,
+   "sourceRef": "e54373e9-71ab-d3bb-3c77-0cc05150392b"
+  },
+  {
+   "fp": "27bc942eae228c23",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "1c1eb54c-33fa-014b-3080-458445d33ee8"
+  },
+  {
+   "fp": "28206a8c19707612",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "17ef7a8e-0ceb-36f5-6286-42f6f018e40f"
+  },
+  {
+   "fp": "282e245685887139",
+   "gencode": "157301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "67dddfe9-8814-2516-7eea-23b8eff1ce65"
+  },
+  {
+   "fp": "28d8b783627644c3",
+   "gencode": "199402ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 1,
+   "sourceRef": "6d23b98e-f9de-be3c-15fd-f4573571691f"
+  },
+  {
+   "fp": "2964b738e2f7e492",
+   "gencode": "A27002ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "53b9f59f-335f-3d45-9fda-fe9052325848"
+  },
+  {
+   "fp": "2965c1864c9aa08e",
+   "gencode": "227730ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 9,
+   "sourceRef": "35d10ce0-8cd9-64de-0c3c-a0beeec9001a"
+  },
+  {
+   "fp": "299cdcc061717bf2",
+   "gencode": "E46900ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "fba1895f-5c49-44b3-95c2-7890781618f7"
+  },
+  {
+   "fp": "2a2a3bda1fc20911",
+   "gencode": "D14400ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "1f7f0599-6595-f302-a933-062d15c50662"
+  },
+  {
+   "fp": "2ac64664210add6f",
+   "gencode": "D65500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "10b71f2e-518f-7071-0464-5ad989e3714d"
+  },
+  {
+   "fp": "2ba2d58836f8f077",
+   "gencode": "162601ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "36938ada-329c-921c-03c2-4dc38ee3ad8f"
+  },
+  {
+   "fp": "2c3ee49b8696212d",
+   "gencode": "E73100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "291571b5-28ba-0e9f-e497-93627f4dba06"
+  },
+  {
+   "fp": "2c9780e2d3b72bc8",
+   "gencode": "157301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 7,
+   "sourceRef": "da9c69d4-f8d5-7bbd-de72-ad3d62271c14"
+  },
+  {
+   "fp": "2e14f4eb929b674e",
+   "gencode": "292800ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 5,
+   "sourceRef": "73945065-a0dd-a04f-164d-c4546eff799e"
+  },
+  {
+   "fp": "2e2fa3034f59f675",
+   "gencode": "A02400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "e89429b2-51c5-3963-45ba-fef377a1c09c"
+  },
+  {
+   "fp": "2ebae14a6667e996",
+   "gencode": "276100ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "5d22c142-9e55-cfca-9fd1-7967d052ebd9"
+  },
+  {
+   "fp": "2f21e0374d07c9ba",
+   "gencode": "E46900ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "19f38cd7-884b-e4c0-0669-371af698c4d6"
+  },
+  {
+   "fp": "303330077abdb55d",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "f061d8da-9065-3534-81c9-325a7764a0a3"
+  },
+  {
+   "fp": "30f3dbee34eb5a7b",
+   "gencode": "347904ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 7,
+   "sourceRef": "8d30886f-184a-7a5d-a450-b0812c48e040"
+  },
+  {
+   "fp": "30fb50bdf22bde74",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 62,
+   "sourceRef": "0304c664-f9af-c03c-0b81-27c7c8c1eeb3"
+  },
+  {
+   "fp": "32f34df4a8598d8b",
+   "gencode": "347904ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "0f9ac55e-8d37-26ae-b892-c6e5dcf373f0"
+  },
+  {
+   "fp": "34112fbad8b98ba9",
+   "gencode": "E91800ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "31e4a2f5-17ec-8606-41bd-44e897974257"
+  },
+  {
+   "fp": "35140fb60950865c",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "fecf118b-9d3b-ea35-0948-89e23f4e7040"
+  },
+  {
+   "fp": "3568f68a8a63736f",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "8508d8d4-93ca-1b2a-a3f2-ae2168f7c655"
+  },
+  {
+   "fp": "35fc179b573971cb",
+   "gencode": "104303ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 6,
+   "sourceRef": "d9aa25a1-6e55-5db4-5a4c-8650558d592f"
+  },
+  {
+   "fp": "36a38ad8bc6a5179",
+   "gencode": "E61700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "c2c8a4db-9b7c-1e96-df25-48707247fe70"
+  },
+  {
+   "fp": "36fa0e8693495af6",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "2e3b9c6a-9701-8736-3a10-a0695389703c"
+  },
+  {
+   "fp": "373771c18fff6d7d",
+   "gencode": "270500ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "35827574-52aa-f686-25c0-ffa83fe2cbec"
+  },
+  {
+   "fp": "3815b7ed1947f8c3",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "9ac31c96-2d20-95ee-bf45-b7f919a2c031"
+  },
+  {
+   "fp": "38966661a4d8b5bb",
+   "gencode": "166501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "56632f20-07dd-ed93-f0ee-eeea7617f50c"
+  },
+  {
+   "fp": "38c028a90a1e8d65",
+   "gencode": "E73100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "0d0a6e7f-c90d-b6a5-81a6-6f468a0003d1"
+  },
+  {
+   "fp": "38eb7f258157aaa1",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "5dc9a286-b25d-e861-3eeb-42c7cf42faf2"
+  },
+  {
+   "fp": "390c5088b0b93a4b",
+   "gencode": "D08400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "a6c5c1d4-82d0-3c70-2318-d5154751b0fe"
+  },
+  {
+   "fp": "39a5a51c5282c269",
+   "gencode": "268600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "5e030fab-beb5-abfa-c29f-ca012af2c371"
+  },
+  {
+   "fp": "3a7977a38c522092",
+   "gencode": "566833ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 9,
+   "sourceRef": "988791d2-2f52-5b3e-e2ed-b3ae02fc4a55"
+  },
+  {
+   "fp": "3ab5126690fbcacc",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "dbeb3a05-b31e-3438-696d-0771160b5a0e"
+  },
+  {
+   "fp": "3ae8916dded9bdef",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 16,
+   "sourceRef": "7c9b74ef-bc78-6829-0c46-424d579f40b4"
+  },
+  {
+   "fp": "3bc7fe3aef0c8e5e",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "02d4e098-7926-b80f-4ca2-0b5195ffe068"
+  },
+  {
+   "fp": "3ddb69b993f9d099",
+   "gencode": "142334ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 5,
+   "sourceRef": "91d99cdd-555f-34f3-4bd9-b20dd38cf5fb"
+  },
+  {
+   "fp": "3e05b9fbed231b0d",
+   "gencode": "101404ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "782a94f8-29d3-9f25-d8eb-2b28f125f023"
+  },
+  {
+   "fp": "3f4866764448cae4",
+   "gencode": "E58800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "c97aaa04-ac0c-cb77-0ddc-e6f04ef15def"
+  },
+  {
+   "fp": "409d5aec6abbf59f",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "946abc9a-a174-48d7-52fc-c17a6d906e03"
+  },
+  {
+   "fp": "40b93afa39c0002d",
+   "gencode": "172806ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 6,
+   "sourceRef": "9610e797-1d5a-d6e8-7b40-312c9d0b22f3"
+  },
+  {
+   "fp": "40fb2cb3a1f68e66",
+   "gencode": "D65500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "9e7c1408-1f88-eade-63ac-94a1d51e241b"
+  },
+  {
+   "fp": "417fae74fe9e49c6",
+   "gencode": "E78000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "c45ca717-7682-2485-cc65-6b432c8d99ae"
+  },
+  {
+   "fp": "434e53ccb9d85777",
+   "gencode": "D22300ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "38e2044f-f9d5-44cb-d821-5e553789f146"
+  },
+  {
+   "fp": "442c533a3e98efab",
+   "gencode": "E78400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "a3e34ad9-3921-ba25-d2cf-ef321b934b59"
+  },
+  {
+   "fp": "444ab5fccf14556f",
+   "gencode": "101404ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "f883415f-b8ed-7f13-d854-28ee89206aa1"
+  },
+  {
+   "fp": "45e26b3644d5090d",
+   "gencode": "A04700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "2e26988a-cd90-e975-48a4-cb67f4fc71b1"
+  },
+  {
+   "fp": "465a674a887e38f1",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "e5c43eb1-40a0-cd79-ca06-6fdaab1b73e9"
+  },
+  {
+   "fp": "4780f3e9e6e8314a",
+   "gencode": "A49300ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 50,
+   "sourceRef": "1b22635e-e87b-7609-6c5b-f20b3a137a22"
+  },
+  {
+   "fp": "47a482269a60c0da",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "af909729-a95d-87c6-19ff-ff37740299c0"
+  },
+  {
+   "fp": "47a71bef48fee5f7",
+   "gencode": "E58200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "b810bed7-8b87-4844-03f8-ce6d9ae8527c"
+  },
+  {
+   "fp": "47e5ca1b0ee85d47",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "a7a48fd9-591e-38a1-0e44-109bd5308f98"
+  },
+  {
+   "fp": "48eda0df2966d757",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "a247d63c-4186-27f5-fc35-e40d9469c7c3"
+  },
+  {
+   "fp": "4a8e3888c0837c0e",
+   "gencode": "136601ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "b142cd31-2559-7a42-bd66-a456a22c1962"
+  },
+  {
+   "fp": "4b130ef87837b878",
+   "gencode": "260300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "94061e5b-d201-d198-3afc-f8a1dba220e5"
+  },
+  {
+   "fp": "4b6e877375f82a3d",
+   "gencode": "260300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "a2a6cfd3-82b6-1045-599a-384cc57b5e77"
+  },
+  {
+   "fp": "4c813595039967ed",
+   "gencode": "231802ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 19,
+   "sourceRef": "6541f49a-0288-7a46-6f7a-75422b17f3b2"
+  },
+  {
+   "fp": "4d406879c2a7531d",
+   "gencode": "142301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 11,
+   "sourceRef": "c95f4335-3472-744e-0b98-691ed7468e46"
+  },
+  {
+   "fp": "4ea24450119e1071",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "d1b88534-b845-dc2b-c102-14e59004a222"
+  },
+  {
+   "fp": "4f7e3dfe4ddc2c91",
+   "gencode": "A80800ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "562310cb-7380-cc4f-b656-362ba675de98"
+  },
+  {
+   "fp": "4fd749a75b1bfb68",
+   "gencode": "A18800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "7a5820a9-929b-3db7-9a5d-f9c8fbe24b7c"
+  },
+  {
+   "fp": "50450ddbb10ee1d1",
+   "gencode": "257100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "37d447d7-c969-4cde-561f-19accb8f9220"
+  },
+  {
+   "fp": "51eb80b7927e4cb0",
+   "gencode": "159703ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 5,
+   "sourceRef": "af63d3aa-58b5-c08f-99a2-f8dc913a6e8e"
+  },
+  {
+   "fp": "522e3ab9e11bc303",
+   "gencode": "D08400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "72b5dba9-29c0-a3d4-96d3-d09880b293f6"
+  },
+  {
+   "fp": "524e0da986acb000",
+   "gencode": "113232APD",
+   "route": "oral",
+   "form": "산",
+   "size": 6,
+   "sourceRef": "4f4a32ae-eb2e-070e-a0da-8331378e7f75"
+  },
+  {
+   "fp": "54504b44e296e1ea",
+   "gencode": "A28100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "19af368e-775a-c31f-d1ab-eb3358ae8890"
+  },
+  {
+   "fp": "548bfbd5f2ca1c96",
+   "gencode": "A49300ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 11,
+   "sourceRef": "51666ebf-d0ad-4dda-4427-5bec9a926bbc"
+  },
+  {
+   "fp": "562b5ae5002690b7",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "592ac1ff-4d20-7917-2bd6-355dd7cd9d7d"
+  },
+  {
+   "fp": "56dd01ecd8051b51",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 7,
+   "sourceRef": "e0af5f04-d185-ded1-7c5a-b3d12b9772ba"
+  },
+  {
+   "fp": "56e3f3e7b4c8278f",
+   "gencode": "106301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "8aeb06c9-0e10-3251-96fa-39a75a3618ca"
+  },
+  {
+   "fp": "57e785920688f18a",
+   "gencode": "D21900ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "a821e1c3-2e57-7bfe-5693-f55c90bb1862"
+  },
+  {
+   "fp": "589ead3ea18717b1",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "edf67f99-8289-96cd-3fc3-d9c75a24be87"
+  },
+  {
+   "fp": "5949f99f6a59d5a4",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "833c942e-fef6-dab0-88ac-9137396f3a8e"
+  },
+  {
+   "fp": "59946cba75b91e4a",
+   "gencode": "A65401ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 19,
+   "sourceRef": "c734e97b-fda3-e8eb-93a4-1da90472b4b5"
+  },
+  {
+   "fp": "5a52f4eb4ba61b2b",
+   "gencode": "227730ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 3,
+   "sourceRef": "b07f6322-8b8d-8fde-c7dd-07af67fc2bd9"
+  },
+  {
+   "fp": "5ac849b1afc6ed48",
+   "gencode": "473503ACE",
+   "route": "oral",
+   "form": "장용캡슐",
+   "size": 6,
+   "sourceRef": "8f8d312d-fa68-dca6-d6cf-b1d0a52bbbeb"
+  },
+  {
+   "fp": "5ba849d794d2e8d2",
+   "gencode": "227730ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 7,
+   "sourceRef": "e6fc79a8-206a-3068-a0a1-1c6c8146d790"
+  },
+  {
+   "fp": "5c44074172aaa998",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "cbab71da-bcda-6b49-fb57-bf31d4bd43a9"
+  },
+  {
+   "fp": "5c91161d8b4535f1",
+   "gencode": "D02400ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "1d3641af-f6d0-4343-f50a-deda19c29e1d"
+  },
+  {
+   "fp": "5cc19ec3d2aba8e6",
+   "gencode": "E44900ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 6,
+   "sourceRef": "c9d544ed-5484-c336-fd7f-59ad69496d1c"
+  },
+  {
+   "fp": "5d5a8ecad09d3023",
+   "gencode": "E69000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "32672d56-cc3f-3ded-2e99-8aac0ab4d2d1"
+  },
+  {
+   "fp": "5e3039ac66d4c823",
+   "gencode": "E69700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "50e4dccd-1b2d-4932-2914-6b734c219421"
+  },
+  {
+   "fp": "5e71e7e34dce75a0",
+   "gencode": "C95700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "cfa7f901-5b55-35f6-a97e-f5dc78016ef9"
+  },
+  {
+   "fp": "5f0bd4070b376ead",
+   "gencode": "C30800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "dfd15d27-98a0-c718-d66e-89b265df03ed"
+  },
+  {
+   "fp": "5f36d628b7bc9c3c",
+   "gencode": "257100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "7859dd8f-8601-974e-e55c-debde36e1e7b"
+  },
+  {
+   "fp": "5f4cf9412892a511",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 6,
+   "sourceRef": "e988df71-b59e-74ae-2ae7-2124945fd7f7"
+  },
+  {
+   "fp": "5f6df2adfd77ddf2",
+   "gencode": "D21900ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "c53e4178-c5a9-6be6-ee34-380486d3ee99"
+  },
+  {
+   "fp": "61129cb3b1f0fa12",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "78d81852-79bf-6e54-0181-e17338247446"
+  },
+  {
+   "fp": "614fda1b9c51bd0c",
+   "gencode": "111001ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 4,
+   "sourceRef": "a22e2ee5-00f4-d045-3bd4-99bacc0f9938"
+  },
+  {
+   "fp": "6186363c4cdaeabd",
+   "gencode": "157301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 10,
+   "sourceRef": "b0f4149d-3b22-62a9-03dc-9432384812b4"
+  },
+  {
+   "fp": "6234a4332dbfdacf",
+   "gencode": "E72800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "183b94ec-379a-4b8a-7ad4-bd645e356ef5"
+  },
+  {
+   "fp": "62ab3e68d97a2051",
+   "gencode": "271400ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 6,
+   "sourceRef": "c953d801-e4a4-3312-5385-5894fb408d17"
+  },
+  {
+   "fp": "6328b1a94d294606",
+   "gencode": "E38900ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "73d49698-8a9b-0e77-ee45-782e3e62f922"
+  },
+  {
+   "fp": "642cb5dabe8703b2",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 7,
+   "sourceRef": "7b31a581-aeb7-ea9f-2022-6fa20f2e6282"
+  },
+  {
+   "fp": "6448b66e496bc1b8",
+   "gencode": "180830ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 3,
+   "sourceRef": "a1824273-9eb2-0ad2-0491-0193bcc33e26"
+  },
+  {
+   "fp": "644de3d1e2b0fe56",
+   "gencode": "E73400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "916c2d8e-8185-c762-0d13-18274200d626"
+  },
+  {
+   "fp": "653aea3ab1a7b7a6",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "6032f202-af6e-14c8-3c79-a0fcf995c0e4"
+  },
+  {
+   "fp": "663043cb71faf7ef",
+   "gencode": "172804ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 5,
+   "sourceRef": "ff134ba7-c61d-4a8a-9b3e-eaa21293c6a5"
+  },
+  {
+   "fp": "6734506edad299b1",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 14,
+   "sourceRef": "def0e132-7dc8-6e8c-ad7d-d3e5234deb16"
+  },
+  {
+   "fp": "67b00ef444e30309",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "b801b5e4-889c-1cdf-4be0-b2fa3d2ca424"
+  },
+  {
+   "fp": "6899f6a68a444380",
+   "gencode": "D15300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "04d71f3a-edc4-bded-9ed4-a6e95b566239"
+  },
+  {
+   "fp": "6975706964fcd86f",
+   "gencode": "E44000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "5be24907-134d-c9a1-eb9c-e5493aff6393"
+  },
+  {
+   "fp": "6a8d035da77d2eba",
+   "gencode": "E73500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "071eaf96-f10f-fdbf-dd6d-ddb5191ca371"
+  },
+  {
+   "fp": "6acf149919b07323",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 6,
+   "sourceRef": "4c7cba96-6756-72be-891b-04b9ef96e5ae"
+  },
+  {
+   "fp": "6be8b85d4b71c1bc",
+   "gencode": "A21200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "ee14568e-da2f-3c3e-68e8-3e4732ee823f"
+  },
+  {
+   "fp": "6d39ea9d1a7c7067",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "519fe951-3224-f080-6ebb-54122370eaeb"
+  },
+  {
+   "fp": "6d3efa1038a40518",
+   "gencode": "D39500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "f25db163-4199-903c-1be5-dfa7bfc6eca6"
+  },
+  {
+   "fp": "6df398bc6ab90960",
+   "gencode": "111001ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 117,
+   "sourceRef": "96688145-7de3-f85c-15da-c3a8f351cb79"
+  },
+  {
+   "fp": "6fbe72c0918dd889",
+   "gencode": "172806ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 31,
+   "sourceRef": "632b97b8-2844-ef0b-1367-5f384553eba0"
+  },
+  {
+   "fp": "7064829a20d8d13d",
+   "gencode": "E04600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "da7dff5e-b0e4-f356-595d-cb00fd6d3561"
+  },
+  {
+   "fp": "7153361853cf6f9c",
+   "gencode": "D82200ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "a3bed235-9549-4fb4-93ef-b066d1479c6d"
+  },
+  {
+   "fp": "71ab592654c7da21",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "f4f20e3f-9aad-17b8-8aea-917c67b414fb"
+  },
+  {
+   "fp": "7400afc83459f550",
+   "gencode": "E83000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "8d22e817-334a-af01-4ac9-f91ebf951cef"
+  },
+  {
+   "fp": "741769d4e2411812",
+   "gencode": "130502ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 4,
+   "sourceRef": "d35ef07f-ef13-f99b-298e-285b7609fd39"
+  },
+  {
+   "fp": "75c7bc7e913b100d",
+   "gencode": "A80500ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 7,
+   "sourceRef": "bbb6319f-1362-0b74-0919-2bd46a3c4a2a"
+  },
+  {
+   "fp": "75ceb9ca558e2927",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "c9c0e854-b08c-85a3-7e46-0977cf3787ce"
+  },
+  {
+   "fp": "773fb4f0140dd543",
+   "gencode": "347904ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 8,
+   "sourceRef": "a6894006-981f-acfc-7a24-4e2a7a70515b"
+  },
+  {
+   "fp": "78b51612501f21f3",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "aa362109-a4b5-1d80-a336-7e85471bbfb3"
+  },
+  {
+   "fp": "7979df9ab553785e",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "75b71096-abb2-87ac-7d0e-0312d01f1b3c"
+  },
+  {
+   "fp": "79b250eea4eb6259",
+   "gencode": "384300APD",
+   "route": "oral",
+   "form": "산",
+   "size": 4,
+   "sourceRef": "4bb991ff-7b1a-be6e-5c9f-fa1ce6e21519"
+  },
+  {
+   "fp": "7b2a1b1e7c6ca12c",
+   "gencode": "D78300ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "97da7e31-45f5-d48c-ea95-4a3978a21343"
+  },
+  {
+   "fp": "7ca4f85ea893456e",
+   "gencode": "E44900ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "efc7a24d-3236-f4bb-6924-9fddc5abd124"
+  },
+  {
+   "fp": "7d3ea3340ad09fd6",
+   "gencode": "461134ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "74804605-8db9-8122-75c0-f9162df128f8"
+  },
+  {
+   "fp": "7de9e39314396b0d",
+   "gencode": "292800ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 6,
+   "sourceRef": "d4b43fee-5a16-7de0-cbef-f51390292691"
+  },
+  {
+   "fp": "7dfe4675132172c1",
+   "gencode": "578100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "d9e2ba44-9c26-8667-abd8-167038657ee3"
+  },
+  {
+   "fp": "7eb86e730a5e59ea",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "d23353fa-0c90-379a-ff3b-9ee8ab205d3c"
+  },
+  {
+   "fp": "8034c75c256e03ab",
+   "gencode": "257100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "5b86cc94-c031-0e91-1787-c0b39f925364"
+  },
+  {
+   "fp": "80960664b29ab2cc",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 8,
+   "sourceRef": "bc7b09b0-74b4-e593-d5fa-4167e5d2751d"
+  },
+  {
+   "fp": "8134dd7fa3e24354",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "eb2fad9e-c48e-cdc6-c62f-9064a410dc00"
+  },
+  {
+   "fp": "813b9b760ac8bcb9",
+   "gencode": "254000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 9,
+   "sourceRef": "a28fb73c-7f3a-9a84-d905-21fdf1945bab"
+  },
+  {
+   "fp": "8150f52d2d472ce5",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "b248ad6e-8c14-30fe-5bd1-3433c9b1821b"
+  },
+  {
+   "fp": "8204afa449cdbab6",
+   "gencode": "D22200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 6,
+   "sourceRef": "2c32f47a-c9d1-20cb-685d-c02473e9f1b2"
+  },
+  {
+   "fp": "820bfff26bdfffa0",
+   "gencode": "D02400ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "0de8fbd8-30e7-e742-d847-27c5397eb0de"
+  },
+  {
+   "fp": "8274cb9fd7dea3b8",
+   "gencode": "D82200ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 7,
+   "sourceRef": "018c9078-d0f0-39ea-e6dd-e57aeb0a690e"
+  },
+  {
+   "fp": "82e17e6faf99da9c",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "eb1d9a22-e814-006a-cca0-9fdc5935351c"
+  },
+  {
+   "fp": "83ad8acb6dd79085",
+   "gencode": "D07600ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 3,
+   "sourceRef": "0af3c978-a109-30da-2ace-5c62e8c67d13"
+  },
+  {
+   "fp": "83ea0197d6b05188",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "afa389ed-fd72-6c7a-5ec7-39814c2ebd83"
+  },
+  {
+   "fp": "84a4feaca5ded5b1",
+   "gencode": "B29400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "c2eb60b6-04b5-e07d-ba6b-b2be92de30ab"
+  },
+  {
+   "fp": "84ec5d92c26fb5c3",
+   "gencode": "A74603ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 12,
+   "sourceRef": "999ecd7a-dded-2250-8da3-eb37c92b0990"
+  },
+  {
+   "fp": "85fb79ac9ed590aa",
+   "gencode": "E72800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "7da41ef0-2df8-a56c-84c7-51decdad194b"
+  },
+  {
+   "fp": "86dc201719db5408",
+   "gencode": "292800ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 13,
+   "sourceRef": "6d402bcd-43a1-9d06-8f65-c66e6327fa8b"
+  },
+  {
+   "fp": "87b479b1f4dfc656",
+   "gencode": "402300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "c9bafa60-48ab-fdf9-9325-94138e7d7955"
+  },
+  {
+   "fp": "88656b7df660ce10",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "cb8237de-ef01-0073-8220-2c22d870b6e4"
+  },
+  {
+   "fp": "8870cb0c57bfd47e",
+   "gencode": "D94200ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 5,
+   "sourceRef": "08fab1a4-2eb5-e415-a606-af81b0ef50e1"
+  },
+  {
+   "fp": "888daeb8a0f4eb6b",
+   "gencode": "E75600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "493f3e67-1e8d-5f15-e44e-14742f42e0c4"
+  },
+  {
+   "fp": "8a2bd2090715121e",
+   "gencode": "A52600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "d1630fdf-2388-b0a9-2719-b779c52169d6"
+  },
+  {
+   "fp": "8a5d3e29268e2971",
+   "gencode": "205002APD",
+   "route": "oral",
+   "form": "산",
+   "size": 4,
+   "sourceRef": "ffeac47c-4243-46b9-8c4e-317e8224c35a"
+  },
+  {
+   "fp": "8b0b60abc138e79d",
+   "gencode": "739501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "0f12d392-3782-669e-43f6-35e28866a33a"
+  },
+  {
+   "fp": "8b4d8eada8c923b0",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 116,
+   "sourceRef": "5408235f-c032-cb91-9a9c-b88991ba431a"
+  },
+  {
+   "fp": "8b6a97836668113b",
+   "gencode": "308000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 4,
+   "sourceRef": "4898ce87-39a5-fbcb-3309-b72e7b282c46"
+  },
+  {
+   "fp": "8bdb5ce31ab54834",
+   "gencode": "A04600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "0994689e-1bac-8bce-e14e-23fcaa2042a8"
+  },
+  {
+   "fp": "8c94da49e1c8c0e4",
+   "gencode": "D22300ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "171ab8ac-dc8e-d57e-94d7-da3864a0631f"
+  },
+  {
+   "fp": "8cbdcb0e4321ae18",
+   "gencode": "D04700ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 5,
+   "sourceRef": "0b2f16d9-4e15-b2d5-f4c0-f50a28a94001"
+  },
+  {
+   "fp": "8d3057eb07e14e38",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "8bc002fa-1c0c-7d76-2faa-dc9f03e9741a"
+  },
+  {
+   "fp": "8d7ea02afeec8316",
+   "gencode": "162601ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "7953b50b-1dce-198a-ac39-16e491f99d99"
+  },
+  {
+   "fp": "8e065bfdcbe21be4",
+   "gencode": "531500ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 7,
+   "sourceRef": "ed75a86e-a3d3-1f19-3e76-9a50f1b2260e"
+  },
+  {
+   "fp": "8fbc437f57d22184",
+   "gencode": "347904ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 7,
+   "sourceRef": "4ef755b3-816a-f25b-cf1c-75dbd8aa4d47"
+  },
+  {
+   "fp": "904384e32c29bd4a",
+   "gencode": "187501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 12,
+   "sourceRef": "221fab31-48a4-d6b4-19e2-5da15fb80d95"
+  },
+  {
+   "fp": "909f6c40d0442b6e",
+   "gencode": "C96000ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "cacbe889-7856-5bc3-07f9-b848136302f9"
+  },
+  {
+   "fp": "931c94f01c544401",
+   "gencode": "A21200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "6050d723-ac6a-b606-bbca-8b45084fcb8e"
+  },
+  {
+   "fp": "936d8b35a3ebbf1e",
+   "gencode": "157301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "3f1acf61-c1ea-d702-b406-b9779bd741a6"
+  },
+  {
+   "fp": "93dcd3eed23c98c6",
+   "gencode": "E58700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "221cd3b4-91df-23c0-fe19-a8a35327adeb"
+  },
+  {
+   "fp": "9428fe7fe876e7c6",
+   "gencode": "D14700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 6,
+   "sourceRef": "80c01713-8da4-1fc5-bb9f-21ee2b3fe1a0"
+  },
+  {
+   "fp": "947ca4636d9bc036",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "0680ed49-13b5-aed0-ee14-5d0c47bf7158"
+  },
+  {
+   "fp": "960da7de8754d7f0",
+   "gencode": "E76800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "55c99781-63db-ba4c-6180-b3b24f691bdb"
+  },
+  {
+   "fp": "98902b74d5658d73",
+   "gencode": "A02400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "1219fdcd-081e-bc82-d98f-bac395d3eaef"
+  },
+  {
+   "fp": "98908612d64167df",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "b7f1caa9-5f42-d65a-ae39-5ffb6ef6a6d5"
+  },
+  {
+   "fp": "9955d618a341853a",
+   "gencode": "185401ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "ee49651f-d74c-316a-cd2a-16a6b1c81336"
+  },
+  {
+   "fp": "9a82f57015a05dd9",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "7e4cf318-8394-d6d5-1bdc-cb0f82f9a148"
+  },
+  {
+   "fp": "9a9a7a67939c5efa",
+   "gencode": "101404ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "54083951-c48b-6b6f-1baa-b84a8579cf02"
+  },
+  {
+   "fp": "9aa5e90d02c00dea",
+   "gencode": "462700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "dc6809f1-291d-25e2-4bb7-021fdba5ddf3"
+  },
+  {
+   "fp": "9b53677f7c1c087f",
+   "gencode": "E20200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "c8b124ec-6017-b6dd-d787-493bcbe80e4e"
+  },
+  {
+   "fp": "9d9239c2b32c7067",
+   "gencode": "162601ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "76228f34-1693-7d3f-1149-639b8a5550cc"
+  },
+  {
+   "fp": "9e23d0240353e2f2",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "111723ba-fe6b-4d56-35ec-14184bdfd6c7"
+  },
+  {
+   "fp": "9e351fe6d6afe7a1",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "42465788-c79d-742c-21d7-a45cc2dbcd92"
+  },
+  {
+   "fp": "9e9277fdd0afb168",
+   "gencode": "244301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "c2b4dc59-45f1-75e1-ab4f-1ce740bcc8d9"
+  },
+  {
+   "fp": "9f6afdbdc859217d",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "9f2007fc-0b96-e199-66ca-94565b3ea50c"
+  },
+  {
+   "fp": "9fbcef305f60ab2c",
+   "gencode": "E72100ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "6946d4b3-2741-9f2e-6c6e-06ad1c749901"
+  },
+  {
+   "fp": "a0049fc5e3db99a7",
+   "gencode": "276100ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 2,
+   "sourceRef": "b26d02bc-0cf8-a974-8d5e-41a54f69fb26"
+  },
+  {
+   "fp": "a0c14e06bf577f45",
+   "gencode": "D78300ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "6bbc67fb-e24d-b824-5a31-2bbdd0cd37c8"
+  },
+  {
+   "fp": "a28a85eca6cdd955",
+   "gencode": "172836ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 4,
+   "sourceRef": "7c396174-3bd3-30e9-8a91-010a72df11fa"
+  },
+  {
+   "fp": "a3c67b4613fd3eb8",
+   "gencode": "E68900ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "7a85d5e7-c4bd-69b5-d33f-5ec288c69b5b"
+  },
+  {
+   "fp": "a5592dcb4f316a55",
+   "gencode": "D08400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "5ea0c113-465a-bd80-a23d-379fbbcde3cf"
+  },
+  {
+   "fp": "a577e48e3ef7a450",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 7,
+   "sourceRef": "62e86012-08c5-15d2-a0a3-cd2f0f939a18"
+  },
+  {
+   "fp": "a5b3a69ac303bec9",
+   "gencode": "E78000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "13d36505-146f-16fa-b086-c076996ba9a0"
+  },
+  {
+   "fp": "a6757e473fbafaf4",
+   "gencode": "101330ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 8,
+   "sourceRef": "3fed40c5-afdc-5705-f7fa-30b3620f5a5e"
+  },
+  {
+   "fp": "a6782c4ee025dc8f",
+   "gencode": "130502ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 5,
+   "sourceRef": "570aa93a-33a0-562c-5cb9-06ea62ae7510"
+  },
+  {
+   "fp": "a694c9dc112e365e",
+   "gencode": "C97900ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "ab30a922-dbc8-b13a-e425-0d3bf44eec92"
+  },
+  {
+   "fp": "a7860cfa21908fad",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "0005146c-db31-b548-d830-5eff56f27489"
+  },
+  {
+   "fp": "a91d88a47af43dfd",
+   "gencode": "D22400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "00127370-dc8e-ffea-f131-3ccee3e309f0"
+  },
+  {
+   "fp": "a9bfdd441435d876",
+   "gencode": "E04100ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "c88d59e1-ee40-0c65-bb43-9d1472697e44"
+  },
+  {
+   "fp": "aaf3760afcac6cee",
+   "gencode": "E76800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "db29a584-eca9-c7fd-da32-3d2c9ff9ded4"
+  },
+  {
+   "fp": "abf4f38a2169326c",
+   "gencode": "106301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "56d863b4-9f4f-c15e-3b0d-b12cce52fd41"
+  },
+  {
+   "fp": "acf45d17a9835491",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "9db0509f-8fc5-4169-b81b-e281ec120f41"
+  },
+  {
+   "fp": "ad32288458b1e25f",
+   "gencode": "D40600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "89670c92-9d7b-873c-b739-22efc8e3a33c"
+  },
+  {
+   "fp": "adb268deb17fd6fd",
+   "gencode": "D77000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "cf7f5aa3-ab72-e07a-61fa-74978b750882"
+  },
+  {
+   "fp": "ae0799f2c725fda5",
+   "gencode": "D07700ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 3,
+   "sourceRef": "0163fae6-28b2-0cd7-950f-5838a44e7515"
+  },
+  {
+   "fp": "aea75a86495f1c79",
+   "gencode": "105203ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "76d39a31-9fa5-876c-d858-ec5599f214eb"
+  },
+  {
+   "fp": "b08ac3c4eadbd375",
+   "gencode": "A65401ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 5,
+   "sourceRef": "5f1c7b73-14bb-92d7-3125-1e6d9497cfad"
+  },
+  {
+   "fp": "b0d9a9b3835ce258",
+   "gencode": "199501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 1,
+   "sourceRef": "d0e573f3-5392-b461-82ed-8f17e423fcfc"
+  },
+  {
+   "fp": "b251eaa7b92efa63",
+   "gencode": "402300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "0bd275dc-f23b-406e-332f-10082646d561"
+  },
+  {
+   "fp": "b26d47f2b1fdb6e5",
+   "gencode": "C95700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "f7cc8ff4-642c-a825-3e32-c00c62464640"
+  },
+  {
+   "fp": "b33f6c66e4ac7beb",
+   "gencode": "A52500ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "994ee539-69c7-36a8-3a50-116262294305"
+  },
+  {
+   "fp": "b393265c63595d94",
+   "gencode": "473503ACE",
+   "route": "oral",
+   "form": "장용캡슐",
+   "size": 4,
+   "sourceRef": "08b9354c-456d-04db-1a08-99052838d73d"
+  },
+  {
+   "fp": "b44bfe6b4ef92c84",
+   "gencode": "727000ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "a8f172ec-5cc2-d29d-827c-1ae8c417d590"
+  },
+  {
+   "fp": "b4f5ca755bb1eea9",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "201252e4-f5fd-ad5f-e93e-dac1e70d8e8c"
+  },
+  {
+   "fp": "b533659077e54d0c",
+   "gencode": "199501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "e963adb8-8732-681b-0ccf-a5d93c28afb5"
+  },
+  {
+   "fp": "b63a6fef21f3d4ea",
+   "gencode": "172806ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 11,
+   "sourceRef": "e2eccb94-de5a-08d0-6a60-3e733da037eb"
+  },
+  {
+   "fp": "b63b11bef295dbed",
+   "gencode": "D52700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "c33699c8-5b80-7593-8fbe-ccbcf3955523"
+  },
+  {
+   "fp": "b6506d61c7739d6b",
+   "gencode": "271400ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 4,
+   "sourceRef": "80c58b0b-ecf5-2dc0-3544-8a3e1d3de462"
+  },
+  {
+   "fp": "b72fb8ebda14e8d7",
+   "gencode": "D14700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "af445e72-59e7-4136-1560-0b2cc48d34d3"
+  },
+  {
+   "fp": "b74eee9290583856",
+   "gencode": "E73500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "8730f20f-be34-4ba8-e4e2-459903bd2650"
+  },
+  {
+   "fp": "b7f6e848f5c83100",
+   "gencode": "D62000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "36c9fd07-6259-c835-31c1-aac4649e0e1c"
+  },
+  {
+   "fp": "b95d66383b9157a5",
+   "gencode": "111001ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 6,
+   "sourceRef": "db94725c-53d4-b553-2bac-9b6a5e4e99da"
+  },
+  {
+   "fp": "b96ef81c2a54ac44",
+   "gencode": "566833ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "2c7a1e56-6f76-e460-0527-e19eeb8d1ae4"
+  },
+  {
+   "fp": "b9a2308c431dc813",
+   "gencode": "D54500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "afd19243-7169-a09c-3b33-34d8fa2dd8a2"
+  },
+  {
+   "fp": "b9fb4ef9a5b85da5",
+   "gencode": "101842AGN",
+   "route": "oral",
+   "form": "과립",
+   "size": 2,
+   "sourceRef": "d27001b4-1929-20e6-b169-14b37deca63e"
+  },
+  {
+   "fp": "babea388b7d7c9dd",
+   "gencode": "D54500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "cb8eeae4-4708-954c-8f3d-94aa25ad3cee"
+  },
+  {
+   "fp": "bae5f95aa70c27b2",
+   "gencode": "A65401ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 4,
+   "sourceRef": "d3667600-f1a0-b16f-eef0-8a5624ce95f7"
+  },
+  {
+   "fp": "bb3a8a6f1322332b",
+   "gencode": "308000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "cee8f7f7-3c66-bd53-14bb-a9e4cdb42e4d"
+  },
+  {
+   "fp": "bc2394bf108e648c",
+   "gencode": "C20700ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 2,
+   "sourceRef": "e9cf088e-535a-65ff-599d-3020f70417b4"
+  },
+  {
+   "fp": "bc2b0b5947d92d8a",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "e98339c0-8201-86ba-4a27-70e24672ce7f"
+  },
+  {
+   "fp": "bd1c1c127228f1a5",
+   "gencode": "A04700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "6f5aa6dc-23c1-5982-0b36-f169131c8a8f"
+  },
+  {
+   "fp": "bd21fe82cae0aadc",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "f9684e40-96f6-e30b-8eb7-ce94a673a050"
+  },
+  {
+   "fp": "bd709a913e109be1",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "ece126d1-24b4-f057-867f-63a8fbeac52c"
+  },
+  {
+   "fp": "bdc5a8d44783860d",
+   "gencode": "A22000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "097109c2-baaa-8d4d-06b7-fd59f17223d3"
+  },
+  {
+   "fp": "be627a2e249a2164",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "fe1b526e-8d3b-4aec-5ed7-b9c910dc8822"
+  },
+  {
+   "fp": "beaa62b1c2d42d2a",
+   "gencode": "D12500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "44bed972-d01f-8931-2b01-1e4542283b71"
+  },
+  {
+   "fp": "bf37611c06fbf3c7",
+   "gencode": "530800ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 4,
+   "sourceRef": "01a8fd2d-c141-790f-1476-1bd36173bdc8"
+  },
+  {
+   "fp": "bfd53924843dc1e7",
+   "gencode": "D65500ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "749a7017-b7dd-85f7-6caf-0dfef3263945"
+  },
+  {
+   "fp": "bff467e14dac866e",
+   "gencode": "A18600ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "f6cf40e6-8f90-124b-c2f0-9e2cc4a1a00a"
+  },
+  {
+   "fp": "c05a95bf0f65cb16",
+   "gencode": "A78900ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "e8b6cd70-b4cc-0ede-ff49-3b1cc1cfe4ef"
+  },
+  {
+   "fp": "c0e7dc6bb9fadc21",
+   "gencode": "113232APD",
+   "route": "oral",
+   "form": "산",
+   "size": 4,
+   "sourceRef": "f7e591c3-e0b7-b6a8-b597-4d3326bc8c1a"
+  },
+  {
+   "fp": "c1b39a1bdf12c56d",
+   "gencode": "E75600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "e32fdde4-e18d-5357-0afc-dec01a6b4b96"
+  },
+  {
+   "fp": "c2e10aebb83ba855",
+   "gencode": "106331ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 7,
+   "sourceRef": "bfca0ea9-c737-e94b-0dd8-d37baf99d08d"
+  },
+  {
+   "fp": "c3987d783791ea57",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "d5f51955-6317-aa27-f68d-93469a9ded6f"
+  },
+  {
+   "fp": "c56fa8454abbdd49",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "76a0858e-eb34-9092-e487-bc0513c98e44"
+  },
+  {
+   "fp": "c613f1fd08d83dd6",
+   "gencode": "142334ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 2,
+   "sourceRef": "d0a05ec5-6229-5f2a-d63d-02c85c5f325b"
+  },
+  {
+   "fp": "c756c50d8c384700",
+   "gencode": "D65200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "dc903bac-164a-c2e1-6e5f-9fc325dd4f69"
+  },
+  {
+   "fp": "c89b296b7fe6806f",
+   "gencode": "E78000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "ab437028-adf8-7127-5a18-1707becbd3f0"
+  },
+  {
+   "fp": "c8fa7e08a35653e4",
+   "gencode": "E61700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "b19ed7a0-f4f6-2f4a-6ed2-0a556ceee009"
+  },
+  {
+   "fp": "c9b49ea9422e6097",
+   "gencode": "130502ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 3,
+   "sourceRef": "3f0c92a8-083e-4f36-a5b3-dc083ed91576"
+  },
+  {
+   "fp": "ca117f3c9d23d94c",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "b7c23f68-4848-0644-2776-2ca715b05758"
+  },
+  {
+   "fp": "cac332281877b9cd",
+   "gencode": "257100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "b0c6467e-6acb-0462-0007-12d0e0669480"
+  },
+  {
+   "fp": "cccc1bb8e9068ca0",
+   "gencode": "A28100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "e2ed24e4-8b1c-82ef-da3c-dba0522b8f0c"
+  },
+  {
+   "fp": "cd75b7a2d741035e",
+   "gencode": "A04700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "f17c5994-706e-d177-bb7b-067575e18eb2"
+  },
+  {
+   "fp": "cdf49b30132364d1",
+   "gencode": "A06600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 8,
+   "sourceRef": "9b6a1ac8-2311-4e7e-b0fb-ee9c975fae95"
+  },
+  {
+   "fp": "d03a3c131ea25cbc",
+   "gencode": "172836ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 2,
+   "sourceRef": "11e0cea1-6cef-d850-a4ec-dda39c7a0ab1"
+  },
+  {
+   "fp": "d14c2f91fd9e7d84",
+   "gencode": "101305ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 9,
+   "sourceRef": "46827744-86a3-6991-6aba-afa7f4f0b5f8"
+  },
+  {
+   "fp": "d158e65e6421c049",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "26ffebfb-a9c3-b44d-bbbb-de678a0e546a"
+  },
+  {
+   "fp": "d165e01347c327d9",
+   "gencode": "B03600ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 19,
+   "sourceRef": "d14a4325-47ef-ddfa-30f3-d96296082546"
+  },
+  {
+   "fp": "d17a2d52a842c100",
+   "gencode": "101842AGN",
+   "route": "oral",
+   "form": "과립",
+   "size": 7,
+   "sourceRef": "44d35b61-6f0f-4504-cb0a-1b0cbd93c6d0"
+  },
+  {
+   "fp": "d2248a1901d1231e",
+   "gencode": "D65200ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "0723c907-bbd7-0e4c-9b6a-01bfe4adb7bb"
+  },
+  {
+   "fp": "d2786f3dd0c87e1d",
+   "gencode": "227735ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 3,
+   "sourceRef": "db0f9710-9f97-49c7-f3e7-7ff716b04941"
+  },
+  {
+   "fp": "d2e24b2fc35a021c",
+   "gencode": "E75600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "7d506140-6722-1ee1-6603-343bbe873bd2"
+  },
+  {
+   "fp": "d2fcd3931fbcaa07",
+   "gencode": "A55700ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 5,
+   "sourceRef": "d16fb81a-da8e-bb04-4513-742542826c79"
+  },
+  {
+   "fp": "d322fefadabc0bb4",
+   "gencode": "142301ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "d95c6474-9a3f-7c91-5ae2-6a303305fa58"
+  },
+  {
+   "fp": "d39b99ac77334d94",
+   "gencode": "B04300ALQ",
+   "route": "oral",
+   "form": "내복액",
+   "size": 3,
+   "sourceRef": "9e764d1e-c89c-508d-0626-7f32baa6bfd8"
+  },
+  {
+   "fp": "d456067aed7c0a74",
+   "gencode": "D62000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "b5511ce7-c46a-2d25-a274-6d3cf0134345"
+  },
+  {
+   "fp": "d4e44347e55400d4",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 28,
+   "sourceRef": "9ae98e61-1036-b7fa-3c85-24ec9cfdc7df"
+  },
+  {
+   "fp": "d52001fc8d7af917",
+   "gencode": "D26500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "570f2812-2a1e-b0cc-1e4b-68fc293adc27"
+  },
+  {
+   "fp": "d53fbae8aaeaacfe",
+   "gencode": "A04700ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "da870b73-04c0-6aa3-11e1-084f2013e882"
+  },
+  {
+   "fp": "d76ece84b88e9d2d",
+   "gencode": "E69900ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "82e125d2-d8d8-7625-9496-eaf40e1d2e97"
+  },
+  {
+   "fp": "d8d7e1ab7731b051",
+   "gencode": "106301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "262905e7-0acd-af78-9756-1f873eceaf9f"
+  },
+  {
+   "fp": "db084281d6ba26fe",
+   "gencode": "166502ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "f5639fad-c259-7c9f-86c5-a3b4ce9054b9"
+  },
+  {
+   "fp": "db9fe17213a0bec3",
+   "gencode": "D08400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "b001820b-6c3e-6175-82bb-f7c74d13db05"
+  },
+  {
+   "fp": "dcb831f6cb0a6e73",
+   "gencode": "260300ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "95694efa-dcff-2e34-ddfe-c02741438438"
+  },
+  {
+   "fp": "dd4c68dc543e9b07",
+   "gencode": "E20200ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "2e7a014b-5ff4-eb47-78cd-5dd1149e2f40"
+  },
+  {
+   "fp": "dd5ea9651214139a",
+   "gencode": "E69700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 4,
+   "sourceRef": "3cf05684-9de4-5fb3-d41a-f319c48d6ed5"
+  },
+  {
+   "fp": "dec386c777bdac87",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "e071d88c-6456-3c80-a46e-703dc202466d"
+  },
+  {
+   "fp": "df9aa50a3b3f75b7",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "9137c6b0-895e-1357-93c2-685bbd3496fc"
+  },
+  {
+   "fp": "dfc74d8c19c4be7d",
+   "gencode": "D39500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "754eca73-dd81-3369-4c1a-5436b5d44598"
+  },
+  {
+   "fp": "dfe60d5fef06932a",
+   "gencode": "101404ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "5392a78c-6505-42aa-9d9a-08d98a635854"
+  },
+  {
+   "fp": "e0283310b279a51d",
+   "gencode": "D07901ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 6,
+   "sourceRef": "93be1e35-c139-3615-e876-f26d272e05ae"
+  },
+  {
+   "fp": "e11bdbeb1ff6abd5",
+   "gencode": "142334ASY",
+   "route": "oral",
+   "form": "시럽",
+   "size": 2,
+   "sourceRef": "bc7f30bd-1c7c-af5a-f043-2e80113da446"
+  },
+  {
+   "fp": "e2e6f8e65805123d",
+   "gencode": "270500ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "7a5d91d6-c889-1f9e-ba84-ba88079da2ee"
+  },
+  {
+   "fp": "e4ae05899dfcaf5a",
+   "gencode": "104303ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 12,
+   "sourceRef": "ce7d358a-1244-f59a-747e-d7666ea5bc28"
+  },
+  {
+   "fp": "e60e3831637338d8",
+   "gencode": "149801ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "1350b384-474d-73bd-9719-92001c7af2af"
+  },
+  {
+   "fp": "e697ac0f492d4dbd",
+   "gencode": "D04600ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "69545962-7a2c-6be6-ed03-46c5436bced8"
+  },
+  {
+   "fp": "e6b9ba48fba4696c",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "ca708d8b-af5e-45be-30e5-186e69568913"
+  },
+  {
+   "fp": "e739b42bee3e6e9f",
+   "gencode": "101330ASS",
+   "route": "oral",
+   "form": "현탁액",
+   "size": 2,
+   "sourceRef": "a71ee347-3d63-7e51-4b73-dc0cb8d12bb7"
+  },
+  {
+   "fp": "e85472fae1a23c8a",
+   "gencode": "130501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "e39115ad-8abc-a9b6-e75b-8c368697966a"
+  },
+  {
+   "fp": "ea58fe6cd402011b",
+   "gencode": "E78400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "93f8f51f-5d3c-28a9-6f45-454b0d714917"
+  },
+  {
+   "fp": "eadf16cf9d0f4011",
+   "gencode": "270500ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "ae6019de-750c-a7c7-87b1-748613c5aa15"
+  },
+  {
+   "fp": "ec972941fa46e456",
+   "gencode": "268600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "e8d04f73-11cf-351b-9e05-f9f0c4c39213"
+  },
+  {
+   "fp": "ed1f22a2f5036051",
+   "gencode": "101804ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "9944c7ca-62e0-1d9e-46b9-8f97a5426925"
+  },
+  {
+   "fp": "ed7563ad55093988",
+   "gencode": "292800ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 7,
+   "sourceRef": "480fde4e-39da-545f-2d24-2d44c2e8609a"
+  },
+  {
+   "fp": "ee592fcc26e3e195",
+   "gencode": "A52600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 5,
+   "sourceRef": "d6b6701f-6b21-2356-c017-a5c748291296"
+  },
+  {
+   "fp": "ef2128deae626149",
+   "gencode": "C97900ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "d45b4d53-e280-e37a-7881-4ff48c73dd64"
+  },
+  {
+   "fp": "f01ba5a991fd07c6",
+   "gencode": "113232APD",
+   "route": "oral",
+   "form": "산",
+   "size": 2,
+   "sourceRef": "019cca8b-07d7-6cde-6c7f-db66bc29f5e4"
+  },
+  {
+   "fp": "f111c6deede11e8f",
+   "gencode": "727000ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "418c5bcc-2085-d0b2-c4d4-063dde2895f3"
+  },
+  {
+   "fp": "f200dcb96d7d3ee7",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "6d2d0dd5-3a0a-fa1f-663f-9ddb32022c52"
+  },
+  {
+   "fp": "f31c943743dc0920",
+   "gencode": "D33500ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 16,
+   "sourceRef": "4f494976-46a3-7562-0082-cde613e1ae0c"
+  },
+  {
+   "fp": "f3474c4a146f77e0",
+   "gencode": "A25000ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "b8330edf-fd12-0d42-1a20-501b14568620"
+  },
+  {
+   "fp": "f40f5a4168a26aab",
+   "gencode": "B67900ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "31893b8b-5afa-81d7-dd63-42b549561be9"
+  },
+  {
+   "fp": "f5a05db9c2c76d62",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 15,
+   "sourceRef": "18401238-95cd-e454-48f5-923c5fb872a6"
+  },
+  {
+   "fp": "f6999903d700bf66",
+   "gencode": "142301ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 4,
+   "sourceRef": "c8564bfe-ac50-7693-6ef0-c748e5e6917d"
+  },
+  {
+   "fp": "f6dfc20d8220a27f",
+   "gencode": "273900ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 3,
+   "sourceRef": "fb83bd4f-c5be-3b79-77d9-2e08cd4e7b9c"
+  },
+  {
+   "fp": "f74e783578c2b9cd",
+   "gencode": "578100ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 7,
+   "sourceRef": "3a1bd704-7ff7-94e8-bf87-57574f0d9e9a"
+  },
+  {
+   "fp": "f873d1fbba190242",
+   "gencode": "172806ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 5,
+   "sourceRef": "6263bcc9-c0b8-2190-ef9c-8bc65dc5833c"
+  },
+  {
+   "fp": "f8a0adeb1c7034ce",
+   "gencode": "378000ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "2d31995f-f9a0-b061-0632-e0986ed648dd"
+  },
+  {
+   "fp": "f9a77cb96f4a960c",
+   "gencode": "292800ATE",
+   "route": "oral",
+   "form": "장용정",
+   "size": 6,
+   "sourceRef": "f2577ef3-1e20-0eda-bc34-2c6b3df03881"
+  },
+  {
+   "fp": "f9aa904e7dc0be21",
+   "gencode": "153101ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 4,
+   "sourceRef": "fb5f24c2-83b4-4c61-94a5-c5a65409aaac"
+  },
+  {
+   "fp": "fa64ea1e98c065e5",
+   "gencode": "E58700ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 3,
+   "sourceRef": "0e89c00a-9318-135c-9064-94b2d77c5bbe"
+  },
+  {
+   "fp": "fb2bf27af4649222",
+   "gencode": "268600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 3,
+   "sourceRef": "57d3c357-8280-2301-b70f-69bad3ac0973"
+  },
+  {
+   "fp": "fb40a713a1f1d71c",
+   "gencode": "185401ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 8,
+   "sourceRef": "4ff8fb85-f81f-5d43-17ee-9f4fa90b7341"
+  },
+  {
+   "fp": "fb7388ea653acc3d",
+   "gencode": "B29400ACS",
+   "route": "oral",
+   "form": "연질캡슐",
+   "size": 2,
+   "sourceRef": "30bdcb24-bbb1-f526-1721-b0a471f39e8f"
+  },
+  {
+   "fp": "fb966ff3f2b9890d",
+   "gencode": "246501ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 10,
+   "sourceRef": "ac0f8143-7b03-2658-96a3-ee67f383bebe"
+  },
+  {
+   "fp": "fd3fd1ffd1b49270",
+   "gencode": "268600ACH",
+   "route": "oral",
+   "form": "캡슐",
+   "size": 2,
+   "sourceRef": "c7f7b400-dc4a-67da-c9de-fc5de0523189"
+  },
+  {
+   "fp": "fdeeab1a2be551e0",
+   "gencode": "E76800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "027f7d90-07d4-d510-cfa1-25a33b3ce6c9"
+  },
+  {
+   "fp": "ff1dc2106da2e064",
+   "gencode": "D75800ATB",
+   "route": "oral",
+   "form": "정",
+   "size": 2,
+   "sourceRef": "2f89a296-1d83-c7e4-864f-338761cacc7a"
+  }
+ ],
+ "anomalies": [],
+ "verdict": "READY_FOR_PRODUCTION"
+}
