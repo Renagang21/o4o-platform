@@ -86,6 +86,13 @@ export function createAssetSnapshotController(
     //   등록은 추후 자료함 통합 시 옵션으로 열어두는 의미.
     // CHECK-O4O-LMS-KPA-LESSON-SNAPSHOT-CREATION-REMOVAL-V1: 'lesson' 제거 — 신규 lesson snapshot
     //   생성 경로를 닫는다. 기존 row / store-assets?type=lesson 조회 호환은 별도 경로로 유지.
+    // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1 — 계약 정합:
+    //   아래 목록은 **copy + 목록 조회(GET /assets?type=) 양쪽에 쓰이는 allowlist** 다.
+    //   실제 "신규 사본 생성"이 가능한 타입은 resolver 분기가 있는 3종뿐이다.
+    //     신규 생성 가능 : cms · content · signage      (콘텐츠 · 디지털사이니지 정책 범위)
+    //     생성 차단(404) : resource · blog · pop · qr   (resolver 분기 없음 → SOURCE_NOT_FOUND)
+    //   차단 타입을 목록에서 빼지 않는 이유 — 빼면 기존 사본의 조회가 400 으로 깨진다
+    //   (예: StoreLibraryResourcesPage 의 GET /assets?type=resource). lesson 선례와 동일.
     allowedAssetTypes: ['cms', 'signage', 'content', 'resource', 'blog', 'pop', 'qr'],
   });
 }

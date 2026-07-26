@@ -68,9 +68,12 @@ interface LatestSectionProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   loading: boolean;
+  /** WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: API 실패와 실제 0건 구분 */
+  error: boolean;
+  onRetry: () => void;
 }
 
-function LatestActivitySection({ items, activeTab, onTabChange, loading }: LatestSectionProps) {
+function LatestActivitySection({ items, activeTab, onTabChange, loading, error, onRetry }: LatestSectionProps) {
   const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
   const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
 
@@ -101,6 +104,18 @@ function LatestActivitySection({ items, activeTab, onTabChange, loading }: Lates
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+        </div>
+      ) : error ? (
+        /* WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
+           API 실패를 "등록된 글이 없습니다" 로 위장하지 않는다. 기존 컴포넌트 범위 내 최소 구분. */
+        <div className="text-center py-8">
+          <p className="text-sm text-slate-500 m-0">최신글을 불러오지 못했습니다</p>
+          <button
+            onClick={onRetry}
+            className="mt-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50"
+          >
+            다시 시도
+          </button>
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
@@ -168,6 +183,9 @@ export function CommunityHomePage() {
   const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
   const [latestTab, setLatestTab] = useState('all');
   const [latestLoading, setLatestLoading] = useState(true);
+  // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: 오류/0건 구분 + 재시도
+  const [latestError, setLatestError] = useState(false);
+  const [latestReloadKey, setLatestReloadKey] = useState(0);
 
   // WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 카드 클릭 시 로그인 유도
   const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
@@ -187,11 +205,16 @@ export function CommunityHomePage() {
 
   useEffect(() => {
     setLatestLoading(true);
+    setLatestError(false);
     homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
-      .then((res) => setLatestItems(res.data ?? []))
-      .catch(() => setLatestItems([]))
+      .then((res) => {
+        // 계약 위반(비배열)도 실패로 간주 — 빈 목록으로 위장하지 않는다
+        if (!Array.isArray(res?.data)) { setLatestItems([]); setLatestError(true); return; }
+        setLatestItems(res.data);
+      })
+      .catch(() => { setLatestItems([]); setLatestError(true); })
       .finally(() => setLatestLoading(false));
-  }, [latestTab]);
+  }, [latestTab, latestReloadKey]);
 
   // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
   //   공지 데이터는 `/home/notices` → cms_contents 다. 기존 href `/content/{id}` 는
@@ -271,6 +294,8 @@ export function CommunityHomePage() {
           activeTab={latestTab}
           onTabChange={setLatestTab}
           loading={latestLoading}
+          error={latestError}
+          onRetry={() => setLatestReloadKey((k) => k + 1)}
         />
       }
       // WO-O4O-KPA-HOME-ROLE-USAGE-MANUAL-RECLASSIFY-V1:

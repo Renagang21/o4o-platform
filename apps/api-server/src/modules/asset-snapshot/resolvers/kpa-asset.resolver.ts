@@ -17,6 +17,16 @@
  *     매장 복사 허용 대상은 콘텐츠(content/cms)·디지털사이니지(signage) 뿐이다.
  *     포럼은 애초에 assetType·resolver 가 없어 복사 경로가 존재하지 않는다.
  *
+ * WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: 신규 복사 경로 최종 정렬.
+ *   - blog / pop / qr 분기·resolver 제거(신규 사본 생성 차단). 실제 매장 가져가기는
+ *     전용 import 엔드포인트(importOperatorBlog/Pop/Qr)가 담당하므로 끊기는 경로 없음.
+ *   - resolveContent 에 status 게이트 추가(ready·published 만) — draft/private 차단.
+ *   - resolveSignage 에 serviceKey/scope/source 게이트 추가 — 서비스 간 자산 격리.
+ *   - blog/pop/qr/resource/lesson 은 allowedAssetTypes 에 남아 있으나 **신규 생성은 불가**하고
+ *     기존 사본의 목록 조회 호환만 유지한다(같은 목록이 GET /assets?type= 에도 쓰임).
+ *
+ * 신규 사본 생성 가능 = **cms · content · signage** 3종뿐이다(전부 '콘텐츠·디지털사이니지' 정책 범위).
+ *
  * Resolves KPA community CMS, Signage, KPA Content assets
  * into the standard ResolvedContent format.
  */
@@ -44,151 +54,27 @@ export class KpaAssetResolver implements ContentResolver {
     //   allowedAssetTypes 에는 'resource' 를 남겨 둔다 — 기존에 가져간 사본의 목록 조회
     //   (GET /assets?type=resource, StoreLibraryResourcesPage)가 계속 동작해야 하기 때문이다.
     //   포럼은 애초에 복사 경로(assetType/resolver)가 존재하지 않는다.
-    if (assetType === 'blog') {
-      return this.resolveBlog(sourceAssetId);
-    }
-    if (assetType === 'pop') {
-      return this.resolvePop(sourceAssetId);
-    }
-    if (assetType === 'qr') {
-      return this.resolveQr(sourceAssetId);
-    }
+    // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
+    //   매장 복사 허용 대상은 **콘텐츠(content/cms) · 디지털사이니지(signage)** 뿐이다.
+    //   blog / pop / qr 분기를 제거해 신규 사본 생성을 닫는다(→ 404 SOURCE_NOT_FOUND).
+    //   - 실제 매장 가져가기는 asset-snapshot 이 아니라 전용 import 엔드포인트가 담당한다
+    //     (HubBlogLibraryPage=importOperatorBlog · HubPopLibraryPage=importOperatorPop ·
+    //      HubQrLibraryPage=importOperatorQr) → 본 차단으로 끊기는 실사용 경로 없음.
+    //   - allowedAssetTypes 에는 3종을 남겨 둔다 — 같은 목록이 조회(GET /assets?type=)에도
+    //     쓰여 제거하면 기존 사본 조회가 400 으로 깨지기 때문이다(resource 와 동일 처리).
     return null;
-  }
-
-  /**
-   * WO-O4O-KPA-OPERATOR-HUB-QR-TEMPLATE-FOUNDATION-V1 Phase 1 Backend Foundation (2026-05-24)
-   *
-   * Phase 1 — placeholder. 항상 null 반환.
-   *
-   * operator_qr_templates entity 는 신설됐으나 (IR-O4O-KPA-OPERATOR-HUB-QR-BUSINESS-DEFINITION-V1
-   * Option B) 실 resolver 구현 (id + author_role='operator' AND status='published' 조건 +
-   * target_type/target_url/target_content_* contentJson 매핑) 은 Phase 2 후속.
-   *
-   * 본 단계는 assetType='qr' 호출이 allowedAssetTypes 통과 후 resolver 분기까지 도달하되
-   * 항상 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
-   *
-   * 본 trace 결정 사항: QR 의 매장 가져가기는 자료함 사본 (asset-snapshot copy) 흐름이 아니라
-   * 직접 import endpoint (Phase 3-B 의 /stores/:slug/qr/staff/import) 가 채택될 가능성 높음
-   * (변환 흐름: operator_qr_templates → store_qr_codes INSERT). 본 resolver 는 자료함 통합
-   * 옵션을 위해 미리 골격만 등록.
-   */
-  private async resolveQr(_id: string): Promise<ResolvedContent | null> {
-    return null;
-  }
-
-  /**
-   * WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1 (2026-05-24)
-   *
-   * Phase 1 placeholder 를 실 구현으로 전환. resolveBlog 패턴 mirror.
-   *
-   * 통과 조건:
-   *   - author_role = 'operator'  (매장 직접 작성 POP 차단 — 매장 전용)
-   *   - status = 'published'      (draft/archived 차단)
-   *
-   * 차단:
-   *   - author_role = 'store'  → 매장 직접 작성 POP 는 자료함 가져가기 대상 아님
-   *   - status ≠ 'published'   → 비공개 상태 POP 차단
-   *
-   * service_key 정합 (cross-service 노출 차단) 은 listing 단 (queryPop) 에서 처리한다.
-   * ContentResolver 인터페이스가 (sourceAssetId, assetType) 만 받으므로 resolver 레벨
-   * service_key 검증은 인터페이스 확장이 필요 — 별도 WO 대상. 다른 resolver (resolveBlog
-   * 포함) 도 동일 패턴.
-   *
-   * Full Copy — POP 본문 / 메타데이터를 contentJson 에 담아 자료함에 보존한다.
-   */
-  private async resolvePop(id: string): Promise<ResolvedContent | null> {
-    const rows = await this.dataSource.query(
-      `SELECT id, title, slug, excerpt, content, status, author_role,
-              published_at, created_at, service_key, store_id
-       FROM store_pops
-       WHERE id = $1
-         AND author_role = 'operator'
-         AND status = 'published'
-       LIMIT 1`,
-      [id],
-    );
-    if (!rows || rows.length === 0) return null;
-    const p = rows[0];
-
-    return {
-      title: p.title,
-      type: 'pop',
-      sourceService: 'kpa',
-      contentJson: {
-        title: p.title,
-        slug: p.slug,
-        excerpt: p.excerpt,
-        content: p.content,
-        authorRole: p.author_role,
-        publishedAt:
-          p.published_at instanceof Date ? p.published_at.toISOString() : p.published_at,
-        sourceServiceKey: p.service_key,
-        sourceStoreId: p.store_id,
-        capturedAt: new Date().toISOString(),
-      },
-    };
-  }
-
-  /**
-   * WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-QUERY-V1 (2026-05-23)
-   *
-   * Phase 2 — 운영자 HUB 게시 블로그를 매장 자료함으로 가져가기 위한 source resolver.
-   *
-   * 통과 조건:
-   *   - author_role = 'operator'  (매장 직접 작성 블로그는 본 resolver 대상 아님)
-   *   - status = 'published'      (draft/archived 차단)
-   *
-   * 차단:
-   *   - author_role = 'store'  → 매장 직접 작성 블로그는 매장 전용, HUB 자료함 가져가기 대상 아님
-   *   - status ≠ 'published'   → 비공개 상태 블로그 차단
-   *
-   * service_key 정합 (cross-service 노출 차단) 은 listing 단 (HubContentQueryService.queryBlog)
-   * 에서 처리한다. ContentResolver 인터페이스가 (sourceAssetId, assetType) 만 받으므로
-   * resolver 레벨 service_key 검증은 인터페이스 확장이 필요 — 별도 WO 대상.
-   * 다른 resolver (resolveCms / resolveSignage 등) 도 동일 패턴.
-   *
-   * Full Copy — 블로그 본문 / 메타데이터를 contentJson 에 담아 자료함에 보존한다.
-   */
-  private async resolveBlog(id: string): Promise<ResolvedContent | null> {
-    const rows = await this.dataSource.query(
-      `SELECT id, title, slug, excerpt, content, status, author_role,
-              published_at, created_at, service_key, store_id
-       FROM store_blog_posts
-       WHERE id = $1
-         AND author_role = 'operator'
-         AND status = 'published'
-       LIMIT 1`,
-      [id],
-    );
-    if (!rows || rows.length === 0) return null;
-    const b = rows[0];
-
-    return {
-      title: b.title,
-      type: 'blog',
-      sourceService: 'kpa',
-      contentJson: {
-        title: b.title,
-        slug: b.slug,
-        excerpt: b.excerpt,
-        content: b.content,
-        authorRole: b.author_role,
-        publishedAt:
-          b.published_at instanceof Date ? b.published_at.toISOString() : b.published_at,
-        sourceServiceKey: b.service_key,
-        sourceStoreId: b.store_id,
-        capturedAt: new Date().toISOString(),
-      },
-    };
   }
 
   /**
    * WO-O4O-SUPPLIER-RESOURCE-CURRENT-PUBLISH-AND-HUB-FLOW-PRESERVE-V1:
    * status='published' 게이트 추가 — HUB 목록(cms 탭: status='published')과 가져오기 게이트 정합.
    * 종전에는 ID 만 알면 pending/draft/archived cms 콘텐츠도 매장 사본 생성이 가능했다
-   * (승인 전 공급자 제출물 포함). resolveBlog/resolvePop 과 동일 패턴.
-   * service_key 정합은 기존 결정대로 listing 단 담당(resolvePop 주석 참조 — 인터페이스 확장 별도 WO).
+   * (승인 전 공급자 제출물 포함).
+   * service_key 정합은 기존 결정대로 listing 단(HubContentQueryService)이 담당한다 —
+   * ContentResolver 인터페이스가 (sourceAssetId, assetType) 만 받아 resolver 레벨 service_key
+   * 검증은 인터페이스 확장이 필요하며 별도 WO 대상이다.
+   * (WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: resolveBlog/resolvePop 은
+   *  제거되어 더 이상 참조 대상이 아니므로 주석에서 뺀다.)
    */
   private async resolveCms(id: string): Promise<ResolvedContent | null> {
     const repo = this.dataSource.getRepository(CmsContent);
@@ -221,11 +107,15 @@ export class KpaAssetResolver implements ContentResolver {
    *
    * Gates:
    *   1. is_deleted = false  (삭제된 콘텐츠 차단)
-   *   2. reusable_policy ≠ 'restricted'  (제작자 명시적 차단)
+   *   2. sub_type ≠ 'resource'  (자료실 우회 차단)
+   *   3. reusable_policy ≠ 'restricted'  (제작자 명시적 차단)
+   *   4. status ∈ {ready, published}  (draft/private 차단)
    * 위 조건 미충족 시 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
    *
-   * status 게이트는 운영자가 작성한 콘텐츠도 매장이 가져갈 수 있어야 하므로 본 단계에서는
-   * 적용하지 않는다.
+   * WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
+   *   종전 주석은 "운영자 콘텐츠도 가져갈 수 있어야 하므로 status 게이트를 적용하지 않는다" 였으나,
+   *   운영자 콘텐츠는 'ready' 로 저장되어 게이트를 통과하므로 그 의도는 유지되고
+   *   draft/private 만 차단된다.
    */
   private async resolveContent(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
@@ -246,6 +136,12 @@ export class KpaAssetResolver implements ContentResolver {
 
     // Gate 2 — reusable_policy 검증 (restricted 는 가져가기 차단)
     if (c.reusable_policy === 'restricted') return null;
+
+    // Gate 3 — WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1
+    //   상태 게이트가 없어 **draft/private 콘텐츠도 ID 만 알면 매장 사본 생성**이 가능했다.
+    //   매장에 내보낼 수 있는 상태는 ready(발행 가능/검토 완료) · published 뿐이다.
+    //   resolveCms/resolveBlog/resolvePop 이 이미 쓰는 status 게이트와 동일한 패턴.
+    if (c.status !== 'ready' && c.status !== 'published') return null;
 
     return {
       title: c.title,
@@ -282,6 +178,13 @@ export class KpaAssetResolver implements ContentResolver {
               "thumbnailUrl", "duration", "resolution", "content", "tags", "metadata"
        FROM "signage_media"
        WHERE "id" = $1 AND "deletedAt" IS NULL AND "status" = 'active'
+         -- WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
+         --   serviceKey/scope/source 게이트가 없어 **다른 서비스의 활성 미디어도 ID 만 알면
+         --   KPA 매장 사본으로 복사**할 수 있었다(서비스 간 자산 격리 부재).
+         --   HUB 조회(HubContentQueryService.querySignageMedia) 및 공개 상세 API 와 동일 기준으로 맞춘다.
+         AND "serviceKey" = 'kpa-society'
+         AND "scope" = 'global'
+         AND "source" IN ('hq', 'supplier', 'community')
        LIMIT 1`,
       [id],
     );

@@ -1712,6 +1712,23 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
+      //   상세가 id + is_deleted 만 검사해 **draft/private 콘텐츠도 ID 만 알면 조회**됐다.
+      //   목록(GET /contents)의 기존 접근 정책과 정렬한다 — 공개 범위를 넓히지 않는다.
+      //     비로그인   : published 만
+      //     로그인     : published · ready · 본인 소유(draft/private 포함)
+      //     운영자/관리자: 기존 관리 범위(전체)
+      //   ready 는 매장 HUB 콘텐츠 허브(status='ready')와 제작 자료 선택 흐름
+      //   (SelectContentsForProductionModal → getContentHubItem)이 소비하므로 로그인 사용자에게 허용한다.
+      //   존재 여부 노출을 피하려고 403 이 아니라 기존 404 형식을 그대로 쓴다.
+      const isOperatorOrAdmin = isKpaOperatorOrAdmin((req as any).user);
+      const isOwner = !!userId && content.created_by === userId;
+      const viewableStatuses = userId ? ['published', 'ready'] : ['published'];
+      if (!isOperatorOrAdmin && !isOwner && !viewableStatuses.includes(content.status)) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+
       // Check recommendation status for logged-in user
       let isRecommendedByMe = false;
       if (userId) {
