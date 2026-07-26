@@ -10,7 +10,9 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, Edit3, Link2, Trash2, FileText } from 'lucide-react';
 
 // ── Types ──
@@ -57,6 +59,7 @@ const typeStyle: Record<ContentType, string> = {
 
 export function PartnerContentsPage() {
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
   const [typeFilter, setTypeFilter] = useState<ContentType | ''>('');
   const [statusFilter, setStatusFilter] = useState<ContentStatus | ''>('');
 
@@ -66,6 +69,56 @@ export function PartnerContentsPage() {
     if (statusFilter && c.status !== statusFilter) return false;
     return true;
   });
+
+  // WO-O4O-NETURE-SETTLEMENT-AND-COMMISSION-LISTS-STANDARDIZATION-BATCH-V4:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   관리 열의 아이콘 3종(수정/링크/삭제)은 다중 행 액션이라 RowActionMenu 로 이관한다.
+  const columns: ListColumnDef<ContentItem>[] = [
+    {
+      key: 'title',
+      header: '콘텐츠',
+      minWidth: 200,
+      render: (_v, c) => <span className="text-sm font-medium text-gray-900">{c.title}</span>,
+    },
+    {
+      key: 'type',
+      header: '유형',
+      width: '110px',
+      render: (_v, c) => (
+        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeStyle[c.type]}`}>{c.type}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: '120px',
+      render: (_v, c) => <span className="text-sm text-gray-500">{c.createdAt}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '110px',
+      render: (_v, c) => (
+        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[c.status]}`}>{c.status}</span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      width: '72px',
+      align: 'center',
+      system: true,
+      render: (_v, c) => (
+        <RowActionMenu
+          actions={[
+            { key: 'edit', label: '수정', onClick: () => navigate(`/account/partner/contents/${c.id}`) },
+            { key: 'links', label: '링크', onClick: () => navigate(`/account/partner/links/${c.id}`) },
+            { key: 'delete', label: '삭제', variant: 'danger' as const, onClick: () => { /* TODO: 삭제 API 미구현 (기존 동작 유지) */ } },
+          ]}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-5">
@@ -139,63 +192,14 @@ export function PartnerContentsPage() {
         <>
           {/* Desktop Table */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">콘텐츠</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">유형</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">등록일</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">상태</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">관리</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm font-medium text-gray-900">{c.title}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${typeStyle[c.type]}`}>
-                        {c.type}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-500">{c.createdAt}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[c.status]}`}>
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Link
-                          to={`/account/partner/contents/${c.id}`}
-                          className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Edit3 size={15} />
-                        </Link>
-                        <Link
-                          to={`/account/partner/links/${c.id}`}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                          title="Links"
-                        >
-                          <Link2 size={15} />
-                        </Link>
-                        <button
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* WO-…-BATCH-V4: raw <table> → 표준 DataTable (데스크톱 표만 전환, 모바일 카드 뷰는 유지).
+                행 액션 3종(수정/링크/삭제)은 RowActionMenu 로 이관. */}
+            <DataTable<ContentItem>
+              columns={columns}
+              data={filtered}
+              rowKey={(c) => c.id}
+              emptyMessage="콘텐츠가 없습니다"
+            />
           </div>
 
           {/* Mobile Cards */}
