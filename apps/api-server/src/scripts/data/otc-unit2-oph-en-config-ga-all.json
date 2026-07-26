@@ -1,0 +1,454 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-READINESS-V1",
+ "unitId": "nonoral-unit-2-ophthalmic",
+ "note": "파트 저작본 무변형 병합(본문 미수정). 생산 입력 전용. usageLabel 은 점안 전용 프로파일이 주입한다.",
+ "parts": [
+  "otc-unit2-oph-en-config-ga-p01.json",
+  "otc-unit2-oph-en-config-ga-p02.json",
+  "otc-unit2-oph-en-config-ga-p03.json"
+ ],
+ "groups": [
+  {
+   "fp": "08491da02a0cbf9d",
+   "title": "Eye Drops (A26400COS)",
+   "efficacy": "This is an over-the-counter medicine used for discomfort while wearing soft or hard contact lenses, tear supplementation (dry eye), eye fatigue and blurred vision (when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to it, an allergic constitution, severe eye pain or glaucoma.\n\nWhen it is given to a child, give it under the supervision of a guardian.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nUse this medicine only once after opening it (single-use packs only). At the first use, discard the first 1 to 2 drops without instilling them.\n\nDo not share it with other people.\n\nDo not use a product that is past its expiry date, and even within the expiry date use it promptly once it has been opened.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Contact lens discomfort, tear supplementation (dry eye), eye fatigue and blurred vision",
+    "Choosing a product": "Products with the same generic-name code (A26400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "2175a2ba89dbc58b",
+   "title": "Eye Drops (A08500COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, supplementation of tear fluid (dry eye), discomfort while wearing hard or soft contact lenses, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to eye drops, severe eye pain or glaucoma.\n\nKeep to the stated dosage and schedule.\n\nWhen it is given to a child, give it under the supervision of a guardian.\n\nUse this medicine in the eye only.\n\nTo prevent contamination, do not share it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, tear supplementation (dry eye), contact lens discomfort and blurred vision",
+    "Choosing a product": "Products with the same generic-name code (A08500COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "b7c4fa0644d3fdb8",
+   "title": "Eye Drops (180137COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment such as desensitisation therapy; if you have had an allergic reaction to a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are allergic; or if you are pregnant or breast-feeding.\n\nDrowsiness or sedation may rarely occur after use, so be careful when driving or operating machinery.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep the tip from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, do not share it with other people.\n\nIf you wear contact lenses, remove the lens before instilling this medicine and put the lens back in at least 15 minutes after instillation.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180137COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "9369c1cd55af76aa",
+   "title": "Eye Drops (331800COS)",
+   "efficacy": "This is an over-the-counter medicine used for dry eye caused by insufficient tear secretion and lack of mucus.",
+   "usage": "Depending on the irritation symptoms in the eye, instill 1 to 2 drops into the eye as 1 dose, several times in 1 day. Discard any remaining solution and the container immediately after instillation.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nUse this medicine in the eye only.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nAfter opening, use it only once and immediately, and discard any remaining solution and the container straight away (single-use packs only).",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Dry eye caused by insufficient tear secretion and lack of mucus",
+    "Choosing a product": "Products with the same generic-name code (331800COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "7784aa8b824c2922",
+   "title": "Eye Drops (A08500COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, supplementation of tears (dry eye), discomfort while wearing hard or soft contact lenses, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain, glaucoma, or allergic symptoms caused by eye drops (redness of the eye, itching, swelling, rash, reddening of the skin and the like).\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated through eye discharge or fungi, so keep the tip from touching the eye directly.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nUse this medicine only once after opening it (single-use packs only). At the first use, discard the first 1 to 2 drops without instilling them (single-use packs only).\n\nIf your symptoms do not improve after about 2 weeks of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, tear supplementation (dry eye), contact lens discomfort and blurred vision",
+    "Choosing a product": "Products with the same generic-name code (A08500COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "cc60dcc7e8260ed2",
+   "title": "Eye Drops (A26400COS)",
+   "efficacy": "This is an over-the-counter medicine used for discomfort while wearing soft or hard contact lenses, tear supplementation (dry eye), eye fatigue and blurred vision (when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day. Discard any remaining solution and the container immediately after instillation (single-use packs only).",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to it, an allergic constitution, severe eye pain or glaucoma.\n\nWhen it is given to a child, give it under the supervision of a guardian.\n\nKeep to the stated dosage and schedule.\n\nUse it so that the front of the container does not touch the eyelid or the eyelashes, and do not use a solution that has become cloudy.\n\nUse this medicine in the eye only.\n\nUse this medicine only once after opening it (single-use packs only). At the first use, discard the first 1 to 2 drops without instilling them (single-use packs only).\n\nDo not share it with other people.\n\nDo not use a product that is past its expiry date, and even within the expiry date use it promptly once it has been opened.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Contact lens discomfort, tear supplementation (dry eye), eye fatigue and blurred vision",
+    "Choosing a product": "Products with the same generic-name code (A26400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "e0b9e2eda3331ee2",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic eye inflammation), stye, blepharitis (soreness of the eyelid) and itching of the eye.",
+   "usage": "Instill 1 to 3 drops into the eye as 1 dose, 3 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to it or to sulfonamides, or if you have severe eye pain.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis, stye, blepharitis and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "1b28025164e0c018",
+   "title": "Eye Drops (A52200COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, conjunctival congestion, eye discomfort after swimming or when dust or sweat gets into the eye, eye inflammation caused by ultraviolet and other light, soreness of the eyelid, discomfort while wearing hard contact lenses, itching of the eye, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain, glaucoma, or have had allergic symptoms caused by eye drops (for example redness of the eye, itching, swelling, rash or reddening of the skin).\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nKeep the tip of the container from touching the eyelid or the eyelashes, and do not use a solution that has become cloudy.\n\nDo not share it with other people.\n\nIf your symptoms do not improve after several days of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, conjunctival congestion, eye inflammation from light, sore eyelids, lens discomfort and itching",
+    "Choosing a product": "Products with the same generic-name code (A52200COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "50481409fd62a8ef",
+   "title": "Eye Gel (124203COO)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of dry eye symptoms.",
+   "usage": "Adults: depending on the severity of the symptoms, instill 1 drop into the conjunctival sac as 1 dose, 2 to 5 times in 1 day, and instill it about 30 minutes before going to bed. Treatment of dry keratoconjunctivitis generally needs long-term or continuous treatment, so you should consult an ophthalmologist.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain; if you have had allergic symptoms caused by eye drops (redness of the eye, itching, swelling, reddening of the skin and the like); if you are pregnant, may be pregnant or are breast-feeding; if the user is a child; or if you have corneal damage.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nRemove contact lenses before use and put them back in 30 minutes after instilling this medicine.\n\nIf you use other eye drops at the same time, leave an interval of at least 15 minutes between them and always use this medicine last.\n\nBlurred vision may occur after use, so be careful when driving or operating machinery.\n\nInstill it in small drops to avoid sticking of the eyelids.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye gel",
+    "What it is for": "Relief of dry eye symptoms",
+    "Choosing a product": "Products with the same generic-name code (124203COO) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "5a33b4740c014afb",
+   "title": "Eye Drops (228834COS)",
+   "efficacy": "This is an over-the-counter medicine used for vernal keratitis or conjunctivitis and for allergic conjunctivitis.",
+   "usage": "Instill 1 to 2 drops into the eye as 1 dose, 4 times in 1 day (morning, noon, evening and before going to bed). Increase or reduce the amount as appropriate for the symptoms.",
+   "caution": "Do not use this medicine if you have hypersensitivity to benzalkonium chloride.\n\nBefore using this medicine, consult a pharmacist if you are pregnant or may be pregnant.\n\nAvoid wearing soft contact lenses while you are using it.\n\nUse this medicine in the eye only.\n\nDo not use any remaining solution once 1 month has passed since the container was opened.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Vernal keratitis or conjunctivitis and allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (228834COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "817fea6770e59681",
+   "title": "Eye Drops (A52200COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, conjunctival congestion, eye discomfort after swimming or when dust or sweat gets into the eye, eye inflammation caused by ultraviolet and other light, soreness of the eyelid, discomfort while wearing hard contact lenses, itching of the eye, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain or glaucoma; if you have had allergic symptoms caused by eye drops (for example redness of the eye, itching, swelling, rash or reddening of the skin); or if you have or have had hypersensitivity to propylene glycol.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nDo not use a product that is past its expiry date, and once the container has been opened use it as soon as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, conjunctival congestion, eye inflammation from light, sore eyelids, lens discomfort and itching",
+    "Choosing a product": "Products with the same generic-name code (A52200COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "9bb78678769324c6",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment such as desensitisation therapy; if you have had an allergic reaction to a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nDrowsiness or sedation may rarely occur, so be careful when driving or operating machinery.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf you use this medicine together with other eye drops, leave an interval of at least 5 minutes between them.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "c4bb1ceb3f1b6c2d",
+   "title": "Eye Drops (A52200COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, conjunctival congestion, eye discomfort after swimming or when dust or sweat gets into the eye, eye inflammation caused by ultraviolet and other light, soreness of the eyelid, discomfort while wearing hard contact lenses, itching of the eye, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain or glaucoma, or if you have had allergic symptoms caused by eye drops (for example redness of the eye, itching, swelling, rash or reddening of the skin).\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nKeep the tip of the container from touching the eyelid or the eyelashes, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nDo not use a product that is past its expiry date, and once the container has been opened use it as soon as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, conjunctival congestion, eye inflammation from light, sore eyelids, lens discomfort and itching",
+    "Choosing a product": "Products with the same generic-name code (A52200COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "1d359c0e601dfab3",
+   "title": "Eye Drops (228653COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of burning, irritation and discomfort caused by dry eye or by exposure to wind and sun, and for the prevention of eye irritation.",
+   "usage": "When needed, instill 1 to 2 drops into the affected eye.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain, or if you have had an allergic reaction caused by eye drops (redness of the eye, itching, swelling, reddening of the skin and the like).\n\nIf your symptoms do not improve after 3 days of use, stop using it immediately and consult a pharmacist.\n\nDiscard any remaining solution and the container after instillation.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nKeep the tip of the container from touching the eyelid or the eyelashes, and do not use a solution that has become cloudy.\n\nTo prevent contamination, do not share it with other people.\n\nWhen it is used for a child, use it under the supervision of a guardian.\n\nKeep to the stated dosage and schedule.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort from dry eye, wind or sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (228653COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "2e6ffe5c7a5ffab2",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had allergic symptoms caused by a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nDrowsiness or sedation may rarely occur, so be careful when driving or operating machinery.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf you use this medicine together with other eye drops, leave an interval of at least 5 minutes between them.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "41cfffa3e295487d",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had allergic symptoms caused by a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nDrowsiness or sedation may rarely occur after use, so be careful when driving or operating machinery.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "6d20ddaaab4a48bc",
+   "title": "Eye Drops (A52200COS)",
+   "efficacy": "This is an over-the-counter medicine used for eye fatigue, conjunctival congestion, eye discomfort after swimming or when dust or sweat gets into the eye, eye inflammation caused by ultraviolet and other light, soreness of the eyelid, discomfort while wearing hard contact lenses, itching of the eye, and blurred vision (such as when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain or glaucoma, or if you have had allergic symptoms caused by eye drops (for example redness of the eye, itching, swelling, rash or reddening of the skin).\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf your symptoms do not improve after several days of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Eye fatigue, conjunctival congestion, eye inflammation from light, sore eyelids, lens discomfort and itching",
+    "Choosing a product": "Products with the same generic-name code (A52200COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "8b1243dff30c5403",
+   "title": "Eye Drops (228834COS)",
+   "efficacy": "This is an over-the-counter medicine used for vernal keratitis or conjunctivitis and for allergic conjunctivitis.",
+   "usage": "Instill 1 to 2 drops into the eye as 1 dose, 4 times in 1 day (morning, noon, evening and before going to bed). Increase or reduce the amount as appropriate for the symptoms.",
+   "caution": "Do not use this medicine if you have hypersensitivity to benzalkonium chloride.\n\nBefore using this medicine, consult a pharmacist if you are pregnant or may be pregnant.\n\nAvoid wearing soft contact lenses while you are using it.\n\nUse this medicine in the eye only.\n\nDo not use any remaining solution once 1 month has passed since the container was opened.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Vernal keratitis or conjunctivitis and allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (228834COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "ab75aaddc2c342d4",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis, stye, soreness of the eyelid and itching of the eye.",
+   "usage": "Instill 1 to 3 drops into the eye as 1 dose, 3 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain, or if you have had allergic symptoms caused by sulfonamides or by eye drops.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf your symptoms do not improve after 3 to 4 days of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis, stye, sore eyelids and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "ab93ddec03654396",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic conjunctivitis), stye, soreness of the eyelid and itching of the eye.",
+   "usage": "Instill 1 to 3 drops into the eye as 1 dose, 3 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain, or if you have had allergic symptoms caused by sulfonamides or by eye drops (for example rash, reddening of the skin, itching, nausea, fever or swelling).\n\nIf your symptoms do not improve after 3 to 4 days of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nIf you have a stye, be careful not to rub the eyelid or otherwise irritate the eye.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis (epidemic conjunctivitis), stye, sore eyelids and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "cd5d89fb606475a4",
+   "title": "Eye Drops (228653COS)",
+   "efficacy": "This is an over-the-counter medicine used for the temporary relief of burning, irritation and discomfort caused by dry eye or by exposure to wind and sun, and for the prevention of eye irritation.",
+   "usage": "When needed, instill 1 to 2 drops into the affected eye, and discard any remaining solution and the container after instillation.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain, or if you have ever had allergic symptoms caused by eye drops (redness of the eye, itching, swelling, reddening of the skin and the like).\n\nIf your symptoms do not improve after 3 days of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nWhen it is used for a child, use it under the supervision of a guardian.\n\nUse this medicine in the eye only, that is, as a medicine put into the eye.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nDo not let the tip of the container touch the eyelid or the eyelashes. If it does, the solution may be contaminated or become cloudy through eye discharge or fungi. Do not use a solution that has become cloudy.\n\nTo prevent contamination, do not share it with other people.\n\nBecause of its high viscosity, vision may become blurred for a short time.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Temporary relief of burning, irritation and discomfort from dry eye, wind or sun, and prevention of eye irritation",
+    "Choosing a product": "Products with the same generic-name code (228653COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "de8126ee3cb6f44a",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic conjunctivitis), stye, soreness of the eyelid and itching of the eye.",
+   "usage": "Instill 1 to 3 drops into the eye as 1 dose, 3 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have severe eye pain; if you have had allergic symptoms caused by sulfonamides (for example rash, reddening of the skin, itching, nausea or fever); or if you have had allergic symptoms caused by eye drops (for example redness, itching, swelling, rash or reddening of the skin).\n\nIf your symptoms do not improve after 3 to 4 days of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nIf you have a stye, be careful not to rub the eyelid or otherwise irritate the eye.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis (epidemic conjunctivitis), stye, sore eyelids and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "0125eb92854260b9",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had allergic symptoms caused by a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nDrowsiness or sedation may rarely occur after use, so be careful when driving or operating machinery.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.\n\nIf you use it together with other eye drops, leave an interval of at least 5 minutes between them.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "1789c703501b815f",
+   "title": "Eye Drops (180137COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had allergic symptoms caused by a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nDrowsiness or sedation may rarely occur, so be careful when driving or operating machinery.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf you use this medicine together with other eye drops, leave an interval of at least 5 minutes between them.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180137COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "19a7284435ecef46",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic eye inflammation), stye, blepharitis (soreness of the eyelid) and itching of the eye.",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have had an allergy to eye drops or to sulfonamides, if you have severe eye pain, or if you have glaucoma.\n\nUse this medicine in the eye only.\n\nIf your symptoms do not improve after 3 to 4 days of use, stop using it and consult a pharmacist.\n\nKeep to the stated dosage and schedule. Excessive use may instead cause redness of the eye.\n\nIf you have a stye, be careful not to rub the eyelid or otherwise irritate the eye.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nDo not use it continuously for a long period.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis, stye, blepharitis and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "1d615a120032fffd",
+   "title": "Eye Drops (331800COS)",
+   "efficacy": "This is an over-the-counter medicine used for dry eye caused by insufficient tear secretion and lack of mucus.",
+   "usage": "Depending on the irritation symptoms in the eye, instill 1 to 2 drops into the eye as 1 dose, several times in 1 day.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nIf you wear contact lenses, remove the lens when using this medicine and put it back in at least 30 minutes later.\n\nUse it within 1 month of opening the container.\n\nUse this medicine in the eye only.\n\nKeep the tip of the container from touching the eyelid or the eyelashes, and do not use a solution that has become cloudy.\n\nDo not share it with other people.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Dry eye caused by insufficient tear secretion and lack of mucus",
+    "Choosing a product": "Products with the same generic-name code (331800COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "1e051e72ebf96820",
+   "title": "Eye Drops (180137COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment such as desensitisation therapy; if you have had an allergic reaction to a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are allergic; or if you are pregnant or breast-feeding.\n\nDrowsiness or sedation may rarely occur after use, so be careful when driving or operating machinery.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, do not share it with other people.\n\nIf you wear contact lenses, remove the lens before instilling this medicine and put the lens back in at least 15 minutes after instillation.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nIf you use it together with other eye drops, leave an interval of at least 5 minutes between them.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180137COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "3fdf54c6e83b480d",
+   "title": "Eye Gel (124203COO)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of dry eye symptoms.",
+   "usage": "Adults: depending on the severity of the symptoms, instill 1 drop into the conjunctival sac as 1 dose, 2 to 5 times in 1 day, and instill it about 30 minutes before going to bed. Treatment of dry keratoconjunctivitis generally needs long-term or continuous treatment, so you should consult an ophthalmologist.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain; if you have had allergic symptoms caused by eye drops (redness of the eye, itching, swelling, reddening of the skin and the like); if you are pregnant, may be pregnant or are breast-feeding; or if the user is a child.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nRemove contact lenses before using this medicine and put them back in 30 minutes after use.\n\nIf you use other eye drops at the same time, leave an interval of at least 15 minutes between them and always use this medicine last.\n\nBlurred vision may occur after use, so be careful when driving or operating machinery.\n\nClose the cap after use.\n\nInstill it in small drops to avoid sticking of the eyelids.\n\nKeep the tip of the container from touching the eyeball. If the tip touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so be careful, and do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye gel",
+    "What it is for": "Relief of dry eye symptoms",
+    "Choosing a product": "Products with the same generic-name code (124203COO) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "4230f2287ea13056",
+   "title": "Eye Gel (124203COO)",
+   "efficacy": "This is an over-the-counter medicine used for the relief of dry eye symptoms.",
+   "usage": "Adults: depending on the severity of the symptoms, instill 1 drop into the conjunctival sac as 1 dose, 2 to 5 times in 1 day, and instill it about 30 minutes before going to bed. Treatment of dry keratoconjunctivitis generally needs long-term or continuous treatment, so you should consult an ophthalmologist.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it.\n\nBefore using this medicine, consult a pharmacist if you have severe eye pain; if you have had allergic symptoms caused by eye drops (redness of the eye, itching, swelling, reddening of the skin and the like); if you are pregnant, may be pregnant or are breast-feeding; or if the user is a child.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nRemove contact lenses before use and put them back in 30 minutes after instilling this medicine.\n\nIf you use other eye drops at the same time, leave an interval of at least 15 minutes between them and always use this medicine last.\n\nBlurred vision may occur after use, so be careful when driving or operating machinery.\n\nClose the cap after use.\n\nInstill it in small drops to avoid sticking of the eyelids.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye gel",
+    "What it is for": "Relief of dry eye symptoms",
+    "Choosing a product": "Products with the same generic-name code (124203COO) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "45763152d2494e37",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had allergic symptoms caused by a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nDrowsiness or sedation may rarely occur after use, so be careful when driving or operating machinery.\n\nIf you have experienced blurred vision after instillation, do not drive or operate machinery until your vision is clear again.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.\n\nIf you use it together with other eye drops, leave an interval of at least 5 minutes between them.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "68d8f8f86b2d3946",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic eye inflammation), stye, blepharitis (soreness of the eyelid) and itching of the eye.",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have had allergic symptoms caused by sulfonamides (rash, reddening of the skin, itching, nausea, fever and the like); if you have had allergic symptoms caused by eye drops (redness, itching, swelling, rash, reddening of the skin and the like); or if you have severe eye pain.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nUse this medicine in the eye only.\n\nDo not use a solution that has become cloudy.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf your symptoms do not improve after about 3 to 4 days of use, stop using it immediately and consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis, stye, blepharitis and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "70fa837b79a1228d",
+   "title": "Eye Drops (A26400COS)",
+   "efficacy": "This is an over-the-counter medicine used for discomfort while wearing soft or hard contact lenses, tear supplementation (dry eye), eye fatigue and blurred vision (when there is a lot of eye discharge).",
+   "usage": "Instill 2 to 3 drops into the eye as 1 dose, 5 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to it, an allergic constitution, severe eye pain or glaucoma.\n\nWhen it is given to a child, give it under the supervision of a guardian.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nDo not share it with other people.\n\nDo not use a product that is past its expiry date, and even within the expiry date use it promptly once it has been opened.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Contact lens discomfort, tear supplementation (dry eye), eye fatigue and blurred vision",
+    "Choosing a product": "Products with the same generic-name code (A26400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "baadc597c61d6771",
+   "title": "Eye Drops (180138COS)",
+   "efficacy": "This is an over-the-counter medicine used for allergic conjunctivitis.",
+   "usage": "Adults: instill 1 drop into the eye as 1 dose, 2 to 4 times in 1 day, or as appropriate for the condition. For infants and children, follow the doctor's prescription.",
+   "caution": "Do not use this medicine if you have hypersensitivity to it, or if the user is a child under 1 year of age.\n\nBefore using this medicine, consult a pharmacist if you are receiving allergy treatment (such as desensitisation therapy); if you have had an allergic reaction to a medicine; if you have eye pain with itching; if it is not clear whether your symptoms are caused by an allergy; or if you are pregnant or breast-feeding.\n\nIf you have experienced blurred vision after putting it into the eye, do not drive or operate machinery until your vision is clear again.\n\nDrowsiness or sedation may rarely occur, so be careful when driving or operating machinery.\n\nIf your symptoms do not improve after about 1 week of use, stop using it immediately and consult a pharmacist.\n\nKeep to the stated dosage and schedule.\n\nUse this medicine in the eye only.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly. Do not use a solution that has become cloudy.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf you use this medicine together with other eye drops, leave an interval of at least 5 minutes between them.\n\nDo not use it while wearing soft lenses, and put the lens in at least 15 minutes after use.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Allergic conjunctivitis",
+    "Choosing a product": "Products with the same generic-name code (180138COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  },
+  {
+   "fp": "d69affe1a4871731",
+   "title": "Eye Drops (A74400COS)",
+   "efficacy": "This is an over-the-counter medicine used for conjunctivitis (epidemic eye inflammation), stye, blepharitis (soreness of the eyelid) and itching of the eye.",
+   "usage": "Instill 1 to 3 drops into the eye as 1 dose, 3 to 6 times in 1 day.",
+   "caution": "Before using this medicine, consult a pharmacist if you have hypersensitivity to it or to sulfonamides, or if you have severe eye pain.\n\nKeep to the stated dosage and schedule.\n\nDo not use it continuously for a long period.\n\nUse this medicine in the eye only.\n\nDo not use it as a wetting solution for soft contact lenses, and do not use it while wearing soft contact lenses.\n\nTo prevent contamination, avoid sharing it with other people as far as possible.\n\nIf the tip of the container touches the eyelid or the eyelashes, the solution may be contaminated or become cloudy through eye discharge or fungi, so keep it from touching the eye directly.\n\nDo not use a solution that has become cloudy.\n\nIf your symptoms do not improve after 3 to 4 days of use, consult a pharmacist.",
+   "summaryTable": {
+    "Category": "Over-the-counter medicine · Eye drops",
+    "What it is for": "Conjunctivitis, stye, blepharitis and itching of the eye",
+    "Choosing a product": "Products with the same generic-name code (A74400COS) share the same ingredient, strength and dosage form. Check the ingredient and strength rather than the brand name.",
+    "Ask the pharmacist": "Ask the pharmacist in the store first if any of the cautions above apply to you."
+   }
+  }
+ ]
+}

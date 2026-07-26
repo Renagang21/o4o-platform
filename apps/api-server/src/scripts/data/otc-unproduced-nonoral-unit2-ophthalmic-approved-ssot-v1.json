@@ -1,0 +1,3508 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT2-OPHTHALMIC-FINAL-READINESS-V1",
+ "artifact": "nonoral-unit2-ophthalmic-approved-ssot",
+ "agent": "ga",
+ "unitId": "nonoral-unit-2-ophthalmic",
+ "status": "APPROVED_FOR_PRODUCTION",
+ "readOnly": true,
+ "dbWrite": 0,
+ "apply": "NOT_PERFORMED",
+ "basedOn": {
+  "proposal": "otc-unproduced-nonoral-approval-proposal-v1.json",
+  "proposalCommit": "05dc50b14",
+  "censusContract": "otc-unproduced-large-census.ts VERBATIM"
+ },
+ "routeContract": {
+  "route": "ophthalmic",
+  "suffixes": [
+   "COO",
+   "COS"
+  ],
+  "koUsageLabel": "점안 사용 안내",
+  "enUsageLabel": "How to use the eye drops",
+  "profileModule": "otc-unproduced-nonoral-unit2-ophthalmic-profile.ga.ts",
+  "sharedRunnerModified": false
+ },
+ "safetyFingerprintAxes": [
+  "indication",
+  "dosage",
+  "caution",
+  "numeric",
+  "age",
+  "duration",
+  "contraindication",
+  "codeIngredientStrength",
+  "codeForm",
+  "route"
+ ],
+ "fingerprintContract": {
+  "formula": "H(join('|', 10 axes))",
+  "anchor": "fpToUuidV2(fp)",
+  "changed": false
+ },
+ "totals": {
+  "fingerprints": 34,
+  "masters": 159
+ },
+ "writePlan": {
+  "ko": 636,
+  "en": 318,
+  "total": 954
+ },
+ "gates": {
+  "G1_fpMaster": "34/159",
+  "G2_masterDup": 0,
+  "G2_masterMissing": 0,
+  "G3_fpInternalMismatch": 0,
+  "G4_routeOphthalmic": 159,
+  "G4_routeConflict": 0,
+  "G5_officialAxisMissing": 0,
+  "G6_holdFp": 0,
+  "G6_holdMaster": 0,
+  "G7_liveMaster": 0,
+  "G7_liveFp": 0,
+  "G7_liveSourceRef": 0,
+  "G7_canonicalDup": 0,
+  "G8_authoredKoCanonical": 0,
+  "G8_authoredEnCanonical": 0,
+  "G9_writeTotal": 954,
+  "G10_status": "APPROVED_FOR_PRODUCTION",
+  "G12_dbWrite": 0
+ },
+ "allGatesPass": true,
+ "reproduction": {
+  "easyCanonicalFound": 159,
+  "gencodeSingle": 159,
+  "gencodeMatch": 159,
+  "routeOphthalmic": 159,
+  "fpReproduced": 159,
+  "fpReproductionRate": 1,
+  "missingAxisSample": [],
+  "fpFailSample": [],
+  "routeConflictSample": []
+ },
+ "koReadiness": {
+  "composableGroups": 34,
+  "anomalyGroups": 0,
+  "numericLossGroups": 0,
+  "oralVerbGroups": 0,
+  "anomalySample": [],
+  "sample": [
+   {
+    "fp": "0125eb92854260b9",
+    "gencode": "180138COS",
+    "usageLabel": "점안 사용 안내"
+   },
+   {
+    "fp": "08491da02a0cbf9d",
+    "gencode": "A26400COS",
+    "usageLabel": "점안 사용 안내"
+   },
+   {
+    "fp": "1789c703501b815f",
+    "gencode": "180137COS",
+    "usageLabel": "점안 사용 안내"
+   }
+  ]
+ },
+ "groups": [
+  {
+   "fp": "0125eb92854260b9",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "bd5f2709-cc34-b2c4-0e0c-505db8dee13b",
+   "masterIds": [
+    "3a020e36-02df-4b54-a61e-2c01d420e6a5",
+    "d7f03aff-aeb7-4260-91a9-a9f7911a9afd"
+   ]
+  },
+  {
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 17,
+   "sourceRef": "7deae8ce-4da2-94ca-e1f7-ab060d9e04b8",
+   "masterIds": [
+    "293d4663-4cbb-4b16-8b18-8a75a2ac5dd7",
+    "2d628e2f-caf1-4f7e-b044-4a71328e61fb",
+    "5cff71a3-d22d-4258-9312-1f460dc973c5",
+    "65c534b7-b8b4-42f8-a0a1-d7e58ad57103",
+    "672abc44-61d6-4640-9014-66a619e7a9ce",
+    "6793a7c6-308d-4260-8db5-2780c26568c9",
+    "8222f913-e627-43a7-b148-91fb548f4b54",
+    "958578ba-cebb-47c0-825f-f98a0e7b2a69",
+    "bf5304c8-b16c-4016-9cf8-2a633d2b56dc",
+    "c4af1336-289a-4e74-a493-314cf97d8d39",
+    "d3cbb509-b1b7-4842-a36f-e39bba239660",
+    "db10462d-6512-4818-8b31-e7823ca4e568",
+    "ddc828aa-a5e7-4640-a6d9-21732a683a9a",
+    "e3bf22b9-ec46-4203-b88c-b3b74c9930cd",
+    "f229977f-bc27-4378-9d39-2c56ef9b274a",
+    "f606dc00-f92c-4b45-9457-605d6c9d6914",
+    "fae93aa5-add7-4157-b309-04abbf71b4c0"
+   ]
+  },
+  {
+   "fp": "1789c703501b815f",
+   "gencode": "180137COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "dfc04cfd-af55-e245-bbb5-b31be118c911",
+   "masterIds": [
+    "107b7514-2417-4dc4-844e-acf81ad4d5bc",
+    "b9dbd1ff-f12f-4f33-a4a7-ae614254bd92"
+   ]
+  },
+  {
+   "fp": "19a7284435ecef46",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "28c40c42-a1af-0190-317e-0c9e1eb3690c",
+   "masterIds": [
+    "310d0d04-f199-4846-b9b1-bf4231055caa",
+    "5f43f9f8-04c0-48bf-98ed-b18a9bbe0e4f"
+   ]
+  },
+  {
+   "fp": "1b28025164e0c018",
+   "gencode": "A52200COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 4,
+   "sourceRef": "bf281566-175c-0066-e796-b83365bd0d82",
+   "masterIds": [
+    "111cfcff-1727-445f-a514-66481c4aa63e",
+    "32656562-d840-4476-b9e3-abb36bb85af0",
+    "b7a8c4e5-d478-47ec-87e8-7d10aa793fe9",
+    "d2125315-acbb-4807-aced-a46be3501a07"
+   ]
+  },
+  {
+   "fp": "1d359c0e601dfab3",
+   "gencode": "228653COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "f186ec68-93c2-7a6f-357d-2dadb4e27e61",
+   "masterIds": [
+    "a3bd568d-1e88-4fea-aaf0-102a71e21d97",
+    "e142b7f8-a40c-4d4f-ab63-0d99dbbae8f1",
+    "f10cc548-448e-4168-a110-84238c015c36"
+   ]
+  },
+  {
+   "fp": "1d615a120032fffd",
+   "gencode": "331800COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "813973a7-34c7-8fc8-cded-fdd8377a5b24",
+   "masterIds": [
+    "ddb75ed3-e307-4f03-903c-934cab6bd26b",
+    "e5f99385-1bb1-4b0a-b2a0-69d68dbc69e8"
+   ]
+  },
+  {
+   "fp": "1e051e72ebf96820",
+   "gencode": "180137COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "1e117812-7079-c637-5200-7ba82f75fbdc",
+   "masterIds": [
+    "18b9172a-2794-4606-a312-c9e508927c33",
+    "bb4458b3-8f3c-4fa9-ac3a-c09edb32114e"
+   ]
+  },
+  {
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 16,
+   "sourceRef": "d94dd4cb-4526-a477-742e-b191eed561f0",
+   "masterIds": [
+    "33c2a35e-8eaf-4412-80be-94bc7ef2800a",
+    "4f99bea7-ff56-438f-a27a-715c6417d71b",
+    "603bc971-9947-4aa3-be95-ab6e567f59f9",
+    "61c3524d-3fbf-47b3-9c10-a05b48a4555c",
+    "6d3c07da-7db8-43fe-a449-ef4cffeda5ae",
+    "7c744788-ae56-44f5-8c35-f32ab67428a5",
+    "7cc0aaa6-b7a4-4c0b-843c-a107ceec5019",
+    "9b401c06-b08a-4d68-9ff4-5d31c3acc35e",
+    "a30a7b8b-28c4-49af-a1e4-f4cecfae04fc",
+    "b323c0ff-5449-4ef4-8b92-ccafd998fe92",
+    "b60e3461-eacc-4a30-97f0-33d86b3a9cd5",
+    "c263d1d7-af29-4d50-b08e-a31234d18a03",
+    "c46e1ddb-9b71-4441-8a30-80467be33f85",
+    "e3515618-9832-42dc-9677-daad27d07a1e",
+    "ed65c36d-ac86-4609-910d-4692b5b913c7",
+    "f71947ce-b610-4b79-a8d1-2874d6e098ef"
+   ]
+  },
+  {
+   "fp": "2e6ffe5c7a5ffab2",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "74889a09-c4f4-5e3e-24bb-9140477ffb0d",
+   "masterIds": [
+    "1d322877-3176-496c-ac59-9a57ead4a97d",
+    "9cf43831-7de0-46e2-808a-5e866ac8f76a",
+    "bd38241e-a9c0-4709-ac36-a863f48d02ed"
+   ]
+  },
+  {
+   "fp": "3fdf54c6e83b480d",
+   "gencode": "124203COO",
+   "suffix": "COO",
+   "route": "ophthalmic",
+   "form": "점안겔",
+   "size": 2,
+   "sourceRef": "590f8b13-7911-a206-e074-73286bbfe3a3",
+   "masterIds": [
+    "d1461f2e-7486-4312-8eba-72781e784ef5",
+    "e66c3b9b-c642-47a9-8c00-7eb188035c54"
+   ]
+  },
+  {
+   "fp": "41cfffa3e295487d",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "941f7b79-6a30-ee74-6607-294a31e77b45",
+   "masterIds": [
+    "48d950b2-f300-4afc-b7ce-9c57caa5467e",
+    "7c7942a5-f2cc-4a15-9e37-ffe8ae92b8c6",
+    "a6352706-c373-4202-b19d-d47e6c9f5a76"
+   ]
+  },
+  {
+   "fp": "4230f2287ea13056",
+   "gencode": "124203COO",
+   "suffix": "COO",
+   "route": "ophthalmic",
+   "form": "점안겔",
+   "size": 2,
+   "sourceRef": "3f90b9ea-6d2d-9d0a-fcf9-7846217e88d5",
+   "masterIds": [
+    "83fc5803-079c-44a4-9c7b-27acd469c537",
+    "bb5d607a-915e-47ed-bceb-d4e1dde831a6"
+   ]
+  },
+  {
+   "fp": "45763152d2494e37",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "98e93400-03e0-e421-fbf3-e9ed7d50af52",
+   "masterIds": [
+    "0fd1c112-94af-4389-9218-ba3fe35234f3",
+    "d73f4ac5-dace-4f5d-8bb7-eb4f8cc87cae"
+   ]
+  },
+  {
+   "fp": "50481409fd62a8ef",
+   "gencode": "124203COO",
+   "suffix": "COO",
+   "route": "ophthalmic",
+   "form": "점안겔",
+   "size": 4,
+   "sourceRef": "c730007c-782e-a150-5890-19357322a69c",
+   "masterIds": [
+    "36c134fd-28d1-4026-858d-d30e15cd9fcb",
+    "5f95f897-e641-4a9e-8da5-b274d03ea63f",
+    "7b716083-0a28-4caf-adc6-7d9d89c0e24e",
+    "bc8b3d30-933c-4be4-84ce-292e733c4036"
+   ]
+  },
+  {
+   "fp": "5a33b4740c014afb",
+   "gencode": "228834COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 4,
+   "sourceRef": "13c215bd-74a7-2155-b835-626145e46222",
+   "masterIds": [
+    "05b7da68-c29b-4fe9-8cd4-fc2aea89108c",
+    "6c919014-39a2-4e53-9b4d-ef926aa396be",
+    "eb9e7c59-2dc8-49b5-9f21-3b435f27df73",
+    "f5929cfa-cc7c-4a43-aa92-85cbac4af83b"
+   ]
+  },
+  {
+   "fp": "68d8f8f86b2d3946",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "e1f149c8-ecb2-dc08-0ef2-2442e89cbcd4",
+   "masterIds": [
+    "1bdaa400-c3b0-41c7-ac0b-1764bab53f3d",
+    "83a03a0b-93a9-4849-8720-b5090c8a1f8a"
+   ]
+  },
+  {
+   "fp": "6d20ddaaab4a48bc",
+   "gencode": "A52200COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "704fd7e9-a121-adfe-b9a6-f6c441d261f4",
+   "masterIds": [
+    "62fb65c8-bbc6-43d6-b124-5f110a813c6c",
+    "6bea7470-1b01-47dd-be4c-a9343acebdb0",
+    "efe24d60-6a97-4d30-a35f-4fc2b4612a43"
+   ]
+  },
+  {
+   "fp": "70fa837b79a1228d",
+   "gencode": "A26400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "f5e8b947-22fa-c430-e377-a55c4fdc5723",
+   "masterIds": [
+    "3683e72e-29de-4387-82c1-ff7173e006f8",
+    "fdd87e2c-871d-461e-a9f5-d0cc33b75db9"
+   ]
+  },
+  {
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 10,
+   "sourceRef": "9c5d4a70-0235-5e35-464a-8aecd162a991",
+   "masterIds": [
+    "035b6186-196f-445b-bc70-9b3183dbbee7",
+    "2223fafe-934f-49fc-8bd6-10a0e89bf7a0",
+    "3e51a38a-f51d-4de9-ad7d-fbfee1f261d6",
+    "5c1aa14f-9e15-4c0f-9474-c267e8699599",
+    "63fd347a-8bda-44f9-92f1-4c850199bf89",
+    "771fd8a2-5086-439b-b798-0cb1f44c7c3b",
+    "89cc04f8-31a0-424b-b9d2-afba03b612bc",
+    "b86820ce-80da-414c-bbec-07ca33e2037a",
+    "e7a74a1b-ed6b-4ac7-882c-3633d639cfb4",
+    "f4cf9e0f-1b63-4ada-9a21-cd61bfdf6a37"
+   ]
+  },
+  {
+   "fp": "817fea6770e59681",
+   "gencode": "A52200COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 4,
+   "sourceRef": "1de2470e-3d33-e993-da54-c62438746c36",
+   "masterIds": [
+    "25f71045-189a-4da8-a2ed-e44f071fa51e",
+    "436fbcb9-7993-4224-81c8-c581e293b9c3",
+    "55c60fb1-b073-4909-914c-3b3c79d5878d",
+    "9440b169-171b-48f6-8b90-91454e31c3a2"
+   ]
+  },
+  {
+   "fp": "8b1243dff30c5403",
+   "gencode": "228834COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "1cc0d4f6-d6b0-7285-2e09-19be5f104041",
+   "masterIds": [
+    "35c3556c-153a-4d42-9d1d-c92e1fca117e",
+    "77dae34b-c344-4f5a-b99e-d3a7a834ccd0",
+    "ccc990f8-b555-48c2-8edd-7cb408936e49"
+   ]
+  },
+  {
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 11,
+   "sourceRef": "73284d81-ed56-f34e-8182-a33a8a5994ab",
+   "masterIds": [
+    "03ca2239-7513-4ff8-a1e0-809ca8a13b14",
+    "04719f8c-faca-40ad-8675-631538a76e7b",
+    "25ddf5bf-85a1-4a82-876f-5be67ab04092",
+    "38e7e482-4bcf-4137-bf5b-35f2092703bb",
+    "4a24e5ce-3419-457c-928c-89445e7a4b02",
+    "6b224a9a-38af-4a1f-b436-b6487464ed48",
+    "7382de7b-c6ba-4dc1-b586-ca3370187477",
+    "8945aa2e-f258-45b8-aa5b-452cd12b01b5",
+    "9ed2eb40-6ad7-4342-9edc-e4b3666e4298",
+    "c37fcbd5-2015-4924-be5f-b8c74a4080d9",
+    "eba1922a-90b0-4574-954d-72c9117cc56a"
+   ]
+  },
+  {
+   "fp": "9bb78678769324c6",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 4,
+   "sourceRef": "c2c6a12b-8c59-93ab-b1d9-bea357cce7b4",
+   "masterIds": [
+    "057c6a06-cd6b-41be-a3e1-8ac79baa5ad2",
+    "27695b57-e7c1-4f13-9c8c-309bfa2d6637",
+    "787b62e5-f93d-4104-94dd-470e12b85b5e",
+    "b67631cb-bfe6-4bf7-b890-78790192a2a3"
+   ]
+  },
+  {
+   "fp": "ab75aaddc2c342d4",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "429c1512-1d5c-72a3-ff24-e4ce603288e4",
+   "masterIds": [
+    "0bf47b8f-1602-4fad-9f2e-64233d651399",
+    "17435b8e-c50d-460a-b0d5-31b621688a3d",
+    "c51de7f4-c4b5-437e-a8ab-16b6a71ef646"
+   ]
+  },
+  {
+   "fp": "ab93ddec03654396",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "1c412284-5477-3fec-f30d-8fa0bb91cf65",
+   "masterIds": [
+    "4fcaaf5e-8ce7-4c77-a484-3fc325fefc4a",
+    "8b88500e-d85e-4a6a-909c-71809228504a",
+    "baa44dc7-2846-4054-8b67-42ca03882469"
+   ]
+  },
+  {
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 14,
+   "sourceRef": "96b91eb0-0bfa-43f7-be69-a4d64e30c809",
+   "masterIds": [
+    "113b11fe-9da2-4109-9767-e28c4690240e",
+    "13a0354b-124d-4c73-ae0b-a3e0f5c8b776",
+    "3ffe88d7-aaab-41fd-9332-f89f71b9e19a",
+    "4d774af3-2695-4db3-8e0b-108cf0127f3b",
+    "5b8b4c95-9b3d-4d13-a21a-0c7cd13f2e56",
+    "8dfe8ba0-efb9-4346-90cd-ed7805119557",
+    "9d8f903e-0282-4ac8-b09e-7392bf797b1f",
+    "b47339fb-1402-4a0f-bbc3-b2b7d0a483df",
+    "bee125d6-1557-4dfb-b0f4-a9736602ce17",
+    "c0171a31-3fd2-4c92-895d-866985d76bb6",
+    "d635d262-2b69-4606-a2b0-a3e91c5ca63d",
+    "d847df9e-171a-408d-99bd-08240acc3882",
+    "ed505119-2b83-4b4e-bbff-201d730e75c6",
+    "fb7925c2-df1b-4e1c-8885-576e8162af57"
+   ]
+  },
+  {
+   "fp": "baadc597c61d6771",
+   "gencode": "180138COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "a4b84e35-f692-960c-7822-7444a94b4c61",
+   "masterIds": [
+    "ca1014b3-1a31-4598-8b3d-993bf3a8a4a4",
+    "da04461f-0ce4-4d00-8fd4-f6fe8484a86d"
+   ]
+  },
+  {
+   "fp": "c4bb1ceb3f1b6c2d",
+   "gencode": "A52200COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 4,
+   "sourceRef": "03245116-14aa-1e2d-fee4-0371e25354e7",
+   "masterIds": [
+    "0d0d688f-65d0-45d7-aee5-e48e06eea0b8",
+    "7f16c444-7e97-4a41-9dd3-68b4c6a31b01",
+    "d4c3dbde-456e-423d-9707-7d10e027c8b8",
+    "dcb9af97-a9fa-4471-ab18-e652c3475e47"
+   ]
+  },
+  {
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 10,
+   "sourceRef": "9baa3d6b-de3a-1a72-40db-9aec1e198339",
+   "masterIds": [
+    "04ceb1bd-6549-4dc5-8993-d1c415da27e3",
+    "0df38a11-4e32-4452-98cd-794c2fa00922",
+    "23c35ce5-6229-4769-89eb-8b02199a5c9b",
+    "2ddd0bf3-3288-4fd8-a915-5afe1e3b3d64",
+    "40353687-001f-4a17-b98c-df2d917e705a",
+    "531cd211-7640-468d-b4e5-c6ab9f9bf46e",
+    "b6441bd1-3dbd-4349-9d66-8dd6d9556641",
+    "b967ae6f-2949-49fa-bdb3-c3f8503524d7",
+    "c6ea2539-61b0-456f-a49a-6b85cb6f8c4f",
+    "e83a5069-a699-4ccf-bc43-d72780bb5acd"
+   ]
+  },
+  {
+   "fp": "cd5d89fb606475a4",
+   "gencode": "228653COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "cfc4f498-34e7-6d46-9f19-113912508ed8",
+   "masterIds": [
+    "5d8fd6c8-e443-4814-9f09-0b90c8817053",
+    "93292998-1487-49fc-83bb-79b2273669d5",
+    "de1f70c7-c6f7-4b3a-8e0c-1a2d13dbc6a4"
+   ]
+  },
+  {
+   "fp": "d69affe1a4871731",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 2,
+   "sourceRef": "332b6cf0-8104-a680-1feb-5c057cef35b2",
+   "masterIds": [
+    "18c016ef-579b-4614-aaf5-c35e42d20a81",
+    "a5f79221-dcd7-4b58-822c-b443203f9fb0"
+   ]
+  },
+  {
+   "fp": "de8126ee3cb6f44a",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 3,
+   "sourceRef": "93b4418c-ca76-ebab-532c-3a648221e079",
+   "masterIds": [
+    "3ce6943a-089b-4c9c-9615-4300524d9a69",
+    "42d06afd-45f8-4b59-9bca-24f6dd380e21",
+    "470a681a-bbd5-4e99-8c85-8b9555d848e3"
+   ]
+  },
+  {
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "suffix": "COS",
+   "route": "ophthalmic",
+   "form": "점안액",
+   "size": 6,
+   "sourceRef": "046cf46a-d354-8928-8ceb-0fd55673c43b",
+   "masterIds": [
+    "27c2ead6-a56c-4d7c-8dfe-adc32721e8de",
+    "6fda1885-388f-4f0b-8369-a9d8117c9087",
+    "a97e44ce-10d4-4ef0-acd1-da8904b0bf44",
+    "d502a4a0-ed64-41c1-a567-11cd9163a2af",
+    "e9b72069-6fa7-4cf2-890b-c7e0506bd51b",
+    "f2806c29-b7c6-4591-83f1-c88819d7954e"
+   ]
+  }
+ ],
+ "masters": [
+  {
+   "masterId": "035b6186-196f-445b-bc70-9b3183dbbee7",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "03ca2239-7513-4ff8-a1e0-809ca8a13b14",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "04719f8c-faca-40ad-8675-631538a76e7b",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "04ceb1bd-6549-4dc5-8993-d1c415da27e3",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "057c6a06-cd6b-41be-a3e1-8ac79baa5ad2",
+   "fp": "9bb78678769324c6",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "5783ac4eda437077",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "05b7da68-c29b-4fe9-8cd4-fc2aea89108c",
+   "fp": "5a33b4740c014afb",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0350621f326f4258",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "0bf47b8f-1602-4fad-9f2e-64233d651399",
+   "fp": "ab75aaddc2c342d4",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4877b645de109523",
+    "dosage": "aceea71cca721439",
+    "caution": "6a136947789c3af6",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "531373e566e8d4e7",
+    "contraindication": "4d01ee6a0d092a62",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "0d0d688f-65d0-45d7-aee5-e48e06eea0b8",
+   "fp": "c4bb1ceb3f1b6c2d",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "64fb1f851bfa11bc",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "3cfaa4c27f821962",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "0df38a11-4e32-4452-98cd-794c2fa00922",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "0fd1c112-94af-4389-9218-ba3fe35234f3",
+   "fp": "45763152d2494e37",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "2347a7a6bbf3fe79",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "107b7514-2417-4dc4-844e-acf81ad4d5bc",
+   "fp": "1789c703501b815f",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "84c7afcbd3366eaa",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "111cfcff-1727-445f-a514-66481c4aa63e",
+   "fp": "1b28025164e0c018",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "c5c4b72ea34c9e55",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "113b11fe-9da2-4109-9767-e28c4690240e",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "13a0354b-124d-4c73-ae0b-a3e0f5c8b776",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "17435b8e-c50d-460a-b0d5-31b621688a3d",
+   "fp": "ab75aaddc2c342d4",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4877b645de109523",
+    "dosage": "aceea71cca721439",
+    "caution": "6a136947789c3af6",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "531373e566e8d4e7",
+    "contraindication": "4d01ee6a0d092a62",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "18b9172a-2794-4606-a312-c9e508927c33",
+   "fp": "1e051e72ebf96820",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "fda8fa70c13d930c",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "18c016ef-579b-4614-aaf5-c35e42d20a81",
+   "fp": "d69affe1a4871731",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "851f0f9c474343a1",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "96fc365fb3e44670",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "1bdaa400-c3b0-41c7-ac0b-1764bab53f3d",
+   "fp": "68d8f8f86b2d3946",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "cc1bec4ddca71eb1",
+    "caution": "a62ae6d7aa617199",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "91c3bf809d8f1242",
+    "contraindication": "2238ff1cf4300b9d",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "1d322877-3176-496c-ac59-9a57ead4a97d",
+   "fp": "2e6ffe5c7a5ffab2",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "84c7afcbd3366eaa",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "2223fafe-934f-49fc-8bd6-10a0e89bf7a0",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "23c35ce5-6229-4769-89eb-8b02199a5c9b",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "25ddf5bf-85a1-4a82-876f-5be67ab04092",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "25f71045-189a-4da8-a2ed-e44f071fa51e",
+   "fp": "817fea6770e59681",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "eef361359ebb93aa",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e20d7e53f7ad7439",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "27695b57-e7c1-4f13-9c8c-309bfa2d6637",
+   "fp": "9bb78678769324c6",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "5783ac4eda437077",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "27c2ead6-a56c-4d7c-8dfe-adc32721e8de",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "293d4663-4cbb-4b16-8b18-8a75a2ac5dd7",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "2d628e2f-caf1-4f7e-b044-4a71328e61fb",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "2ddd0bf3-3288-4fd8-a915-5afe1e3b3d64",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "310d0d04-f199-4846-b9b1-bf4231055caa",
+   "fp": "19a7284435ecef46",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "aeb497630169f685",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "09cb81d810cf3370",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "32656562-d840-4476-b9e3-abb36bb85af0",
+   "fp": "1b28025164e0c018",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "c5c4b72ea34c9e55",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "33c2a35e-8eaf-4412-80be-94bc7ef2800a",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "35c3556c-153a-4d42-9d1d-c92e1fca117e",
+   "fp": "8b1243dff30c5403",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0cee426704d73620",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "3683e72e-29de-4387-82c1-ff7173e006f8",
+   "fp": "70fa837b79a1228d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "73cda345cdab0461",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e1324ccfb500d06c",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "36c134fd-28d1-4026-858d-d30e15cd9fcb",
+   "fp": "50481409fd62a8ef",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "333590e7d750ec11",
+    "caution": "7aa905b9177b4a4e",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "38e7e482-4bcf-4137-bf5b-35f2092703bb",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "3a020e36-02df-4b54-a61e-2c01d420e6a5",
+   "fp": "0125eb92854260b9",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "f29527ce94d896c2",
+    "caution": "83c9fb5b92942a9e",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "fb0223be8a6d86fb",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "3ce6943a-089b-4c9c-9615-4300524d9a69",
+   "fp": "de8126ee3cb6f44a",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ee3b628079bc16b1",
+    "dosage": "aceea71cca721439",
+    "caution": "02fbc8dd4a31c429",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "18706223f2b8eeac",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "3e51a38a-f51d-4de9-ad7d-fbfee1f261d6",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "3ffe88d7-aaab-41fd-9332-f89f71b9e19a",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "40353687-001f-4a17-b98c-df2d917e705a",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "42d06afd-45f8-4b59-9bca-24f6dd380e21",
+   "fp": "de8126ee3cb6f44a",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ee3b628079bc16b1",
+    "dosage": "aceea71cca721439",
+    "caution": "02fbc8dd4a31c429",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "18706223f2b8eeac",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "436fbcb9-7993-4224-81c8-c581e293b9c3",
+   "fp": "817fea6770e59681",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "eef361359ebb93aa",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e20d7e53f7ad7439",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "470a681a-bbd5-4e99-8c85-8b9555d848e3",
+   "fp": "de8126ee3cb6f44a",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ee3b628079bc16b1",
+    "dosage": "aceea71cca721439",
+    "caution": "02fbc8dd4a31c429",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "18706223f2b8eeac",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "48d950b2-f300-4afc-b7ce-9c57caa5467e",
+   "fp": "41cfffa3e295487d",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "52d6154ec94741d6",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "fb0223be8a6d86fb",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "4a24e5ce-3419-457c-928c-89445e7a4b02",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "4d774af3-2695-4db3-8e0b-108cf0127f3b",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "4f99bea7-ff56-438f-a27a-715c6417d71b",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "4fcaaf5e-8ce7-4c77-a484-3fc325fefc4a",
+   "fp": "ab93ddec03654396",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "defb4442eab53710",
+    "dosage": "aceea71cca721439",
+    "caution": "5049f68f49a71b1e",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "2170aebd05f59fdd",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "531cd211-7640-468d-b4e5-c6ab9f9bf46e",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "55c60fb1-b073-4909-914c-3b3c79d5878d",
+   "fp": "817fea6770e59681",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "eef361359ebb93aa",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e20d7e53f7ad7439",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5b8b4c95-9b3d-4d13-a21a-0c7cd13f2e56",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5c1aa14f-9e15-4c0f-9474-c267e8699599",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5cff71a3-d22d-4258-9312-1f460dc973c5",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5d8fd6c8-e443-4814-9f09-0b90c8817053",
+   "fp": "cd5d89fb606475a4",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "2799ab4caff0d18d",
+    "dosage": "b56e5648a3cb0420",
+    "caution": "17898058f832338e",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "23d90955578bf772",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5f43f9f8-04c0-48bf-98ed-b18a9bbe0e4f",
+   "fp": "19a7284435ecef46",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "aeb497630169f685",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "09cb81d810cf3370",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "5f95f897-e641-4a9e-8da5-b274d03ea63f",
+   "fp": "50481409fd62a8ef",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "333590e7d750ec11",
+    "caution": "7aa905b9177b4a4e",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "603bc971-9947-4aa3-be95-ab6e567f59f9",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "61c3524d-3fbf-47b3-9c10-a05b48a4555c",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "62fb65c8-bbc6-43d6-b124-5f110a813c6c",
+   "fp": "6d20ddaaab4a48bc",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "0bb193fe389f73fd",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "645f05216494630a",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "63fd347a-8bda-44f9-92f1-4c850199bf89",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "65c534b7-b8b4-42f8-a0a1-d7e58ad57103",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "672abc44-61d6-4640-9014-66a619e7a9ce",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6793a7c6-308d-4260-8db5-2780c26568c9",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6b224a9a-38af-4a1f-b436-b6487464ed48",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6bea7470-1b01-47dd-be4c-a9343acebdb0",
+   "fp": "6d20ddaaab4a48bc",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "0bb193fe389f73fd",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "645f05216494630a",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6c919014-39a2-4e53-9b4d-ef926aa396be",
+   "fp": "5a33b4740c014afb",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0350621f326f4258",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6d3c07da-7db8-43fe-a449-ef4cffeda5ae",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "6fda1885-388f-4f0b-8369-a9d8117c9087",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7382de7b-c6ba-4dc1-b586-ca3370187477",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "771fd8a2-5086-439b-b798-0cb1f44c7c3b",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "77dae34b-c344-4f5a-b99e-d3a7a834ccd0",
+   "fp": "8b1243dff30c5403",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0cee426704d73620",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "787b62e5-f93d-4104-94dd-470e12b85b5e",
+   "fp": "9bb78678769324c6",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "5783ac4eda437077",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7b716083-0a28-4caf-adc6-7d9d89c0e24e",
+   "fp": "50481409fd62a8ef",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "333590e7d750ec11",
+    "caution": "7aa905b9177b4a4e",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7c744788-ae56-44f5-8c35-f32ab67428a5",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7c7942a5-f2cc-4a15-9e37-ffe8ae92b8c6",
+   "fp": "41cfffa3e295487d",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "52d6154ec94741d6",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "fb0223be8a6d86fb",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7cc0aaa6-b7a4-4c0b-843c-a107ceec5019",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "7f16c444-7e97-4a41-9dd3-68b4c6a31b01",
+   "fp": "c4bb1ceb3f1b6c2d",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "64fb1f851bfa11bc",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "3cfaa4c27f821962",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "8222f913-e627-43a7-b148-91fb548f4b54",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "83a03a0b-93a9-4849-8720-b5090c8a1f8a",
+   "fp": "68d8f8f86b2d3946",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "cc1bec4ddca71eb1",
+    "caution": "a62ae6d7aa617199",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "91c3bf809d8f1242",
+    "contraindication": "2238ff1cf4300b9d",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "83fc5803-079c-44a4-9c7b-27acd469c537",
+   "fp": "4230f2287ea13056",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "68d97bb5ed70ab35",
+    "caution": "02a9b18a0d41776c",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "8945aa2e-f258-45b8-aa5b-452cd12b01b5",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "89cc04f8-31a0-424b-b9d2-afba03b612bc",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "8b88500e-d85e-4a6a-909c-71809228504a",
+   "fp": "ab93ddec03654396",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "defb4442eab53710",
+    "dosage": "aceea71cca721439",
+    "caution": "5049f68f49a71b1e",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "2170aebd05f59fdd",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "8dfe8ba0-efb9-4346-90cd-ed7805119557",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "93292998-1487-49fc-83bb-79b2273669d5",
+   "fp": "cd5d89fb606475a4",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "2799ab4caff0d18d",
+    "dosage": "b56e5648a3cb0420",
+    "caution": "17898058f832338e",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "23d90955578bf772",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "9440b169-171b-48f6-8b90-91454e31c3a2",
+   "fp": "817fea6770e59681",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "eef361359ebb93aa",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e20d7e53f7ad7439",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "958578ba-cebb-47c0-825f-f98a0e7b2a69",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "9b401c06-b08a-4d68-9ff4-5d31c3acc35e",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "9cf43831-7de0-46e2-808a-5e866ac8f76a",
+   "fp": "2e6ffe5c7a5ffab2",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "84c7afcbd3366eaa",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "9d8f903e-0282-4ac8-b09e-7392bf797b1f",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "9ed2eb40-6ad7-4342-9edc-e4b3666e4298",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "a30a7b8b-28c4-49af-a1e4-f4cecfae04fc",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "a3bd568d-1e88-4fea-aaf0-102a71e21d97",
+   "fp": "1d359c0e601dfab3",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "8749a4169b8ff681",
+    "dosage": "2d4ce9fa3c4eff6b",
+    "caution": "efd23e57b7c6db19",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "a5f79221-dcd7-4b58-822c-b443203f9fb0",
+   "fp": "d69affe1a4871731",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "851f0f9c474343a1",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "96fc365fb3e44670",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "a6352706-c373-4202-b19d-d47e6c9f5a76",
+   "fp": "41cfffa3e295487d",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "52d6154ec94741d6",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "fb0223be8a6d86fb",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "a97e44ce-10d4-4ef0-acd1-da8904b0bf44",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b323c0ff-5449-4ef4-8b92-ccafd998fe92",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b47339fb-1402-4a0f-bbc3-b2b7d0a483df",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b60e3461-eacc-4a30-97f0-33d86b3a9cd5",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b6441bd1-3dbd-4349-9d66-8dd6d9556641",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b67631cb-bfe6-4bf7-b890-78790192a2a3",
+   "fp": "9bb78678769324c6",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "5783ac4eda437077",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b7a8c4e5-d478-47ec-87e8-7d10aa793fe9",
+   "fp": "1b28025164e0c018",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "c5c4b72ea34c9e55",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b86820ce-80da-414c-bbec-07ca33e2037a",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b967ae6f-2949-49fa-bdb3-c3f8503524d7",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "b9dbd1ff-f12f-4f33-a4a7-ae614254bd92",
+   "fp": "1789c703501b815f",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "84c7afcbd3366eaa",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "baa44dc7-2846-4054-8b67-42ca03882469",
+   "fp": "ab93ddec03654396",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "defb4442eab53710",
+    "dosage": "aceea71cca721439",
+    "caution": "5049f68f49a71b1e",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "809cb806cfaa8c47",
+    "contraindication": "2170aebd05f59fdd",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bb4458b3-8f3c-4fa9-ac3a-c09edb32114e",
+   "fp": "1e051e72ebf96820",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "fda8fa70c13d930c",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bb5d607a-915e-47ed-bceb-d4e1dde831a6",
+   "fp": "4230f2287ea13056",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "68d97bb5ed70ab35",
+    "caution": "02a9b18a0d41776c",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bc8b3d30-933c-4be4-84ce-292e733c4036",
+   "fp": "50481409fd62a8ef",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "5e3da0f2d3b3c9ae",
+    "dosage": "333590e7d750ec11",
+    "caution": "7aa905b9177b4a4e",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bd38241e-a9c0-4709-ac36-a863f48d02ed",
+   "fp": "2e6ffe5c7a5ffab2",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "84c7afcbd3366eaa",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bee125d6-1557-4dfb-b0f4-a9736602ce17",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "bf5304c8-b16c-4016-9cf8-2a633d2b56dc",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c0171a31-3fd2-4c92-895d-866985d76bb6",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c263d1d7-af29-4d50-b08e-a31234d18a03",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c37fcbd5-2015-4924-be5f-b8c74a4080d9",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c46e1ddb-9b71-4441-8a30-80467be33f85",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c4af1336-289a-4e74-a493-314cf97d8d39",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c51de7f4-c4b5-437e-a8ab-16b6a71ef646",
+   "fp": "ab75aaddc2c342d4",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4877b645de109523",
+    "dosage": "aceea71cca721439",
+    "caution": "6a136947789c3af6",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "531373e566e8d4e7",
+    "contraindication": "4d01ee6a0d092a62",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "c6ea2539-61b0-456f-a49a-6b85cb6f8c4f",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ca1014b3-1a31-4598-8b3d-993bf3a8a4a4",
+   "fp": "baadc597c61d6771",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "7b430e3d886f3418",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ccc990f8-b555-48c2-8edd-7cb408936e49",
+   "fp": "8b1243dff30c5403",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0cee426704d73620",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d1461f2e-7486-4312-8eba-72781e784ef5",
+   "fp": "3fdf54c6e83b480d",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "86c54195eaa00217",
+    "dosage": "cbef1ec68e9849ac",
+    "caution": "075257c714dca127",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d2125315-acbb-4807-aced-a46be3501a07",
+   "fp": "1b28025164e0c018",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "c82638a628c88570",
+    "dosage": "923501c8a23385da",
+    "caution": "c5c4b72ea34c9e55",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d3cbb509-b1b7-4842-a36f-e39bba239660",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d4c3dbde-456e-423d-9707-7d10e027c8b8",
+   "fp": "c4bb1ceb3f1b6c2d",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "64fb1f851bfa11bc",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "3cfaa4c27f821962",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d502a4a0-ed64-41c1-a567-11cd9163a2af",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d635d262-2b69-4606-a2b0-a3e91c5ca63d",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d73f4ac5-dace-4f5d-8bb7-eb4f8cc87cae",
+   "fp": "45763152d2494e37",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "2347a7a6bbf3fe79",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d7f03aff-aeb7-4260-91a9-a9f7911a9afd",
+   "fp": "0125eb92854260b9",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "f29527ce94d896c2",
+    "caution": "83c9fb5b92942a9e",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "fb0223be8a6d86fb",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "d847df9e-171a-408d-99bd-08240acc3882",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "da04461f-0ce4-4d00-8fd4-f6fe8484a86d",
+   "fp": "baadc597c61d6771",
+   "gencode": "180138COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "3bd62c31127c822c",
+    "caution": "7b430e3d886f3418",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "be4af058766d97bb",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180138",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "db10462d-6512-4818-8b31-e7823ca4e568",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "dcb9af97-a9fa-4471-ab18-e652c3475e47",
+   "fp": "c4bb1ceb3f1b6c2d",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "64fb1f851bfa11bc",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "3cfaa4c27f821962",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ddb75ed3-e307-4f03-903c-934cab6bd26b",
+   "fp": "1d615a120032fffd",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "41126f454b9a0bbf",
+    "caution": "92a2b0fe854d9056",
+    "numeric": "80705e54c403e53e",
+    "age": "df140b9da555206c",
+    "duration": "eb88f4ec8f123c88",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ddc828aa-a5e7-4640-a6d9-21732a683a9a",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "de1f70c7-c6f7-4b3a-8e0c-1a2d13dbc6a4",
+   "fp": "cd5d89fb606475a4",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "2799ab4caff0d18d",
+    "dosage": "b56e5648a3cb0420",
+    "caution": "17898058f832338e",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "23d90955578bf772",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e142b7f8-a40c-4d4f-ab63-0d99dbbae8f1",
+   "fp": "1d359c0e601dfab3",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "8749a4169b8ff681",
+    "dosage": "2d4ce9fa3c4eff6b",
+    "caution": "efd23e57b7c6db19",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e3515618-9832-42dc-9677-daad27d07a1e",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e3bf22b9-ec46-4203-b88c-b3b74c9930cd",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e5f99385-1bb1-4b0a-b2a0-69d68dbc69e8",
+   "fp": "1d615a120032fffd",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "41126f454b9a0bbf",
+    "caution": "92a2b0fe854d9056",
+    "numeric": "80705e54c403e53e",
+    "age": "df140b9da555206c",
+    "duration": "eb88f4ec8f123c88",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e66c3b9b-c642-47a9-8c00-7eb188035c54",
+   "fp": "3fdf54c6e83b480d",
+   "gencode": "124203COO",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "86c54195eaa00217",
+    "dosage": "cbef1ec68e9849ac",
+    "caution": "075257c714dca127",
+    "numeric": "e18021ba49fa2db2",
+    "age": "4e78e9980a994b13",
+    "duration": "8b9798b32a93a640",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "124203",
+    "codeForm": "COO",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e7a74a1b-ed6b-4ac7-882c-3633d639cfb4",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e83a5069-a699-4ccf-bc43-d72780bb5acd",
+   "fp": "cc60dcc7e8260ed2",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "56e7186b9934383f",
+    "dosage": "2af90964b7be95bb",
+    "caution": "e625cd62b3cac58a",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "a86017c6802268b9",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "e9b72069-6fa7-4cf2-890b-c7e0506bd51b",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "eb9e7c59-2dc8-49b5-9f21-3b435f27df73",
+   "fp": "5a33b4740c014afb",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0350621f326f4258",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "eba1922a-90b0-4574-954d-72c9117cc56a",
+   "fp": "9369c1cd55af76aa",
+   "gencode": "331800COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "f970e9db57eb5511",
+    "dosage": "8c1fb373aa88e074",
+    "caution": "5c345af8cf4e5511",
+    "numeric": "80705e54c403e53e",
+    "age": "d41d8cd98f00b204",
+    "duration": "80705e54c403e53e",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "331800",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ed505119-2b83-4b4e-bbff-201d730e75c6",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "ed65c36d-ac86-4609-910d-4692b5b913c7",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "efe24d60-6a97-4d30-a35f-4fc2b4612a43",
+   "fp": "6d20ddaaab4a48bc",
+   "gencode": "A52200COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "0bb193fe389f73fd",
+    "dosage": "9d263e9cb18b5755",
+    "caution": "645f05216494630a",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "1e884d7305a50be7",
+    "codeIngredientStrength": "A52200",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f10cc548-448e-4168-a110-84238c015c36",
+   "fp": "1d359c0e601dfab3",
+   "gencode": "228653COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "8749a4169b8ff681",
+    "dosage": "2d4ce9fa3c4eff6b",
+    "caution": "efd23e57b7c6db19",
+    "numeric": "d41d8cd98f00b204",
+    "age": "60ba5ca771facb95",
+    "duration": "7a2ba477ded87865",
+    "contraindication": "c0bf598d5774bf03",
+    "codeIngredientStrength": "228653",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f229977f-bc27-4378-9d39-2c56ef9b274a",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f2806c29-b7c6-4591-83f1-c88819d7954e",
+   "fp": "e0b9e2eda3331ee2",
+   "gencode": "A74400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "b65c6cdf889d5a3c",
+    "dosage": "bf6e99723902f008",
+    "caution": "e7988d7e2e79a124",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "31cf764215640ee1",
+    "contraindication": "61e288794f781ff7",
+    "codeIngredientStrength": "A74400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f4cf9e0f-1b63-4ada-9a21-cd61bfdf6a37",
+   "fp": "7784aa8b824c2922",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "4c596601dd526ec5",
+    "dosage": "d93759b9998193ad",
+    "caution": "24a7b91e1bfa529c",
+    "numeric": "31cf764215640ee1",
+    "age": "d41d8cd98f00b204",
+    "duration": "8dffa6b2ff35c937",
+    "contraindication": "1bf8f031b29f967d",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f5929cfa-cc7c-4a43-aa92-85cbac4af83b",
+   "fp": "5a33b4740c014afb",
+   "gencode": "228834COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "bd9c575333ff0e32",
+    "dosage": "b54c7811ca7aad82",
+    "caution": "0350621f326f4258",
+    "numeric": "64ce0875c3f5471f",
+    "age": "21b0492dc2f486cc",
+    "duration": "a7a8a9c03dd152e2",
+    "contraindication": "8a84c5711c8f0848",
+    "codeIngredientStrength": "228834",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f606dc00-f92c-4b45-9457-605d6c9d6914",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "f71947ce-b610-4b79-a8d1-2874d6e098ef",
+   "fp": "2175a2ba89dbc58b",
+   "gencode": "A08500COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "7684a40c001d665d",
+    "dosage": "d93759b9998193ad",
+    "caution": "861d04266a05d500",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "5719b6d6a1a3d0ca",
+    "codeIngredientStrength": "A08500",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "fae93aa5-add7-4157-b309-04abbf71b4c0",
+   "fp": "08491da02a0cbf9d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "b86ec36ebc7b7e10",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "940c35af1c637190",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "fb7925c2-df1b-4e1c-8885-576e8162af57",
+   "fp": "b7c4fa0644d3fdb8",
+   "gencode": "180137COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "ce718f17534e73d3",
+    "dosage": "32e92c5c1e19e73b",
+    "caution": "d8b41ae1c9574c73",
+    "numeric": "64ce0875c3f5471f",
+    "age": "f9f028dbb0e11ed4",
+    "duration": "d8358c6e60d1da25",
+    "contraindication": "17ca4871d9ed376a",
+    "codeIngredientStrength": "180137",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  },
+  {
+   "masterId": "fdd87e2c-871d-461e-a9f5-d0cc33b75db9",
+   "fp": "70fa837b79a1228d",
+   "gencode": "A26400COS",
+   "route": "ophthalmic",
+   "safetyFingerprint": {
+    "indication": "cf04e44c9ce364d7",
+    "dosage": "dafa6f91cf796b5d",
+    "caution": "73cda345cdab0461",
+    "numeric": "31cf764215640ee1",
+    "age": "60ba5ca771facb95",
+    "duration": "31cf764215640ee1",
+    "contraindication": "e1324ccfb500d06c",
+    "codeIngredientStrength": "A26400",
+    "codeForm": "COS",
+    "route": "ophthalmic"
+   }
+  }
+ ],
+ "anomalies": []
+}
