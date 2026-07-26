@@ -235,10 +235,58 @@
    },
    {
     "unitId": "oral-unit-2",
-    "state": "UNBLOCKED",
-    "precondition": "oral-unit-1 GREEN 충족",
-    "note": "착수 조건은 해제되었으나 본 WO 범위에서 Unit 2 LIVE apply 는 수행하지 않는다. write-owner 지정은 별도 WO."
+    "state": "GREEN",
+    "writeOwner": "agent-da",
+    "applied": {
+     "ko": 7396,
+     "en": 3698,
+     "total": 11094
+    },
+    "declared": {
+     "ko": 7396,
+     "en": 3698,
+     "total": 11094
+    },
+    "enInput": {
+     "file": "otc-unit2-en-config-ga-all.json",
+     "author": "agent-ga",
+     "md5": "f48856404bbf95c8bf58850dddbc414d",
+     "modified": false
+    },
+    "independentVerify": {
+     "allPass": true,
+     "checks": 10
+    },
+    "scopePostVerify": {
+     "allPass": true,
+     "gates": 8
+    },
+    "evidence": [
+     "otc-unproduced-oral-unit2-dryrun.json",
+     "otc-unproduced-oral-unit2-dryrun.en.json",
+     "otc-unproduced-oral-unit2-apply-run.ko.json",
+     "otc-unproduced-oral-unit2-apply-run.en.json",
+     "otc-unproduced-oral-unit2-verify.json",
+     "otc-unproduced-oral-unit2-postverify-scope.json",
+     "otc-unproduced-oral-unit2-apply-order.json"
+    ]
    }
-  ]
+  ],
+  "route": {
+   "state": "COMPLETE",
+   "units": 2,
+   "fingerprints": 747,
+   "masters": 3699,
+   "applied": {
+    "ko": 14796,
+    "en": 7398,
+    "total": 22194
+   },
+   "declared": {
+    "ko": 14796,
+    "en": 7398,
+    "total": 22194
+   }
+  }
  }
 }

@@ -1,0 +1,32 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-ORAL-UNIT2-FINAL-PRODUCTION-V1",
+ "dbWrite": 0,
+ "metrics": {
+  "unit2": 1849,
+  "unit1": 1850,
+  "u1Ko": 1850,
+  "u1En": 1850,
+  "u1EasyCanonicalLeft": 0,
+  "finalMasters": 199,
+  "finKo": 199,
+  "finEn": 199,
+  "splitMasters": 90,
+  "splKo": 90,
+  "splEn": 90,
+  "bigconRows": 3,
+  "bigconAuthored": 0,
+  "authoredOutsideOralUnits": 6997,
+  "koWrite": 7396,
+  "enWrite": 3698
+ },
+ "gates": {
+  "S1 KO apply 원장 7,396": true,
+  "S2 EN apply 원장 3,698": true,
+  "S3 Unit 2 총 write 11,094": true,
+  "S4 Unit 1 KO/EN canonical 1,850 유지": true,
+  "S5 Unit 1 easy canonical 잔존 0": true,
+  "S6 외용 final 199m 무변경": true,
+  "S7 split 90m 무변경": true,
+  "S8 빅콘에스600정 authored write 0": true
+ }
+}
