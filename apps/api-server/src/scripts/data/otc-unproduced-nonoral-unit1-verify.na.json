@@ -1,0 +1,111 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-APPLY-ENABLEMENT-V1",
+  "artifact": "independent-verify",
+  "agent": "na",
+  "readOnly": true,
+  "dbWrite": 0,
+  "ssot": "otc-unproduced-nonoral-unit1-approved-ssot-v1.json",
+  "expected": {
+    "fp": 70,
+    "master": 443,
+    "ko": 1772,
+    "en": 886,
+    "total": 2658
+  },
+  "state": "PRE_APPLY",
+  "note": "apply 전 실행이므로 ko/en canonical 계열은 0 이 정상이다. GREEN 판정은 apply 후 실행 결과로만 한다.",
+  "values": {
+    "targetMasters": 443,
+    "koAuthoredCanonical": 0,
+    "enCanonical": 0,
+    "easyDeprecated": 0,
+    "easyStillCanonical": 443,
+    "auditKo": 0,
+    "needsReviewLeft": 0,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "enHangul": 0,
+    "holdWritten": 0,
+    "ophthalmicUnit2Written": 0,
+    "priorLiveAuthoredOutsideUnit": 10696
+  },
+  "checks": [
+    {
+      "name": "targetMasters",
+      "actual": 443,
+      "expected": 443,
+      "pass": true
+    },
+    {
+      "name": "koAuthoredCanonical",
+      "actual": 0,
+      "expected": 443,
+      "pass": false
+    },
+    {
+      "name": "enCanonical",
+      "actual": 0,
+      "expected": 443,
+      "pass": false
+    },
+    {
+      "name": "easyDeprecated",
+      "actual": 0,
+      "expected": 443,
+      "pass": false
+    },
+    {
+      "name": "easyStillCanonical",
+      "actual": 443,
+      "expected": 0,
+      "pass": false
+    },
+    {
+      "name": "auditKo",
+      "actual": 0,
+      "expected": 443,
+      "pass": false
+    },
+    {
+      "name": "needsReviewLeft",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "name": "canonicalDup",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "name": "sourceRefLeak",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "name": "enHangul",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "name": "holdWritten",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    },
+    {
+      "name": "ophthalmicUnit2Written",
+      "actual": 0,
+      "expected": 0,
+      "pass": true
+    }
+  ],
+  "allPass": false,
+  "priorLiveInvariant": {
+    "authoredCanonicalOutsideUnit": 10696,
+    "note": "apply 전후 동일해야 한다(본 단위 밖 write 0 증거). 스냅샷 비교는 apply 후 재실행으로 수행."
+  }
+}

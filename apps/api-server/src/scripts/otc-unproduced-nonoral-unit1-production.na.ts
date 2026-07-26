@@ -49,6 +49,8 @@ async function connect(): Promise<any> {
 interface GState {
   g: V2Group; raw: Unit1SsotGroup; anomalies: string[];
   fpOk: number; bad: number; easy1: number; authoredKo: number; enCanon: number;
+  /** KO authored canonical 중 source_ref_id 가 본 트랙 앵커와 일치하는 master 수 */
+  koAnchorOk: number;
   koHtml: string; officialDosage: string; officialInd: string; officialCau: string;
   enHtml: string; enAnomalies: string[];
 }
@@ -65,6 +67,12 @@ async function prepare(ds: any, stage: 'ko' | 'en'): Promise<{
       SELECT master_id, COALESCE(language,'ko') lang, count(*) c FROM shared_product_descriptions
       WHERE master_id=ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND deleted_at IS NULL
       GROUP BY 1,2 HAVING count(*)>1) d`, [allIds]));
+  // KO 앵커 대조 — authored ko canonical 의 source_ref_id 가 본 트랙 앵커인지 (EN 단계 사전 게이트)
+  const anchorRows = retRows<{ mid: string; ref: string | null }>(await ds.query(
+    `SELECT master_id::text mid, source_ref_id::text ref FROM shared_product_descriptions
+     WHERE master_id=ANY($1::uuid[]) AND description_type='STORE' AND COALESCE(language,'ko')='ko'
+       AND status='canonical' AND source_type=$2 AND deleted_at IS NULL`, [allIds, AUTHORED_SOURCE]));
+  const anchorByMid = new Map(anchorRows.map((r) => [r.mid, r.ref]));
 
   const states: GState[] = groups.map((g) => {
     const rawG = raw.find((r) => r.fp === g.fp)!;
@@ -124,7 +132,12 @@ async function prepare(ds: any, stage: 'ko' | 'en'): Promise<{
       if (authoredKo !== g.size) anomalies.push(`authored ko ${authoredKo}/${g.size} — KO 선행 필요`);
       if (enCanon !== 0) anomalies.push(`en canonical 이미 ${enCanon} — 중복 차단`);
     }
-    return { g, raw: rawG, anomalies, fpOk, bad, easy1, authoredKo, enCanon,
+    const expectedRef = fpToUuidV2(g.fp);
+    const koAnchorOk = g.masterIds.filter((mid) => anchorByMid.get(mid) === expectedRef).length;
+    if (stage === 'en' && koAnchorOk !== g.size) {
+      anomalies.push(`KO 앵커 불일치 ${koAnchorOk}/${g.size} (expected sourceRef ${expectedRef})`);
+    }
+    return { g, raw: rawG, anomalies, fpOk, bad, easy1, authoredKo, enCanon, koAnchorOk,
       koHtml: ko.html, officialDosage: rax.dos, officialInd: rax.ind, officialCau: rax.cau,
       enHtml, enAnomalies };
   });
@@ -316,14 +329,257 @@ async function rollbackTest(): Promise<void> {
   console.log(`  → ${out}`);
 }
 
+// ════════════════════════════════════════════════════════════════════════════════
+// apply — 기본값 dry-run. --apply 없으면 write 0. 단계별 이중 확인 환경변수 필수.
+// ════════════════════════════════════════════════════════════════════════════════
+const CONFIRM_ENV = { ko: 'OTC_NONORAL_U1_KO_CONFIRM', en: 'OTC_NONORAL_U1_EN_CONFIRM' } as const;
+const CONFIRM_VALUE = 'YES';
+
+/** 실행 순서 선행 조건 — 경구 Unit 2 가 GREEN 이 아니면 apply 차단(원장 read-only). */
+function oralUnit2Green(): { ok: boolean; state: string } {
+  const p = path.join(DATA_DIR, 'otc-unproduced-oral-execution-order-v1.json');
+  if (!fs.existsSync(p)) return { ok: false, state: 'LEDGER_MISSING' };
+  const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+  const u = (j.executionStatus?.units || []).find((x: any) => x.unitId === 'oral-unit-2');
+  const state = u?.state ?? 'UNKNOWN';
+  return { ok: state === 'GREEN', state };
+}
+
+/** 단계별 사전 게이트 — 하나라도 실패하면 write 0 으로 종료한다. */
+function preGates(states: GState[], allIds: string[], canonicalDup: number, lang: 'ko' | 'en'): Record<string, boolean> {
+  const ssot = JSON.parse(fs.readFileSync(SSOT_PATH, 'utf8'));
+  const g = gatesOf(states, allIds, canonicalDup, lang);
+  const authored = states.reduce((t, x) => t + x.authoredKo, 0);
+  const easy1 = states.reduce((t, x) => t + x.easy1, 0);
+  const enCanon = states.reduce((t, x) => t + x.enCanon, 0);
+  const eligM = states.filter((x) => x.anomalies.length === 0).reduce((t, x) => t + x.g.size, 0);
+  if (lang === 'ko') {
+    return {
+      'K1 SSOT status=APPROVED_FOR_PRODUCTION': ssot.status === 'APPROVED_FOR_PRODUCTION',
+      'K2 70 fp / 443 master': states.length === EXPECTED.fp && allIds.length === EXPECTED.master,
+      'K3 authored KO canonical 0': authored === 0,
+      'K4 EN canonical 0': enCanon === 0,
+      'K5 easy canonical 443': easy1 === EXPECTED.master,
+      'K6 기존 LIVE 교집합 0': (ssot.gates?.G8_liveMaster ?? 1) === 0 && (ssot.gates?.G8_liveFp ?? 1) === 0
+        && (ssot.gates?.G8_liveSourceRef ?? 1) === 0,
+      'K7 HOLD 대상 혼입 0': (ssot.gates?.G6_holdRouteMixed ?? 1) === 0,
+      'K8 canonicalDup 0': canonicalDup === 0,
+      'K9 예상 KO write 1,772T': eligM * 4 === EXPECTED.ko,
+      'K10 이상 그룹 0': g['D11 이상 그룹 0'] === true,
+    };
+  }
+  return {
+    'E1 authored KO canonical 443': authored === EXPECTED.master,
+    'E2 KO 앵커 전건 본 트랙 sourceRef 일치': states.every((x) => x.koAnchorOk === x.g.size),
+    'E3 EN canonical 0': enCanon === 0,
+    'E4 EN JSON 70/70 fp': g['D12 EN 70/70 fp'] === true,
+    'E5 EN 한글 0': g['D13 EN 한글 0'] === true,
+    'E6 EN 경구동사 0': g['D14 EN 경구동사 0'] === true,
+    'E7 공식 수치·기간·부위 누락 0': g['D5 공식 수치·기간 누락 0'] === true && g['D3 route·효능·용법 대조 mismatch 0'] === true,
+    'E8 canonicalDup 0': canonicalDup === 0,
+    'E9 예상 EN write 886T': eligM * 2 === EXPECTED.en,
+    'E10 이상 그룹 0': g['D11 이상 그룹 0'] === true,
+  };
+}
+
+/** 커밋 전 사후검증 — 실패 시 예외를 던져 전량 ROLLBACK 시킨다. */
+async function postVerify(qr: any, allIds: string[], sourceRefs: string[], lang: 'ko' | 'en', writeActual: number): Promise<Record<string, unknown>> {
+  const r = retRows<Record<string, string>>(await qr.query(`
+    SELECT
+      (SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical'
+        AND source_type=$2 AND deleted_at IS NULL)::text ko_auth,
+      (SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='deprecated'
+        AND source_type='mfds_easy_drug' AND deleted_at IS NULL)::text easy_dep,
+      (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND status='canonical'
+        AND source_type='mfds_easy_drug' AND deleted_at IS NULL)::text easy_left,
+      (SELECT count(*) FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[])
+        AND event_type='canonical_replaced' AND language='ko')::text audit,
+      (SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND language='en' AND status='canonical' AND deleted_at IS NULL)::text en_canon,
+      (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND status='needs_review' AND deleted_at IS NULL)::text nr,
+      (SELECT count(*) FROM (SELECT master_id, COALESCE(language,'ko') l FROM shared_product_descriptions
+        WHERE master_id=ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND deleted_at IS NULL
+        GROUP BY 1,2 HAVING count(*)>1) d)::text dup,
+      (SELECT count(*) FROM shared_product_descriptions WHERE source_ref_id=ANY($3::uuid[])
+        AND NOT (master_id=ANY($1::uuid[])) AND deleted_at IS NULL)::text ref_leak,
+      (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+        AND description_type='STORE' AND language='en' AND status='canonical'
+        AND content ~ '[가-힣]' AND deleted_at IS NULL)::text en_hangul`,
+    [allIds, AUTHORED_SOURCE, sourceRefs]))[0];
+  const v = {
+    koAuthoredCanonical: +r.ko_auth, easyDeprecated: +r.easy_dep, easyStillCanonical: +r.easy_left,
+    auditKo: +r.audit, enCanonical: +r.en_canon, needsReviewLeft: +r.nr,
+    canonicalDup: +r.dup, sourceRefLeak: +r.ref_leak, enHangul: +r.en_hangul, writeActual,
+  };
+  const fail: string[] = [];
+  if (v.koAuthoredCanonical !== EXPECTED.master) fail.push(`authored KO ${v.koAuthoredCanonical} != ${EXPECTED.master}`);
+  if (v.easyDeprecated !== EXPECTED.master) fail.push(`easy deprecated ${v.easyDeprecated} != ${EXPECTED.master}`);
+  if (v.easyStillCanonical !== 0) fail.push(`easy canonical 잔존 ${v.easyStillCanonical}`);
+  if (v.auditKo !== EXPECTED.master) fail.push(`audit ${v.auditKo} != ${EXPECTED.master}`);
+  if (v.canonicalDup !== 0) fail.push(`canonicalDup ${v.canonicalDup}`);
+  if (v.sourceRefLeak !== 0) fail.push(`sourceRef leak ${v.sourceRefLeak}`);
+  if (lang === 'ko') {
+    if (v.enCanonical !== 0) fail.push(`EN canonical ${v.enCanonical} != 0`);
+    if (writeActual !== EXPECTED.ko) fail.push(`KO writeActual ${writeActual} != ${EXPECTED.ko}`);
+  } else {
+    if (v.enCanonical !== EXPECTED.master) fail.push(`EN canonical ${v.enCanonical} != ${EXPECTED.master}`);
+    if (v.needsReviewLeft !== 0) fail.push(`needs_review 잔존 ${v.needsReviewLeft}`);
+    if (v.enHangul !== 0) fail.push(`EN 한글 ${v.enHangul}`);
+    if (writeActual !== EXPECTED.en) fail.push(`EN writeActual ${writeActual} != ${EXPECTED.en}`);
+  }
+  if (fail.length) throw new Error(`${lang.toUpperCase()} 사후검증 실패 → ROLLBACK: ${fail.join(' · ')}`);
+  return v;
+}
+
+async function runApply(lang: 'ko' | 'en'): Promise<void> {
+  const applyFlag = process.argv.includes('--apply');
+  const envName = CONFIRM_ENV[lang];
+  const envOk = process.env[envName] === CONFIRM_VALUE;
+  const pre = oralUnit2Green();
+  const out = arg('out') || path.join(DATA_DIR, `otc-unproduced-nonoral-unit1-apply-run.${lang}.json`);
+
+  // ── 차단 3중: 실행 순서 · --apply · 이중 확인 환경변수 ─────────────────────────
+  if (!pre.ok) {
+    console.error(`차단: 경구 Unit 2 state=${pre.state} (GREEN 아님) → apply 불가. DB write 0.`);
+    process.exit(3);
+  }
+  if (!applyFlag) { console.error('차단: --apply 미지정 → dry-run 전용. DB write 0.'); process.exit(3); }
+  if (!envOk) {
+    console.error(`차단: ${envName}=${CONFIRM_VALUE} 필요(현재 ${process.env[envName] ?? '미설정'}) → DB write 0.`);
+    process.exit(3);
+  }
+
+  const ds = await connect();
+  const { states, allIds, canonicalDup } = await prepare(ds, lang);
+  const gates = preGates(states, allIds, canonicalDup, lang);
+  const failed = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
+  if (failed.length) {
+    await ds.destroy();
+    console.error(`사전 게이트 실패 → write 0: ${failed.join(' · ')}`);
+    process.exit(4);
+  }
+  const sourceRefs = states.map((s) => fpToUuidV2(s.g.fp));
+
+  const qr = ds.createQueryRunner();
+  await qr.connect();
+  await qr.startTransaction();
+  let writes = 0;
+  let verified: Record<string, unknown>;
+  try {
+    for (const s of states) {
+      const sourceRef = fpToUuidV2(s.g.fp);
+      for (const mid of s.g.masterIds) {
+        if (lang === 'ko') {
+          const cur = retRows<{ id: string; source_type: string }>(await qr.query(
+            `SELECT id::text, source_type FROM shared_product_descriptions
+             WHERE master_id=$1::uuid AND description_type='STORE' AND COALESCE(language,'ko')='ko'
+               AND status='canonical' AND deleted_at IS NULL FOR UPDATE`, [mid]));
+          if (cur.length !== 1) throw new Error(`master ${mid} ko canonical ${cur.length}건 → ROLLBACK`);
+          if (cur[0].source_type !== 'mfds_easy_drug') throw new Error(`master ${mid} source ${cur[0].source_type} 예상밖 → ROLLBACK`);
+          await qr.query(`UPDATE shared_product_descriptions SET status='deprecated', updated_at=now() WHERE id=$1::uuid`, [cur[0].id]);
+          writes++;
+          const ins = retRows<{ id: string }>(await qr.query(
+            `INSERT INTO shared_product_descriptions
+               (master_id, content, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+             VALUES ($1::uuid,$2,$3,$4::uuid,'needs_review','ko','STORE',now(),now()) RETURNING id::text`,
+            [mid, s.koHtml, AUTHORED_SOURCE, sourceRef]));
+          writes++;
+          await qr.query(`UPDATE shared_product_descriptions SET status='canonical', updated_at=now() WHERE id=$1::uuid`, [ins[0].id]);
+          writes++;
+          await qr.query(
+            `INSERT INTO shared_product_description_audit_logs
+               (event_type, description_type, master_id, language, previous_description_id, new_description_id,
+                previous_status, new_status, metadata, performed_at)
+             VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb,now())`,
+            [mid, cur[0].id, ins[0].id, JSON.stringify({
+              previousDemotedTo: 'deprecated', previousSource: 'mfds_easy_drug', newSource: AUTHORED_SOURCE,
+              source_ref_id: sourceRef, fp: s.g.fp, gencode: s.g.gencode, route: s.g.route, track: TRACK, wo: WO_PROD })]);
+          writes++;
+        } else {
+          const dupChk = retRows<{ n: string }>(await qr.query(
+            `SELECT count(*)::text n FROM shared_product_descriptions
+             WHERE master_id=$1::uuid AND description_type='STORE' AND language='en'
+               AND status='canonical' AND deleted_at IS NULL`, [mid]));
+          if (+dupChk[0].n !== 0) throw new Error(`master ${mid} en canonical 이미 존재 → ROLLBACK`);
+          const ins = retRows<{ id: string }>(await qr.query(
+            `INSERT INTO shared_product_descriptions
+               (master_id, content, source_type, source_ref_id, status, language, description_type, created_at, updated_at)
+             VALUES ($1::uuid,$2,$3,$4::uuid,'needs_review','en','STORE',now(),now()) RETURNING id::text`,
+            [mid, s.enHtml, AUTHORED_SOURCE, sourceRef]));
+          writes++;
+          await qr.query(`UPDATE shared_product_descriptions SET status='canonical', updated_at=now() WHERE id=$1::uuid`, [ins[0].id]);
+          writes++;
+        }
+      }
+      const expT = s.g.size * (lang === 'ko' ? 4 : 2);
+      if (expT <= 0) throw new Error(`fp ${s.g.fp} 예상 T 비정상 → ROLLBACK`);
+    }
+    const expTotal = lang === 'ko' ? EXPECTED.ko : EXPECTED.en;
+    if (writes !== expTotal) throw new Error(`writeActual ${writes} != 예상 ${expTotal} → ROLLBACK`);
+    verified = await postVerify(qr, allIds, sourceRefs, lang, writes);
+    await qr.commitTransaction();
+  } catch (e) {
+    await qr.rollbackTransaction();
+    await qr.release(); await ds.destroy();
+    throw e;
+  }
+  await qr.release(); await ds.destroy();
+
+  const report = {
+    wo: WO_PROD, track: TRACK, lang, mode: 'apply', approvalCommit: APPROVAL_COMMIT,
+    ssot: path.basename(SSOT_PATH), fingerprints: states.length, masters: allIds.length,
+    writePlan: expTotalOf(lang), writeActual: writes, writeMatch: writes === expTotalOf(lang),
+    preGates: gates, postVerify: verified,
+    reports: states.map((s) => ({ fp: s.g.fp, sourceRef: fpToUuidV2(s.g.fp), route: s.g.route,
+      size: s.g.size, t: s.g.size * (lang === 'ko' ? 4 : 2) })),
+  };
+  fs.writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.log(`APPLY ${lang.toUpperCase()} 완료 — writeActual ${writes} (예상 ${expTotalOf(lang)}) · 사후검증 PASS`);
+  console.log(`  → ${out}`);
+}
+const expTotalOf = (lang: 'ko' | 'en'): number => (lang === 'ko' ? EXPECTED.ko : EXPECTED.en);
+
+/** 환경변수·플래그 차단 시험 — write 경로에 진입하지 못하는지 실증(DB 미접속). */
+function envBlockTest(): void {
+  const out = arg('out') || path.join(DATA_DIR, 'otc-unproduced-nonoral-unit1-envblock-test.na.json');
+  const pre = oralUnit2Green();
+  const cases = [
+    { name: '--apply 없음', applyFlag: false, env: CONFIRM_VALUE },
+    { name: '환경변수 미설정', applyFlag: true, env: undefined },
+    { name: '환경변수 값 불일치', applyFlag: true, env: 'yes' },
+    { name: '환경변수 오타', applyFlag: true, env: 'Y' },
+    { name: '3조건 전부 충족 (write 허용 조건 — 본 시험은 실행하지 않음)', applyFlag: true, env: CONFIRM_VALUE },
+  ];
+  const results = cases.map((c) => {
+    const blockedBy: string[] = [];
+    if (!pre.ok) blockedBy.push(`실행순서(경구 Unit2=${pre.state})`);
+    if (!c.applyFlag) blockedBy.push('--apply 미지정');
+    if (c.env !== CONFIRM_VALUE) blockedBy.push('이중확인 환경변수');
+    return { case: c.name, wouldWrite: blockedBy.length === 0, blockedBy, dbWrite: 0 };
+  });
+  const report = { wo: WO_PROD, track: TRACK, mode: 'env-block-test', dbWrite: 0,
+    oralUnit2State: pre.state, confirmEnv: CONFIRM_ENV, confirmValue: CONFIRM_VALUE,
+    results, allBlocked: results.every((r) => !r.wouldWrite) };
+  fs.writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  for (const r of results) console.log(`  ${r.wouldWrite ? 'WRITE' : 'BLOCK'}  ${r.case}${r.blockedBy.length ? ' ← ' + r.blockedBy.join(' · ') : ''}`);
+  console.log(`환경변수 차단 시험: 전건 차단=${report.allBlocked} · DB write 0 → ${out}`);
+}
+
 async function main(): Promise<void> {
   if (process.argv.includes('--dump-source')) return dumpSource();
   if (process.argv.includes('--rollback-test')) return rollbackTest();
+  if (process.argv.includes('--env-block-test')) return envBlockTest();
   if (arg('mode') === 'dry-run') return dryRun();
-  if (process.argv.includes('--apply')) {
-    throw new Error('본 WO 범위에서 LIVE apply 는 금지다. write-owner 인계 후 별도 WO 에서 연다.');
+  if (arg('mode') === 'apply') {
+    const lang = arg('lang');
+    if (lang !== 'ko' && lang !== 'en') { console.error('--lang=ko|en 필요'); process.exit(2); }
+    return runApply(lang);
   }
-  console.error('--dump-source | --mode=dry-run | --rollback-test');
+  console.error('--dump-source | --mode=dry-run | --rollback-test | --env-block-test | --mode=apply --lang=ko|en --apply');
   process.exit(2);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

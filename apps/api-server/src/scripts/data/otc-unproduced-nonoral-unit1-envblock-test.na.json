@@ -1,0 +1,53 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-PRODUCTION-READINESS-AND-EN-V1",
+  "track": "nonoral-unit-1",
+  "mode": "env-block-test",
+  "dbWrite": 0,
+  "oralUnit2State": "GREEN",
+  "confirmEnv": {
+    "ko": "OTC_NONORAL_U1_KO_CONFIRM",
+    "en": "OTC_NONORAL_U1_EN_CONFIRM"
+  },
+  "confirmValue": "YES",
+  "results": [
+    {
+      "case": "--apply 없음",
+      "wouldWrite": false,
+      "blockedBy": [
+        "--apply 미지정"
+      ],
+      "dbWrite": 0
+    },
+    {
+      "case": "환경변수 미설정",
+      "wouldWrite": false,
+      "blockedBy": [
+        "이중확인 환경변수"
+      ],
+      "dbWrite": 0
+    },
+    {
+      "case": "환경변수 값 불일치",
+      "wouldWrite": false,
+      "blockedBy": [
+        "이중확인 환경변수"
+      ],
+      "dbWrite": 0
+    },
+    {
+      "case": "환경변수 오타",
+      "wouldWrite": false,
+      "blockedBy": [
+        "이중확인 환경변수"
+      ],
+      "dbWrite": 0
+    },
+    {
+      "case": "3조건 전부 충족 (write 허용 조건 — 본 시험은 실행하지 않음)",
+      "wouldWrite": true,
+      "blockedBy": [],
+      "dbWrite": 0
+    }
+  ],
+  "allBlocked": false
+}
