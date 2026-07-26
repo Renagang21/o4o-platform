@@ -47,6 +47,7 @@ export default function SupplierLibraryPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<SupplierLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
 
@@ -71,11 +72,20 @@ export default function SupplierLibraryPage() {
     return () => { cancelled = true; };
   }, []);
 
+  // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패는 throw 된다. "등록된 자료가 없습니다"(정상 0건)와 구분한다.
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const data = await supplierApi.getLibraryItems();
-    setItems(data);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const { items: rows } = await supplierApi.getLibraryItems();
+      setItems(rows);
+    } catch {
+      setItems([]);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -289,7 +299,31 @@ export default function SupplierLibraryPage() {
         파일 URL을 직접 입력하여 자료를 등록합니다. 파일 업로드 기능은 추후 제공됩니다.
       </div>
 
-      {/* Table */}
+      {/* WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
+          조회 실패 시 목록 대신 지속 오류 UI. 정상 빈 상태 문구는 노출하지 않는다. */}
+      {loadError && !loading ? (
+        <div style={{
+          backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px',
+          padding: '48px 24px', textAlign: 'center',
+        }}>
+          <AlertCircle size={40} style={{ color: '#dc2626', marginBottom: '12px' }} />
+          <p style={{ fontSize: '15px', color: '#475569', marginBottom: '4px' }}>
+            자료함 목록을 불러오지 못했습니다.
+          </p>
+          <p style={{ fontSize: '13px', color: '#94a3b8' }}>잠시 후 다시 시도해 주세요.</p>
+          <button
+            onClick={fetchItems}
+            style={{
+              marginTop: '16px', padding: '8px 16px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#fff',
+              color: '#475569', fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : (
+      /* Table */
       <DataTable
         columns={columns}
         dataSource={dataSource}
@@ -297,6 +331,7 @@ export default function SupplierLibraryPage() {
         loading={loading}
         emptyText="등록된 자료가 없습니다"
       />
+      )}
 
       {/* Delete Confirm Modal */}
       {deleteConfirm && (

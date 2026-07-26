@@ -10,10 +10,13 @@
  * - document: RichTextEditor 기반 blocks 입력
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import { supplierApi } from '../../lib/api';
+import { supplierApi, type SupplierLibraryItem } from '../../lib/api';
+
+/** 서버 limit 상한(neture-library.service.ts: Math.min(limit, 100))과 동일하게 맞춘다. */
+const LOOKUP_LIMIT = 100;
 import { RichTextEditor } from '@o4o/content-editor';
 import type { EditorContent } from '@o4o/content-editor';
 
@@ -57,13 +60,32 @@ export default function SupplierLibraryFormPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
+  //   수정 대상 조회 상태. error(조회 실패) 와 not-found(대상 없음) 를 분리한다.
+  //   out-of-range = 조회는 성공했으나 대상이 limit 범위 밖일 수 있는 경우.
+  const [loadState, setLoadState] =
+    useState<'idle' | 'loading' | 'error' | 'not-found' | 'out-of-range' | 'success'>('idle');
 
-  // 수정 모드: 기존 데이터 로드
-  useEffect(() => {
+  // 수정 모드: 기존 데이터 로드 (다시 시도에서도 동일 함수 재사용 — 목록 조회만 재호출)
+  const loadItem = useCallback(async () => {
     if (!isEditMode || !id) return;
-    const loadItem = async () => {
+    {
       setLoading(true);
-      const items = await supplierApi.getLibraryItems({ limit: 100 });
+      setLoadState('loading');
+      let items: SupplierLibraryItem[];
+      let total: number;
+      try {
+        // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
+        //   조회 실패는 throw 된다. 이를 not-found 로 표시하지 않는다.
+        //   단건 조회 API 가 없어 목록에서 찾는 구조는 유지한다(backend 무변경).
+        const res = await supplierApi.getLibraryItems({ limit: LOOKUP_LIMIT });
+        items = res.items;
+        total = res.total;
+      } catch {
+        setLoadState('error');
+        setLoading(false);
+        return;
+      }
       const item = items.find((i) => i.id === id);
       if (item) {
         const isDocument = item.contentType === 'document';
@@ -82,13 +104,20 @@ export default function SupplierLibraryFormPage() {
           category: item.category || '',
           isPublic: item.isPublic,
         });
+        setLoadState('success');
+      } else if (total > items.length) {
+        // 조회는 성공했으나 대상이 조회 범위(limit) 밖일 수 있다.
+        // "없음" 으로 단정하지 않는다 — 후속 WO 대상(§CHECK 참조).
+        setLoadState('out-of-range');
       } else {
-        setError('자료를 찾을 수 없습니다.');
+        setLoadState('not-found');
       }
       setLoading(false);
-    };
-    loadItem();
+    }
   }, [id, isEditMode]);
+
+  useEffect(() => { loadItem(); }, [loadItem]);
+  const reloadItem = loadItem;
 
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -186,6 +215,58 @@ export default function SupplierLibraryFormPage() {
       <div style={{ padding: '32px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
         <Loader2 size={24} className="animate-spin" style={{ color: '#2563eb' }} />
         <span style={{ marginLeft: '8px', color: '#64748b' }}>불러오는 중...</span>
+      </div>
+    );
+  }
+
+  // WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:
+  //   수정 대상 조회 실패/미존재는 빈 수정 폼 대신 전용 화면으로 분리한다.
+  if (isEditMode && (loadState === 'error' || loadState === 'not-found' || loadState === 'out-of-range')) {
+    const isError = loadState === 'error';
+    const isOutOfRange = loadState === 'out-of-range';
+    return (
+      <div style={{ padding: '32px', maxWidth: '720px' }}>
+        <button
+          onClick={() => navigate('/supplier/library')}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '20px',
+            background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer', padding: 0,
+          }}
+        >
+          <ArrowLeft size={16} /> 자료함으로 돌아가기
+        </button>
+        <div style={{
+          backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px',
+          padding: '48px 24px', textAlign: 'center',
+        }}>
+          <p style={{ fontSize: '15px', color: '#475569', marginBottom: '4px' }}>
+            {isError
+              ? '자료 정보를 불러오지 못했습니다.'
+              : isOutOfRange
+                ? '자료 정보를 확인할 수 없습니다.'
+                : '자료를 찾을 수 없습니다.'}
+          </p>
+          <p style={{ fontSize: '13px', color: '#94a3b8' }}>
+            {isError
+              ? '잠시 후 다시 시도해 주세요.'
+              : isOutOfRange
+                ? '자료함에서 해당 자료를 열어 주세요.'
+                : '이미 삭제되었거나 접근할 수 없는 자료입니다.'}
+          </p>
+          {/* not-found 는 다시 시도 대상이 아니다. */}
+          {(isError || isOutOfRange) && (
+            <button
+              onClick={reloadItem}
+              style={{
+                marginTop: '16px', padding: '8px 16px', borderRadius: '8px',
+                border: '1px solid #e2e8f0', backgroundColor: '#fff',
+                color: '#475569', fontSize: '14px', cursor: 'pointer',
+              }}
+            >
+              다시 시도
+            </button>
+          )}
+        </div>
       </div>
     );
   }

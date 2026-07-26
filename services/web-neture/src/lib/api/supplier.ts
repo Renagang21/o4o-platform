@@ -56,6 +56,15 @@ export const SUPPLIER_RECRUITMENTS_LOAD_FAILED = 'SUPPLIER_RECRUITMENTS_LOAD_FAI
 export const SUPPLIER_ONBOARDING_LOAD_FAILED = 'SUPPLIER_ONBOARDING_LOAD_FAILED';
 export const SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED = 'SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED = 'SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED';
+
+/** 자료 목록 + 총 건수. total 로 조회 범위(limit) 밖 존재 여부를 판단한다. */
+export interface SupplierLibraryItemsResult {
+  items: SupplierLibraryItem[];
+  total: number;
+}
+
 /** 상품 승인 탭 카운트 — 필드명은 backend 응답 그대로다(unrequested 등). */
 export interface SupplierApprovalCounts {
   total: number;
@@ -870,20 +879,36 @@ export const supplierApi = {
   },
 
   // Library API
-  async getLibraryItems(opts?: { category?: string; page?: number; limit?: number }): Promise<SupplierLibraryItem[]> {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인): `{ success, data: { items, total } }`.
+   *   `neture-library.service.ts:62` — limit 상한 100 (`Math.min(limit || 20, 100)`).
+   *   정상 빈 목록은 `items: []` 다.
+   * 조회 실패는 고정 코드로 throw 하고, 소비처가 "총 건수" 로 조회 범위를
+   * 판단할 수 있도록 `total` 을 함께 반환한다.
+   */
+  async getLibraryItems(opts?: { category?: string; page?: number; limit?: number }): Promise<SupplierLibraryItemsResult> {
+    let response;
     try {
       const params = new URLSearchParams();
       if (opts?.category) params.append('category', opts.category);
       if (opts?.page) params.append('page', String(opts.page));
       if (opts?.limit) params.append('limit', String(opts.limit));
       const query = params.toString();
-      const response = await api.get(`/neture/library${query ? `?${query}` : ''}`);
-      const result = response.data;
-      return result.data?.items || [];
+      response = await api.get(`/neture/library${query ? `?${query}` : ''}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch library items:', error);
-      return [];
+      console.warn('[Supplier API] Failed to fetch library items:', extractApiError(error));
+      throw new Error(SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!result?.success || !Array.isArray(result.data?.items)) {
+      console.warn('[Supplier API] Unexpected library payload shape');
+      throw new Error(SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED);
+    }
+    // total 은 보조 필드다. 누락되어도 목록 자체는 유효하므로 실패로 보지 않는다.
+    const items = result.data.items as SupplierLibraryItem[];
+    return { items, total: typeof result.data.total === 'number' ? result.data.total : items.length };
   },
 
   async createLibraryItem(data: {
