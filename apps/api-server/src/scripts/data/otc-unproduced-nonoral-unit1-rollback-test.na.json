@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-PRODUCTION-READINESS-AND-EN-V1",
+  "track": "nonoral-unit-1",
+  "mode": "rollback-test",
+  "dbWrite": 0,
+  "sampleFp": [
+    "0a73d615e9a36877",
+    "713bd9cf71b4ce20",
+    "71c52233fb91edef"
+  ],
+  "fp_0a73d615e9a36877": {
+    "masters": 68,
+    "expectedT": 272,
+    "postVerify": "PASS"
+  },
+  "fp_713bd9cf71b4ce20": {
+    "masters": 46,
+    "expectedT": 184,
+    "postVerify": "PASS"
+  },
+  "fp_71c52233fb91edef": {
+    "masters": 19,
+    "expectedT": 76,
+    "postVerify": "PASS"
+  },
+  "writesInsideTx": 532,
+  "expectedInsideTx": 532,
+  "writeMatch": true,
+  "postVerify": "PASS",
+  "afterRollback": {
+    "easyCanonical": 443,
+    "authoredCanonical": 0
+  },
+  "stateUnchanged": true,
+  "verdict": "PASS"
+}

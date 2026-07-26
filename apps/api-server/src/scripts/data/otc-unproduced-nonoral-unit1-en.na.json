@@ -1,0 +1,1129 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-PRODUCTION-READINESS-AND-EN-V1",
+  "track": "nonoral-unit-1",
+  "agent": "na",
+  "approvalCommit": "4f188953d",
+  "grounding": "공식 KO 원문(e약은요 STORE ko canonical) 유일. 신규 의료 사실 0. 연령·용량·횟수·간격·기간·적용부위 전량 보존. usageLabel 은 route 프로파일에서 주입.",
+  "translations": [
+    {
+      "fp": "048cc50a09e53860",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "075b7d9ba048443b",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults insert one tablet (100 mg) deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults insert 2 tablets (200 mg) deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using it, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. It is better to avoid vaginal intercourse while using it, as a partner may be infected during intercourse.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; use with tampons or vaginal products",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "0a73d615e9a36877",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the cream (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount, and do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to other amide-type local anaesthetics, if the application site has a wound or inflammation, or if your partner is pregnant. Before using this medicine, talk to a doctor or pharmacist if you have liver or kidney disease or are hypersensitive to propylene glycol. For external use only. Do not use it in the eyes or the nose. It is better not to apply it repeatedly to the same area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Hypersensitivity to amide-type local anaesthetics; wound or inflammation at the application site; partner is pregnant",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "0c1b08d4a378c3e3",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it; if you have a skin infection caused by bacteria (tuberculosis, syphilis and similar), fungi (candidiasis, tinea and similar), spirochaetes, yeasts, viruses (herpes zoster, herpes simplex, chickenpox, vaccinia and similar) or animal parasites (scabies, pubic lice and similar); if you have eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea; or if you are hypersensitive to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Bacterial, fungal, viral or parasitic skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "0c9fda758be46afc",
+      "gencode": "102906CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, or if you are pregnant or may be pregnant. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection. Do not use it as a base to dilute this medicine or to mix other medicines. This medicine is for external use only.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency such as AIDS or a bone marrow transplant",
+        "Choosing point": "Products with the same generic code (102906CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "130e0c721590505f",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, or are breastfeeding.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "1841a94833c49604",
+      "gencode": "B23200CCM",
+      "route": "topical",
+      "title": "Cream for Itching, Insect Bites and Contact Dermatitis",
+      "efficacy": "This medicine is used for itching, insect bites, urticaria, prickly heat, contact dermatitis caused by lacquer and similar, chilblains, eczema, dermatitis and skin erosion.",
+      "usage": "Apply it to the affected area several times a day.",
+      "caution": "Do not use this medicine on areas affected by chickenpox, athlete's foot, tinea or similar, or on areas with pus. Before using this medicine, talk to a doctor or pharmacist if you are hypersensitive to medicines or cosmetics, if you have an allergic constitution, if the skin is very moist or eroded, or if the affected area is extensive. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for external use only; do not use it internally. Take care that it does not get into the eyes.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Itching, insect bites, urticaria, prickly heat, contact dermatitis, chilblains, eczema",
+        "Who should be careful": "Chickenpox, athlete's foot, tinea or areas with pus; extensive affected areas",
+        "Choosing point": "Products with the same generic code (B23200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "18f6046fcc71999e",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it; if you have a skin infection caused by bacteria (tuberculosis, syphilis and similar), fungi (candidiasis, tinea and similar), spirochaetes, yeasts, viruses (herpes zoster, herpes simplex, chickenpox, vaccinia and similar) or animal parasites (scabies, pubic lice); if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; or acne vulgaris.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Bacterial, fungal, viral or parasitic skin infections; hypersensitivity to aminoglycosides or bacitracin",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "1c33b712e12bf68c",
+      "gencode": "102906CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, if you are pregnant or may be pregnant, or if you are hypersensitive to propylene glycol or have reacted to it before. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection. Do not use it as a base to dilute this medicine or to mix other medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (102906CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "248982a68b2ad690",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "2d5b130e0035e8e6",
+      "gencode": "392430CCM",
+      "route": "topical",
+      "title": "Cream for Temporary Relief of Haemorrhoid Discomfort",
+      "efficacy": "This medicine is used for the temporary relief of discomfort, burning and itching caused by haemorrhoids.",
+      "usage": "Adults apply it directly to the affected area up to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it. Before using this medicine, talk to a doctor or pharmacist for children aged 12 years or under and if you are pregnant or may be pregnant. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for use on the anal area only; do not use it in the eyes. Talk to a doctor or pharmacist if you are also using an antihypertensive or an antidepressant medicine.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves discomfort, burning and itching around the anus",
+        "Main use": "Temporary relief of haemorrhoid symptoms",
+        "Who should be careful": "Children aged 12 years or under; pregnancy; use with antihypertensives or antidepressants",
+        "Choosing point": "Products with the same generic code (392430CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "2e697b803cc3a553",
+      "gencode": "A18500CCM",
+      "route": "topical",
+      "title": "Cream for Scars and Skin Damage after Surgery, Burns or Accidents",
+      "efficacy": "This medicine is used for wounds and scars from hypertrophic and keloid, movement-restricting or cosmetic skin damage after surgery, amputation, burns or accidents, and for traumatic contracture and cicatricial stricture.",
+      "usage": "Massage it gently into the wound area several times a day until it is fully absorbed. For a fresh wound, avoid physical stimulation such as extreme cold, ultraviolet light or strong massage. For a severe wound or an old scar, fix it in place and leave it overnight.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant, or on an incised or unhealed wound or on a wound area on mucosal skin that is weeping. If you are breastfeeding, talk to a doctor or pharmacist. Take care that the wound is not exposed to the heat of the sun or to light. When giving it to a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Softens and improves the appearance of scars and damaged skin",
+        "Main use": "Hypertrophic and keloid scars, traumatic contracture, cicatricial stricture",
+        "Who should be careful": "Pregnancy; incised or unhealed wounds; weeping wounds on mucosal skin",
+        "Choosing point": "Products with the same generic code (A18500CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "321adcea63d19542",
+      "gencode": "D01300ATO",
+      "route": "oromucosal",
+      "title": "Lozenge for Cough, Phlegm and Throat Discomfort",
+      "efficacy": "This medicine is used for cough, phlegm, asthma, stomatitis, tonsillitis, and hoarseness, throat discomfort, sore throat and swelling of the throat caused by pharyngitis and laryngitis.",
+      "usage": "Adults and those aged 15 years and over: one tablet at a time, 6 times a day (at intervals of at least 2 hours). Those aged 11 years and over but under 15 years: one tablet at a time, 4 times a day (at intervals of at least 3 hours). Those aged 8 years and over but under 11 years: one tablet at a time, 3 times a day (at intervals of at least 4 hours). Do not chew or swallow it whole; let it dissolve slowly in the mouth.",
+      "caution": "This medicine contains aspartame, which is metabolised in the body to phenylalanine, so patients with phenylketonuria who need to restrict their intake of phenylalanine must not use it. Do not use this medicine if you are hypersensitive to it, if you are pregnant or may be pregnant, in infants under 3 months of age and children under 2 years of age, or if you have a genetic problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves cough, phlegm and inflammation in the mouth and throat",
+        "Main use": "Cough, phlegm, stomatitis, tonsillitis, sore and swollen throat",
+        "Who should be careful": "Phenylketonuria (contains aspartame); pregnancy; infants under 3 months and children under 2 years",
+        "Choosing point": "Products with the same generic code (D01300ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "33535a1064bbad58",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Gel-Type Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the gel (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount. Do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine in patients with liver or kidney disease. This medicine is for external use only. Take care not to apply it repeatedly to the same area. Do not use it in the eyes or on mucous membranes. Do not use it under an occlusive dressing. Do not use it for 3 months or longer without the supervision of a doctor.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Liver or kidney disease; use in the eyes or on mucous membranes; use for 3 months or longer without supervision",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "384dd85d7c9d4ab1",
+      "gencode": "392430CCM",
+      "route": "topical",
+      "title": "Cream for Temporary Relief of Haemorrhoid Discomfort",
+      "efficacy": "This medicine is used for the temporary relief of discomfort, burning and itching caused by haemorrhoids.",
+      "usage": "Adults apply it directly to the affected area up to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it. Before using this medicine, talk to a doctor or pharmacist for children aged 12 years or under, if you are pregnant or may be pregnant, or if you are hypersensitive to propylene glycol or have reacted to it before. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for use on the anal area only; do not use it in the eyes. If there is no improvement after about 7 days of use, stop using it immediately and talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves discomfort, burning and itching around the anus",
+        "Main use": "Temporary relief of haemorrhoid symptoms",
+        "Who should be careful": "Children aged 12 years or under; pregnancy; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (392430CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "3fffa5590382e1eb",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults usually insert one tablet (100 mg) deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults usually insert 2 tablets (200 mg) deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or have reacted to it before. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using it, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. It is better to avoid vaginal intercourse while using it, as a partner may be infected during intercourse.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; use with tampons or vaginal products",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "456783b15f8909e9",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults: insert one tablet (100 mg) deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults insert 2 tablets (200 mg) deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using it, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. It is better to avoid vaginal intercourse while using it, as a partner may be infected during intercourse. Do not let the medicine get into the eyes and do not swallow it. This medicine is for vaginal use only; do not use it internally. This medicine can weaken latex or rubber products such as condoms and diaphragms.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; use with condoms or diaphragms",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "4b7006113fd29d95",
+      "gencode": "102935CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, if you are pregnant or may be pregnant, or if you are hypersensitive to propylene glycol or have reacted to it before. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection. Do not use it as a base to dilute this medicine or to mix other medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (102935CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "4f55e332ebb1f301",
+      "gencode": "A57300CCM",
+      "route": "topical",
+      "title": "Cream for Insect Bites, Itching and Dermatitis",
+      "efficacy": "This medicine is used for insect bites, itchy skin, eczema, urticaria, dermatitis, prickly heat and chilblains.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine in infants aged 30 months or under, around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer or similar, or on wounds. Before using this medicine, talk to a doctor or pharmacist if you have reacted to a medicine or a cosmetic with hypersensitivity (rash, redness, itching, dermatitis caused by lacquer and similar), if you have an allergic constitution, if the skin is very moist or eroded, or for children. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for external use only; do not use it internally. Take care that it does not get into the eyes, and if it does, wash it out immediately with water. If the symptoms do not improve after using it for 5 to 6 days, stop using it and talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Insect bites, itchy skin, eczema, urticaria, dermatitis, prickly heat, chilblains",
+        "Who should be careful": "Infants aged 30 months or under; eyes, mucous membranes and wounds must be avoided",
+        "Choosing point": "Products with the same generic code (A57300CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "502f7e7803703459",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Ointment-Type Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the ointment (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount, and do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to other amide-type local anaesthetics, if the application site has a wound or inflammation, or if your partner is pregnant. Before using this medicine, talk to a doctor or pharmacist if you have liver or kidney disease. Do not use this medicine for 3 months or longer without the supervision of a doctor. This medicine is for external use only. Do not use it in the eyes or the nose. It is better not to apply it repeatedly to the same area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Hypersensitivity to amide-type local anaesthetics; liver or kidney disease; use for 3 months or longer without supervision",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "527c326e572114a7",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to, or have had an allergic reaction to, this medicine or aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are hypersensitive to, or have had an allergic reaction to, propylene glycol, if you are pregnant, may be pregnant or are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides, bacitracin or propylene glycol; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "5aeeb9c287b0796d",
+      "gencode": "161906ATO",
+      "route": "oromucosal",
+      "title": "Throat Lozenge for Short-Term Relief of Sore Throat",
+      "efficacy": "This medicine is used for the short-term relief of the symptoms of pharyngitis.",
+      "usage": "Adults and children and adolescents aged 12 years and over should let one lozenge dissolve slowly in the mouth. Move it around in the mouth to avoid local irritation. If needed, use up to 5 lozenges a day at intervals of 3 to 6 hours, for a maximum of 3 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine, to aspirin or to other non-steroidal anti-inflammatory drugs; if you have a peptic ulcer or bleeding; if you have had asthma (including an asthma attack), urticaria, bronchospasm or rhinitis caused by aspirin or another non-steroidal anti-inflammatory drug; if you have severe heart failure, gastrointestinal bleeding or perforation caused by a non-steroidal anti-inflammatory drug or an antirheumatic drug, severe colitis, a severe blood disorder, an unexplained haematopoietic disorder, severe liver impairment or severe kidney impairment; or if you are in the last 3 months of pregnancy or are breastfeeding.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves inflammation and pain in the throat",
+        "Main use": "Short-term relief of the symptoms of pharyngitis",
+        "Who should be careful": "Hypersensitivity to aspirin or other NSAIDs; peptic ulcer or bleeding; last 3 months of pregnancy",
+        "Choosing point": "Products with the same generic code (161906ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "5bba497e94292643",
+      "gencode": "A57300CCM",
+      "route": "topical",
+      "title": "Cream for Insect Bites, Itching and Dermatitis",
+      "efficacy": "This medicine is used for insect bites, itchy skin, eczema, urticaria, dermatitis, prickly heat and chilblains.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine in infants aged 30 months or under, around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer or similar, or on wounds. Before using this medicine, talk to a doctor or pharmacist if you have reacted to a medicine or a cosmetic with hypersensitivity (rash, redness, itching, dermatitis caused by lacquer and similar), if you have an allergic constitution, if the skin is very moist or eroded, or for children. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for external use only; do not use it internally. Take care that it does not get into the eyes, and if it does, wash it out immediately with water. If the symptoms do not improve after using it for 5 to 6 days, stop using it and talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Insect bites, itchy skin, eczema, urticaria, dermatitis, prickly heat, chilblains",
+        "Who should be careful": "Infants aged 30 months or under; eyes, mucous membranes and wounds must be avoided",
+        "Choosing point": "Products with the same generic code (A57300CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "5f4235b8d0c8676a",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "With the 100 mg strength, adults insert one tablet at a time deep into the vagina once a day at bedtime for 6 consecutive days; for short-course treatment, adults insert 2 tablets (200 mg) at a time deep into the vagina once a day at bedtime for 3 consecutive days. With the 200 mg strength, adults insert 2 tablets at a time deep into the vagina once a day at bedtime for 3 consecutive days. With the 500 mg strength, adults insert 5 tablets at a time deep into the vagina once a day at bedtime for 1 day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or if you have a genetic problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using this product, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. Talk to a doctor or pharmacist if a vaginal infection occurs or while you are using this product.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; galactose intolerance",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "6556faea04cc13b3",
+      "gencode": "A57200CCM",
+      "route": "topical",
+      "title": "Cream for Itching, Dermatitis and Insect Bites",
+      "efficacy": "This medicine is used for itching, dermatitis, eczema, urticaria, prickly heat, frostbite, insect bites and skin soreness.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine in children under 1 month of age. Before using this medicine, talk to a doctor or pharmacist if you have an allergic constitution, if you are hypersensitive to medicines or cosmetics, if the skin is very moist or the inflammation is severe, or for infants and young children under 6 years of age. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for external use only; do not use it internally. Take care that it does not get into the eyes, and if it does, wash it out immediately with water.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Itching, dermatitis, eczema, urticaria, prickly heat, frostbite, insect bites",
+        "Who should be careful": "Children under 1 month of age; infants and young children under 6 years; contact with the eyes",
+        "Choosing point": "Products with the same generic code (A57200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "66d7698ffae52396",
+      "gencode": "102935CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, if you are pregnant or may be pregnant, or if you are hypersensitive to propylene glycol or have reacted to it before. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (102935CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "6a16edf177c8be74",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults insert one tablet (100 mg) at a time deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults insert 2 tablets (200 mg) at a time deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or have reacted to it before. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using it, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. It is better to avoid vaginal intercourse while using it, as a partner may be infected during intercourse. Do not let the medicine get into the eyes. This medicine is for vaginal use only.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; use with tampons or vaginal products",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "6b024e15ec2c1704",
+      "gencode": "A57200CCM",
+      "route": "topical",
+      "title": "Cream for Eczema, Dermatitis and Insect Bites",
+      "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, dermatitis caused by lacquer and similar, itching, insect bites, urticaria and chilblains.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine on eczema, on wounds, on sensitive skin, in or around the eyes, or on mucous membranes. Before using this medicine, talk to a doctor or pharmacist if you have had an allergic reaction to a medicine or a cosmetic (rash, redness, itching, dermatitis caused by lacquer and similar), if you have an allergic constitution, or if the skin is very moist, eroded or severely inflamed. If there is no improvement after using it for 5 to 6 days, stop using it immediately and talk to a doctor or pharmacist. This medicine is for external use only.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria, chilblains",
+        "Who should be careful": "Wounds, sensitive skin, eyes and mucous membranes must be avoided",
+        "Choosing point": "Products with the same generic code (A57200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "6d103adbbad1f104",
+      "gencode": "530094CCM",
+      "route": "topical",
+      "title": "Cream to Promote Tissue Regeneration in Painless Wounds",
+      "efficacy": "This medicine is used to promote tissue regeneration in painless wounds.",
+      "usage": "Apply it to the wound area 2 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Promotes tissue regeneration in the wound area",
+        "Main use": "Painless wounds",
+        "Who should be careful": "Hypersensitivity to this medicine",
+        "Choosing point": "Products with the same generic code (530094CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "6feec6603464312d",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, for infants and children, or if you are hypersensitive to propylene glycol or have reacted to it before.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides, bacitracin or propylene glycol; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "713bd9cf71b4ce20",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "71548c12c7eb10f1",
+      "gencode": "346500COM",
+      "route": "topical",
+      "title": "Ointment for Corticosteroid-Responsive Skin Disorders with Secondary Infection",
+      "efficacy": "This medicine is used for the initial treatment of corticosteroid-responsive skin disorders secondarily infected by neomycin-sensitive bacteria (dermatitis, infected wounds).",
+      "usage": "Apply an appropriate amount to the affected area 1 to 2 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; rosacea; or a wound in or around the eyes or on the breast area. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · ointment",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Dermatitis and infected wounds responsive to corticosteroids",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; wounds around the eyes or on the breast",
+        "Choosing point": "Products with the same generic code (346500COM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "71c52233fb91edef",
+      "gencode": "A57100CCM",
+      "route": "topical",
+      "title": "Antifungal Cream for Skin Infections Caused by Dermatophytes",
+      "efficacy": "This medicine is used for fungal skin infections caused by dermatophytes (athlete's foot, tinea cruris and tinea).",
+      "usage": "Apply an appropriate amount to the affected area once a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant or may be pregnant, if you are breastfeeding, or for infants and children. Do not use it on or around the eyes, on mucous membranes (inside the mouth, inside the nose, the vagina), on the scrotum or the external genitals, or on areas with eczema, moist or macerated skin, cracking or severe wounds, or on the nails or the scalp. Before using this medicine, talk to a doctor or pharmacist if you have an allergic constitution, if the affected area is on the face or is extensive or has pus, or if you are hypersensitive to propylene glycol or have reacted to it before. Follow the directions and the amount exactly. Do not apply it while the affected area or the skin around it is dirty.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Kills the dermatophytes that cause the skin infection",
+        "Main use": "Athlete's foot, tinea cruris, tinea",
+        "Who should be careful": "Pregnancy, breastfeeding, infants and children; eyes, mucous membranes, genitals, nails and scalp must be avoided",
+        "Choosing point": "Products with the same generic code (A57100CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "75fc816ef7758b02",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults usually insert one tablet (100 mg) deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults usually insert 2 tablets (200 mg) deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or if you have a genetic problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Use it only in children aged 12 years and over and in adults. Do not use it during menstruation. While using it, do not use tampons or vaginal douches.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Galactose intolerance; pregnancy or breastfeeding; only for age 12 years and over",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "7d278a24d227c451",
+      "gencode": "A18500CCM",
+      "route": "topical",
+      "title": "Cream for Scars and Skin Damage after Surgery, Burns or Accidents",
+      "efficacy": "This medicine is used for wounds and scars from hypertrophic and keloid, movement-restricting or cosmetic skin damage after surgery, amputation, burns or accidents, and for traumatic contracture and cicatricial stricture.",
+      "usage": "Massage it gently into the wound area several times a day until it is fully absorbed. For a severe wound or an old scar, fix it in place with a dressing and leave it overnight.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or to methyl parahydroxybenzoate, if you are pregnant, or on an incised or unhealed wound or on a wound area on mucosal skin that is weeping. Before using this medicine, talk to a doctor or pharmacist if you are breastfeeding. Take care that the wound is not exposed to the heat of the sun or to light, and for a fresh wound avoid physical stimulation such as extreme cold, ultraviolet light or strong massage. When giving it to a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Softens and improves the appearance of scars and damaged skin",
+        "Main use": "Hypertrophic and keloid scars, traumatic contracture, cicatricial stricture",
+        "Who should be careful": "Pregnancy; hypersensitivity to methyl parahydroxybenzoate; incised, unhealed or weeping wounds",
+        "Choosing point": "Products with the same generic code (A18500CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "7e3bb7c8a23c4deb",
+      "gencode": "D01300ATO",
+      "route": "oromucosal",
+      "title": "Lozenge for Cough, Phlegm and Throat Discomfort",
+      "efficacy": "This medicine is used for cough, phlegm, asthma, stomatitis, tonsillitis, and hoarseness, throat discomfort, sore throat and swelling of the throat caused by pharyngitis and laryngitis.",
+      "usage": "Adults and those aged 15 years and over: one tablet at a time, 6 times a day (at intervals of at least 2 hours). Those aged 11 years and over but under 15 years: one tablet at a time, 4 times a day (at intervals of at least 3 hours). Those aged 8 years and over but under 11 years: one tablet at a time, 3 times a day (at intervals of at least 4 hours). Do not chew or swallow it whole; let it dissolve slowly in the mouth.",
+      "caution": "Do not use this medicine if you are hypersensitive to it; if you are pregnant or may be pregnant; in infants under 3 months of age; if you are using an MAO inhibitor (an antidepressant, antipsychotic, mood stabiliser, antiparkinsonian medicine and similar) or stopped one within the last 2 weeks; or if you have a genetic problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before using this medicine, talk to a doctor or pharmacist if you are breastfeeding, are elderly or are in poor physical condition.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves cough, phlegm and inflammation in the mouth and throat",
+        "Main use": "Cough, phlegm, stomatitis, tonsillitis, sore and swollen throat",
+        "Who should be careful": "Pregnancy; infants under 3 months; MAO inhibitor use within the last 2 weeks; elderly",
+        "Choosing point": "Products with the same generic code (D01300ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "8137728114ad6559",
+      "gencode": "A87803AMS",
+      "route": "oromucosal",
+      "title": "Nicotine Gum to Help You Stop Smoking",
+      "efficacy": "This medicine is used as a smoking cessation aid to reduce the amount you smoke and to help you stop smoking.",
+      "usage": "For adults, the 2 mg gum is recommended for smokers of 20 or fewer cigarettes a day, and the 4 mg gum is recommended for heavy smokers of more than 20 cigarettes a day or when the 2 mg strength has not worked. Chew the gum for 30 minutes in the following order and then throw the used gum away: put one piece in the mouth and chew it slowly at intervals of a few seconds; when you feel a strong taste or a slight tingling, rest the gum in the cheek until the strong taste or tingling settles; then chew it slowly again and repeat as above, continuing to chew for 30 minutes. Once you are used to the taste of the gum, increase the chewing speed as needed. Use the gum whenever you feel the urge to smoke so that you stay completely off cigarettes. Usually chew 8 to 12 pieces of the 2 mg or 4 mg gum a day, and do not exceed a total of 15 pieces a day. As the urge to smoke gradually decreases, reduce the number used each day. It is usually used for about 3 months.",
+      "caution": "Do not use this medicine if you are hypersensitive to it; if you have unstable angina or worsening angina; if you have had a myocardial infarction within the last 3 months; in the late stage after an acute infarction; if you have a severe cardiac arrhythmia, systemic hypertension, peripheral vascular disease, acute stroke or cerebrovascular disease; if you are pregnant, may be pregnant or are breastfeeding; in children and adolescents under 18 years of age; or if you are a non-smoker or an occasional smoker. Before using this medicine, talk to a doctor or pharmacist if you have gastritis, a gastric or duodenal ulcer, or an obstruction.",
+      "summaryTable": {
+        "Category": "Over-the-counter · gum",
+        "How it works": "Supplies nicotine to relieve the craving to smoke",
+        "Main use": "Smoking cessation aid",
+        "Who should be careful": "Unstable angina; myocardial infarction within the last 3 months; pregnancy or breastfeeding; under 18 years of age",
+        "Choosing point": "Products with the same generic code (A87803AMS) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "815a8b88b3498ef2",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it; if you have a skin infection caused by bacteria (tuberculosis, syphilis and similar), fungi (candidiasis, tinea and similar), spirochaetes, yeasts, viruses (herpes zoster, herpes simplex, chickenpox, vaccinia and similar) or animal parasites (scabies, pubic lice and similar); if you have eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea; or if you are hypersensitive to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Bacterial, fungal, viral or parasitic skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "81bb3b7083ad11c4",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Gel-Type Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the gel (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount, and do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to other amide-type local anaesthetics, if the application site has a wound or inflammation, or if your partner is pregnant. Before using this medicine, talk to a doctor or pharmacist if you have liver or kidney disease or are hypersensitive to propylene glycol or have reacted to it before. This medicine is for external use only. Do not use it in the eyes or the nose. It is better not to apply it repeatedly to the same area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Hypersensitivity to amide-type local anaesthetics; liver or kidney disease; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "81e81be4178744f9",
+      "gencode": "346500COM",
+      "route": "topical",
+      "title": "Ointment for Corticosteroid-Responsive Skin Disorders with Secondary Infection",
+      "efficacy": "This medicine is used for the initial treatment of corticosteroid-responsive skin disorders secondarily infected by neomycin-sensitive bacteria (dermatitis, infected wounds).",
+      "usage": "Apply an appropriate amount to the affected area 1 to 2 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Do not use it in or around the eyes. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, for infants and children, or if you are hypersensitive to propylene glycol.",
+      "summaryTable": {
+        "Category": "Over-the-counter · ointment",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Dermatitis and infected wounds responsive to corticosteroids",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; use near the eyes",
+        "Choosing point": "Products with the same generic code (346500COM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "87833d620456daf7",
+      "gencode": "A57100CCM",
+      "route": "topical",
+      "title": "Antifungal Cream for Skin Infections Caused by Dermatophytes",
+      "efficacy": "This medicine is used for fungal skin infections caused by dermatophytes (athlete's foot, tinea cruris and tinea).",
+      "usage": "Apply an appropriate amount to the affected area once a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant or may be pregnant, if you are breastfeeding, or for infants and children. Do not use it on or around the eyes, on mucous membranes (inside the mouth, inside the nose, the vagina), on the scrotum or the external genitals, or on areas with eczema, moist or macerated skin, cracking or severe wounds, or on the nails or the scalp. Before using this medicine, talk to a doctor or pharmacist if you have an allergic constitution or if the affected area is on the face or is extensive or has pus.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Kills the dermatophytes that cause the skin infection",
+        "Main use": "Athlete's foot, tinea cruris, tinea",
+        "Who should be careful": "Pregnancy, breastfeeding, infants and children; eyes, mucous membranes, genitals, nails and scalp must be avoided",
+        "Choosing point": "Products with the same generic code (A57100CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "8828c09746b29f38",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Gel-Type Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the gel (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount, and do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to other amide-type local anaesthetics, if the application site has a wound or inflammation, or if your partner is pregnant. Before using this medicine, talk to a doctor or pharmacist if you have liver or kidney disease or are hypersensitive to propylene glycol. For external use only. Do not use it in the eyes or the nose. It is better not to apply it repeatedly to the same area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Hypersensitivity to amide-type local anaesthetics; wound or inflammation at the application site; partner is pregnant",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "882bb1ca3b3fb441",
+      "gencode": "346500COM",
+      "route": "topical",
+      "title": "Ointment for Corticosteroid-Responsive Skin Disorders with Secondary Infection",
+      "efficacy": "This medicine is used for the initial treatment of corticosteroid-responsive skin disorders secondarily infected by neomycin-sensitive bacteria (dermatitis, infected wounds).",
+      "usage": "Apply an appropriate amount to the affected area 1 to 2 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; rosacea; or a wound in or around the eyes or on the breast area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · ointment",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Dermatitis and infected wounds responsive to corticosteroids",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; wounds around the eyes or on the breast",
+        "Choosing point": "Products with the same generic code (346500COM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "8c16f5460ed1a751",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; or acne vulgaris.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "8c661c49e6582823",
+      "gencode": "B23200CCM",
+      "route": "topical",
+      "title": "Cream for Itching, Insect Bites and Contact Dermatitis",
+      "efficacy": "This medicine is used for itching, insect bites, urticaria, prickly heat, contact dermatitis caused by lacquer and similar, chilblains, eczema, dermatitis and skin erosion.",
+      "usage": "Apply it to the affected area several times a day.",
+      "caution": "Do not use this medicine on areas affected by chickenpox, athlete's foot, tinea or similar, or on areas with pus. Before using this medicine, talk to a doctor or pharmacist if you have had an allergic reaction to a medicine or a cosmetic, if you have an allergic constitution, if the skin is very moist or eroded, if the affected area is extensive, or if you are hypersensitive to propylene glycol. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Itching, insect bites, urticaria, prickly heat, contact dermatitis, chilblains, eczema",
+        "Who should be careful": "Chickenpox, athlete's foot, tinea or areas with pus; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (B23200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "8f5f35929f858d9d",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "90765dbaea3a1ab0",
+      "gencode": "161906ATO",
+      "route": "oromucosal",
+      "title": "Throat Lozenge for Short-Term Relief of Sore Throat",
+      "efficacy": "This medicine is used for the short-term relief of the symptoms of pharyngitis.",
+      "usage": "Adults and children and adolescents aged 12 years and over should let one lozenge dissolve slowly in the mouth. Move it around in the mouth to avoid local irritation. If needed, use up to 5 lozenges a day at intervals of 3 to 6 hours, for a maximum of 3 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine, to aspirin or to other non-steroidal anti-inflammatory drugs; if you have a peptic ulcer or bleeding; if you have had asthma (including an asthma attack), urticaria, bronchospasm or rhinitis caused by aspirin or another non-steroidal anti-inflammatory drug; if you have severe heart failure, gastrointestinal bleeding or perforation caused by a non-steroidal anti-inflammatory drug or an antirheumatic drug, severe colitis, a severe blood disorder, an unexplained haematopoietic disorder, severe liver impairment or severe kidney impairment; if you are in the last 3 months of pregnancy; or if you have hereditary fructose intolerance, glucose-galactose malabsorption or sucrase-isomaltase deficiency.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves inflammation and pain in the throat",
+        "Main use": "Short-term relief of the symptoms of pharyngitis",
+        "Who should be careful": "Hypersensitivity to aspirin or other NSAIDs; peptic ulcer or bleeding; severe heart, liver or kidney impairment; last 3 months of pregnancy",
+        "Choosing point": "Products with the same generic code (161906ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "91a8f5a3c2097654",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant, are breastfeeding, or for infants and children.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "a4cf00b953703bcb",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or have reacted to it before; if you have a skin infection caused by bacteria (tuberculosis, syphilis and similar), fungi (candidiasis, tinea and similar), spirochaetes, yeasts, viruses (herpes zoster, herpes simplex, chickenpox, vaccinia and similar) or animal parasites (scabies, pubic lice and similar); if you have eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea; or if you are hypersensitive to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Bacterial, fungal, viral or parasitic skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "a5642ede188c68f6",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; or acne vulgaris.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "aaad3eb9fc5b3341",
+      "gencode": "A57100CCM",
+      "route": "topical",
+      "title": "Antifungal Cream for Skin Infections Caused by Dermatophytes",
+      "efficacy": "This medicine is used for fungal skin infections caused by dermatophytes (athlete's foot, tinea cruris and tinea).",
+      "usage": "Apply an appropriate amount to the affected area once a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant or may be pregnant, if you are breastfeeding, or for infants and children. Do not use it on or around the eyes, on mucous membranes (inside the mouth, inside the nose, the vagina and similar), on the scrotum or the external genitals, or on areas with eczema, moist or macerated skin, cracking or severe wounds, or on the nails or the scalp. Before using this medicine, talk to a doctor or pharmacist if you have an allergic constitution or if the affected area is on the face or is extensive or has pus.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Kills the dermatophytes that cause the skin infection",
+        "Main use": "Athlete's foot, tinea cruris, tinea",
+        "Who should be careful": "Pregnancy, breastfeeding, infants and children; eyes, mucous membranes, genitals, nails and scalp must be avoided",
+        "Choosing point": "Products with the same generic code (A57100CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "adf3c63a90a05189",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; or acne vulgaris.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "b0b1242f1726ea1f",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "b8c1a9bf654cc52c",
+      "gencode": "B97100CPL",
+      "route": "topical",
+      "title": "Medicated Plaster for Bruises, Stiff Shoulders and Rheumatic Pain",
+      "efficacy": "This medicine is used as an analgesic and anti-inflammatory for bruises, stiff shoulders and rheumatic pain.",
+      "usage": "Clean and dry the affected area, then apply one plaster once a day. Fix it with a bandage or tape if needed.",
+      "caution": "Do not use this medicine on eczema, on dermatitis caused by lacquer or similar, or on wounds. Before using this medicine, talk to a doctor or pharmacist if you are hypersensitive to medicines or cosmetics, if you have an allergic constitution, if the skin is very moist or eroded, if you are pregnant or may be pregnant, or if you are breastfeeding. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. For external use only. If there is no improvement after using it for 5 to 6 days, stop using it immediately.",
+      "summaryTable": {
+        "Category": "Over-the-counter · plaster",
+        "How it works": "Relieves pain and inflammation at the site where it is applied",
+        "Main use": "Bruises, stiff shoulders, rheumatic pain",
+        "Who should be careful": "Eczema, lacquer dermatitis or wounds; pregnancy or breastfeeding",
+        "Choosing point": "Products with the same generic code (B97100CPL) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "b918e02d846e4065",
+      "gencode": "183807CCM",
+      "route": "topical",
+      "title": "Lidocaine Cream for Reduced Sensitivity of the Male Genitals",
+      "efficacy": "This medicine is used to reduce the sensitivity of touch of the male genitals.",
+      "usage": "Apply 0.25-0.66 g of the cream (23-62 mg as lidocaine) to the affected area 5-15 minutes before intercourse. The amount and the application time differ from person to person, so use the smallest effective amount, and do not apply more than 2 g (184 mg as lidocaine) within 24 hours.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to other amide-type local anaesthetics, if the application site has a wound or inflammation, or if your partner is pregnant. Before using this medicine, talk to a doctor or pharmacist if you have liver or kidney disease or are hypersensitive to propylene glycol. Do not use this medicine for 3 months or longer unless a doctor directs you to. This medicine is for external use only. Do not use it in the eyes or the nose. It is better not to apply it repeatedly to the same area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Reduces the sensitivity of touch of the male genitals",
+        "Main use": "Reduced sensitivity of touch of the male genitals",
+        "Who should be careful": "Hypersensitivity to amide-type local anaesthetics; liver or kidney disease; use for 3 months or longer",
+        "Choosing point": "Products with the same generic code (183807CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "bb422e8b5b99d426",
+      "gencode": "363700CCM",
+      "route": "topical",
+      "title": "Cream for Secondarily Infected Allergic or Inflammatory Skin Disorders",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin disorders (eczema, contact dermatitis, seborrhoeic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine; if you are hypersensitive to, or have reacted to, aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; or rosacea.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Secondarily infected allergic or inflammatory skin disorders; first-degree burns",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; ulcers; deep burns or frostbite",
+        "Choosing point": "Products with the same generic code (363700CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "bf4a061b1a6254d6",
+      "gencode": "A11800CCM",
+      "route": "topical",
+      "title": "Cream for Allergic Dermatitis, Prickly Heat and Nappy Rash",
+      "efficacy": "This medicine is used for allergic dermatitis, cosmetic irritation, prickly heat, itching, contact dermatitis (nappy rash), shaving irritation and to prevent rough skin.",
+      "usage": "Apply an appropriate amount to the affected area several times a day, or spread it on gauze or similar and attach it.",
+      "caution": "Do not use this medicine on wounds or mucous membranes, in patients with a bacterial, fungal, viral or animal parasitic skin infection, on areas with pus, if you are hypersensitive to this medicine, or in eczematous otitis externa with a perforated eardrum, an ulcer, a deep second-degree or worse burn or frostbite, perioral dermatitis, acne vulgaris or rosacea. Before using this medicine, talk to a doctor or pharmacist if you have had an allergic reaction to a medicine or a cosmetic, if you have an allergic constitution, if the affected area is extensive, or if you are pregnant or may be pregnant.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves inflammation and protects irritated skin",
+        "Main use": "Allergic dermatitis, prickly heat, itching, nappy rash, shaving irritation",
+        "Who should be careful": "Wounds or mucous membranes; skin infections; areas with pus; pregnancy",
+        "Choosing point": "Products with the same generic code (A11800CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "c9659ddcc4c144bf",
+      "gencode": "102935CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, or if you are pregnant or may be pregnant. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection. Do not use it as a base to dilute this medicine or to mix other medicines.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency such as AIDS or a bone marrow transplant",
+        "Choosing point": "Products with the same generic code (102935CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "cac0945b55517f16",
+      "gencode": "137401CTB",
+      "route": "vaginal",
+      "title": "Vaginal Tablet for Candidal Vaginitis",
+      "efficacy": "This medicine is used for candidal vaginitis.",
+      "usage": "Adults usually insert one tablet (100 mg) deep into the vagina once a day at bedtime for 6 consecutive days. For short-course treatment, adults usually insert 2 tablets (200 mg) deep into the vagina once a day at bedtime for 3 consecutive days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or have reacted to it before. Before using this medicine, talk to a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding. Do not use it during menstruation. While using it, do not use tampons, vaginal douches, cleansers or other products inserted into the vagina. It is better to avoid vaginal intercourse while using it, as a partner may be infected during intercourse. Do not let the medicine get into the eyes and do not swallow it.",
+      "summaryTable": {
+        "Category": "Over-the-counter · vaginal tablet",
+        "How it works": "Kills the Candida fungus that causes vaginitis",
+        "Main use": "Candidal vaginitis",
+        "Who should be careful": "Pregnancy or breastfeeding; menstruation; use with tampons or vaginal products",
+        "Choosing point": "Products with the same generic code (137401CTB) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "d836e36b79a92957",
+      "gencode": "A57200CCM",
+      "route": "topical",
+      "title": "Cream for Itching, Dermatitis and Insect Bites",
+      "efficacy": "This medicine is used for itching, dermatitis, eczema, urticaria, prickly heat, frostbite, insect bites and skin soreness.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine in children under 1 month of age. Before using this medicine, talk to a doctor or pharmacist if you have an allergic constitution, if you have had an allergic reaction to a medicine or a cosmetic, if the skin is very moist or the inflammation is severe, or for infants and young children under 6 years of age. If there is no improvement after using it for 5 to 6 days, stop using it immediately and talk to a doctor or pharmacist. If a large amount (about 10 g or more) is swallowed, see a doctor as soon as possible. Follow the directions and the amount exactly. When using it for a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Itching, dermatitis, eczema, urticaria, prickly heat, frostbite, insect bites",
+        "Who should be careful": "Children under 1 month of age; infants and young children under 6 years; swallowing a large amount",
+        "Choosing point": "Products with the same generic code (A57200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "d8c7b73753dfb033",
+      "gencode": "D01300ATO",
+      "route": "oromucosal",
+      "title": "Lozenge for Cough, Phlegm and Throat Discomfort",
+      "efficacy": "This medicine is used for cough, phlegm, asthma, stomatitis, tonsillitis, and hoarseness, throat discomfort, sore throat and swelling of the throat caused by pharyngitis and laryngitis.",
+      "usage": "Adults and those aged 15 years and over: one tablet at a time, 6 times a day (at intervals of at least 2 hours). Those aged 11 years and over but under 15 years: one tablet at a time, 4 times a day (at intervals of at least 3 hours). Those aged 8 years and over but under 11 years: one tablet at a time, 3 times a day (at intervals of at least 4 hours). Do not chew or swallow it whole; let it dissolve slowly in the mouth.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or have reacted to it before; if you are pregnant or may be pregnant; in infants under 3 months of age; if you are using an MAO inhibitor (an antidepressant, antipsychotic, mood stabiliser, antiparkinsonian medicine and similar) or stopped one within the last 2 weeks; or if you have a genetic problem such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before using this medicine, talk to a doctor or pharmacist if you have a constitution that easily causes urticaria, contact dermatitis, allergic rhinitis, migraine or food allergy, or if this medicine has caused an allergy.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves cough, phlegm and inflammation in the mouth and throat",
+        "Main use": "Cough, phlegm, stomatitis, tonsillitis, sore and swollen throat",
+        "Who should be careful": "Pregnancy; infants under 3 months; MAO inhibitor use within the last 2 weeks; galactose intolerance",
+        "Choosing point": "Products with the same generic code (D01300ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "dcad5a5e64ef5bcf",
+      "gencode": "161906ATO",
+      "route": "oromucosal",
+      "title": "Throat Lozenge for Short-Term Relief of Sore Throat",
+      "efficacy": "This medicine is used for the short-term relief of the symptoms of pharyngitis.",
+      "usage": "Adults and children and adolescents aged 12 years and over should let one lozenge dissolve slowly in the mouth. Move it around in the mouth to avoid local irritation. If needed, use up to 5 lozenges a day at intervals of 3 to 6 hours, for a maximum of 3 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine, to aspirin or to other non-steroidal anti-inflammatory drugs; if you have a peptic ulcer or bleeding; if you have had asthma (including an asthma attack), urticaria, bronchospasm or rhinitis caused by aspirin or another non-steroidal anti-inflammatory drug; if you have severe heart failure, gastrointestinal bleeding or perforation caused by a non-steroidal anti-inflammatory drug or an antirheumatic drug, severe colitis, a severe blood disorder, an unexplained haematopoietic disorder, severe liver impairment or severe kidney impairment; if you are in the last 3 months of pregnancy or are breastfeeding; if you have hereditary fructose intolerance, glucose-galactose malabsorption or sucrase-isomaltase deficiency; or in children under 12 years of age.",
+      "summaryTable": {
+        "Category": "Over-the-counter · lozenge",
+        "How it works": "Relieves inflammation and pain in the throat",
+        "Main use": "Short-term relief of the symptoms of pharyngitis",
+        "Who should be careful": "Hypersensitivity to aspirin or other NSAIDs; peptic ulcer or bleeding; last 3 months of pregnancy; children under 12 years",
+        "Choosing point": "Products with the same generic code (161906ATO) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "df28ec6c8f9b9faf",
+      "gencode": "A18500CCM",
+      "route": "topical",
+      "title": "Cream for Scars and Skin Damage after Surgery, Burns or Accidents",
+      "efficacy": "This medicine is used for wounds and scars from hypertrophic and keloid, movement-restricting or cosmetic skin damage after surgery, amputation, burns or accidents, and for traumatic contracture and cicatricial stricture.",
+      "usage": "Massage it gently into the wound area several times a day until it is fully absorbed. For a severe wound or an old scar, fix it in place with a dressing and leave it overnight.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or to methylparaben, if you are pregnant, or on an incised or unhealed wound or on a wound area on mucosal skin that is weeping. Before using this medicine, talk to a doctor or pharmacist if you are breastfeeding. Take care that the wound is not exposed to the heat of the sun or to light, and for a fresh wound avoid physical stimulation such as extreme cold, ultraviolet light or strong massage. When giving it to a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Softens and improves the appearance of scars and damaged skin",
+        "Main use": "Hypertrophic and keloid scars, traumatic contracture, cicatricial stricture",
+        "Who should be careful": "Pregnancy; hypersensitivity to methylparaben; incised, unhealed or weeping wounds",
+        "Choosing point": "Products with the same generic code (A18500CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "e359930baf19f65f",
+      "gencode": "A18500CCM",
+      "route": "topical",
+      "title": "Cream for Scars and Skin Damage after Surgery, Burns or Accidents",
+      "efficacy": "This medicine is used for wounds and scars from hypertrophic and keloid, movement-restricting or cosmetic skin damage after surgery, amputation, burns or accidents, and for traumatic contracture and cicatricial stricture.",
+      "usage": "Massage it gently into the wound area several times a day until it is fully absorbed. For a severe wound or an old scar, fix it in place with a dressing and leave it overnight.",
+      "caution": "Do not use this medicine if you are hypersensitive to it or to methyl parahydroxybenzoate, if you are pregnant, or on an incised or unhealed wound or on a wound area on mucosal skin that is weeping. Before using this medicine, talk to a doctor or pharmacist if you are breastfeeding. Take care that the wound is not exposed to the heat of the sun or to light, and for a fresh wound avoid physical stimulation such as extreme cold, ultraviolet light or strong massage. When giving it to a child, do so under the guidance and supervision of a guardian.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Softens and improves the appearance of scars and damaged skin",
+        "Main use": "Hypertrophic and keloid scars, traumatic contracture, cicatricial stricture",
+        "Who should be careful": "Pregnancy; hypersensitivity to methyl parahydroxybenzoate; incised, unhealed or weeping wounds",
+        "Choosing point": "Products with the same generic code (A18500CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "e59814f802ce6f0f",
+      "gencode": "102935CCM",
+      "route": "topical",
+      "title": "Antiviral Cream for Herpes Simplex Virus Infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections, including initial and recurrent genital herpes and cold sores.",
+      "usage": "Apply it to the affected area 5 times a day at intervals of about 4 hours. Continue the treatment for 5 days; if it has not healed after 5 days of use, it may be used for a further 5 days.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are breastfeeding, or in children. Before using this medicine, talk to a doctor or pharmacist if you have an immune deficiency such as AIDS or a bone marrow transplant, if you are hypersensitive to or have had an allergic reaction to propylene glycol, or if you are pregnant or may be pregnant. Start the treatment as early as possible; for a recurrence, start it when the first warning symptoms or lesions appear. Follow the directions and the amount exactly. Do not use it to prevent transmission to others or to prevent recurrent herpes simplex infection.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Blocks the multiplication of the herpes simplex virus",
+        "Main use": "Initial and recurrent genital herpes; cold sores",
+        "Who should be careful": "Breastfeeding; children; immune deficiency; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (102935CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "e632d571ca052291",
+      "gencode": "392430CCM",
+      "route": "topical",
+      "title": "Cream for Temporary Relief of Haemorrhoid Discomfort",
+      "efficacy": "This medicine is used for the temporary relief of discomfort, burning and itching caused by haemorrhoids.",
+      "usage": "Adults apply it directly to the affected area up to 3 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to it. Use it with care if you are hypersensitive to propylene glycol or have had an allergic reaction to it. Before using this medicine, talk to a doctor or pharmacist for children aged 12 years or under and if you are pregnant or may be pregnant. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. This medicine is for use on the anal area only; do not use it in the eyes.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves discomfort, burning and itching around the anus",
+        "Main use": "Temporary relief of haemorrhoid symptoms",
+        "Who should be careful": "Children aged 12 years or under; pregnancy; hypersensitivity to propylene glycol",
+        "Choosing point": "Products with the same generic code (392430CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "ebcc7dd033d83737",
+      "gencode": "B23200CCM",
+      "route": "topical",
+      "title": "Cream for Itching, Insect Bites and Contact Dermatitis",
+      "efficacy": "This medicine is used for itching, insect bites, urticaria, prickly heat, contact dermatitis caused by lacquer and similar, chilblains, eczema, dermatitis and skin erosion.",
+      "usage": "Apply it to the affected area once to several times a day.",
+      "caution": "Do not use this medicine on areas affected by chickenpox, athlete's foot, tinea or similar, or on areas with pus. Before using this medicine, talk to a doctor or pharmacist if you are hypersensitive to medicines or cosmetics, if you have an allergic constitution, if the skin is very moist or eroded, or if the affected area is extensive. Follow the directions and the amount exactly. When giving it to a child, do so under the guidance and supervision of a guardian. If there is no improvement after using it for 5 to 6 days, stop using it and talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Itching, insect bites, urticaria, prickly heat, contact dermatitis, chilblains, eczema",
+        "Who should be careful": "Chickenpox, athlete's foot, tinea or areas with pus; extensive affected areas",
+        "Choosing point": "Products with the same generic code (B23200CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "ec33a1e1da5b38a0",
+      "gencode": "A57300CCM",
+      "route": "topical",
+      "title": "Cream for Eczema, Dermatitis and Insect Bites",
+      "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, dermatitis caused by lacquer and similar, itching, insect bites, urticaria and chilblains.",
+      "usage": "Apply an appropriate amount to the affected area several times a day.",
+      "caution": "Do not use this medicine in infants aged 30 months or under, in or around the eyes, on mucous membranes, on eczema, on wounds or on sensitive skin. In particular, do not use a large amount on peeling skin or on areas with blisters. Before using this medicine, talk to a doctor or pharmacist if you have had an allergic reaction to a medicine or a cosmetic (rash, redness, itching, dermatitis caused by lacquer and similar), if you have an allergic constitution, if the skin is very moist, eroded or severely inflamed, or for children. If there is no improvement after using it for 5 to 6 days, stop using it and talk to a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Relieves itching and inflammation of the skin",
+        "Main use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria, chilblains",
+        "Who should be careful": "Infants aged 30 months or under; eyes, mucous membranes, wounds and sensitive skin must be avoided",
+        "Choosing point": "Products with the same generic code (A57300CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "f59b7b1c2e80a7d2",
+      "gencode": "A18500CCM",
+      "route": "topical",
+      "title": "Cream for Scars and Skin Damage after Surgery, Burns or Accidents",
+      "efficacy": "This medicine is used for wounds and scars from hypertrophic and keloid, movement-restricting or cosmetic skin damage after surgery, amputation, burns or accidents, and for traumatic contracture and cicatricial stricture.",
+      "usage": "Massage it gently into the wound area several times a day until it is fully absorbed. For a severe wound or an old scar, fix it in place with a dressing and leave it overnight.",
+      "caution": "Do not use this medicine if you are hypersensitive to it, if you are pregnant, or on an incised or unhealed wound or on a wound area on mucosal skin that is weeping. Before using this medicine, talk to a doctor or pharmacist if you are breastfeeding. When giving it to a child, do so under the guidance and supervision of a guardian. Take care that the wound is not exposed to the heat of the sun or to light, and for a fresh wound avoid physical stimulation such as extreme cold, ultraviolet light or strong massage.",
+      "summaryTable": {
+        "Category": "Over-the-counter · cream",
+        "How it works": "Softens and improves the appearance of scars and damaged skin",
+        "Main use": "Hypertrophic and keloid scars, traumatic contracture, cicatricial stricture",
+        "Who should be careful": "Pregnancy; incised or unhealed wounds; weeping wounds on mucosal skin",
+        "Choosing point": "Products with the same generic code (A18500CCM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    },
+    {
+      "fp": "ff115a9ae4db473a",
+      "gencode": "346500COM",
+      "route": "topical",
+      "title": "Ointment for Corticosteroid-Responsive Skin Disorders with Secondary Infection",
+      "efficacy": "This medicine is used for the initial treatment of corticosteroid-responsive skin disorders secondarily infected by neomycin-sensitive bacteria (dermatitis, infected wounds).",
+      "usage": "Apply an appropriate amount to the affected area 1 to 2 times a day.",
+      "caution": "Do not use this medicine if you are hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin or neomycin, or to bacitracin; if you have a skin infection (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice); eczematous otitis externa with a perforated eardrum; an ulcer (except Behcet's disease); a deep second-degree or worse burn or frostbite; perioral dermatitis; acne vulgaris; rosacea; or a wound in or around the eyes or on the breast area.",
+      "summaryTable": {
+        "Category": "Over-the-counter · ointment",
+        "How it works": "Relieves inflammation and treats secondary bacterial infection of the skin",
+        "Main use": "Dermatitis and infected wounds responsive to corticosteroids",
+        "Who should be careful": "Hypersensitivity to aminoglycosides or bacitracin; skin infections; wounds around the eyes or on the breast",
+        "Choosing point": "Products with the same generic code (346500COM) have the same ingredient, strength and dosage form. Check by ingredient and strength, not by product name."
+      }
+    }
+  ]
+}
