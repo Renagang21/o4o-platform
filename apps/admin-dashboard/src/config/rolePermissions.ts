@@ -113,13 +113,20 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'general-settings'
     // No role restriction
   },
+  // WO-O4O-ADMIN-CANONICAL-SUPER-ADMIN-MENU-PERMISSION-FIX-V1:
+  //   아래 5개 메뉴(system-settings / integrations / tools / import-export / database)는
+  //   legacy 무접두 'super_admin' 에만 열려 있어, canonical 최고 관리자 역할
+  //   'platform:super_admin' 만 보유한 계정에서 메뉴가 숨겨졌다(기능 은폐).
+  //   hasMenuPermission 은 userRoles(=role_assignments 의 raw 문자열)와 정확 비교하므로
+  //   prefix/무접두가 자동 정규화되지 않는다 — core-users 와 동일하게 두 형식을 병기한다.
+  //   additive 변경: 기존 super_admin/admin/manager 동작은 그대로 유지(legacy 제거는 후속 WO).
   {
     menuId: 'system-settings',
-    roles: ['super_admin', 'admin', 'manager']
+    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
   },
   {
     menuId: 'integrations',
-    roles: ['super_admin', 'admin', 'manager']
+    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
   },
 
   // Appearance - No restriction (allow all)
@@ -127,15 +134,15 @@ export const menuPermissions: MenuPermission[] = [
   // Tools - 관리자만 접근 가능 (앱 장터, 파일 교체 등)
   {
     menuId: 'tools',
-    roles: ['super_admin', 'admin', 'manager']
+    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
   },
   {
     menuId: 'import-export',
-    roles: ['super_admin', 'admin', 'manager']
+    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
   },
   {
     menuId: 'database',
-    roles: ['super_admin', 'admin', 'manager']
+    roles: ['super_admin', 'platform:super_admin', 'admin', 'manager']
   },
   {
     menuId: 'logs',

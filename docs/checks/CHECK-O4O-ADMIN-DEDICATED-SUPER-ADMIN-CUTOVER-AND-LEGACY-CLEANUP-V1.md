@@ -45,6 +45,24 @@ UI 범위만 구현했다. **프로덕션 역할 변경 0 · DB write 0 · migra
 | `database` | `['super_admin','admin','manager']` | ❌ |
 | (참고) line 66 메뉴 | `['super_admin','platform:super_admin']` | ✅ |
 
+> ## ⚠️ 정정 (2026-07-26, 후속 조사) — 아래 §2-B 의 결론은 **틀렸다**
+>
+> `WO-O4O-ADMIN-CANONICAL-SUPER-ADMIN-MENU-PERMISSION-FIX-V1` 수행 중 확인한 사실:
+>
+> - `/api/v1/navigation/admin` 은 **빈 배열을 반환하는 stub** 이다(`navigation.routes.ts` — Phase R1 에서
+>   navigation registry 제거). 따라서 동적 메뉴는 항상 비어 있고 **정적 메뉴가 유일한 소스**다.
+> - `admin-menu.static.tsx` 에 `system-settings` / `integrations` / `tools` / `import-export` /
+>   `database` id 를 가진 메뉴 항목이 **하나도 없다**(각 0건). `getAccessibleMenus` 도 사용처가 없다.
+> - 즉 이 5개 `menuPermissions` 항목은 **어떤 메뉴에도 매칭되지 않는 dead config** 다.
+>
+> **따라서:** ① canonical `platform:super_admin` 에게 숨겨진 메뉴는 없었다(기능 은폐 아님).
+> ② legacy `super_admin` 은 이 경로로 "실사용 중"이 아니다 → **legacy 제거를 막는 근거가 되지 못한다.**
+> 실제로 게이트가 적용되는 유일한 항목은 `core-users` 이며, 이미 `super_admin` 과
+> `platform:super_admin` 을 병기하고 있어 legacy 제거의 영향을 받지 않는다.
+>
+> §1(자격증명 미보유) 중지 조건은 **그대로 유효**하므로 cutover 보류 결론 자체는 변하지 않는다.
+> 다만 그 사유에서 §2-B 는 제외해야 한다. 아래 원문은 이력 보존을 위해 남긴다.
+
 **함의 2가지:**
 
 1. legacy `super_admin` 은 죽은 문자열이 아니라 **admin 메뉴 가시성에 현재 사용 중**이다
