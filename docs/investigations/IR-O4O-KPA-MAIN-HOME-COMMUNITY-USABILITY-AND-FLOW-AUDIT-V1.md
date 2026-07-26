@@ -109,7 +109,7 @@
 | 첨부 | ✅ | ✅ 에디터 | ✅ upload/link |
 | 공유·링크 | — | ✅ 링크 복사 | ✅ 외부링크 |
 
-- **글쓰기 필수 입력:** 공통 `CommunityContentWriteShell`이 `requireTags` **기본값 true**이고 KPA가 override하지 않아 **태그 1개 이상이 필수**다([CommunityContentWriteShell.tsx:79,113,186-187](packages/shared-space-ui/src/community/CommunityContentWriteShell.tsx#L79)). 일반 게시판에서는 없는 단계다. 분류 UI 자체는 이미 제거되어(`content_type`/`sub_type` 고정, [ContentWritePage.tsx:109-110](services/web-kpa-society/src/pages/contents/ContentWritePage.tsx#L109-L110)) O4O 개념 학습 부담은 없다.
+- **글쓰기 필수 입력 — 태그 1개 이상 (⚠️ 2026-07-25 정정, 아래 §12 참조):** 공통 `CommunityContentWriteShell`이 `requireTags` **기본값 true**이고 KPA가 override하지 않는다([CommunityContentWriteShell.tsx:79,113,186-187](packages/shared-space-ui/src/community/CommunityContentWriteShell.tsx#L79)). **이는 KPA 로컬 설정 누락이 아니라 O4O 공통 태그 정책의 의도된 동작이다** — 프론트뿐 아니라 서버도 강제하며, 정책 문서에 명문화되어 있다. 분류 UI 자체는 이미 제거되어(`content_type`/`sub_type` 고정, [ContentWritePage.tsx:109-110](services/web-kpa-society/src/pages/contents/ContentWritePage.tsx#L109-L110)) O4O 개념 학습 부담은 없다.
 - 포럼 글쓰기는 `forumSlug`가 URL로 전달되어 별도 개념 학습이 없다([ForumWritePage.tsx:47-60](services/web-kpa-society/src/pages/forum/ForumWritePage.tsx#L47-L60)).
 - 공통 컴포넌트 재사용률은 높다 — `BaseTable`/`BaseDetailDrawer`/`RowActionMenu`/`ActionBar`(@o4o/ui), `ForumHubTemplate`/`ResourcesHubTemplate`/`ContentHubTemplate`/`CommunityContentDetailView`(@o4o/shared-space-ui). **서비스별 독자 UI 패턴은 발견되지 않음.**
 
@@ -206,7 +206,7 @@
 | # | 내용 | 근거 |
 |---|------|------|
 | U1 | **콘텐츠 목록에 검색이 없다.** 포럼·자료실에는 있는데 콘텐츠만 없어, 같은 커뮤니티 안에서 검색 유무가 기능마다 다르다 | [ContentListPage.tsx](services/web-kpa-society/src/pages/contents/ContentListPage.tsx) 전체에 검색 UI 없음 |
-| U2 | **글 작성 시 태그가 필수.** 일반 게시판에는 없는 단계 | [CommunityContentWriteShell.tsx:79,113](packages/shared-space-ui/src/community/CommunityContentWriteShell.tsx#L79) |
+| ~~U2~~ | ~~**글 작성 시 태그가 필수.** 일반 게시판에는 없는 단계~~ → **철회(2026-07-25).** O4O 공통 태그 정책이 강제하는 **의도된 동작**이며 사용자 결정으로 현행 유지 확정. 상세 §12 | [O4O-TAG-POLICY-V1.md](../architecture/data/O4O-TAG-POLICY-V1.md) |
 | U3 | **Home 하단 안내 4연속** (CTA → 이용 가이드 → 역할별 활용 → 다른 서비스 소개). 약사·약대생 대상 서비스에 설명 비중이 높다 | §1-1 6~9번 |
 | U4 | **"자료실"이 두 화면으로 존재.** Home 카드는 `/resources`, 콘텐츠 페이지 헤더 링크는 `/content/resources` — 데이터는 같은 `kpa_contents(sub_type='resource')`인데 화면·조작이 다르다 | [ContentListPage.tsx:659-665](services/web-kpa-society/src/pages/contents/ContentListPage.tsx#L659-L665) vs [App.tsx:746](services/web-kpa-society/src/App.tsx#L746) |
 | U5 | **로그인 유도 방식이 3가지.** 모달 게이트(Home 카드) / 게이트 없음(최신글) / `/login` 페이지 이동(자료 등록·포럼 개설신청) | §2-8 |
@@ -255,7 +255,7 @@
 | S5 | 자료실 항목 링크(C5) | 최신글 resource 항목을 `/resources`로 보내거나, 상세에서 `usage_type` 액션 노출 | 소 |
 | S6 | 복사 후 이동(C6) | `afterCopyAction.href`/`infoLinks`를 `/store/library/contents`로 정렬 + `ContentListPage` 주석 정정 | 2줄 |
 | S7 | 안내 중복(R1) | CTA 링크를 이용 가이드와 다른 대상으로 바꾸거나 CTA 제거 — 두 블록 모두 기존 공통 컴포넌트 | 소 |
-| S8 | 태그 필수(U2) | 공통 shell에 이미 있는 `requireTags: false` config 전달 | 1줄 |
+| ~~S8~~ | ~~태그 필수(U2)~~ → **철회(2026-07-25).** "config 1줄" 판단은 **프론트 표면만 본 오판**이었다. 서버(`POST`/`PATCH /contents` 400)와 O4O 공통 태그 정책이 함께 강제하므로 단순 정비 대상이 아니다. §12 | — |
 | S9 | 콘텐츠 검색(U1) | 자료실이 쓰는 검색 패턴 또는 `CommunityContentSearchBar`(@o4o/shared-space-ui) 재사용 | 소 |
 | S10 | 로그인 유도 통일(U5) | 자료 등록·포럼 개설신청도 Home 카드와 같은 `openLoginModal` + `setOnLoginSuccess` 사용 | 소 |
 | S11 | 빈 상태/오류 구분(§2-9) | 최신글·공지에 `error` state 추가 — 콘텐츠 상세가 이미 쓰는 패턴 | 소 |
@@ -287,8 +287,8 @@
 
 | 분류 | 항목 |
 |------|------|
-| **유지** | Home 골격 순서 · 헤더 메뉴 구조 · 약사공론 영역 · 포럼 전 기능 · 가져오기=복사 정책 · 자료함→제작 흐름(POP/QR/사이니지/타블렛) · 로그인 성공/취소 처리 · 공통 컴포넌트 재사용 · 반응형 기본기 · 체험 계정(제거 조건 문서화됨) |
-| **단순 정비** | S1~S14 (링크 정정 3, 상세 액션 1, 링크 정렬 2, 중복 축소 2, 필수값 완화 1, 검색 재사용 1, 로그인 유도 통일 1, 오류 구분 1, 자료실 단일화 1, 주석 1) |
+| **유지** | Home 골격 순서 · 헤더 메뉴 구조 · 약사공론 영역 · 포럼 전 기능 · 가져오기=복사 정책 · 자료함→제작 흐름(POP/QR/사이니지/타블렛) · 로그인 성공/취소 처리 · 공통 컴포넌트 재사용 · 반응형 기본기 · 체험 계정(제거 조건 문서화됨) · **태그 1개 이상 필수(2026-07-25 확정, §12)** |
+| **단순 정비** | S1~S7 · S9~S14 (링크 정정 3, 상세 액션 1, 링크 정렬 2, 중복 축소 2, 검색 재사용 1, 로그인 유도 통일 1, 오류 구분 1, 자료실 단일화 1, 주석 1) — **S8(태그 필수 완화)은 철회되어 13건** |
 | **연결 단절** | C1 공지→상세 · C2 강의 항목→상세 · C3 사이니지 항목→상세 · C4 콘텐츠 상세→가져오기 · C5 자료 항목→자료 사용 · C6 복사 완료→관리 화면 |
 
 **신규 구조 없이 정비 가능한 범위:** 위 연결 단절 6건 + 단순 정비 14건 **전부**. 신규 테이블·API 재설계·분류/태그 체계·추천 알고리즘·기여도/보상·역할별 별도 화면이 필요한 항목은 **없다**.
@@ -322,7 +322,7 @@
 | 3 | **가져온 콘텐츠 관리 링크 정렬** | C6 `/store/library/contents`로 통일 + 주석 정정 | 관리 위치 혼선 제거 |
 | 4 | **Home 안내 영역 중복·밀도 정비** | R1 CTA/가이드 중복 · U3 안내 4연속 축소 · U7 주석 | 순서·문구 조정만 |
 | 5 | **자료실 진입 단일화** | U4/S12 `/content` 헤더 링크 → `/resources` | 1줄 |
-| 6 | **콘텐츠 작성·검색 정비** | U2 태그 필수 완화 · U1 검색 추가(기존 컴포넌트) | 게시판 기본기 |
+| 6 | **콘텐츠 목록 검색 연결** | U1 검색 추가(기존 컴포넌트 재사용). ~~U2 태그 필수 완화~~ 철회 — 태그는 필수 유지(§12) | 게시판 기본기 |
 | 7 | **로그인 유도 통일 + 오류/빈 상태 구분** | U5 모달 통일 · S11 error state | 일관성 |
 
 > 우선순위 1·2는 실제 오류·단절이므로 먼저 처리하고, 3~7은 사용성 정비다. R2(최신글 탭 바로가기 = 서비스 카드 중복)는 두 진입이 서로 다른 맥락(요약 목록 / 진입 허브)에서 작동하므로 **정비 대상에서 제외하고 유지**를 권한다.
@@ -341,6 +341,58 @@
 | 유지 / 단순 정비 / 연결 단절 분류 | ✅ §8 |
 | 신규 체계·복잡 기능 제안 없음 | ✅ §9 |
 | 후속 작업 작은 범위 제안 | ✅ §10 |
+
+---
+
+---
+
+## 12. 정정 — 태그 필수는 의도된 플랫폼 공통 동작 (2026-07-25)
+
+> **대상:** §2-4 글쓰기 필수 입력 · §3 U2 · §6 S8 · §8 분류 · §10 후속 6번
+> **계기:** `WO-O4O-KPA-CONTENT-AUTHORING-OPTIONAL-TAGS-V1` 착수 후 조사에서 확인, 중지 → 사용자 결정으로 **현행 유지 확정**
+
+### 12-1. 기존 판단과 정정
+
+| | 내용 |
+|---|------|
+| **기존 판단** | 태그 필수는 KPA 가 `requireTags` 를 override 하지 않아 생긴 것이며, **config 1줄로 완화 가능**한 단순 정비 항목(S8) |
+| **정정** | 프론트 설정 변경은 가능하지만, **서버와 O4O 공통 태그 정책이 최소 1개를 강제**하므로 태그 필수는 **의도된 플랫폼 공통 동작**이다. 단순 정비 항목이 아니다 |
+
+기존 판단은 **프론트 표면(`CommunityContentWriteShell`)만 보고 내린 오판**이었다.
+
+### 12-2. 강제 지점 (3중)
+
+| 계층 | 위치 | 동작 |
+|------|------|------|
+| 프론트 | [CommunityContentWriteShell.tsx:79,113](../../packages/shared-space-ui/src/community/CommunityContentWriteShell.tsx#L79) | `requireTags ?? true` → `태그를 1개 이상 입력해주세요` |
+| 서버 (생성) | [kpa.routes.ts:1611-1623](../../apps/api-server/src/routes/kpa/kpa.routes.ts#L1611-L1623) | `sanitizedTags.length === 0` → **400 VALIDATION_ERROR** |
+| 서버 (수정) | [kpa.routes.ts:1771-1784](../../apps/api-server/src/routes/kpa/kpa.routes.ts#L1771-L1784) | 태그 전체 제거 시 **400** |
+
+두 서버 지점 모두 주석이 `// O4O Tag Policy V1 — sanitize + 최소 1개 필수` 로, 아래 정책을 직접 구현한 코드다.
+
+### 12-3. 정책 근거
+
+[`docs/architecture/data/O4O-TAG-POLICY-V1.md`](../architecture/data/O4O-TAG-POLICY-V1.md) — **Status: Active** (Since 2026-04-25)
+
+| 절 | 내용 |
+|----|------|
+| §3 입력 규칙 | **최소 개수 — 1개 이상 필수** |
+| §10 Content — 정책 정렬 **완료** | **태그 최소 1개 필수 (400 응답)** · Frontend 검증(required) |
+| §10 Forum / LMS / Signage | 동일 정책으로 정렬 완료 (`CourseService` 등) |
+
+→ 프론트만 완화하면 서버 400 이 발생해 UX 가 오히려 악화되고, `POST /contents` 는 **자료실(`sub_type='resource'`)과 공유**되므로 영향이 콘텐츠 밖으로 번진다.
+
+### 12-4. 확정 사항 (사용자 결정)
+
+```text
+콘텐츠 작성      → 태그 1개 이상 필수
+자료실 작성      → 태그 1개 이상 필수
+Forum/LMS/Signage → 기존 공통 태그 정책 유지
+```
+
+태그가 "검색 보조 데이터"라는 정책 §1 정의와 별개로, 현재 O4O 에서는 **콘텐츠 등록 시 최소한의 검색 가능성과 정리 기준을 확보하기 위한 공통 입력 조건**으로 유지한다.
+
+`WO-O4O-KPA-CONTENT-AUTHORING-OPTIONAL-TAGS-V1` 은 **중지 후 종료** — 코드 0 · DB 0 · 정책 문서 0.
 
 ---
 
