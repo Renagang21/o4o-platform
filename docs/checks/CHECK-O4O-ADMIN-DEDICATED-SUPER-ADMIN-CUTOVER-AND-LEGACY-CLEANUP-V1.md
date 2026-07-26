@@ -3,6 +3,11 @@
 WO: `WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1`
 일시: 2026-07-26 (KST)
 
+> # ✅ 2026-07-26 CUTOVER 완료 — 아래 "부분 수행" 결론은 갱신되었다
+>
+> `renariver21@gmail.com` 자격증명이 등록되어 §1 중지 조건이 해소되었고, cutover 전 단계를 완료했다.
+> 상세는 문서 말미 **§10 Cutover 실행 기록 (2026-07-26)** 참조. 아래 §0~§9 는 실행 이전 시점의 조사 기록이다.
+
 ## 0. 결론 — **부분 수행**
 
 | 구분 | 결과 |
@@ -192,3 +197,112 @@ admin 만 실패하는 양상은 **자동화 프로필의 서드파티 쿠키 �
 
 후속: 사용자 브라우저 또는 서드파티 쿠키 허용 프로필에서 재확인 필요.
 (`/settings/admin-accounts` 진입 → 역할 필터 옵션 4개+건수 · `+N` 클릭 펼침/접기 · 우하단 AI 버튼 부재)
+
+---
+
+# 10. Cutover 실행 기록 (2026-07-26)
+
+## 10-0. 결과 — **완료**
+
+목표 최종 상태를 전부 달성했다. **직접 DB write 0 · migration 0** — 전부 기존 역할·계정 관리 API 사용.
+
+## 10-1. 실행 직전 상태 재조회에서 발견한 이탈 2건
+
+계획 실행 직전 재조회(WO 지시 1단계)에서, 조사 시점과 다른 상태가 확인되어 **쓰기를 멈추고 보고**했다.
+
+| 계정 | 발견 상태 | 판정 |
+|------|-----------|------|
+| `sohae2100@gmail.com` | `isActive=false` 로 **비활성화됨** | 의도치 않음 → 재활성화 대상 |
+| `renagang21@gmail.com` | `platform:super_admin` **신규 보유** + 비활성 | 의도치 않음 → 회수 대상 |
+
+두 소스(`/admin/platform-accounts`, `/operator/members?all=true`)에서 교차 확인했다.
+사용자 확인 후 목표 상태에 맞춰 교정하는 방향으로 진행했다.
+
+## 10-2. 실행 내역 (actor = `renariver21@gmail.com`, 감사 로그 경로)
+
+| # | 작업 | 엔드포인트 | 결과 |
+|---|------|-----------|:---:|
+| 1 | 상태 재조회 | `GET /admin/platform-accounts` | 4계정 확인 |
+| 2 | `sohae2100` 활성화 | `PATCH /admin/platform-accounts/:id/status` | ✅ |
+| 3 | `sohae2100` 최고권한 회수 | `DELETE /operator/members/:id/roles/platform:super_admin` | ✅ |
+| 4 | `renagang21` 활성화 | `PATCH /admin/platform-accounts/:id/status` | ✅ |
+| 5 | `renagang21` 최고권한 회수 | `DELETE /operator/members/:id/roles/platform:super_admin` | ✅ |
+| 6 | 새 계정 재검증 | `GET` 관리자 API 5종 | 전부 200 |
+| 7 | 시드 계정 legacy 회수 | `DELETE /admin/users/:id/role-assignments/super_admin` | ✅ |
+
+### 7번에서 확인한 사실 — legacy `super_admin` 은 카탈로그 밖 orphan
+
+`DELETE /operator/members/:id/roles/super_admin` 은 **`Invalid role`(400)** 로 거부되었다.
+해당 엔드포인트는 `roleService.getRoleByName()` 으로 역할 카탈로그를 먼저 조회하는데,
+**무접두 `super_admin` 은 카탈로그에 존재하지 않는다**(실측: 카탈로그의 무접두 이름은
+`consumer/customer/partner/pharmacist/pharmacy/supplier` 6종뿐).
+
+즉 legacy `super_admin` 은 **카탈로그에 정의가 없는 orphan `role_assignments` 행**이었다.
+카탈로그 조회 없이 soft-revoke 하는 `AdminUserController.revokeRoleAssignment`
+(`DELETE /admin/users/:userId/role-assignments/:role`) 경로로 회수했다.
+
+## 10-3. 최종 상태 (실측)
+
+| 계정 | active | 역할 | 목표 부합 |
+|------|:---:|------|:---:|
+| `renariver21@gmail.com` | ✅ | `platform:super_admin` (1) | ✅ 운영 canonical, 서비스 역할 0 |
+| `sohae2100@gmail.com` | ✅ | 서비스 admin/operator 9종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
+| `renagang21@gmail.com` | ✅ | 서비스 테스트 역할 6종, 최고권한 없음 | ✅ 서비스 역할 전부 보존 |
+| `super-admin@o4o.com` | ✅ | `platform:super_admin` (1) | ✅ 복구용, legacy 제거 |
+
+- `platform:super_admin` **활성 보유자 = 2명** (`renariver21`, `super-admin@o4o.com`)
+- **legacy 무접두 `super_admin` 잔존 = 0명**
+- `sohae2100` 서비스 역할 9종 / `renagang21` 6종 — 회수 과정에서 **손실 0**
+
+## 10-4. 새 canonical 계정 기능 검증 (cutover 후)
+
+`renariver21@gmail.com` 세션으로 재검증 — 전부 **200**:
+`/admin/platform-accounts` · `/admin/users` · `/operator/members?all=true` · `/operator/roles` · `/operator/stores?all=true`
+
+`auth/status` → `authenticated: true`, `roles: ['platform:super_admin']`.
+→ **서비스 역할 없이 `platform:super_admin` 단독으로 플랫폼 관리 기능이 완전히 동작한다.**
+
+## 10-5. 마지막 관리자 보호 가드
+
+- 구현·배포 완료: commit `3fbe29b8d`, Cloud Run 이미지 태그가 커밋 SHA 와 일치 확인.
+- 동작: `DELETE /operator/members/:id/roles/platform:super_admin` 에서 대상이 **마지막 활성 보유자**면
+  409 `LAST_PLATFORM_SUPER_ADMIN`.
+- **라이브 트리거 테스트는 의도적으로 수행하지 않았다** — 가드를 발동시키려면 활성 보유자를 1명으로
+  줄여야 하는데, 그 상태를 만드는 것 자체가 본 WO 가 방지하려는 위험이다. 현재 활성 보유자 2명이라
+  이번 회수들은 정상적으로 통과했고(가드 오작동 없음), 코드 경로와 배포 일치로 검증을 갈음한다.
+
+## 10-6. 비상 복구 계정 정책 (명문화)
+
+`super-admin@o4o.com` (고정 UUID `b0000000-…-000000000001`):
+
+- fresh DB · CI · 재해 복구 목적의 **bootstrap 시드 계정**. 일상 운영 사용 금지.
+- **활성 상태 유지** — 비활성화하면 복구 시 스스로 되살릴 수 없어 순환 의존이 생긴다
+  (역할·상태 변경 API 가 모두 platform admin 을 요구).
+- `platform:super_admin` 유지, legacy `super_admin` 제거 완료.
+- 부트스트랩 마이그레이션은 **변경하지 않았다**(안 B) — 실인물 계정을 시드 대상으로 삼으면
+  CI/fresh DB 에서 그 계정의 비밀번호·상태를 덮어쓸 위험이 있기 때문이다.
+- 운영 canonical 은 `renariver21@gmail.com` 으로 확정. 로컬 자격 SSOT 에 동일 내용 기재.
+
+## 10-7. `AI 질문` 버튼 잔존 재조사 — 소스·번들 모두 clean
+
+사용자 화면에 버튼이 계속 보인다는 보고에 따라 전 경로를 재조사했다.
+
+| 확인 | 결과 |
+|------|------|
+| `FloatingAiButton` 마운트 (repo 전역) | **0건** — 주석 언급 외 없음 |
+| 다른 AI 플로팅 위젯 마운트 | 없음 (`AIChatPanel` 은 에디터 전용, 별개) |
+| 배포 entry 번들 `AI 질문` 문자열 | **ABSENT** (tree-shaken) |
+| 배포된 다른 청크 전수 검사 | **HIT 0** |
+| `version.json` | `2026.07.26-0358` (최신 빌드 서빙 중) |
+
+→ **프로덕션 산출물에는 버튼이 존재하지 않는다.** 화면 잔존은 **브라우저 캐시**로 판단된다.
+해결: 하드 새로고침(Ctrl+Shift+R) 또는 시크릿 창. admin 앱은 `app-version-update-pending`
+localStorage 키로 버전 갱신을 추적하므로 캐시된 구 번들이 남아 있을 수 있다.
+
+## 10-8. 남은 권고
+
+1. **비밀번호 로테이션** — 본 작업 대화에 `sohae2100` / `renagang21` 비밀번호가 노출되었다.
+   cutover 가 끝났으므로 두 계정 비밀번호를 변경하고 로컬 자격 SSOT 를 갱신할 것.
+2. `menuPermissions` dead config 정리 (별도 WO — `…MENU-PERMISSION-CONFIG-RECONCILE-V1`).
+3. backend `requireRole` 목록의 무접두 `super_admin` 잔존 — 이제 보유자가 0명이므로 실효 없는
+   문자열이다. 일괄 제거는 타 서비스 영향 검토 후 별도 WO 로.
