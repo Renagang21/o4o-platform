@@ -49,6 +49,9 @@ export const SUPPLIER_SETTLEMENTS_LOAD_FAILED = 'SUPPLIER_SETTLEMENTS_LOAD_FAILE
 /** WO-O4O-NETURE-SUPPLIER-APPROVAL-COUNTS-LOAD-ERROR-CONTRACT-V1 */
 export const SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED = 'SUPPLIER_APPROVAL_COUNTS_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_RECRUITMENTS_LOAD_FAILED = 'SUPPLIER_RECRUITMENTS_LOAD_FAILED';
+
 /** 상품 승인 탭 카운트 — 필드명은 backend 응답 그대로다(unrequested 등). */
 export interface SupplierApprovalCounts {
   total: number;
@@ -1563,14 +1566,22 @@ export interface RecruitmentDetail {
 
 export const supplierRecruitmentApi = {
   // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
+  // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+  //   실패를 [] 로 삼키면 "모집 0건" 과 구분되지 않는다. 고정 코드로 throw 한다.
   async listMine(): Promise<SupplierRecruitment[]> {
+    let response;
     try {
-      const response = await api.get('/neture/partner/recruitments/mine');
-      return response.data?.data ?? [];
+      response = await api.get('/neture/partner/recruitments/mine');
     } catch (error) {
-      console.warn('[Supplier Recruitment API] Failed to list:', error);
-      return [];
+      console.warn('[Supplier Recruitment API] Failed to list:', extractApiError(error));
+      throw new Error(SUPPLIER_RECRUITMENTS_LOAD_FAILED);
     }
+    const rows = response.data?.data;
+    if (!Array.isArray(rows)) {
+      console.warn('[Supplier Recruitment API] Unexpected recruitments payload shape');
+      throw new Error(SUPPLIER_RECRUITMENTS_LOAD_FAILED);
+    }
+    return rows as SupplierRecruitment[];
   },
 
   // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1

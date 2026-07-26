@@ -22,6 +22,7 @@ export default function SupplierB2BContentPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
 
@@ -29,8 +30,12 @@ export default function SupplierB2BContentPage() {
   const [selectedProduct, setSelectedProduct] = useState<SupplierProduct | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+  //   getProductsPaginated() 는 이미 throw 하는데 catch 가 [] 로 흡수해
+  //   조회 실패가 "제품 0건" 과 구분되지 않았다(IR B 등급). 명시 상태로 분리한다.
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const result = await supplierApi.getProductsPaginated({
         page,
@@ -42,6 +47,9 @@ export default function SupplierB2BContentPage() {
       setTotal(result.pagination?.total || 0);
     } catch {
       setProducts([]);
+      setTotalPages(1);
+      setTotal(0);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -129,6 +137,18 @@ export default function SupplierB2BContentPage() {
             {loading ? (
               <tr>
                 <td colSpan={4} className="text-center py-12 text-gray-400">로딩 중...</td>
+              </tr>
+            ) : loadError ? (
+              <tr>
+                <td colSpan={4} className="text-center py-12 text-gray-500">
+                  제품 콘텐츠 목록을 불러오지 못했습니다.
+                  <button
+                    onClick={fetchProducts}
+                    className="ml-2 underline text-gray-600 hover:text-gray-800"
+                  >
+                    다시 시도
+                  </button>
+                </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>

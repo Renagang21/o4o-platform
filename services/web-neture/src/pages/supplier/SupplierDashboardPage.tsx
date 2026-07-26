@@ -82,6 +82,24 @@ const OPS_AREA_LABELS: Record<OpsArea, string> = {
   settlements: '정산',
 };
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+ * 콘텐츠·유통 영역의 조회 실패를 영역 단위로 구분한다.
+ * 주문·재고·정산(OpsFailures) 과는 별개 상태다.
+ */
+type ContentDistributionFailures = {
+  recruitments: boolean;
+  storeDescriptions: boolean;
+  marketTrials: boolean;
+  eventOffers: boolean;
+};
+const NO_CD_FAILURE: ContentDistributionFailures = {
+  recruitments: false,
+  storeDescriptions: false,
+  marketTrials: false,
+  eventOffers: false,
+};
+
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
@@ -148,9 +166,10 @@ export default function SupplierDashboardPage() {
   const [settlementKpi, setSettlementKpi] = useState<SettlementKpi | null>(null);
   const [approval, setApproval] = useState<ApprovalCounts | null>(null);
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
-  const [recruitments, setRecruitments] = useState<SupplierRecruitment[]>([]);
-  const [storeDescs, setStoreDescs] = useState<SupplierStoreDescriptionDraft[]>([]);
-  const [trials, setTrials] = useState<Trial[]>([]);
+  // null = 조회 실패/미수신 — 정상 0건([]) 과 구분한다.
+  const [recruitments, setRecruitments] = useState<SupplierRecruitment[] | null>(null);
+  const [storeDescs, setStoreDescs] = useState<SupplierStoreDescriptionDraft[] | null>(null);
+  const [trials, setTrials] = useState<Trial[] | null>(null);
   const [eventOfferStats, setEventOfferStats] = useState<SupplierEventOfferStats | null>(null);
 
   // AI · 분석 (기존 유지)
@@ -163,6 +182,7 @@ export default function SupplierDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [opsFailed, setOpsFailed] = useState<OpsFailures>(NO_OPS_FAILURE);
   const [approvalError, setApprovalError] = useState(false);
+  const [cdFailed, setCdFailed] = useState<ContentDistributionFailures>(NO_CD_FAILURE);
   const [aiOpen, setAiOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -220,10 +240,25 @@ export default function SupplierDashboardPage() {
     setApprovalError(approvalFailed);
     setApproval(approvalFailed ? null : (ops[3] as PromiseFulfilledResult<ApprovalCounts>).value);
     setProfile(settled(ops[4] as PromiseSettledResult<SupplierProfile | null>, null));
-    setRecruitments(settled(ops[5] as PromiseSettledResult<SupplierRecruitment[]>, []));
-    setStoreDescs(settled(ops[6] as PromiseSettledResult<SupplierStoreDescriptionDraft[]>, []));
-    setTrials(settled(ops[7] as PromiseSettledResult<Trial[]>, []));
-    setEventOfferStats(settled(ops[8] as PromiseSettledResult<SupplierEventOfferStats | null>, null));
+
+    // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+    //   콘텐츠·유통 4영역도 rejection 을 []/null 로 흡수하지 않고 영역별 실패로 분리한다.
+    //   실패 영역은 null 로 두어 "정상 0건" 과 구분한다.
+    const recruitmentsFailed = ops[5].status === 'rejected';
+    const storeDescsFailed = ops[6].status === 'rejected';
+    const trialsFailed = ops[7].status === 'rejected';
+    const eventOffersFailed = ops[8].status === 'rejected';
+
+    setRecruitments(recruitmentsFailed ? null : (ops[5] as PromiseFulfilledResult<SupplierRecruitment[]>).value);
+    setStoreDescs(storeDescsFailed ? null : (ops[6] as PromiseFulfilledResult<SupplierStoreDescriptionDraft[]>).value);
+    setTrials(trialsFailed ? null : (ops[7] as PromiseFulfilledResult<Trial[]>).value);
+    setEventOfferStats(eventOffersFailed ? null : (ops[8] as PromiseFulfilledResult<SupplierEventOfferStats | null>).value);
+    setCdFailed({
+      recruitments: recruitmentsFailed,
+      storeDescriptions: storeDescsFailed,
+      marketTrials: trialsFailed,
+      eventOffers: eventOffersFailed,
+    });
 
     setOpsFailed({ orders: ordersFailed, inventory: inventoryFailed, settlements: settlementsFailed });
 
@@ -237,6 +272,48 @@ export default function SupplierDashboardPage() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+  //   영역별 다시 시도 — 해당 API 만 재호출한다(전체 대시보드 재호출·AI 재호출 없음).
+  const retryRecruitments = useCallback(async () => {
+    try {
+      setRecruitments(await supplierRecruitmentApi.listMine());
+      setCdFailed((p) => ({ ...p, recruitments: false }));
+    } catch {
+      setRecruitments(null);
+      setCdFailed((p) => ({ ...p, recruitments: true }));
+    }
+  }, []);
+
+  const retryStoreDescs = useCallback(async () => {
+    try {
+      setStoreDescs(await supplierStoreDescriptionApi.listMine());
+      setCdFailed((p) => ({ ...p, storeDescriptions: false }));
+    } catch {
+      setStoreDescs(null);
+      setCdFailed((p) => ({ ...p, storeDescriptions: true }));
+    }
+  }, []);
+
+  const retryTrials = useCallback(async () => {
+    try {
+      setTrials(await getMyTrials());
+      setCdFailed((p) => ({ ...p, marketTrials: false }));
+    } catch {
+      setTrials(null);
+      setCdFailed((p) => ({ ...p, marketTrials: true }));
+    }
+  }, []);
+
+  const retryEventOffers = useCallback(async () => {
+    try {
+      setEventOfferStats(await supplierKpaEventOfferApi.getStats());
+      setCdFailed((p) => ({ ...p, eventOffers: false }));
+    } catch {
+      setEventOfferStats(null);
+      setCdFailed((p) => ({ ...p, eventOffers: true }));
+    }
+  }, []);
 
   if (error) {
     return (
@@ -253,8 +330,9 @@ export default function SupplierDashboardPage() {
 
   /* ---- 파생 값 ---- */
 
-  const recruitmentPending = recruitments.reduce((sum, r) => sum + (r.applications?.pending ?? 0), 0);
-  const descRevisionRequested = storeDescs.filter((d) => d.status === 'revision_requested').length;
+  // 실패 영역(null)은 0 이 아니라 "계산 불가" 다. 아래 actionItems 필터에서 후보 제외한다.
+  const recruitmentPending = (recruitments ?? []).reduce((sum, r) => sum + (r.applications?.pending ?? 0), 0);
+  const descRevisionRequested = (storeDescs ?? []).filter((d) => d.status === 'revision_requested').length;
   const profileComplete =
     profile == null
       ? true // 미확인 시 미완료로 단정하지 않는다 (fail-open — SupplierActivationGate 와 동일)
@@ -281,19 +359,23 @@ export default function SupplierDashboardPage() {
     if (opsFailed.inventory && a.key.startsWith('inv-')) return false;
     if (opsFailed.settlements && a.key === 'settlement') return false;
     if (approvalError && a.key === 'product-approval') return false;
+    if (cdFailed.storeDescriptions && a.key === 'desc-revision') return false;
+    if (cdFailed.recruitments && a.key === 'recruit-pending') return false;
     return true;
   });
 
   const failedAreas = (Object.keys(opsFailed) as OpsArea[]).filter((k) => opsFailed[k]);
+  // 콘텐츠·유통 실패는 처리 필요 판단을 불완전하게 만든다 → 정상 문구를 단정하지 않는다.
+  const cdActionAffected = cdFailed.storeDescriptions || cdFailed.recruitments;
   const showProfileAction = !loading && profile != null && !profileComplete;
   const hasAnyAction = actionItems.length > 0 || showProfileAction;
 
   const supplierStatusRaw = String(profile?.status ?? '').toUpperCase();
   const supplierStatusLabel = supplierStatusRaw ? (SUPPLIER_STATUS_LABELS[supplierStatusRaw] ?? supplierStatusRaw) : null;
 
-  const descCounts = countBy(storeDescs, (d) => d.status);
-  const trialCounts = countBy(trials, (t) => String(t.status));
-  const recruitmentOpen = recruitments.filter((r) => String(r.status).toLowerCase() === 'open').length;
+  const descCounts = countBy(storeDescs ?? [], (d) => d.status);
+  const trialCounts = countBy(trials ?? [], (t) => String(t.status));
+  const recruitmentOpen = (recruitments ?? []).filter((r) => String(r.status).toLowerCase() === 'open').length;
 
   const topByRevenue = performance.slice(0, 5);
   const topByOrders = [...performance].sort((a, b) => b.orders - a.orders).slice(0, 5);
@@ -372,12 +454,16 @@ export default function SupplierDashboardPage() {
               </Link>
             )}
           </div>
-        ) : failedAreas.length > 0 ? (
-          // 주문·재고·정산 중 하나라도 실패하면 "처리할 업무 없음" 으로 단정하지 않는다.
+        ) : failedAreas.length > 0 || cdActionAffected ? (
+          // 처리 필요 계산에 쓰이는 영역이 하나라도 실패하면 "처리할 업무 없음" 으로 단정하지 않는다.
           <div className="flex items-center gap-2 py-2">
             <AlertTriangle size={18} className="text-amber-500" />
             <p className="text-sm text-slate-600">
-              {failedAreas.map((a) => OPS_AREA_LABELS[a]).join(' · ')} 현황을 불러오지 못해 처리 필요 업무를 확인할 수 없습니다.
+              {[
+                ...failedAreas.map((a) => OPS_AREA_LABELS[a]),
+                ...(cdFailed.storeDescriptions ? ['매장용 설명서'] : []),
+                ...(cdFailed.recruitments ? ['판매자 모집'] : []),
+              ].join(' · ')} 현황을 불러오지 못해 처리 필요 업무를 확인할 수 없습니다.
             </p>
           </div>
         ) : (
@@ -496,7 +582,9 @@ export default function SupplierDashboardPage() {
               매장용 설명서 →
             </Link>
           </div>
-          {storeDescs.length > 0 ? (
+          {cdFailed.storeDescriptions ? (
+            <AreaLoadError label="설명서 현황을 불러오지 못했습니다." onRetry={retryStoreDescs} />
+          ) : storeDescs && storeDescs.length > 0 ? (
             <dl className="space-y-2">
               {Object.entries(descCounts).map(([status, count]) => (
                 <StatRow
@@ -534,11 +622,15 @@ export default function SupplierDashboardPage() {
               <h3 className="text-sm font-semibold text-slate-800">판매자 모집</h3>
               <Link to="/supplier/recruitments" className="text-xs text-blue-600 hover:text-blue-700">관리 →</Link>
             </div>
-            <dl className="space-y-1.5">
-              <StatRow label="전체 모집" value={`${recruitments.length.toLocaleString()}건`} />
-              <StatRow label="모집 중" value={`${recruitmentOpen.toLocaleString()}건`} />
-              <StatRow label="신청 대기" value={`${recruitmentPending.toLocaleString()}건`} />
-            </dl>
+            {cdFailed.recruitments ? (
+              <AreaLoadError label="판매자 모집 현황을 불러오지 못했습니다." onRetry={retryRecruitments} />
+            ) : (
+              <dl className="space-y-1.5">
+                <StatRow label="전체 모집" value={`${(recruitments?.length ?? 0).toLocaleString()}건`} />
+                <StatRow label="모집 중" value={`${recruitmentOpen.toLocaleString()}건`} />
+                <StatRow label="신청 대기" value={`${recruitmentPending.toLocaleString()}건`} />
+              </dl>
+            )}
           </div>
 
           {/* 유통참여형 펀딩 */}
@@ -549,7 +641,9 @@ export default function SupplierDashboardPage() {
               </h3>
               <Link to="/supplier/market-trial" className="text-xs text-violet-700 hover:text-violet-800">관리 →</Link>
             </div>
-            {trials.length > 0 ? (
+            {cdFailed.marketTrials ? (
+              <AreaLoadError label="펀딩 현황을 불러오지 못했습니다." onRetry={retryTrials} tone="violet" />
+            ) : trials && trials.length > 0 ? (
               <dl className="space-y-1.5">
                 {Object.entries(trialCounts).map(([status, count]) => (
                   <StatRow
@@ -578,15 +672,15 @@ export default function SupplierDashboardPage() {
               <h3 className="text-sm font-semibold text-amber-900">이벤트 오퍼 (KPA)</h3>
               <Link to="/supplier/event-offers" className="text-xs text-amber-700 hover:text-amber-800">관리 →</Link>
             </div>
-            {eventOfferStats ? (
+            {cdFailed.eventOffers || !eventOfferStats ? (
+              <AreaLoadError label="이벤트 오퍼 현황을 불러오지 못했습니다." onRetry={retryEventOffers} tone="amber" />
+            ) : (
               <dl className="space-y-1.5">
                 <StatRow label="전체 이벤트" value={`${eventOfferStats.totalOffers.toLocaleString()}건`} />
                 <StatRow label="노출 중" value={`${eventOfferStats.activeOffers.toLocaleString()}건`} />
                 <StatRow label="이벤트 주문" value={`${eventOfferStats.totalOrders.toLocaleString()}건`} />
                 <StatRow label="이벤트 매출" value={won(eventOfferStats.totalRevenue)} />
               </dl>
-            ) : (
-              <p className="text-xs text-amber-700">이벤트 현황을 불러오지 못했습니다.</p>
             )}
           </div>
         </div>
@@ -823,6 +917,25 @@ function KpiLink({ label, value, to, accent, small }: {
       <p className={`text-xs font-medium mb-1 ${accent ? 'text-slate-300' : 'text-slate-500'}`}>{label}</p>
       <p className={`${small ? 'text-base' : 'text-2xl'} font-bold break-all`}>{value}</p>
     </Link>
+  );
+}
+
+/**
+ * WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+ * 영역 단위 조회 실패 표시 + 해당 API 만 재호출하는 다시 시도.
+ * 대시보드 전체를 오류 화면으로 바꾸지 않는다.
+ */
+function AreaLoadError({ label, onRetry, tone = 'slate' }: {
+  label: string; onRetry: () => void; tone?: 'slate' | 'violet' | 'amber';
+}) {
+  const text = tone === 'violet' ? 'text-violet-700' : tone === 'amber' ? 'text-amber-800' : 'text-slate-600';
+  return (
+    <div className="flex flex-wrap items-center gap-2 py-1">
+      <span className={`text-xs ${text}`}>{label}</span>
+      <button onClick={onRetry} className={`text-xs font-medium underline ${text}`}>
+        다시 시도
+      </button>
+    </div>
   );
 }
 

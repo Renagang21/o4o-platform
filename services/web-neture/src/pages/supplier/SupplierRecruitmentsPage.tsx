@@ -33,12 +33,22 @@ export default function SupplierRecruitmentsPage() {
   const navigate = useNavigate();
   const [rows, setRows] = useState<SupplierRecruitment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [closingId, setClosingId] = useState<string | null>(null);
 
+  // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
+  //   listMine() 이 throw 하도록 바뀌었다. 조회 실패를 "모집 0건" 으로 표시하지 않는다.
   const load = async () => {
     setLoading(true);
-    setRows(await supplierRecruitmentApi.listMine());
-    setLoading(false);
+    setLoadError(false);
+    try {
+      setRows(await supplierRecruitmentApi.listMine());
+    } catch {
+      setRows([]);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -82,6 +92,17 @@ export default function SupplierRecruitmentsPage() {
 
       {loading ? (
         <div className="py-16 text-center text-slate-400 text-sm">불러오는 중...</div>
+      ) : loadError ? (
+        <div className="py-16 text-center">
+          <p className="text-sm text-slate-600">판매자 모집 현황을 불러오지 못했습니다.</p>
+          <button
+            type="button"
+            onClick={load}
+            className="mt-3 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            다시 시도
+          </button>
+        </div>
       ) : rows.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-sm text-slate-500">생성한 판매자 모집이 없습니다.</p>
