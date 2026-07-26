@@ -120,7 +120,25 @@ frontend 잔존(참고, 본 IR 범위 밖 · 별도 WO):
 | `media-library.controller.ts` ×4 | `r.includes('admin') \|\| r.includes('operator') \|\| r.includes('super_admin')` | **부분문자열** 매칭. `includes('admin')` 이 이미 `platform:super_admin` 을 포함 → `super_admin` 항은 **완전 중복** |
 | `guide.controller.ts:31` | `r === 'admin' \|\| r === 'super_admin'` (endsWith 검사와 OR) | 무접두 보유자 0 → 무효항 |
 | `store-ai/product-access.utils.ts:18` | `['admin','super_admin','operator']` SQL 파라미터 | 무접두 보유자 0 → 매칭 0 |
-| `scope-assignment.utils.ts:57,100` | `hasRole(allRoles,'super_admin')` | 무접두 보유자 0 → 무효 |
+| ~~`scope-assignment.utils.ts:57,100`~~ | ~~`hasRole(allRoles,'super_admin')`~~ | **오분류 — 아래 정정 참조** |
+
+> ### ⚠️ 정정 (2026-07-26, `WO-…-NOOP-CLEANUP-V1` 수행 중 발견)
+>
+> `scope-assignment.utils.ts:57,100` 은 **D(무효항)가 아니라 A(suffix 의미, 제거 금지)** 다.
+>
+> 같은 파일의 `hasRole()` (line 40-43) 이 **suffix 매칭**을 한다:
+> ```ts
+> function hasRole(allRoles: Set<string>, target: string): boolean {
+>   if (allRoles.has(target)) return true;
+>   return Array.from(allRoles).some(r => r.endsWith(`:${target}`));   // ← platform:super_admin 매칭
+> }
+> ```
+> 따라서 `hasRole(allRoles, 'super_admin')` 은 **`platform:super_admin` 을 실제로 매칭한다.**
+> 제거하면 최고 관리자의 `rolesToScopeLevel` → `'admin'` 판정과
+> `detectServiceFromRole` → 전 서비스 접근 판정이 **모두 깨진다.**
+>
+> → §3-A(제거 금지) 목록에 **5번째 항목으로 추가**한다. `WO-…-NOOP-CLEANUP-V1` 에서 제외했다.
+> 즉시 제거 가능 목록은 **5건 → 4건**으로 정정된다.
 
 > `media-library` 의 `includes()` 매칭은 별개 위험이다 — `r.includes('admin')` 은
 > `kpa:store_owner` 는 막지만 `*_admin` 계열을 전부 통과시키는 **과대 매칭**이다. 정리 시 함께 볼 것.
@@ -153,8 +171,8 @@ frontend 잔존(참고, 본 IR 범위 밖 · 별도 WO):
 | 1 | `media-library.controller.ts` ×4 의 `r.includes('super_admin')` | `includes('admin')` 에 완전 포함되는 중복항 |
 | 2 | `guide.controller.ts:31` `r === 'super_admin'` | 보유자 0, endsWith 검사로 canonical 커버 |
 | 3 | `store-ai/product-access.utils.ts:18` 의 `'super_admin'` | 보유자 0 |
-| 4 | `scope-assignment.utils.ts:57,100` 의 `'super_admin'` | 보유자 0 |
-| 5 | `roles.routes.ts:24` 의 `'super_admin'` **1개만** | 보유자 0, prefixed 항목이 실동작 담당 |
+| ~~4~~ | ~~`scope-assignment.utils.ts:57,100`~~ | **철회 — §3-D 정정 참조. suffix 매칭이라 제거 금지** |
+| 4 | `roles.routes.ts:24` 의 `'super_admin'` **1개만** | 보유자 0, `hasAnyRole` 은 `In()` 정확 매칭 |
 
 ※ 1~5 모두 **`'admin'`·`'manager'` 등 다른 무접두는 건드리지 않는 것**이 전제다.
 

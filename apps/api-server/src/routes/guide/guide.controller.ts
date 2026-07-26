@@ -22,13 +22,17 @@ import { GuideContent } from './entities/guide-content.entity.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 
+// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
+//   무접두 'super_admin' 은 역할 카탈로그에 정의가 없고 보유자도 0명이라 무효항 → 제거(판정 결과 불변).
+//   NOTE: 본 함수는 ':admin'/':operator' suffix 로만 판정하므로 'platform:super_admin'(suffix
+//   ':super_admin')은 여전히 통과하지 못한다. 이는 본 WO 이전부터의 기존 동작이며,
+//   권한 확대에 해당하므로 여기서 바꾸지 않는다 (IR-…-GUARD-CONSUMER-AUDIT-V1 후속 WO 대상).
 function isOperatorOrAbove(roles: string[]): boolean {
   return roles.some(
     (r) =>
       r.endsWith(':operator') ||
       r.endsWith(':admin') ||
-      r === 'admin' ||
-      r === 'super_admin'
+      r === 'admin'
   );
 }
 

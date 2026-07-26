@@ -15,7 +15,11 @@
 
 import type { DataSource } from 'typeorm';
 
-const PLATFORM_ADMIN_ROLES = ['admin', 'super_admin', 'operator'];
+// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
+//   role_assignments 를 정확 문자열로 매칭하는 목록이다. 무접두 'super_admin' 은 역할 카탈로그에
+//   정의가 없고 보유자도 0명이라 어떤 행과도 매칭되지 않는 무효항이므로 제거(질의 결과 불변).
+//   나머지 무접두 'admin'/'operator' 는 본 WO 범위 밖이라 유지한다.
+const PLATFORM_ADMIN_ROLES = ['admin', 'operator'];
 
 /**
  * Verify that the authenticated user's organization has access to the given product.

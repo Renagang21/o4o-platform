@@ -115,7 +115,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     try {
       const roles: string[] = req.user?.roles || [];
       const isOperator = roles.some((r: string) =>
-        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+        // WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1: includes('super_admin') 은
+        // 바로 앞 includes('admin') 에 완전히 포함되는 중복항이라 제거(판정 결과 불변).
+        r.includes('admin') || r.includes('operator')
       );
       if (!isOperator) {
         res.status(403).json({ success: false, error: 'Operator access required' });
@@ -152,7 +154,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     try {
       const roles: string[] = req.user?.roles || [];
       const isOperator = roles.some((r: string) =>
-        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+        // WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1: includes('super_admin') 은
+        // 바로 앞 includes('admin') 에 완전히 포함되는 중복항이라 제거(판정 결과 불변).
+        r.includes('admin') || r.includes('operator')
       );
       if (!isOperator) {
         res.status(403).json({ success: false, error: 'Operator access required' });
@@ -183,7 +187,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     try {
       const roles: string[] = req.user?.roles || [];
       const isOperator = roles.some((r: string) =>
-        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+        // WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1: includes('super_admin') 은
+        // 바로 앞 includes('admin') 에 완전히 포함되는 중복항이라 제거(판정 결과 불변).
+        r.includes('admin') || r.includes('operator')
       );
       if (!isOperator) {
         res.status(403).json({ success: false, error: 'Operator access required' });
@@ -227,7 +233,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     try {
       const roles: string[] = req.user?.roles || [];
       const isOperator = roles.some((r: string) =>
-        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+        // WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1: includes('super_admin') 은
+        // 바로 앞 includes('admin') 에 완전히 포함되는 중복항이라 제거(판정 결과 불변).
+        r.includes('admin') || r.includes('operator')
       );
       if (!isOperator) {
         res.status(403).json({ success: false, error: 'Operator access required' });

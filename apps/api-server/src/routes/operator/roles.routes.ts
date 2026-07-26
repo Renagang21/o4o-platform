@@ -20,8 +20,12 @@ router.use(authenticate);
 //   guard 통과는 카탈로그 '조회'만 의미한다. 생성/수정/삭제는 RoleController 가
 //   scope.isPlatformAdmin(platform:admin | platform:super_admin) 으로 별도 강제하므로
 //   kpa:admin / kpa:operator 는 CUD 불가(조회 전용) 상태가 유지된다.
+// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
+//   requireRole → hasAnyRole 은 role_assignments 에 대한 In() 정확 문자열 매칭이다.
+//   무접두 'super_admin' 은 역할 카탈로그에 정의가 없고 보유자 0명이라 무효항 → 제거(판정 불변).
+//   'admin'/'operator'/'manager' 는 본 WO 범위 밖이라 유지한다.
 router.use(requireRole([
-  'admin', 'super_admin', 'operator', 'manager',
+  'admin', 'operator', 'manager',
   'platform:admin', 'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
