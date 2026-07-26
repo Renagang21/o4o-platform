@@ -3,6 +3,6 @@
  "unitId": "oral-unit-1",
  "writeOwner": "agent-da",
  "koApplied": true,
- "enApplied": false,
- "independentVerified": false
+ "enApplied": true,
+ "independentVerified": true
 }

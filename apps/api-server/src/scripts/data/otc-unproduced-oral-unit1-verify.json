@@ -5,7 +5,7 @@
  "metrics": {
   "targetMasters": 1850,
   "koAuthoredCanonical": 1850,
-  "enCanonical": 0,
+  "enCanonical": 1850,
   "easyDeprecated": 1850,
   "easyStillCanonical": 0,
   "needsReviewLeft": 0,
@@ -24,7 +24,7 @@
   "canonicalDup 0": true,
   "sourceRef leak 0": true,
   "EN 한글 0": true,
-  "EN canonical 1,850": false
+  "EN canonical 1,850": true
  },
- "allPass": false
+ "allPass": true
 }

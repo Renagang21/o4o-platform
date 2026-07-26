@@ -511,6 +511,16 @@ async function verify(): Promise<void> {
   fs.writeFileSync(outPath, JSON.stringify({ wo: WO, unitId: UNIT, dbWrite: 0, metrics: v, checks,
     allPass: Object.values(checks).every(Boolean) }, null, 1) + '\n', 'utf8');
   console.log(`  → ${outPath}`);
+  // 독립검증 전항목 PASS + KO/EN apply 완료일 때만 원장의 independentVerified 를 올린다.
+  // (이 플래그가 Unit 2 착수 차단을 해제하는 유일한 스위치다.)
+  if (Object.values(checks).every(Boolean) && fs.existsSync(RUN_LEDGER)) {
+    const l = JSON.parse(fs.readFileSync(RUN_LEDGER, 'utf8'));
+    if (l.koApplied === true && l.enApplied === true && l.independentVerified !== true) {
+      l.independentVerified = true;
+      fs.writeFileSync(RUN_LEDGER, JSON.stringify(l, null, 1) + '\n', 'utf8');
+      console.log('  apply-order 원장 → independentVerified=true');
+    }
+  }
   if (Object.values(checks).some((x) => !x)) process.exitCode = 1;
 }
 

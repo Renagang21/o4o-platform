@@ -2,7 +2,8 @@
 
 WO: `WO-O4O-OTC-UNPRODUCED-ORAL-UNIT1-FINAL-PRODUCTION-V1`
 기준: 승인 SSOT `8328047ac` · Unit 1 = 373 fp / 1,850 master · 예상 11,100T
-상태: **PARTIAL — KO 7,400T LIVE 완료·검증 GREEN. EN 3,700T 는 373 그룹 저작 미완으로 미실행. Unit 1 미완결 → Unit 2 착수 불가.**
+상태: **SUPERSEDED BY 후속 CHECK — 본 문서 시점은 KO 7,400T 완료 / EN 미실행이었다. EN 3,700T 는 이후 완료됐다.**
+후속: [`CHECK-O4O-OTC-UNPRODUCED-ORAL-UNIT1-EN-CONTINUE-TO-FINAL-GREEN-V1.md`](CHECK-O4O-OTC-UNPRODUCED-ORAL-UNIT1-EN-CONTINUE-TO-FINAL-GREEN-V1.md) — EN 373/373 저작 → EN 3,700T LIVE → 독립검증 10/10 · 범위 사후검증 7/7 → Unit 1 총 11,100T **GREEN** · Unit 2 착수 조건 해제. 아래 §15 의 "불가" 판정은 그 시점 기준이며 현재는 해소됐다.
 
 ## 0. 결론
 

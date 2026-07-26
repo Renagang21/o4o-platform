@@ -1,0 +1,27 @@
+{
+ "wo": "WO-O4O-OTC-UNPRODUCED-ORAL-UNIT1-EN-CONTINUE-TO-FINAL-GREEN-V1",
+ "dbWrite": 0,
+ "metrics": {
+  "unit1": 1850,
+  "unit2Only": 1849,
+  "u2Ko": 0,
+  "u2En": 0,
+  "finalMasters": 199,
+  "finKo": 199,
+  "finEn": 199,
+  "splitMasters": 90,
+  "splKo": 90,
+  "splEn": 90,
+  "koWrite": 7400,
+  "enWrite": 3700
+ },
+ "gates": {
+  "S1 KO apply 원장 7,400": true,
+  "S2 EN apply 원장 3,700": true,
+  "S3 Unit 1 총 write 11,100": true,
+  "S4 Unit 2 전용 master KO write 0": true,
+  "S5 Unit 2 전용 master EN write 0": true,
+  "S6 외용 final 199m KO/EN 무변경": true,
+  "S7 split 90m KO/EN 무변경": true
+ }
+}
