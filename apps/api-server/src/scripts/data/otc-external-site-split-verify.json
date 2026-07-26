@@ -1,0 +1,32 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-SPLIT-READY-FINAL-PRODUCTION-V1",
+ "dbWrite": 0,
+ "metrics": {
+  "targetMasters": 90,
+  "koAuthoredCanonical": 90,
+  "enCanonical": 90,
+  "easyDeprecated": 90,
+  "easyStillCanonical": 0,
+  "needsReviewLeft": 0,
+  "auditKo": 90,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0,
+  "holdWritten": 0,
+  "externalLive199Intact": 199
+ },
+ "checks": {
+  "KO authored canonical == 90": true,
+  "EN canonical == 90": true,
+  "easy_drug deprecated == 90": true,
+  "easy_drug ko canonical 잔존 0": true,
+  "needs_review 0": true,
+  "audit == 90": true,
+  "canonicalDup 0": true,
+  "sourceRef 충돌 0": true,
+  "EN 한글 0": true,
+  "HOLD(MULTI_ROUTE+PROFESSIONAL) write 0": true,
+  "기존 외부 LIVE 199 불변": true
+ },
+ "allPass": true
+}
