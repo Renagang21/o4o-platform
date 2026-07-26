@@ -23,8 +23,10 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { ContentRenderer } from '@o4o/content-editor';
+// WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1: ContentDocumentsPage 와 동일한 공통 검색 입력
+import { CommunityContentSearchBar } from '@o4o/shared-space-ui';
 import { contentApi, type ContentItem } from '../../api/content';
 // WO-O4O-KPA-CONTENT-DETAIL-STORE-IMPORT-LINK-V1:
 //   가져가기 호출/판정/라벨을 공용 모듈로 이동 — 콘텐츠 상세(/content/:id)와 동일 동작 공유.
@@ -100,11 +102,14 @@ function DocumentsSection({
   isAuthenticated,
   refreshKey,
   onChanged,
+  search,
 }: {
   currentUserId?: string;
   isAuthenticated: boolean;
   refreshKey: number;
   onChanged: () => void;
+  /** WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1: 서버 search 파라미터(제목·요약·본문·작성자·태그) */
+  search: string;
 }) {
   const navigate = useNavigate();
   const [items, setItems] = useState<ContentItem[]>([]);
@@ -136,6 +141,8 @@ function DocumentsSection({
       sort: 'latest',
       content_type: 'information',
       sub_type: 'content',
+      // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1: 기존 서버 search 계약 그대로 사용
+      search: search || undefined,
     })
       .then((res) => {
         if (cancelled) return;
@@ -150,7 +157,7 @@ function DocumentsSection({
         setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [refreshKey]);
+  }, [refreshKey, search]);
 
   const openDrawer = useCallback((item: ContentItem) => {
     setDrawerItem(item);
@@ -358,7 +365,13 @@ function DocumentsSection({
         title="문서형 콘텐츠"
         description="리치 텍스트 편집기로 작성한 문서"
         primaryAction={isAuthenticated ? { label: '문서 등록', to: '/content/documents/new' } : undefined}
-        moreLink={{ label: '전체 보기', to: '/content/documents' }}
+        // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1:
+        //   허브는 6건 요약이므로, 검색 중이면 '전체 보기'가 검색어를 그대로 넘겨
+        //   전체 목록(페이지네이션 보유)에서 나머지 결과를 볼 수 있게 한다.
+        moreLink={{
+          label: search ? '검색 결과 전체 보기' : '전체 보기',
+          to: search ? `/content/documents?search=${encodeURIComponent(search)}` : '/content/documents',
+        }}
       />
 
       {loading ? (
@@ -392,7 +405,9 @@ function DocumentsSection({
               onSelectionChange={setSelected}
               onRowClick={(row) => openDrawer(row)}
               emptyMessage={
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">
+                  {search ? '검색 결과가 없습니다' : '아직 문서가 없습니다'}
+                </div>
               }
             />
           </div>
@@ -401,7 +416,9 @@ function DocumentsSection({
           <div className="block md:hidden">
             {items.length === 0 ? (
               <Card className="overflow-hidden">
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 문서가 없습니다</div>
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">
+                  {search ? '검색 결과가 없습니다' : '아직 문서가 없습니다'}
+                </div>
               </Card>
             ) : (
               <div className="flex flex-col gap-3">
@@ -476,7 +493,7 @@ function DocumentsSection({
 // WO-O4O-SURVEY-CORE-PHASE1-V1: O4O 공통 Survey API 연결, placeholder 제거.
 // participationApi는 내부에서 /api/v1/surveys?serviceKey=kpa-society를 호출한다.
 
-function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
+function SurveysSection({ isAuthenticated, search }: { isAuthenticated: boolean; search: string }) {
   const navigate = useNavigate();
   const [items, setItems] = useState<ParticipationSet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -485,7 +502,8 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    participationApi.getParticipationSets({ page: 1, limit: 6 })
+    // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1: 설문도 기존 search 파라미터 지원
+    participationApi.getParticipationSets({ page: 1, limit: 6, search: search || undefined })
       .then((res) => {
         if (cancelled) return;
         setItems(Array.isArray(res.data) ? res.data : []);
@@ -499,7 +517,7 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
         setLoading(false);
       });
     return () => { cancelled = true; };
-  }, []);
+  }, [search]);
 
   useEffect(() => {
     setSelected((prev) => {
@@ -583,7 +601,11 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
         title="설문조사"
         description="의견을 수집하거나 참여를 받는 설문"
         primaryAction={isAuthenticated ? { label: '설문 등록', to: '/content/surveys/new' } : undefined}
-        moreLink={{ label: '전체 보기', to: '/content/surveys' }}
+        // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1: ContentSurveysPage 는 이미 ?search= 를 읽는다
+        moreLink={{
+          label: search ? '검색 결과 전체 보기' : '전체 보기',
+          to: search ? `/content/surveys?search=${encodeURIComponent(search)}` : '/content/surveys',
+        }}
       />
 
       {loading ? (
@@ -610,7 +632,9 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
               onSelectionChange={setSelected}
               onRowClick={(row) => navigate(targetForSurvey(row))}
               emptyMessage={
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">
+                  {search ? '검색 결과가 없습니다' : '아직 등록된 설문이 없습니다'}
+                </div>
               }
             />
           </div>
@@ -619,7 +643,9 @@ function SurveysSection({ isAuthenticated }: { isAuthenticated: boolean }) {
           <div className="block md:hidden">
             {items.length === 0 ? (
               <Card className="overflow-hidden">
-                <div className="py-8 px-4 text-sm text-slate-400 text-center">아직 등록된 설문이 없습니다</div>
+                <div className="py-8 px-4 text-sm text-slate-400 text-center">
+                  {search ? '검색 결과가 없습니다' : '아직 등록된 설문이 없습니다'}
+                </div>
               </Card>
             ) : (
               <div className="flex flex-col gap-3">
@@ -667,6 +693,30 @@ export function ContentListPage() {
     setRefreshKey((k) => k + 1);
   }, []);
 
+  // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1:
+  //   검색어는 KPA canonical 패턴대로 query string(`?search=`)에 보존한다
+  //   (ContentSurveysPage / CourseHubPage / ForumListPage 와 동일). 새 규칙 신설 아님.
+  //   디바운스 300ms 는 ContentDocumentsPage 와 동일 값.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState(search);
+
+  // 뒤로가기 등으로 URL 이 바뀌면 입력값도 따라간다
+  useEffect(() => { setSearchInput(search); }, [search]);
+
+  useEffect(() => {
+    const next = searchInput.trim();
+    if (next === search) return;
+    const t = setTimeout(() => {
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        if (next) p.set('search', next); else p.delete('search');
+        return p;
+      }, { replace: true });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput, search, setSearchParams]);
+
   return (
     <div className="max-w-[1100px] mx-auto px-4 pt-8 pb-16">
       <header className="mb-8 flex items-end justify-between gap-3 flex-wrap">
@@ -683,14 +733,27 @@ export function ContentListPage() {
         </Link>
       </header>
 
+      {/* WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1:
+          공통 CommunityContentSearchBar 재사용 — 두 섹션이 각자의 기존 search 파라미터로 조회한다.
+          (신규 검색 컴포넌트·통합 검색·랭킹 없음) */}
+      <div className="mb-6">
+        <CommunityContentSearchBar
+          value={searchInput}
+          onChange={setSearchInput}
+          onClear={() => setSearchInput('')}
+          placeholder="제목, 내용, 태그로 검색"
+        />
+      </div>
+
       <DocumentsSection
         currentUserId={user?.id}
         isAuthenticated={isAuthenticated}
         refreshKey={refreshKey}
         onChanged={handleDocumentsChanged}
+        search={search}
       />
 
-      <SurveysSection isAuthenticated={isAuthenticated} />
+      <SurveysSection isAuthenticated={isAuthenticated} search={search} />
     </div>
   );
 }

@@ -23,7 +23,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { CommunityContentSearchBar } from '@o4o/shared-space-ui';
 import { ContentRenderer } from '@o4o/content-editor';
 import { contentApi, type ContentItem } from '../../api/content';
@@ -88,8 +88,13 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   // WO-O4O-KPA-COMMUNITY-CONTENT-SEARCH-SURFACE-V1: 제목·본문·태그 검색 (기존 contentApi.list search 활용)
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
+  // WO-O4O-KPA-CONTENT-LIST-SEARCH-CONNECTION-V1:
+  //   초기값을 `?search=` 에서 읽어 /content 허브의 "검색 결과 전체 보기" 인계를 받는다.
+  //   (형제 화면 ContentSurveysPage 와 동일한 query string 패턴)
+  const [urlSearchParams] = useSearchParams();
+  const initialSearch = urlSearchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [search, setSearch] = useState(initialSearch);
 
   // Drawer state
   const [drawerItem, setDrawerItem] = useState<ContentItem | null>(null);
