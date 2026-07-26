@@ -29,6 +29,21 @@ type AuthMiddleware = RequestHandler;
 
 const VALID_SERVICE_KEYS = Object.values(SERVICE_KEYS) as string[];
 
+// WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04) — 잔존 사용처 정책:
+//
+//   아래 두 헬퍼는 **서비스 경계 축이 아니라 row 판별자 축**으로만 남는다.
+//   organization_product_listings.service_key 는 한 매장 안에서도 복수 값을 가진다
+//   ('kpa-society' 일반 진열 / 'kpa-groupbuy' 이벤트오퍼 / 'kpa' 주문 파생행 — 본 파일 /orderable 참조).
+//   따라서 `/listings/:id`(PUT) · `/listings/:id/channels`(GET·PUT) 는 **수정 대상 row 를 지목**하기 위해
+//   클라이언트가 그 row 의 실제 service_key 를 보내야 한다(프론트 pharmacyProducts.ts 주석과 동일 계약).
+//   서버가 마운트 키로 고정하면 혼합 도메인(all 탭) 진열 관리가 깨진다.
+//
+//   보안상 안전한 이유: 세 경로 모두 `WHERE id = :id AND organization_id = :orgId AND service_key = :key`
+//   이고 organizationId 는 requirePharmacyOwner 가 서버에서 해석한 값이다.
+//   → service_key 를 위조해도 **타 매장 row 에는 도달할 수 없고**, 자기 조직 row 를 못 찾아 404 가 될 뿐이다.
+//   → 타 서비스 키 row 를 새로 만드는 경로(POST /apply)는 본 WO 에서 차단했으므로 유입원도 없다.
+//
+//   서비스 경계가 걸린 쓰기·읽기(/apply · /applications · /approved)는 마운트 도출로 전환됐다.
 function resolveServiceKeyFromQuery(query: any): string {
   const requested = query?.service_key;
   if (!requested) return SERVICE_KEYS.KPA_SOCIETY;
@@ -53,6 +68,71 @@ const STORE_SERVICE_KEY_TO_APPROVAL_KEY: Record<string, string> = {
   cosmetics: 'k-cosmetics',
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1
+//
+// 서비스 노출 게이트 SSOT — catalog 목록과 apply 신청이 **같은 조건**을 쓰도록
+// SQL 조각을 한 곳에서 생성한다 (WO §7: 비슷하지만 다른 SQL 복사 금지).
+//
+//   PUBLIC          → 승인 불필요 (기존 정책 유지. 의약품·매장유형 게이트는 HUB-P1-06 후속 WO)
+//   SERVICE/PRIVATE → 현재 서비스 approval key 로 offer_service_approvals.approved 필요
+//
+// PRIVATE 의 allowed_seller_ids(매장 범위) 검증은 본 WO 범위 밖 —
+// WO-O4O-STORE-HUB-PRIVATE-OFFER-SELLER-SCOPE-GATE-V1 에서 처리한다.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildServiceApprovalGateSql(paramIndex: number): string {
+  return `(
+        spo.distribution_type = 'PUBLIC'
+        OR EXISTS (
+          SELECT 1 FROM offer_service_approvals osa
+          WHERE osa.offer_id = spo.id
+            AND osa.service_key = $${paramIndex}
+            AND osa.approval_status = 'approved'
+        )
+      )`;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * 신청 자격 검증 — catalog 목록에 노출될 수 있는 offer 인지 서버에서 재확인한다 (HUB-P0-01).
+ *
+ * catalog(`GET /catalog`) 의 WHERE 와 동일한 3조건 + 동일한 승인 게이트를 적용한다:
+ *   spo.is_active = true / neture_suppliers.status = 'ACTIVE' / buildServiceApprovalGateSql
+ *
+ * 반환: 노출 가능하면 distribution_type, 아니면 null.
+ * 호출자는 null 을 404 OFFER_NOT_AVAILABLE 로 변환한다 (WO §8 — 내부 상태 미노출:
+ * offer 없음 / 비활성 / 공급자 비활성 / 현재 서비스 미승인 / 타 서비스 전용을 구분하지 않는다).
+ */
+async function findApplicableOffer(
+  dataSource: DataSource,
+  offerId: string,
+  approvalServiceKey: string | undefined,
+): Promise<{ distribution_type: string } | null> {
+  // 비-UUID 는 조회 자체가 불가능하므로 캐스팅 500 대신 '노출 불가' 로 처리한다.
+  if (typeof offerId !== 'string' || !UUID_RE.test(offerId)) return null;
+
+  const params: any[] = [offerId];
+  let gate = '';
+  if (approvalServiceKey) {
+    params.push(approvalServiceKey);
+    gate = `AND ${buildServiceApprovalGateSql(params.length)}`;
+  }
+
+  const [row] = await dataSource.query(
+    `SELECT spo.distribution_type
+       FROM supplier_product_offers spo
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
+      WHERE spo.id = $1::uuid
+        AND spo.is_active = true
+        AND s.status = 'ACTIVE'
+        ${gate}
+      LIMIT 1`,
+    params,
+  );
+  return row ?? null;
+}
+
 export function createPharmacyProductsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -73,6 +153,12 @@ export function createPharmacyProductsController(
   //   마운트 serviceKey 캡처. /apply 내부에서 body-resolved serviceKey 가 동명 지역변수로 가려지므로
   //   "마운트가 KPA 인지" 판별용으로 별도 보관. (KPA 한정 정책 적용 — GP/KCos 무영향)
   const mountServiceKey = serviceKey;
+
+  // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+  //   product_approvals 읽기 경로가 쓰기(/apply)와 같은 service_key 축을 보도록 마운트에서 도출한다.
+  //   back-compat 마운트(serviceKey 미지정)는 종전 기본값 유지.
+  const resolveMountServiceKeyForRead = (): string =>
+    serviceKey ? STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey] : SERVICE_KEYS.KPA_SOCIETY;
 
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
@@ -121,15 +207,8 @@ export function createPharmacyProductsController(
     let approvalFilter = '';
     if (approvalServiceKey) {
       params.push(approvalServiceKey);
-      approvalFilter = `AND (
-        spo.distribution_type = 'PUBLIC'
-        OR EXISTS (
-          SELECT 1 FROM offer_service_approvals osa
-          WHERE osa.offer_id = spo.id
-            AND osa.service_key = $${params.length}
-            AND osa.approval_status = 'approved'
-        )
-      )`;
+      // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1: 게이트 SSOT 사용 (apply 와 동일 조건)
+      approvalFilter = `AND ${buildServiceApprovalGateSql(params.length)}`;
     }
 
     // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
@@ -211,15 +290,7 @@ export function createPharmacyProductsController(
     let countApprovalFilter = '';
     if (approvalServiceKey) {
       countParams.push(approvalServiceKey);
-      countApprovalFilter = `AND (
-        spo.distribution_type = 'PUBLIC'
-        OR EXISTS (
-          SELECT 1 FROM offer_service_approvals osa
-          WHERE osa.offer_id = spo.id
-            AND osa.service_key = $${countParams.length}
-            AND osa.approval_status = 'approved'
-        )
-      )`;
+      countApprovalFilter = `AND ${buildServiceApprovalGateSql(countParams.length)}`;
     }
 
     const countResult = await dataSource.query(
@@ -255,7 +326,38 @@ export function createPharmacyProductsController(
     const user = (req as any).user;
     const organizationId = (req as any).organizationId;
     const { supplyProductId } = req.body;
-    const serviceKey = resolveServiceKeyFromBody(req.body);
+
+    // ── HUB-P0-04: serviceKey 서버 고정 ──────────────────────────────────────
+    // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1
+    //
+    // 종전에는 body.service_key 를 그대로 신뢰해 product_approvals /
+    // organization_product_listings 의 service_key 에 기록했다 → 타 서비스 경계 row 생성 가능
+    // (Boundary Policy Guard Rule 4: serviceKey 스푸핑 금지 이탈).
+    //
+    // 이제 마운트 serviceKey 에서 서버가 도출한다. 도출값은 현행 저장값과 **완전히 동일**하다:
+    //   kpa        → 'kpa-society'  (KPA 프론트는 service_key 미전송 → 종전 기본값과 동일)
+    //   glycopharm → 'glycopharm'   (GP 프론트 전송값과 동일)
+    //   cosmetics  → 'k-cosmetics'  (KCos 프론트 전송값과 동일)
+    // → 신규/기존 row 의 service_key 축이 갈라지지 않으므로 migration·회귀가 없다.
+    //
+    // back-compat 마운트(serviceKey 미지정)는 종전 기본값을 유지한다.
+    const derivedServiceKey = serviceKey
+      ? STORE_SERVICE_KEY_TO_APPROVAL_KEY[serviceKey]
+      : SERVICE_KEYS.KPA_SOCIETY;
+
+    // 클라이언트가 다른 값을 보내면 조용히 무시하지 않고 400 으로 거부한다 —
+    // 남아 있는 호출부를 배포 후 즉시 발견하기 위함 (WO §5).
+    const requestedServiceKey = req.body?.service_key;
+    if (requestedServiceKey && requestedServiceKey !== derivedServiceKey) {
+      throw new ApiError(
+        400,
+        `service_key mismatch: this route serves '${derivedServiceKey}'`,
+        'SERVICE_KEY_MISMATCH',
+      );
+    }
+    const serviceKeyForWrite = derivedServiceKey;
+    // 승인 게이트 조회 키. back-compat 마운트(serviceKey 미지정)는 catalog 와 동일하게 게이트 미적용.
+    const approvalServiceKeyForApply = serviceKey ? derivedServiceKey : undefined;
 
     if (!supplyProductId) {
       throw new ApiError(400, 'supplyProductId is required', 'MISSING_PARAM');
@@ -269,20 +371,21 @@ export function createPharmacyProductsController(
     );
     const service = new ProductApprovalV2Service(dataSource);
 
-    // Offer distribution type 조회
-    const [offer] = await dataSource.query(
-      `SELECT distribution_type FROM supplier_product_offers WHERE id = $1::uuid AND is_active = true`,
-      [supplyProductId]
-    );
+    // ── HUB-P0-01: 신청 게이트를 카탈로그 노출 게이트와 일치시킨다 ──────────────
+    // 종전에는 `WHERE id=$1 AND is_active=true` 만 검사해, 현재 서비스에서 승인되지 않아
+    // **카탈로그에 보이지 않는 offer 도 ID 직접 지정으로 신청**할 수 있었다.
+    // findApplicableOffer 가 catalog 와 같은 조건(활성 offer + 공급자 ACTIVE + 서비스 승인)을 재검증한다.
+    const offer = await findApplicableOffer(dataSource, supplyProductId, approvalServiceKeyForApply);
     if (!offer) {
-      throw new ApiError(404, 'Product not found or inactive', 'PRODUCT_NOT_FOUND');
+      // WO §8: 내부 상태를 구분해 노출하지 않는다.
+      throw new ApiError(404, 'Product not available for this service', 'OFFER_NOT_AVAILABLE');
     }
 
     let result;
     if (offer.distribution_type === 'SERVICE') {
-      result = await service.createServiceApproval(supplyProductId, organizationId, serviceKey, user.id);
+      result = await service.createServiceApproval(supplyProductId, organizationId, serviceKeyForWrite, user.id);
     } else if (offer.distribution_type === 'PUBLIC') {
-      result = await service.createPublicListing(supplyProductId, organizationId, serviceKey);
+      result = await service.createPublicListing(supplyProductId, organizationId, serviceKeyForWrite);
       // WO-O4O-KPA-STORE-ORDERABLE-PRODUCT-SOURCE-TABS-V1 (KPA 한정 정책):
       //   KPA 는 '활성화 대기'(inactive OPL) 상태를 사용하지 않는다 — 약국이 허브에서 PUBLIC 상품을
       //   선택하면 즉시 주문 가능한 active OPL 이 된다. createPublicListing 의 공유 기본값(is_active=false)은
@@ -295,7 +398,7 @@ export function createPharmacyProductsController(
         (result.data as any).is_active = true;
       }
     } else if (offer.distribution_type === 'PRIVATE') {
-      result = await service.createPrivateApproval(supplyProductId, organizationId, serviceKey, user.id);
+      result = await service.createPrivateApproval(supplyProductId, organizationId, serviceKeyForWrite, user.id);
     } else {
       throw new ApiError(400, `Unsupported distribution type: ${offer.distribution_type}`, 'UNSUPPORTED_TYPE');
     }
@@ -313,11 +416,15 @@ export function createPharmacyProductsController(
     const status = req.query.status as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
-    const serviceKey = resolveServiceKeyFromQuery(req.query);
+    // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+    //   query.service_key 대신 마운트에서 도출 — /apply 가 기록하는 값과 동일 축을 읽는다.
+    //   (KPA 도출값 'kpa-society' = 종전 기본값이므로 회귀 없음. GP/KCos 는 종전 기본값
+    //    'kpa-society' 로 빈 결과가 나오던 경로가 자기 서비스 값으로 교정된다.)
+    const readServiceKey = resolveMountServiceKeyForRead();
 
     const hasStatus = status && ['pending', 'approved', 'rejected'].includes(status);
     const statusFilter = hasStatus ? `AND pa.approval_status = $3` : '';
-    const baseParams: any[] = hasStatus ? [organizationId, serviceKey, status] : [organizationId, serviceKey];
+    const baseParams: any[] = hasStatus ? [organizationId, readServiceKey, status] : [organizationId, readServiceKey];
 
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS total
@@ -363,7 +470,8 @@ export function createPharmacyProductsController(
   // ─── GET /approved — 승인된 상품 목록 (v2: product_approvals) ──────
   router.get('/approved', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
-    const serviceKey = resolveServiceKeyFromQuery(req.query);
+    // HUB-P0-04: /applications 와 동일 — 마운트에서 도출.
+    const readServiceKey = resolveMountServiceKeyForRead();
 
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
@@ -384,7 +492,7 @@ export function createPharmacyProductsController(
          AND pa.service_key = $2
          AND pa.approval_status = 'approved'
        ORDER BY pa.created_at DESC`,
-      [organizationId, serviceKey],
+      [organizationId, readServiceKey],
     );
 
     res.json({ success: true, data });

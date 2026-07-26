@@ -177,11 +177,15 @@ export async function cancelProductByOfferId(offerId: string): Promise<{ success
 /**
  * 상품 판매 신청 (레거시 — 수동 입력)
  */
+/**
+ * WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+ *   service_key 파라미터 제거 — 서비스 경계는 요청 경로(/api/v1/kpa/*)가 결정하고
+ *   backend 가 마운트 serviceKey 에서 도출한다. 클라이언트가 보낸 값은 400 SERVICE_KEY_MISMATCH.
+ */
 export async function applyProduct(params: {
   externalProductId: string;
   productName: string;
   productMetadata?: Record<string, unknown>;
-  service_key?: string;
 }): Promise<{ success: boolean; data: ProductApplication }> {
   return apiClient.post('/pharmacy/products/apply', params);
 }
@@ -193,18 +197,20 @@ export async function getApplications(params?: {
   status?: string;
   page?: number;
   limit?: number;
-  service_key?: string;
+  // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+  //   service_key 제거 — backend 가 마운트에서 도출하며 query 값은 무시한다.
 }): Promise<PaginatedResponse<ProductApplication>> {
   return apiClient.get('/pharmacy/products/applications', params);
 }
 
 /**
  * 승인된 상품 목록
+ *
+ * WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+ *   service_key 제거 — backend 가 마운트에서 도출하며 query 값은 무시한다.
  */
-export async function getApprovedProducts(params?: {
-  service_key?: string;
-}): Promise<{ success: boolean; data: ProductApplication[] }> {
-  return apiClient.get('/pharmacy/products/approved', params);
+export async function getApprovedProducts(): Promise<{ success: boolean; data: ProductApplication[] }> {
+  return apiClient.get('/pharmacy/products/approved');
 }
 
 /**

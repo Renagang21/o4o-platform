@@ -67,9 +67,11 @@ export async function getCatalog(params?: {
  * 카탈로그 기반 상품 신청 (supplyProductId) — 공유 컨트롤러 POST /apply
  */
 export async function applyBySupplyProductId(supplyProductId: string): Promise<void> {
+  // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+  //   service_key 전송 제거. 서비스 경계는 요청 경로(/cosmetics/*)가 결정하며,
+  //   backend 가 마운트 serviceKey('cosmetics')에서 'k-cosmetics' 를 도출한다(종전 전송값과 동일).
   await api.post('/cosmetics/pharmacy/products/apply', {
     supplyProductId,
-    service_key: 'k-cosmetics',
   });
 }
 

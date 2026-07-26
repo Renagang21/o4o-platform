@@ -83,12 +83,12 @@ export async function getCatalog(params?: {
 export async function applyBySupplyProductId(
   supplyProductId: string,
 ): Promise<{ success: boolean; data: ProductApplication }> {
-  // WO-O4O-GLYCOPHARM-SUPPLY-CATALOG-SERVICEKEY-FRONTEND-FIX-V1:
-  //   canonical service_key 'glycopharm' 명시 전송 — backend 기본값('kpa-society') 의존 제거.
-  //   K-Cosmetics(service_key:'k-cosmetics')와 대칭. backend 는 body.service_key 사용.
+  // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+  //   service_key 전송 제거. 서비스 경계는 요청 경로(/glycopharm/*)가 결정하며,
+  //   backend 가 마운트 serviceKey 에서 'glycopharm' 을 도출한다(종전 전송값과 동일).
+  //   (구 WO-O4O-GLYCOPHARM-SUPPLY-CATALOG-SERVICEKEY-FRONTEND-FIX-V1 의 명시 전송을 대체)
   const res = await api.post('/glycopharm/pharmacy/products/apply', {
     supplyProductId,
-    service_key: 'glycopharm',
   });
   return res.data;
 }

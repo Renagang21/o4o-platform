@@ -149,10 +149,11 @@ function ApplicationsTab() {
     try {
       setSubmitting(true);
       setError(null);
+      // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
+      //   service_key 전송 제거 — 서비스 경계는 요청 경로가 결정한다.
       await applyProduct({
         externalProductId: formData.externalProductId.trim(),
         productName: formData.productName.trim(),
-        service_key: formData.serviceKey,
       });
       setFormData({ externalProductId: '', productName: '', serviceKey: 'kpa' });
       setShowForm(false);
