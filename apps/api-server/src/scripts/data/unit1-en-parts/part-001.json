@@ -1,0 +1,101 @@
+{
+ "batch": 1,
+ "groups": [
+  {
+   "fp": "389e637e80b64f6b",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 3 times a day. For acute respiratory disease, do not take it continuously for 10 days or more.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer, or severe renal impairment (creatinine clearance < 25 mL/min). Before taking it, patients with mild or moderate hepatic impairment, pregnant women or women who may be pregnant, breastfeeding women, and people hypersensitive to Yellow No. 5 should consult a doctor or pharmacist. Anyone taking a cough medicine should consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Mucolytic and expectorant in acute and chronic respiratory disease", "Check with a pharmacist": "Liver cirrhosis, peptic ulcer, severe renal impairment, pregnancy, breastfeeding" }
+  },
+  {
+   "fp": "503e71b0d820d4cc",
+   "title": "Mucolytic Tablet",
+   "efficacy": "This medicine is used for acute and chronic bronchitis and asthmatic bronchitis with impaired mucus secretion.",
+   "usage": "For adults, 1 tablet (30 mg) 3 times a day, regardless of meals. For continued treatment, 1 tablet (30 mg) 2 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have severe renal impairment, severe hepatic impairment, galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, patients with renal impairment or peptic ulcer, pregnant women, breastfeeding women and elderly people should consult a doctor or pharmacist. Consult a doctor or pharmacist if taking it together with an antibiotic such as erythromycin, cephalexin, oxytetracycline, amoxicillin, cefuroxime or doxycycline.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Acute and chronic bronchitis, asthmatic bronchitis with impaired mucus secretion", "Check with a pharmacist": "Renal or hepatic impairment, peptic ulcer, antibiotic use, pregnancy" }
+  },
+  {
+   "fp": "d2de3d7cb5bb8785",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 3 times a day. For acute respiratory disease, do not take it continuously for 10 days or more.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer, or severe renal impairment (creatinine clearance < 25 mL/min). Before taking it, patients with mild or moderate hepatic impairment, pregnant women or women who may be pregnant, and breastfeeding women should consult a doctor or pharmacist. Anyone taking a cough medicine should consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Mucolytic and expectorant in acute and chronic respiratory disease", "Check with a pharmacist": "Liver cirrhosis, peptic ulcer, severe renal impairment, pregnancy, breastfeeding" }
+  },
+  {
+   "fp": "f9f9df4296748622",
+   "title": "Gastrointestinal Motility Tablet",
+   "efficacy": "This medicine is used for digestive symptoms (abdominal pain, indigestion, nausea, vomiting) in oesophageal reflux and hiatus hernia, gastroduodenitis and gastric or duodenal ulcer, and for irritable bowel syndrome, spastic colon, and childhood disorders (habitual vomiting, non-infectious impaired intestinal transit such as constipation and diarrhoea).",
+   "usage": "For adults, 1 to 2 tablets (100 to 200 mg) 3 times a day before meals. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not take if you have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, pregnant women or women who may be pregnant and breastfeeding women should consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Digestive symptoms of reflux, gastroduodenitis, ulcer; irritable bowel syndrome", "Check with a pharmacist": "Galactose intolerance, pregnancy, breastfeeding" }
+  },
+  {
+   "fp": "5d41ce2a0afc7de1",
+   "title": "Tonic Oral Liquid",
+   "efficacy": "This medicine is used as a tonic and restorative for a weak constitution, physical fatigue, reduced strength after illness, loss of appetite, nutritional disorder, and febrile or wasting disease.",
+   "usage": "For adults, 1 bottle (20 mL) once a day. This medicine is for oral use only and must not be used as an injection.",
+   "caution": "Because it is manufactured from human placenta as a raw material, take it only when the benefit outweighs the risk. Do not take if you are hypersensitive to this medicine or are taking levodopa. Before taking it, pregnant women, breastfeeding women and patients under a doctor's treatment should consult a doctor or pharmacist. Keep to the stated directions and amount. It may turn the urine yellow and affect clinical test values. Do not take it together with levodopa.",
+   "summaryTable": { "Category": "OTC medicine - oral liquid", "Use": "Tonic for fatigue, weak constitution, loss of appetite, recovery after illness", "Check with a pharmacist": "Levodopa use, pregnancy, breastfeeding, ongoing medical treatment" }
+  },
+  {
+   "fp": "0bdbf76c4dcc5270",
+   "title": "Acid Reducer Tablet",
+   "efficacy": "This medicine is used for excess stomach acid, heartburn and acid reflux.",
+   "usage": "For people aged 16 years and over, 1 tablet (10 mg) per dose, up to 2 tablets (20 mg) a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to H2 receptor antagonists, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist if you have difficulty or pain on swallowing, vomiting of blood or bloody stools, heartburn lasting 3 months or longer, dizziness or drowsiness with cold sweats, chest or shoulder pain with shortness of breath, or frequent chest pain.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Excess stomach acid, heartburn, acid reflux", "Check with a pharmacist": "Difficulty swallowing, bleeding, chest pain, symptoms lasting 3 months or longer" }
+  },
+  {
+   "fp": "fa21f2bfeb608a91",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For adults and children aged 6 years and over, 1 tablet (10 mg) once a day at bedtime; for patients sensitive to adverse reactions, 1/2 tablet (5 mg) split into a morning and an evening dose. Adjust appropriately according to age and symptoms. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives, or have renal failure (creatinine clearance < 10 mL/min). Before taking it, pregnant women, breastfeeding women, patients with renal or hepatic impairment, elderly people, patients with epilepsy or a risk of seizures, and patients with predisposing factors for urinary retention (spinal cord lesion, prostate enlargement) should consult a doctor or pharmacist. Do not take it together with theophylline or ritonavir. Do not take it with excessive alcohol.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching", "Check with a pharmacist": "Renal or hepatic impairment, epilepsy, urinary retention, pregnancy" }
+  },
+  {
+   "fp": "b3f60b8cf8e2d355",
+   "title": "Low-dose Aspirin Enteric-coated Tablet",
+   "efficacy": "This medicine is used to inhibit thrombus formation in myocardial infarction, cerebral infarction and unstable angina, to inhibit thrombus formation after coronary artery bypass grafting (CABG) or percutaneous transluminal coronary angioplasty (PTCA), and to reduce cardiovascular risk in high-risk patients (those with combined risk factors such as a family history of ischaemic heart disease, high blood pressure, high cholesterol, obesity or diabetes).",
+   "usage": "For adults, 1 tablet once a day. As this is an enteric-coated tablet, it may be taken before a meal with plenty of water.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to other salicylates, analgesics, anti-inflammatory medicines or antirheumatic medicines, or if you have peptic ulcer, aspirin-induced asthma or a history of it, haemophilia, severe hepatic impairment, severe renal impairment, severe cardiac insufficiency or a bleeding tendency, if you are receiving methotrexate at 15 mg or more per week, or if you are in the third trimester of pregnancy. In the first and second trimesters, do not take it unless it is essential. Before use, consult a doctor or pharmacist if you have renal impairment or cardiovascular circulatory disorder such as renovascular disease or congestive heart failure.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Prevention of thrombus formation; cardiovascular risk reduction", "Check with a pharmacist": "Peptic ulcer, bleeding tendency, aspirin asthma, methotrexate use, pregnancy" }
+  },
+  {
+   "fp": "80d0a0592af86c4f",
+   "title": "Expectorant Soft Capsule",
+   "efficacy": "This medicine is used for phlegm and for a cough caused by phlegm.",
+   "usage": "For adults and children aged 15 years and over, 2 capsules per dose; for children aged 8 to 14 years, 1 capsule per dose, 3 times a day after meals.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, or are a child under 8 years. Before taking it, consult a doctor or pharmacist if you are pregnant or may be pregnant, are breastfeeding, are elderly, have a constitution prone to urticaria, contact dermatitis, bronchial asthma, allergic rhinitis, migraine or food allergy, have experienced allergic symptoms such as fever, rash, joint pain, asthma or itching, or have high fever, heart disease, liver disease or severe kidney disease, or a history of gastric or duodenal ulcer.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Phlegm and cough caused by phlegm", "Check with a pharmacist": "Under 8 years; gastric or duodenal ulcer; heart, liver or kidney disease" }
+  },
+  {
+   "fp": "6085e4ab609128a3",
+   "title": "Antispasmodic Antacid Tablet",
+   "efficacy": "This medicine is used for stomach pain, abdominal pain, colic, excess stomach acid and heartburn.",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 2 to 3 times a day; for people aged 8 years to under 15 years, 1 tablet 2 to 3 times a day, after or between meals. When taken 2 or more times a day, leave an interval of at least 4 hours.",
+   "caution": "Do not take if you are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist if you are pregnant or may be pregnant, are frail or elderly, have experienced hypersensitivity to a medicine, or have heart disorder, glaucoma (eye pain, blurred vision) or difficulty passing urine. Keep to the stated directions and amount. When given to a child, give it under the supervision of a guardian. Blurred vision may occur after taking it.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Stomach and abdominal pain, colic, excess acid, heartburn", "Check with a pharmacist": "Age 7 years or under; glaucoma, urinary difficulty, heart disorder, pregnancy" }
+  },
+  {
+   "fp": "8e7d7aeb468561be",
+   "title": "Antacid Oral Suspension",
+   "efficacy": "This medicine is used for acid reflux, heartburn and indigestion caused by reflux of stomach contents (for example after meals, during pregnancy, or accompanying reflux oesophagitis).",
+   "usage": "For adults and children aged 12 years and over, 10 to 20 mL 4 times a day, after meals and at bedtime.",
+   "caution": "Do not take if you are hypersensitive to this medicine. Before taking it, consult a doctor or pharmacist if you must strictly limit sodium, for example with congestive heart failure or renal impairment, if you have high blood calcium, nephrocalcinosis or recurrent calcium-containing kidney stones, or for children under 12 years. Consult a doctor or pharmacist about tetracycline, digoxin, fluoroquinolones, iron salts, ketoconazole, neuroleptics, thyroxine, penicillamine, beta blockers (atenolol, metoprolol, propranolol), glucocorticoids, chloroquine, estramustine and diphosphonates.",
+   "summaryTable": { "Category": "OTC medicine - oral suspension", "Use": "Acid reflux, heartburn, indigestion from reflux of stomach contents", "Check with a pharmacist": "Under 12 years; sodium restriction, high blood calcium, kidney stones" }
+  },
+  {
+   "fp": "d277925b24531493",
+   "title": "Combined Oral Contraceptive Tablet",
+   "efficacy": "This medicine is used for contraception.",
+   "usage": "Take 1 tablet a day for 21 days, then have a 7-day break before starting a new pack. Take the tablets at about the same time each day with water, in the order shown on the pack. Withdrawal bleeding occurs during the 7-day break, usually starting 2 to 3 days after the last tablet, and menstruation may not have finished before the new pack is started. Refer to the detailed approved product information.",
+   "caution": "Because the risk of serious cardiovascular events such as thrombosis may increase, women taking an oral contraceptive should refrain from smoking. Smokers aged 35 years and over must not take this medicine. Do not take if you are hypersensitive to this medicine, or have venous thrombosis, arterial thrombosis, warning signs of thrombosis, a predisposition to venous or arterial thrombosis such as activated protein C (APC) resistance, antithrombin III deficiency, protein C deficiency, protein S deficiency, hyperhomocysteinaemia or antiphospholipid antibodies, or migraine, diabetes, severe metabolic disorder such as severe hyperlipidaemia, hyperlipoproteinaemia or porphyria, or prolonged immobility.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Contraception", "Check with a pharmacist": "Smoking at 35 years and over; thrombosis risk, migraine, diabetes, metabolic disorder" }
+  }
+ ]
+}
