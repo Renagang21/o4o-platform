@@ -244,6 +244,9 @@ where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) }
 | `content` + published 문서형 | **201 CREATED** ✅ |
 | `signage` + KPA community 미디어 | **201 CREATED** ✅ |
 | `content` + 자료실 id(우회) | **404** ✅ (선행 WO 유지) |
+| **`cms` + GlycoPharm published id** | **404 `SOURCE_NOT_FOUND`** ✅ *(수정 전 201 CREATED)* |
+| **`cms` + Neture published id** | **404 `SOURCE_NOT_FOUND`** ✅ *(수정 전 201 CREATED)* |
+| `cms` + **KPA** published id (과차단 회귀) | **201 CREATED** "대한약사회에 오신 것을 환영합니다" ✅ |
 | `resource` | **404** ✅ |
 | `blog` | **404** ✅ |
 | `pop` | **404** ✅ |
@@ -275,7 +278,10 @@ where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) }
 | `04966e5a-1059-4044-94f7-827e501891d2` | **CMS 격리 실증**(GlycoPharm "서비스 이용 안내" 유출 사본) | 동일 | `DELETE` **200 `deleted:true`** |
 | `af1e668b-f88a-44c5-8216-791c2690ae67` | **CMS 격리 실증**(Neture "네뚜레 플랫폼 오픈 안내" 유출 사본) | 동일 | `DELETE` **200 `deleted:true`** |
 
-재조회 시 4개 ID 모두 **부재**(`stillPresent: 0`). **신규 콘텐츠·픽스처는 생성하지 않았다**(기존 draft `7d81c00e…`, 타 서비스 CMS 원본은 읽기 전용 참조 — 원본 변경·삭제 0).
+| `23da5fb0-46f5-48b1-b452-116a983c8531` | CMS 수정 후 **과차단 회귀** 검증(KPA 자체 CMS) | 동일 | `DELETE` **200 `deleted:true`** |
+
+재조회 시 5개 ID 모두 **부재**(`stillPresent: 0`, 잔존 `cms` 사본 **0건**).
+**신규 콘텐츠·픽스처는 생성하지 않았다** — 기존 draft `7d81c00e…`, 타 서비스 CMS 원본(GlycoPharm·Neture)은 **읽기 전용 참조**이며 원본 변경·삭제 0.
 
 ---
 
@@ -294,6 +300,8 @@ where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) }
 
 | 항목 | 내용 |
 |------|------|
+| ~~cms 서비스 격리~~ | ✅ **해소** — §5-1 에서 `serviceKey IN ('kpa','kpa-society')` 강제 후 프로덕션 실증(타 서비스 404 / 자체 201) |
+| ~~signage `source='store'` 제외 근거~~ | ✅ **해소** — 기존 HUB 공유 계약과 동일한 의도된 정책으로 확정·명문화(§5) |
 | Home 사이니지 `source='community'` 포함 여부 | 선행 CHECK(FINAL-STABILIZATION §3-2)에서 보고한 미결 사항. 본 WO 에서 **임의 변경하지 않았다**(WO §5 명시) |
 | GP·K-Cosmetics·Neture | 같은 shared controller 를 mount 하므로 본 resolver 변경이 그 mount 에도 적용된다. 단 **해당 서비스 코드는 수정하지 않았고**(WO §5), 이 resolver 는 원래 KPA 자산만 해석하므로 의미 변화가 없다 |
 | `cms` → `content` 통합 | 테이블·계약이 달라 데이터 이관 필요 — 별도 판단 |
