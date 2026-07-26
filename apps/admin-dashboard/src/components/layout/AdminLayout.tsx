@@ -6,7 +6,6 @@ import toast from 'react-hot-toast'
 import { useAuth } from '@o4o/auth-context'
 import { useLocation } from 'react-router-dom'
 import { useAdminFullscreen } from '@/hooks/useAdminFullscreen'
-import FloatingAiButton from '@/components/ai/FloatingAiButton'
 
 interface AdminLayoutProps {
   children: ReactNode
@@ -95,8 +94,10 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* Floating AI Button - Phase AI-1 */}
-      {!isFullscreenMode && <FloatingAiButton />}
+      {/* WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
+          고정 'AI 질문' floating 버튼 제거 — 관리 화면 우하단을 상시 점유해
+          목록 하단 행의 액션과 겹쳤다. 컴포넌트(FloatingAiButton)는 보존하고
+          Admin 레이아웃에서의 상시 마운트만 해제한다. */}
     </div>
   )
 }

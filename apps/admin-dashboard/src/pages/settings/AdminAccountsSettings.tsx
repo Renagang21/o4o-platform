@@ -26,6 +26,18 @@ import type { O4OColumn } from '@o4o/ui';
 
 const MAX_ROLE_BADGES = 2;
 
+// WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
+//   역할 필터 canonical 화. backend(admin/platform-accounts.routes.ts)가 목록을 구성하는
+//   기준과 동일한 4개 역할만 필터 옵션으로 노출한다. 계정의 roles 배열에는 legacy 무접두
+//   역할(예: 'super_admin')이 섞여 들어오는데, 이는 role_assignments 잔재일 뿐 본 화면의
+//   포함 기준이 아니므로 필터에서 제외한다(표시·검색·정렬에는 그대로 남는다).
+const CANONICAL_ADMIN_ROLES = [
+  'platform:super_admin',
+  'platform:admin',
+  'neture:admin',
+  'neture:operator',
+] as const;
+
 interface AdminAccount {
   id: string;
   email: string;
@@ -58,6 +70,7 @@ export default function AdminAccountsSettings() {
   const [statusFilter, setStatusFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set());
   const [bulkAction, setBulkAction] = useState('');
   const [bulkBusy, setBulkBusy] = useState(false);
 
@@ -84,11 +97,17 @@ export default function AdminAccountsSettings() {
   useEffect(() => { load(); }, [load]);
 
   // 목록에 등장하는 역할 → 필터 옵션
-  const roleOptions = useMemo(() => {
-    const set = new Set<string>();
-    accounts.forEach((a) => a.roles.forEach((r) => set.add(r)));
-    return Array.from(set).sort().map((r) => ({ value: r, label: r }));
-  }, [accounts]);
+  // canonical 역할만, 각 옵션에 해당 계정 수를 함께 표기(필터 결과 건수와 일치).
+  const roleOptions = useMemo(
+    () =>
+      CANONICAL_ADMIN_ROLES.map((r) => ({
+        role: r,
+        count: accounts.filter((a) => a.roles.includes(r)).length,
+      }))
+        .filter((o) => o.count > 0)
+        .map((o) => ({ value: o.role, label: `${o.role} (${o.count})` })),
+    [accounts],
+  );
 
   const filtered = useMemo(() => {
     const kw = search.trim().toLowerCase();
@@ -171,6 +190,15 @@ export default function AdminAccountsSettings() {
     });
   }, []);
 
+  // 행별 '전체 역할 보기' 펼침 상태
+  const toggleRoles = useCallback((id: string) => {
+    setExpandedRoles((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
   const columns: O4OColumn<AdminAccount>[] = useMemo(() => [
     {
       // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
@@ -212,16 +240,28 @@ export default function AdminAccountsSettings() {
       width: 220,
       // WO-O4O-ADMIN-ADMIN-ACCOUNTS-TABLE-USABILITY-FIX-V1:
       //   과밀 방지 — 대표 2개만 배지, 나머지는 +N. title 로 전체 역할 확인.
+      // WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
+      //   '전체 역할 보기' — +N 을 클릭하면 해당 행의 역할을 모두 펼친다(title hover 로만
+      //   확인 가능하던 것을 명시적 토글로 승격). 축약은 표시 계층에만 적용되므로
+      //   필터·정렬·검색은 계속 원본 roles 배열 기준이다.
       render: (_: unknown, a: AdminAccount) => {
-        const shown = a.roles.slice(0, MAX_ROLE_BADGES);
+        const expanded = expandedRoles.has(a.id);
+        const shown = expanded ? a.roles : a.roles.slice(0, MAX_ROLE_BADGES);
         const rest = a.roles.length - shown.length;
         return (
-          <div className="flex flex-wrap items-center gap-1" title={a.roles.join(', ')}>
+          <div className="flex flex-wrap items-center gap-1">
             {shown.map((r) => (
               <span key={r} className={`inline-block px-2 py-0.5 text-xs rounded ${r === 'platform:super_admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}`}>{r}</span>
             ))}
-            {rest > 0 && (
-              <span className="inline-block px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-600 font-medium" title={a.roles.join(', ')}>+{rest}</span>
+            {(rest > 0 || expanded) && (
+              <button
+                type="button"
+                onClick={() => toggleRoles(a.id)}
+                title={expanded ? '역할 접기' : `전체 역할 보기 — ${a.roles.join(', ')}`}
+                className="inline-block px-2 py-0.5 text-xs rounded bg-slate-200 text-slate-600 font-medium hover:bg-slate-300"
+              >
+                {expanded ? '접기' : `+${rest}`}
+              </button>
             )}
           </div>
         );
@@ -290,7 +330,7 @@ export default function AdminAccountsSettings() {
         />
       ),
     },
-  ], [selectedKeys, busyId, toggleRow, navigate]);
+  ], [selectedKeys, expandedRoles, busyId, toggleRow, toggleRoles, navigate]);
 
   return (
     <div className="space-y-4">
