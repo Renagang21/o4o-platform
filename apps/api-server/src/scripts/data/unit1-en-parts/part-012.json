@@ -1,0 +1,413 @@
+{
+  "batch": 12,
+  "groups": [
+    {
+      "fp": "672c72887ce79fae",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthrosis, ankylosing spondylitis, painful swelling and inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+      "usage": "For adults, 1 capsule (300 mg) per dose, 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious cardiovascular reactions may occur. Serious gastrointestinal reactions such as bleeding, ulcer and perforation of the gastrointestinal tract may also occur. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis and joint inflammation; pain and swelling after injury or surgery",
+        "Check with a pharmacist": "Regular alcohol use; heart, blood vessel or stomach problems"
+      }
+    },
+    {
+      "fp": "694cbaa58c1b9392",
+      "title": "Oral Contraceptive Tablet",
+      "efficacy": "This medicine is used for contraception.",
+      "usage": "Take 1 tablet a day for 21 days in the order marked on the pack, then have a 7-day break. It is best to take it at about the same time each day. Menstruation occurs during the 7-day break and usually starts within 2 to 3 days after the last tablet. If you continue with this medicine, start a new pack after the 7-day break; your period may not have finished before you start the new pack. See the full approved product information for details.",
+      "caution": "Women taking oral contraceptives should avoid smoking, because the risk of serious cardiovascular events such as thrombosis may increase. Smokers aged 35 years and over must not take this medicine. It must also not be taken by people who are hypersensitive to it, or who have a tumour (for example breast cancer, endometrial cancer or a pituitary tumour), thrombophlebitis, thromboembolism, cerebrovascular or coronary artery disease, undiagnosed abnormal genital bleeding, severe high blood pressure or severe liver impairment. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Contraception (21 days of tablets, then a 7-day break)",
+        "Check with a pharmacist": "Smoking, age 35 years and over; blood clots, tumours, liver disease"
+      }
+    },
+    {
+      "fp": "6baa54e5e85e2028",
+      "title": "Multivitamin Tablet with Iron",
+      "efficacy": "This medicine is used to supply vitamins A, B1, B2, B6, C, D and E in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age. It is also used to relieve dry eyes and night blindness, to prevent poor development of bones and teeth and rickets, and for iron deficiency anaemia.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, once a day.",
+      "caution": "Taking 5000 IU or more of vitamin A a day may cause birth defects, so women within the first 3 months of pregnancy and women who may be pregnant must not take this medicine. An overdose in children aged 6 years or under may cause fatal iron poisoning, so keep it out of the reach of children. It must not be taken by people who are hypersensitive to it or who have hypercalcaemia (too much calcium in the blood). Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin A, B, C, D and E supply; dry eyes, night blindness; iron deficiency anaemia",
+        "Check with a pharmacist": "Pregnancy or possible pregnancy; children (risk of iron poisoning)"
+      }
+    },
+    {
+      "fp": "6bea7f3107dd7c1c",
+      "title": "Vitamin D and B Complex Tablet",
+      "efficacy": "This medicine is used to supply vitamins D, B1, B2 and B6 in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age. It is also used to relieve neuralgia, muscle pain and joint pain (such as low back pain and stiff shoulders), and for beriberi and eye strain.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, once a day after a meal.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, or who have hypercalcaemia (too much calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease or kidney stones, or by infants under 3 months of age. Before taking it, infants under 1 year of age, children who get a lot of sunlight and eat a normal diet, women who are or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D, B1, B2 and B6 supply; neuralgia, muscle and joint pain; eye strain",
+        "Check with a pharmacist": "Infants under 3 months; high blood calcium, kidney disease or stones"
+      }
+    },
+    {
+      "fp": "6d3ae5307e2901ea",
+      "title": "Gastrointestinal Motility Regulator Tablet",
+      "efficacy": "This medicine is used for digestive problems such as abdominal pain, indigestion, nausea and vomiting caused by oesophageal reflux and hiatal hernia, gastritis or duodenitis, and gastric or duodenal ulcer. It is used for irritable bowel syndrome and spastic colon. It is also used for habitual vomiting and for changes in bowel habit such as constipation or diarrhoea.",
+      "usage": "For adults, 1 to 2 tablets (100 to 200 mg) per dose, 3 times a day before meals. The dose may be increased or decreased as appropriate for age and symptoms.",
+      "caution": "Before taking this medicine, women who are pregnant and women who are breastfeeding should consult a doctor or pharmacist. If a breastfeeding woman has to take it, breastfeeding should be stopped.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Abdominal pain, indigestion, nausea and vomiting; irritable bowel syndrome",
+        "Check with a pharmacist": "Pregnancy; breastfeeding"
+      }
+    },
+    {
+      "fp": "6e0be7c74a022d87",
+      "title": "Vitamin D Tablet",
+      "efficacy": "This medicine is used to supply vitamin D during pregnancy and breastfeeding, during growth periods and in old age, and to prevent poor development of bones and teeth and rickets.",
+      "usage": "For adults, 2 tablets per dose, once a day after a meal.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, or who have hypercalcaemia, sarcoidosis, kidney disease, kidney stones or severe kidney failure, or by infants under 12 months of age. Before taking it, children who get a lot of sunlight and eat a normal diet, pregnant women, breastfeeding women and people with heart or circulatory problems, kidney problems or low blood protein should consult a doctor or pharmacist. Keep to the stated dosage.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D supply; prevention of poor bone and tooth development and rickets",
+        "Check with a pharmacist": "Infants under 12 months; high blood calcium, kidney disease"
+      }
+    },
+    {
+      "fp": "7141b5000e3006ed",
+      "title": "Almagate Antacid Tablet",
+      "efficacy": "This medicine is used for its antacid action and to improve symptoms in gastric and duodenal ulcer, gastritis, excess stomach acid, heartburn, nausea, vomiting, stomach pain and acid reflux.",
+      "usage": "For adults and children aged 12 years and over, 1 g of almagate per dose, 3 times a day, chewed 30 minutes to 1 hour after meals. If needed, one further dose may be taken before bedtime.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, or who have Alzheimer's disease, haemorrhoids, fluid retention (swelling), toxaemia of pregnancy, diarrhoea, undiagnosed digestive tract bleeding, or hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people with kidney problems, people who are physically weak, people on a low-phosphorus diet and people with digestive absorption problems should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet (chewable)",
+        "Use": "Antacid action for gastric and duodenal ulcer, gastritis, excess acid, heartburn",
+        "Check with a pharmacist": "Kidney problems; diarrhoea; low-phosphorus diet"
+      }
+    },
+    {
+      "fp": "73efcab1cddad3f9",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthrosis, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+      "usage": "For adults, take 300 mg by mouth per dose, 2 to 4 times a day. Do not exceed 1200 mg a day.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. It must not be taken by people who are hypersensitive to it or who have a stomach ulcer. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis and joint inflammation; pain and swelling after injury or surgery",
+        "Check with a pharmacist": "Regular alcohol use; heart, blood vessel or stomach problems"
+      }
+    },
+    {
+      "fp": "745fcfb5bf2f6583",
+      "title": "Vitamin D and B Complex Tablet",
+      "efficacy": "This medicine is used to supply vitamins D, B1, B2 and B6 in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age. It is also used to relieve neuralgia, muscle pain and joint pain (such as low back pain and stiff shoulders), and for beriberi and eye strain.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, once a day after a meal.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 3 months of age, or by people with hypercalcaemia (too much calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease or kidney stones. Before taking it, infants under 1 year of age, children who get a lot of sunlight and eat a normal diet, women who are or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D, B1, B2 and B6 supply; neuralgia, muscle and joint pain; eye strain",
+        "Check with a pharmacist": "Infants under 3 months; high blood calcium, kidney disease or stones"
+      }
+    },
+    {
+      "fp": "7944992ce7843515",
+      "title": "Cold Relief Oral Liquid",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 1 sachet per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral liquid",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, fever, headache, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "7bba6783240bb1b1",
+      "title": "Acid Reducer Tablet for Stomach Pain",
+      "efficacy": "This medicine is used for stomach pain, heartburn, a feeling of food stuck in the stomach and nausea.",
+      "usage": "For adults aged 15 years and over and under 80 years, 2 tablets per dose. If needed, 2 tablets per dose may be taken at intervals of 4 hours, up to 3 times a day. Do not take more than 3 doses (6 tablets) a day. Do not keep taking it for more than 2 weeks.",
+      "caution": "This medicine must not be taken by people receiving dialysis; people with a blood disorder, kidney or liver disease, stomach or duodenal disease, asthma or an immune disease such as rheumatism; people who have had a low red blood cell, low platelet or low white blood cell count; people who have had hypersensitivity to a histamine H2 receptor antagonist; children under 15 years of age; older people aged 80 years and over; women who are or may be pregnant; or breastfeeding women. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Stomach pain, heartburn, feeling of food stuck in the stomach, nausea",
+        "Check with a pharmacist": "Under 15 years or 80 years and over; dialysis; kidney or liver disease"
+      }
+    },
+    {
+      "fp": "801fafdb5eb3c96f",
+      "title": "Motion Sickness Tablet",
+      "efficacy": "This medicine is used to prevent and relieve dizziness, vomiting and headache caused by motion sickness.",
+      "usage": "To prevent motion sickness, people aged 15 years and over take 1 tablet per dose 30 minutes to 1 hour before travelling. If symptoms appear, a further single dose may be taken, leaving an interval of at least 4 hours, up to a maximum of 3 doses a day.",
+      "caution": "This medicine must not be taken by breastfeeding women, by children, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people who have had an allergic reaction to a medicine (rash, redness, itching), women who are or may be pregnant, breastfeeding women, and people with glaucoma (eye pain, blurred vision) or difficulty passing urine should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Prevention and relief of motion sickness: dizziness, vomiting, headache",
+        "Check with a pharmacist": "Children; breastfeeding; glaucoma or difficulty passing urine"
+      }
+    },
+    {
+      "fp": "810abd1064df10b5",
+      "title": "Enteric-coated Laxative Tablet",
+      "efficacy": "This medicine is used to relieve constipation, poor appetite, abdominal bloating, abnormal fermentation in the bowel and haemorrhoids.",
+      "usage": "For adults, 3 tablets per dose, once a day at bedtime (on an empty stomach). Start with the smallest dose and increase or decrease it a little at a time while watching the form and condition of the stools. Do not chew the tablets.",
+      "caution": "This medicine must not be taken by people with an acute abdominal disease (such as appendicitis, intestinal bleeding or ulcerative colitis), intestinal obstruction, or hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people with severe abdominal pain, nausea or vomiting, women who are or may be pregnant, people with kidney problems and people on a sodium-restricted diet should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral enteric-coated tablet",
+        "Use": "Constipation, poor appetite, abdominal bloating, haemorrhoids",
+        "Check with a pharmacist": "Severe abdominal pain or vomiting; pregnancy; kidney problems"
+      }
+    },
+    {
+      "fp": "813e9f819c9d1824",
+      "title": "Oral Contraceptive Tablet",
+      "efficacy": "The approved indication text for this product is stated as its dosing schedule: take 1 tablet a day for 21 days in the order marked on the pack, then have a 7-day break. It is best to take it at about the same time each day. Menstruation occurs during the 7-day break and usually starts within 2 to 3 days after the last tablet. If you continue with this medicine, start a new pack after the 7-day break; your period may not have finished before you start the new pack. See the full approved product information for details.",
+      "usage": "Take 1 tablet a day for 21 days in the order marked on the pack, then have a 7-day break. It is best to take it at about the same time each day. Menstruation occurs during the 7-day break and usually starts within 2 to 3 days after the last tablet. If you continue with this medicine, start a new pack after the 7-day break; your period may not have finished before you start the new pack. See the full approved product information for details.",
+      "caution": "Women taking oral contraceptives should avoid smoking, because the risk of serious cardiovascular events such as thrombosis may increase. Smokers aged 35 years and over must not take this medicine. It must also not be taken by people who are hypersensitive to it, or who have a tumour (for example breast cancer, endometrial cancer or a pituitary tumour), thrombophlebitis, thromboembolism, cerebrovascular or coronary artery disease, undiagnosed abnormal genital bleeding, severe high blood pressure or severe liver impairment. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Oral contraceptive (21 days of tablets, then a 7-day break)",
+        "Check with a pharmacist": "Smoking, age 35 years and over; blood clots, tumours, liver disease"
+      }
+    },
+    {
+      "fp": "8193a17bcdb22c22",
+      "title": "Calcium Carbonate Antacid Tablet",
+      "efficacy": "This medicine is used for its antacid action and to improve symptoms in gastric and duodenal ulcer, gastritis and excess stomach acid, and to supply calcium.",
+      "usage": "For adults, for gastric or duodenal ulcer, gastritis and excess stomach acid, 2 to 10 tablets (1 to 5 g) a day in 3 to 4 divided doses; for calcium supply, 3 to 6 tablets (1.5 to 3 g) a day in 1 to 2 divided doses. The dose may be increased or decreased as appropriate for age and symptoms.",
+      "caution": "Do not exceed the maximum dose of 15 tablets (7.5 g) a day. This medicine must not be taken by people with severe hypercalcaemia or severe hypercalciuria, hyperparathyroidism or hypothyroidism, severe kidney failure, or achlorhydria or a lack of stomach acid. Before taking it, people with kidney, heart or lung problems and people with constipation should consult a doctor or pharmacist. Keep to the stated dosage.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Antacid action for ulcer, gastritis and excess stomach acid; calcium supply",
+        "Check with a pharmacist": "High blood calcium; kidney, heart or lung problems; constipation"
+      }
+    },
+    {
+      "fp": "8262094e24df4e62",
+      "title": "Zinc Supplement Tablet",
+      "efficacy": "This medicine is used to supply zinc.",
+      "usage": "For adolescents aged 12 years and over and adults, 1 tablet per dose, once a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 12 months of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people with heart or circulatory problems, kidney problems or low blood protein should consult a doctor or pharmacist. Keep to the stated dosage.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Zinc supply",
+        "Check with a pharmacist": "Infants under 12 months; heart, circulatory or kidney problems"
+      }
+    },
+    {
+      "fp": "83f4c0d5bc2d5a1d",
+      "title": "Multivitamin Tablet",
+      "efficacy": "This medicine is used to supply vitamins D, E, B1, B2, B6 and C in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age. Through the vitamins it contains, it is also used for neuralgia, muscle pain, low back pain and other joint pain such as stiff shoulders, beriberi, eye strain, angular stomatitis and cheilitis.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, once a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 12 months of age, or by people with hypercalcaemia, sarcoidosis, kidney disease or kidney stones. Before taking it, infants under 1 year of age, children who get a lot of sunlight and eat a normal diet, women who are or may be pregnant, breastfeeding women, premature babies, infants, and people with hyperoxaluria, peptic ulcer, chronic ulcerative colitis or regional enteritis should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D, E, B and C supply; neuralgia, muscle and joint pain, eye strain",
+        "Check with a pharmacist": "Infants under 12 months; high blood calcium; kidney disease or stones"
+      }
+    },
+    {
+      "fp": "859d738144b57e31",
+      "title": "Carnitine Tablet",
+      "efficacy": "This medicine is used for primary and secondary carnitine deficiency and for myocardial metabolic disorder caused by ischaemic heart disease such as angina pectoris and acute myocardial infarction.",
+      "usage": "For adults, 2 to 3 g a day in 2 to 3 divided doses. The dose may be increased or decreased as appropriate for age and symptoms.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by people who have had hypersensitivity or an allergic reaction to soybean oil, or by people who are hypersensitive to soy or peanuts. Before taking it, people with a fat metabolism disorder such as hyperlipoproteinaemia, diabetic hyperlipidaemia or pancreatitis, people who need care when given fat emulsions, people at particular risk from fat overload, and women who are or may be pregnant should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Carnitine deficiency; myocardial metabolic disorder in ischaemic heart disease",
+        "Check with a pharmacist": "Soy or peanut allergy; fat metabolism disorders; pregnancy"
+      }
+    },
+    {
+      "fp": "860b28d8634381b8",
+      "title": "Cold Relief Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over, 2 capsules per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "893d371717336521",
+      "title": "Vitamin D and B Complex Tablet",
+      "efficacy": "This medicine is used to supply vitamins D, B1, B2 and B6 in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age. Through the vitamins it contains, it is also used for neuralgia, muscle pain, low back pain and other joint pain such as stiff shoulders, angular stomatitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "usage": "For adults aged 19 years and over, 1 tablet per dose, once a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it or who have hypercalcaemia, sarcoidosis, kidney disease or kidney stones. Before taking it, women who are or may be pregnant, breastfeeding women, premature babies, infants and people who have had kidney stones should consult a doctor or pharmacist. If there is no improvement in symptoms after about 1 month of use, stop taking this medicine immediately and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D, B1, B2 and B6 supply; neuralgia, muscle and joint pain, mouth symptoms",
+        "Check with a pharmacist": "High blood calcium; kidney disease or stones; pregnancy"
+      }
+    },
+    {
+      "fp": "8a52cd7f136ec3a6",
+      "title": "Antacid and Digestive Tablet",
+      "efficacy": "This medicine is used for excess stomach acid, heartburn, stomach discomfort, a bloated feeling in the stomach, a feeling of food stuck in the stomach, nausea, vomiting, stomach pain, acid reflux, indigestion, poor appetite and overeating, to help digestion, and for a bloated feeling in the stomach caused by indigestion.",
+      "usage": "For adults, 2 tablets per dose, 3 times a day after each meal.",
+      "caution": "This medicine must not be taken by people receiving dialysis, by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, by children under 15 years of age, by women who are or may be pregnant, or by breastfeeding women. Before taking it, people who are hypersensitive to this medicine, people with kidney or liver problems, people with low phosphate levels, and people who are hypersensitive to Yellow No. 4 should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Excess stomach acid, heartburn, indigestion, bloating, nausea, stomach pain",
+        "Check with a pharmacist": "Under 15 years; dialysis; kidney or liver problems; pregnancy"
+      }
+    },
+    {
+      "fp": "8b58a0bfb10e13a3",
+      "title": "Anti-nausea Oral Liquid",
+      "efficacy": "This medicine is used to relieve nausea and vomiting.",
+      "usage": "For adults and adolescents (aged 12 years and over and weighing 35 kg or more), 10 mg per dose (5 mg per dose when taking levodopa), 3 times a day before meals. The maximum daily dose is 30 mg, and it should generally not be used for longer than 1 week.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it; people for whom stimulating stomach movement is dangerous (gastrointestinal bleeding, mechanical obstruction, perforation); people with a prolactin-secreting tumour; people taking a strong CYP3A4 inhibitor; people with moderate or severe liver impairment; women who are or may be pregnant; people taking medicines that prolong the QTc interval; people with an electrolyte imbalance (low or high potassium, or low magnesium); or people with heart failure or other heart disease. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral liquid",
+        "Use": "Relief of nausea and vomiting",
+        "Check with a pharmacist": "Under 12 years or under 35 kg; heart, liver or hormone problems; other medicines"
+      }
+    },
+    {
+      "fp": "8ca5eeee59224db9",
+      "title": "Digestive and Bowel Tablet",
+      "efficacy": "This medicine is used for poor appetite, abdominal bloating, abnormal fermentation in the bowel and haemorrhoids.",
+      "usage": "1 tablet per dose: adults (aged 15 years and over) 3 times a day, and children aged 11 years and over to under 15 years 2 times a day, taken before a meal, with a meal, between meals or after a meal. Leave an interval of at least 4 hours between doses. Start with the smallest dose and increase or decrease it a little at a time while watching the form and condition of the stools.",
+      "caution": "This medicine must not be taken by people with an acute abdominal disease (such as appendicitis, intestinal bleeding or ulcerative colitis) or intestinal obstruction. Before taking it, people with severe abdominal pain, nausea or vomiting, women who are or may be pregnant, people with kidney problems, and people who have had rectal bleeding or bowel failure should consult a doctor or pharmacist. Keep to the stated dosage. Do not take it together with an antacid.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Poor appetite, abdominal bloating, abnormal bowel fermentation, haemorrhoids",
+        "Check with a pharmacist": "Severe abdominal pain or vomiting; pregnancy; kidney problems"
+      }
+    },
+    {
+      "fp": "8d93f43d8f1006a5",
+      "title": "Antacid and Digestive Tablet",
+      "efficacy": "This medicine is used for excess stomach acid, heartburn, stomach discomfort, a bloated feeling in the stomach, a feeling of food stuck in the stomach, nausea, vomiting, stomach pain, acid reflux, indigestion, poor appetite and overeating, to help digestion, and for a bloated feeling in the stomach caused by indigestion.",
+      "usage": "For adults, 2 tablets per dose, 3 times a day after each meal.",
+      "caution": "This medicine must not be taken by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, by children under 15 years of age, by women who are or may be pregnant, or by breastfeeding women. Before taking it, people who have had allergic symptoms (rash, redness, itching), people with kidney or liver problems, and people who have had hypersensitivity or an allergic reaction to Yellow No. 4 (tartrazine) should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Excess stomach acid, heartburn, indigestion, bloating, nausea, stomach pain",
+        "Check with a pharmacist": "Under 15 years; kidney or liver problems; pregnancy; dye allergy"
+      }
+    },
+    {
+      "fp": "91b38210a146e0b3",
+      "title": "Ibuprofen Soft Capsule for Pain and Fever",
+      "efficacy": "This medicine is used to relieve headache, toothache, pain after a tooth extraction, sore throat, earache, joint pain, neuralgia, low back pain, muscle pain, shoulder pain, bruise pain, fracture pain, sprain pain, period pain and pain from injury, and to reduce fever with chills.",
+      "usage": "For people aged 15 years and over or adults, 1 to 2 capsules per dose, 1 to 3 times a day at intervals of at least 4 hours; for children aged 11 years and over to under 15 years, 1 capsule per dose, 1 to 3 times a day at intervals of at least 4 hours; for children aged 8 years and over to under 11 years, 1 capsule per dose, 1 to 2 times a day at intervals of at least 6 hours. Avoid taking it on an empty stomach.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. People with uncontrolled high blood pressure, congestive heart failure, established ischaemic heart disease, peripheral arterial disease or cerebrovascular disease should use ibuprofen only after careful consideration, and should avoid high-dose ibuprofen (2400 mg a day). Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Headache, toothache, joint and muscle pain, period pain; fever with chills",
+        "Check with a pharmacist": "Under 8 years; regular alcohol use; heart or blood vessel disease"
+      }
+    },
+    {
+      "fp": "934b791ee729b997",
+      "title": "Antihistamine Tablet for Allergy",
+      "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria, itchy skin, eczema and dermatitis.",
+      "usage": "For adults and children aged 6 years and over, 10 mg once a day before bedtime. For patients who are sensitive to side effects, 5 mg each in the morning and evening. The dose may be increased or decreased as appropriate for age and symptoms; for patients with kidney impairment, see the approved product information for the recommended dose.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it or to hydroxyzine or piperazine derivatives or who have had such hypersensitivity, by people with kidney failure, by infants under 6 years of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people with kidney or liver impairment, people with epilepsy or a risk of seizures, and people with difficulty passing urine should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Allergic rhinitis and conjunctivitis, chronic urticaria, itchy skin, dermatitis",
+        "Check with a pharmacist": "Under 6 years; kidney or liver problems; epilepsy; urinary difficulty"
+      }
+    },
+    {
+      "fp": "94a481dcbd830538",
+      "title": "Digestive Enzyme Tablet",
+      "efficacy": "This medicine is used for indigestion, poor appetite, overeating, a feeling of food stuck in the stomach, to help digestion, and for a bloated feeling in the stomach caused by indigestion.",
+      "usage": "For adults, 1 to 2 tablets per dose, 3 times a day after meals.",
+      "caution": "Children aged 7 years and under must not take this medicine. Before taking it, people with an allergic constitution, women who are or may be pregnant, and people who have had hypersensitivity or an allergic reaction to Yellow No. 4 (tartrazine) should consult a doctor or pharmacist. Keep to the stated dosage. If there is no improvement in symptoms after about 2 weeks of use, stop taking it immediately and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Indigestion, poor appetite, overeating, bloating after eating",
+        "Check with a pharmacist": "Age 7 years and under; pregnancy; dye allergy"
+      }
+    },
+    {
+      "fp": "9642f5c43c902919",
+      "title": "Analgesic and Antipyretic Tablet",
+      "efficacy": "This medicine is used for headache, neuralgia, muscle pain, period pain, sprain pain, fever and pain due to a cold, toothache, joint pain and rheumatic pain.",
+      "usage": "For adults, 2 tablets every 6 hours, not exceeding a maximum of 8 tablets a day. The dose may be increased or decreased as appropriate for age and symptoms.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage. Do not take this medicine together with other products containing acetaminophen. It must not be taken by people who are hypersensitive to it or who have peptic ulcer, a severe blood disorder or severe liver impairment. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Headache, neuralgia, muscle and joint pain, period pain, toothache, fever",
+        "Check with a pharmacist": "Regular alcohol use; other acetaminophen products; liver disease"
+      }
+    },
+    {
+      "fp": "98ff9a1de48b2829",
+      "title": "Vitamin B6 Tablet",
+      "efficacy": "This medicine is used to supply vitamin B6 during pregnancy and breastfeeding and when strength is low during or after illness, and to relieve angular stomatitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, 2 times a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 3 months of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, infants under 1 year of age and people who are short of folic acid should consult a doctor or pharmacist. Keep to the stated dosage. When it is given to a child, an adult should supervise.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin B6 supply; mouth and lip inflammation, eczema, dermatitis",
+        "Check with a pharmacist": "Infants under 3 months; low folic acid"
+      }
+    },
+    {
+      "fp": "9a0eb8e4c986ef4b",
+      "title": "Multivitamin Soft Capsule",
+      "efficacy": "This medicine is used to supply vitamins A, E, B1, B2, B6 and C in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, and in old age. It is also used to relieve dry eyes and night blindness, and stiff shoulders and neck, tingling hands and feet and cold hands and feet associated with poor peripheral circulation and the menopause.",
+      "usage": "For children aged 8 years and over and adults, 1 capsule per dose, once a day.",
+      "caution": "Taking 5000 IU or more of vitamin A a day may cause birth defects, so women within the first 3 months of pregnancy and women who may be pregnant must not take this medicine. It must also not be taken by people who are hypersensitive to this medicine or to soybean oil, soy or peanuts, or by infants under 12 months of age. Before taking it, women who are or may be pregnant, breastfeeding women, premature babies, infants and people with hyperoxaluria should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Vitamin A, E, B and C supply; dry eyes, night blindness; cold or tingling hands and feet",
+        "Check with a pharmacist": "Pregnancy or possible pregnancy; soy or peanut allergy; infants under 12 months"
+      }
+    },
+    {
+      "fp": "9b3a700ee7115b6e",
+      "title": "Chewable Multivitamin Tablet",
+      "efficacy": "This medicine is used to supply vitamins A, D, E, B1, B2, B6 and C in physical fatigue, during pregnancy and breastfeeding, during and after illness, during growth periods and in old age, to relieve dry eyes and night blindness, and to prevent poor development of bones and teeth and rickets.",
+      "usage": "For people aged 12 years and over and adults, 2 tablets per dose, 2 times a day; for children aged 36 months and over to under 12 years, 1 tablet per dose, 2 times a day, dissolved in the mouth or chewed after meals.",
+      "caution": "Taking 5000 IU or more of vitamin A a day may cause birth defects, so women within the first 3 months of pregnancy and women who may be pregnant must not take this medicine. It must also not be taken by people who are hypersensitive to it, by people with hypercalcaemia (too much calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney stones, severe heart failure or hereditary problems such as galactose intolerance, or by infants under 12 months of age. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral chewable tablet",
+        "Use": "Vitamin A, D, E, B and C supply; dry eyes, night blindness; bone and tooth development",
+        "Check with a pharmacist": "Pregnancy or possible pregnancy; infants under 12 months; high blood calcium"
+      }
+    },
+    {
+      "fp": "9bdb58f0cebda824",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold, such as runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain.",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for children aged 8 years and over to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 8 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "9d9b822d50c2719f",
+      "title": "Vitamin B Complex Tablet",
+      "efficacy": "This medicine is used to supply vitamins B1, B2 and B6 in physical fatigue, during pregnancy and breastfeeding and when strength is low during or after illness, and to relieve neuralgia, muscle pain and joint pain (such as low back pain and stiff shoulders), and for beriberi and eye strain.",
+      "usage": "For people aged 12 years and over and adults, 1 tablet per dose, once a day after a meal.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 3 months of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, women who are or may be pregnant, breastfeeding women, premature babies and infants should consult a doctor or pharmacist. Keep to the stated dosage.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin B1, B2 and B6 supply; neuralgia, muscle and joint pain; eye strain",
+        "Check with a pharmacist": "Infants under 3 months; pregnancy; breastfeeding"
+      }
+    },
+    {
+      "fp": "9e54fdc68ad01c0c",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold, such as runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain.",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for children over 7 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome (a skin and mucous membrane disorder) and toxic epidermal necrolysis (Lyell's syndrome), have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Age 7 years or under; regular alcohol use; skin rash after taking"
+      }
+    }
+  ]
+}
