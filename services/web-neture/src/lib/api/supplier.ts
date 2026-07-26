@@ -492,6 +492,14 @@ export interface CopyImagesResult {
 
 // ==================== Supplier API ====================
 
+/**
+ * 상품 목록 조회 실패 sentinel.
+ * WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1:
+ * 조회 실패를 빈 배열·빈 pagination 으로 변환하면 화면에서 "정상 0건" 과 구분되지 않으므로 throw 한다.
+ * 서버 원문 대신 고정 코드만 전파하고, 원인은 console 로만 남긴다.
+ */
+export const SUPPLIER_PRODUCTS_LOAD_FAILED = 'SUPPLIER_PRODUCTS_LOAD_FAILED';
+
 export const supplierApi = {
   /**
    * 자사 관리자 HTML 에서 추출한 이미지 URL 을 O4O 미디어 라이브러리로 복사.
@@ -529,14 +537,19 @@ export const supplierApi = {
   },
 
   async getProducts(): Promise<SupplierProduct[]> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/products');
-      const result = response.data;
-      return result.data || [];
+      response = await api.get('/neture/supplier/products');
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch products:', error);
-      return [];
+      console.warn('[Supplier API] Failed to fetch products:', extractApiError(error));
+      throw new Error(SUPPLIER_PRODUCTS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!result?.success || !Array.isArray(result.data)) {
+      console.warn('[Supplier API] Unexpected products payload shape');
+      throw new Error(SUPPLIER_PRODUCTS_LOAD_FAILED);
+    }
+    return result.data as SupplierProduct[];
   },
 
   // WO-NETURE-SUPPLIER-EXCEL-LIST-V1: Paginated product list
@@ -548,6 +561,7 @@ export const supplierApi = {
     completenessStatus?: string;
     serviceApprovalStatus?: string;
   }): Promise<{ data: SupplierProduct[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
+    let response;
     try {
       const sp = new URLSearchParams();
       if (params?.page) sp.set('page', String(params.page));
@@ -563,16 +577,22 @@ export const supplierApi = {
       if (params?.completenessStatus) sp.set('completenessStatus', params.completenessStatus);
       if (params?.serviceApprovalStatus) sp.set('serviceApprovalStatus', params.serviceApprovalStatus);
       const qs = sp.toString() ? `?${sp}` : '';
-      const response = await api.get(`/neture/supplier/products${qs}`);
-      const result = response.data;
-      return {
-        data: result.data || [],
-        pagination: result.pagination || { page: 1, limit: 50, total: 0, totalPages: 0 },
-      };
+      response = await api.get(`/neture/supplier/products${qs}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch paginated products:', error);
-      return { data: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } };
+      console.warn('[Supplier API] Failed to fetch paginated products:', extractApiError(error));
+      throw new Error(SUPPLIER_PRODUCTS_LOAD_FAILED);
     }
+
+    const result = response.data;
+    if (!result?.success || !Array.isArray(result.data)) {
+      console.warn('[Supplier API] Unexpected paginated products payload shape');
+      throw new Error(SUPPLIER_PRODUCTS_LOAD_FAILED);
+    }
+    // pagination 은 성공 응답의 보조 필드다. 누락 시에도 목록 자체는 유효하므로 기존 기본값을 유지한다.
+    return {
+      data: result.data as SupplierProduct[],
+      pagination: result.pagination || { page: 1, limit: 50, total: result.data.length, totalPages: 1 },
+    };
   },
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: Approval tab counts

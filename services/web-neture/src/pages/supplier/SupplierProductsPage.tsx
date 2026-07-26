@@ -616,6 +616,8 @@ export default function SupplierProductsPage() {
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(true);
+  // 조회 실패(loadError) 와 정상 0건을 구분한다 — 실패 시 빈 상태 문구를 표시하지 않는다.
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generatingTagFor, setGeneratingTagFor] = useState<string | null>(null);
 
@@ -1054,24 +1056,35 @@ export default function SupplierProductsPage() {
     }, 2000);
   };
 
+  // WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1:
+  // getProductsPaginated 는 조회 실패 시 throw 한다. 실패를 빈 목록으로 렌더하지 않고 loadError 로 분리한다.
   const fetchProducts = useCallback(async (page = 1, searchKeyword?: string) => {
     setLoading(true);
     const kw = searchKeyword !== undefined ? searchKeyword : keyword;
-    const result = await supplierApi.getProductsPaginated({
-      page,
-      limit: 50,
-      keyword: kw || undefined,
-      hasImage: filterHasImage || undefined,
-      hasDescription: filterHasDescription || undefined,
-      barcodeSource: filterBarcodeSource || undefined,
-      completenessStatus: filterCompleteness || undefined,
-      serviceApprovalStatus: activeTab === 'all' ? undefined : activeTab,
-    });
-    setProducts(result.data);
-    setPagination(result.pagination);
-    setSelectedIds(new Set());
-    setDrawerProduct(null);
-    setLoading(false);
+    try {
+      const result = await supplierApi.getProductsPaginated({
+        page,
+        limit: 50,
+        keyword: kw || undefined,
+        hasImage: filterHasImage || undefined,
+        hasDescription: filterHasDescription || undefined,
+        barcodeSource: filterBarcodeSource || undefined,
+        completenessStatus: filterCompleteness || undefined,
+        serviceApprovalStatus: activeTab === 'all' ? undefined : activeTab,
+      });
+      setProducts(result.data);
+      setPagination(result.pagination);
+      setSelectedIds(new Set());
+      setDrawerProduct(null);
+      setLoadError(false);
+    } catch {
+      setProducts([]);
+      setSelectedIds(new Set());
+      setDrawerProduct(null);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness, activeTab]);
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: fetch tab counts
@@ -1480,7 +1493,19 @@ export default function SupplierProductsPage() {
         data={filteredProducts}
         rowKey="id"
         loading={loading}
-        emptyMessage={emptyStateNode}
+        emptyMessage={loadError ? (
+          <div className="flex flex-col items-center gap-2 py-8">
+            <p className="text-sm text-slate-600">상품 목록을 불러오지 못했습니다.</p>
+            <p className="text-xs text-slate-400">잠시 후 다시 시도해 주세요.</p>
+            <button
+              type="button"
+              onClick={() => fetchProducts(pagination.page)}
+              className="mt-1 px-3 py-1 text-xs text-white bg-blue-600 hover:bg-blue-700 rounded"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : emptyStateNode}
         onSave={handleSave}
         saving={saving}
         tableId="supplier-products"

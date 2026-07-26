@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Plus, Search, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Package, Plus, Search, ToggleLeft, ToggleRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { supplierApi, supplierProfileApi, type SupplierProduct } from '../../lib/api';
 
 // ============================================================================
@@ -437,25 +437,28 @@ function EmptyState() {
 export default function SupplierProductsListPage() {
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-NETURE-SUPPLIER-PRODUCTS-LOAD-ERROR-CONTRACT-V1: 조회 실패 ↔ 정상 0건 구분
+  const [loadError, setLoadError] = useState(false);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState('');
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [supplierStatus, setSupplierStatus] = useState<string | undefined>();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const data = await supplierApi.getProducts();
-        setProducts(data);
-      } catch {
-        // non-critical
-      }
-      setLoading(false);
-    };
-    fetchProducts();
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await supplierApi.getProducts();
+      setProducts(data);
+      setLoadError(false);
+    } catch {
+      setProducts([]);
+      setLoadError(true);
+    }
+    setLoading(false);
   }, []);
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   // Fetch supplier profile to get supplier status
   useEffect(() => {
@@ -546,6 +549,21 @@ export default function SupplierProductsListPage() {
       {/* Content */}
       {loading ? (
         <div className="text-center py-16 text-sm text-slate-500">로딩 중...</div>
+      ) : loadError ? (
+        /* 조회 실패 — 빈 상태(등록된 상품이 없습니다)를 함께 표시하지 않는다 */
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
+          <AlertCircle size={40} className="mx-auto text-red-400 mb-3" />
+          <p className="text-sm text-slate-600">상품 목록을 불러오지 못했습니다.</p>
+          <p className="text-xs text-slate-400 mt-1">잠시 후 다시 시도해 주세요.</p>
+          <button
+            type="button"
+            onClick={fetchProducts}
+            className="mt-4 inline-flex items-center gap-1.5 px-5 py-2.5 border border-slate-200 text-slate-600 text-sm font-medium rounded-lg hover:bg-slate-50"
+          >
+            <RefreshCw size={16} />
+            다시 시도
+          </button>
+        </div>
       ) : filtered.length === 0 && products.length === 0 ? (
         <EmptyState />
       ) : filtered.length === 0 ? (
