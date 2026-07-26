@@ -127,6 +127,7 @@ export default function StoreOrdersPage() {
     return () => { cancelled = true; };
   }, []);
   const [page, setPage] = useState(1);
+  const [loadError, setLoadError] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
@@ -135,17 +136,28 @@ export default function StoreOrdersPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Fetch orders
+  // IR/WO-O4O-NETURE-STORE-ORDERS-LIST-500-AND-LOAD-ERROR-CONTRACT-V1:
+  //   getOrders() 가 실패 시 throw 한다. 조회 장애를 "주문 내역이 없습니다" 로 표시하지 않는다.
   const fetchOrders = useCallback(async () => {
     setLoading(true);
-    const result = await storeApi.getOrders({
-      page,
-      limit: 20,
-      status: statusFilter || undefined,
-    });
-    setOrders(result.data);
-    setTotalPages(result.meta.totalPages);
-    setTotal(result.meta.total);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const result = await storeApi.getOrders({
+        page,
+        limit: 20,
+        status: statusFilter || undefined,
+      });
+      setOrders(result.data);
+      setTotalPages(result.meta.totalPages);
+      setTotal(result.meta.total);
+    } catch {
+      setOrders([]);
+      setTotalPages(0);
+      setTotal(0);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [page, statusFilter]);
 
   useEffect(() => {
@@ -271,8 +283,18 @@ export default function StoreOrdersPage() {
         <div style={styles.loading}>주문 내역을 불러오는 중...</div>
       )}
 
+      {/* Error — 조회 실패. "주문 내역이 없습니다" 로 표시하지 않는다. */}
+      {!loading && loadError && (
+        <div style={styles.empty}>
+          <Package size={48} color="#cbd5e1" />
+          <h3 style={styles.emptyTitle}>주문 내역을 불러오지 못했습니다</h3>
+          <p style={styles.emptyText}>잠시 후 다시 시도해 주세요.</p>
+          <button onClick={fetchOrders} style={styles.retryBtn}>다시 시도</button>
+        </div>
+      )}
+
       {/* Empty */}
-      {!loading && filteredOrders.length === 0 && (
+      {!loading && !loadError && filteredOrders.length === 0 && (
         <div style={styles.empty}>
           <Package size={48} color="#cbd5e1" />
           <h3 style={styles.emptyTitle}>주문 내역이 없습니다</h3>
@@ -282,7 +304,7 @@ export default function StoreOrdersPage() {
       )}
 
       {/* Desktop Table */}
-      {!loading && filteredOrders.length > 0 && (
+      {!loading && !loadError && filteredOrders.length > 0 && (
         <>
           <div style={styles.tableWrap} data-store-orders-table>
             <table style={styles.table}>
@@ -613,6 +635,17 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#6366f1',
     borderRadius: 8,
     textDecoration: 'none',
+  },
+  // IR/WO-O4O-NETURE-STORE-ORDERS-LIST-500-AND-LOAD-ERROR-CONTRACT-V1
+  retryBtn: {
+    marginTop: 16,
+    padding: '8px 16px',
+    fontSize: 14,
+    color: '#475569',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 8,
+    cursor: 'pointer',
   },
 
   // Message

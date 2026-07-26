@@ -12,6 +12,7 @@ import { api } from '../apiClient';
  * 실패는 고정 코드로 throw 하고 서버 원문은 console 로만 남긴다.
  * (supplier.ts 의 동일 패턴 — extractApiError 는 그쪽 모듈 전용이라 순환을 피해 여기 별도 정의)
  */
+export const STORE_ORDERS_LOAD_FAILED = 'STORE_ORDERS_LOAD_FAILED';
 export const STORE_ORDER_NOT_FOUND = 'STORE_ORDER_NOT_FOUND';
 export const STORE_ORDER_LOAD_FAILED = 'STORE_ORDER_LOAD_FAILED';
 export const STORE_SHIPMENT_ORDER_NOT_FOUND = 'STORE_SHIPMENT_ORDER_NOT_FOUND';
@@ -361,20 +362,35 @@ export const storeApi = {
     }
   },
 
+  /**
+   * IR/WO-O4O-NETURE-STORE-ORDERS-LIST-500-AND-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(seller.controller.ts:237): 정상이면 항상 `200 { success, data:[], meta }`.
+   * 정상 0건도 `data: []` 이므로, 실패를 빈 배열로 삼키면 "주문 내역이 없습니다" 와 구분되지 않는다.
+   */
   async getOrders(params?: { page?: number; limit?: number; status?: string }): Promise<StoreOrdersResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', String(params.page));
+    if (params?.limit) searchParams.set('limit', String(params.limit));
+    if (params?.status) searchParams.set('status', params.status);
+    const qs = searchParams.toString();
+
+    let response;
     try {
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.set('page', String(params.page));
-      if (params?.limit) searchParams.set('limit', String(params.limit));
-      if (params?.status) searchParams.set('status', params.status);
-      const qs = searchParams.toString();
-      const response = await api.get(`/neture/seller/orders${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/neture/seller/orders${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[Store API] Failed to fetch orders:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Store API] Failed to fetch orders:', describeApiError(error));
+      throw new Error(STORE_ORDERS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Store API] Unexpected orders payload shape');
+      throw new Error(STORE_ORDERS_LOAD_FAILED);
+    }
+    return {
+      data: result.data,
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
   /**

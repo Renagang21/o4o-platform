@@ -227,6 +227,24 @@ export class NetureRepository {
     sort?: string;
     order?: 'asc' | 'desc';
   }): Promise<{ orders: NetureOrder[]; total: number }> {
+    // IR/WO-O4O-NETURE-STORE-ORDERS-LIST-500-AND-LOAD-ERROR-CONTRACT-V1:
+    //   sort 는 API 상 컬럼명(snake_case)으로 들어오지만 TypeORM order 는 **엔티티 속성명**을 요구한다.
+    //   매핑 없이 넘기면 EntityPropertyNotFoundError 로 500 이 된다(= 목록 API 상시 500 의 원인).
+    //   화이트리스트 밖 값은 기본 정렬로 떨어뜨려 임의 입력이 500 을 만들지 못하게 한다.
+    const SORTABLE_FIELDS: Record<string, string> = {
+      created_at: 'createdAt',
+      createdAt: 'createdAt',
+      updated_at: 'updatedAt',
+      updatedAt: 'updatedAt',
+      order_number: 'orderNumber',
+      orderNumber: 'orderNumber',
+      total_amount: 'totalAmount',
+      totalAmount: 'totalAmount',
+      final_amount: 'finalAmount',
+      finalAmount: 'finalAmount',
+      status: 'status',
+    };
+
     const page = options.page || 1;
     const limit = options.limit || 20;
     const skip = (page - 1) * limit;
@@ -235,7 +253,7 @@ export class NetureRepository {
     if (options.userId) where.userId = options.userId;
     if (options.status) where.status = options.status;
 
-    const orderField = options.sort || 'createdAt';
+    const orderField = SORTABLE_FIELDS[options.sort ?? ''] ?? 'createdAt';
     const orderDir = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const [orders, total] = await this.orderRepo.findAndCount({
