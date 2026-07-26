@@ -5,10 +5,17 @@
  *
  * serviceKey + api 어댑터 주입. 목록(상태 필터/페이지) + 상세(본문/상태 변경/내부 메모).
  * 본문은 plain text(whitespace-pre-wrap) — dangerouslySetInnerHTML 미사용(XSS 회피).
- * 스타일: inline (서비스 Tailwind 비의존).
+ *
+ * WO-O4O-CROSS-SERVICE-RAW-TABLE-STANDARDIZATION-BATCH-V1:
+ *   raw <table> + inline style → 표준 `DataTable`(@o4o/operator-ux-core) + Tailwind 로 전환.
+ *   기존 헤더의 "스타일: inline (서비스 Tailwind 비의존)" 방침은 폐기되었다
+ *   (표준 Tailwind 통일 결정). 서비스별 차이는 props(title/inquiryTypeLabels)로만 처리하며
+ *   공용 컴포넌트 내부에 서비스 조건문·전용 CSS 를 두지 않는다.
+ *   목록은 선택 후 일괄 작업이 정의되어 있지 않으므로 체크박스/ActionBar 는 넣지 않는다.
  */
 
-import { type CSSProperties, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   CONTACT_STATUSES,
   type ContactInquiryDetail,
@@ -19,44 +26,26 @@ import {
 
 const STATUS_LABEL: Record<string, string> = Object.fromEntries(CONTACT_STATUSES.map((s) => [s.value, s.label]));
 
-const S = {
-  page: { maxWidth: 1000, margin: '0 auto', padding: '24px 16px' } as CSSProperties,
-  h1: { fontSize: 22, fontWeight: 700, color: '#0f172a', margin: '0 0 4px' } as CSSProperties,
-  lead: { color: '#64748b', fontSize: 13, margin: '0 0 16px' } as CSSProperties,
-  bar: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' } as CSSProperties,
-  select: { padding: '7px 10px', fontSize: 13, border: '1px solid #cbd5e1', borderRadius: 8 } as CSSProperties,
-  btnGhost: { padding: '6px 12px', fontSize: 13, fontWeight: 600, color: '#334155', background: '#fff', border: '1px solid #cbd5e1', borderRadius: 8, cursor: 'pointer' } as CSSProperties,
-  card: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' } as CSSProperties,
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: 13 } as CSSProperties,
-  th: { textAlign: 'left', padding: '9px 10px', color: '#64748b', fontWeight: 600, borderBottom: '1px solid #e2e8f0', fontSize: 12 } as CSSProperties,
-  td: { padding: '9px 10px', borderBottom: '1px solid #f1f5f9', color: '#334155' } as CSSProperties,
-  badge: (c: string, b: string): CSSProperties => ({ display: 'inline-block', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 600, color: c, background: b }),
-  state: { padding: '40px 0', textAlign: 'center', color: '#94a3b8', fontSize: 14 } as CSSProperties,
-  banner: (t: 'success' | 'error'): CSSProperties => ({ padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 14, background: t === 'success' ? '#ecfdf5' : '#fef2f2', color: t === 'success' ? '#047857' : '#b91c1c', border: `1px solid ${t === 'success' ? '#a7f3d0' : '#fecaca'}` }),
-  // detail panel
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.4)', display: 'flex', justifyContent: 'flex-end', zIndex: 50 } as CSSProperties,
-  drawer: { width: 'min(560px, 100%)', height: '100%', background: '#fff', overflowY: 'auto', padding: 24, boxSizing: 'border-box' } as CSSProperties,
-  dh: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 } as CSSProperties,
-  dTitle: { fontSize: 18, fontWeight: 700, color: '#0f172a', margin: 0 } as CSSProperties,
-  field: { marginBottom: 12 } as CSSProperties,
-  label: { display: 'block', fontSize: 12, color: '#64748b', marginBottom: 3 } as CSSProperties,
-  value: { fontSize: 14, color: '#1e293b' } as CSSProperties,
-  body: { fontSize: 14, color: '#1e293b', whiteSpace: 'pre-wrap', wordBreak: 'break-word', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12 } as CSSProperties,
-  textarea: { width: '100%', boxSizing: 'border-box', padding: '8px 10px', fontSize: 14, border: '1px solid #cbd5e1', borderRadius: 8, minHeight: 80, fontFamily: 'inherit' } as CSSProperties,
-  btnPrimary: { padding: '8px 16px', fontSize: 14, fontWeight: 600, color: '#fff', background: '#0f172a', border: 'none', borderRadius: 8, cursor: 'pointer' } as CSSProperties,
+const BTN_GHOST =
+  'px-3 py-1.5 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed';
+const FIELD_LABEL = 'block text-xs text-slate-500 mb-1';
+const FIELD_VALUE = 'text-sm text-slate-800';
+
+/** 상태 배지 — O4O 표준 배지 패턴(Tailwind 토큰) 재사용 */
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  received: 'bg-blue-100 text-blue-700',
+  in_review: 'bg-amber-100 text-amber-800',
+  answered: 'bg-emerald-50 text-emerald-700',
+  closed: 'bg-slate-100 text-slate-600',
+  spam: 'bg-red-50 text-red-700',
 };
 
 function statusBadge(status: string) {
   const label = STATUS_LABEL[status] || status;
-  const map: Record<string, [string, string]> = {
-    received: ['#1d4ed8', '#dbeafe'],
-    in_review: ['#92400e', '#fef3c7'],
-    answered: ['#047857', '#ecfdf5'],
-    closed: ['#475569', '#f1f5f9'],
-    spam: ['#b91c1c', '#fef2f2'],
-  };
-  const [c, b] = map[status] || ['#475569', '#f1f5f9'];
-  return <span style={S.badge(c, b)}>{label}</span>;
+  const cls = STATUS_BADGE_CLASS[status] || 'bg-slate-100 text-slate-600';
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${cls}`}>{label}</span>
+  );
 }
 
 function fmt(iso: string | null | undefined): string {
@@ -120,93 +109,151 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
     }
   };
 
+  const columns: ListColumnDef<ContactInquiryListItem>[] = [
+    { key: 'createdAt', header: '접수일', width: '150px', render: (_v, i) => fmt(i.createdAt) },
+    { key: 'inquiryType', header: '유형', width: '110px', render: (_v, i) => typeLabel(i.inquiryType) },
+    {
+      key: 'subject',
+      header: '제목',
+      minWidth: 200,
+      render: (_v, i) => (
+        <span className="block max-w-[240px] truncate" title={i.subject}>{i.subject}</span>
+      ),
+    },
+    { key: 'name', header: '이름', width: '110px', render: (_v, i) => i.name },
+    { key: 'organizationName', header: '소속', width: '140px', render: (_v, i) => i.organizationName || '-' },
+    { key: 'status', header: '상태', width: '100px', render: (_v, i) => statusBadge(i.status) },
+    { key: 'handledAt', header: '처리일', width: '150px', render: (_v, i) => (i.handledAt ? fmt(i.handledAt) : '-') },
+  ];
+
   return (
-    <div style={S.page}>
-      <h1 style={S.h1}>{title ?? '문의 관리'}</h1>
-      <p style={S.lead}>공개 문의(Contact)로 접수된 내역을 확인·처리합니다. 대상 서비스: <strong>{serviceKey}</strong></p>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <h1 className="text-xl font-bold text-slate-900 mb-1">{title ?? '문의 관리'}</h1>
+      <p className="text-sm text-slate-500 mb-4">
+        공개 문의(Contact)로 접수된 내역을 확인·처리합니다. 대상 서비스: <strong>{serviceKey}</strong>
+      </p>
 
-      {message && <div style={S.banner(message.type)}>{message.text}</div>}
+      {message && (
+        <div
+          className={`px-4 py-2.5 rounded-lg text-sm mb-4 border ${
+            message.type === 'success'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              : 'bg-red-50 text-red-700 border-red-200'
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
-      <div style={S.bar}>
-        <select style={S.select} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+      <div className="flex flex-wrap items-center gap-2 mb-3.5">
+        <select
+          className="px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg bg-white"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
           <option value="">전체 상태</option>
           {CONTACT_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
-        <button style={S.btnGhost} onClick={() => load(1)}>새로고침</button>
+        <button type="button" className={BTN_GHOST} onClick={() => load(1)}>새로고침</button>
       </div>
 
-      <div style={S.card}>
-        {loading ? <div style={S.state}>불러오는 중…</div> : !result || result.items.length === 0 ? (
-          <div style={S.state}>접수된 문의가 없습니다.</div>
-        ) : (
-          <table style={S.table}>
-            <thead>
-              <tr>
-                <th style={S.th}>접수일</th><th style={S.th}>유형</th><th style={S.th}>제목</th>
-                <th style={S.th}>이름</th><th style={S.th}>소속</th><th style={S.th}>상태</th><th style={S.th}>처리일</th>
-              </tr>
-            </thead>
-            <tbody>
-              {result.items.map((i: ContactInquiryListItem) => (
-                <tr key={i.id} style={{ cursor: 'pointer' }} onClick={() => openDetail(i.id)}>
-                  <td style={S.td}>{fmt(i.createdAt)}</td>
-                  <td style={S.td}>{typeLabel(i.inquiryType)}</td>
-                  <td style={{ ...S.td, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={i.subject}>{i.subject}</td>
-                  <td style={S.td}>{i.name}</td>
-                  <td style={S.td}>{i.organizationName || '-'}</td>
-                  <td style={S.td}>{statusBadge(i.status)}</td>
-                  <td style={S.td}>{i.handledAt ? fmt(i.handledAt) : '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <DataTable<ContactInquiryListItem>
+        columns={columns}
+        data={result?.items ?? []}
+        rowKey={(i) => i.id}
+        loading={loading}
+        emptyMessage="접수된 문의가 없습니다."
+        onRowClick={(i) => openDetail(i.id)}
+      />
 
       {result && result.pagination.totalPages > 1 && (
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center', marginTop: 14 }}>
-          <button style={S.btnGhost} disabled={result.pagination.page <= 1} onClick={() => load(result.pagination.page - 1)}>이전</button>
-          <span style={{ fontSize: 13, color: '#64748b' }}>{result.pagination.page} / {result.pagination.totalPages}</span>
-          <button style={S.btnGhost} disabled={result.pagination.page >= result.pagination.totalPages} onClick={() => load(result.pagination.page + 1)}>다음</button>
+        <div className="flex items-center justify-center gap-3 mt-3.5">
+          <button
+            type="button"
+            className={BTN_GHOST}
+            disabled={result.pagination.page <= 1}
+            onClick={() => load(result.pagination.page - 1)}
+          >
+            이전
+          </button>
+          <span className="text-sm text-slate-500">
+            {result.pagination.page} / {result.pagination.totalPages}
+          </span>
+          <button
+            type="button"
+            className={BTN_GHOST}
+            disabled={result.pagination.page >= result.pagination.totalPages}
+            onClick={() => load(result.pagination.page + 1)}
+          >
+            다음
+          </button>
         </div>
       )}
 
       {detail && (
-        <div style={S.overlay} onClick={() => setDetail(null)}>
-          <div style={S.drawer} onClick={(e) => e.stopPropagation()}>
-            <div style={S.dh}>
-              <h2 style={S.dTitle}>{detail.subject}</h2>
-              <button style={S.btnGhost} onClick={() => setDetail(null)}>닫기</button>
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-slate-900/40"
+          onClick={() => setDetail(null)}
+        >
+          <div
+            className="w-[min(560px,100%)] h-full bg-white overflow-y-auto p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <h2 className="text-lg font-bold text-slate-900 m-0">{detail.subject}</h2>
+              <button type="button" className={BTN_GHOST} onClick={() => setDetail(null)}>닫기</button>
             </div>
-            <div style={S.field}><span style={S.label}>유형</span><span style={S.value}>{typeLabel(detail.inquiryType)}</span></div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>이름</span><span style={S.value}>{detail.name}</span></div>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>이메일</span><span style={S.value}>{detail.email}</span></div>
-            </div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>연락처</span><span style={S.value}>{detail.phone || '-'}</span></div>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>소속</span><span style={S.value}>{detail.organizationName || '-'}</span></div>
-            </div>
-            <div style={S.field}><span style={S.label}>문의 내용</span><div style={S.body}>{detail.message}</div></div>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>접수일</span><span style={S.value}>{fmt(detail.createdAt)}</span></div>
-              <div style={{ ...S.field, flex: 1 }}><span style={S.label}>알림 상태</span><span style={S.value}>{detail.notificationStatus || '-'}</span></div>
-            </div>
-            {detail.sourcePath && <div style={S.field}><span style={S.label}>경로</span><span style={S.value}>{detail.sourcePath}</span></div>}
 
-            <div style={{ height: 1, background: '#e2e8f0', margin: '14px 0' }} />
+            <div className="mb-3"><span className={FIELD_LABEL}>유형</span><span className={FIELD_VALUE}>{typeLabel(detail.inquiryType)}</span></div>
+            <div className="flex gap-4">
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>이름</span><span className={FIELD_VALUE}>{detail.name}</span></div>
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>이메일</span><span className={FIELD_VALUE}>{detail.email}</span></div>
+            </div>
+            <div className="flex gap-4">
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>연락처</span><span className={FIELD_VALUE}>{detail.phone || '-'}</span></div>
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>소속</span><span className={FIELD_VALUE}>{detail.organizationName || '-'}</span></div>
+            </div>
+            <div className="mb-3">
+              <span className={FIELD_LABEL}>문의 내용</span>
+              {/* plain text 유지 — dangerouslySetInnerHTML 미사용(XSS 회피) */}
+              <div className="text-sm text-slate-800 whitespace-pre-wrap break-words bg-slate-50 border border-slate-200 rounded-lg p-3">
+                {detail.message}
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>접수일</span><span className={FIELD_VALUE}>{fmt(detail.createdAt)}</span></div>
+              <div className="mb-3 flex-1"><span className={FIELD_LABEL}>알림 상태</span><span className={FIELD_VALUE}>{detail.notificationStatus || '-'}</span></div>
+            </div>
+            {detail.sourcePath && (
+              <div className="mb-3"><span className={FIELD_LABEL}>경로</span><span className={FIELD_VALUE}>{detail.sourcePath}</span></div>
+            )}
 
-            <div style={S.field}>
-              <span style={S.label}>상태</span>
-              <select style={{ ...S.select, width: '100%' }} value={detailStatus} onChange={(e) => setDetailStatus(e.target.value)}>
+            <div className="h-px bg-slate-200 my-3.5" />
+
+            <div className="mb-3">
+              <span className={FIELD_LABEL}>상태</span>
+              <select
+                className="w-full px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg bg-white"
+                value={detailStatus}
+                onChange={(e) => setDetailStatus(e.target.value)}
+              >
                 {CONTACT_STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
-            <div style={S.field}>
-              <span style={S.label}>내부 메모</span>
-              <textarea style={S.textarea} value={detailNote} onChange={(e) => setDetailNote(e.target.value)} />
+            <div className="mb-3">
+              <span className={FIELD_LABEL}>내부 메모</span>
+              <textarea
+                className="w-full box-border px-2.5 py-2 text-sm border border-slate-300 rounded-lg min-h-20 font-[inherit]"
+                value={detailNote}
+                onChange={(e) => setDetailNote(e.target.value)}
+              />
             </div>
-            <button style={{ ...S.btnPrimary, opacity: saving ? 0.6 : 1 }} disabled={saving} onClick={handleSave}>
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 disabled:opacity-60"
+              disabled={saving}
+              onClick={handleSave}
+            >
               {saving ? '저장 중…' : '저장'}
             </button>
           </div>
