@@ -18,7 +18,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Store, Package, Truck, ExternalLink, User, ShieldCheck } from 'lucide-react';
 import { supplierApi, CARRIERS, getTrackingUrl, SHIPMENT_STATUS_LABELS } from '../../lib/api';
+import { SUPPLIER_SHIPMENT_ORDER_NOT_FOUND } from '../../lib/api/supplier';
 import type { StoreOrder, StoreOrderItem, Shipment } from '../../lib/api';
+
+/**
+ * WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1
+ * 배송 조회 상태는 주문 조회 상태와 독립적이다.
+ *   none            정상 미출고(200 + null)
+ *   success         배송 정보 존재
+ *   error           401·500·네트워크·깨진 payload — 실제 송장 유무를 알 수 없다
+ *   order-not-found 404 ORDER_NOT_FOUND — 주문 not-found 화면과 통합
+ */
+type ShipmentLoadState = 'idle' | 'loading' | 'none' | 'success' | 'error' | 'order-not-found';
 
 // ============================================================================
 // Status Config
@@ -111,30 +122,61 @@ export default function SupplierOrderDetailPage() {
 
   // Shipment state (WO-O4O-SHIPMENT-ENGINE-V1)
   const [shipment, setShipment] = useState<Shipment | null>(null);
+  const [shipmentState, setShipmentState] = useState<ShipmentLoadState>('idle');
   const [carrierCode, setCarrierCode] = useState('cj');
   const [trackingNumber, setTrackingNumber] = useState('');
   const [submittingShipment, setSubmittingShipment] = useState(false);
 
+  // WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1:
+  //   배송 조회는 주문 조회와 분리한다. 배송 실패가 주문 본문을 가리지 않도록
+  //   내부에서 상태만 세팅하고 throw 하지 않는다.
+  //     200 + null → 'none'(정상 미출고) / 200 + 객체 → 'success'
+  //     404        → 'order-not-found'(주문 not-found 화면과 통합)
+  //     그 외      → 'error'(배송 영역 전용 지속 오류)
+  const loadShipment = useCallback(async () => {
+    if (!id) return;
+    setShipmentState('loading');
+    try {
+      const data = await supplierApi.getShipment(id);
+      setShipment(data);
+      setShipmentState(data ? 'success' : 'none');
+    } catch (e) {
+      setShipment(null);
+      setShipmentState(
+        (e as Error)?.message === SUPPLIER_SHIPMENT_ORDER_NOT_FOUND ? 'order-not-found' : 'error',
+      );
+    }
+  }, [id]);
+
   // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
   //   getOrderById() 는 미존재(404)만 null 을 반환하고 조회 실패는 throw 한다.
   //   not-found 와 error 는 다른 상태다 — 하나로 합치지 않는다.
-  //   getShipment() 는 IR E 등급(미변경)이라 실패해도 배송정보만 비운다.
   const fetchOrder = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     setLoadError(false);
+    let orderData: StoreOrder | null = null;
     try {
-      const orderData = await supplierApi.getOrderById(id);
+      orderData = await supplierApi.getOrderById(id);
       setOrder(orderData);
-      setShipment(await supplierApi.getShipment(id).catch(() => null));
     } catch {
       setOrder(null);
       setShipment(null);
+      setShipmentState('idle');
       setLoadError(true);
-    } finally {
       setLoading(false);
+      return;
     }
-  }, [id]);
+    // 주문이 not-found 면 배송 조회는 의미가 없다.
+    if (!orderData) {
+      setShipment(null);
+      setShipmentState('idle');
+      setLoading(false);
+      return;
+    }
+    await loadShipment();
+    setLoading(false);
+  }, [id, loadShipment]);
 
   useEffect(() => {
     fetchOrder();
@@ -165,6 +207,13 @@ export default function SupplierOrderDetailPage() {
   // WO-O4O-SHIPMENT-ENGINE-V1: 송장 등록
   const handleCreateShipment = useCallback(async () => {
     if (!order || !trackingNumber.trim()) return;
+    // WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1:
+    //   조회 실패 상태에서는 기존 송장 존재 여부를 알 수 없으므로 등록을 허용하지 않는다.
+    if (shipmentState !== 'none') {
+      setMessage({ type: 'error', text: '배송 정보를 확인할 수 없어 처리할 수 없습니다.' });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
     const carrier = CARRIERS.find((c) => c.code === carrierCode);
     if (!carrier) return;
 
@@ -188,11 +237,18 @@ export default function SupplierOrderDetailPage() {
       setSubmittingShipment(false);
       setTimeout(() => setMessage(null), 3000);
     }
-  }, [order, carrierCode, trackingNumber, fetchOrder]);
+  }, [order, carrierCode, trackingNumber, fetchOrder, shipmentState]);
 
   // WO-O4O-SHIPMENT-ENGINE-V1: 배송 완료 처리
   const handleDeliverShipment = useCallback(async () => {
-    if (!shipment) return;
+    // WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1:
+    //   배송 조회가 실패한 상태에서는 실제 송장 유무를 알 수 없으므로 처리하지 않는다.
+    //   무성 return 으로 이유를 숨기지 않고 사유를 표시한다.
+    if (shipmentState !== 'success' || !shipment) {
+      setMessage({ type: 'error', text: '배송 정보를 확인할 수 없어 처리할 수 없습니다.' });
+      setTimeout(() => setMessage(null), 3000);
+      return;
+    }
 
     setSubmittingShipment(true);
     try {
@@ -209,7 +265,7 @@ export default function SupplierOrderDetailPage() {
       setSubmittingShipment(false);
       setTimeout(() => setMessage(null), 3000);
     }
-  }, [shipment, fetchOrder]);
+  }, [shipment, fetchOrder, shipmentState]);
 
   // Loading
   if (loading) {
@@ -245,7 +301,8 @@ export default function SupplierOrderDetailPage() {
   }
 
   // Not found — 미존재(404). 다시 시도 대상이 아니다.
-  if (!order) {
+  // 배송 조회의 404 ORDER_NOT_FOUND 도 같은 의미이므로 이 화면으로 통합한다.
+  if (!order || shipmentState === 'order-not-found') {
     return (
       <div style={styles.notFound}>
         <h2 style={styles.notFoundTitle}>주문을 찾을 수 없습니다</h2>
@@ -461,7 +518,28 @@ export default function SupplierOrderDetailPage() {
           </SectionCard>
 
           {/* 5. Shipment Management (WO-O4O-SHIPMENT-ENGINE-V1) */}
-          {order.status === 'preparing' && !shipment && (
+          {/* WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1:
+              배송 조회 실패는 "배송 정보 없음" 이 아니다. 섹션을 숨기지 않고 오류를 지속 표시하며,
+              송장 등록·배송완료 mutation 은 노출하지 않는다. */}
+          {shipmentState === 'loading' && (
+            <SectionCard title="배송 관리" icon={<Truck size={18} style={{ color: '#64748b' }} />}>
+              <p style={styles.shipmentHint}>배송 정보를 불러오는 중...</p>
+            </SectionCard>
+          )}
+
+          {shipmentState === 'error' && (
+            <SectionCard title="배송 관리" icon={<Truck size={18} style={{ color: '#64748b' }} />}>
+              <div style={styles.shipmentError}>
+                <p style={styles.shipmentErrorTitle}>배송 정보를 불러오지 못했습니다.</p>
+                <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주세요.</p>
+                <button onClick={loadShipment} style={styles.shipmentRetryButton}>
+                  다시 시도
+                </button>
+              </div>
+            </SectionCard>
+          )}
+
+          {order.status === 'preparing' && shipmentState === 'none' && (
             <SectionCard title="송장 등록" icon={<Truck size={18} style={{ color: '#64748b' }} />}>
               <div style={styles.shipmentForm}>
                 <div style={styles.formField}>
@@ -498,7 +576,7 @@ export default function SupplierOrderDetailPage() {
             </SectionCard>
           )}
 
-          {shipment && (
+          {shipmentState === 'success' && shipment && (
             <SectionCard title="배송 관리" icon={<Truck size={18} style={{ color: '#64748b' }} />}>
               <div style={styles.shipmentInfo}>
                 <div style={styles.shipmentRow}>
@@ -916,6 +994,40 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: '#94a3b8',
     margin: 0,
+  },
+  // WO-O4O-NETURE-SUPPLIER-SHIPMENT-LOAD-ERROR-CONTRACT-V1
+  shipmentError: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: '6px',
+    padding: '16px',
+    borderRadius: '8px',
+    border: '1px solid #fecaca',
+    backgroundColor: '#fef2f2',
+  },
+  shipmentErrorTitle: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#b91c1c',
+    margin: 0,
+    wordBreak: 'keep-all',
+  },
+  shipmentErrorText: {
+    fontSize: '13px',
+    color: '#7f1d1d',
+    margin: 0,
+    wordBreak: 'keep-all',
+  },
+  shipmentRetryButton: {
+    marginTop: '6px',
+    padding: '8px 16px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '14px',
+    cursor: 'pointer',
   },
   shipmentInfo: {
     display: 'flex',
